@@ -16,7 +16,7 @@ namespace Symfony\Component\Serializer\Mapping;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AttributeMetadata implements AttributeMetadataInterface
+class AttributeMetadata implements AttributeMetadataMemberInterface
 {
     /**
      * @var string
@@ -32,18 +32,18 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
+     *           {@link getMemberGroups()} instead.
      */
-    public $groups = array();
+    public $memberGroups = [];
 
     /**
      * @var int|null
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getMaxDepth()} instead.
+     *           {@link getMemberMaxDepth()} instead.
      */
-    public $maxDepth;
+    public $memberMaxDepth = [];
 
     /**
      * Constructs a metadata for the given attribute.
@@ -68,9 +68,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function addGroup($group)
     {
-        if (!in_array($group, $this->groups)) {
-            $this->groups[] = $group;
-        }
+        $this->addMemberGroup($this->name, $group);
     }
 
     /**
@@ -78,7 +76,39 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function getGroups()
     {
-        return $this->groups;
+        if (empty($this->memberGroups)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_merge(...array_values($this->memberGroups))));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addMemberGroup($memberName, $group)
+    {
+        if (!isset($this->memberGroups[$memberName])) {
+            $this->memberGroups[$memberName] = [];
+        }
+
+        if (!in_array($group, $this->memberGroups[$memberName])) {
+            $this->memberGroups[$memberName][] = $group;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMemberGroups() {
+        return $this->memberGroups;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroupsByMemberName($memberName) {
+        return $this->memberGroups[$memberName];
     }
 
     /**
@@ -86,7 +116,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function setMaxDepth($maxDepth)
     {
-        $this->maxDepth = $maxDepth;
+        $this->setMaxDepthByMemberName($this->name, $maxDepth);
     }
 
     /**
@@ -94,7 +124,35 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function getMaxDepth()
     {
-        return $this->maxDepth;
+        return end($this->memberMaxDepth);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMemberMaxDepth()
+    {
+        return $this->memberMaxDepth;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMaxDepthByMemberName($memberName, $maxDepth)
+    {
+        $this->memberMaxDepth[$memberName] = $maxDepth;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMaxDepthByMemberName($memberName)
+    {
+        if (!isset($this->memberMaxDepth[$memberName])) {
+            return null;
+        }
+
+        return $this->memberMaxDepth[$memberName];
     }
 
     /**
@@ -102,13 +160,20 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function merge(AttributeMetadataInterface $attributeMetadata)
     {
-        foreach ($attributeMetadata->getGroups() as $group) {
-            $this->addGroup($group);
+        if (!$attributeMetadata instanceof AttributeMetadataMemberInterface) {
+            throw new \LogicException("Can only merge instances of AttributeMetadataMemberInterface");
+        }
+        foreach ($attributeMetadata->getMemberGroups() as $memberName => $groups) {
+            foreach ($groups as $group) {
+                $this->addMemberGroup($memberName, $group);
+            }
         }
 
         // Overwrite only if not defined
-        if (null === $this->maxDepth) {
-            $this->maxDepth = $attributeMetadata->getMaxDepth();
+        if ([] === $this->memberMaxDepth) {
+            foreach ($attributeMetadata->getMemberMaxDepth() as $memberName => $maxDepth) {
+                $this->setMaxDepthByMemberName($memberName, $maxDepth);
+            }
         }
     }
 
@@ -119,6 +184,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep()
     {
-        return array('name', 'groups', 'maxDepth');
+        return array('name', 'memberGroups', 'memberMaxDepth');
     }
 }

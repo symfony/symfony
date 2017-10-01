@@ -70,8 +70,6 @@ class Collator
     const SORT_STRING = 1;
 
     /**
-     * Constructor.
-     *
      * @param string $locale The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      *
      * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed

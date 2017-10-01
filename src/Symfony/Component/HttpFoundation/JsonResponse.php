@@ -32,8 +32,6 @@ class JsonResponse extends Response
     protected $encodingOptions = 15;
 
     /**
-     * Constructor.
-     *
      * @param mixed $data    The response data
      * @param int   $status  The response status code
      * @param array $headers An array of response headers

@@ -32,8 +32,6 @@ class LdapClient implements LdapClientInterface
     private $connection;
 
     /**
-     * Constructor.
-     *
      * @param string $host
      * @param int    $port
      * @param int    $version

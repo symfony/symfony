@@ -35,8 +35,6 @@ class RegisterListenersPass implements CompilerPassInterface
     protected $subscriberTag;
 
     /**
-     * Constructor.
-     *
      * @param string $dispatcherService Service name of the event dispatcher in processed container
      * @param string $listenerTag       Tag name used for listener
      * @param string $subscriberTag     Tag name used for subscribers

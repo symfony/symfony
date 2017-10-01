@@ -20,8 +20,6 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
 /**
- * SecurityDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SecurityDataCollector extends DataCollector
@@ -31,8 +29,6 @@ class SecurityDataCollector extends DataCollector
     private $logoutUrlGenerator;
 
     /**
-     * Constructor.
-     *
      * @param TokenStorageInterface|null  $tokenStorage
      * @param RoleHierarchyInterface|null $roleHierarchy
      * @param LogoutUrlGenerator|null     $logoutUrlGenerator

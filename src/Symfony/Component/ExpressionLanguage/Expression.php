@@ -21,8 +21,6 @@ class Expression
     protected $expression;
 
     /**
-     * Constructor.
-     *
      * @param string $expression An expression
      */
     public function __construct($expression)

@@ -826,8 +826,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 $bagClass
 
 /*{$this->docStar}
- * $class.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  */
@@ -851,9 +849,6 @@ EOF;
 
         $code = <<<EOF
 
-    /*{$this->docStar}
-     * Constructor.
-     */
     public function __construct()
     {{$targetDirs}
         parent::__construct($arguments);
@@ -888,9 +883,6 @@ EOF;
 
         $code = <<<EOF
 
-    /*{$this->docStar}
-     * Constructor.
-     */
     public function __construct()
     {{$targetDirs}
 EOF;

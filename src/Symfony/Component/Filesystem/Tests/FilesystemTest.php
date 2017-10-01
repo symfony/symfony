@@ -374,16 +374,13 @@ class FilesystemTest extends FilesystemTestCase
      */
     public function testFilesExistsFails()
     {
-        if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Test covers edge case on Windows only.');
-        }
-
         $basePath = $this->workspace.'\\directory\\';
+        $maxPathLength = PHP_MAXPATHLEN - 2;
 
         $oldPath = getcwd();
         mkdir($basePath);
         chdir($basePath);
-        $file = str_repeat('T', 259 - strlen($basePath));
+        $file = str_repeat('T', $maxPathLength - strlen($basePath) + 1);
         $path = $basePath.$file;
         exec('TYPE NUL >>'.$file); // equivalent of touch, we can not use the php touch() here because it suffers from the same limitation
         $this->longPathNamesWindows[] = $path; // save this so we can clean up later
@@ -850,6 +847,7 @@ class FilesystemTest extends FilesystemTestCase
             array('/var/lib/symfony/src/Symfony', '/var/lib/symfony/src/Symfony/Component/', '../'),
             array('var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../'),
             array('/usr/lib/symfony/', '/var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
+            array('usr/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
             array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/', 'src/Symfony/'),
             array('/aa/bb', '/aa/bb', './'),
             array('/aa/bb', '/aa/bb/', './'),
@@ -881,6 +879,17 @@ class FilesystemTest extends FilesystemTestCase
             array('C:/aa/bb/../../cc', 'C:/aa/../dd/..', 'cc/'),
             array('C:/../aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'),
             array('C:/../../aa/../bb/cc', 'C:/aa/dd/..', '../bb/cc/'),
+            array('aa/bb', 'aa/cc', '../bb/'),
+            array('aa/cc', 'bb/cc', '../../aa/cc/'),
+            array('aa/bb', 'aa/./cc', '../bb/'),
+            array('aa/./bb', 'aa/cc', '../bb/'),
+            array('aa/./bb', 'aa/./cc', '../bb/'),
+            array('../../', '../../', './'),
+            array('../aa/bb/', 'aa/bb/', '../../../aa/bb/'),
+            array('../../../', '../../', '../'),
+            array('', '', './'),
+            array('', 'aa/', '../'),
+            array('aa/', '', 'aa/'),
         );
 
         if ('\\' === DIRECTORY_SEPARATOR) {

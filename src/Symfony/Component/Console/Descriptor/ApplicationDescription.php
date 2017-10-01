@@ -50,8 +50,6 @@ class ApplicationDescription
     private $aliases;
 
     /**
-     * Constructor.
-     *
      * @param Application $application
      * @param string|null $namespace
      */

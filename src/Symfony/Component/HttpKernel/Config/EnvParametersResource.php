@@ -31,8 +31,6 @@ class EnvParametersResource implements SelfCheckingResourceInterface, \Serializa
     private $variables;
 
     /**
-     * Constructor.
-     *
      * @param string $prefix
      */
     public function __construct($prefix)

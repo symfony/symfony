@@ -44,8 +44,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     private $userProviders;
 
     /**
-     * Constructor.
-     *
      * @param array           $userProviders
      * @param string          $secret
      * @param string          $providerKey

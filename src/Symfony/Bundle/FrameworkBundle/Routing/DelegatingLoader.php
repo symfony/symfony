@@ -32,8 +32,6 @@ class DelegatingLoader extends BaseDelegatingLoader
     private $loading = false;
 
     /**
-     * Constructor.
-     *
      * Ability to pass a LoggerInterface instance as second argument will be removed in 3.0.
      *
      * @param ControllerNameParser    $parser   A ControllerNameParser instance
@@ -92,7 +90,7 @@ class DelegatingLoader extends BaseDelegatingLoader
         $this->loading = false;
 
         foreach ($collection->all() as $route) {
-            if (!$controller = $route->getDefault('_controller')) {
+            if (!is_string($controller = $route->getDefault('_controller')) || !$controller) {
                 continue;
             }
 

@@ -45,8 +45,6 @@ abstract class Client
     private $isMainRequest = true;
 
     /**
-     * Constructor.
-     *
      * @param array     $server    The server parameters (equivalent of $_SERVER)
      * @param History   $history   A History instance to store the browser history
      * @param CookieJar $cookieJar A CookieJar instance to store the cookies

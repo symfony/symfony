@@ -35,8 +35,6 @@ class FragmentListener implements EventSubscriberInterface
     private $fragmentPath;
 
     /**
-     * Constructor.
-     *
      * @param UriSigner $signer       A UriSigner instance
      * @param string    $fragmentPath The path that triggers this listener
      */

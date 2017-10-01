@@ -45,8 +45,6 @@ class Specificity
     private $c;
 
     /**
-     * Constructor.
-     *
      * @param int $a
      * @param int $b
      * @param int $c

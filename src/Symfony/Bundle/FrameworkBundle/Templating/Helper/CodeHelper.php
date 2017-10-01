@@ -14,8 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
- * CodeHelper.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CodeHelper extends Helper
@@ -25,8 +23,6 @@ class CodeHelper extends Helper
     protected $charset;
 
     /**
-     * Constructor.
-     *
      * @param string $fileLinkFormat The format for links to source files
      * @param string $rootDir        The project root directory
      * @param string $charset        The charset

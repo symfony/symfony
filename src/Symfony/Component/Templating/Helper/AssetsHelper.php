@@ -33,8 +33,6 @@ use Symfony\Component\Templating\Asset\UrlPackage;
 class AssetsHelper extends CoreAssetsHelper
 {
     /**
-     * Constructor.
-     *
      * @param string       $basePath      The base path
      * @param string|array $baseUrls      Base asset URLs
      * @param string       $version       The asset version

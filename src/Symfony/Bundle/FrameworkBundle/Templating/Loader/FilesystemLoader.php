@@ -26,8 +26,6 @@ class FilesystemLoader implements LoaderInterface
     protected $locator;
 
     /**
-     * Constructor.
-     *
      * @param FileLocatorInterface $locator A FileLocatorInterface instance
      */
     public function __construct(FileLocatorInterface $locator)

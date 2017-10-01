@@ -34,8 +34,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     private $tokenProvider;
 
     /**
-     * Constructor.
-     *
      * Note: The $secureRandom parameter is deprecated since version 2.8 and will be removed in 3.0.
      *
      * @param array                 $userProviders

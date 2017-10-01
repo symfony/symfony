@@ -40,8 +40,6 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     private $redis;
 
     /**
-     * Constructor.
-     *
      * @param string $dsn      A data source name
      * @param string $username Not used
      * @param string $password Not used

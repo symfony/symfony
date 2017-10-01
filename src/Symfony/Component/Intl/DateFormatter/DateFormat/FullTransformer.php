@@ -37,8 +37,6 @@ class FullTransformer
     private $timezone;
 
     /**
-     * Constructor.
-     *
      * @param string $pattern  The pattern to be used to format and/or parse values
      * @param string $timezone The timezone to perform the date/time calculations
      */

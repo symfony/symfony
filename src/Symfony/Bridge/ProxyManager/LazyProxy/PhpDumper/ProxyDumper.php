@@ -41,8 +41,6 @@ class ProxyDumper implements DumperInterface
     private $classGenerator;
 
     /**
-     * Constructor.
-     *
      * @param string $salt
      */
     public function __construct($salt = '')

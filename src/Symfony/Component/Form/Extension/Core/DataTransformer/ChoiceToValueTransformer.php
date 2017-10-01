@@ -23,8 +23,6 @@ class ChoiceToValueTransformer implements DataTransformerInterface
     private $choiceList;
 
     /**
-     * Constructor.
-     *
      * @param ChoiceListInterface $choiceList
      */
     public function __construct(ChoiceListInterface $choiceList)

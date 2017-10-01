@@ -40,8 +40,6 @@ class FragmentHandler
     private $requestStack;
 
     /**
-     * Constructor.
-     *
      * RequestStack will become required in 3.0.
      *
      * @param RequestStack                $requestStack The Request stack that controls the lifecycle of requests

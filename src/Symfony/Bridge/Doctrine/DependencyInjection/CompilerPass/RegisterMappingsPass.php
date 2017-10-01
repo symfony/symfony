@@ -97,8 +97,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     private $aliasMap;
 
     /**
-     * Constructor.
-     *
      * The $managerParameters is an ordered list of container parameters that could provide the
      * name of the manager to register these namespaces and alias on. The first non-empty name
      * is used, the others skipped.

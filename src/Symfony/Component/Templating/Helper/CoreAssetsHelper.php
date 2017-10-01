@@ -35,8 +35,6 @@ class CoreAssetsHelper extends Helper implements PackageInterface
     protected $namedPackages = array();
 
     /**
-     * Constructor.
-     *
      * @param PackageInterface $defaultPackage The default package
      * @param array            $namedPackages  Additional packages indexed by name
      */

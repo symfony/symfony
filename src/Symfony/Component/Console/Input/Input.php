@@ -36,8 +36,6 @@ abstract class Input implements InputInterface
     protected $interactive = true;
 
     /**
-     * Constructor.
-     *
      * @param InputDefinition|null $definition A InputDefinition instance
      */
     public function __construct(InputDefinition $definition = null)

@@ -35,8 +35,6 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
     private $dnString;
 
     /**
-     * Constructor.
-     *
      * @param UserProviderInterface $userProvider               A UserProvider
      * @param UserCheckerInterface  $userChecker                A UserChecker
      * @param string                $providerKey                The provider key

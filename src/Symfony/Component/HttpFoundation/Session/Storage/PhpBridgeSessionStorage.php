@@ -22,8 +22,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandle
 class PhpBridgeSessionStorage extends NativeSessionStorage
 {
     /**
-     * Constructor.
-     *
      * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
      * @param MetadataBag                                                      $metaBag MetadataBag
      */

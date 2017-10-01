@@ -34,8 +34,6 @@ class DebugClassLoader
     private static $darwinCache = array('/' => array('/', array()));
 
     /**
-     * Constructor.
-     *
      * @param callable|object $classLoader Passing an object is @deprecated since version 2.5 and support for it will be removed in 3.0
      */
     public function __construct($classLoader)

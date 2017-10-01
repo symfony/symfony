@@ -29,8 +29,6 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
     protected $lifetime;
 
     /**
-     * Constructor.
-     *
      * @param string $dsn      A data source name
      * @param string $username
      * @param string $password

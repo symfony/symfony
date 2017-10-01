@@ -22,8 +22,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 /**
- * ProfilerController.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ProfilerController
@@ -36,8 +34,6 @@ class ProfilerController
     private $toolbarPosition;
 
     /**
-     * Constructor.
-     *
      * @param UrlGeneratorInterface $generator       The URL Generator
      * @param Profiler              $profiler        The profiler
      * @param Environment           $twig            The twig environment

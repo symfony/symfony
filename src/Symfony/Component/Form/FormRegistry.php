@@ -50,8 +50,6 @@ class FormRegistry implements FormRegistryInterface
     private $resolvedTypeFactory;
 
     /**
-     * Constructor.
-     *
      * @param FormExtensionInterface[]         $extensions          An array of FormExtensionInterface
      * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types
      *

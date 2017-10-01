@@ -28,15 +28,17 @@ class TestClassMetadataFactory
         $expected->addAttributeMetadata($foo);
 
         $bar = new AttributeMetadata('bar');
-        $bar->addGroup('b');
-        $bar->addGroup('c');
-        $bar->addGroup('name_converter');
+        $bar->addMemberGroup('bar', 'b');
+        $bar->addMemberGroup('bar', 'c');
+        $bar->addMemberGroup('bar', 'name_converter');
+        $bar->addMemberGroup('setBar', 'b');
+        $bar->addMemberGroup('getBar', 'c');
         $expected->addAttributeMetadata($bar);
 
         $fooBar = new AttributeMetadata('fooBar');
-        $fooBar->addGroup('a');
-        $fooBar->addGroup('b');
-        $fooBar->addGroup('name_converter');
+        $fooBar->addMemberGroup('isFooBar', 'a');
+        $fooBar->addMemberGroup('isFooBar', 'b');
+        $fooBar->addMemberGroup('isFooBar', 'name_converter');
         $expected->addAttributeMetadata($fooBar);
 
         $symfony = new AttributeMetadata('symfony');
@@ -48,14 +50,14 @@ class TestClassMetadataFactory
             $expected->addAttributeMetadata($kevin);
 
             $coopTilleuls = new AttributeMetadata('coopTilleuls');
-            $coopTilleuls->addGroup('a');
-            $coopTilleuls->addGroup('b');
+            $coopTilleuls->addMemberGroup('getCoopTilleuls', 'a');
+            $coopTilleuls->addMemberGroup('getCoopTilleuls', 'b');
             $expected->addAttributeMetadata($coopTilleuls);
         }
 
         if ($withInterface) {
-            $symfony->addGroup('a');
-            $symfony->addGroup('name_converter');
+            $symfony->addMemberGroup('getSymfony', 'a');
+            $symfony->addMemberGroup('getSymfony', 'name_converter');
         }
 
         // load reflection class so that the comparison passes

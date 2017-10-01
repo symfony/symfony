@@ -59,10 +59,10 @@ class AnnotationLoader implements LoaderInterface
                 foreach ($this->reader->getPropertyAnnotations($property) as $annotation) {
                     if ($annotation instanceof Groups) {
                         foreach ($annotation->getGroups() as $group) {
-                            $attributesMetadata[$property->name]->addGroup($group);
+                            $attributesMetadata[$property->name]->addMemberGroup($property->name, $group);
                         }
                     } elseif ($annotation instanceof MaxDepth) {
-                        $attributesMetadata[$property->name]->setMaxDepth($annotation->getMaxDepth());
+                        $attributesMetadata[$property->name]->setMaxDepthByMemberName($property->name, $annotation->getMaxDepth());
                     }
 
                     $loaded = true;
@@ -94,14 +94,14 @@ class AnnotationLoader implements LoaderInterface
                     }
 
                     foreach ($annotation->getGroups() as $group) {
-                        $attributeMetadata->addGroup($group);
+                        $attributeMetadata->addMemberGroup($method->name, $group);
                     }
                 } elseif ($annotation instanceof MaxDepth) {
                     if (!$accessorOrMutator) {
                         throw new MappingException(sprintf('MaxDepth on "%s::%s" cannot be added. MaxDepth can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                     }
 
-                    $attributeMetadata->setMaxDepth($annotation->getMaxDepth());
+                    $attributeMetadata->setMaxDepthByMemberName($method->name, $annotation->getMaxDepth());
                 }
 
                 $loaded = true;

@@ -16,6 +16,8 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
+use Symfony\Component\Form\Tests\Fixtures\FormWithSameParentTypeAsObject;
+use Symfony\Component\Form\Tests\Fixtures\FormWithSameParentTypeAsString;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
@@ -154,6 +156,32 @@ class FormRegistryTest extends TestCase
             ->willReturn($resolvedType);
 
         $this->assertSame($resolvedType, $this->registry->getType(get_class($type)));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
+     * @expectedExceptionMessage Form "foo_type" cannot have itself as a parent.
+     */
+    public function testFormCannotHaveItselfAsAParent()
+    {
+        $type = new FormWithSameParentTypeAsString();
+
+        $this->extension2->addType($type);
+
+        $this->registry->getType('foo_type');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\LogicException
+     * @expectedExceptionMessage Form "foo_type" cannot have itself as a parent.
+     */
+    public function testFormCannotHaveItselfAsAParentIfGetParentReturnsInstance()
+    {
+        $type = new FormWithSameParentTypeAsObject();
+
+        $this->extension2->addType($type);
+
+        $this->registry->getType('foo_type');
     }
 
     /**

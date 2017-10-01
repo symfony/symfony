@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\ExceptionInterface;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
@@ -102,6 +103,14 @@ class FormRegistry implements FormRegistryInterface
      */
     private function resolveType(FormTypeInterface $type)
     {
+            if ($parentType->getName() === $type->getName()) {
+                throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
+            }
+
+        }
+
+        if ($parentType === $type->getName()) {
+            throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
         $typeExtensions = array();
         $parentType = $type->getParent();
         $fqcn = get_class($type);

@@ -135,8 +135,6 @@ final class CacheItem implements CacheItemInterface
      * Returns the list of tags bound to the value coming from the pool storage if any.
      *
      * @return array
-     *
-     * @experimental in version 3.3
      */
     public function getPreviousTags()
     {

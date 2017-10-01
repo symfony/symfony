@@ -25,6 +25,7 @@ class TestClassMetadataFactory
 
         $foo = new AttributeMetadata('foo');
         $foo->addGroup('a');
+        $foo->addMemberGroup('setFoo', 'a');
         $expected->addAttributeMetadata($foo);
 
         $bar = new AttributeMetadata('bar');
@@ -39,10 +40,12 @@ class TestClassMetadataFactory
         $fooBar->addMemberGroup('isFooBar', 'a');
         $fooBar->addMemberGroup('isFooBar', 'b');
         $fooBar->addMemberGroup('isFooBar', 'name_converter');
+        $fooBar->addMemberGroup('setFooBar', 'name_converter');
         $expected->addAttributeMetadata($fooBar);
 
         $symfony = new AttributeMetadata('symfony');
         $expected->addAttributeMetadata($symfony);
+        $symfony->addMemberGroup('setSymfony', 'name_converter');
 
         if ($withParent) {
             $kevin = new AttributeMetadata('kevin');

@@ -102,7 +102,6 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     {
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
-        $attributeMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($object)->getAttributesMetadata() : [];
 
         $attributes = array();
         foreach ($reflectionMethods as $method) {
@@ -111,20 +110,39 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
             }
 
             $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
-            $groups = array_key_exists($attributeName, $attributeMetadata) ? $attributeMetadata[$attributeName]->getGroupsByMemberName($method->name) : [];
 
-            // If using groups, ensure that the method has the group.
-            if (isset($context[static::GROUPS]) && is_array($context[static::GROUPS])) {
-                if (count(array_intersect($groups, $context[static::GROUPS])) && $this->isAllowedAttribute($object, $attributeName)) {
-                    $attributes[] = $attributeName;
-                }
-            }
-            elseif ($this->isAllowedAttribute($object, $attributeName)) {
+            if ($this->isMethodAllowed($object, $attributeName, $method->name, $context)) {
                 $attributes[] = $attributeName;
             }
         }
 
         return $attributes;
+    }
+
+    /**
+     * Determine if the method is allowed.
+     *
+     * @param object $object
+     * @param string $attributeName
+     * @param string $methodName
+     * @param array $context
+     *
+     * @return bool
+     */
+    protected function isMethodAllowed($object, $attributeName, $methodName, $context = array()) {
+        $attributeMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($object)->getAttributesMetadata() : [];
+
+        $groups = array_key_exists($attributeName, $attributeMetadata) ? $attributeMetadata[$attributeName]->getGroupsByMemberName($methodName) : [];
+        if (isset($context[static::GROUPS]) && is_array($context[static::GROUPS])) {
+            if (count(array_intersect($groups, $context[static::GROUPS])) && $this->isAllowedAttribute($object, $attributeName)) {
+                return true;
+            }
+        }
+        else if ($this->isAllowedAttribute($object, $attributeName)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -157,6 +175,10 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     {
         $setter = 'set'.ucfirst($attribute);
         $key = get_class($object).':'.$setter;
+
+        if (!$this->isMethodAllowed($object, $attribute, $setter, $context)) {
+            return;
+        }
 
         if (!isset(self::$setterAccessibleCache[$key])) {
             self::$setterAccessibleCache[$key] = is_callable(array($object, $setter)) && !(new \ReflectionMethod($object, $setter))->isStatic();

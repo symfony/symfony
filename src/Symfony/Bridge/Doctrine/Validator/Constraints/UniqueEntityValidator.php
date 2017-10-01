@@ -171,6 +171,7 @@ class UniqueEntityValidator extends ConstraintValidator
             ->setParameter('{{ value }}', $this->formatWithIdentifiers($em, $class, $invalidValue))
             ->setInvalidValue($invalidValue)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
+            ->setCause($result)
             ->addViolation();
     }
 

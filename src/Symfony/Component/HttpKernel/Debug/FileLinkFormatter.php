@@ -23,11 +23,14 @@ class FileLinkFormatter implements \Serializable
 {
     private $fileLinkFormat;
     private $requestStack;
-    private $router;
+    private $urlGenerator;
     private $baseDir;
     private $queryString;
 
-    public function __construct($fileLinkFormat = null, RequestStack $requestStack = null, $baseDir = null, $queryString = null, UrlGeneratorInterface $router = null)
+    /**
+     * @param $urlGenerator UrlGeneratorInterface
+     */
+    public function __construct($fileLinkFormat = null, $urlGenerator = null, $baseDir = null, $queryString = null)
     {
         $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         if ($fileLinkFormat && !is_array($fileLinkFormat)) {
@@ -36,10 +39,17 @@ class FileLinkFormatter implements \Serializable
         }
 
         $this->fileLinkFormat = $fileLinkFormat;
-        $this->requestStack = $requestStack;
-        $this->router = $router;
         $this->baseDir = $baseDir;
         $this->queryString = $queryString;
+
+        if ($urlGenerator instanceof RequestStack) {
+            @trigger_error(sprintf('Passing a RequestStack to %s() as a second argument is deprecated since version 3.4 and will be unsupported in 4.0. Pass a UrlGeneratorInterface instead.', __METHOD__), E_USER_DEPRECATED);
+            $this->requestStack = $urlGenerator;
+        } elseif ($urlGenerator instanceof UrlGeneratorInterface) {
+            $this->urlGenerator = $urlGenerator;
+        } elseif (null !== $urlGenerator) {
+            throw new \InvalidArgumentException('The second argument of %s() must either implement UrlGeneratorInterface or RequestStack.');
+        }
     }
 
     public function format($file, $line)
@@ -78,9 +88,9 @@ class FileLinkFormatter implements \Serializable
             return $this->fileLinkFormat;
         }
 
-        if (null !== $this->router) {
+        if (null !== $this->urlGenerator) {
             return array(
-                $this->router->generate('_profiler_open_file').$this->queryString,
+                $this->urlGenerator->generate('_profiler_open_file').$this->queryString,
                 $this->baseDir.DIRECTORY_SEPARATOR, '',
             );
         }

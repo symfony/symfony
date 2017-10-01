@@ -38,6 +38,9 @@ class FileLinkFormatterTest extends TestCase
         $this->assertSame("debug://open?url=file://$file&line=3", $sut->format($file, 3));
     }
 
+    /**
+     * @group legacy
+     */
     public function testWhenFileLinkFormatAndRequestStack()
     {
         $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
@@ -55,9 +58,8 @@ class FileLinkFormatterTest extends TestCase
     {
         $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
         $baseDir = __DIR__;
-        $router = $this->getRouter();
 
-        $sut = new FileLinkFormatter('debug://open?url=file://%f&line=%l', null, $baseDir, '/_profiler/open?file=%f&line=%l#line%l', $router);
+        $sut = new FileLinkFormatter('debug://open?url=file://%f&line=%l', $this->getUrlGenerator(), $baseDir, '/_profiler/open?file=%f&line=%l#line%l');
 
         $this->assertSame("debug://open?url=file://$file&line=3", $sut->format($file, 3));
     }
@@ -66,14 +68,13 @@ class FileLinkFormatterTest extends TestCase
     {
         $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
         $baseDir = __DIR__;
-        $router = $this->getRouter();
 
-        $sut = new FileLinkFormatter(null, null, $baseDir, '?file=%f&line=%l#line%l', $router);
+        $sut = new FileLinkFormatter(null, $this->getUrlGenerator(), $baseDir, '?file=%f&line=%l#line%l');
 
         $this->assertSame('/_profiler_customized?file=file.php&line=3#line3', $sut->format($file, 3));
     }
 
-    private function getRouter()
+    private function getUrlGenerator()
     {
         $routes = new RouteCollection();
         $routes->add('_profiler_open_file', new Route('/_profiler_customized'));

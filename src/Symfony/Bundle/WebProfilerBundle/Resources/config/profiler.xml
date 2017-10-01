@@ -54,10 +54,9 @@
 
         <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter">
             <argument>%debug.file_link_format%</argument>
-            <argument type="service" id="request_stack" on-invalid="ignore" />
+            <argument type="service" id="router" on-invalid="null" />
             <argument>null</argument>
             <argument>?file=%%f&amp;line=%%l#line%%l</argument>
-            <argument type="service" id="router" on-invalid="null" />
         </service>
     </services>
 </container>

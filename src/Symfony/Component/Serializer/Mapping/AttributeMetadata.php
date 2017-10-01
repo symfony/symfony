@@ -34,7 +34,7 @@ class AttributeMetadata implements AttributeMetadataMemberInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getMemberGroups()} instead.
      */
-    public $memberGroups = [];
+    public $memberGroups = array();
 
     /**
      * @var int|null
@@ -43,7 +43,7 @@ class AttributeMetadata implements AttributeMetadataMemberInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getMemberMaxDepth()} instead.
      */
-    public $memberMaxDepth = [];
+    public $memberMaxDepth = array();
 
     /**
      * Constructs a metadata for the given attribute.
@@ -77,7 +77,7 @@ class AttributeMetadata implements AttributeMetadataMemberInterface
     public function getGroups()
     {
         if (empty($this->memberGroups)) {
-            return [];
+            return array();
         }
 
         return array_values(array_unique(array_merge(...array_values($this->memberGroups))));
@@ -89,7 +89,7 @@ class AttributeMetadata implements AttributeMetadataMemberInterface
     public function addMemberGroup($memberName, $group)
     {
         if (!isset($this->memberGroups[$memberName])) {
-            $this->memberGroups[$memberName] = [];
+            $this->memberGroups[$memberName] = array();
         }
 
         if (!in_array($group, $this->memberGroups[$memberName])) {
@@ -100,16 +100,18 @@ class AttributeMetadata implements AttributeMetadataMemberInterface
     /**
      * {@inheritdoc}
      */
-    public function getMemberGroups() {
+    public function getMemberGroups()
+    {
         return $this->memberGroups;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getGroupsByMemberName($memberName) {
+    public function getGroupsByMemberName($memberName)
+    {
         if (!isset($this->memberGroups[$memberName])) {
-            return [];
+            return array();
         }
 
         return $this->memberGroups[$memberName];
@@ -165,7 +167,7 @@ class AttributeMetadata implements AttributeMetadataMemberInterface
     public function merge(AttributeMetadataInterface $attributeMetadata)
     {
         if (!$attributeMetadata instanceof AttributeMetadataMemberInterface) {
-            throw new \LogicException("Can only merge instances of AttributeMetadataMemberInterface");
+            throw new \LogicException('Can only merge instances of AttributeMetadataMemberInterface');
         }
         foreach ($attributeMetadata->getMemberGroups() as $memberName => $groups) {
             foreach ($groups as $group) {
@@ -174,7 +176,7 @@ class AttributeMetadata implements AttributeMetadataMemberInterface
         }
 
         // Overwrite only if not defined
-        if ([] === $this->memberMaxDepth) {
+        if (array() === $this->memberMaxDepth) {
             foreach ($attributeMetadata->getMemberMaxDepth() as $memberName => $maxDepth) {
                 $this->setMaxDepthByMemberName($memberName, $maxDepth);
             }

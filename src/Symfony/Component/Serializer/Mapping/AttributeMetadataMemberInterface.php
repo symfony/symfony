@@ -22,7 +22,6 @@ namespace Symfony\Component\Serializer\Mapping;
  */
 interface AttributeMetadataMemberInterface extends AttributeMetadataInterface
 {
-
     /**
      * Adds this attribute to the given group.
      *
@@ -41,7 +40,7 @@ interface AttributeMetadataMemberInterface extends AttributeMetadataInterface
     /**
      * Sets the serialization max depth for this attribute.
      *
-     * @param string $memberName
+     * @param string   $memberName
      * @param int|null $maxDepth
      */
     public function setMaxDepthByMemberName($memberName, $maxDepth);

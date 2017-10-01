@@ -3,12 +3,12 @@
 [33m----------------------------------------------------------------[39m
 
  BirthdayType, ButtonType, CheckboxType, ChoiceType, CollectionType
- CountryType, CurrencyType, DateIntervalType, DateTimeType, DateType
- EmailType, FileType, FormType, HiddenType, IntegerType
- LanguageType, LocaleType, MoneyType, NumberType, PasswordType
- PercentType, RadioType, RangeType, RepeatedType, ResetType
- SearchType, SubmitType, TextType, TextareaType, TimeType
- TimezoneType, UrlType
+ ColorType, CountryType, CurrencyType, DateIntervalType, DateTimeType
+ DateType, EmailType, FileType, FormType, HiddenType
+ IntegerType, LanguageType, LocaleType, MoneyType, NumberType
+ PasswordType, PercentType, RadioType, RangeType, RepeatedType
+ ResetType, SearchType, SubmitType, TelType, TextType
+ TextareaType, TimeType, TimezoneType, UrlType
 
 [33mService form types[39m
 [33m------------------[39m

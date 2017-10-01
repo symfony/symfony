@@ -2467,7 +2467,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testTel()
     {
         $tel = '0102030405';
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TelephoneType', $tel);
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TelType', $tel);
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
             '/input

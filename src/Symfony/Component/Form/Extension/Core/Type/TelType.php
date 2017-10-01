@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 
-class TelephoneType extends AbstractType
+class TelType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -28,6 +28,6 @@ class TelephoneType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'telephone';
+        return 'tel';
     }
 }

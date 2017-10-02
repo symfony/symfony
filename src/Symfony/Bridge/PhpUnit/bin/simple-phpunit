@@ -38,7 +38,11 @@ $COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rt
     ? $PHP.' '.escapeshellarg($COMPOSER)
     : 'composer';
 
-if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".getenv('SYMFONY_PHPUNIT_REMOVE') !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
+if (false === $SYMFONY_PHPUNIT_REMOVE = getenv('SYMFONY_PHPUNIT_REMOVE')) {
+    $SYMFONY_PHPUNIT_REMOVE = 'phpspec/prophecy symfony/yaml';
+}
+
+if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default
 
     @mkdir($PHPUNIT_DIR, 0777, true);
@@ -60,8 +64,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     $zip->extractTo(getcwd());
     $zip->close();
     chdir("phpunit-$PHPUNIT_VERSION");
-    $SYMFONY_PHPUNIT_REMOVE = getenv('SYMFONY_PHPUNIT_REMOVE');
-    passthru("$COMPOSER remove --no-update ".('' === $SYMFONY_PHPUNIT_REMOVE ?: 'phpspec/prophecy symfony/yaml'));
+    passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
     if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
         passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
@@ -83,7 +86,7 @@ Symfony\Bridge\PhpUnit\TextUI\Command::main();
 EOPHP
     );
     chdir('..');
-    file_put_contents(".$PHPUNIT_VERSION.md5", md5_file(__FILE__)."\n".getenv('SYMFONY_PHPUNIT_REMOVE'));
+    file_put_contents(".$PHPUNIT_VERSION.md5", md5_file(__FILE__)."\n".$SYMFONY_PHPUNIT_REMOVE);
     chdir($oldPwd);
 
 }

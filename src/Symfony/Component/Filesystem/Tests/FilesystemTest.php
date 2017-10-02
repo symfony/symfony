@@ -1097,7 +1097,6 @@ class FilesystemTest extends FilesystemTestCase
             array('/var/lib/symfony/src/Symfony', '/var/lib/symfony/src/Symfony/Component', '../'),
             array('/var/lib/symfony/src/Symfony', '/var/lib/symfony/src/Symfony/Component/', '../'),
             array('/usr/lib/symfony/', '/var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
-            array('usr/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
             array('/var/lib/symfony/src/Symfony/', '/var/lib/symfony/', 'src/Symfony/'),
             array('/aa/bb', '/aa/bb', './'),
             array('/aa/bb', '/aa/bb/', './'),
@@ -1129,6 +1128,31 @@ class FilesystemTest extends FilesystemTestCase
             array('C:/aa/bb/../../cc', 'C:/aa/../dd/..', 'cc/'),
             array('C:/../aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'),
             array('C:/../../aa/../bb/cc', 'C:/aa/dd/..', '../bb/cc/'),
+        );
+
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $paths[] = array('c:\var\lib/symfony/src/Symfony/', 'c:/var/lib/symfony/', 'src/Symfony/');
+        }
+
+        return $paths;
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider provideLegacyPathsForMakePathRelativeWithRelativePaths
+     * @expectedDeprecation Support for passing relative paths to Symfony\Component\Filesystem\Filesystem::makePathRelative() is deprecated since version 3.4 and will be removed in 4.0.
+     */
+    public function testMakePathRelativeWithRelativePaths($endPath, $startPath, $expectedPath)
+    {
+        $path = $this->filesystem->makePathRelative($endPath, $startPath);
+
+        $this->assertEquals($expectedPath, $path);
+    }
+
+    public function provideLegacyPathsForMakePathRelativeWithRelativePaths()
+    {
+        return array(
+            array('usr/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
             array('aa/bb', 'aa/cc', '../bb/'),
             array('aa/cc', 'bb/cc', '../../aa/cc/'),
             array('aa/bb', 'aa/./cc', '../bb/'),
@@ -1141,21 +1165,6 @@ class FilesystemTest extends FilesystemTestCase
             array('', 'aa/', '../'),
             array('aa/', '', 'aa/'),
         );
-
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $paths[] = array('c:\var\lib/symfony/src/Symfony/', 'c:/var/lib/symfony/', 'src/Symfony/');
-        }
-
-        return $paths;
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Support for passing relative paths to Symfony\Component\Filesystem\Filesystem::makePathRelative() is deprecated since version 3.4 and will be removed in 4.0.
-     */
-    public function testMakePathRelativeWithRelativePaths()
-    {
-        $this->assertSame('../../../', $this->filesystem->makePathRelative('var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component'));
     }
 
     public function testMirrorCopiesFilesAndDirectoriesRecursively()

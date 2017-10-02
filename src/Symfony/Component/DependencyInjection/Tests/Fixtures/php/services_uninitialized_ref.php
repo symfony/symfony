@@ -21,9 +21,6 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
     private $parameters;
     private $targetDirs = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->services = array();

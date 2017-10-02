@@ -30,8 +30,6 @@ class TemplateFinder implements TemplateFinderInterface
     private $templates;
 
     /**
-     * Constructor.
-     *
      * @param KernelInterface             $kernel  A KernelInterface instance
      * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      * @param string                      $rootDir The directory where global templates can be stored

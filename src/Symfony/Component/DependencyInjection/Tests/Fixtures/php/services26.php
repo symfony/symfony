@@ -21,9 +21,6 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
     private $parameters;
     private $targetDirs = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $dir = __DIR__;

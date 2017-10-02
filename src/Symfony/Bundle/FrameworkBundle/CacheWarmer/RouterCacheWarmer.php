@@ -29,8 +29,6 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
     protected $router;
 
     /**
-     * Constructor.
-     *
      * @param ContainerInterface $container
      */
     public function __construct($container)

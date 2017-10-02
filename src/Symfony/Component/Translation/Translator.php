@@ -24,8 +24,6 @@ use Symfony\Component\Translation\Formatter\ChoiceMessageFormatterInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 
 /**
- * Translator.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Translator implements TranslatorInterface, TranslatorBagInterface
@@ -76,8 +74,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $configCacheFactory;
 
     /**
-     * Constructor.
-     *
      * @param string                         $locale    The locale
      * @param MessageFormatterInterface|null $formatter The message formatter
      * @param string|null                    $cacheDir  The directory to use for the cache

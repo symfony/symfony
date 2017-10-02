@@ -29,8 +29,6 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
     private $hash;
 
     /**
-     * Constructor.
-     *
      * @param string $prefix    A directory prefix
      * @param string $pattern   A glob pattern
      * @param bool   $recursive Whether directories should be scanned recursively or not

@@ -20,8 +20,6 @@ class MemcachedAdapter extends AbstractAdapter
     protected $maxIdLength = 250;
 
     /**
-     * Constructor.
-     *
      * Using a MemcachedAdapter with a TagAwareAdapter for storing tags is discouraged.
      * Using a RedisAdapter is recommended instead. If you cannot do otherwise, be aware that:
      * - the Memcached::OPT_BINARY_PROTOCOL must be enabled

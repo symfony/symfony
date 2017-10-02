@@ -38,8 +38,6 @@ class LogoutListener implements ListenerInterface
     private $csrfTokenManager;
 
     /**
-     * Constructor.
-     *
      * @param TokenStorageInterface          $tokenStorage
      * @param HttpUtils                      $httpUtils        An HttpUtils instance
      * @param LogoutSuccessHandlerInterface  $successHandler   A LogoutSuccessHandlerInterface instance

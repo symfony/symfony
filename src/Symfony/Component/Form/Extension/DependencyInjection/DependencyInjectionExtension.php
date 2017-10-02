@@ -29,8 +29,6 @@ class DependencyInjectionExtension implements FormExtensionInterface
     private $guesserServiceIds;
 
     /**
-     * Constructor.
-     *
      * @param ContainerInterface $typeContainer
      * @param iterable[]         $typeExtensionServices
      * @param iterable           $guesserServices

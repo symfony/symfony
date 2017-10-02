@@ -12,15 +12,11 @@
 namespace Symfony\Component\HttpKernel\Exception;
 
 /**
- * LengthRequiredHttpException.
- *
  * @author Ben Ramsey <ben@benramsey.com>
  */
 class LengthRequiredHttpException extends HttpException
 {
     /**
-     * Constructor.
-     *
      * @param string     $message  The internal exception message
      * @param \Exception $previous The previous exception
      * @param int        $code     The internal exception code

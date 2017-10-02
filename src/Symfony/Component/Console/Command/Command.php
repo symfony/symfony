@@ -62,8 +62,6 @@ class Command
     }
 
     /**
-     * Constructor.
-     *
      * @param string|null $name The name of the command; passing null means it must be set in configure()
      *
      * @throws LogicException When the command name is empty

@@ -167,7 +167,7 @@ interface FormConfigInterface
     /**
      * Returns the class of the form data or null if the data is scalar or an array.
      *
-     * @return string The data class or null
+     * @return null|string The data class or null
      */
     public function getDataClass();
 

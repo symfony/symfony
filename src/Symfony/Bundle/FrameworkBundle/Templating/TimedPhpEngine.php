@@ -26,8 +26,6 @@ class TimedPhpEngine extends PhpEngine
     protected $stopwatch;
 
     /**
-     * Constructor.
-     *
      * @param TemplateNameParserInterface $parser    A TemplateNameParserInterface instance
      * @param ContainerInterface          $container A ContainerInterface instance
      * @param LoaderInterface             $loader    A LoaderInterface instance

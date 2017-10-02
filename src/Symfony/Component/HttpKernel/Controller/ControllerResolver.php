@@ -15,8 +15,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * ControllerResolver.
- *
  * This implementation uses the '_controller' request attribute to determine
  * the controller to execute and uses the request attributes to determine
  * the controller method arguments.
@@ -44,8 +42,6 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
     private $supportsScalarTypes;
 
     /**
-     * Constructor.
-     *
      * @param LoggerInterface $logger A LoggerInterface instance
      */
     public function __construct(LoggerInterface $logger = null)

@@ -37,8 +37,6 @@ class NodeExtension extends AbstractExtension
     private $flags;
 
     /**
-     * Constructor.
-     *
      * @param int $flags
      */
     public function __construct($flags = 0)

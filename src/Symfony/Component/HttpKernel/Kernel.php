@@ -76,8 +76,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     const END_OF_LIFE = '11/2021';
 
     /**
-     * Constructor.
-     *
      * @param string $environment The environment
      * @param bool   $debug       Whether to enable debugging or not
      */

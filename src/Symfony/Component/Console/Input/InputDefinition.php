@@ -36,8 +36,6 @@ class InputDefinition
     private $shortcuts;
 
     /**
-     * Constructor.
-     *
      * @param array $definition An array of InputArgument and InputOption instance
      */
     public function __construct(array $definition = array())

@@ -30,8 +30,6 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
     private $dispatcher;
 
     /**
-     * Constructor.
-     *
      * @param HttpKernelInterface      $kernel     A HttpKernelInterface instance
      * @param EventDispatcherInterface $dispatcher A EventDispatcherInterface instance
      */

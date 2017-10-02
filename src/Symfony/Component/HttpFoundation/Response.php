@@ -187,8 +187,6 @@ class Response
     );
 
     /**
-     * Constructor.
-     *
      * @param mixed $content The response content, see setContent()
      * @param int   $status  The response status code
      * @param array $headers An array of response headers

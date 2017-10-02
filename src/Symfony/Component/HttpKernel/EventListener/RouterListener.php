@@ -40,8 +40,6 @@ class RouterListener implements EventSubscriberInterface
     private $requestStack;
 
     /**
-     * Constructor.
-     *
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher      The Url or Request matcher
      * @param RequestStack                                $requestStack A RequestStack instance
      * @param RequestContext|null                         $context      The RequestContext (can be null when $matcher implements RequestContextAwareInterface)

@@ -23,8 +23,6 @@ class ParsedExpression extends Expression
     private $nodes;
 
     /**
-     * Constructor.
-     *
      * @param string $expression An expression
      * @param Node   $nodes      A Node representing the expression
      */

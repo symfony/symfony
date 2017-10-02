@@ -21,8 +21,6 @@ class ValueGuess extends Guess
     private $value;
 
     /**
-     * Constructor.
-     *
      * @param string|int|bool|null $value      The guessed value
      * @param int                  $confidence The confidence that the guessed class name
      *                                         is correct

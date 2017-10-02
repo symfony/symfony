@@ -9,7 +9,6 @@ CHANGELOG
 4.0.0
 -----
 
- * added orphaned events support to `EventDataCollector`
  * removed the `DataCollector::varToString()` method, use `DataCollector::cloneVar()`
    instead
  * using the `DataCollector::cloneVar()` method requires the VarDumper component
@@ -34,6 +33,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * added orphaned events support to `EventDataCollector`
  * added a minimalist PSR-3 `Logger` class that writes in `stderr`
  * made kernels implementing `CompilerPassInterface` able to process the container
  * deprecated bundle inheritance

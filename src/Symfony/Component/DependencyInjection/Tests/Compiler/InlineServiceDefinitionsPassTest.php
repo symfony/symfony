@@ -252,33 +252,6 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame('inline', (string) $values[0]);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetInlinedServiceIdData()
-    {
-        $container = new ContainerBuilder();
-        $container
-            ->register('inlinable.service')
-            ->setPublic(false)
-        ;
-        $container
-            ->register('non_inlinable.service')
-            ->setPublic(true)
-        ;
-
-        $container
-            ->register('other_service')
-            ->setArguments(array(new Reference('inlinable.service')))
-        ;
-
-        $inlinePass = new InlineServiceDefinitionsPass();
-        $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), $inlinePass));
-        $repeatedPass->process($container);
-
-        $this->assertEquals(array('inlinable.service' => array('other_service')), $inlinePass->getInlinedServiceIds());
-    }
-
     protected function process(ContainerBuilder $container)
     {
         $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new InlineServiceDefinitionsPass()));

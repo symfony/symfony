@@ -132,24 +132,6 @@ class AutowirePassTest extends TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testExceptionsAreStored()
-    {
-        $container = new ContainerBuilder();
-
-        $container->register('c1', __NAMESPACE__.'\CollisionA');
-        $container->register('c2', __NAMESPACE__.'\CollisionB');
-        $container->register('c3', __NAMESPACE__.'\CollisionB');
-        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
-        $aDefinition->setAutowired(true);
-
-        $pass = new AutowirePass(false);
-        $pass->process($container);
-        $this->assertCount(1, $pass->getAutowiringExceptions());
-    }
-
-    /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
      * @expectedExceptionMessage Invalid service "private_service": constructor of class "Symfony\Component\DependencyInjection\Tests\Compiler\PrivateConstructor" must be public.
      */

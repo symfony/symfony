@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by issei-m at 2017-05-09T16:35:23Z
+
+Looks good😀
+btw would "TelephoneType" be better to be named "TelType" in accordance with type-name of html5 tag? (I'm not familiar with English, so not sure the abbr like "tel" is common used though.)
+
+---------------------------------------------------------------------------
+
+by issei-m at 2017-05-09T16:48:15Z
+
+> would "TelephoneType" be better to be named "TelType" in accordance with type-name of html5 tag?
+
+Oops, I've just missed the review-comment by @ro0NL. Never mind this comment.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-05-09T16:50:01Z
+
+my reasoning; tel === telephone, so TelephoneType is explicit/verbose. In my domain i'd also call this field `$user->telephone`, not `$user->tel`.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-21T20:22:58Z
+
+Needs rebase to fix the conflict. (Let's keep `TelephoneType` btw, in case there is still debate)
+
+---------------------------------------------------------------------------
+
+by apetitpa at 2017-10-01T22:45:33Z
+
+@ogizanagi @fabpot rebased with 3.4 (sorry for the delay)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-01T23:17:35Z
+
+@apetitpa Can you have a look at the tests, they seem to be broken by your changes.
+
+---------------------------------------------------------------------------
+
+by apetitpa at 2017-10-02T09:09:50Z
+
+@fabpot It's done, it's green again. Travis 7.1 failing test will be fixed when merging.
+
+---------------------------------------------------------------------------
+
+by apetitpa at 2017-10-02T12:15:44Z
+
+@nicolas-grekas It's done but I still have one concern regarding the name of the `TelephoneType` class. Should we keep this name or use the original suggested name which was `TelType` as the HTML input type
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-02T12:20:31Z
+
+If HTML5 is fine with "tel", so am I.
+
+---------------------------------------------------------------------------
+
+by apetitpa at 2017-10-02T12:45:48Z
+
+@nicolas-grekas Done, reverted to `TelType` as agreed

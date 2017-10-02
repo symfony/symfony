@@ -311,9 +311,6 @@ class Container%s extends Container
     private $targetDirs = array();
     private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $dir = $this->targetDirs[0] = dirname(__DIR__);

@@ -27,8 +27,6 @@ class NamespacedAttributeBag extends AttributeBag
     private $namespaceCharacter;
 
     /**
-     * Constructor.
-     *
      * @param string $storageKey         Session storage key
      * @param string $namespaceCharacter Namespace character to use in keys
      */

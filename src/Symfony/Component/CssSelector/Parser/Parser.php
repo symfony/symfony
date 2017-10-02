@@ -33,8 +33,6 @@ class Parser implements ParserInterface
     private $tokenizer;
 
     /**
-     * Constructor.
-     *
      * @param null|Tokenizer $tokenizer
      */
     public function __construct(Tokenizer $tokenizer = null)

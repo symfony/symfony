@@ -29,8 +29,6 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     private $signer;
 
     /**
-     * Constructor.
-     *
      * The "fallback" strategy when surrogate is not available should always be an
      * instance of InlineFragmentRenderer.
      *

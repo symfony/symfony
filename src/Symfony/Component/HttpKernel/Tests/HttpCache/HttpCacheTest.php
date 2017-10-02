@@ -1168,7 +1168,7 @@ class HttpCacheTest extends HttpCacheTestCase
             array(
                 'status' => 200,
                 'body' => 'Hello World!',
-                'headers' => array('Cache-Control' => 's-maxage=300'),
+                'headers' => array('Cache-Control' => 's-maxage=200'),
             ),
             array(
                 'status' => 200,
@@ -1182,8 +1182,33 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/', array(), array(), true);
         $this->assertEquals('Hello World! My name is Bobby.', $this->response->getContent());
 
-        // check for 100 or 99 as the test can be executed after a second change
-        $this->assertTrue(in_array($this->response->getTtl(), array(99, 100)));
+        $this->assertEquals(100, $this->response->getTtl());
+    }
+
+    public function testEsiCacheSendsTheLowestTtlForHeadRequests()
+    {
+        $responses = array(
+            array(
+                'status' => 200,
+                'body' => 'I am a long-lived master response, but I embed a short-lived resource: <esi:include src="/foo" />',
+                'headers' => array(
+                    'Cache-Control' => 's-maxage=300',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ),
+            ),
+            array(
+                'status' => 200,
+                'body' => 'I am a short-lived resource',
+                'headers' => array('Cache-Control' => 's-maxage=100'),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('HEAD', '/', array(), array(), true);
+
+        $this->assertEmpty($this->response->getContent());
+        $this->assertEquals(100, $this->response->getTtl());
     }
 
     public function testEsiCacheForceValidation()
@@ -1219,6 +1244,37 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
     }
 
+    public function testEsiCacheForceValidationForHeadRequests()
+    {
+        $responses = array(
+            array(
+                'status' => 200,
+                'body' => 'I am the master response and use expiration caching, but I embed another resource: <esi:include src="/foo" />',
+                'headers' => array(
+                    'Cache-Control' => 's-maxage=300',
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ),
+            ),
+            array(
+                'status' => 200,
+                'body' => 'I am the embedded resource and use validation caching',
+                'headers' => array('ETag' => 'foobar'),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('HEAD', '/', array(), array(), true);
+
+        // The response has been assembled from expiration and validation based resources
+        // This can neither be cached nor revalidated, so it should be private/no cache
+        $this->assertEmpty($this->response->getContent());
+        $this->assertNull($this->response->getTtl());
+        $this->assertTrue($this->response->mustRevalidate());
+        $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($this->response->headers->hasCacheControlDirective('no-cache'));
+    }
+
     public function testEsiRecalculateContentLengthHeader()
     {
         $responses = array(
@@ -1227,7 +1283,6 @@ class HttpCacheTest extends HttpCacheTestCase
                 'body' => '<esi:include src="/foo" />',
                 'headers' => array(
                     'Content-Length' => 26,
-                    'Cache-Control' => 's-maxage=300',
                     'Surrogate-Control' => 'content="ESI/1.0"',
                 ),
             ),
@@ -1242,6 +1297,37 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->request('GET', '/', array(), array(), true);
         $this->assertEquals('Hello World!', $this->response->getContent());
+        $this->assertEquals(12, $this->response->headers->get('Content-Length'));
+    }
+
+    public function testEsiRecalculateContentLengthHeaderForHeadRequest()
+    {
+        $responses = array(
+            array(
+                'status' => 200,
+                'body' => '<esi:include src="/foo" />',
+                'headers' => array(
+                    'Content-Length' => 26,
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                ),
+            ),
+            array(
+                'status' => 200,
+                'body' => 'Hello World!',
+                'headers' => array(),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('HEAD', '/', array(), array(), true);
+
+        // https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13
+        // "The Content-Length entity-header field indicates the size of the entity-body,
+        // in decimal number of OCTETs, sent to the recipient or, in the case of the HEAD
+        // method, the size of the entity-body that would have been sent had the request
+        // been a GET."
+        $this->assertEmpty($this->response->getContent());
         $this->assertEquals(12, $this->response->headers->get('Content-Length'));
     }
 
@@ -1332,6 +1418,35 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->setNextResponses($responses);
 
         $this->request('GET', '/', array(), array(), true);
+        $this->assertNull($this->response->getETag());
+        $this->assertNull($this->response->getLastModified());
+    }
+
+    public function testEsiCacheRemoveValidationHeadersIfEmbeddedResponsesAndHeadRequest()
+    {
+        $time = \DateTime::createFromFormat('U', time());
+
+        $responses = array(
+            array(
+                'status' => 200,
+                'body' => '<esi:include src="/hey" />',
+                'headers' => array(
+                    'Surrogate-Control' => 'content="ESI/1.0"',
+                    'ETag' => 'hey',
+                    'Last-Modified' => $time->format(DATE_RFC2822),
+                ),
+            ),
+            array(
+                'status' => 200,
+                'body' => 'Hey!',
+                'headers' => array(),
+            ),
+        );
+
+        $this->setNextResponses($responses);
+
+        $this->request('HEAD', '/', array(), array(), true);
+        $this->assertEmpty($this->response->getContent());
         $this->assertNull($this->response->getETag());
         $this->assertNull($this->response->getLastModified());
     }

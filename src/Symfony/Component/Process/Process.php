@@ -130,8 +130,6 @@ class Process implements \IteratorAggregate
     );
 
     /**
-     * Constructor.
-     *
      * @param string|array   $commandline The command line to run
      * @param string|null    $cwd         The working directory or null to use the working dir of the current PHP process
      * @param array|null     $env         The environment variables or null to use the same environment as the current PHP process

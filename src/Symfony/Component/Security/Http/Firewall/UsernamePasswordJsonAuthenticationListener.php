@@ -39,8 +39,6 @@ use Symfony\Component\Security\Http\SecurityEvents;
  * an authentication via a JSON document composed of a username and a password.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental in version 3.3
  */
 class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
 {

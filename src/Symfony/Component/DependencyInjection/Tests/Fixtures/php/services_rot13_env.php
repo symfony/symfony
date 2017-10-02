@@ -22,9 +22,6 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
     private $targetDirs = array();
     private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();

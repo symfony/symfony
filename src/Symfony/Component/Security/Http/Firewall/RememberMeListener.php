@@ -39,8 +39,6 @@ class RememberMeListener implements ListenerInterface
     private $sessionStrategy;
 
     /**
-     * Constructor.
-     *
      * @param TokenStorageInterface                       $tokenStorage
      * @param RememberMeServicesInterface                 $rememberMeServices
      * @param AuthenticationManagerInterface              $authenticationManager

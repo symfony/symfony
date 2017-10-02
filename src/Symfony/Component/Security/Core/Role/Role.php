@@ -21,8 +21,6 @@ class Role
     private $role;
 
     /**
-     * Constructor.
-     *
      * @param string $role The role name
      */
     public function __construct($role)

@@ -728,7 +728,7 @@ class Application
     protected function doRenderException(\Exception $e, OutputInterface $output)
     {
         do {
-            $message = $e->getMessage();
+            $message = trim($e->getMessage());
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $title = sprintf('  [%s%s]  ', get_class($e), 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : '');
                 $len = Helper::strlen($title);
@@ -1068,9 +1068,8 @@ class Application
             $lines[] = str_pad($line, $width);
             $line = $char;
         }
-        if ('' !== $line) {
-            $lines[] = count($lines) ? str_pad($line, $width) : $line;
-        }
+
+        $lines[] = count($lines) ? str_pad($line, $width) : $line;
 
         mb_convert_variables($encoding, 'utf8', $lines);
 

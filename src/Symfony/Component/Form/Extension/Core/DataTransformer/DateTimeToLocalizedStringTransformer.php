@@ -28,8 +28,6 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     private $calendar;
 
     /**
-     * Constructor.
-     *
      * @see BaseDateTimeTransformer::formats for available format options
      *
      * @param string $inputTimezone  The name of the input timezone

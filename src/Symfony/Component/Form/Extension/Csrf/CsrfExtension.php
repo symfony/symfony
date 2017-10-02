@@ -38,8 +38,6 @@ class CsrfExtension extends AbstractExtension
     private $translationDomain;
 
     /**
-     * Constructor.
-     *
      * @param CsrfTokenManagerInterface $tokenManager      The CSRF token manager
      * @param TranslatorInterface       $translator        The translator for translating error messages
      * @param null|string               $translationDomain The translation domain for translating

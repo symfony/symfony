@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -22,9 +20,6 @@ class ProjectServiceContainer extends Container
     private $targetDirs = array();
     private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $dir = __DIR__;

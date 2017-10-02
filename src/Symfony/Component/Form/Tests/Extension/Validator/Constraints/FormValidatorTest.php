@@ -370,6 +370,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->getForm();
 
         $this->expectValidateAt(0, 'data', $object, new GroupSequence(array('group1', 'group2')));
+        $this->expectValidateAt(1, 'data', $object, new GroupSequence(array('group1', 'group2')));
 
         $this->validator->validate($form, new Form());
 

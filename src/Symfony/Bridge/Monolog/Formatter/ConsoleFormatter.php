@@ -47,8 +47,6 @@ class ConsoleFormatter implements FormatterInterface
     private $dumper;
 
     /**
-     * Constructor.
-     *
      * Available options:
      *   * format: The format of the outputted log string. The following placeholders are supported: %datetime%, %start_tag%, %level_name%, %end_tag%, %channel%, %message%, %context%, %extra%;
      *   * date_format: The format of the outputted date string;

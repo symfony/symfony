@@ -223,8 +223,6 @@ class Request
     );
 
     /**
-     * Constructor.
-     *
      * @param array           $query      The GET parameters
      * @param array           $request    The POST parameters
      * @param array           $attributes The request attributes (parameters parsed from the PATH_INFO, ...)

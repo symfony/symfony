@@ -852,8 +852,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /*{$this->docStar}
- * $class.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -865,9 +863,6 @@ class $class extends $baseClass
     private \$targetDirs = array();
     private \$privates = array();
 
-    /*{$this->docStar}
-     * Constructor.
-     */
     public function __construct()
     {
 

@@ -11,8 +11,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * Container.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -24,9 +22,6 @@ class Container extends AbstractContainer
     private $targetDirs = array();
     private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->services = $this->privates = array();

@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
- * CodeHelper.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CodeHelper extends Helper
@@ -26,8 +24,6 @@ class CodeHelper extends Helper
     protected $charset;
 
     /**
-     * Constructor.
-     *
      * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
      * @param string                   $rootDir        The project root directory
      * @param string                   $charset        The charset

@@ -22,9 +22,6 @@ class ProjectServiceContainer extends Container
     private $targetDirs = array();
     private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $dir = __DIR__;

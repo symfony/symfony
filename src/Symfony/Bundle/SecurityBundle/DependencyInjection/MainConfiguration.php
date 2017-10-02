@@ -29,8 +29,6 @@ class MainConfiguration implements ConfigurationInterface
     private $userProviderFactories;
 
     /**
-     * Constructor.
-     *
      * @param array $factories
      * @param array $userProviderFactories
      */

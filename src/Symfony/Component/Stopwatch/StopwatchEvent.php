@@ -44,8 +44,6 @@ class StopwatchEvent
     private $started = array();
 
     /**
-     * Constructor.
-     *
      * @param float       $origin        The origin time in milliseconds
      * @param string|null $category      The event category or null to use the default
      * @param bool        $morePrecision If true, time is stored as float to keep the original microsecond precision

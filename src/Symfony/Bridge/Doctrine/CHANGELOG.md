@@ -15,6 +15,7 @@ CHANGELOG
 -----
 
  * added support for doctrine/dbal v2.6 types
+ * added cause of UniqueEntity constraint violation
 
 3.1.0
 -----

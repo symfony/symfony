@@ -33,8 +33,6 @@ class FragmentHandler
     private $requestStack;
 
     /**
-     * Constructor.
-     *
      * @param RequestStack                $requestStack The Request stack that controls the lifecycle of requests
      * @param FragmentRendererInterface[] $renderers    An array of FragmentRendererInterface instances
      * @param bool                        $debug        Whether the debug mode is enabled or not

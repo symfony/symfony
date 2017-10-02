@@ -26,6 +26,8 @@ CHANGELOG
 3.4.0
 -----
 
+ * Made the `cache:clear` command to *not* clear "app" PSR-6 cache pools anymore,
+   but to still clear "system" ones; use the `cache:pool:clear` command to clear "app" pools instead
  * Always register a minimalist logger that writes in `stderr`
  * Deprecated `profiler.matcher` option
  * Added support for `EventSubscriberInterface` on `MicroKernelTrait`

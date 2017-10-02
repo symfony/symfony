@@ -54,8 +54,6 @@ class DbalSessionHandler implements \SessionHandlerInterface
     private $timeCol = 'sess_time';
 
     /**
-     * Constructor.
-     *
      * @param Connection $con       A connection
      * @param string     $tableName Table name
      */

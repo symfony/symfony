@@ -14,6 +14,8 @@ namespace Symfony\Component\EventDispatcher\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * @deprecated since version 4.1, will be removed in 5.0.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface TraceableEventDispatcherInterface extends EventDispatcherInterface
@@ -36,11 +38,4 @@ interface TraceableEventDispatcherInterface extends EventDispatcherInterface
      * Resets the trace.
      */
     public function reset();
-
-    /**
-     * Gets the orphaned events.
-     *
-     * @return array An array of orphaned events
-     */
-    public function getOrphanedEvents();
 }

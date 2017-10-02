@@ -1,10 +1,14 @@
 CHANGELOG
 =========
 
-4.0.0
+4.1.0
 -----
 
  * added information about orphaned events
+
+4.0.0
+-----
+
  * removed the `WebProfilerExtension::dumpValue()` method
  * removed the `getTemplates()` method of the `TemplateManager` class in favor of the ``getNames()`` method
  * removed the `web_profiler.position` config option and the

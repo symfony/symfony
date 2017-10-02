@@ -4,6 +4,7 @@ CHANGELOG
 4.1.0
 -----
 
+ * added orphaned events support to `EventDataCollector`
  * `ExceptionListener` now logs and collects exceptions at priority `2048` (previously logged at `-128` and collected at `0`)
 
 4.0.0
@@ -33,7 +34,6 @@ CHANGELOG
 3.4.0
 -----
 
- * added orphaned events support to `EventDataCollector`
  * added a minimalist PSR-3 `Logger` class that writes in `stderr`
  * made kernels implementing `CompilerPassInterface` able to process the container
  * deprecated bundle inheritance

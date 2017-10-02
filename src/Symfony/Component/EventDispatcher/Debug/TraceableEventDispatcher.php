@@ -209,6 +209,16 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         return $notCalled;
     }
 
+    /**
+     * Gets the orphaned events.
+     *
+     * @return array An array of orphaned events
+     */
+    public function getOrphanedEvents()
+    {
+        return $this->orphanedEvents;
+    }
+
     public function reset()
     {
         $this->called = array();
@@ -249,8 +259,10 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     private function preProcess($eventName)
     {
-        if (false === $this->dispatcher->hasListeners($eventName)) {
+        if (!$this->dispatcher->hasListeners($eventName)) {
             $this->orphanedEvents[] = $eventName;
+
+            return;
         }
 
         foreach ($this->dispatcher->getListeners($eventName) as $listener) {
@@ -324,15 +336,5 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         }
 
         return 1;
-    }
-
-    /**
-     * Gets the orphaned events.
-     *
-     * @return array An array of orphaned events
-     */
-    public function getOrphanedEvents()
-    {
-        return $this->orphanedEvents;
     }
 }

@@ -51,7 +51,7 @@ class MarkdownDescriptor extends Descriptor
     {
         $output = '- Path: '.$route->getPath()
             ."\n".'- Path Regex: '.$route->compile()->getRegex()
-            ."\n".'- Host: '.('' !== $route->getHost() ? $route->getHost() : 'ANY')
+            ."\n".'- Host: '.($route->getHost() ?: 'ANY')
             ."\n".'- Host Regex: '.('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')
             ."\n".'- Scheme: '.($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')

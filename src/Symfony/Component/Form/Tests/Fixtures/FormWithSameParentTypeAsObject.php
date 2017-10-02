@@ -22,6 +22,6 @@ class FormWithSameParentTypeAsObject extends AbstractType
 
     public function getParent()
     {
-        return new FormWithSameParentTypeAsObject();
+        return new self();
     }
 }

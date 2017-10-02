@@ -30,7 +30,7 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        // only show the first error so they user can focus on it
+        // only show the first error so the user can focus on it
         $errors = $value->getErrors();
         $message = reset($errors);
 

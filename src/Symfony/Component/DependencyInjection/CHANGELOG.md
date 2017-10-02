@@ -36,6 +36,8 @@ CHANGELOG
  * deprecated case insensitivity of parameter names
  * deprecated the `ResolveDefinitionTemplatesPass` class in favor of `ResolveChildDefinitionsPass`
  * added `TaggedIteratorArgument` with YAML (`!tagged foo`) and XML (`<service type="tagged"/>`) support
+ * deprecated `AutowireExceptionPass` and `AutowirePass::getAutowiringExceptions()`, use `Definition::addError()` and the `DefinitionErrorExceptionPass` instead
+
 
 3.3.0
 -----

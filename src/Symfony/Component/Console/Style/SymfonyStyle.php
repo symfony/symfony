@@ -121,7 +121,7 @@ class SymfonyStyle extends OutputStyle
 
         $messages = is_array($message) ? array_values($message) : array($message);
         foreach ($messages as $message) {
-            $this->writeln(sprintf(' %s', $message));
+            $this->writeln(sprintf('%s', $message));
         }
     }
 

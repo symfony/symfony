@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-10-02T17:18:59Z
+
+Failures:
+* Travis failure is normal over `master` branch.
+* About fabbot I'm not sure if it should be fixed, because similar fixtures have the same extra line.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-10-02T19:28:28Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-10-02T19:32:13Z
+
+Now the solution looks better to me, so the response is setting on `kernel.request` event.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-02T22:23:31Z
+
+@yceruto Can you also patch the other URL matchers like `UrlMatcher` for instance. Just for consistency.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-10-02T22:45:30Z
+
+@fabpot indeed, thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-02T23:02:27Z
+
+@yceruto I think we need support for the new exception in `Symfony\Component\Routing\Matcher\UrlMatcher` as well.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-10-02T23:15:41Z
+
+@fabpot done.
+
+---------------------------------------------------------------------------
+
+by 92161898515 at 2017-10-02T23:23:56Z
+
+👍

@@ -21,7 +21,7 @@ class ContainerDebugCommandTest extends WebTestCase
 {
     public function testDumpContainerIfNotExists()
     {
-        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+        static::bootKernel(array('test_case' => 'ContainerDebug'));
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
@@ -36,7 +36,7 @@ class ContainerDebugCommandTest extends WebTestCase
 
     public function testNoDebug()
     {
-        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => false));
+        static::bootKernel(array('test_case' => 'ContainerDebug', 'debug' => false));
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
@@ -49,7 +49,7 @@ class ContainerDebugCommandTest extends WebTestCase
 
     public function testPrivateAlias()
     {
-        static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
+        static::bootKernel(array('test_case' => 'ContainerDebug'));
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);

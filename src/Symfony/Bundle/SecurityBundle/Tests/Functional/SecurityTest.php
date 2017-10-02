@@ -18,7 +18,7 @@ class SecurityTest extends WebTestCase
 {
     public function testServiceIsFunctional()
     {
-        $kernel = self::createKernel(array('test_case' => 'SecurityHelper', 'root_config' => 'config.yml'));
+        $kernel = self::createKernel(array('test_case' => 'SecurityHelper'));
         $kernel->boot();
         $container = $kernel->getContainer();
 

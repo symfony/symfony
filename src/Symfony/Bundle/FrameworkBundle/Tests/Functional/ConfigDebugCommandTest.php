@@ -25,7 +25,7 @@ class ConfigDebugCommandTest extends WebTestCase
 
     protected function setUp()
     {
-        $kernel = static::createKernel(array('test_case' => 'ConfigDump'));
+        $kernel = static::bootKernel(array('test_case' => 'ConfigDump'));
         $this->application = new Application($kernel);
         $this->application->doRun(new ArrayInput(array()), new NullOutput());
     }

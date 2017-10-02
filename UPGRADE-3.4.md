@@ -124,9 +124,10 @@ FrameworkBundle
  * Using the `KERNEL_DIR` environment variable or the automatic guessing based
    on the `phpunit.xml` / `phpunit.xml.dist` file location is deprecated since 3.4.
    Set the `KERNEL_CLASS` environment variable to the fully-qualified class name
-   of your Kernel instead. Not setting the `KERNEL_CLASS` environment variable
-   will throw an exception on 4.0 unless you override the `KernelTestCase::createKernel()`
-   or `KernelTestCase::getKernelClass()` method.
+   of your Kernel class or override the `KernelTestCase::createKernel()` or
+   `KernelTestCase::getKernelClass()` method, otherwise default test kernel
+   implementation will be used (which also could be substituted with your own by
+   overriding `KernelTestCase::getDefaultTestKernelClass()` method).
 
  * The `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()`
    methods are deprecated since 3.4 and will be removed in 4.0.

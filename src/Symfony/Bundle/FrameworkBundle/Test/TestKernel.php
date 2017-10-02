@@ -35,7 +35,9 @@ while ($dir !== $lastDir) {
     $dir = dirname($dir);
 }
 
+use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -47,6 +49,13 @@ use Symfony\Component\Config\Loader\LoaderInterface;
  */
 class TestKernel extends Kernel implements TestKernelInterface
 {
+    /**
+     * Directory holds all the kernel temporary data
+     *
+     * @var string
+     */
+    protected $tempDir;
+
     /**
      * Directory holds test cases configs.
      *
@@ -69,13 +78,6 @@ class TestKernel extends Kernel implements TestKernelInterface
     protected $rootConfig;
 
     /**
-     * Filesystem.
-     *
-     * @var Filesystem
-     */
-    private $fs;
-
-    /**
      * If $rootDir is not provided, it would be set to $configDir.
      *
      * Attention! If $rootDir is provided but is not exist, it would be created.
@@ -83,16 +85,16 @@ class TestKernel extends Kernel implements TestKernelInterface
      *
      * {@inheritdoc}
      */
-    public function setTestKernelConfiguration($testCase, $configDir, $rootConfig, $rootDir = null)
+    public function setTestKernelConfiguration($tempDir, $testCase, $configDir, $rootConfig, $rootDir = null)
     {
-        $this->fs = new Filesystem();
+        $fs = new Filesystem();
 
         if (!$rootDir) {
             $rootDir = $configDir;
         }
 
         if (!is_dir($rootDir)) {
-            $this->fs->mkdir($rootDir);
+            $fs->mkdir($rootDir);
         }
         $this->rootDir = realpath($rootDir);
 
@@ -102,13 +104,13 @@ class TestKernel extends Kernel implements TestKernelInterface
         }
         $this->testCase = $testCase;
 
-        if (!$this->fs->isAbsolutePath($rootConfig) &&
+        if (!$fs->isAbsolutePath($rootConfig) &&
             !file_exists($rootConfig = implode(DIRECTORY_SEPARATOR, array($this->configDir, $testCase, $rootConfig)))) {
             throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $rootConfig));
         }
 
+        $this->tempDir = $tempDir;
         $this->rootConfig = $rootConfig;
-        $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->configDir).str_replace(DIRECTORY_SEPARATOR, '_', $testCase)).uniqid();
     }
 
     /**
@@ -133,7 +135,7 @@ class TestKernel extends Kernel implements TestKernelInterface
      */
     public function getCacheDir()
     {
-        return implode(DIRECTORY_SEPARATOR, array($this->getTempAppDir(), $this->testCase, 'cache', $this->environment));
+        return implode(DIRECTORY_SEPARATOR, array($this->tempDir, $this->testCase, 'cache', $this->environment));
     }
 
     /**
@@ -141,15 +143,7 @@ class TestKernel extends Kernel implements TestKernelInterface
      */
     public function getLogDir()
     {
-        return implode(DIRECTORY_SEPARATOR, array($this->getTempAppDir(), $this->testCase, 'logs'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTempAppDir()
-    {
-        return sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->getName();
+        return implode(DIRECTORY_SEPARATOR, array($this->tempDir, $this->testCase, 'logs'));
     }
 
     /**
@@ -161,6 +155,16 @@ class TestKernel extends Kernel implements TestKernelInterface
     }
 
     /**
+     * Makes output less verbose
+     *
+     * @param ContainerBuilder $container
+     */
+    protected function build(ContainerBuilder $container)
+    {
+        $container->register('logger', NullLogger::class);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -169,11 +173,11 @@ class TestKernel extends Kernel implements TestKernelInterface
             array(
                 $this->getEnvironment(),
                 $this->isDebug(),
+                $this->tempDir,
                 $this->testCase,
                 $this->configDir,
                 $this->rootConfig,
-                $this->rootDir,
-                $this->name
+                $this->rootDir
             )
         );
     }
@@ -183,11 +187,9 @@ class TestKernel extends Kernel implements TestKernelInterface
      */
     public function unserialize($str)
     {
-        list($env, $debug, $testCase, $configDir, $rootConfig, $rootDir, $name) = unserialize($str);
+        list($env, $debug, $tempDir, $testCase, $configDir, $rootConfig, $rootDir) = unserialize($str);
         $this->__construct($env, $debug);
-        $this->setTestKernelConfiguration($testCase, $configDir, $rootConfig, $rootDir);
-        // restore original name to prevent regeneration
-        $this->name = $name;
+        $this->setTestKernelConfiguration($tempDir, $testCase, $configDir, $rootConfig, $rootDir);
     }
 
     /**

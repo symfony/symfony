@@ -1,0 +1,2 @@
+_sessiontest_bundle:
+    resource: '@TestBundle/Resources/config/routing.yml'

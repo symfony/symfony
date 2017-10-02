@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\app\AppKernel;
 
 class WebTestCase extends BaseWebTestCase
 {
@@ -21,20 +22,30 @@ class WebTestCase extends BaseWebTestCase
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 
+    protected static function getDefaultTestKernelClass()
+    {
+        return AppKernel::class;
+    }
+
     protected static function createKernel(array $options = array())
     {
-        if (!isset($options['environment'])) {
-            if (!isset($options['test_case'])) {
-                throw new \InvalidArgumentException('The option "test_case" must be set.');
-            }
+        if (!isset($options['test_case'])) {
+            throw new \InvalidArgumentException('The option "test_case" must be set.');
+        }
 
-            $options['environment'] = 'securitybundletest'.strtolower($options['test_case']);
+        if (!isset($options['environment'])) {
+            $options['environment'] = strtolower(static::getVarDir().$options['test_case']);
         }
 
         if (!isset($options['config_dir'])) {
-            $options['config_dir'] = __DIR__."/app";
+            $options['config_dir'] = __DIR__.'/app';
         }
 
         return parent::createKernel($options);
+    }
+
+    protected static function getVarDir()
+    {
+        return 'SB'. parent::getVarDir();
     }
 }

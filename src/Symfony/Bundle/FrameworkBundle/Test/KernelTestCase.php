@@ -140,7 +140,7 @@ abstract class KernelTestCase extends TestCase
                 }
             }
 
-            if ($kernelClass = static::findKernelClassInDirectory($dir)) {
+            if (!$kernelClass = static::findKernelClassInDirectory($dir)) {
                 throw new \RuntimeException(sprintf('There is no test kernel class in specified KERNEL_DIR "%s"', $_SERVER['KERNEL_CLASS']));
             }
 
@@ -171,7 +171,7 @@ abstract class KernelTestCase extends TestCase
         $finder = new Finder();
         $finder->name('*Kernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
-        if (count($results)) {
+        if ($results) {
             $file = current($results);
 
             $classes = ClassFinder::findClasses($file);
@@ -263,6 +263,7 @@ abstract class KernelTestCase extends TestCase
             }
 
             $kernel->setTestKernelConfiguration(
+                static::getTempDir(),
                 $options['test_case'],
                 $options['config_dir'],
                 isset($options['root_config']) ? $options['root_config'] : 'config.yml',
@@ -284,11 +285,6 @@ abstract class KernelTestCase extends TestCase
             if ($container instanceof ResettableContainerInterface) {
                 $container->reset();
             }
-
-            if ($kernel instanceof TestKernelInterface) {
-                $fs = new Filesystem();
-                $fs->remove($kernel->getTempAppDir());
-            }
         }
     }
 
@@ -298,5 +294,40 @@ abstract class KernelTestCase extends TestCase
     protected function tearDown()
     {
         static::ensureKernelShutdown();
+    }
+
+    /**
+     * Clean up before test class run
+     */
+    public static function setUpBeforeClass()
+    {
+        static::ensureTempDirCleared();
+    }
+
+    /**
+     * Clean up before test class run
+     */
+    public static function tearDownAfterClass()
+    {
+        static::ensureTempDirCleared();
+    }
+
+    protected static function ensureTempDirCleared()
+    {
+        if (!file_exists(static::getTempDir())) {
+             return;
+         }
+         $fs = new Filesystem();
+         $fs->remove(static::getTempDir());
+    }
+
+    protected static function getTempDir()
+    {
+        return sys_get_temp_dir().DIRECTORY_SEPARATOR.static::getVarDir();
+    }
+
+    protected static function getVarDir()
+    {
+        return substr(strrchr(get_called_class(), '\\'), 1);
     }
 }

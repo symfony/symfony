@@ -23,18 +23,11 @@ interface TestKernelInterface extends KernelInterface
     /**
      * Sets Kernel configuration.
      *
+     * @param string      $tmpDir     Directory holds all the kernel temporary data
      * @param string      $testCase   Directory name where kernel configs are stored
      * @param string      $configDir  Path to directory with test cases configurations
      * @param string      $rootConfig Name of the application config file
      * @param string|null $rootDir    Optional path to root directory of test application
      */
-    public function setTestKernelConfiguration($testCase, $configDir, $rootConfig, $rootDir = null);
-
-    /**
-     * Returns temporary application folder that is used to store cache, logs of test kernel.
-     * This folder normally should be removed after test case is executed.
-     *
-     * @return string
-     */
-    public function getTempAppDir();
+    public function setTestKernelConfiguration($tmpDir, $testCase, $configDir, $rootConfig, $rootDir = null);
 }

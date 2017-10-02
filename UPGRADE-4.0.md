@@ -425,9 +425,10 @@ FrameworkBundle
 
  * Using the `KERNEL_DIR` environment variable and the automatic guessing based
    on the `phpunit.xml` file location have been removed from the `KernelTestCase::getKernelClass()`
-   method implementation. Set the `KERNEL_CLASS` environment variable to the
-   fully-qualified class name of your Kernel or override the `KernelTestCase::createKernel()`
-   or `KernelTestCase::getKernelClass()` method instead.
+   method implementation. Set the `KERNEL_CLASS` environment variable to the fully-qualified class name
+   of your Kernel class or override the `KernelTestCase::createKernel()` or `KernelTestCase::getKernelClass()` method,
+   otherwise default test kernel implementation will be used (which also could be substituted with your own by
+   overriding `KernelTestCase::getDefaultTestKernelClass()` method).
 
  * The methods `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()`
    have been removed.

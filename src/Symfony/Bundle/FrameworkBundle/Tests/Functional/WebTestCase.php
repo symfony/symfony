@@ -23,12 +23,12 @@ class WebTestCase extends BaseWebTestCase
 
     protected static function createKernel(array $options = array())
     {
-        if (!isset($options['environment'])) {
-            if (!isset($options['test_case'])) {
-                throw new \InvalidArgumentException('The option "test_case" must be set.');
-            }
+        if (!isset($options['test_case'])) {
+            throw new \InvalidArgumentException('The option "test_case" must be set.');
+        }
 
-            $options['environment'] = 'frameworkbundletest'.strtolower($options['test_case']);
+        if (!isset($options['environment'])) {
+            $options['environment'] = strtolower(static::getVarDir().$options['test_case']);
         }
 
         if (!isset($options['config_dir'])) {
@@ -36,5 +36,10 @@ class WebTestCase extends BaseWebTestCase
         }
         
         return parent::createKernel($options);
+    }
+
+    protected static function getVarDir()
+    {
+        return 'FB'. parent::getVarDir();
     }
 }

@@ -20,7 +20,7 @@ class JsonLoginTest extends WebTestCase
 {
     public function testDefaultJsonLoginSuccess()
     {
-        $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'config.yml'));
+        $client = $this->createClient(array('test_case' => 'JsonLogin'));
         $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "foo"}}');
         $response = $client->getResponse();
 
@@ -31,7 +31,7 @@ class JsonLoginTest extends WebTestCase
 
     public function testDefaultJsonLoginFailure()
     {
-        $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'config.yml'));
+        $client = $this->createClient(array('test_case' => 'JsonLogin'));
         $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "bad"}}');
         $response = $client->getResponse();
 
@@ -64,7 +64,7 @@ class JsonLoginTest extends WebTestCase
 
     public function testDefaultJsonLoginBadRequest()
     {
-        $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'config.yml'));
+        $client = $this->createClient(array('test_case' => 'JsonLogin'));
         $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), 'Not a json content');
         $response = $client->getResponse();
 

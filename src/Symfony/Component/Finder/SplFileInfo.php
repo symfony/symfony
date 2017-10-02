@@ -22,8 +22,6 @@ class SplFileInfo extends \SplFileInfo
     private $relativePathname;
 
     /**
-     * Constructor.
-     *
      * @param string $file             The file name
      * @param string $relativePath     The relative path
      * @param string $relativePathname The relative path name

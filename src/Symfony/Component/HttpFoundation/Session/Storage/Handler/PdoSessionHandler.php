@@ -148,8 +148,6 @@ class PdoSessionHandler implements \SessionHandlerInterface
     private $gcCalled = false;
 
     /**
-     * Constructor.
-     *
      * You can either pass an existing database connection as PDO instance or
      * pass a DSN string that will be used to lazy-connect to the database
      * when the session is actually used. Furthermore it's possible to pass null
@@ -580,11 +578,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 return $releaseStmt;
             case 'pgsql':
                 // Obtaining an exclusive session level advisory lock requires an integer key.
-                // So we convert the HEX representation of the session id to an integer.
-                // Since integers are signed, we have to skip one hex char to fit in the range.
-                if (4 === PHP_INT_SIZE) {
-                    $sessionInt1 = hexdec(substr($sessionId, 0, 7));
-                    $sessionInt2 = hexdec(substr($sessionId, 7, 7));
+                // When session.sid_bits_per_character > 4, the session id can contain non-hex-characters.
+                // So we cannot just use hexdec().
+                if (4 === \PHP_INT_SIZE) {
+                    $sessionInt1 = $this->convertStringToInt($sessionId);
+                    $sessionInt2 = $this->convertStringToInt(substr($sessionId, 4, 4));
 
                     $stmt = $this->pdo->prepare('SELECT pg_advisory_lock(:key1, :key2)');
                     $stmt->bindValue(':key1', $sessionInt1, \PDO::PARAM_INT);
@@ -595,7 +593,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     $releaseStmt->bindValue(':key1', $sessionInt1, \PDO::PARAM_INT);
                     $releaseStmt->bindValue(':key2', $sessionInt2, \PDO::PARAM_INT);
                 } else {
-                    $sessionBigInt = hexdec(substr($sessionId, 0, 15));
+                    $sessionBigInt = $this->convertStringToInt($sessionId);
 
                     $stmt = $this->pdo->prepare('SELECT pg_advisory_lock(:key)');
                     $stmt->bindValue(':key', $sessionBigInt, \PDO::PARAM_INT);
@@ -611,6 +609,27 @@ class PdoSessionHandler implements \SessionHandlerInterface
             default:
                 throw new \DomainException(sprintf('Advisory locks are currently not implemented for PDO driver "%s".', $this->driver));
         }
+    }
+
+    /**
+     * Encodes the first 4 (when PHP_INT_SIZE == 4) or 8 characters of the string as an integer.
+     *
+     * Keep in mind, PHP integers are signed.
+     *
+     * @param string $string
+     *
+     * @return int
+     */
+    private function convertStringToInt($string)
+    {
+        if (4 === \PHP_INT_SIZE) {
+            return (ord($string[3]) << 24) + (ord($string[2]) << 16) + (ord($string[1]) << 8) + ord($string[0]);
+        }
+
+        $int1 = (ord($string[7]) << 24) + (ord($string[6]) << 16) + (ord($string[5]) << 8) + ord($string[4]);
+        $int2 = (ord($string[3]) << 24) + (ord($string[2]) << 16) + (ord($string[1]) << 8) + ord($string[0]);
+
+        return $int2 + ($int1 << 32);
     }
 
     /**

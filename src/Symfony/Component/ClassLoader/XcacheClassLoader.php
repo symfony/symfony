@@ -60,8 +60,6 @@ class XcacheClassLoader
     private $decorated;
 
     /**
-     * Constructor.
-     *
      * @param string $prefix    The XCache namespace prefix to use
      * @param object $decorated A class loader object that implements the findFile() method
      *

@@ -31,8 +31,6 @@ class LocaleListener implements EventSubscriberInterface
     private $requestStack;
 
     /**
-     * Constructor.
-     *
      * @param RequestStack                      $requestStack  A RequestStack instance
      * @param string                            $defaultLocale The default locale
      * @param RequestContextAwareInterface|null $router        The router

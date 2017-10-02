@@ -61,8 +61,6 @@ class ApcClassLoader
     protected $decorated;
 
     /**
-     * Constructor.
-     *
      * @param string $prefix    The APC namespace prefix to use
      * @param object $decorated A class loader object that implements the findFile() method
      *

@@ -64,8 +64,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     private $rememberMeServices;
 
     /**
-     * Constructor.
-     *
      * @param TokenStorageInterface                  $tokenStorage          A TokenStorageInterface instance
      * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
      * @param SessionAuthenticationStrategyInterface $sessionStrategy

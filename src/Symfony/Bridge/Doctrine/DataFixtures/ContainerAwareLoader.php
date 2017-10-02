@@ -31,8 +31,6 @@ class ContainerAwareLoader extends Loader
     private $container;
 
     /**
-     * Constructor.
-     *
      * @param ContainerInterface $container A ContainerInterface instance
      */
     public function __construct(ContainerInterface $container)

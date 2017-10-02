@@ -22,8 +22,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
     protected $cacheControl = array();
 
     /**
-     * Constructor.
-     *
      * @param array $headers An array of HTTP headers
      */
     public function __construct(array $headers = array())

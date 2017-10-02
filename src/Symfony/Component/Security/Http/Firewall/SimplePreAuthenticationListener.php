@@ -40,8 +40,6 @@ class SimplePreAuthenticationListener implements ListenerInterface
     private $dispatcher;
 
     /**
-     * Constructor.
-     *
      * @param TokenStorageInterface           $tokenStorage          A TokenStorageInterface instance
      * @param AuthenticationManagerInterface  $authenticationManager An AuthenticationManagerInterface instance
      * @param string                          $providerKey

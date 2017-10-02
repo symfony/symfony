@@ -36,8 +36,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     private $scale;
 
     /**
-     * Constructor.
-     *
      * @see self::$types for a list of supported types
      *
      * @param int    $scale The scale
@@ -119,6 +117,18 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         $formatter = $this->getNumberFormatter();
+        $groupSep = $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL);
+        $decSep = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+        $grouping = $formatter->getAttribute(\NumberFormatter::GROUPING_USED);
+
+        if ('.' !== $decSep && (!$grouping || '.' !== $groupSep)) {
+            $value = str_replace('.', $decSep, $value);
+        }
+
+        if (',' !== $decSep && (!$grouping || ',' !== $groupSep)) {
+            $value = str_replace(',', $decSep, $value);
+        }
+
         // replace normal spaces so that the formatter can read them
         $value = $formatter->parse(str_replace(' ', "\xc2\xa0", $value));
 

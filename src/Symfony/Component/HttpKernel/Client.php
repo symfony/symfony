@@ -33,8 +33,6 @@ class Client extends BaseClient
     protected $kernel;
 
     /**
-     * Constructor.
-     *
      * @param HttpKernelInterface $kernel    An HttpKernel instance
      * @param array               $server    The server parameters (equivalent of $_SERVER)
      * @param History             $history   A History instance to store the browser history

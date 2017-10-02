@@ -25,8 +25,6 @@ class MapClassLoader
     private $map = array();
 
     /**
-     * Constructor.
-     *
      * @param array $map A map where keys are classes and values the absolute file path
      */
     public function __construct(array $map)

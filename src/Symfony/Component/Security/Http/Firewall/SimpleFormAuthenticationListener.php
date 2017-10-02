@@ -37,8 +37,6 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
     private $csrfTokenManager;
 
     /**
-     * Constructor.
-     *
      * @param TokenStorageInterface                  $tokenStorage          A TokenStorageInterface instance
      * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
      * @param SessionAuthenticationStrategyInterface $sessionStrategy

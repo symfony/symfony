@@ -37,8 +37,6 @@ class ProfilerListener implements EventSubscriberInterface
     protected $parents;
 
     /**
-     * Constructor.
-     *
      * @param Profiler                     $profiler           A Profiler instance
      * @param RequestStack                 $requestStack       A RequestStack instance
      * @param RequestMatcherInterface|null $matcher            A RequestMatcher instance

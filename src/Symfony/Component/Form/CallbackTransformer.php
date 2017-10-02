@@ -31,8 +31,6 @@ class CallbackTransformer implements DataTransformerInterface
     private $reverseTransform;
 
     /**
-     * Constructor.
-     *
      * @param callable $transform        The forward transform callback
      * @param callable $reverseTransform The reverse transform callback
      */

@@ -27,8 +27,6 @@ class CodeExtension extends AbstractExtension
     private $charset;
 
     /**
-     * Constructor.
-     *
      * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
      * @param string                   $rootDir        The project root directory
      * @param string                   $charset        The charset

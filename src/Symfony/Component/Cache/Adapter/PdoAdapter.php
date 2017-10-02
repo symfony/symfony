@@ -20,8 +20,6 @@ class PdoAdapter extends AbstractAdapter
     protected $maxIdLength = 255;
 
     /**
-     * Constructor.
-     *
      * You can either pass an existing database connection as PDO instance or
      * a Doctrine DBAL Connection or a DSN string that will be used to
      * lazy-connect to the database when the cache is actually used.

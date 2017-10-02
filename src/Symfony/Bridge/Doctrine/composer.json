@@ -23,7 +23,7 @@
     "require-dev": {
         "symfony/stopwatch": "~2.8|~3.0",
         "symfony/dependency-injection": "~3.3",
-        "symfony/form": "^3.2.5",
+        "symfony/form": "^3.3.10",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/property-access": "~2.8|~3.0",
         "symfony/property-info": "~2.8|3.0",

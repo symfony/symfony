@@ -27,8 +27,6 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 
 /**
- * SecurityDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface
@@ -41,8 +39,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     private $hasVarDumper;
 
     /**
-     * Constructor.
-     *
      * @param TokenStorageInterface|null          $tokenStorage
      * @param RoleHierarchyInterface|null         $roleHierarchy
      * @param LogoutUrlGenerator|null             $logoutUrlGenerator

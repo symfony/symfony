@@ -37,8 +37,6 @@ class Form extends Link implements \ArrayAccess
     private $baseHref;
 
     /**
-     * Constructor.
-     *
      * @param \DOMElement $node       A \DOMElement instance
      * @param string      $currentUri The URI of the page where the form is embedded
      * @param string      $method     The method to use for the link (if null, it defaults to the method defined by the form)

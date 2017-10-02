@@ -80,7 +80,7 @@ class MergeCollectionListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$dataToMergeInto) {
+        if (null === $dataToMergeInto) {
             // No original data was set. Set it if allowed
             if ($this->allowAdd) {
                 $dataToMergeInto = $data;

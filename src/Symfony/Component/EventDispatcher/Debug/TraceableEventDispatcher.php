@@ -34,8 +34,6 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     private $wrappedListeners;
 
     /**
-     * Constructor.
-     *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      * @param Stopwatch                $stopwatch  A Stopwatch instance
      * @param LoggerInterface          $logger     A LoggerInterface instance

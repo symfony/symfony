@@ -43,8 +43,6 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
     );
 
     /**
-     * Constructor.
-     *
      * @param HttpKernelInterface $httpKernel
      * @param HttpUtils           $httpUtils
      * @param array               $options    Options for processing a failed authentication attempt

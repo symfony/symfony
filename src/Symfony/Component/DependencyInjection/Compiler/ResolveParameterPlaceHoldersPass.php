@@ -39,7 +39,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
             $aliases = array();
             foreach ($container->getAliases() as $name => $target) {
                 $this->currentId = $name;
-                $aliases[$this->bag->resolveValue($name)] = $this->bag->resolveValue($target);
+                $aliases[$this->bag->resolveValue($name)] = $target;
             }
             $container->setAliases($aliases);
         } catch (ParameterNotFoundException $e) {

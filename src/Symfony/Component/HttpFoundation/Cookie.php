@@ -81,8 +81,6 @@ class Cookie
     }
 
     /**
-     * Constructor.
-     *
      * @param string                        $name     The name of the cookie
      * @param string|null                   $value    The value of the cookie
      * @param int|string|\DateTimeInterface $expire   The time the cookie expires

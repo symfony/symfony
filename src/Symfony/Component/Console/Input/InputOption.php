@@ -33,8 +33,6 @@ class InputOption
     private $description;
 
     /**
-     * Constructor.
-     *
      * @param string       $name        The option name
      * @param string|array $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
      * @param int          $mode        The option mode: One of the VALUE_* constants

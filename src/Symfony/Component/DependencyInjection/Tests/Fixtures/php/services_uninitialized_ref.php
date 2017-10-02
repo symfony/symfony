@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * Symfony_DI_PhpDumper_Test_Uninitialized_Reference.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *

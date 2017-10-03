@@ -40,6 +40,34 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 trait ControllerTrait
 {
     /**
+     * Returns true if the service id is defined.
+     *
+     * @param string $id The service id
+     *
+     * @return bool true if the service id is defined, false otherwise
+     *
+     * @final since version 3.4
+     */
+    protected function has($id)
+    {
+        return $this->container->has($id);
+    }
+
+    /**
+     * Gets a container service by its id.
+     *
+     * @param string $id The service id
+     *
+     * @return object The service
+     *
+     * @final since version 3.4
+     */
+    protected function get($id)
+    {
+        return $this->container->get($id);
+    }
+
+    /**
      * Generates a URL from the given parameters.
      *
      * @param string $route         The name of the route
@@ -49,6 +77,8 @@ trait ControllerTrait
      * @return string The generated URL
      *
      * @see UrlGeneratorInterface
+     *
+     * @final since version 3.4
      */
     protected function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
@@ -63,6 +93,8 @@ trait ControllerTrait
      * @param array  $query      An array of query parameters
      *
      * @return Response A Response instance
+     *
+     * @final since version 3.4
      */
     protected function forward($controller, array $path = array(), array $query = array())
     {
@@ -81,6 +113,8 @@ trait ControllerTrait
      * @param int    $status The status code to use for the Response
      *
      * @return RedirectResponse
+     *
+     * @final since version 3.4
      */
     protected function redirect($url, $status = 302)
     {
@@ -95,6 +129,8 @@ trait ControllerTrait
      * @param int    $status     The status code to use for the Response
      *
      * @return RedirectResponse
+     *
+     * @final since version 3.4
      */
     protected function redirectToRoute($route, array $parameters = array(), $status = 302)
     {
@@ -110,6 +146,8 @@ trait ControllerTrait
      * @param array $context Context to pass to serializer when using serializer component
      *
      * @return JsonResponse
+     *
+     * @final since version 3.4
      */
     protected function json($data, $status = 200, $headers = array(), $context = array())
     {
@@ -132,6 +170,8 @@ trait ControllerTrait
      * @param string              $disposition Disposition of response ("attachment" is default, other type is "inline")
      *
      * @return BinaryFileResponse
+     *
+     * @final since version 3.4
      */
     protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
@@ -148,6 +188,8 @@ trait ControllerTrait
      * @param string $message The message
      *
      * @throws \LogicException
+     *
+     * @final since version 3.4
      */
     protected function addFlash($type, $message)
     {
@@ -167,6 +209,8 @@ trait ControllerTrait
      * @return bool
      *
      * @throws \LogicException
+     *
+     * @final since version 3.4
      */
     protected function isGranted($attributes, $subject = null)
     {
@@ -186,6 +230,8 @@ trait ControllerTrait
      * @param string $message    The message passed to the exception
      *
      * @throws AccessDeniedException
+     *
+     * @final since version 3.4
      */
     protected function denyAccessUnlessGranted($attributes, $subject = null, $message = 'Access Denied.')
     {
@@ -205,6 +251,8 @@ trait ControllerTrait
      * @param array  $parameters An array of parameters to pass to the view
      *
      * @return string The rendered view
+     *
+     * @final since version 3.4
      */
     protected function renderView($view, array $parameters = array())
     {
@@ -227,6 +275,8 @@ trait ControllerTrait
      * @param Response $response   A response instance
      *
      * @return Response A Response instance
+     *
+     * @final since version 3.4
      */
     protected function render($view, array $parameters = array(), Response $response = null)
     {
@@ -255,6 +305,8 @@ trait ControllerTrait
      * @param StreamedResponse $response   A response instance
      *
      * @return StreamedResponse A StreamedResponse instance
+     *
+     * @final since version 3.4
      */
     protected function stream($view, array $parameters = array(), StreamedResponse $response = null)
     {
@@ -294,6 +346,8 @@ trait ControllerTrait
      * @param \Exception|null $previous The previous exception
      *
      * @return NotFoundHttpException
+     *
+     * @final since version 3.4
      */
     protected function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
@@ -311,6 +365,8 @@ trait ControllerTrait
      * @param \Exception|null $previous The previous exception
      *
      * @return AccessDeniedException
+     *
+     * @final since version 3.4
      */
     protected function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
     {
@@ -325,6 +381,8 @@ trait ControllerTrait
      * @param array  $options Options for the form
      *
      * @return Form
+     *
+     * @final since version 3.4
      */
     protected function createForm($type, $data = null, array $options = array())
     {
@@ -338,6 +396,8 @@ trait ControllerTrait
      * @param array $options Options for the form
      *
      * @return FormBuilder
+     *
+     * @final since version 3.4
      */
     protected function createFormBuilder($data = null, array $options = array())
     {
@@ -350,6 +410,8 @@ trait ControllerTrait
      * @return Registry
      *
      * @throws \LogicException If DoctrineBundle is not available
+     *
+     * @final since version 3.4
      */
     protected function getDoctrine()
     {
@@ -368,6 +430,8 @@ trait ControllerTrait
      * @throws \LogicException If SecurityBundle is not available
      *
      * @see TokenInterface::getUser()
+     *
+     * @final since version 3.4
      */
     protected function getUser()
     {
@@ -394,6 +458,8 @@ trait ControllerTrait
      * @param string $token The actual token sent with the request that should be validated
      *
      * @return bool
+     *
+     * @final since version 3.4
      */
     protected function isCsrfTokenValid($id, $token)
     {

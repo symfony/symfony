@@ -105,6 +105,8 @@ final class Locale extends \Locale
         if (strlen($locale) < 4) {
             return self::$defaultFallback;
         }
+
+        return null;
     }
 
     /**

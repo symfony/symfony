@@ -82,22 +82,24 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                 // baz3
                 if ('/test/baz3' === $trimmedPathinfo) {
+                    $ret = array('_route' => 'baz3');
                     if (substr($pathinfo, -1) !== '/') {
-                        return $this->redirect($pathinfo.'/', 'baz3');
+                        return array_replace($ret, $this->redirect($pathinfo.'/', 'baz3'));
                     }
 
-                    return array('_route' => 'baz3');
+                    return $ret;
                 }
 
             }
 
             // baz4
             if (preg_match('#^/test/(?P<foo>[^/]++)/?$#s', $pathinfo, $matches)) {
+                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz4')), array ());
                 if (substr($pathinfo, -1) !== '/') {
-                    return $this->redirect($pathinfo.'/', 'baz4');
+                    return array_replace($ret, $this->redirect($pathinfo.'/', 'baz4'));
                 }
 
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz4')), array ());
+                return $ret;
             }
 
             // baz5
@@ -176,11 +178,12 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // hey
             if ('/multi/hey' === $trimmedPathinfo) {
+                $ret = array('_route' => 'hey');
                 if (substr($pathinfo, -1) !== '/') {
-                    return $this->redirect($pathinfo.'/', 'hey');
+                    return array_replace($ret, $this->redirect($pathinfo.'/', 'hey'));
                 }
 
-                return array('_route' => 'hey');
+                return $ret;
             }
 
             // overridden2
@@ -321,22 +324,24 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         // secure
         if ('/secure' === $pathinfo) {
+            $ret = array('_route' => 'secure');
             $requiredSchemes = array (  'https' => 0,);
             if (!isset($requiredSchemes[$scheme])) {
-                return $this->redirect($pathinfo, 'secure', key($requiredSchemes));
+                return array_replace($ret, $this->redirect($pathinfo, 'secure', key($requiredSchemes)));
             }
 
-            return array('_route' => 'secure');
+            return $ret;
         }
 
         // nonsecure
         if ('/nonsecure' === $pathinfo) {
+            $ret = array('_route' => 'nonsecure');
             $requiredSchemes = array (  'http' => 0,);
             if (!isset($requiredSchemes[$scheme])) {
-                return $this->redirect($pathinfo, 'nonsecure', key($requiredSchemes));
+                return array_replace($ret, $this->redirect($pathinfo, 'nonsecure', key($requiredSchemes)));
             }
 
-            return array('_route' => 'nonsecure');
+            return $ret;
         }
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();

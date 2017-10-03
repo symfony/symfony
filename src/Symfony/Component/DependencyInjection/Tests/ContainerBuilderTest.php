@@ -630,6 +630,7 @@ class ContainerBuilderTest extends TestCase
         $container->setParameter('env(HTTP_DUMMY_VAR)', '123');
         $container->register('teatime', 'stdClass')
             ->setProperty('foo', '%env(DUMMY_ENV_VAR)%')
+            ->setPublic(true)
         ;
         $container->compile(true);
 
@@ -663,6 +664,74 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('foo', '%env(FOO)%');
         $container->compile(true);
+    }
+
+    public function testDynamicEnv()
+    {
+        putenv('DUMMY_FOO=some%foo%');
+        putenv('DUMMY_BAR=%bar%');
+
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', 'Foo%env(resolve:DUMMY_BAR)%');
+        $container->setParameter('bar', 'Bar');
+        $container->setParameter('baz', '%env(resolve:DUMMY_FOO)%');
+
+        $container->compile(true);
+        putenv('DUMMY_FOO');
+        putenv('DUMMY_BAR');
+
+        $this->assertSame('someFooBar', $container->getParameter('baz'));
+    }
+
+    public function testCastEnv()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FAKE)', '123');
+
+        $container->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setProperties(array(
+                'fake' => '%env(int:FAKE)%',
+            ));
+
+        $container->compile(true);
+
+        $this->assertSame(123, $container->get('foo')->fake);
+    }
+
+    public function testEnvAreNullable()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FAKE)', null);
+
+        $container->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setProperties(array(
+            'fake' => '%env(int:FAKE)%',
+        ));
+
+        $container->compile(true);
+
+        $this->assertNull($container->get('foo')->fake);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException
+     * @expectedExceptionMessage Circular reference detected for parameter "env(resolve:DUMMY_ENV_VAR)" ("env(resolve:DUMMY_ENV_VAR)" > "env(resolve:DUMMY_ENV_VAR)").
+     */
+    public function testCircularDynamicEnv()
+    {
+        putenv('DUMMY_ENV_VAR=some%foo%');
+
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', '%bar%');
+        $container->setParameter('bar', '%env(resolve:DUMMY_ENV_VAR)%');
+
+        try {
+            $container->compile(true);
+        } finally {
+            putenv('DUMMY_ENV_VAR');
+        }
     }
 
     /**
@@ -738,32 +807,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testAddClassResource()
-    {
-        $container = new ContainerBuilder();
-
-        $container->setResourceTracking(false);
-        $container->addClassResource(new \ReflectionClass('BarClass'));
-
-        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
-
-        $container->setResourceTracking(true);
-        $container->addClassResource(new \ReflectionClass('BarClass'));
-
-        $resources = $container->getResources();
-
-        $this->assertCount(2, $resources, '2 resources were registered');
-
-        /* @var $resource \Symfony\Component\Config\Resource\FileResource */
-        $resource = end($resources);
-
-        $this->assertInstanceOf('Symfony\Component\Config\Resource\FileResource', $resource);
-        $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
-    }
-
     public function testGetReflectionClass()
     {
         $container = new ContainerBuilder();
@@ -796,7 +839,7 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
 
-        $container->register('foo', 'BarClass');
+        $container->register('foo', 'BarClass')->setPublic(true);
         $container->getDefinition('foo')->setLazy(true);
 
         $container->compile();
@@ -895,7 +938,7 @@ class ContainerBuilderTest extends TestCase
 
         $container->addDefinitions(array(
             'bar' => $fooDefinition,
-            'bar_user' => $fooUserDefinition,
+            'bar_user' => $fooUserDefinition->setPublic(true),
         ));
 
         $container->compile();
@@ -909,7 +952,7 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
-        $container->setDefinition('a', new Definition('stdClass'));
+        $container->register('a', 'stdClass')->setPublic(true);
         $container->compile();
         $container->set('a', new \stdClass());
     }
@@ -926,7 +969,7 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $def = new Definition('stdClass');
-        $def->setSynthetic(true);
+        $def->setSynthetic(true)->setPublic(true);
         $container->setDefinition('a', $def);
         $container->compile();
         $container->set('a', $a = new \stdClass());
@@ -967,10 +1010,10 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
 
         $abstract = new Definition('AbstractClass');
-        $abstract->setAbstract(true);
+        $abstract->setAbstract(true)->setPublic(true);
 
         $container->setDefinition('abstract_service', $abstract);
-        $container->setAlias('abstract_alias', 'abstract_service');
+        $container->setAlias('abstract_alias', 'abstract_service')->setPublic(true);
 
         $container->compile();
 
@@ -984,6 +1027,7 @@ class ContainerBuilderTest extends TestCase
             $container->set('a', new \BazClass());
             $definition = new Definition('BazClass');
             $definition->setLazy(true);
+            $definition->setPublic(true);
             $container->setDefinition('a', $definition);
         });
 
@@ -1011,6 +1055,7 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass');
         $container->register('bar', 'MethodCallClass')
+            ->setPublic(true)
             ->setProperty('simple', 'bar')
             ->setProperty('complex', new Reference('foo'))
             ->addMethodCall('callMe');
@@ -1024,9 +1069,10 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register(A::class);
+        $container->register(A::class)->setPublic(true);
         $bDefinition = $container->register('b', __NAMESPACE__.'\B');
         $bDefinition->setAutowired(true);
+        $bDefinition->setPublic(true);
 
         $container->compile();
 
@@ -1085,17 +1131,50 @@ class ContainerBuilderTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo_service', ServiceLocator::class)
+            ->setPublic(true)
             ->addArgument(array(
                 'bar' => new ServiceClosureArgument(new Reference('bar_service')),
                 'baz' => new ServiceClosureArgument(new TypedReference('baz_service', 'stdClass')),
             ))
         ;
-        $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')));
+        $container->register('bar_service', 'stdClass')->setArguments(array(new Reference('baz_service')))->setPublic(true);
         $container->register('baz_service', 'stdClass')->setPublic(false);
         $container->compile();
 
         $this->assertInstanceOf(ServiceLocator::class, $foo = $container->get('foo_service'));
         $this->assertSame($container->get('bar_service'), $foo->get('bar'));
+    }
+
+    public function testUninitializedReference()
+    {
+        $container = include __DIR__.'/Fixtures/containers/container_uninitialized_ref.php';
+        $container->compile();
+
+        $bar = $container->get('bar');
+
+        $this->assertNull($bar->foo1);
+        $this->assertNull($bar->foo2);
+        $this->assertNull($bar->foo3);
+        $this->assertNull($bar->closures[0]());
+        $this->assertNull($bar->closures[1]());
+        $this->assertNull($bar->closures[2]());
+        $this->assertSame(array(), iterator_to_array($bar->iter));
+
+        $container = include __DIR__.'/Fixtures/containers/container_uninitialized_ref.php';
+        $container->compile();
+
+        $container->get('foo1');
+        $container->get('baz');
+
+        $bar = $container->get('bar');
+
+        $this->assertEquals(new \stdClass(), $bar->foo1);
+        $this->assertNull($bar->foo2);
+        $this->assertEquals(new \stdClass(), $bar->foo3);
+        $this->assertEquals(new \stdClass(), $bar->closures[0]());
+        $this->assertNull($bar->closures[1]());
+        $this->assertEquals(new \stdClass(), $bar->closures[2]());
+        $this->assertEquals(array('foo1' => new \stdClass(), 'foo3' => new \stdClass()), iterator_to_array($bar->iter));
     }
 
     public function testRegisterForAutoconfiguration()
@@ -1109,25 +1188,31 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame($childDefA, $container->registerForAutoconfiguration('AInterface'));
     }
 
-    /**
-     * This test checks the trigger of a deprecation note and should not be removed in major releases.
-     *
-     * @group legacy
-     * @expectedDeprecation The "foo" service is deprecated. You should stop using it, as it will soon be removed.
-     */
-    public function testPrivateServiceTriggersDeprecation()
+    public function testCaseSensitivity()
     {
         $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass')
-            ->setPublic(false)
-            ->setDeprecated(true);
-        $container->register('bar', 'stdClass')
-            ->setPublic(true)
-            ->setProperty('foo', new Reference('foo'));
+        $container->register('foo', 'stdClass')->setPublic(true);
+        $container->register('Foo', 'stdClass')->setProperty('foo', new Reference('foo'))->setPublic(false);
+        $container->register('fOO', 'stdClass')->setProperty('Foo', new Reference('Foo'))->setPublic(true);
+
+        $this->assertSame(array('service_container', 'foo', 'Foo', 'fOO', 'Psr\Container\ContainerInterface', 'Symfony\Component\DependencyInjection\ContainerInterface'), $container->getServiceIds());
 
         $container->compile();
 
-        $container->get('bar');
+        $this->assertNotSame($container->get('foo'), $container->get('fOO'), '->get() returns the service for the given id, case sensitively');
+        $this->assertSame($container->get('fOO')->Foo->foo, $container->get('foo'), '->get() returns the service for the given id, case sensitively');
+    }
+
+    public function testParameterWithMixedCase()
+    {
+        $container = new ContainerBuilder(new ParameterBag(array('foo' => 'bar', 'FOO' => 'BAR')));
+        $container->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->setProperty('foo', '%FOO%');
+
+        $container->compile();
+
+        $this->assertSame('BAR', $container->get('foo')->foo);
     }
 }
 

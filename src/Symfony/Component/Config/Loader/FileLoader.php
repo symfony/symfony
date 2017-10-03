@@ -79,7 +79,7 @@ abstract class FileLoader extends Loader
      * @throws FileLoaderImportCircularReferenceException
      * @throws FileLocatorFileNotFoundException
      */
-    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
+    public function import($resource, $type = null, bool $ignoreErrors = false, $sourceResource = null)
     {
         if (is_string($resource) && strlen($resource) !== $i = strcspn($resource, '*?{[')) {
             $ret = array();
@@ -102,7 +102,7 @@ abstract class FileLoader extends Loader
     /**
      * @internal
      */
-    protected function glob($pattern, $recursive, &$resource = null, $ignoreErrors = false)
+    protected function glob(string $pattern, bool $recursive, &$resource = null, bool $ignoreErrors = false)
     {
         if (strlen($pattern) === $i = strcspn($pattern, '*?{[')) {
             $prefix = $pattern;
@@ -136,7 +136,7 @@ abstract class FileLoader extends Loader
         }
     }
 
-    private function doImport($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
+    private function doImport($resource, $type = null, bool $ignoreErrors = false, $sourceResource = null)
     {
         try {
             $loader = $this->resolve($resource, $type);

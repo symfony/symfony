@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added using options from Memcached DSN
+ * added PruneableInterface so PSR-6 or PSR-16 cache implementations can declare support for manual stale cache pruning
+ * added prune logic to FilesystemTrait, PhpFilesTrait, PdoTrait, TagAwareAdapter and ChainTrait
+ * now FilesystemAdapter, PhpFilesAdapter, FilesystemCache, PhpFilesCache, PdoAdapter, PdoCache, ChainAdapter, and
+   ChainCache implement PruneableInterface and support manual stale cache pruning
+
 3.3.0
 -----
 

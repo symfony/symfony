@@ -51,7 +51,7 @@ class GuardListener
     }
 
     // code should be sync with Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter
-    private function getVariables(GuardEvent $event)
+    private function getVariables(GuardEvent $event): array
     {
         $token = $this->tokenStorage->getToken();
 

@@ -45,22 +45,22 @@ abstract class ManagerRegistry extends AbstractManagerRegistry implements Contai
         $manager = $this->container->get($name);
 
         if (!$manager instanceof LazyLoadingInterface) {
-            @trigger_error(sprintf('Resetting a non-lazy manager service is deprecated since Symfony 3.2 and will throw an exception in version 4.0. Set the "%s" service as lazy and require "symfony/proxy-manager-bridge" in your composer.json file instead.', $name), E_USER_DEPRECATED);
-
-            $this->container->set($name, null);
-
-            return;
+            throw new \LogicException(sprintf('Resetting a non-lazy manager service is not supported. Set the "%s" service as lazy and require "symfony/proxy-manager-bridge" in your composer.json file instead.', $name));
         }
         $manager->setProxyInitializer(\Closure::bind(
             function (&$wrappedInstance, LazyLoadingInterface $manager) use ($name) {
-                if (isset($this->normalizedIds[$normalizedId = strtolower($name)])) {
+                if (isset($this->normalizedIds[$normalizedId = strtolower($name)])) { // BC with DI v3.4
                     $name = $this->normalizedIds[$normalizedId];
                 }
                 if (isset($this->aliases[$name])) {
                     $name = $this->aliases[$name];
                 }
-                $method = !isset($this->methodMap[$name]) ? 'get'.strtr($name, $this->underscoreMap).'Service' : $this->methodMap[$name];
-                $wrappedInstance = $this->{$method}(false);
+                if (isset($this->fileMap[$name])) {
+                    $wrappedInstance = $this->load($this->fileMap[$name], false);
+                } else {
+                    $method = $this->methodMap[$name] ?? 'get'.strtr($name, $this->underscoreMap).'Service'; // BC with DI v3.4
+                    $wrappedInstance = $this->{$method}(false);
+                }
 
                 $manager->setProxyInitializer(null);
 

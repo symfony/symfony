@@ -3,19 +3,18 @@
 use %a
 class LazyServiceProjectServiceContainer extends Container
 {%a
-    public function getFooService($lazyLoad = true)
+    protected function getFooService($lazyLoad = true)
     {
         if ($lazyLoad) {
-
-            return $this->services['foo'] =%sstdClass_%s(
-                function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
+            return $this->services['foo'] = $this->createProxy('stdClass_%s', function () {
+                return %S\stdClass_%s(function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
                     $wrappedInstance = $this->getFooService(false);
 
                     $proxy->setProxyInitializer(null);
 
                     return true;
-                }
-            );
+                });
+            });
         }
 
         return new \stdClass();

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
@@ -34,13 +35,15 @@ class Definition
     private $configurator;
     private $tags = array();
     private $public = true;
+    private $private = true;
     private $synthetic = false;
     private $abstract = false;
     private $lazy = false;
     private $decoratedService;
     private $autowired = false;
-    private $autowiringTypes = array();
     private $changes = array();
+    private $bindings = array();
+    private $errors = array();
 
     protected $arguments = array();
 
@@ -600,6 +603,7 @@ class Definition
         $this->changes['public'] = true;
 
         $this->public = (bool) $boolean;
+        $this->private = false;
 
         return $this;
     }
@@ -612,6 +616,35 @@ class Definition
     public function isPublic()
     {
         return $this->public;
+    }
+
+    /**
+     * Sets if this service is private.
+     *
+     * When set, the "private" state has a higher precedence than "public".
+     * In version 3.4, a "private" service always remains publicly accessible,
+     * but triggers a deprecation notice when accessed from the container,
+     * so that the service can be made really private in 4.0.
+     *
+     * @param bool $boolean
+     *
+     * @return $this
+     */
+    public function setPrivate($boolean)
+    {
+        $this->private = (bool) $boolean;
+
+        return $this;
+    }
+
+    /**
+     * Whether this service is private.
+     *
+     * @return bool
+     */
+    public function isPrivate()
+    {
+        return $this->private;
     }
 
     /**
@@ -778,28 +811,6 @@ class Definition
     }
 
     /**
-     * Sets types that will default to this definition.
-     *
-     * @param string[] $types
-     *
-     * @return $this
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
-     */
-    public function setAutowiringTypes(array $types)
-    {
-        @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', E_USER_DEPRECATED);
-
-        $this->autowiringTypes = array();
-
-        foreach ($types as $type) {
-            $this->autowiringTypes[$type] = true;
-        }
-
-        return $this;
-    }
-
-    /**
      * Is the definition autowired?
      *
      * @return bool
@@ -826,70 +837,56 @@ class Definition
     }
 
     /**
-     * Gets autowiring types that will default to this definition.
+     * Gets bindings.
      *
-     * @return string[]
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
+     * @return array
      */
-    public function getAutowiringTypes(/*$triggerDeprecation = true*/)
+    public function getBindings()
     {
-        if (1 > func_num_args() || func_get_arg(0)) {
-            @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', E_USER_DEPRECATED);
+        return $this->bindings;
+    }
+
+    /**
+     * Sets bindings.
+     *
+     * Bindings map $named or FQCN arguments to values that should be
+     * injected in the matching parameters (of the constructor, of methods
+     * called and of controller actions).
+     *
+     * @param array $bindings
+     *
+     * @return $this
+     */
+    public function setBindings(array $bindings)
+    {
+        foreach ($bindings as $key => $binding) {
+            if (!$binding instanceof BoundArgument) {
+                $bindings[$key] = new BoundArgument($binding);
+            }
         }
 
-        return array_keys($this->autowiringTypes);
-    }
-
-    /**
-     * Adds a type that will default to this definition.
-     *
-     * @param string $type
-     *
-     * @return $this
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
-     */
-    public function addAutowiringType($type)
-    {
-        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
-
-        $this->autowiringTypes[$type] = true;
+        $this->bindings = $bindings;
 
         return $this;
     }
 
     /**
-     * Removes a type.
+     * Add an error that occurred when building this Definition.
      *
-     * @param string $type
-     *
-     * @return $this
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
+     * @param string $error
      */
-    public function removeAutowiringType($type)
+    public function addError($error)
     {
-        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
-
-        unset($this->autowiringTypes[$type]);
-
-        return $this;
+        $this->errors[] = $error;
     }
 
     /**
-     * Will this definition default for the given type?
+     * Returns any errors that occurred while building this Definition.
      *
-     * @param string $type
-     *
-     * @return bool
-     *
-     * @deprecated since version 3.3, to be removed in 4.0.
+     * @return array
      */
-    public function hasAutowiringType($type)
+    public function getErrors()
     {
-        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
-
-        return isset($this->autowiringTypes[$type]);
+        return $this->errors;
     }
 }

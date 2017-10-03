@@ -12,6 +12,8 @@
 namespace Symfony\Component\Config\Tests\Definition\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
 
@@ -69,6 +71,35 @@ EOL
         );
     }
 
+    public function testInvalidYamlExample()
+    {
+        $config = $this->prophesize(ConfigurationInterface::class);
+        $config->getConfigTreeBuilder()->will(function () {
+            $builder = new TreeBuilder();
+            $root = $builder->root('dump_example');
+
+            $root->children()->scalarNode('scalar_value')
+                ->example(
+                    array(
+                        'valid value',
+                        'another valid value'
+                    )
+                );
+                return $builder;
+        });
+        $dumper = new YamlReferenceDumper();
+        $expected = <<<EOL
+dump_example:
+    scalar_value:         ~
+
+        # Examples:
+        # - valid value
+        # - another valid value
+
+EOL;
+        $this->assertEquals($expected, $dumper->dump($config->reveal()));
+    }
+
     /**
      * @dataProvider provideDumpAtPath
      */
@@ -98,6 +129,8 @@ acme_root:
         - elem1
         - elem2
     scalar_required:      ~ # Required
+    scalar_deprecated:    ~ # Deprecated (The child node "scalar_deprecated" at path "acme_root.scalar_deprecated" is deprecated.)
+    scalar_deprecated_with_message: ~ # Deprecated (Deprecation custom message for "scalar_deprecated_with_message" at "acme_root.scalar_deprecated_with_message")
     node_with_a_looong_name: ~
     enum_with_default:    this # One of "this"; "that"
     enum:                 ~ # One of "this"; "that"

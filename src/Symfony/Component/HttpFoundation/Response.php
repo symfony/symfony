@@ -199,11 +199,6 @@ class Response
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
-
-        /* RFC2616 - 14.18 says all Responses need to have a Date */
-        if (!$this->headers->has('Date')) {
-            $this->setDate(\DateTime::createFromFormat('U', time()));
-        }
     }
 
     /**
@@ -330,11 +325,6 @@ class Response
         // headers have already been sent by the developer
         if (headers_sent()) {
             return $this;
-        }
-
-        /* RFC2616 - 14.18 says all Responses need to have a Date */
-        if (!$this->headers->has('Date')) {
-            $this->setDate(\DateTime::createFromFormat('U', time()));
         }
 
         // headers
@@ -619,6 +609,34 @@ class Response
     }
 
     /**
+     * Marks the response as "immutable".
+     *
+     * @param bool $immutable enables or disables the immutable directive
+     *
+     * @return $this
+     */
+    public function setImmutable($immutable = true)
+    {
+        if ($immutable) {
+            $this->headers->addCacheControlDirective('immutable');
+        } else {
+            $this->headers->removeCacheControlDirective('immutable');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns true if the response is marked as "immutable".
+     *
+     * @return bool returns true if the response is marked as "immutable"; otherwise false
+     */
+    public function isImmutable()
+    {
+        return $this->headers->hasCacheControlDirective('immutable');
+    }
+
+    /**
      * Returns true if the response must be revalidated by caches.
      *
      * This method indicates that the response must not be served stale by a
@@ -646,15 +664,6 @@ class Response
      */
     public function getDate()
     {
-        /*
-            RFC2616 - 14.18 says all Responses need to have a Date.
-            Make sure we provide one even if it the header
-            has been removed in the meantime.
-         */
-        if (!$this->headers->has('Date')) {
-            $this->setDate(\DateTime::createFromFormat('U', time()));
-        }
-
         return $this->headers->getDate('Date');
     }
 
@@ -954,7 +963,7 @@ class Response
      */
     public function setCache(array $options)
     {
-        if ($diff = array_diff(array_keys($options), array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public'))) {
+        if ($diff = array_diff(array_keys($options), array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public', 'immutable'))) {
             throw new \InvalidArgumentException(sprintf('Response does not support the following options: "%s".', implode('", "', array_values($diff))));
         }
 
@@ -988,6 +997,10 @@ class Response
             } else {
                 $this->setPublic();
             }
+        }
+
+        if (isset($options['immutable'])) {
+            $this->setImmutable((bool) $options['immutable']);
         }
 
         return $this;
@@ -1256,8 +1269,7 @@ class Response
     {
         $status = ob_get_status(true);
         $level = count($status);
-        // PHP_OUTPUT_HANDLER_* are not defined on HHVM 3.3
-        $flags = defined('PHP_OUTPUT_HANDLER_REMOVABLE') ? PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE) : -1;
+        $flags = PHP_OUTPUT_HANDLER_REMOVABLE | ($flush ? PHP_OUTPUT_HANDLER_FLUSHABLE : PHP_OUTPUT_HANDLER_CLEANABLE);
 
         while ($level-- > $targetLevel && ($s = $status[$level]) && (!isset($s['del']) ? !isset($s['flags']) || ($s['flags'] & $flags) === $flags : $s['del'])) {
             if ($flush) {

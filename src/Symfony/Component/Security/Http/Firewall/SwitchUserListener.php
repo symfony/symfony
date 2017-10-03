@@ -38,6 +38,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class SwitchUserListener implements ListenerInterface
 {
+    const EXIT_VALUE = '_exit';
+
     private $tokenStorage;
     private $provider;
     private $userChecker;
@@ -47,8 +49,9 @@ class SwitchUserListener implements ListenerInterface
     private $role;
     private $logger;
     private $dispatcher;
+    private $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, $stateless = false)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -63,6 +66,7 @@ class SwitchUserListener implements ListenerInterface
         $this->role = $role;
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
+        $this->stateless = $stateless;
     }
 
     /**
@@ -80,7 +84,7 @@ class SwitchUserListener implements ListenerInterface
             return;
         }
 
-        if ('_exit' === $request->get($this->usernameParameter)) {
+        if (self::EXIT_VALUE === $request->get($this->usernameParameter)) {
             $this->tokenStorage->setToken($this->attemptExitUser($request));
         } else {
             try {
@@ -90,12 +94,13 @@ class SwitchUserListener implements ListenerInterface
             }
         }
 
-        $request->query->remove($this->usernameParameter);
-        $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+        if (!$this->stateless) {
+            $request->query->remove($this->usernameParameter);
+            $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+            $response = new RedirectResponse($request->getUri(), 302);
 
-        $response = new RedirectResponse($request->getUri(), 302);
-
-        $event->setResponse($response);
+            $event->setResponse($response);
+        }
     }
 
     /**
@@ -143,8 +148,10 @@ class SwitchUserListener implements ListenerInterface
         $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
 
         if (null !== $this->dispatcher) {
-            $switchEvent = new SwitchUserEvent($request, $token->getUser());
+            $switchEvent = new SwitchUserEvent($request, $token->getUser(), $token);
             $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
+            // use the token from the event in case any listeners have replaced it.
+            $token = $switchEvent->getToken();
         }
 
         return $token;
@@ -167,8 +174,9 @@ class SwitchUserListener implements ListenerInterface
 
         if (null !== $this->dispatcher && $original->getUser() instanceof UserInterface) {
             $user = $this->provider->refreshUser($original->getUser());
-            $switchEvent = new SwitchUserEvent($request, $user);
+            $switchEvent = new SwitchUserEvent($request, $user, $original);
             $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
+            $original = $switchEvent->getToken();
         }
 
         return $original;

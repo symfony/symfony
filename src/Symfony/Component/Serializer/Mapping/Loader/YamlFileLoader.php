@@ -15,7 +15,6 @@ use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * YAML File Loader.
@@ -114,17 +113,7 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new Parser();
         }
 
-        $prevErrorHandler = set_error_handler(function ($level, $message, $script, $line) use (&$prevErrorHandler) {
-            $message = E_USER_DEPRECATED === $level ? preg_replace('/ on line \d+/', ' in "'.$this->file.'"$0', $message) : $message;
-
-            return $prevErrorHandler ? $prevErrorHandler($level, $message, $script, $line) : false;
-        });
-
-        try {
-            $classes = $this->yamlParser->parse(file_get_contents($this->file), Yaml::PARSE_KEYS_AS_STRINGS);
-        } finally {
-            restore_error_handler();
-        }
+        $classes = $this->yamlParser->parseFile($this->file);
 
         if (empty($classes)) {
             return array();

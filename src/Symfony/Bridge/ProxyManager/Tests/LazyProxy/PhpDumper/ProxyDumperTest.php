@@ -55,49 +55,35 @@ class ProxyDumperTest extends TestCase
         $code = $this->dumper->getProxyCode($definition);
 
         $this->assertStringMatchesFormat(
-            '%Aclass SymfonyBridgeProxyManagerTestsLazyProxyPhpDumperProxyDumperTest%aextends%w'
+            '%Aclass ProxyDumperTest%aextends%w'
                 .'\Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper\ProxyDumperTest%a',
             $code
         );
     }
 
-    public function testGetProxyFactoryCodeWithCustomMethod()
-    {
-        $definition = new Definition(__CLASS__);
-
-        $definition->setLazy(true);
-
-        $code = $this->dumper->getProxyFactoryCode($definition, 'foo', 'getFoo2Service');
-
-        $this->assertStringMatchesFormat(
-            '%wif ($lazyLoad) {%wreturn $this->services[\'foo\'] =%s'
-            .'SymfonyBridgeProxyManagerTestsLazyProxyPhpDumperProxyDumperTest_%s(%wfunction '
-            .'(&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {'
-            .'%w$wrappedInstance = $this->getFoo2Service(false);%w$proxy->setProxyInitializer(null);'
-            .'%wreturn true;%w}%w);%w}%w',
-           $code
-        );
-    }
-
-    /**
-     * @group legacy
-     */
     public function testGetProxyFactoryCode()
     {
         $definition = new Definition(__CLASS__);
 
         $definition->setLazy(true);
 
-        $code = $this->dumper->getProxyFactoryCode($definition, 'foo');
+        $code = $this->dumper->getProxyFactoryCode($definition, 'foo', '$this->getFoo2Service(false)');
 
         $this->assertStringMatchesFormat(
-            '%wif ($lazyLoad) {%wreturn $this->services[\'foo\'] =%s'
-            .'SymfonyBridgeProxyManagerTestsLazyProxyPhpDumperProxyDumperTest_%s(%wfunction '
-            .'(&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {'
-            .'%w$wrappedInstance = $this->getFooService(false);%w$proxy->setProxyInitializer(null);'
-            .'%wreturn true;%w}%w);%w}%w',
+            '%A$wrappedInstance = $this->getFoo2Service(false);%w$proxy->setProxyInitializer(null);%A',
             $code
         );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Missing factory code to construct the service "foo".
+     */
+    public function testGetProxyFactoryCodeWithoutCustomMethod()
+    {
+        $definition = new Definition(__CLASS__);
+        $definition->setLazy(true);
+        $this->dumper->getProxyFactoryCode($definition, 'foo');
     }
 
     /**

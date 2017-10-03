@@ -308,10 +308,6 @@ class TextDescriptor extends Descriptor
         $tableRows[] = array('Autowired', $definition->isAutowired() ? 'yes' : 'no');
         $tableRows[] = array('Autoconfigured', $definition->isAutoconfigured() ? 'yes' : 'no');
 
-        if ($autowiringTypes = $definition->getAutowiringTypes(false)) {
-            $tableRows[] = array('Autowiring Types', implode(', ', $autowiringTypes));
-        }
-
         if ($definition->getFile()) {
             $tableRows[] = array('Required File', $definition->getFile() ? $definition->getFile() : '-');
         }

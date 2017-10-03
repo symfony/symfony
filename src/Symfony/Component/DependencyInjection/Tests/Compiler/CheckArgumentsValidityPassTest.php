@@ -64,4 +64,15 @@ class CheckArgumentsValidityPassTest extends TestCase
             array(array(), array(array('baz', array(1 => 1)))),
         );
     }
+
+    public function testNoException()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register('foo');
+        $definition->setArguments(array(null, 'a' => 'a'));
+
+        $pass = new CheckArgumentsValidityPass(false);
+        $pass->process($container);
+        $this->assertCount(1, $definition->getErrors());
+    }
 }

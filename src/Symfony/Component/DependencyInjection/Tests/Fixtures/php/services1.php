@@ -18,12 +18,22 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
+    private $privates = array();
 
     public function __construct()
     {
-        $this->services = array();
+        $this->services = $this->privates = array();
 
         $this->aliases = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->privates = array();
+        parent::reset();
     }
 
     /**
@@ -39,16 +49,6 @@ class ProjectServiceContainer extends Container
      */
     public function isCompiled()
     {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isFrozen()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
-
         return true;
     }
 }

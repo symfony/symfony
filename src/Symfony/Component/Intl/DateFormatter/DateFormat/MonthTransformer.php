@@ -74,7 +74,7 @@ class MonthTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function format(\DateTime $dateTime, $length)
+    public function format(\DateTime $dateTime, int $length): string
     {
         $matchLengthMap = array(
             1 => 'n',
@@ -97,7 +97,7 @@ class MonthTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function getReverseMatchingRegExp($length)
+    public function getReverseMatchingRegExp(int $length): string
     {
         switch ($length) {
             case 1:
@@ -123,7 +123,7 @@ class MonthTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function extractDateOptions($matched, $length)
+    public function extractDateOptions(string $matched, int $length): array
     {
         if (!is_numeric($matched)) {
             if (3 === $length) {

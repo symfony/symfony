@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Bundle\WebServerBundle\WebServerConfig;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,7 +26,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  */
-class ServerStartCommand extends ServerCommand
+class ServerStartCommand extends Command
 {
     private $documentRoot;
     private $environment;
@@ -93,17 +94,11 @@ EOF
                 'You can either install it or use the "server:run" command instead.',
             ));
 
-            if ($io->ask('Do you want to execute <info>server:run</info> immediately? [yN] ', false)) {
+            if ($io->confirm('Do you want to execute <info>server:run</info> immediately?', false)) {
                 return $this->getApplication()->find('server:run')->run($input, $output);
             }
 
             return 1;
-        }
-
-        // deprecated, logic to be removed in 4.0
-        // this allows the commands to work out of the box with web/ and public/
-        if ($this->documentRoot && !is_dir($this->documentRoot) && is_dir(dirname($this->documentRoot).'/web')) {
-            $this->documentRoot = dirname($this->documentRoot).'/web';
         }
 
         if (null === $documentRoot = $input->getOption('docroot')) {

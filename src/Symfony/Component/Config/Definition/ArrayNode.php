@@ -250,6 +250,10 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 continue;
             }
 
+            if ($child->isDeprecated()) {
+                @trigger_error($child->getDeprecationMessage($name, $this->getPath()), E_USER_DEPRECATED);
+            }
+
             try {
                 $value[$name] = $child->finalize($value[$name]);
             } catch (UnsetKeyException $e) {

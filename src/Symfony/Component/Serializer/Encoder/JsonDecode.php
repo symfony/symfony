@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 /**
  * Decodes JSON data.
@@ -69,11 +69,11 @@ class JsonDecode implements DecoderInterface
      *      If not specified, this method will use the default set in JsonDecode::__construct
      *
      * json_decode_options: integer
-     *      Specifies additional options as per documentation for json_decode. Only supported with PHP 5.4.0 and higher
+     *      Specifies additional options as per documentation for json_decode.
      *
      * @return mixed
      *
-     * @throws UnexpectedValueException
+     * @throws NotEncodableValueException
      *
      * @see http://php.net/json_decode json_decode
      */
@@ -88,7 +88,7 @@ class JsonDecode implements DecoderInterface
         $decodedData = json_decode($data, $associative, $recursionDepth, $options);
 
         if (JSON_ERROR_NONE !== $this->lastError = json_last_error()) {
-            throw new UnexpectedValueException(json_last_error_msg());
+            throw new NotEncodableValueException(json_last_error_msg());
         }
 
         return $decodedData;

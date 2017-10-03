@@ -85,7 +85,7 @@ class XliffFileDumper extends FileDumper
         foreach ($messages->all($domain) as $source => $target) {
             $translation = $dom->createElement('trans-unit');
 
-            $translation->setAttribute('id', md5($source));
+            $translation->setAttribute('id', strtr(substr(base64_encode(hash('sha256', $source, true)), 0, 7), '/+', '._'));
             $translation->setAttribute('resname', $source);
 
             $s = $translation->appendChild($dom->createElement('source'));
@@ -145,7 +145,24 @@ class XliffFileDumper extends FileDumper
 
         foreach ($messages->all($domain) as $source => $target) {
             $translation = $dom->createElement('unit');
-            $translation->setAttribute('id', md5($source));
+            $translation->setAttribute('id', strtr(substr(base64_encode(hash('sha256', $source, true)), 0, 7), '/+', '._'));
+            $metadata = $messages->getMetadata($source, $domain);
+
+            // Add notes section
+            if ($this->hasMetadataArrayInfo('notes', $metadata)) {
+                $notesElement = $dom->createElement('notes');
+                foreach ($metadata['notes'] as $note) {
+                    $n = $dom->createElement('note');
+                    $n->appendChild($dom->createTextNode(isset($note['content']) ? $note['content'] : ''));
+                    unset($note['content']);
+
+                    foreach ($note as $name => $value) {
+                        $n->setAttribute($name, $value);
+                    }
+                    $notesElement->appendChild($n);
+                }
+                $translation->appendChild($notesElement);
+            }
 
             $segment = $translation->appendChild($dom->createElement('segment'));
 
@@ -156,7 +173,6 @@ class XliffFileDumper extends FileDumper
             $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);
 
             $targetElement = $dom->createElement('target');
-            $metadata = $messages->getMetadata($source, $domain);
             if ($this->hasMetadataArrayInfo('target-attributes', $metadata)) {
                 foreach ($metadata['target-attributes'] as $name => $value) {
                     $targetElement->setAttribute($name, $value);

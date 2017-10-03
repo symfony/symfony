@@ -72,6 +72,16 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     /**
      * {@inheritdoc}
      */
+    public function provideValidComparisonsToPropertyPath()
+    {
+        return array(
+            array(5),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function provideInvalidComparisons()
     {
         return array(

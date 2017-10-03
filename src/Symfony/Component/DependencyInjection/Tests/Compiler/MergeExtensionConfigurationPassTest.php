@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -52,6 +53,22 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $pass->process($container);
 
         $this->assertEquals(array($provider), $tmpProviders);
+    }
+
+    public function testExtensionLoadGetAMergeExtensionConfigurationContainerBuilderInstance()
+    {
+        $extension = $this->getMockBuilder(FooExtension::class)->setMethods(array('load'))->getMock();
+        $extension->expects($this->once())
+            ->method('load')
+            ->with($this->isType('array'), $this->isInstanceOf(MergeExtensionConfigurationContainerBuilder::class))
+        ;
+
+        $container = new ContainerBuilder(new ParameterBag());
+        $container->registerExtension($extension);
+        $container->prependExtensionConfig('foo', array());
+
+        $pass = new MergeExtensionConfigurationPass();
+        $pass->process($container);
     }
 
     public function testExtensionConfigurationIsTrackedByDefault()

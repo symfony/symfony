@@ -45,7 +45,7 @@
                  public="false"
                  abstract="true" />
 
-        <service id="security.rememberme.response_listener" class="Symfony\Component\Security\Http\RememberMe\ResponseListener" public="true">
+        <service id="security.rememberme.response_listener" class="Symfony\Component\Security\Http\RememberMe\ResponseListener">
             <tag name="kernel.event_subscriber" />
         </service>
     </services>

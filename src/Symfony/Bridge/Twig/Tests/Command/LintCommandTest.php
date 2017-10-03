@@ -73,10 +73,7 @@ class LintCommandTest extends TestCase
      */
     private function createCommandTester()
     {
-        $twig = new Environment(new FilesystemLoader());
-
-        $command = new LintCommand();
-        $command->setTwigEnvironment($twig);
+        $command = new LintCommand(new Environment(new FilesystemLoader()));
 
         $application = new Application();
         $application->add($command);

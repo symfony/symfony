@@ -34,20 +34,27 @@ class StopwatchEvent
     private $category;
 
     /**
+     * @var bool
+     */
+    private $morePrecision;
+
+    /**
      * @var float[]
      */
     private $started = array();
 
     /**
-     * @param float       $origin   The origin time in milliseconds
-     * @param string|null $category The event category or null to use the default
+     * @param float       $origin        The origin time in milliseconds
+     * @param string|null $category      The event category or null to use the default
+     * @param bool        $morePrecision If true, time is stored as float to keep the original microsecond precision
      *
      * @throws \InvalidArgumentException When the raw time is not valid
      */
-    public function __construct($origin, $category = null)
+    public function __construct($origin, $category = null, $morePrecision = false)
     {
         $this->origin = $this->formatTime($origin);
         $this->category = is_string($category) ? $category : 'default';
+        $this->morePrecision = $morePrecision;
     }
 
     /**
@@ -95,7 +102,7 @@ class StopwatchEvent
             throw new \LogicException('stop() called but start() has not been called before.');
         }
 
-        $this->periods[] = new StopwatchPeriod(array_pop($this->started), $this->getNow());
+        $this->periods[] = new StopwatchPeriod(array_pop($this->started), $this->getNow(), $this->morePrecision);
 
         return $this;
     }
@@ -175,7 +182,7 @@ class StopwatchEvent
 
         for ($i = 0; $i < $left; ++$i) {
             $index = $stopped + $i;
-            $periods[] = new StopwatchPeriod($this->started[$index], $this->getNow());
+            $periods[] = new StopwatchPeriod($this->started[$index], $this->getNow(), $this->morePrecision);
         }
 
         $total = 0;

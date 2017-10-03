@@ -31,6 +31,7 @@ class PhpArrayCacheWithFallbackTest extends CacheTestCase
         'testSetMultipleInvalidKeys' => 'PhpArrayCache does no validation',
         'testSetMultipleInvalidTtl' => 'PhpArrayCache does no validation',
         'testHasInvalidKeys' => 'PhpArrayCache does no validation',
+        'testPrune' => 'PhpArrayCache just proxies',
     );
 
     protected static $file;

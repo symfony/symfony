@@ -18,6 +18,8 @@ namespace Symfony\Component\VarDumper\Caster;
  */
 class LinkStub extends ConstStub
 {
+    public $inVendor = false;
+
     private static $vendorRoots;
     private static $composerRoots;
 
@@ -50,10 +52,10 @@ class LinkStub extends ConstStub
         if ($label !== $this->attr['file'] = realpath($href) ?: $href) {
             return;
         }
-        if ($composerRoot = $this->getComposerRoot($href, $inVendor)) {
+        if ($composerRoot = $this->getComposerRoot($href, $this->inVendor)) {
             $this->attr['ellipsis'] = strlen($href) - strlen($composerRoot) + 1;
             $this->attr['ellipsis-type'] = 'path';
-            $this->attr['ellipsis-tail'] = 1 + ($inVendor ? 2 + strlen(implode(array_slice(explode(DIRECTORY_SEPARATOR, substr($href, 1 - $this->attr['ellipsis'])), 0, 2))) : 0);
+            $this->attr['ellipsis-tail'] = 1 + ($this->inVendor ? 2 + strlen(implode(array_slice(explode(DIRECTORY_SEPARATOR, substr($href, 1 - $this->attr['ellipsis'])), 0, 2))) : 0);
         } elseif (3 < count($ellipsis = explode(DIRECTORY_SEPARATOR, $href))) {
             $this->attr['ellipsis'] = 2 + strlen(implode(array_slice($ellipsis, -2)));
             $this->attr['ellipsis-type'] = 'path';

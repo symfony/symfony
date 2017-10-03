@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * deprecated `Symfony\Bridge\Twig\Form\TwigRenderer`
+ * deprecated `DebugCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument  of the constructor instead
+ * deprecated `LintCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument of the constructor instead
+
 3.3.0
 -----
 

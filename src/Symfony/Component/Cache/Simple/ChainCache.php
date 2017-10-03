@@ -13,6 +13,8 @@ namespace Symfony\Component\Cache\Simple;
 
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\ResettableInterface;
 
 /**
  * Chains several caches together.
@@ -22,7 +24,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ChainCache implements CacheInterface
+class ChainCache implements CacheInterface, PruneableInterface, ResettableInterface
 {
     private $miss;
     private $caches = array();
@@ -218,5 +220,33 @@ class ChainCache implements CacheInterface
         }
 
         return $saved;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prune()
+    {
+        $pruned = true;
+
+        foreach ($this->caches as $cache) {
+            if ($cache instanceof PruneableInterface) {
+                $pruned = $cache->prune() && $pruned;
+            }
+        }
+
+        return $pruned;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        foreach ($this->caches as $cache) {
+            if ($cache instanceof ResettableInterface) {
+                $cache->reset();
+            }
+        }
     }
 }

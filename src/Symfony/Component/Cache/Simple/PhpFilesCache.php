@@ -12,9 +12,10 @@
 namespace Symfony\Component\Cache\Simple;
 
 use Symfony\Component\Cache\Exception\CacheException;
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\PhpFilesTrait;
 
-class PhpFilesCache extends AbstractCache
+class PhpFilesCache extends AbstractCache implements PruneableInterface
 {
     use PhpFilesTrait;
 

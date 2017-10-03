@@ -280,4 +280,9 @@ abstract class DoctrineType extends AbstractType
     {
         return 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
     }
+
+    public function reset()
+    {
+        $this->choiceLoaders = array();
+    }
 }

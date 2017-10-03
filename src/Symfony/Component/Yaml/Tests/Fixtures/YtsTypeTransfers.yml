@@ -52,10 +52,10 @@ php: |
 test: Forcing Strings
 brief: >
     Any YAML type can be forced into a string using the
-    explicit !str method.
+    explicit !!str method.
 yaml: |
-    date string: !str 2001-08-01
-    number string: !str 192
+    date string: !!str 2001-08-01
+    number string: !!str 192
 php: |
     array(
       'date string' => '2001-08-01',
@@ -182,34 +182,6 @@ php: |
       'simple' => 12,
     )
 ---
-test: Positive Big Integer
-deprecated: true
-dump_skip: true
-brief: >
-    An integer is a series of numbers, optionally
-    starting with a positive or negative sign.  Integers
-    may also contain commas for readability.
-yaml: |
-    one-thousand: 1,000
-php: |
-    array(
-      'one-thousand' => 1000.0,
-    )
----
-test: Negative Big Integer
-deprecated: true
-dump_skip: true
-brief: >
-    An integer is a series of numbers, optionally
-    starting with a positive or negative sign.  Integers
-    may also contain commas for readability.
-yaml: |
-    negative one-thousand: -1,000
-php: |
-    array(
-      'negative one-thousand' => -1000.0
-    )
----
 test: Floats
 dump_skip: true
 brief: >
@@ -223,20 +195,6 @@ php: |
      array(
        'a simple float' => 2.0,
        'scientific notation' => 1000.09
-     )
----
-test: Larger Float
-dump_skip: true
-deprecated: true
-brief: >
-     Floats are represented by numbers with decimals,
-     allowing for scientific notation, as well as
-     positive and negative infinity and "not a number."
-yaml: |
-     larger float: 1,000.09
-php: |
-     array(
-       'larger float' => 1000.09,
      )
 ---
 test: Time

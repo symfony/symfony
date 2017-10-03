@@ -2,9 +2,11 @@
 services:
     service_container:
         class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
         synthetic: true
     foo:
         class: Foo
+        public: true
         autowire: true
     Psr\Container\ContainerInterface:
         alias: service_container

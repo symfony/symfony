@@ -253,6 +253,10 @@
     margin-right: 5px;
 }
 
+.sf-toolbar-block-ajax .sf-toolbar-icon {
+    cursor: pointer;
+}
+
 .sf-toolbar-status-green .sf-toolbar-label,
 .sf-toolbar-status-yellow .sf-toolbar-label,
 .sf-toolbar-status-red .sf-toolbar-label {
@@ -296,15 +300,21 @@
     margin-left: 4px;
 }
 
-.sf-toolbar-block:hover {
+.sf-toolbar-block:hover,
+.sf-toolbar-block.hover {
     position: relative;
 }
-.sf-toolbar-block:hover .sf-toolbar-icon {
+.sf-toolbar-block:hover .sf-toolbar-icon,
+.sf-toolbar-block.hover .sf-toolbar-icon {
     background-color: #444;
     position: relative;
     z-index: 10002;
 }
-.sf-toolbar-block:hover .sf-toolbar-info {
+.sf-toolbar-block-ajax.hover .sf-toolbar-info {
+    z-index: 10001;
+}
+.sf-toolbar-block:hover .sf-toolbar-info,
+.sf-toolbar-block.hover .sf-toolbar-info {
     display: block;
     padding: 10px;
     max-width: 480px;
@@ -408,34 +418,6 @@
 .sf-toolbar-block-dump .sf-toolbar-info img {
     display: none;
 }
-
-/* Override the setting when the toolbar is on the top */
-{% if position == 'top' %}
-    .sf-minitoolbar {
-        border-bottom-left-radius: 4px;
-        border-top-left-radius: 0;
-        bottom: auto;
-        right: 0;
-        top: 0;
-    }
-
-    .sf-toolbarreset {
-        bottom: auto;
-        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
-        top: 0;
-    }
-
-    .sf-toolbar-block .sf-toolbar-info {
-        bottom: auto;
-        top: 36px;
-    }
-{% endif %}
-
-{% if not floatable %}
-    .sf-toolbarreset {
-        position: static;
-    }
-{% endif %}
 
 /* Responsive Design */
 .sf-toolbar-icon .sf-toolbar-label,

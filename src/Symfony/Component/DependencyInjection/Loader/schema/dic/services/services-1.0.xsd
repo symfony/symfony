@@ -100,6 +100,7 @@
     </xsd:annotation>
     <xsd:choice maxOccurs="unbounded">
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="autowire" type="boolean" />
@@ -116,7 +117,7 @@
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
-      <xsd:element name="autowiring-type" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" />
     <xsd:attribute name="class" type="xsd:string" />
@@ -158,6 +159,7 @@
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="namespace" type="xsd:string" use="required" />
     <xsd:attribute name="resource" type="xsd:string" use="required" />
@@ -204,7 +206,19 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="name" type="xsd:string" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
-    <xsd:attribute name="strict" type="boolean" />
+    <xsd:attribute name="tag" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="bind" mixed="true">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="bind" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="service" type="service" />
+    </xsd:choice>
+    <xsd:attribute name="type" type="argument_type" />
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="key" type="xsd:string" use="required" />
+    <xsd:attribute name="on-invalid" type="invalid_sequence" />
+    <xsd:attribute name="method" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="argument" mixed="true">
@@ -217,7 +231,7 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="index" type="xsd:integer" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
-    <xsd:attribute name="strict" type="boolean" />
+    <xsd:attribute name="tag" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">
@@ -243,6 +257,7 @@
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="iterator" />
+      <xsd:enumeration value="tagged" />
     </xsd:restriction>
   </xsd:simpleType>
 
@@ -251,6 +266,7 @@
       <xsd:enumeration value="null" />
       <xsd:enumeration value="ignore" />
       <xsd:enumeration value="exception" />
+      <xsd:enumeration value="ignore_uninitialized" />
     </xsd:restriction>
   </xsd:simpleType>
 

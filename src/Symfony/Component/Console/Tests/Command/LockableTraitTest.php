@@ -13,7 +13,9 @@ namespace Symfony\Component\Console\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Filesystem\LockHandler;
+use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 
 class LockableTraitTest extends TestCase
 {
@@ -39,8 +41,14 @@ class LockableTraitTest extends TestCase
     {
         $command = new \FooLockCommand();
 
-        $lock = new LockHandler($command->getName());
-        $lock->lock();
+        if (SemaphoreStore::isSupported()) {
+            $store = new SemaphoreStore();
+        } else {
+            $store = new FlockStore();
+        }
+
+        $lock = (new Factory($store))->createLock($command->getName());
+        $lock->acquire();
 
         $tester = new CommandTester($command);
         $this->assertSame(1, $tester->execute(array()));

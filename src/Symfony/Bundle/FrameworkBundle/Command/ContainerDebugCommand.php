@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,9 +28,13 @@ use Symfony\Component\Config\FileLocator;
  * A console command for retrieving information about services.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
+ *
+ * @internal since version 3.4
  */
-class ContainerDebugCommand extends ContainerAwareCommand
+class ContainerDebugCommand extends Command
 {
+    protected static $defaultName = 'debug:container';
+
     /**
      * @var ContainerBuilder|null
      */
@@ -41,7 +46,6 @@ class ContainerDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('debug:container')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),

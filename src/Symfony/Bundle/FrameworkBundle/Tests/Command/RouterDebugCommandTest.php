@@ -53,14 +53,12 @@ class RouterDebugCommandTest extends TestCase
     private function createCommandTester()
     {
         $application = new Application($this->getKernel());
-
-        $command = new RouterDebugCommand();
-        $application->add($command);
+        $application->add(new RouterDebugCommand($this->getRouter()));
 
         return new CommandTester($application->find('debug:router'));
     }
 
-    private function getKernel()
+    private function getRouter()
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
@@ -68,21 +66,30 @@ class RouterDebugCommandTest extends TestCase
         $router
             ->expects($this->any())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection))
-        ;
+            ->will($this->returnValue($routeCollection));
 
+        return $router;
+    }
+
+    private function getKernel()
+    {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('has')
-            ->with('router')
-            ->will($this->returnValue(true))
+            ->will($this->returnCallback(function ($id) {
+                if ('console.command_loader' === $id) {
+                    return false;
+                }
+
+                return true;
+            }))
         ;
         $container
             ->expects($this->any())
             ->method('get')
             ->with('router')
-            ->willReturn($router)
+            ->willReturn($this->getRouter())
         ;
 
         $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();

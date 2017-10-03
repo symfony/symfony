@@ -13,7 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @final since version 3.3.
  */
-class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterface
+class ArrayDenormalizer implements ContextAwareDenormalizerInterface, SerializerAwareInterface
 {
     /**
      * @var SerializerInterface|DenormalizerInterface
@@ -33,6 +33,8 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
 
     /**
      * {@inheritdoc}
+     *
+     * @throws NotNormalizableValueException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
@@ -52,7 +54,7 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
         $builtinType = isset($context['key_type']) ? $context['key_type']->getBuiltinType() : null;
         foreach ($data as $key => $value) {
             if (null !== $builtinType && !call_user_func('is_'.$builtinType, $key)) {
-                throw new UnexpectedValueException(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, gettype($key)));
+                throw new NotNormalizableValueException(sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, $builtinType, gettype($key)));
             }
 
             $data[$key] = $serializer->denormalize($value, $class, $format, $context);
@@ -64,10 +66,8 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null/*, array $context = array()*/)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
-        $context = func_num_args() > 3 ? func_get_arg(3) : array();
-
         return '[]' === substr($type, -2)
             && $this->serializer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
     }

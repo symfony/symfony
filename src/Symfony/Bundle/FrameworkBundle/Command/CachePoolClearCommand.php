@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,15 +24,25 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class CachePoolClearCommand extends ContainerAwareCommand
+final class CachePoolClearCommand extends Command
 {
+    protected static $defaultName = 'cache:pool:clear';
+
+    private $poolClearer;
+
+    public function __construct(Psr6CacheClearer $poolClearer)
+    {
+        parent::__construct();
+
+        $this->poolClearer = $poolClearer;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('cache:pool:clear')
             ->setDefinition(array(
                 new InputArgument('pools', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of cache pools or cache pool clearers'),
             ))
@@ -51,17 +62,15 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+        $kernel = $this->getApplication()->getKernel();
         $pools = array();
         $clearers = array();
-        $container = $this->getContainer();
-        $cacheDir = $container->getParameter('kernel.cache_dir');
-        $globalClearer = $container->get('cache.global_clearer');
 
         foreach ($input->getArgument('pools') as $id) {
-            if ($globalClearer->hasPool($id)) {
+            if ($this->poolClearer->hasPool($id)) {
                 $pools[$id] = $id;
             } else {
-                $pool = $container->get($id);
+                $pool = $kernel->getContainer()->get($id);
 
                 if ($pool instanceof CacheItemPoolInterface) {
                     $pools[$id] = $pool;
@@ -75,7 +84,7 @@ EOF
 
         foreach ($clearers as $id => $clearer) {
             $io->comment(sprintf('Calling cache clearer: <info>%s</info>', $id));
-            $clearer->clear($cacheDir);
+            $clearer->clear($kernel->getContainer()->getParameter('kernel.cache_dir'));
         }
 
         foreach ($pools as $id => $pool) {
@@ -84,7 +93,7 @@ EOF
             if ($pool instanceof CacheItemPoolInterface) {
                 $pool->clear();
             } else {
-                $globalClearer->clearPool($id);
+                $this->poolClearer->clearPool($id);
             }
         }
 

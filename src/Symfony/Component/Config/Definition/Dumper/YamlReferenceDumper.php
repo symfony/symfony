@@ -123,6 +123,11 @@ class YamlReferenceDumper
             $comments[] = 'Required';
         }
 
+        // deprecated?
+        if ($node->isDeprecated()) {
+            $comments[] = sprintf('Deprecated (%s)', $node->getDeprecationMessage($node->getName(), $node->getPath()));
+        }
+
         // example
         if ($example && !is_array($example)) {
             $comments[] = 'Example: '.$example;
@@ -161,7 +166,7 @@ class YamlReferenceDumper
 
             $this->writeLine('# '.$message.':', $depth * 4 + 4);
 
-            $this->writeArray($example, $depth + 1);
+            $this->writeArray($example, $depth + 1, true);
         }
 
         if ($children) {
@@ -185,7 +190,7 @@ class YamlReferenceDumper
         $this->reference .= sprintf($format, $text)."\n";
     }
 
-    private function writeArray(array $array, $depth)
+    private function writeArray(array $array, $depth, $commented = false)
     {
         $isIndexed = array_values($array) === $array;
 
@@ -197,13 +202,13 @@ class YamlReferenceDumper
             }
 
             if ($isIndexed) {
-                $this->writeLine('- '.$val, $depth * 4);
+                $this->writeLine(($commented ? '# - ' : '- ').$val, $depth * 4);
             } else {
-                $this->writeLine(sprintf('%-20s %s', $key.':', $val), $depth * 4);
+                $this->writeLine(sprintf($commented ? '# %-20s %s' : '%-20s %s', $key.':', $val), $depth * 4);
             }
 
             if (is_array($value)) {
-                $this->writeArray($value, $depth + 1);
+                $this->writeArray($value, $depth + 1, $commented);
             }
         }
     }

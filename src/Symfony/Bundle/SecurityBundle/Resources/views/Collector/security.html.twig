@@ -16,47 +16,63 @@
     {% endset %}
 
     {% set text %}
-        {% if collector.enabled %}
-            {% if collector.token %}
+        {% if collector.impersonated %}
+            <div class="sf-toolbar-info-group">
                 <div class="sf-toolbar-info-piece">
-                    <b>Logged in as</b>
-                    <span>{{ collector.user }}</span>
+                    <b>Impersonator</b>
+                    <span>{{ collector.impersonatorUser }}</span>
                 </div>
-
-                <div class="sf-toolbar-info-piece">
-                    <b>Authenticated</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-{{ is_authenticated ? 'green' : 'red' }}">{{ is_authenticated ? 'Yes' : 'No' }}</span>
-                </div>
-
-                <div class="sf-toolbar-info-piece">
-                    <b>Token class</b>
-                    <span>{{ collector.tokenClass|abbr_class }}</span>
-                </div>
-            {% else %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Authenticated</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-red">No</span>
-                </div>
-            {% endif %}
-
-            {% if collector.firewall %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Firewall name</b>
-                    <span>{{ collector.firewall.name }}</span>
-                </div>
-            {% endif %}
-
-            {% if collector.token and collector.logoutUrl %}
-                <div class="sf-toolbar-info-piece">
-                    <b>Actions</b>
-                    <span><a href="{{ collector.logoutUrl }}">Logout</a></span>
-                </div>
-            {% endif %}
-        {% else %}
-            <div class="sf-toolbar-info-piece">
-                <span>The security is disabled.</span>
             </div>
         {% endif %}
+
+        <div class="sf-toolbar-info-group">
+            {% if collector.enabled %}
+                {% if collector.token %}
+                    <div class="sf-toolbar-info-piece">
+                        <b>Logged in as</b>
+                        <span>{{ collector.user }}</span>
+                    </div>
+
+                    <div class="sf-toolbar-info-piece">
+                        <b>Authenticated</b>
+                        <span class="sf-toolbar-status sf-toolbar-status-{{ is_authenticated ? 'green' : 'red' }}">{{ is_authenticated ? 'Yes' : 'No' }}</span>
+                    </div>
+
+                    <div class="sf-toolbar-info-piece">
+                        <b>Token class</b>
+                        <span>{{ collector.tokenClass|abbr_class }}</span>
+                    </div>
+                {% else %}
+                    <div class="sf-toolbar-info-piece">
+                        <b>Authenticated</b>
+                        <span class="sf-toolbar-status sf-toolbar-status-red">No</span>
+                    </div>
+                {% endif %}
+
+                {% if collector.firewall %}
+                    <div class="sf-toolbar-info-piece">
+                        <b>Firewall name</b>
+                        <span>{{ collector.firewall.name }}</span>
+                    </div>
+                {% endif %}
+
+                {% if collector.token and collector.logoutUrl %}
+                    <div class="sf-toolbar-info-piece">
+                        <b>Actions</b>
+                        <span>
+                            <a href="{{ collector.logoutUrl }}">Logout</a>
+                            {% if collector.impersonated and collector.impersonationExitPath %}
+                                | <a href="{{ collector.impersonationExitPath }}">Exit impersonation</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="sf-toolbar-info-piece">
+                    <span>The security is disabled.</span>
+                </div>
+            {% endif %}
+        </div>
     {% endset %}
 
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: color_code }) }}
@@ -150,6 +166,8 @@
             </div>
 
             {% if collector.firewall.security_enabled %}
+                <h4>Configuration</h4>
+
                 <table>
                     <thead>
                         <tr>
@@ -188,6 +206,46 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <h4>Listeners</h4>
+
+                {% if collector.listeners|default([]) is empty %}
+                    <div class="empty">
+                        <p>No security listeners have been recorded. Check that debugging is enabled in the kernel.</p>
+                    </div>
+                {% else %}
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Listener</th>
+                            <th>Duration</th>
+                            <th>Response</th>
+                        </tr>
+                        </thead>
+
+                        {% set previous_event = (collector.listeners|first) %}
+                        {% for listener in collector.listeners %}
+                            {% if loop.first or listener != previous_event %}
+                                {% if not loop.first %}
+                                    </tbody>
+                                {% endif %}
+
+                                <tbody>
+                                {% set previous_event = listener %}
+                            {% endif %}
+
+                            <tr>
+                                <td class="font-normal">{{ profiler_dump(listener.stub) }}</td>
+                                <td class="no-wrap">{{ '%0.2f'|format(listener.time * 1000) }} ms</td>
+                                <td class="font-normal">{{ listener.response ? profiler_dump(listener.response) : '(none)' }}</td>
+                            </tr>
+
+                            {% if loop.last %}
+                                </tbody>
+                            {% endif %}
+                        {% endfor %}
+                    </table>
+                {% endif %}
             {% endif %}
         {% elseif collector.enabled %}
             <div class="empty">

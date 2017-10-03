@@ -366,7 +366,6 @@ return function (root, x) {
     for (i = 0; i < len; ++i) {
         elt = t[i];
         if ('SAMP' == elt.tagName) {
-            elt.className = 'sf-dump-expanded';
             a = elt.previousSibling || {};
             if ('A' != a.tagName) {
                 a = doc.createElement('A');
@@ -384,7 +383,8 @@ return function (root, x) {
                 x += elt.parentNode.getAttribute('data-depth')/1;
             }
             elt.setAttribute('data-depth', x);
-            if (x > options.maxDepth) {
+            if (elt.className ? 'sf-dump-expanded' !== elt.className : (x > options.maxDepth)) {
+                elt.className = 'sf-dump-expanded';
                 toggle(a);
             }
         } else if (/\bsf-dump-ref\b/.test(elt.className) && (a = elt.getAttribute('href'))) {
@@ -426,7 +426,7 @@ return function (root, x) {
                 if (this.isEmpty()) {
                     return this.current();
                 }
-                this.idx = this.idx < (this.nodes.length - 1) ? this.idx + 1 : this.idx;
+                this.idx = this.idx < (this.nodes.length - 1) ? this.idx + 1 : 0;
         
                 return this.current();
             },
@@ -434,7 +434,7 @@ return function (root, x) {
                 if (this.isEmpty()) {
                     return this.current();
                 }
-                this.idx = this.idx > 0 ? this.idx - 1 : this.idx;
+                this.idx = this.idx > 0 ? this.idx - 1 : (this.nodes.length - 1);
         
                 return this.current();
             },
@@ -508,7 +508,7 @@ return function (root, x) {
                     return;
                 }
 
-                var xpathResult = doc.evaluate('//pre[@id="' + root.id + '"]//span[@class="sf-dump-str" or @class="sf-dump-key" or @class="sf-dump-public" or @class="sf-dump-protected" or @class="sf-dump-private"][contains(child::text(), ' + xpathString(searchQuery) + ')]', document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+                var xpathResult = doc.evaluate('//pre[@id="' + root.id + '"]//span[@class="sf-dump-str" or @class="sf-dump-key" or @class="sf-dump-public" or @class="sf-dump-protected" or @class="sf-dump-private"][contains(translate(child::text(), ' + xpathString(searchQuery.toUpperCase()) + ', ' + xpathString(searchQuery.toLowerCase()) + '), ' + xpathString(searchQuery.toLowerCase()) + ')]', document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
 
                 while (node = xpathResult.iterateNext()) state.nodes.push(node);
                 
@@ -728,15 +728,25 @@ EOHTML
     {
         parent::enterHash($cursor, $type, $class, false);
 
+        if ($cursor->skipChildren) {
+            $cursor->skipChildren = false;
+            $eol = ' class=sf-dump-compact>';
+        } elseif ($this->expandNextHash) {
+            $this->expandNextHash = false;
+            $eol = ' class=sf-dump-expanded>';
+        } else {
+            $eol = '>';
+        }
+
         if ($hasChild) {
+            $this->line .= '<samp';
             if ($cursor->refIndex) {
                 $r = Cursor::HASH_OBJECT !== $type ? 1 - (Cursor::HASH_RESOURCE !== $type) : 2;
                 $r .= $r && 0 < $cursor->softRefHandle ? $cursor->softRefHandle : $cursor->refIndex;
 
-                $this->line .= sprintf('<samp id=%s-ref%s>', $this->dumpId, $r);
-            } else {
-                $this->line .= '<samp>';
+                $this->line .= sprintf(' id=%s-ref%s', $this->dumpId, $r);
             }
+            $this->line .= $eol;
             $this->dumpLine($cursor->depth);
         }
     }

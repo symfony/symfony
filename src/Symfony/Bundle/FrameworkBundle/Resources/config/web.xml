@@ -51,23 +51,23 @@
             <tag name="controller.argument_value_resolver" priority="-150" />
         </service>
 
-        <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener" public="true">
+        <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener">
             <tag name="kernel.event_subscriber" />
             <argument>%kernel.charset%</argument>
         </service>
 
-        <service id="streamed_response_listener" class="Symfony\Component\HttpKernel\EventListener\StreamedResponseListener" public="true">
+        <service id="streamed_response_listener" class="Symfony\Component\HttpKernel\EventListener\StreamedResponseListener">
             <tag name="kernel.event_subscriber" />
         </service>
 
-        <service id="locale_listener" class="Symfony\Component\HttpKernel\EventListener\LocaleListener" public="true">
+        <service id="locale_listener" class="Symfony\Component\HttpKernel\EventListener\LocaleListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="request_stack" />
             <argument>%kernel.default_locale%</argument>
             <argument type="service" id="router" on-invalid="ignore" />
         </service>
 
-        <service id="validate_request_listener" class="Symfony\Component\HttpKernel\EventListener\ValidateRequestListener" public="true">
+        <service id="validate_request_listener" class="Symfony\Component\HttpKernel\EventListener\ValidateRequestListener">
             <tag name="kernel.event_subscriber" />
         </service>
 

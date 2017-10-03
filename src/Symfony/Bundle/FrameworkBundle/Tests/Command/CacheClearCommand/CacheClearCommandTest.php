@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Kernel;
 
 class CacheClearCommandTest extends TestCase
 {
@@ -50,17 +49,6 @@ class CacheClearCommandTest extends TestCase
         $application = new Application($this->kernel);
         $application->setCatchExceptions(false);
 
-        if (Kernel::VERSION_ID >= 30400) {
-            $expectedMsg = 'The "cache:clear" command in Symfony 3.3 is incompatible with HttpKernel 3.4, please upgrade "symfony/framework-bundle" or downgrade "symfony/http-kernel".';
-
-            if (method_exists($this, 'expectException')) {
-                $this->expectException(\LogicException::class);
-                $this->expectExceptionMessage($expectedMsg);
-            } else {
-                $this->setExpectedException(\LogicException::class, $expectedMsg);
-            }
-        }
-
         $application->doRun($input, new NullOutput());
 
         // Ensure that all *.meta files are fresh
@@ -77,8 +65,9 @@ class CacheClearCommandTest extends TestCase
         }
 
         // check that app kernel file present in meta file of container's cache
-        $containerRef = new \ReflectionObject($this->kernel->getContainer());
-        $containerFile = $containerRef->getFileName();
+        $containerClass = $this->kernel->getContainer()->getParameter('kernel.container_class');
+        $containerRef = new \ReflectionClass($containerClass);
+        $containerFile = dirname(dirname($containerRef->getFileName())).'/'.$containerClass.'.php';
         $containerMetaFile = $containerFile.'.meta';
         $kernelRef = new \ReflectionObject($this->kernel);
         $kernelFile = $kernelRef->getFileName();
@@ -92,6 +81,9 @@ class CacheClearCommandTest extends TestCase
             }
         }
         $this->assertTrue($found, 'Kernel file should present as resource');
-        $this->assertRegExp(sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', get_class($this->kernel->getContainer())), file_get_contents($containerFile), 'kernel.container_class is properly set on the dumped container');
+
+        $containerRef = new \ReflectionClass(require $containerFile);
+        $containerFile = str_replace('tes_'.DIRECTORY_SEPARATOR, 'test'.DIRECTORY_SEPARATOR, $containerRef->getFileName());
+        $this->assertRegExp(sprintf('/\'kernel.container_class\'\s*=>\s*\'%s\'/', $containerClass), file_get_contents($containerFile), 'kernel.container_class is properly set on the dumped container');
     }
 }

@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+4.4.0
+-----
+
+ * removed `ContainerAwareRuntimeLoader`
+
+3.4.0
+-----
+
+ * added exclusive Twig namespace only for root bundles
+ * deprecated `Symfony\Bundle\TwigBundle\Command\DebugCommand`, use `Symfony\Bridge\Twig\Command\DebugCommand` instead
+ * deprecated relying on the `ContainerAwareInterface` implementation for `Symfony\Bundle\TwigBundle\Command\LintCommand`
+ * added option to configure default path templates (via `default_path`)
+
 3.3.0
 -----
 

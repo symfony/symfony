@@ -28,7 +28,7 @@ final class Validation
      *
      * @return ValidatorInterface The new validator
      */
-    public static function createValidator()
+    public static function createValidator(): ValidatorInterface
     {
         return self::createValidatorBuilder()->getValidator();
     }
@@ -38,7 +38,7 @@ final class Validation
      *
      * @return ValidatorBuilderInterface The new builder
      */
-    public static function createValidatorBuilder()
+    public static function createValidatorBuilder(): ValidatorBuilder
     {
         return new ValidatorBuilder();
     }

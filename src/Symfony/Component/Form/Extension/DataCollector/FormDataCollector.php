@@ -67,17 +67,18 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      */
     private $formsByView;
 
-    private $hasVarDumper;
-
     public function __construct(FormDataExtractorInterface $dataExtractor)
     {
+        if (!class_exists(ClassStub::class)) {
+            throw new \LogicException(sprintf('The VarDumper component is needed for using the %s class. Install symfony/var-dumper version 3.4 or above.', __CLASS__));
+        }
+
         $this->dataExtractor = $dataExtractor;
         $this->data = array(
             'forms' => array(),
             'forms_by_hash' => array(),
             'nb_errors' => 0,
         );
-        $this->hasVarDumper = class_exists(ClassStub::class);
     }
 
     /**
@@ -226,11 +227,9 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     public function serialize()
     {
-        if ($this->hasVarDumper) {
-            foreach ($this->data['forms_by_hash'] as &$form) {
-                if (isset($form['type_class']) && !$form['type_class'] instanceof ClassStub) {
-                    $form['type_class'] = new ClassStub($form['type_class']);
-                }
+        foreach ($this->data['forms_by_hash'] as &$form) {
+            if (isset($form['type_class']) && !$form['type_class'] instanceof ClassStub) {
+                $form['type_class'] = new ClassStub($form['type_class']);
             }
         }
 

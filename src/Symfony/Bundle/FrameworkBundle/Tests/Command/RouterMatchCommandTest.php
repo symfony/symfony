@@ -47,13 +47,13 @@ class RouterMatchCommandTest extends TestCase
     private function createCommandTester()
     {
         $application = new Application($this->getKernel());
-        $application->add(new RouterMatchCommand());
-        $application->add(new RouterDebugCommand());
+        $application->add(new RouterMatchCommand($this->getRouter()));
+        $application->add(new RouterDebugCommand($this->getRouter()));
 
         return new CommandTester($application->find('router:match'));
     }
 
-    private function getKernel()
+    private function getRouter()
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
@@ -62,24 +62,35 @@ class RouterMatchCommandTest extends TestCase
         $router
             ->expects($this->any())
             ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollection))
-        ;
+            ->will($this->returnValue($routeCollection));
         $router
             ->expects($this->any())
             ->method('getContext')
-            ->will($this->returnValue($requestContext))
-        ;
+            ->will($this->returnValue($requestContext));
 
+        return $router;
+    }
+
+    private function getKernel()
+    {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->atLeastOnce())
             ->method('has')
-            ->with('router')
-            ->will($this->returnValue(true));
+            ->will($this->returnCallback(function ($id) {
+                if ('console.command_loader' === $id) {
+                    return false;
+                }
+
+                return true;
+            }))
+        ;
         $container
             ->expects($this->any())
             ->method('get')
-            ->willReturn($router);
+            ->with('router')
+            ->willReturn($this->getRouter())
+        ;
 
         $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
         $kernel

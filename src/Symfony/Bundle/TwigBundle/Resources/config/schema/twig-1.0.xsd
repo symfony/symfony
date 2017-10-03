@@ -26,6 +26,7 @@
         <xsd:attribute name="debug" type="xsd:string" />
         <xsd:attribute name="strict-variables" type="xsd:string" />
         <xsd:attribute name="exception-controller" type="xsd:string" />
+        <xsd:attribute name="default-path" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="date">

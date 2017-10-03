@@ -15,7 +15,6 @@ use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\LogicException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * YamlFileLoader loads translations from Yaml files.
@@ -46,7 +45,7 @@ class YamlFileLoader extends FileLoader
         });
 
         try {
-            $messages = $this->yamlParser->parse(file_get_contents($resource), Yaml::PARSE_KEYS_AS_STRINGS);
+            $messages = $this->yamlParser->parseFile($resource);
         } catch (ParseException $e) {
             throw new InvalidResourceException(sprintf('Error parsing YAML, invalid file "%s"', $resource), 0, $e);
         } finally {

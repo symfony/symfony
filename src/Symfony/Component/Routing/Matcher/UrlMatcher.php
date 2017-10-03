@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
@@ -91,6 +92,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             return $ret;
         }
 
+        if (0 === count($this->routes) && '/' === $pathinfo) {
+            throw new NoConfigurationException();
+        }
+
         throw 0 < count($this->allow)
             ? new MethodNotAllowedException(array_unique($this->allow))
             : new ResourceNotFoundException(sprintf('No routes found for "%s".', $pathinfo));
@@ -123,6 +128,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      *
      * @return array An array of parameters
      *
+     * @throws NoConfigurationException  If no routing configuration could be found
      * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      */
@@ -161,15 +167,11 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
 
-            if (self::ROUTE_MATCH === $status[0]) {
-                return $status[1];
-            }
-
             if (self::REQUIREMENT_MISMATCH === $status[0]) {
                 continue;
             }
 
-            return $this->getAttributes($route, $name, array_replace($matches, $hostMatches));
+            return $this->getAttributes($route, $name, array_replace($matches, $hostMatches, isset($status[1]) ? $status[1] : array()));
         }
     }
 

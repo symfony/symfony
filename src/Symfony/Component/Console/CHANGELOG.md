@@ -1,6 +1,27 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * `OutputFormatter` throws an exception when unknown options are used
+ * removed `QuestionHelper::setInputStream()/getInputStream()`
+ * removed `Application::getTerminalWidth()/getTerminalHeight()` and 
+  `Application::setTerminalDimensions()/getTerminalDimensions()`
+* removed `ConsoleExceptionEvent`
+* removed `ConsoleEvents::EXCEPTION`
+
+3.4.0
+-----
+
+ * added `CommandLoaderInterface`, `FactoryCommandLoader` and PSR-11
+   `ContainerCommandLoader` for commands lazy-loading
+ * added a case-insensitive command name matching fallback
+ * added static `Command::$defaultName/getDefaultName()`, allowing for
+   commands to be registered at compile time in the application command loader.
+   Setting the `$defaultName` property avoids the need for filling the `command`
+   attribute on the `console.command` tag when using `AddConsoleCommandPass`.
+
 3.3.0
 -----
 
@@ -12,6 +33,7 @@ CHANGELOG
 * deprecated console.exception event in favor of console.error
 * added ability to handle `CommandNotFoundException` through the 
  `console.error` event
+* deprecated default validation in `SymfonyQuestionHelper::ask`
 
 3.2.0
 ------

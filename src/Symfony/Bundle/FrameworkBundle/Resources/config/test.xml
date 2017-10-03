@@ -18,11 +18,11 @@
             <argument type="service" id="test.client.cookiejar" />
         </service>
 
-        <service id="test.client.history" class="Symfony\Component\BrowserKit\History" shared="false" public="true" />
+        <service id="test.client.history" class="Symfony\Component\BrowserKit\History" shared="false" />
 
-        <service id="test.client.cookiejar" class="Symfony\Component\BrowserKit\CookieJar" shared="false" public="true" />
+        <service id="test.client.cookiejar" class="Symfony\Component\BrowserKit\CookieJar" shared="false" />
 
-        <service id="test.session.listener" class="Symfony\Component\HttpKernel\EventListener\TestSessionListener" public="true">
+        <service id="test.session.listener" class="Symfony\Component\HttpKernel\EventListener\TestSessionListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service">
                 <service class="Symfony\Component\DependencyInjection\ServiceLocator">

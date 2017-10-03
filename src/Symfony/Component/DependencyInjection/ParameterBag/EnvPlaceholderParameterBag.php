@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class EnvPlaceholderParameterBag extends ParameterBag
 {
     private $envPlaceholders = array();
+    private $providedTypes = array();
 
     /**
      * {@inheritdoc}
@@ -34,7 +35,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                     return $placeholder; // return first result
                 }
             }
-            if (preg_match('/\W/', $env)) {
+            if (!preg_match('/^(?:\w++:)*+\w++$/', $env)) {
                 throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
             }
 
@@ -81,6 +82,24 @@ class EnvPlaceholderParameterBag extends ParameterBag
     }
 
     /**
+     * Maps env prefixes to their corresponding PHP types.
+     */
+    public function setProvidedTypes(array $providedTypes)
+    {
+        $this->providedTypes = $providedTypes;
+    }
+
+    /**
+     * Gets the PHP types corresponding to env() parameter prefixes.
+     *
+     * @return string[][]
+     */
+    public function getProvidedTypes()
+    {
+        return $this->providedTypes;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function resolve()
@@ -91,7 +110,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
         parent::resolve();
 
         foreach ($this->envPlaceholders as $env => $placeholders) {
-            if (!isset($this->parameters[$name = strtolower("env($env)")])) {
+            if (!$this->has($name = "env($env)")) {
                 continue;
             }
             if (is_numeric($default = $this->parameters[$name])) {

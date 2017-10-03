@@ -35,9 +35,6 @@ class ExtensionPass implements CompilerPassInterface
         if (!interface_exists('Symfony\Component\Routing\Generator\UrlGeneratorInterface')) {
             $container->removeDefinition('twig.extension.routing');
         }
-        if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
-            $container->removeDefinition('twig.extension.trans');
-        }
 
         if (!class_exists('Symfony\Component\Yaml\Yaml')) {
             $container->removeDefinition('twig.extension.yaml');
@@ -47,10 +44,6 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.form')->addTag('twig.extension');
             $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
             $container->getDefinition('twig.loader.native_filesystem')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
-        }
-
-        if ($container->has('translator')) {
-            $container->getDefinition('twig.extension.trans')->addTag('twig.extension');
         }
 
         if ($container->has('router')) {

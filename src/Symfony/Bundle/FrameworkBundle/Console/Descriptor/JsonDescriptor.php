@@ -231,10 +231,6 @@ class JsonDescriptor extends Descriptor
             'autoconfigure' => $definition->isAutoconfigured(),
         );
 
-        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
-            $data['autowiring_types'][] = $autowiringType;
-        }
-
         if ($showArguments) {
             $data['arguments'] = $this->describeValue($definition->getArguments(), $omitTags, $showArguments);
         }

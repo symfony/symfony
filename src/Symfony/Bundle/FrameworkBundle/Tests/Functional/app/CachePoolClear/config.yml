@@ -5,6 +5,7 @@ services:
     dummy:
         class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeclaredClass
         arguments: ['@cache.private_pool']
+        public: true
     custom_clearer:
         parent: cache.default_clearer
         tags:

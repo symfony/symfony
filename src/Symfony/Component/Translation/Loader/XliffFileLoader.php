@@ -127,7 +127,8 @@ class XliffFileLoader implements LoaderInterface
 
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:2.0');
 
-        foreach ($xml->xpath('//xliff:unit/xliff:segment') as $segment) {
+        foreach ($xml->xpath('//xliff:unit') as $unit) {
+            $segment = $unit->segment;
             $source = $segment->source;
 
             // If the xlf file has another encoding specified, try to convert it because
@@ -141,6 +142,18 @@ class XliffFileLoader implements LoaderInterface
                 $metadata['target-attributes'] = array();
                 foreach ($segment->target->attributes() as $key => $value) {
                     $metadata['target-attributes'][$key] = (string) $value;
+                }
+            }
+
+            if (isset($unit->notes)) {
+                $metadata['notes'] = array();
+                foreach ($unit->notes->note as $noteNode) {
+                    $note = array();
+                    foreach ($noteNode->attributes() as $key => $value) {
+                        $note[$key] = (string) $value;
+                    }
+                    $note['content'] = (string) $noteNode;
+                    $metadata['notes'][] = $note;
                 }
             }
 
@@ -222,7 +235,7 @@ class XliffFileLoader implements LoaderInterface
         $newPath = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
         $parts = explode('/', $newPath);
         if (0 === stripos($newPath, 'phar://')) {
-            $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
+            $tmpfile = tempnam(sys_get_temp_dir(), 'symfony');
             if ($tmpfile) {
                 copy($newPath, $tmpfile);
                 $parts = explode('/', str_replace('\\', '/', $tmpfile));

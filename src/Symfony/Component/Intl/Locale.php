@@ -35,7 +35,7 @@ final class Locale extends \Locale
      *
      * @see getFallback()
      */
-    public static function setDefaultFallback($locale)
+    public static function setDefaultFallback(string $locale)
     {
         self::$defaultFallback = $locale;
     }
@@ -48,7 +48,7 @@ final class Locale extends \Locale
      * @see setDefaultFallback()
      * @see getFallback()
      */
-    public static function getDefaultFallback()
+    public static function getDefaultFallback(): string
     {
         return self::$defaultFallback;
     }
@@ -65,7 +65,7 @@ final class Locale extends \Locale
      * @return string|null The ICU locale code of the fallback locale, or null
      *                     if no fallback exists
      */
-    public static function getFallback($locale)
+    public static function getFallback($locale): ?string
     {
         if (function_exists('locale_parse')) {
             $localeSubTags = locale_parse($locale);

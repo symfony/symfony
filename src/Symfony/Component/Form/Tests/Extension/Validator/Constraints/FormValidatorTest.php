@@ -22,14 +22,12 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @todo use ConstraintValidatorTestCase when symfony/validator ~3.2 is required.
  */
-class FormValidatorTest extends AbstractConstraintValidatorTest
+class FormValidatorTest extends ConstraintValidatorTestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

@@ -13,7 +13,7 @@ namespace Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper;
 
 use ProxyManager\Generator\ClassGenerator;
 use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 
@@ -62,40 +62,35 @@ class ProxyDumper implements DumperInterface
     /**
      * {@inheritdoc}
      */
-    public function getProxyFactoryCode(Definition $definition, $id, $methodName = null)
+    public function getProxyFactoryCode(Definition $definition, $id, $factoryCode = null)
     {
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= " \$this->services['$id'] =";
+            $instantiation .= sprintf(' $this->%s[\'%s\'] =', $definition->isPublic() || !method_exists(ContainerBuilder::class, 'addClassResource') ? 'services' : 'privates', $id);
         }
 
-        if (func_num_args() >= 3) {
-            $methodName = func_get_arg(2);
-        } else {
-            @trigger_error(sprintf('You must use the third argument of %s to define the method to call to construct your service since version 3.1, not using it won\'t be supported in 4.0.', __METHOD__), E_USER_DEPRECATED);
-            $methodName = 'get'.Container::camelize($id).'Service';
+        if (null === $factoryCode) {
+            throw new \InvalidArgumentException(sprintf('Missing factory code to construct the service "%s".', $id));
         }
+
         $proxyClass = $this->getProxyClassName($definition);
 
-        $generatedClass = $this->generateProxyClass($definition);
+        $hasStaticConstructor = $this->generateProxyClass($definition)->hasMethod('staticProxyConstructor');
 
-        $constructorCall = $generatedClass->hasMethod('staticProxyConstructor')
-            ? $proxyClass.'::staticProxyConstructor'
-            : 'new '.$proxyClass;
+        $constructorCall = sprintf($hasStaticConstructor ? '%s::staticProxyConstructor' : 'new %s', '\\'.$proxyClass);
 
         return <<<EOF
         if (\$lazyLoad) {
-
-            $instantiation $constructorCall(
-                function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
-                    \$wrappedInstance = \$this->$methodName(false);
+            $instantiation \$this->createProxy('$proxyClass', function () {
+                return $constructorCall(function (&\$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface \$proxy) {
+                    \$wrappedInstance = $factoryCode;
 
                     \$proxy->setProxyInitializer(null);
 
                     return true;
-                }
-            );
+                });
+            });
         }
 
 
@@ -119,7 +114,7 @@ EOF;
      */
     private function getProxyClassName(Definition $definition)
     {
-        return str_replace('\\', '', $definition->getClass()).'_'.spl_object_hash($definition).$this->salt;
+        return preg_replace('/^.*\\\\/', '', $definition->getClass()).'_'.substr(hash('sha256', spl_object_hash($definition).$this->salt), -7);
     }
 
     /**

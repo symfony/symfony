@@ -27,29 +27,16 @@ final class CachePoolClearerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $container->getParameterBag()->remove('cache.prefix.seed');
-        $poolsByClearer = array();
-        $pools = array();
 
-        foreach ($container->findTaggedServiceIds('cache.pool') as $id => $attributes) {
-            $pools[$id] = new Reference($id);
-            foreach (array_reverse($attributes) as $attr) {
-                if (isset($attr['clearer'])) {
-                    $poolsByClearer[$attr['clearer']][$id] = $pools[$id];
-                }
-                if (!empty($attr['unlazy'])) {
-                    $container->getDefinition($id)->setLazy(false);
-                }
-                if (array_key_exists('clearer', $attr) || array_key_exists('unlazy', $attr)) {
-                    break;
+        foreach ($container->findTaggedServiceIds('cache.pool.clearer') as $id => $attr) {
+            $clearer = $container->getDefinition($id);
+            $pools = array();
+            foreach ($clearer->getArgument(0) as $id => $ref) {
+                if ($container->hasDefinition($id)) {
+                    $pools[$id] = new Reference($id);
                 }
             }
-        }
-
-        $container->getDefinition('cache.global_clearer')->addArgument($pools);
-
-        foreach ($poolsByClearer as $clearer => $pools) {
-            $clearer = $container->getDefinition($clearer);
-            $clearer->addArgument($pools);
+            $clearer->replaceArgument(0, $pools);
         }
 
         if (!$container->has('cache.annotations')) {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,18 +24,19 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * A console command to display information about the current installation.
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
+ *
+ * @final since version 3.4
  */
-class AboutCommand extends ContainerAwareCommand
+class AboutCommand extends Command
 {
+    protected static $defaultName = 'about';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this
-            ->setName('about')
-            ->setDescription('Displays information about the current project')
-        ;
+        $this->setDescription('Displays information about the current project');
     }
 
     /**
@@ -45,7 +47,7 @@ class AboutCommand extends ContainerAwareCommand
         $io = new SymfonyStyle($input, $output);
 
         /** @var $kernel KernelInterface */
-        $kernel = $this->getContainer()->get('kernel');
+        $kernel = $this->getApplication()->getKernel();
 
         $io->table(array(), array(
             array('<info>Symfony</>'),

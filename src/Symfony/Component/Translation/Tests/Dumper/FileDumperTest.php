@@ -28,29 +28,8 @@ class FileDumperTest extends TestCase
         $dumper->dump($catalogue, array('path' => $tempDir));
 
         $this->assertFileExists($tempDir.'/messages.en.concrete');
-    }
 
-    /**
-     * @group legacy
-     */
-    public function testDumpBackupsFileIfExisting()
-    {
-        $tempDir = sys_get_temp_dir();
-        $file = $tempDir.'/messages.en.concrete';
-        $backupFile = $file.'~';
-
-        @touch($file);
-
-        $catalogue = new MessageCatalogue('en');
-        $catalogue->add(array('foo' => 'bar'));
-
-        $dumper = new ConcreteFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir));
-
-        $this->assertFileExists($backupFile);
-
-        @unlink($file);
-        @unlink($backupFile);
+        @unlink($tempDir.'/messages.en.concrete');
     }
 
     public function testDumpCreatesNestedDirectoriesAndFile()

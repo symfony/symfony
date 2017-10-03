@@ -54,7 +54,7 @@ bar';
     public function testConstantAsKey()
     {
         $yaml = <<<YAML
-!php/const:Symfony\Component\Yaml\Tests\Command\Foo::TEST: bar
+!php/const 'Symfony\Component\Yaml\Tests\Command\Foo::TEST': bar
 YAML;
         $ret = $this->createCommandTester()->execute(array('filename' => $this->createFile($yaml)), array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false));
         $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');

@@ -31,6 +31,7 @@ use Symfony\Component\HttpFoundation\Response;
 class Client extends BaseClient
 {
     protected $kernel;
+    private $catchExceptions = true;
 
     /**
      * @param HttpKernelInterface $kernel    An HttpKernel instance
@@ -48,6 +49,16 @@ class Client extends BaseClient
     }
 
     /**
+     * Sets whether to catch exceptions when the kernel is handling a request.
+     *
+     * @param bool $catchExceptions Whether to catch exceptions
+     */
+    public function catchExceptions($catchExceptions)
+    {
+        $this->catchExceptions = $catchExceptions;
+    }
+
+    /**
      * Makes a request.
      *
      * @param Request $request A Request instance
@@ -56,7 +67,7 @@ class Client extends BaseClient
      */
     protected function doRequest($request)
     {
-        $response = $this->kernel->handle($request);
+        $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $this->catchExceptions);
 
         if ($this->kernel instanceof TerminableInterface) {
             $this->kernel->terminate($request, $response);

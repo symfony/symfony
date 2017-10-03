@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Cache\Simple;
 
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\PdoTrait;
 
-class PdoCache extends AbstractCache
+class PdoCache extends AbstractCache implements PruneableInterface
 {
     use PdoTrait;
 

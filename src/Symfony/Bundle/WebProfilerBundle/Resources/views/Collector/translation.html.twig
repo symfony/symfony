@@ -13,6 +13,12 @@
 
         {% set text %}
             <div class="sf-toolbar-info-piece">
+                <b>Locale</b>
+                <span class="sf-toolbar-status">
+                    {{ collector.locale|default('-') }}
+                </span>
+            </div>
+            <div class="sf-toolbar-info-piece">
                 <b>Missing messages</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countMissings ? 'red' }}">
                     {{ collector.countMissings }}
@@ -61,6 +67,20 @@
 {% endblock %}
 
 {% block panelContent %}
+
+    <h2>Translation Locales</h2>
+
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.locale|default('-') }}</span>
+            <span class="label">Locale</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.fallbackLocales|join(', ')|default('-') }}</span>
+            <span class="label">Fallback locales</span>
+        </div>
+    </div>
+
     <h2>Translation Metrics</h2>
 
     <div class="metrics">
@@ -81,6 +101,8 @@
     </div>
 
     <h2>Translation Messages</h2>
+
+    {% block messages %}
 
     {# sort translation messages in groups #}
     {% set messages_defined, messages_missing, messages_fallback = [], [], [] %}
@@ -108,7 +130,9 @@
                         <p>None of the used translation messages are defined for the given locale.</p>
                     </div>
                 {% else %}
-                    {{ helper.render_table(messages_defined) }}
+                    {% block defined_messages %}
+                        {{ helper.render_table(messages_defined) }}
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>
@@ -127,7 +151,9 @@
                         <p>No fallback translation messages were used.</p>
                     </div>
                 {% else %}
-                    {{ helper.render_table(messages_fallback) }}
+                    {% block fallback_messages %}
+                        {{ helper.render_table(messages_fallback) }}
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>
@@ -147,11 +173,16 @@
                         <p>There are no messages of this category.</p>
                     </div>
                 {% else %}
-                    {{ helper.render_table(messages_missing) }}
+                    {% block missing_messages %}
+                        {{ helper.render_table(messages_missing) }}
+                    {% endblock %}
                 {% endif %}
             </div>
         </div>
     </div>
+
+    {% endblock messages %}
+
 {% endblock %}
 
 {% macro render_table(messages) %}

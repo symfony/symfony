@@ -1,6 +1,45 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `DataCollector::varToString()` method, use `DataCollector::cloneVar()`
+   instead
+ * using the `DataCollector::cloneVar()` method requires the VarDumper component
+ * removed the `ValueExporter` class
+ * removed `ControllerResolverInterface::getArguments()`
+ * removed `TraceableControllerResolver::getArguments()`
+ * removed `ControllerResolver::getArguments()` and the ability to resolve arguments
+ * removed the `argument_resolver` service dependency from the `debug.controller_resolver`
+ * removed `LazyLoadingFragmentHandler::addRendererService()`
+ * removed `Psr6CacheClearer::addPool()`
+ * removed `Extension::addClassesToCompile()` and `Extension::getClassesToCompile()`
+ * removed `Kernel::loadClassCache()`, `Kernel::doLoadClassCache()`, `Kernel::setClassCache()`,
+   and `Kernel::getEnvParameters()`
+ * support for the `X-Status-Code` when handling exceptions in the `HttpKernel`
+   has been dropped, use the `HttpKernel::allowCustomResponseCode()` method
+   instead
+ * removed convention-based commands registration
+ * removed the `ChainCacheClearer::add()` method
+ * removed the `CacheaWarmerAggregate::add()` and `setWarmers()` methods
+ * made `CacheWarmerAggregate` and `ChainCacheClearer` classes final
+
+3.4.0
+-----
+
+ * added a minimalist PSR-3 `Logger` class that writes in `stderr`
+ * made kernels implementing `CompilerPassInterface` able to process the container
+ * deprecated bundle inheritance
+ * added `RebootableInterface` and implemented it in `Kernel`
+ * deprecated commands auto registration
+ * deprecated `EnvParametersResource`
+ * added `Symfony\Component\HttpKernel\Client::catchExceptions()`
+ * deprecated the `ChainCacheClearer::add()` method
+ * deprecated the `CacheaWarmerAggregate::add()` and `setWarmers()` methods
+ * made `CacheWarmerAggregate` and `ChainCacheClearer` classes final
+
+
 3.3.0
 -----
 

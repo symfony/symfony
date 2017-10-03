@@ -33,7 +33,7 @@ interface TranslatorInterface
      *
      * @return string
      */
-    public function cssToXPath($cssExpr, $prefix = 'descendant-or-self::');
+    public function cssToXPath(string $cssExpr, string $prefix = 'descendant-or-self::'): string;
 
     /**
      * Translates a parsed selector node to an XPath expression.
@@ -43,5 +43,5 @@ interface TranslatorInterface
      *
      * @return string
      */
-    public function selectorToXPath(SelectorNode $selector, $prefix = 'descendant-or-self::');
+    public function selectorToXPath(SelectorNode $selector, string $prefix = 'descendant-or-self::'): string;
 }

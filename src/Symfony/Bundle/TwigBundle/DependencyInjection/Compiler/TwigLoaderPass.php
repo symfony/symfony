@@ -43,7 +43,7 @@ class TwigLoaderPass implements CompilerPassInterface
         }
 
         if (1 === $found) {
-            $container->setAlias('twig.loader', $id);
+            $container->setAlias('twig.loader', $id)->setPrivate(true);
         } else {
             $chainLoader = $container->getDefinition('twig.loader.chain');
             krsort($prioritizedLoaders);
@@ -54,7 +54,7 @@ class TwigLoaderPass implements CompilerPassInterface
                 }
             }
 
-            $container->setAlias('twig.loader', 'twig.loader.chain');
+            $container->setAlias('twig.loader', 'twig.loader.chain')->setPrivate(true);
         }
     }
 }

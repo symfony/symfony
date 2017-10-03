@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
  * Adds all configured security voters to the access decision manager.
@@ -37,7 +38,16 @@ class AddSecurityVotersPass implements CompilerPassInterface
 
         $voters = $this->findAndSortTaggedServices('security.voter', $container);
         if (!$voters) {
-            throw new LogicException('No security voters found. You need to tag at least one with "security.voter"');
+            throw new LogicException('No security voters found. You need to tag at least one with "security.voter".');
+        }
+
+        foreach ($voters as $voter) {
+            $definition = $container->getDefinition((string) $voter);
+            $class = $container->getParameterBag()->resolveValue($definition->getClass());
+
+            if (!is_a($class, VoterInterface::class, true)) {
+                throw new LogicException(sprintf('%s must implement the %s when used as a voter.', $class, VoterInterface::class));
+            }
         }
 
         $adm = $container->getDefinition('security.access.decision_manager');

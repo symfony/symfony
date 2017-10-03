@@ -11,9 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseLintCommand;
 
 /**
@@ -22,22 +19,15 @@ use Symfony\Component\Translation\Command\XliffLintCommand as BaseLintCommand;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+ *
+ * @final since version 3.4
  */
-class XliffLintCommand extends Command
+class XliffLintCommand extends BaseLintCommand
 {
-    private $command;
+    protected static $defaultName = 'lint:xliff';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    public function __construct()
     {
-        $this->setName('lint:xliff');
-
-        if (!$this->isEnabled()) {
-            return;
-        }
-
         $directoryIteratorProvider = function ($directory, $default) {
             if (!is_dir($directory)) {
                 $directory = $this->getApplication()->getKernel()->locateResource($directory);
@@ -50,12 +40,17 @@ class XliffLintCommand extends Command
             return 0 === strpos($fileOrDirectory, '@') || $default($fileOrDirectory);
         };
 
-        $this->command = new BaseLintCommand(null, $directoryIteratorProvider, $isReadableProvider);
+        parent::__construct(null, $directoryIteratorProvider, $isReadableProvider);
+    }
 
-        $this
-            ->setDescription($this->command->getDescription())
-            ->setDefinition($this->command->getDefinition())
-            ->setHelp($this->command->getHelp().<<<'EOF'
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure()
+    {
+        parent::configure();
+
+        $this->setHelp($this->getHelp().<<<'EOF'
 
 Or find all files in a bundle:
 
@@ -63,18 +58,5 @@ Or find all files in a bundle:
 
 EOF
             );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
-    {
-        return class_exists(BaseLintCommand::class);
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        return $this->command->execute($input, $output);
     }
 }

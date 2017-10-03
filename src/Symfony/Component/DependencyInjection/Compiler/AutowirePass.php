@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
@@ -27,16 +26,14 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class AutowirePass extends AbstractRecursivePass
 {
-    private $definedTypes = array();
     private $types;
     private $ambiguousServiceTypes = array();
     private $autowired = array();
     private $lastFailure;
     private $throwOnAutowiringException;
-    private $autowiringExceptions = array();
 
     /**
-     * @param bool $throwOnAutowireException If false, retrieved errors via getAutowiringExceptions
+     * @param bool $throwOnAutowireException Errors can be retrieved via Definition::getErrors()
      */
     public function __construct($throwOnAutowireException = true)
     {
@@ -44,53 +41,17 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
-     * @return AutowiringFailedException[]
-     */
-    public function getAutowiringExceptions()
-    {
-        return $this->autowiringExceptions;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        // clear out any possibly stored exceptions from before
-        $this->autowiringExceptions = array();
-
         try {
             parent::process($container);
         } finally {
-            $this->definedTypes = array();
             $this->types = null;
             $this->ambiguousServiceTypes = array();
             $this->autowired = array();
         }
-    }
-
-    /**
-     * Creates a resource to help know if this service has changed.
-     *
-     * @param \ReflectionClass $reflectionClass
-     *
-     * @return AutowireServiceResource
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.
-     */
-    public static function createResourceForClass(\ReflectionClass $reflectionClass)
-    {
-        @trigger_error('The '.__METHOD__.'() method is deprecated since version 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
-
-        $metadata = array();
-
-        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-            if (!$reflectionMethod->isStatic()) {
-                $metadata[$reflectionMethod->name] = self::getResourceMetadataForMethod($reflectionMethod);
-            }
-        }
-
-        return new AutowireServiceResource($reflectionClass->name, $reflectionClass->getFileName(), $metadata);
     }
 
     /**
@@ -105,7 +66,7 @@ class AutowirePass extends AbstractRecursivePass
                 throw $e;
             }
 
-            $this->autowiringExceptions[] = $e;
+            $this->container->getDefinition($this->currentId)->addError($e->getMessage());
 
             return parent::processValue($value, $isRoot);
         }
@@ -130,7 +91,6 @@ class AutowirePass extends AbstractRecursivePass
             return $value;
         }
 
-        $autowiredMethods = $this->getMethodsToAutowire($reflectionClass);
         $methodCalls = $value->getMethodCalls();
 
         try {
@@ -143,7 +103,7 @@ class AutowirePass extends AbstractRecursivePass
             array_unshift($methodCalls, array($constructor, $value->getArguments()));
         }
 
-        $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls, $autowiredMethods);
+        $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls);
 
         if ($constructor) {
             list(, $arguments) = array_shift($methodCalls);
@@ -161,61 +121,18 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
-     * Gets the list of methods to autowire.
-     *
      * @param \ReflectionClass $reflectionClass
-     *
-     * @return \ReflectionMethod[]
-     */
-    private function getMethodsToAutowire(\ReflectionClass $reflectionClass)
-    {
-        $methodsToAutowire = array();
-
-        foreach ($reflectionClass->getMethods() as $reflectionMethod) {
-            $r = $reflectionMethod;
-
-            if ($r->isConstructor()) {
-                continue;
-            }
-
-            while (true) {
-                if (false !== $doc = $r->getDocComment()) {
-                    if (false !== stripos($doc, '@required') && preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
-                        $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
-                        break;
-                    }
-                    if (false === stripos($doc, '@inheritdoc') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+(?:\{@inheritdoc\}|@inheritdoc)(?:\s|\*/$)#i', $doc)) {
-                        break;
-                    }
-                }
-                try {
-                    $r = $r->getPrototype();
-                } catch (\ReflectionException $e) {
-                    break; // method has no prototype
-                }
-            }
-        }
-
-        return $methodsToAutowire;
-    }
-
-    /**
-     * @param \ReflectionClass    $reflectionClass
-     * @param array               $methodCalls
-     * @param \ReflectionMethod[] $autowiredMethods
+     * @param array            $methodCalls
      *
      * @return array
      */
-    private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls, array $autowiredMethods)
+    private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls)
     {
         foreach ($methodCalls as $i => $call) {
             list($method, $arguments) = $call;
 
             if ($method instanceof \ReflectionFunctionAbstract) {
                 $reflectionMethod = $method;
-            } elseif (isset($autowiredMethods[$lcMethod = strtolower($method)]) && $autowiredMethods[$lcMethod]->isPublic()) {
-                $reflectionMethod = $autowiredMethods[$lcMethod];
-                unset($autowiredMethods[$lcMethod]);
             } else {
                 $reflectionMethod = $this->getReflectionMethod(new Definition($reflectionClass->name), $method);
             }
@@ -225,16 +142,6 @@ class AutowirePass extends AbstractRecursivePass
             if ($arguments !== $call[1]) {
                 $methodCalls[$i][1] = $arguments;
             }
-        }
-
-        foreach ($autowiredMethods as $lcMethod => $reflectionMethod) {
-            $method = $reflectionMethod->name;
-
-            if (!$reflectionMethod->isPublic()) {
-                $class = $reflectionClass->name;
-                throw new AutowiringFailedException($this->currentId, sprintf('Cannot autowire service "%s": method "%s()" must be public.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method));
-            }
-            $methodCalls[] = array($method, $this->autowireMethod($reflectionMethod, array()));
         }
 
         return $methodCalls;
@@ -255,7 +162,7 @@ class AutowirePass extends AbstractRecursivePass
         $class = $reflectionMethod instanceof \ReflectionMethod ? $reflectionMethod->class : $this->currentId;
         $method = $reflectionMethod->name;
         $parameters = $reflectionMethod->getParameters();
-        if (method_exists('ReflectionMethod', 'isVariadic') && $reflectionMethod->isVariadic()) {
+        if ($reflectionMethod->isVariadic()) {
             array_pop($parameters);
         }
 
@@ -331,28 +238,15 @@ class AutowirePass extends AbstractRecursivePass
             return $reference;
         }
 
+        if (!$reference->canBeAutoregistered()) {
+            return;
+        }
+
         if (null === $this->types) {
             $this->populateAvailableTypes();
         }
 
-        if (isset($this->definedTypes[$type])) {
-            return new TypedReference($this->types[$type], $type);
-        }
-
-        if (isset($this->types[$type])) {
-            $message = 'Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won\'t be supported in version 4.0.';
-            if ($aliasSuggestion = $this->getAliasesSuggestionForType($type = $reference->getType(), $deprecationMessage)) {
-                $message .= ' '.$aliasSuggestion;
-            } else {
-                $message .= sprintf(' You should %s the "%s" service to "%s" instead.', isset($this->types[$this->types[$type]]) ? 'alias' : 'rename (or alias)', $this->types[$type], $type);
-            }
-
-            @trigger_error($message, E_USER_DEPRECATED);
-
-            return new TypedReference($this->types[$type], $type);
-        }
-
-        if (!$reference->canBeAutoregistered() || isset($this->types[$type]) || isset($this->ambiguousServiceTypes[$type])) {
+        if (isset($this->types[$type]) || isset($this->ambiguousServiceTypes[$type])) {
             return;
         }
 
@@ -388,12 +282,6 @@ class AutowirePass extends AbstractRecursivePass
             return;
         }
 
-        foreach ($definition->getAutowiringTypes(false) as $type) {
-            $this->definedTypes[$type] = true;
-            $this->types[$type] = $id;
-            unset($this->ambiguousServiceTypes[$type]);
-        }
-
         if ($definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass(), false)) {
             return;
         }
@@ -415,10 +303,6 @@ class AutowirePass extends AbstractRecursivePass
      */
     private function set($type, $id)
     {
-        if (isset($this->definedTypes[$type])) {
-            return;
-        }
-
         // is this already a type/class that is known to match multiple services?
         if (isset($this->ambiguousServiceTypes[$type])) {
             $this->ambiguousServiceTypes[$type][] = $id;
@@ -477,6 +361,8 @@ class AutowirePass extends AbstractRecursivePass
             $this->currentId = $currentId;
         }
 
+        @trigger_error(sprintf('Relying on service auto-registration for type "%s" is deprecated since version 3.4 and won\'t be supported in 4.0. Create a service named "%s" instead.', $type, $type), E_USER_DEPRECATED);
+
         $this->container->log($this, sprintf('Type "%s" has been auto-registered for service "%s".', $type, $this->currentId));
 
         return new TypedReference($argumentId, $type);
@@ -519,31 +405,6 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         return sprintf(' You should maybe alias this %s to %s.', class_exists($type, false) ? 'class' : 'interface', $message);
-    }
-
-    /**
-     * @deprecated since version 3.3, to be removed in 4.0.
-     */
-    private static function getResourceMetadataForMethod(\ReflectionMethod $method)
-    {
-        $methodArgumentsMetadata = array();
-        foreach ($method->getParameters() as $parameter) {
-            try {
-                $class = $parameter->getClass();
-            } catch (\ReflectionException $e) {
-                // type-hint is against a non-existent class
-                $class = false;
-            }
-
-            $isVariadic = method_exists($parameter, 'isVariadic') && $parameter->isVariadic();
-            $methodArgumentsMetadata[] = array(
-                'class' => $class,
-                'isOptional' => $parameter->isOptional(),
-                'defaultValue' => ($parameter->isOptional() && !$isVariadic) ? $parameter->getDefaultValue() : null,
-            );
-        }
-
-        return $methodArgumentsMetadata;
     }
 
     private function getAliasesSuggestionForType($type, $extraContext = null)

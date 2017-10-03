@@ -41,30 +41,33 @@ class PassConfig
 
         $this->beforeOptimizationPasses = array(
             100 => array(
-                $resolveClassPass = new ResolveClassPass(),
+                new ResolveClassPass(),
                 new ResolveInstanceofConditionalsPass(),
+                new RegisterEnvVarProcessorsPass(),
             ),
+            -1000 => array(new ExtensionCompilerPass()),
         );
 
         $this->optimizationPasses = array(array(
-            new ExtensionCompilerPass(),
-            new ResolveDefinitionTemplatesPass(),
+            new ResolveChildDefinitionsPass(),
             new ServiceLocatorTagPass(),
             new DecoratorServicePass(),
-            new ResolveParameterPlaceHoldersPass(),
+            new ResolveParameterPlaceHoldersPass(false),
             new ResolveFactoryClassPass(),
-            new FactoryReturnTypePass($resolveClassPass),
             new CheckDefinitionValidityPass(),
             new RegisterServiceSubscribersPass(),
             new ResolveNamedArgumentsPass(),
-            $autowirePass = new AutowirePass(false),
+            new AutowireRequiredMethodsPass(),
+            new ResolveBindingsPass(),
+            new AutowirePass(false),
+            new ResolveTaggedIteratorArgumentPass(),
             new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
             new CheckReferenceValidityPass(),
-            new CheckArgumentsValidityPass(),
+            new CheckArgumentsValidityPass(false),
         ));
 
         $this->removingPasses = array(array(
@@ -73,11 +76,11 @@ class PassConfig
             new RemoveAbstractDefinitionsPass(),
             new RepeatedPass(array(
                 new AnalyzeServiceReferencesPass(),
-                $inlinedServicePass = new InlineServiceDefinitionsPass(),
+                new InlineServiceDefinitionsPass(),
                 new AnalyzeServiceReferencesPass(),
                 new RemoveUnusedDefinitionsPass(),
             )),
-            new AutowireExceptionPass($autowirePass, $inlinedServicePass),
+            new DefinitionErrorExceptionPass(),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
         ));
     }
@@ -108,21 +111,8 @@ class PassConfig
      *
      * @throws InvalidArgumentException when a pass type doesn't exist
      */
-    public function addPass(CompilerPassInterface $pass, $type = self::TYPE_BEFORE_OPTIMIZATION/*, int $priority = 0*/)
+    public function addPass(CompilerPassInterface $pass, $type = self::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
-        if (func_num_args() >= 3) {
-            $priority = func_get_arg(2);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a third `int $priority = 0` argument in version 4.0. Not defining it is deprecated since 3.2.', __METHOD__), E_USER_DEPRECATED);
-                }
-            }
-
-            $priority = 0;
-        }
-
         $property = $type.'Passes';
         if (!isset($this->$property)) {
             throw new InvalidArgumentException(sprintf('Invalid type "%s".', $type));

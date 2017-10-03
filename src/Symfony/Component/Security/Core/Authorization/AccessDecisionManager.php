@@ -32,7 +32,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     private $allowIfEqualGrantedDeniedDecisions;
 
     /**
-     * @param iterable|VoterInterface[] $voters                             An iterator of VoterInterface instances
+     * @param iterable|VoterInterface[] $voters                             An array or an iterator of VoterInterface instances
      * @param string                    $strategy                           The vote strategy
      * @param bool                      $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
      * @param bool                      $allowIfEqualGrantedDeniedDecisions Whether to grant access if result are equals
@@ -50,20 +50,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $this->strategy = $strategyMethod;
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
-    }
-
-    /**
-     * Configures the voters.
-     *
-     * @param VoterInterface[] $voters An array of VoterInterface instances
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Pass the voters to the constructor instead.
-     */
-    public function setVoters(array $voters)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Pass the voters to the constructor instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->voters = $voters;
     }
 
     /**

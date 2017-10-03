@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * Added an argument to the `Crawler::text()` method to opt-in normalizing whitespaces.
+ * Added the `Crawler::value()` method which behaves the same as `Crawler::text()` with the whitespace normalization
+   parameter being passed.
+
 3.1.0
 -----
 

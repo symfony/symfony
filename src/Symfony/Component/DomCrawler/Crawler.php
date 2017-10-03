@@ -556,13 +556,34 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * Returns the node value of the first node of the list.
+     * Returns the text of the first node of the list.
+     *
+     * Pass true as an argument to normalize whitespaces.
      *
      * @return string The node value
      *
      * @throws \InvalidArgumentException When current node is empty
      */
     public function text()
+    {
+        $value = $this->value();
+
+        // argument to be deprecated in 4.1, whitespace normalization to become the default behavior
+        if (func_num_args() && func_get_arg(0)) {
+            $value = trim(preg_replace('/\s++/', ' ', $value));
+        }
+
+        return $value;
+    }
+
+    /**
+     * Returns the node value of the first node of the list.
+     *
+     * @return string The node value
+     *
+     * @throws \InvalidArgumentException When current node is empty
+     */
+    public function value()
     {
         if (!$this->nodes) {
             throw new \InvalidArgumentException('The current node list is empty.');

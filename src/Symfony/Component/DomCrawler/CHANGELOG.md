@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+* Added flag to the `text` method, to strip surrounding and consecutive spaces/newlines.
+
 3.1.0
 -----
 

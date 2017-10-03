@@ -394,6 +394,18 @@ EOF
         }
     }
 
+    public function testStrippedText()
+    {
+        $this->assertEquals('Fabien\'s Foo', $this->createTestCrawler()->filterXPath('//a[2]')->text(true), '->text(true) returns the stripped node value of the first element of the node list');
+
+        try {
+            $this->createTestCrawler()->filterXPath('//ol')->text(true);
+            $this->fail('->text(true) throws an \InvalidArgumentException if the node list is empty');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->text(true) throws an \InvalidArgumentException if the node list is empty');
+        }
+    }
+
     public function testHtml()
     {
         $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());

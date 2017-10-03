@@ -201,6 +201,8 @@ class Parser
                 throw new ParseException('A YAML file cannot contain tabs as indentation.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
             }
 
+            Inline::initialize($flags, $this->getRealCurrentLineNb(), $this->filename);
+
             $isRef = $mergeNode = false;
             if (self::preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+))?$#u', rtrim($this->currentLine), $values)) {
                 if ($context && 'mapping' == $context) {
@@ -252,7 +254,6 @@ class Parser
                 }
                 $context = 'mapping';
 
-                Inline::initialize($flags, $this->getRealCurrentLineNb(), $this->filename);
                 try {
                     $i = 0;
                     $evaluateKey = !(Yaml::PARSE_KEYS_AS_STRINGS & $flags);
@@ -402,7 +403,6 @@ class Parser
                 // 1-liner optionally followed by newline(s)
                 if (is_string($value) && $this->lines[0] === trim($value)) {
                     try {
-                        Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
                         $value = Inline::parse($this->lines[0], $flags, $this->refs);
                     } catch (ParseException $e) {
                         $e->setParsedLine($this->getRealCurrentLineNb() + 1);
@@ -744,7 +744,6 @@ class Parser
                 }
             }
 
-            Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
             $parsedValue = Inline::parse($value, $flags, $this->refs);
 
             if ('mapping' === $context && is_string($parsedValue) && '"' !== $value[0] && "'" !== $value[0] && '[' !== $value[0] && '{' !== $value[0] && '!' !== $value[0] && false !== strpos($parsedValue, ': ')) {

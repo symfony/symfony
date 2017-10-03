@@ -1853,8 +1853,8 @@ YAML;
     /**
      * @group legacy
      * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead on line 2.
-     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead on line 1.
-     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead on line 1.
+     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead on line 4.
+     * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead on line 5.
      */
     public function testDeprecatedPhpConstantTagMappingKey()
     {

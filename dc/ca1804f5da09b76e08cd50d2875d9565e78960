@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-10T14:42:49Z
+
+While at it patched the command to use `getContainer()->getParamater('kernel.X_dir')` in favor of `getXDir()` directly. Follows consensus reached in #23624 and applies to 3.4.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-12T15:30:13Z
+
+I'm still not convinced by the naming of this option. Here we say "Environment variables (.env)" but in #23951 we say "Loaded variables".
+
+The naming must be perfectly precise: these are only the env vars loaded by Symfony from your local .env file. They are not all the env vars defined or available in your app.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-12T15:52:52Z
+
+Somehow related: symfony/recipes#176
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-12T17:27:44Z
+
+> Here we say "Environment variables (.env)" but in #23951 we say "Loaded variables".
+
+I think it should follow with `Environment vars (dotenv)` or whatever we decide here (or there :)). They should be the same, yes.
+
+From https://github.com/symfony/recipes/pull/176#issuecomment-328896566
+
+> What we could do instead is having a CLI tool that list defined env vars and tell the dev where they are coming from (env var, .env, $_SERVER, ...).
+
+Im worried for a big list of envs, cluttering the output. IMHO `about` only cares about the SF ones. System-wide just do `php -r "var_dump($_ENV, $_SERVER);"` no?
+
+Same applies for web. System-wide you can check phpinfo or so (available via the profiler already). Yet we decided to list all server parameters (thus including those loaded by dotenv). Space is less an issue here.
+
+To mimic "loaded by dotenv" behavior in web, i suggest to highlight those in the current server parameters table and avoid extra panels etc.. See #23951
+
+And technically these variables are not loaded/set by SF persee, only managed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-12T19:55:23Z
+
+@fabpot @javiereguiluz  i just realized.. there is `bin/console about --help` also. Great place for discovery/explanation. That could justify using `Dotenv` again by explaining what that means with --help.
+
+I like the simplicity it brings for _just_ describing the feature we're implementing; expose 1) Symfony 2) Dotenv 3) Variables, a.k.a. `1)SYMFONY_2)DOTENV_3)VARS`.
+
+For this PR that is
+
+1 = `about`
+2 = Dotenv table header
+3 = the table is clearly a key/value table
+
+We shouldnt hide this is about `Dotenv` IMHO.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-12T20:33:54Z
+
+Updated. Latest version;
+
+```
+$ bin/console about
+
+ -------------------- ---------------------------------
+  Environment (.env)
+ -------------------- ---------------------------------
+  APP_ENV              prod
+  APP_DEBUG            1
+ -------------------- ---------------------------------
+
+$ bin/console about --help
+
+Help:
+  The about command displays information about the current Symfony project.
+
+  The PHP section displays configuration that might differ between web and CLI.
+
+  The Environment section displays the current environment variables managed by Symfony Dotenv. It will not
+  be shown if no variables were found.
+```
+
+Works for me :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-26T15:21:21Z
+
+Perhaps we should consider a special command for this as well. Tend to like `debug:env`.
+
+See https://github.com/symfony/symfony/pull/22406#issuecomment-294358081
+
+But, the current proposed feature, works for me :+1: although not used in real life projects with many env e.g.

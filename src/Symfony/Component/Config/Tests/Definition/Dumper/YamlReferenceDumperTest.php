@@ -12,6 +12,8 @@
 namespace Symfony\Component\Config\Tests\Definition\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
 
@@ -67,6 +69,35 @@ locale:
 EOL
             ),
         );
+    }
+
+    public function testInvalidYamlExample()
+    {
+        $config = $this->prophesize(ConfigurationInterface::class);
+        $config->getConfigTreeBuilder()->will(function () {
+            $builder = new TreeBuilder();
+            $root = $builder->root('dump_example');
+
+            $root->children()->scalarNode('scalar_value')
+                ->example(
+                    array(
+                        'valid value',
+                        'another valid value'
+                    )
+                );
+                return $builder;
+        });
+        $dumper = new YamlReferenceDumper();
+        $expected = <<<EOL
+dump_example:
+    scalar_value:         ~
+
+        # Examples:
+        # - valid value
+        # - another valid value
+
+EOL;
+        $this->assertEquals($expected, $dumper->dump($config->reveal()));
     }
 
     /**

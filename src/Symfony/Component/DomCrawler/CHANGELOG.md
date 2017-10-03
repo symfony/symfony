@@ -4,7 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
-* Added `flatText` method to get node value with spaces and newlines normalized.
+* Added flag to the `text` method, to strip surrounding and consecutive spaces/newlines.
 
 3.1.0
 -----

@@ -394,15 +394,15 @@ EOF
         }
     }
 
-    public function testFlatText()
+    public function testStrippedText()
     {
-        $this->assertEquals('Fabien\'s Foo', $this->createTestCrawler()->filterXPath('//a[2]')->flatText(), '->flatText() returns the flattened node value of the first element of the node list');
+        $this->assertEquals('Fabien\'s Foo', $this->createTestCrawler()->filterXPath('//a[2]')->text(true), '->text(true) returns the stripped node value of the first element of the node list');
 
         try {
-            $this->createTestCrawler()->filterXPath('//ol')->flatText();
-            $this->fail('->flatText() throws an \InvalidArgumentException if the node list is empty');
+            $this->createTestCrawler()->filterXPath('//ol')->text(true);
+            $this->fail('->text(true) throws an \InvalidArgumentException if the node list is empty');
         } catch (\InvalidArgumentException $e) {
-            $this->assertTrue(true, '->flatText() throws an \InvalidArgumentException if the node list is empty');
+            $this->assertTrue(true, '->text(true) throws an \InvalidArgumentException if the node list is empty');
         }
     }
 

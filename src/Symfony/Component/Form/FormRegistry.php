@@ -103,13 +103,26 @@ class FormRegistry implements FormRegistryInterface
      */
     private function resolveType(FormTypeInterface $type)
     {
+        static $checkedTypes = array();
+
+        $searchKey = array_search($type->getName(), $checkedTypes);
+        $checkedTypes[] = $type->getName();
+
+        if (false !== $searchKey) {
+            $types = implode(' > ', $checkedTypes);
+            $checkedTypes = array();
+            throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $type->getName(), $types));
+        }
+
             if ($parentType->getName() === $type->getName()) {
+                $checkedTypes = array();
                 throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
             }
 
         }
 
         if ($parentType === $type->getName()) {
+            $checkedTypes = array();
             throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
         $typeExtensions = array();
         $parentType = $type->getParent();
@@ -127,6 +140,8 @@ class FormRegistry implements FormRegistryInterface
             $typeExtensions,
             $parentType ? $this->getType($parentType) : null
         );
+
+        unset($checkedTypes[array_search($type->getName(), $checkedTypes)]);
     }
 
     /**

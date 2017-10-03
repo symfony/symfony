@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -21,6 +21,29 @@ use Symfony\Component\HttpFoundation\Response;
 class TemplateControllerTest extends TestCase
 {
     public function testTwig()
+    {
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $twig->expects($this->once())->method('render')->willReturn('bar');
+
+        $controller = new TemplateController($twig);
+
+        $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
+    }
+
+    public function testTemplating()
+    {
+        $templating = $this->getMockBuilder(EngineInterface::class)->getMock();
+        $templating->expects($this->once())->method('render')->willReturn('bar');
+
+        $controller = new TemplateController(null, $templating);
+
+        $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyTwig()
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
@@ -36,10 +59,13 @@ class TemplateControllerTest extends TestCase
         $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
     }
 
-    public function testTemplating()
+    /**
+     * @group legacy
+     */
+    public function testLegacyTemplating()
     {
         $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
-        $templating->expects($this->once())->method('renderResponse')->willReturn(new Response('bar'));
+        $templating->expects($this->once())->method('render')->willReturn('bar');
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container->expects($this->at(0))->method('has')->willReturn(true);
@@ -57,12 +83,7 @@ class TemplateControllerTest extends TestCase
      */
     public function testNoTwigNorTemplating()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-        $container->expects($this->at(0))->method('has')->willReturn(false);
-        $container->expects($this->at(1))->method('has')->willReturn(false);
-
         $controller = new TemplateController();
-        $controller->setContainer($container);
 
         $controller->templateAction('mytemplate')->getContent();
     }

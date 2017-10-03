@@ -12,9 +12,10 @@
 namespace Symfony\Bridge\Doctrine;
 
 use ProxyManager\Proxy\LazyLoadingInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Doctrine\Common\Persistence\AbstractManagerRegistry;
 
 /**
@@ -24,7 +25,21 @@ use Doctrine\Common\Persistence\AbstractManagerRegistry;
  */
 abstract class ManagerRegistry extends AbstractManagerRegistry implements ContainerAwareInterface
 {
-    use ContainerAwareTrait;
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * @deprecated since version 3.4, to be removed in 4.0 alongside with the ContainerAwareInterface type.
+     * @final since version 3.4
+     */
+    public function setContainer(SymfonyContainerInterface $container = null)
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.4 and will be removed in 4.0. Inject a PSR-11 container using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->container = $container;
+    }
 
     /**
      * {@inheritdoc}

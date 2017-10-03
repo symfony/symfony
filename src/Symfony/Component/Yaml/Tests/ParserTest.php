@@ -1543,6 +1543,17 @@ EOT;
         $this->assertSame(array('foo' => 'bar baz foobar foo', 'bar' => 'baz'), $this->parser->parse($yaml));
     }
 
+    public function testMultiLineQuotedStringWithTrailingBackslash()
+    {
+        $yaml = <<<YAML
+foobar:
+    "foo\
+    bar"
+YAML;
+
+        $this->assertSame(array('foobar' => 'foobar'), $this->parser->parse($yaml));
+    }
+
     public function testParseMultiLineUnquotedString()
     {
         $yaml = <<<EOT

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-03T11:10:53Z
+
+hm, this *should* have fixed the AppVeyor build 🤔
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-03T11:13:30Z
+
+Ah I see, there's something else we need to fix.

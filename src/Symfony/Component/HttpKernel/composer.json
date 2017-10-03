@@ -31,6 +31,7 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/dom-crawler": "~3.4|~4.0",
         "symfony/expression-language": "~3.4|~4.0",
+        "symfony/finder": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",
         "symfony/routing": "~3.4|~4.0",
         "symfony/stopwatch": "~3.4|~4.0",

@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\RequestContext;
 
 class RouterListenerTest extends TestCase
@@ -184,5 +185,27 @@ class RouterListenerTest extends TestCase
         $request->headers->set('host', '###');
         $response = $kernel->handle($request);
         $this->assertSame(400, $response->getStatusCode());
+    }
+
+    public function testNoRoutingConfigurationResponse()
+    {
+        $requestStack = new RequestStack();
+
+        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+        $requestMatcher
+            ->expects($this->once())
+            ->method('matchRequest')
+            ->willThrowException(new NoConfigurationException())
+        ;
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new RouterListener($requestMatcher, $requestStack, new RequestContext()));
+
+        $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
+
+        $request = Request::create('http://localhost/');
+        $response = $kernel->handle($request);
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertContains('Welcome', $response->getContent());
     }
 }

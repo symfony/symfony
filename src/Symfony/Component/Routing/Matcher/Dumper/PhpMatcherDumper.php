@@ -155,6 +155,12 @@ EOF;
             }
         }
 
+        if ('' === $code) {
+            $code .= "        if ('/' === \$pathinfo) {\n";
+            $code .= "            throw new Symfony\Component\Routing\Exception\NoConfigurationException();\n";
+            $code .= "        }\n";
+        }
+
         return $code;
     }
 

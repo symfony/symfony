@@ -374,6 +374,9 @@ class FilesystemTest extends FilesystemTestCase
      */
     public function testFilesExistsFails()
     {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Long file names are an issue on Windows');
+        }
         $basePath = $this->workspace.'\\directory\\';
         $maxPathLength = PHP_MAXPATHLEN - 2;
 

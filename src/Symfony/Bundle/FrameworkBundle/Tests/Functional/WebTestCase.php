@@ -34,12 +34,12 @@ class WebTestCase extends BaseWebTestCase
         if (!isset($options['config_dir'])) {
             $options['config_dir'] = __DIR__.'/app';
         }
-        
+
         return parent::createKernel($options);
     }
 
     protected static function getVarDir()
     {
-        return 'FB'. parent::getVarDir();
+        return 'FB'.parent::getVarDir();
     }
 }

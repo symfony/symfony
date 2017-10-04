@@ -297,7 +297,7 @@ abstract class KernelTestCase extends TestCase
     }
 
     /**
-     * Clean up before test class run
+     * Clean up before test class run.
      */
     public static function setUpBeforeClass()
     {
@@ -305,7 +305,7 @@ abstract class KernelTestCase extends TestCase
     }
 
     /**
-     * Clean up before test class run
+     * Clean up after test class run.
      */
     public static function tearDownAfterClass()
     {
@@ -315,10 +315,10 @@ abstract class KernelTestCase extends TestCase
     protected static function ensureTempDirCleared()
     {
         if (!file_exists(static::getTempDir())) {
-             return;
-         }
-         $fs = new Filesystem();
-         $fs->remove(static::getTempDir());
+            return;
+        }
+        $fs = new Filesystem();
+        $fs->remove(static::getTempDir());
     }
 
     protected static function getTempDir()

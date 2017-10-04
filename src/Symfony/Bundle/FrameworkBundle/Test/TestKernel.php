@@ -50,7 +50,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 class TestKernel extends Kernel implements TestKernelInterface
 {
     /**
-     * Directory holds all the kernel temporary data
+     * Directory holds all the kernel temporary data.
      *
      * @var string
      */
@@ -155,7 +155,7 @@ class TestKernel extends Kernel implements TestKernelInterface
     }
 
     /**
-     * Makes output less verbose
+     * Makes output less verbose.
      *
      * @param ContainerBuilder $container
      */
@@ -177,7 +177,7 @@ class TestKernel extends Kernel implements TestKernelInterface
                 $this->testCase,
                 $this->configDir,
                 $this->rootConfig,
-                $this->rootDir
+                $this->rootDir,
             )
         );
     }

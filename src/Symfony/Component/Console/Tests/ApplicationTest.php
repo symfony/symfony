@@ -1580,6 +1580,13 @@ class ApplicationTest extends TestCase
             $this->assertSame($e->getMessage(), 'Class \'UnknownClass\' not found');
         }
     }
+
+    protected function tearDown()
+    {
+        putenv('SHELL_VERBOSITY');
+        unset($_ENV['SHELL_VERBOSITY']);
+        unset($_SERVER['SHELL_VERBOSITY']);
+    }
 }
 
 class CustomApplication extends Application

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -29,17 +28,14 @@ class LoggerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $alias = $container->setAlias(LoggerInterface::class, 'logger');
-        $alias->setPublic(false);
+        $container->setAlias(LoggerInterface::class, 'logger')
+            ->setPublic(false);
 
         if ($container->has('logger')) {
             return;
         }
 
-        $loggerDefinition = $container->register('logger', Logger::class);
-        $loggerDefinition->setPublic(false);
-        if ($container->getParameter('kernel.debug')) {
-            $loggerDefinition->addArgument(LogLevel::DEBUG);
-        }
+        $container->register('logger', Logger::class)
+            ->setPublic(false);
     }
 }

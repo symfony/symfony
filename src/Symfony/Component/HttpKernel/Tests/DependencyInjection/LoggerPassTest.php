@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -53,16 +52,5 @@ class LoggerPassTest extends TestCase
         $definition = $container->getDefinition('logger');
         $this->assertSame(Logger::class, $definition->getClass());
         $this->assertFalse($definition->isPublic());
-    }
-
-    public function testSetMinLevelWhenDebugging()
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', true);
-
-        (new LoggerPass())->process($container);
-
-        $definition = $container->getDefinition('logger');
-        $this->assertSame(LogLevel::DEBUG, $definition->getArgument(0));
     }
 }

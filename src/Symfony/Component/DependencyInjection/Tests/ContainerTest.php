@@ -186,12 +186,26 @@ class ContainerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Unsetting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Unsetting the "bar" service after it's been initialized is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
      */
-    public function testSetWithNullResetPredefinedService()
+    public function testSetWithNullOnInitializedPredefinedService()
     {
         $sc = new Container();
         $sc->set('foo', new \stdClass());
+        $sc->set('foo', null);
+        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+
+        $sc = new ProjectServiceContainer();
+        $sc->get('bar');
+        $sc->set('bar', null);
+        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
+    }
+
+    public function testSetWithNullOnUninitializedPredefinedService()
+    {
+        $sc = new Container();
+        $sc->set('foo', new \stdClass());
+        $sc->get('foo', null);
         $sc->set('foo', null);
         $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
 
@@ -481,7 +495,7 @@ class ContainerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Setting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Setting the "bar" service after it's been initialized is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
      */
     public function testReplacingAPreDefinedServiceIsDeprecated()
     {

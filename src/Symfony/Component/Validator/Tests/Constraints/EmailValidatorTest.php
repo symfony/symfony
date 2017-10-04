@@ -68,6 +68,16 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @group legacy
+     */
+    public function testLegacyPattern()
+    {
+        $this->validator->validate('example@example.co..uk', new Email());
+
+        $this->assertNoViolation();
+    }
+
+    /**
      * @dataProvider getInvalidEmails
      */
     public function testInvalidEmails($email)

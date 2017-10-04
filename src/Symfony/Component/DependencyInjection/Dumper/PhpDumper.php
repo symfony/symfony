@@ -899,25 +899,16 @@ EOF;
         if ($this->container->isCompiled()) {
             $code .= <<<EOF
 
-    /*{$this->docStar}
-     * {@inheritdoc}
-     */
     public function compile()
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
-    /*{$this->docStar}
-     * {@inheritdoc}
-     */
     public function isCompiled()
     {
         return true;
     }
 
-    /*{$this->docStar}
-     * {@inheritdoc}
-     */
     public function isFrozen()
     {
         @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
@@ -931,9 +922,6 @@ EOF;
         if ($this->asFiles) {
             $code .= <<<EOF
 
-    /*{$this->docStar}
-     * {@inheritdoc}
-     */
     protected function load(\$file, \$lazyLoad = true)
     {
         return require \$file;
@@ -1125,9 +1113,6 @@ EOF;
         if ($this->container->isCompiled()) {
             $code .= <<<'EOF'
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameter($name)
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
@@ -1144,9 +1129,6 @@ EOF;
         return $this->parameters[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameter($name)
     {
         $name = $this->normalizeParameterName($name);
@@ -1154,17 +1136,11 @@ EOF;
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParameter($name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {
@@ -1179,9 +1155,6 @@ EOF;
     }
 
 EOF;
-            if ('' === $this->docStar) {
-                $code = str_replace('/**', '/*', $code);
-            }
 
             if ($dynamicPhp) {
                 $loadedDynamicParameters = $this->exportParameters(array_combine(array_keys($dynamicPhp), array_fill(0, count($dynamicPhp), false)), '', 8);

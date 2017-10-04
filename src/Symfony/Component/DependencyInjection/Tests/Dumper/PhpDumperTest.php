@@ -269,7 +269,7 @@ class PhpDumperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Setting the "bar" service after it's been initialized is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation The "bar" service is already initialized, replacing it is deprecated since Symfony 3.3 and will fail in 4.0.
      */
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
@@ -286,7 +286,7 @@ class PhpDumperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Setting the "bar" service after it's been initialized is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation The "bar" service is already initialized, replacing it is deprecated since Symfony 3.3 and will fail in 4.0.
      */
     public function testOverrideServiceWhenUsingADumpedContainerAndServiceIsUsedFromAnotherOne()
     {

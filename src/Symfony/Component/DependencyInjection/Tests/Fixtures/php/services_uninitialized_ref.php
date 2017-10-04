@@ -35,25 +35,16 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $this->aliases = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compile()
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCompiled()
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFrozen()
     {
         @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);

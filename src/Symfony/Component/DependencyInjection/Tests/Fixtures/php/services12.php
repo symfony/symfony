@@ -35,25 +35,16 @@ class ProjectServiceContainer extends Container
         $this->aliases = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compile()
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCompiled()
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isFrozen()
     {
         @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
@@ -71,9 +62,6 @@ class ProjectServiceContainer extends Container
         return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameter($name)
     {
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
@@ -90,9 +78,6 @@ class ProjectServiceContainer extends Container
         return $this->parameters[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameter($name)
     {
         $name = $this->normalizeParameterName($name);
@@ -100,17 +85,11 @@ class ProjectServiceContainer extends Container
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParameter($name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {

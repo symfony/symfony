@@ -183,6 +183,7 @@ class Container implements ResettableContainerInterface
             unset($this->aliases[$id]);
         }
 
+        $wasSet = isset($this->services[$id]);
         $this->services[$id] = $service;
 
         if (null === $service) {
@@ -196,11 +197,11 @@ class Container implements ResettableContainerInterface
             } else {
                 @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
-        } elseif (isset($this->fileMap[$id]) || isset($this->methodMap[$id])) {
+        } elseif ($wasSet && (isset($this->fileMap[$id]) || isset($this->methodMap[$id]))) {
             if (null === $service) {
-                @trigger_error(sprintf('Unsetting the "%s" pre-defined service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Unsetting the "%s" service after it\'s been initialized is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             } else {
-                @trigger_error(sprintf('Setting the "%s" pre-defined service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Setting the "%s" service after it\'s been initialized is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
         }
     }

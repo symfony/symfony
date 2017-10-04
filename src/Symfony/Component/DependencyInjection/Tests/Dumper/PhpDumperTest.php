@@ -269,7 +269,7 @@ class PhpDumperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Setting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Setting the "bar" service after it's been initialized is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
      */
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
@@ -277,15 +277,16 @@ class PhpDumperTest extends TestCase
         require_once self::$fixturesPath.'/includes/foo.php';
 
         $container = new \ProjectServiceContainer();
-        $container->set('bar', $bar = new \stdClass());
         $container->setParameter('foo_bar', 'foo_bar');
+        $container->get('bar');
+        $container->set('bar', $bar = new \stdClass());
 
         $this->assertSame($bar, $container->get('bar'), '->set() overrides an already defined service');
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation Setting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Setting the "bar" service after it's been initialized is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
      */
     public function testOverrideServiceWhenUsingADumpedContainerAndServiceIsUsedFromAnotherOne()
     {
@@ -294,6 +295,8 @@ class PhpDumperTest extends TestCase
         require_once self::$fixturesPath.'/includes/classes.php';
 
         $container = new \ProjectServiceContainer();
+        $container->setParameter('foo_bar', 'foo_bar');
+        $container->get('bar');
         $container->set('bar', $bar = new \stdClass());
 
         $this->assertSame($bar, $container->get('foo')->bar, '->set() overrides an already defined service');

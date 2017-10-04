@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -55,7 +55,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
     public static function getSubscribedServices()
     {
         return array(
-            'router' => '?'.RouterInterface::class,
+            'router' => '?'.UrlGeneratorInterface::class,
             'request_stack' => '?'.RequestStack::class,
             'http_kernel' => '?'.HttpKernelInterface::class,
             'serializer' => '?'.SerializerInterface::class,

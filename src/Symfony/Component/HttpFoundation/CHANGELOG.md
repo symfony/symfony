@@ -8,6 +8,7 @@ CHANGELOG
  * deprecated the `AbstractProxy`, `NativeProxy` and `SessionHandlerProxy` classes,
  * deprecated setting session save handlers that do not implement `\SessionHandlerInterface` in `NativeSessionStorage::setSaveHandler()`
  * deprecated using `MongoDbSessionHandler` with the legacy mongo extension; use it with the mongodb/mongodb package and ext-mongodb instead
+ * deprecated `MemcacheSessionHandler`; use `MemcachedSessionHandler` instead
 
 3.3.0
 -----

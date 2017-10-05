@@ -889,26 +889,17 @@ EOF;
         $code .= <<<EOF
     }
 
-    /*{$this->docStar}
-     * {@inheritdoc}
-     */
     public function reset()
     {
         \$this->privates = array();
         parent::reset();
     }
 
-    /*{$this->docStar}
-     * {@inheritdoc}
-     */
     public function compile()
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
-    /*{$this->docStar}
-     * {@inheritdoc}
-     */
     public function isCompiled()
     {
         return true;
@@ -919,9 +910,6 @@ EOF;
         if ($this->asFiles) {
             $code .= <<<EOF
 
-    /*{$this->docStar}
-     * {@inheritdoc}
-     */
     protected function load(\$file, \$lazyLoad = true)
     {
         return require \$file;
@@ -1052,9 +1040,6 @@ EOF;
 
         $code = <<<'EOF'
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameter($name)
     {
         $name = (string) $name;
@@ -1069,9 +1054,6 @@ EOF;
         return $this->parameters[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameter($name)
     {
         $name = (string) $name;
@@ -1079,17 +1061,11 @@ EOF;
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParameter($name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {
@@ -1104,9 +1080,6 @@ EOF;
     }
 
 EOF;
-        if ('' === $this->docStar) {
-            $code = str_replace('/**', '/*', $code);
-        }
 
         if ($dynamicPhp) {
             $loadedDynamicParameters = $this->exportParameters(array_combine(array_keys($dynamicPhp), array_fill(0, count($dynamicPhp), false)), '', 8);

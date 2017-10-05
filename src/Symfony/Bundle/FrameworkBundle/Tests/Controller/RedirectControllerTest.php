@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
@@ -66,23 +67,14 @@ class RedirectControllerTest extends TestCase
 
         $request->attributes = new ParameterBag($attributes);
 
-        $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
+        $router = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
         $router
             ->expects($this->once())
             ->method('generate')
             ->with($this->equalTo($route), $this->equalTo($expectedAttributes))
             ->will($this->returnValue($url));
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('router'))
-            ->will($this->returnValue($router));
-
-        $controller = new RedirectController();
-        $controller->setContainer($container);
+        $controller = new RedirectController($router);
 
         $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes);
 
@@ -130,7 +122,7 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals(302, $returnResponse->getStatusCode());
     }
 
-    public function testUrlRedirectDefaultPortParameters()
+    public function testUrlRedirectDefaultPorts()
     {
         $host = 'www.example.com';
         $baseUrl = '/base';
@@ -147,6 +139,30 @@ class RedirectControllerTest extends TestCase
         $expectedUrl = "http://$host:$httpPort$baseUrl$path";
         $request = $this->createRequestObject('https', $host, $httpPort, $baseUrl);
         $controller = $this->createRedirectController($httpPort);
+        $returnValue = $controller->urlRedirectAction($request, $path, false, 'http');
+        $this->assertRedirectUrl($returnValue, $expectedUrl);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testUrlRedirectDefaultPortParameters()
+    {
+        $host = 'www.example.com';
+        $baseUrl = '/base';
+        $path = '/redirect-path';
+        $httpPort = 1080;
+        $httpsPort = 1443;
+
+        $expectedUrl = "https://$host:$httpsPort$baseUrl$path";
+        $request = $this->createRequestObject('http', $host, $httpPort, $baseUrl);
+        $controller = $this->createLegacyRedirectController(null, $httpsPort);
+        $returnValue = $controller->urlRedirectAction($request, $path, false, 'https');
+        $this->assertRedirectUrl($returnValue, $expectedUrl);
+
+        $expectedUrl = "http://$host:$httpPort$baseUrl$path";
+        $request = $this->createRequestObject('https', $host, $httpPort, $baseUrl);
+        $controller = $this->createLegacyRedirectController($httpPort);
         $returnValue = $controller->urlRedirectAction($request, $path, false, 'http');
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
@@ -256,6 +272,14 @@ class RedirectControllerTest extends TestCase
     }
 
     private function createRedirectController($httpPort = null, $httpsPort = null)
+    {
+        return new RedirectController(null, $httpPort, $httpsPort);
+    }
+
+    /**
+     * @deprecated
+     */
+    private function createLegacyRedirectController($httpPort = null, $httpsPort = null)
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 

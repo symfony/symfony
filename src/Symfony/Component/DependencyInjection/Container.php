@@ -152,8 +152,8 @@ class Container implements ResettableContainerInterface
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }
 
-        if (isset($this->fileMap[$id]) || isset($this->methodMap[$id])) {
-            throw new InvalidArgumentException(sprintf('You cannot set the pre-defined service "%s".', $id));
+        if (isset($this->services[$id]) && (isset($this->fileMap[$id]) || isset($this->methodMap[$id]))) {
+            throw new InvalidArgumentException(sprintf('The "%s" service is already initialized, you cannot replace it.', $id));
         }
 
         if (isset($this->aliases[$id])) {

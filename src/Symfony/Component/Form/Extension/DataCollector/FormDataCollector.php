@@ -74,11 +74,8 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
 
         $this->dataExtractor = $dataExtractor;
-        $this->data = array(
-            'forms' => array(),
-            'forms_by_hash' => array(),
-            'nb_errors' => 0,
-        );
+
+        $this->reset();
     }
 
     /**
@@ -86,6 +83,15 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+    }
+
+    public function reset()
+    {
+        $this->data = array(
+            'forms' => array(),
+            'forms_by_hash' => array(),
+            'nb_errors' => 0,
+        );
     }
 
     /**

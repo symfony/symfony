@@ -29,6 +29,8 @@ use Symfony\Component\Security\Http\SecurityEvents;
  * can be called directly (e.g. for manual authentication) or overridden.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @final since version 3.4
  */
 class GuardAuthenticatorHandler
 {
@@ -61,10 +63,10 @@ class GuardAuthenticatorHandler
     /**
      * Returns the "on success" response for the given GuardAuthenticator.
      *
-     * @param TokenInterface              $token
-     * @param Request                     $request
-     * @param GuardAuthenticatorInterface $guardAuthenticator
-     * @param string                      $providerKey        The provider (i.e. firewall) key
+     * @param TokenInterface         $token
+     * @param Request                $request
+     * @param AuthenticatorInterface $guardAuthenticator
+     * @param string                 $providerKey        The provider (i.e. firewall) key
      *
      * @return null|Response
      */
@@ -88,10 +90,10 @@ class GuardAuthenticatorHandler
      * Convenience method for authenticating the user and returning the
      * Response *if any* for success.
      *
-     * @param UserInterface               $user
-     * @param Request                     $request
-     * @param GuardAuthenticatorInterface $authenticator
-     * @param string                      $providerKey   The provider (i.e. firewall) key
+     * @param UserInterface          $user
+     * @param Request                $request
+     * @param AuthenticatorInterface $authenticator
+     * @param string                 $providerKey   The provider (i.e. firewall) key
      *
      * @return Response|null
      */
@@ -110,10 +112,10 @@ class GuardAuthenticatorHandler
      * Handles an authentication failure and returns the Response for the
      * GuardAuthenticator.
      *
-     * @param AuthenticationException     $authenticationException
-     * @param Request                     $request
-     * @param GuardAuthenticatorInterface $guardAuthenticator
-     * @param string                      $providerKey             The key of the firewall
+     * @param AuthenticationException $authenticationException
+     * @param Request                 $request
+     * @param AuthenticatorInterface  $guardAuthenticator
+     * @param string                  $providerKey             The key of the firewall
      *
      * @return null|Response
      */

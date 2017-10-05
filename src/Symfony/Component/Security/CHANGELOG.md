@@ -26,6 +26,7 @@ CHANGELOG
    requests.
  * deprecated HTTP digest authentication
  * Added a new password encoder for the Argon2i hashing algorithm
+ * deprecated `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
 
 3.3.0
 -----

@@ -29,6 +29,10 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     public function __construct($logger = null, $containerPathPrefix = null)
     {
         if (null !== $logger && $logger instanceof DebugLoggerInterface) {
+            if (!method_exists($logger, 'clear')) {
+                @trigger_error(sprintf('Implementing "%s" without the "clear()" method is deprecated since version 3.4 and will be unsupported in 4.0 for class "%s".', DebugLoggerInterface::class, \get_class($logger)), E_USER_DEPRECATED);
+            }
+
             $this->logger = $logger;
         }
 
@@ -41,6 +45,17 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         // everything is done as late as possible
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        if ($this->logger && method_exists($this->logger, 'clear')) {
+            $this->logger->clear();
+        }
+        $this->data = array();
     }
 
     /**

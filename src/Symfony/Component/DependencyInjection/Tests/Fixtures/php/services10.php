@@ -32,26 +32,17 @@ class ProjectServiceContainer extends Container
         $this->aliases = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->privates = array();
         parent::reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compile()
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCompiled()
     {
         return true;
@@ -67,9 +58,6 @@ class ProjectServiceContainer extends Container
         return $this->services['test'] = new \stdClass(array('only dot' => '.', 'concatenation as value' => '.\'\'.', 'concatenation from the start value' => '\'\'.', '.' => 'dot as a key', '.\'\'.' => 'concatenation as a key', '\'\'.' => 'concatenation from the start key', 'optimize concatenation' => 'string1-string2', 'optimize concatenation with empty string' => 'string1string2', 'optimize concatenation from the start' => 'start', 'optimize concatenation at the end' => 'end'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameter($name)
     {
         $name = (string) $name;
@@ -84,9 +72,6 @@ class ProjectServiceContainer extends Container
         return $this->parameters[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameter($name)
     {
         $name = (string) $name;
@@ -94,17 +79,11 @@ class ProjectServiceContainer extends Container
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParameter($name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {

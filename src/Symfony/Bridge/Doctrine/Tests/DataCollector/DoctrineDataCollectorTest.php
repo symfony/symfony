@@ -101,6 +101,20 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertTrue($collectedQueries['default'][1]['explainable']);
     }
 
+    public function testReset()
+    {
+        $queries = array(
+            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
+        );
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+
+        $c->reset();
+        $c->collect(new Request(), new Response());
+
+        $this->assertEquals(array('default' => array()), $c->getQueries());
+    }
+
     /**
      * @dataProvider paramProvider
      */

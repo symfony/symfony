@@ -14,12 +14,16 @@ namespace Symfony\Component\Security\Guard\Tests\Firewall;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
+use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * @author Ryan Weaver <weaverryan@gmail.com>
+ * @author Amaury Leroux de Lens <amaury@lerouxdelens.com>
  */
 class GuardAuthenticationListenerTest extends TestCase
 {
@@ -32,11 +36,16 @@ class GuardAuthenticationListenerTest extends TestCase
 
     public function testHandleSuccess()
     {
-        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
-        $authenticateToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
+        $authenticateToken = $this->getMockBuilder(TokenInterface::class)->getMock();
         $providerKey = 'my_firewall';
 
         $credentials = array('username' => 'weaverryan', 'password' => 'all_your_base');
+
+        $authenticator
+            ->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
         $authenticator
             ->expects($this->once())
             ->method('getCredentials')
@@ -82,10 +91,14 @@ class GuardAuthenticationListenerTest extends TestCase
 
     public function testHandleSuccessStopsAfterResponseIsSet()
     {
-        $authenticator1 = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
-        $authenticator2 = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $authenticator1 = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
+        $authenticator2 = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
 
         // mock the first authenticator to fail, and set a Response
+        $authenticator1
+            ->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
         $authenticator1
             ->expects($this->once())
             ->method('getCredentials')
@@ -112,10 +125,15 @@ class GuardAuthenticationListenerTest extends TestCase
 
     public function testHandleSuccessWithRememberMe()
     {
-        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
-        $authenticateToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
+        $authenticateToken = $this->getMockBuilder(TokenInterface::class)->getMock();
         $providerKey = 'my_firewall_with_rememberme';
 
+        $authenticator
+            ->expects($this->once())
+            ->method('supports')
+            ->with($this->equalTo($this->request))
+            ->willReturn(true);
         $authenticator
             ->expects($this->once())
             ->method('getCredentials')
@@ -155,10 +173,14 @@ class GuardAuthenticationListenerTest extends TestCase
 
     public function testHandleCatchesAuthenticationException()
     {
-        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $providerKey = 'my_firewall2';
 
         $authException = new AuthenticationException('Get outta here crazy user with a bad password!');
+        $authenticator
+            ->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
         $authenticator
             ->expects($this->once())
             ->method('getCredentials')
@@ -185,6 +207,96 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener->handle($this->event);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyInterfaceNullCredentials()
+    {
+        $authenticatorA = $this->getMockBuilder(GuardAuthenticatorInterface::class)->getMock();
+        $providerKey = 'my_firewall3';
+
+        $authenticatorA
+            ->expects($this->once())
+            ->method('getCredentials')
+            ->will($this->returnValue(null));
+
+        // this is not called
+        $this->authenticationManager
+            ->expects($this->never())
+            ->method('authenticate');
+
+        $this->guardAuthenticatorHandler
+            ->expects($this->never())
+            ->method('handleAuthenticationSuccess');
+
+        $listener = new GuardAuthenticationListener(
+            $this->guardAuthenticatorHandler,
+            $this->authenticationManager,
+            $providerKey,
+            array($authenticatorA),
+            $this->logger
+        );
+
+        $listener->handle($this->event);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyInterfaceKeepsWorking()
+    {
+        $authenticator = $this->getMockBuilder(GuardAuthenticatorInterface::class)->getMock();
+        $authenticateToken = $this->getMockBuilder(TokenInterface::class)->getMock();
+        $providerKey = 'my_firewall';
+
+        $credentials = array('username' => 'weaverryan', 'password' => 'all_your_base');
+
+        $authenticator
+            ->expects($this->once())
+            ->method('getCredentials')
+            ->with($this->equalTo($this->request))
+            ->will($this->returnValue($credentials));
+
+        // a clone of the token that should be created internally
+        $uniqueGuardKey = 'my_firewall_0';
+        $nonAuthedToken = new PreAuthenticationGuardToken($credentials, $uniqueGuardKey);
+
+        $this->authenticationManager
+            ->expects($this->once())
+            ->method('authenticate')
+            ->with($this->equalTo($nonAuthedToken))
+            ->will($this->returnValue($authenticateToken));
+
+        $this->guardAuthenticatorHandler
+            ->expects($this->once())
+            ->method('authenticateWithToken')
+            ->with($authenticateToken, $this->request);
+
+        $this->guardAuthenticatorHandler
+            ->expects($this->once())
+            ->method('handleAuthenticationSuccess')
+            ->with($authenticateToken, $this->request, $authenticator, $providerKey);
+
+        $listener = new GuardAuthenticationListener(
+            $this->guardAuthenticatorHandler,
+            $this->authenticationManager,
+            $providerKey,
+            array($authenticator),
+            $this->logger
+        );
+
+        $listener->setRememberMeServices($this->rememberMeServices);
+        // should never be called - our handleAuthenticationSuccess() does not return a Response
+        $this->rememberMeServices
+            ->expects($this->never())
+            ->method('loginSuccess');
+
+        $listener->handle($this->event);
+    }
+
+    /**
+     * @group legacy
+     */
     public function testReturnNullToSkipAuth()
     {
         $authenticatorA = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
@@ -214,6 +326,62 @@ class GuardAuthenticationListenerTest extends TestCase
             $this->authenticationManager,
             $providerKey,
             array($authenticatorA, $authenticatorB),
+            $this->logger
+        );
+
+        $listener->handle($this->event);
+    }
+
+    public function testSupportsReturnFalseSkipAuth()
+    {
+        $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
+        $providerKey = 'my_firewall4';
+
+        $authenticator
+            ->expects($this->once())
+            ->method('supports')
+            ->will($this->returnValue(false));
+
+        // this is not called
+        $authenticator
+            ->expects($this->never())
+            ->method('getCredentials');
+
+        $listener = new GuardAuthenticationListener(
+            $this->guardAuthenticatorHandler,
+            $this->authenticationManager,
+            $providerKey,
+            array($authenticator),
+            $this->logger
+        );
+
+        $listener->handle($this->event);
+    }
+
+    /**
+     * @expectedException \UnexpectedValueException
+     */
+    public function testReturnNullFromGetCredentials()
+    {
+        $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
+        $providerKey = 'my_firewall4';
+
+        $authenticator
+            ->expects($this->once())
+            ->method('supports')
+            ->will($this->returnValue(true));
+
+        // this will raise exception
+        $authenticator
+            ->expects($this->once())
+            ->method('getCredentials')
+            ->will($this->returnValue(null));
+
+        $listener = new GuardAuthenticationListener(
+            $this->guardAuthenticatorHandler,
+            $this->authenticationManager,
+            $providerKey,
+            array($authenticator),
             $this->logger
         );
 

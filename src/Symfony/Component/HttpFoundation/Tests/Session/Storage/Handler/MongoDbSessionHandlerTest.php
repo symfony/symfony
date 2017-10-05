@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
 /**
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
  * @group time-sensitive
+ * @requires extension mongodb
  */
 class MongoDbSessionHandlerTest extends TestCase
 {
@@ -31,21 +32,11 @@ class MongoDbSessionHandlerTest extends TestCase
     {
         parent::setUp();
 
-        if (extension_loaded('mongodb')) {
-            if (!class_exists('MongoDB\Client')) {
-                $this->markTestSkipped('The mongodb/mongodb package is required.');
-            }
-        } elseif (!extension_loaded('mongo')) {
-            $this->markTestSkipped('The Mongo or MongoDB extension is required.');
+        if (!class_exists('MongoDB\Client')) {
+            $this->markTestSkipped('The mongodb/mongodb package is required.');
         }
 
-        if (phpversion('mongodb')) {
-            $mongoClass = 'MongoDB\Client';
-        } else {
-            $mongoClass = version_compare(phpversion('mongo'), '1.3.0', '<') ? 'Mongo' : 'MongoClient';
-        }
-
-        $this->mongo = $this->getMockBuilder($mongoClass)
+        $this->mongo = $this->getMockBuilder('MongoDB\Client')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -307,23 +298,12 @@ class MongoDbSessionHandlerTest extends TestCase
         $method = new \ReflectionMethod($this->storage, 'getMongo');
         $method->setAccessible(true);
 
-        if (phpversion('mongodb')) {
-            $mongoClass = 'MongoDB\Client';
-        } else {
-            $mongoClass = version_compare(phpversion('mongo'), '1.3.0', '<') ? 'Mongo' : 'MongoClient';
-        }
-
-        $this->assertInstanceOf($mongoClass, $method->invoke($this->storage));
+        $this->assertInstanceOf('MongoDB\Client', $method->invoke($this->storage));
     }
 
     private function createMongoCollectionMock()
     {
-        $collectionClass = 'MongoCollection';
-        if (phpversion('mongodb')) {
-            $collectionClass = 'MongoDB\Collection';
-        }
-
-        $collection = $this->getMockBuilder($collectionClass)
+        $collection = $this->getMockBuilder('MongoDB\Collection')
             ->disableOriginalConstructor()
             ->getMock();
 

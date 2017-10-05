@@ -466,9 +466,9 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);
 
-        if (!$config['collect']) {
-            $container->getDefinition('profiler')->addMethodCall('disable', array());
-        }
+        $container->getDefinition('profiler')
+            ->addArgument($config['collect'])
+            ->addTag('kernel.reset', array('method' => 'reset'));
     }
 
     /**

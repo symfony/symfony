@@ -192,6 +192,8 @@ EventDispatcher
  * The `ContainerAwareEventDispatcher` class has been removed.
    Use `EventDispatcher` with closure factories instead.
 
+ * The `reset()` method has been added to `TraceableEventDispatcherInterface`.
+
 ExpressionLanguage
 ------------------
 
@@ -540,6 +542,9 @@ HttpFoundation
 
  * `NativeSessionStorage::setSaveHandler()` now requires an instance of `\SessionHandlerInterface` as argument.
 
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler` does not work with the legacy
+   mongo extension anymore. It requires mongodb/mongodb package and ext-mongodb.
+
 HttpKernel
 ----------
 
@@ -611,6 +616,10 @@ HttpKernel
 
  * The `Symfony\Component\HttpKernel\Config\EnvParametersResource` class has been removed.
 
+ * The `reset()` method has been added to `Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface`.
+
+ * The `clear()` method has been added to `Symfony\Component\HttpKernel\Log\DebugLoggerInterface`.
+
  * The `ChainCacheClearer::add()` method has been removed,
    inject the list of clearers as a constructor argument instead.
 
@@ -673,6 +682,9 @@ Security
    `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` classes
    have been removed. Use another authentication system like `http_basic` instead.
 
+ * The `GuardAuthenticatorInterface` interface has been removed.
+   Use `AuthenticatorInterface` instead.
+
 SecurityBundle
 --------------
 
@@ -693,10 +705,10 @@ SecurityBundle
 
  * Removed the HTTP digest authentication system. The `HttpDigestFactory` class
    has been removed. Use another authentication system like `http_basic` instead.
-   
+
  * The `switch_user.stateless` option is now always true if the firewall is stateless.
 
- * Not configuring explicitly the provider on a firewall is ambiguous when there is more than one registered provider. 
+ * Not configuring explicitly the provider on a firewall is ambiguous when there is more than one registered provider.
    The first configured provider is not used anymore and an exception is thrown instead.
    Explicitly configure the provider to use on your firewalls.
 

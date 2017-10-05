@@ -156,6 +156,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $this->data = $this->cloneVar($this->data);
     }
 
+    public function reset()
+    {
+        $this->data = array();
+        $this->controllers = new \SplObjectStorage();
+    }
+
     public function getMethod()
     {
         return $this->data['method'];

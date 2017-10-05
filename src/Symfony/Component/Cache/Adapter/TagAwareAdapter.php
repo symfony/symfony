@@ -254,19 +254,12 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
 
             $f = $this->getTagsByKey;
             $tagsByKey = $f($items);
-            $deletedTags = $this->deferred = array();
+            $this->deferred = array();
             $tagVersions = $this->getTagVersions($tagsByKey);
             $f = $this->createCacheItem;
 
             foreach ($tagsByKey as $key => $tags) {
-                if ($tags) {
-                    $this->pool->saveDeferred($f(static::TAGS_PREFIX.$key, array_intersect_key($tagVersions, $tags), $items[$key]));
-                } else {
-                    $deletedTags[] = static::TAGS_PREFIX.$key;
-                }
-            }
-            if ($deletedTags) {
-                $this->pool->deleteItems($deletedTags);
+                $this->pool->saveDeferred($f(static::TAGS_PREFIX.$key, array_intersect_key($tagVersions, $tags), $items[$key]));
             }
         }
 

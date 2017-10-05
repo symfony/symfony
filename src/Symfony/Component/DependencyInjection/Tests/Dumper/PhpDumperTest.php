@@ -286,7 +286,7 @@ class PhpDumperTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage You cannot set the pre-defined service "bar".
+     * @expectedExceptionMessage The "bar2" service is already initialized, you cannot replace it.
      */
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
@@ -294,7 +294,8 @@ class PhpDumperTest extends TestCase
         require_once self::$fixturesPath.'/includes/foo.php';
 
         $container = new \ProjectServiceContainer();
-        $container->set('bar', $bar = new \stdClass());
+        $container->get('bar2');
+        $container->set('bar2', new \stdClass());
     }
 
     /**

@@ -165,6 +165,36 @@ class ContainerTest extends TestCase
         $this->assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The "bar" service is already initialized, you cannot replace it.
+     */
+    public function testSetWithNullOnInitializedPredefinedService()
+    {
+        $sc = new Container();
+        $sc->set('foo', new \stdClass());
+        $sc->set('foo', null);
+        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+
+        $sc = new ProjectServiceContainer();
+        $sc->get('bar');
+        $sc->set('bar', null);
+        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
+    }
+
+    public function testSetWithNullOnUninitializedPredefinedService()
+    {
+        $sc = new Container();
+        $sc->set('foo', new \stdClass());
+        $sc->get('foo', null);
+        $sc->set('foo', null);
+        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+
+        $sc = new ProjectServiceContainer();
+        $sc->set('bar', null);
+        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
+    }
+
     public function testGet()
     {
         $sc = new ProjectServiceContainer();
@@ -361,16 +391,6 @@ class ContainerTest extends TestCase
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
         $c->get('internal');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage You cannot set the pre-defined service "bar".
-     */
-    public function testReplacingAPreDefinedService()
-    {
-        $c = new ProjectServiceContainer();
-        $c->set('bar', new \stdClass());
     }
 }
 

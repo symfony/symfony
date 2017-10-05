@@ -47,6 +47,16 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
+    public function reset()
+    {
+        $this->profile->reset();
+        $this->computed = null;
+        $this->data = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function lateCollect()
     {
         $this->data['profile'] = serialize($this->profile);

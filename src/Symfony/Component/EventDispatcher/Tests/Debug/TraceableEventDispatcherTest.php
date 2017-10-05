@@ -124,6 +124,21 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertEquals(array(), $tdispatcher->getNotCalledListeners());
     }
 
+    public function testClearCalledListeners()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', function () {}, 5);
+
+        $tdispatcher->dispatch('foo');
+        $tdispatcher->reset();
+
+        $listeners = $tdispatcher->getNotCalledListeners();
+        $this->assertArrayHasKey('stub', $listeners['foo.closure']);
+        unset($listeners['foo.closure']['stub']);
+        $this->assertEquals(array(), $tdispatcher->getCalledListeners());
+        $this->assertEquals(array('foo.closure' => array('event' => 'foo', 'pretty' => 'closure', 'priority' => 5)), $listeners);
+    }
+
     public function testGetCalledListenersNested()
     {
         $tdispatcher = null;

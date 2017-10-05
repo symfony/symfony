@@ -52,6 +52,14 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
+    public function reset()
+    {
+        $this->data = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function lateCollect()
     {
         if (null !== $this->stopwatch && isset($this->data['token'])) {

@@ -28,6 +28,8 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  * one location.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @deprecated since version 3.4, to be removed in 4.0. Use AuthenticatorInterface instead
  */
 interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
 {

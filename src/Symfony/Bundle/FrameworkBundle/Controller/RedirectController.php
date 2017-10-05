@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,10 +23,37 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Redirects a request to another URL.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since version 3.4
  */
 class RedirectController implements ContainerAwareInterface
 {
-    use ContainerAwareTrait;
+    /**
+     * @deprecated since version 3.4, to be removed in 4.0
+     */
+    protected $container;
+
+    private $router;
+    private $httpPort;
+    private $httpsPort;
+
+    public function __construct(UrlGeneratorInterface $router = null, $httpPort = null, $httpsPort = null)
+    {
+        $this->router = $router;
+        $this->httpPort = $httpPort;
+        $this->httpsPort = $httpsPort;
+    }
+
+    /**
+     * @deprecated since version 3.4, to be removed in 4.0 alongside with the ContainerAwareInterface type.
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.4 and will be removed in 4.0. Inject an UrlGeneratorInterface using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+
+        $this->container = $container;
+        $this->router = $container->get('router');
+    }
 
     /**
      * Redirects to another route with the given name.
@@ -61,7 +88,7 @@ class RedirectController implements ContainerAwareInterface
             }
         }
 
-        return new RedirectResponse($this->container->get('router')->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $permanent ? 301 : 302);
+        return new RedirectResponse($this->router->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $permanent ? 301 : 302);
     }
 
     /**
@@ -115,8 +142,11 @@ class RedirectController implements ContainerAwareInterface
             if (null === $httpPort) {
                 if ('http' === $request->getScheme()) {
                     $httpPort = $request->getPort();
-                } elseif ($this->container->hasParameter('request_listener.http_port')) {
+                } elseif ($this->container && $this->container->hasParameter('request_listener.http_port')) {
+                    @trigger_error(sprintf('Passing the http port as a container parameter is deprecated since Symfony 3.4 and won\'t be possible in 4.0. Pass it to the constructor of the "%s" class instead.', __CLASS__), E_USER_DEPRECATED);
                     $httpPort = $this->container->getParameter('request_listener.http_port');
+                } else {
+                    $httpPort = $this->httpPort;
                 }
             }
 
@@ -127,8 +157,11 @@ class RedirectController implements ContainerAwareInterface
             if (null === $httpsPort) {
                 if ('https' === $request->getScheme()) {
                     $httpsPort = $request->getPort();
-                } elseif ($this->container->hasParameter('request_listener.https_port')) {
+                } elseif ($this->container && $this->container->hasParameter('request_listener.https_port')) {
+                    @trigger_error(sprintf('Passing the https port as a container parameter is deprecated since Symfony 3.4 and won\'t be possible in 4.0. Pass it to the constructor of the "%s" class instead.', __CLASS__), E_USER_DEPRECATED);
                     $httpsPort = $this->container->getParameter('request_listener.https_port');
+                } else {
+                    $httpsPort = $this->httpsPort;
                 }
             }
 

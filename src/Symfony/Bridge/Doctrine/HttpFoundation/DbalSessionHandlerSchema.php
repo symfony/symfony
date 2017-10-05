@@ -11,12 +11,16 @@
 
 namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
+@trigger_error(sprintf('The class %s is deprecated since version 3.4 and will be removed in 4.0. Use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler::createTable instead.', DbalSessionHandlerSchema::class), E_USER_DEPRECATED);
+
 use Doctrine\DBAL\Schema\Schema;
 
 /**
  * DBAL Session Storage Schema.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since version 3.4, to be removed in 4.0. Use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler::createTable instead.
  */
 final class DbalSessionHandlerSchema extends Schema
 {

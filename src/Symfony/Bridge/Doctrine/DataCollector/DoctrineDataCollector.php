@@ -28,6 +28,10 @@ class DoctrineDataCollector extends DataCollector
     private $registry;
     private $connections;
     private $managers;
+
+    /**
+     * @var DebugStack[]
+     */
     private $loggers = array();
 
     public function __construct(ManagerRegistry $registry)
@@ -63,6 +67,16 @@ class DoctrineDataCollector extends DataCollector
             'connections' => $this->connections,
             'managers' => $this->managers,
         );
+    }
+
+    public function reset()
+    {
+        $this->data = array();
+
+        foreach ($this->loggers as $logger) {
+            $logger->queries = array();
+            $logger->currentQuery = 0;
+        }
     }
 
     public function getManagers()

@@ -104,5 +104,16 @@
             <argument>%kernel.project_dir%</argument>
             <argument>%kernel.debug%</argument>
         </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Controller\RedirectController" public="true">
+            <argument type="service" id="router" />
+            <argument>%request_listener.http_port%</argument>
+            <argument>%request_listener.https_port%</argument>
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" public="true">
+            <argument type="service" id="twig" on-invalid="ignore" />
+            <argument type="service" id="templating" on-invalid="ignore" />
+        </service>
     </services>
 </container>

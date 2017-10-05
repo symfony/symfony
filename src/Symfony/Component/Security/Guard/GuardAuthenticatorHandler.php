@@ -70,7 +70,7 @@ class GuardAuthenticatorHandler
      *
      * @return null|Response
      */
-    public function handleAuthenticationSuccess(TokenInterface $token, Request $request, GuardAuthenticatorInterface $guardAuthenticator, $providerKey)
+    public function handleAuthenticationSuccess(TokenInterface $token, Request $request, AuthenticatorInterface $guardAuthenticator, $providerKey)
     {
         $response = $guardAuthenticator->onAuthenticationSuccess($request, $token, $providerKey);
 
@@ -97,7 +97,7 @@ class GuardAuthenticatorHandler
      *
      * @return Response|null
      */
-    public function authenticateUserAndHandleSuccess(UserInterface $user, Request $request, GuardAuthenticatorInterface $authenticator, $providerKey)
+    public function authenticateUserAndHandleSuccess(UserInterface $user, Request $request, AuthenticatorInterface $authenticator, $providerKey)
     {
         // create an authenticated token for the User
         $token = $authenticator->createAuthenticatedToken($user, $providerKey);
@@ -119,7 +119,7 @@ class GuardAuthenticatorHandler
      *
      * @return null|Response
      */
-    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, GuardAuthenticatorInterface $guardAuthenticator, $providerKey)
+    public function handleAuthenticationFailure(AuthenticationException $authenticationException, Request $request, AuthenticatorInterface $guardAuthenticator, $providerKey)
     {
         $token = $this->tokenStorage->getToken();
         if ($token instanceof PostAuthenticationGuardToken && $providerKey === $token->getProviderKey()) {

@@ -17,6 +17,13 @@ Translation
  * The `FileDumper::setBackup()` method has been removed.
  * The `TranslationWriter::disableBackup()` method has been removed.
 
+Validator
+--------
+
+ * The `Email::__construct()` 'strict' property has been removed. Use 'mode'=>"strict" instead.
+ * Calling `EmailValidator::__construct()` method with a boolean parameter has been removed, use `EmailValidator("strict")` instead.
+
+
 Workflow
 --------
 

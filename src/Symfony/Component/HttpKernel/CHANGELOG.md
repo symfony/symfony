@@ -14,7 +14,9 @@ CHANGELOG
  * deprecated the `ChainCacheClearer::add()` method
  * deprecated the `CacheaWarmerAggregate::add()` and `setWarmers()` methods
  * made `CacheWarmerAggregate` and `ChainCacheClearer` classes final
-
+ * added the possibility to reset the profiler to its initial state
+ * deprecated data collectors without a `reset()` method
+ * deprecated implementing `DebugLoggerInterface` without a `clear()` method
 
 3.3.0
 -----

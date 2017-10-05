@@ -59,6 +59,14 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->data = array();
+    }
+
+    /**
      * @return array
      */
     public function getMessages()

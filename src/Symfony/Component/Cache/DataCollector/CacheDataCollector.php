@@ -53,6 +53,15 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
         $this->data['total']['statistics'] = $this->calculateTotalStatistics();
     }
 
+    public function reset()
+    {
+        $this->data = array();
+        foreach ($this->instances as $instance) {
+            // Calling getCalls() will clear the calls.
+            $instance->getCalls();
+        }
+    }
+
     public function lateCollect()
     {
         $this->data = $this->cloneVar($this->data);

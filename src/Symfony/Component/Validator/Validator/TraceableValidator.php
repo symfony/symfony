@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Validator;
 
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
@@ -30,11 +29,16 @@ class TraceableValidator implements ValidatorInterface
     }
 
     /**
-     * @return ConstraintViolationList[]
+     * @return array
      */
     public function getCollectedData()
     {
         return $this->collectedData;
+    }
+
+    public function reset()
+    {
+        $this->collectedData = array();
     }
 
     /**

@@ -35,6 +35,14 @@ class ExceptionDataCollector extends DataCollector
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->data = array();
+    }
+
+    /**
      * Checks if the exception is not null.
      *
      * @return bool true if the exception is not null, false otherwise

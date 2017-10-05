@@ -63,6 +63,13 @@ Debug
 
  * Support for stacked errors in the `ErrorHandler` is deprecated and will be removed in Symfony 4.0.
 
+DoctrineBridge
+--------------
+
+* Deprecated `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler` and
+  `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandlerSchema`. Use
+  `Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler` instead.
+
 EventDispatcher
 ---------------
 

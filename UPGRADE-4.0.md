@@ -186,6 +186,13 @@ DependencyInjection
 
  * The `ExtensionCompilerPass` has been moved to before-optimization passes with priority -1000.
 
+DoctrineBridge
+--------------
+
+* The `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler` and
+  `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandlerSchema` have been removed. Use
+  `Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler` instead.
+
 EventDispatcher
 ---------------
 

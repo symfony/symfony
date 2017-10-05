@@ -1913,6 +1913,34 @@ YAML;
 
         $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
+
+    public function testParseReferencesOnMergeKeys()
+    {
+        $yaml = <<<YAML
+mergekeyrefdef:
+    a: foo
+    <<: &quux
+        b: bar
+        c: baz
+mergekeyderef:
+    d: quux
+    <<: *quux
+YAML;
+        $expected = array(
+            'mergekeyrefdef' => array(
+                'a' => 'foo',
+                'b' => 'bar',
+                'c' => 'baz',
+            ),
+            'mergekeyderef' => array(
+                'd' => 'quux',
+                'b' => 'bar',
+                'c' => 'baz',
+            ),
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
 }
 
 class B

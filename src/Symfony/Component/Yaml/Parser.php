@@ -246,7 +246,7 @@ class Parser
                     $key = (string) $key;
                 }
 
-                if ('<<' === $key) {
+                if ('<<' === $key && (!isset($values['value']) || !self::preg_match('#^&(?P<ref>[^ ]+)#u', $values['value'], $refMatches))) {
                     $mergeNode = true;
                     $allowOverwrite = true;
                     if (isset($values['value'][0]) && '*' === $values['value'][0]) {
@@ -303,7 +303,7 @@ class Parser
                             $data += $parsed; // array union
                         }
                     }
-                } elseif (isset($values['value']) && self::preg_match('#^&(?P<ref>[^ ]++) *+(?P<value>.*)#u', $values['value'], $matches)) {
+                } elseif ('<<' !== $key && isset($values['value']) && self::preg_match('#^&(?P<ref>[^ ]++) *+(?P<value>.*)#u', $values['value'], $matches)) {
                     $isRef = $matches['ref'];
                     $values['value'] = $matches['value'];
                 }
@@ -311,7 +311,7 @@ class Parser
                 $subTag = null;
                 if ($mergeNode) {
                     // Merge keys
-                } elseif (!isset($values['value']) || '' === $values['value'] || 0 === strpos($values['value'], '#') || (null !== $subTag = $this->getLineTag($values['value'], $flags))) {
+                } elseif (!isset($values['value']) || '' === $values['value'] || 0 === strpos($values['value'], '#') || (null !== $subTag = $this->getLineTag($values['value'], $flags)) || '<<' === $key) {
                     // hash
                     // if next line is less indented or equal, then it means that the current value is null
                     if (!$this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
@@ -330,9 +330,12 @@ class Parser
                         // remember the parsed line number here in case we need it to provide some contexts in error messages below
                         $realCurrentLineNbKey = $this->getRealCurrentLineNb();
                         $value = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(), $flags);
-                        // Spec: Keys MUST be unique; first one wins.
-                        // But overwriting is allowed when a merge node is used in current block.
-                        if ($allowOverwrite || !isset($data[$key])) {
+                        if ('<<' === $key) {
+                            $this->refs[$refMatches['ref']] = $value;
+                            $data += $value;
+                        } elseif ($allowOverwrite || !isset($data[$key])) {
+                            // Spec: Keys MUST be unique; first one wins.
+                            // But overwriting is allowed when a merge node is used in current block.
                             if (null !== $subTag) {
                                 $data[$key] = new TaggedValue($subTag, $value);
                             } else {

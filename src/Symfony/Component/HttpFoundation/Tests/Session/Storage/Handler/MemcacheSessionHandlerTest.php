@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHand
 /**
  * @requires extension memcache
  * @group time-sensitive
+ * @group legacy
  */
 class MemcacheSessionHandlerTest extends TestCase
 {

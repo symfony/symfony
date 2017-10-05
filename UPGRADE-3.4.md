@@ -243,6 +243,9 @@ HttpFoundation
  * Using `Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler` with the legacy mongo extension
    has been deprecated and will be removed in 4.0. Use it with the mongodb/mongodb package and ext-mongodb instead.
 
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler` class has been deprecated and
+   will be removed in 4.0. Use `Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler` instead.
+
 HttpKernel
 ----------
 

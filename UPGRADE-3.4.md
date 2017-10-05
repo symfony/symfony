@@ -240,6 +240,9 @@ HttpFoundation
  * `NativeSessionStorage::setSaveHandler()` now takes an instance of `\SessionHandlerInterface` as argument.
    Not passing it is deprecated and will throw a `TypeError` in 4.0.
 
+ * Using `Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler` with the legacy mongo extension
+   has been deprecated and will be removed in 4.0. Use it with the mongodb/mongodb package and ext-mongodb instead.
+
 HttpKernel
 ----------
 

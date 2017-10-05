@@ -542,6 +542,9 @@ HttpFoundation
 
  * `NativeSessionStorage::setSaveHandler()` now requires an instance of `\SessionHandlerInterface` as argument.
 
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler` does not work with the legacy
+   mongo extension anymore. It requires mongodb/mongodb package and ext-mongodb.
+
 HttpKernel
 ----------
 

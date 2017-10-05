@@ -12,7 +12,12 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
+ * Session handler using the mongodb/mongodb package and MongoDB driver extension.
+ *
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
+ *
+ * @see https://packagist.org/packages/mongodb/mongodb
+ * @see http://php.net/manual/en/set.mongodb.php
  */
 class MongoDbSessionHandler implements \SessionHandlerInterface
 {
@@ -57,14 +62,18 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      * If you use such an index, you can drop `gc_probability` to 0 since
      * no garbage-collection is required.
      *
-     * @param \Mongo|\MongoClient|\MongoDB\Client $mongo   A MongoDB\Client, MongoClient or Mongo instance
-     * @param array                               $options An associative array of field options
+     * @param \MongoDB\Client $mongo   A MongoDB\Client instance
+     * @param array           $options An associative array of field options
      *
      * @throws \InvalidArgumentException When MongoClient or Mongo instance not provided
      * @throws \InvalidArgumentException When "database" or "collection" not provided
      */
     public function __construct($mongo, array $options)
     {
+        if ($mongo instanceof \MongoClient || $mongo instanceof \Mongo) {
+            @trigger_error(sprintf('Using %s with the legacy mongo extension is deprecated as of 3.4 and will be removed in 4.0. Use it with the mongodb/mongodb package and ext-mongodb instead.', __CLASS__), E_USER_DEPRECATED);
+        }
+
         if (!($mongo instanceof \MongoDB\Client || $mongo instanceof \MongoClient || $mongo instanceof \Mongo)) {
             throw new \InvalidArgumentException('MongoClient or Mongo instance required');
         }

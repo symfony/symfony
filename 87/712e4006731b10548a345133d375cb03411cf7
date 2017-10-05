@@ -1,0 +1,311 @@
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-07-28T21:24:02Z
+
+@chalasr I have renamed the test
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-07-30T18:12:36Z
+
+I'll fix the other issues either his evening or tomorrow, but I don't have access to a windows machine to test or find a working test. Thanks
+
+> On 30 Jul 2017, at 16:33, Nicolas Grekas <notifications@github.com> wrote:
+>
+> @nicolas-grekas commented on this pull request.
+>
+> In src/Symfony/Component/Process/Tests/ProcessTest.php:
+>
+> > @@ -47,6 +47,25 @@ protected function tearDown()
+>          }
+>      }
+>
+> +    /**
+> +     * @see https://github.com/symfony/symfony/issues/18249
+> +     *
+> +     * @group legacy
+> +     * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd()
+> +     */
+> +    public function testInvalidCwd()
+> +    {
+> +        // Check that it works fine if the CWD exists
+> +        $cmd = new Process('touch testing1.txt', __DIR__);
+> fails on Windows
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub, or mute the thread.
+>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-07T07:10:07Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-08-07T09:52:06Z
+
+@nicolas-grekas Any chance you can provide a fix for windows? I have no machine to test it on.
+
+I will fix the other issues.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-16T16:55:29Z
+
+It looks like Windows already fails when the cwd doesn't exist:
+https://msdn.microsoft.com/en-us/library/ms681382%28v=vs.85%29.aspx#ERROR_DIRECTORY
+
+So you can just throw an exception on Windows - and adjust the test accordingly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-31T14:34:15Z
+
+ping @alexbowers
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-08-31T14:41:32Z
+
+Thanks, I'll try to get around to it this evening. Completely forgot about this.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-02T02:22:27Z
+
+I think all outstanding issues were resolved, can this be confirmed?
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-02T22:13:55Z
+
+@chalasr @fabpot @nicolas-grekas
+
+I believe all changes have been implemented.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-07T22:42:43Z
+
+@fabpot @nicolas-grekas @chalasr
+
+Ready for review.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T08:11:13Z
+
+@fabpot do I resolve these conflicts, or do they get resolved upstream?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-14T08:15:02Z
+
+Can you rebase to resolve the conflicts please? (Don't use the GitHub UI, there should be no merge commit.)
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T08:28:06Z
+
+Whenever I try to rebase, I have no conflicts.
+
+This is saying just one conflict. What am I doing wrong?
+```
+git rebase origin/3.4 -i
+
+Successfully rebased and updated refs/heads/issue/process-cwd-bug.
+
+git status
+
+On branch issue/process-cwd-bug
+Your branch is up-to-date with 'github/issue/process-cwd-bug'.
+nothing to commit, working tree clean
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-14T08:31:16Z
+
+You should have an upstream remote to rebase against. Assuming `origin` is your fork:
+
+```
+git remote add upstream git@github.com:symfony/symfony.git
+git fetch upstream
+git rebase upstream/3.4
+```
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T08:35:13Z
+
+`origin` is my upstream. I have `origin` and `github` as remotes.
+
+`origin` is this repo, `github` is my fork.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T08:38:03Z
+
+Nevermind. It appears my GUI lies to me.
+
+`git remote -v` shows they both point to my fork.
+
+My gui shows differently. Strange.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T08:41:40Z
+
+So, uh. I think i fucked up.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T08:42:07Z
+
+Why would this have caused these issues?
+
+![image](https://user-images.githubusercontent.com/842974/30420273-f7ef5056-9930-11e7-85db-8a8691a22329.png)
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T08:48:21Z
+
+Should this just be a new PR with the commits cherrypicked onto the right base?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-14T08:53:59Z
+
+You should rebase **-i**, then keep only your commit if there are more
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T08:54:15Z
+
+Oh. How do i fix this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-14T08:54:42Z
+
+Oh, and you should not "commit" when resolving a conflict, but "rebase --continue" instead.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T09:02:19Z
+
+Is it possible to fix what i've done?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-09-14T09:09:35Z
+
+@alexbowers if you use `git reflog`, you'll see your local history e.g:
+```
+36139ca HEAD@{23}: rebase finished: returning to refs/heads/master
+36139ca HEAD@{24}: rebase: checkout refs/remotes/origin/masterefs/remotes/origin/master
+684c07c HEAD@{25}: checkout: moving from 2.x to master
+```
+Find the best entry to return at the state just before the mistake happened, then hard reset on it `git reset --hard HEAD@{25}` (assuming `HEAD@{25}` is the best fit).
+Once you did this you can start rebasing (do not push until you are sure to be ok, you could loose your changes).
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T09:17:17Z
+
+```
+➜  symfony git:(issue/process-cwd-bug) git rebase -i upstream/3.4
+Successfully rebased and updated refs/heads/issue/process-cwd-bug.
+➜  symfony git:(issue/process-cwd-bug) git status
+On branch issue/process-cwd-bug
+Your branch and 'github/issue/process-cwd-bug' have diverged,
+and have 20 and 41 different commits each, respectively.
+  (use "git pull" to merge the remote branch into yours)
+nothing to commit, working tree clean
+```
+
+That seems to have worked. But it says I would have to pull to get the changes.
+
+Am i still doing something wrong here?
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T09:17:35Z
+
+I also didn't get a conflict that time for some reason. My GUI is also saying i'm 541 commits behind.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-09-14T09:17:55Z
+
+> Should this just be a new PR with the commits cherry-picked onto the right base?
+
+FYI: You don't need to create a new PR to cherry pick your commit(s) onto a fresh branch if that's what you're comfortable with. Just create a new branch based on `3.4` and cherry pick the commits you want for this PR, then delete this branch and make a new branch with the same name. Then just force push (`git push --force`). Not that this is the best approach, but if rebasing is something you aren't comfortable with and cherry picking is, the option exists.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T09:25:10Z
+
+I think i've found my way back to sanity.
+
+I _think_ its okay now.
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-14T09:27:02Z
+
+The codestyle patch https://fabbot.io/patch/symfony/symfony/23708/b93e7ad5cb0dc7ae9244bc1674044e4bbd379d56/cs.diff is not what i've modified. Is this from other PRs?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T11:57:23Z
+
+@alexbowers anytime this week to fix the remaining comments?
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-09-26T12:08:21Z
+
+Yes, I'll put it in my todo list.
+
+On 26 September 2017 at 12:57, Nicolas Grekas <notifications@github.com>
+wrote:
+
+> @alexbowers <https://github.com/alexbowers> anytime this week to fix the
+> remaining comments?
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/23708#issuecomment-332175534>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAzc3qPIk28oSPfYbjQnhmGXqIDNGgozks5smOa5gaJpZM4OnFmq>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T16:33:34Z
+
+@alexbowers don't forget this PR, we're almost at it and it has to be in 3.4 :)
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-10-05T21:21:15Z
+
+@nicolas-grekas Sent the patch again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T22:17:29Z
+
+Can you just apply fabbot's patch please?
+
+---------------------------------------------------------------------------
+
+by alexbowers at 2017-10-05T22:19:11Z
+
+Done, though that is for changes not related to anything i've done as far as I can tell.

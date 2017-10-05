@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-05T11:45:20Z
+
+Does it really make a difference? We have aliases for both interfaces pointing to the same service, don't we?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-05T12:03:12Z
+
+I think it's sane to have the type that is closer to the injected implementation in the class itself.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-05T12:30:55Z
+
+Instead of changing the interface, I would instead change the implementation to respect the current interface.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T13:31:40Z
+
+done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-05T13:40:07Z
+
+But tests are broken.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-05T14:02:40Z
+
+> Instead of changing the interface, I would instead change the implementation to respect the current interface.
+
+Esp. since the FrameworkBundle EngineInterface will be deprecated #21035

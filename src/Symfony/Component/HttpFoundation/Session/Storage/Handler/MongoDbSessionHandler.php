@@ -118,7 +118,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function gc($maxlifetime)
     {
-        $methodName = $this->mongo instanceof \MongoDB\Client ? 'deleteOne' : 'remove';
+        $methodName = $this->mongo instanceof \MongoDB\Client ? 'deleteMany' : 'remove';
 
         $this->getCollection()->$methodName(array(
             $this->options['expiry_field'] => array('$lt' => $this->createDateTime()),

@@ -281,10 +281,10 @@ trait ControllerTrait
     protected function render($view, array $parameters = array(), Response $response = null)
     {
         if ($this->container->has('templating')) {
-            return $this->container->get('templating')->renderResponse($view, $parameters, $response);
-        }
-
-        if (!$this->container->has('twig')) {
+            $content = $this->container->get('templating')->render($view, $parameters);
+        } elseif ($this->container->has('twig')) {
+            $content = $this->container->get('twig')->render($view, $parameters);
+        } else {
             throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available.');
         }
 
@@ -292,7 +292,7 @@ trait ControllerTrait
             $response = new Response();
         }
 
-        $response->setContent($this->container->get('twig')->render($view, $parameters));
+        $response->setContent($content);
 
         return $response;
     }

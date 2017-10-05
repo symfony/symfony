@@ -451,7 +451,7 @@ abstract class ControllerTraitTest extends TestCase
     public function testRenderTemplating()
     {
         $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
-        $templating->expects($this->once())->method('renderResponse')->willReturn(new Response('bar'));
+        $templating->expects($this->once())->method('render')->willReturn('bar');
 
         $container = new Container();
         $container->set('templating', $templating);

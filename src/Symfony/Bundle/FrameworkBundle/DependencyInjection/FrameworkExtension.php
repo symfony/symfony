@@ -1271,26 +1271,31 @@ class FrameworkExtension extends Extension
             $fileRecorder('xml', dirname($reflClass->getFileName()).'/Resources/config/validation.xml');
         }
 
+        $this->registerComponentMapping($container, $fileRecorder, 'validation');
+
+        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
+    }
+
+    private function registerComponentMapping(ContainerBuilder $container, $fileRecorder, $component)
+    {
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
             $dirname = $bundle['path'];
 
             if (
-                $container->fileExists($file = $dirname.'/Resources/config/validation.yaml', false) ||
-                $container->fileExists($file = $dirname.'/Resources/config/validation.yml', false)
+                $container->fileExists($file = $dirname . '/Resources/config/'.$component.'.yaml', false) ||
+                $container->fileExists($file = $dirname . '/Resources/config/'.$component.'.yml', false)
             ) {
                 $fileRecorder('yml', $file);
             }
 
-            if ($container->fileExists($file = $dirname.'/Resources/config/validation.xml', false)) {
+            if ($container->fileExists($file = $dirname . '/Resources/config/'.$component.'.xml', false)) {
                 $fileRecorder('xml', $file);
             }
 
-            if ($container->fileExists($dir = $dirname.'/Resources/config/validation', '/^$/')) {
+            if ($container->fileExists($dir = $dirname . '/Resources/config/'.$component, '/^$/')) {
                 $this->registerMappingFilesFromDir($dir, $fileRecorder);
             }
         }
-
-        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
     }
 
     private function registerMappingFilesFromDir($dir, callable $fileRecorder)

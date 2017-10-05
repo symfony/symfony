@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Guard;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 
@@ -19,8 +20,20 @@ use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
-abstract class AbstractGuardAuthenticator implements GuardAuthenticatorInterface
+abstract class AbstractGuardAuthenticator implements AuthenticatorInterface
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated since version 3.4, to be removed in 4.0
+     */
+    public function supports(Request $request)
+    {
+        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.4 and will be removed in 4.0. Implement the "%s::supports()" method in class "%s" instead.', __METHOD__, AuthenticatorInterface::class, get_class($this)), E_USER_DEPRECATED);
+
+        return true;
+    }
+
     /**
      * Shortcut to create a PostAuthenticationGuardToken for you, if you don't really
      * care about which authenticated token you're using.

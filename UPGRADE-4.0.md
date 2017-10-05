@@ -679,6 +679,9 @@ Security
    `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` classes
    have been removed. Use another authentication system like `http_basic` instead.
 
+ * The `GuardAuthenticatorInterface` interface has been removed.
+   Use `AuthenticatorInterface` instead.
+
 SecurityBundle
 --------------
 

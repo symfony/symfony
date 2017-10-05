@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by faheemhameed at 2017-10-04T03:20:44Z
+
+This works great. Thanks!! Will this be merged to "symfony/symfony": "3.3.3" so that I can pull the new version easily? or how can I do it. I am quite a newbie here.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-10-04T06:49:05Z
+
+@faheemhameed if accepted, this will be merged in 3.3 branch and it will be available in the next stable version released for Symfony 3.3. If you need this solution as soon as possible, you could even use a forked version of this component in your composer.json or even, copy+paste this change in the specific file inside vendor/ (this las "solution" only recommended in case of real urgency!).
+
+---------------------------------------------------------------------------
+
+by faheemhameed at 2017-10-05T11:45:52Z
+
+@javiereguiluz Thanks for the guide. I have tried to create a fork and tried to update my composer.json using vcs repo based on a note I found in the getcomposer.org website. But it was not successful. I have decided to wait for the update as the issue is not a pressing one for me.
+
+Many thanks.

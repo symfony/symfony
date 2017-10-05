@@ -48,6 +48,11 @@ interface OutputInterface
     public function writeln($messages, $options = 0);
 
     /**
+     * Clears the screen of output.
+     */
+    public function clear();
+
+    /**
      * Sets the verbosity of the output.
      *
      * @param int $level The level of verbosity (one of the VERBOSITY constants)

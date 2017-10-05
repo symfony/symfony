@@ -62,6 +62,14 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     /**
      * {@inheritdoc}
      */
+    public function clear()
+    {
+        $this->output->clear();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function writeln($messages, $type = self::OUTPUT_NORMAL)
     {
         $this->output->writeln($messages, $type);

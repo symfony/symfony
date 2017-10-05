@@ -799,14 +799,14 @@ class PhpDumperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Requesting the "private" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
-     * @expectedDeprecation Requesting the "private_alias" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
-     * @expectedDeprecation Requesting the "decorated_private" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
-     * @expectedDeprecation Requesting the "decorated_private_alias" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
-     * @expectedDeprecation Requesting the "private_not_inlined" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
-     * @expectedDeprecation Requesting the "private_not_removed" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
-     * @expectedDeprecation Requesting the "private_child" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
-     * @expectedDeprecation Requesting the "private_parent" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation The "private" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.
+     * @expectedDeprecation The "private_alias" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.
+     * @expectedDeprecation The "decorated_private" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.
+     * @expectedDeprecation The "decorated_private_alias" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.
+     * @expectedDeprecation The "private_not_inlined" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.
+     * @expectedDeprecation The "private_not_removed" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.
+     * @expectedDeprecation The "private_child" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.
+     * @expectedDeprecation The "private_parent" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.
      */
     public function testLegacyPrivateServices()
     {

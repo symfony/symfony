@@ -384,6 +384,7 @@ class Parser
                 if (0 === $this->currentLineNb) {
                     $parseError = false;
                     $previousLineWasNewline = false;
+                    $previousLineWasTerminatedWithBackslash = false;
                     $value = '';
 
                     foreach ($this->lines as $line) {
@@ -401,13 +402,25 @@ class Parser
 
                             if ('' === trim($parsedLine)) {
                                 $value .= "\n";
-                                $previousLineWasNewline = true;
-                            } elseif ($previousLineWasNewline) {
+                            } elseif (!$previousLineWasNewline && !$previousLineWasTerminatedWithBackslash) {
+                                $value .= ' ';
+                            }
+
+                            if ('' !== trim($parsedLine) && '\\' === substr($parsedLine, -1)) {
+                                $value .= ltrim(substr($parsedLine, 0, -1));
+                            } elseif ('' !== trim($parsedLine)) {
                                 $value .= trim($parsedLine);
+                            }
+
+                            if ('' === trim($parsedLine)) {
+                                $previousLineWasNewline = true;
+                                $previousLineWasTerminatedWithBackslash = false;
+                            } elseif ('\\' === substr($parsedLine, -1)) {
                                 $previousLineWasNewline = false;
+                                $previousLineWasTerminatedWithBackslash = true;
                             } else {
-                                $value .= ' '.trim($parsedLine);
                                 $previousLineWasNewline = false;
+                                $previousLineWasTerminatedWithBackslash = false;
                             }
                         } catch (ParseException $e) {
                             $parseError = true;
@@ -416,7 +429,7 @@ class Parser
                     }
 
                     if (!$parseError) {
-                        return trim($value);
+                        return Inline::parse(trim($value));
                     }
                 }
 

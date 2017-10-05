@@ -11,6 +11,7 @@ CHANGELOG
    commands to be registered at compile time in the application command loader.
    Setting the `$defaultName` property avoids the need for filling the `command`
    attribute on the `console.command` tag when using `AddConsoleCommandPass`.
+ * added `clearScreen` to `ConsoleOutput` to clear visual output from CLI screens.
 
 3.3.0
 -----

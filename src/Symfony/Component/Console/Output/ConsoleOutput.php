@@ -27,7 +27,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
+class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface, ClearInterface
 {
     /**
      * @var StreamOutput
@@ -151,5 +151,13 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     private function openErrorStream()
     {
         return fopen($this->hasStderrSupport() ? 'php://stderr' : 'php://output', 'w');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clearScreen()
+    {
+        $this->write(sprintf("\033\143"));
     }
 }

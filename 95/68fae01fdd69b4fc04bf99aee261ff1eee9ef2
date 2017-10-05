@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-17T08:50:46Z
+
+ping @Nyholm @lyrixx
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-17T09:06:16Z
+
+Hello.
+
+@nicolas-grekas you can simply add the workflow label instead of pinging me ;) (Both are fine anyway)
+
+@GDIBass:
+
+I'm :-1: with the current implementation.
+It's the developer responsibility to set the right token when using the security from the CLI.
+
+I understand your PR it's a convenient fallback but IMHO it will lead to many WTF for people that are not aware to see "feature"/fallaback.
+
+May be we can instead throw an exception if the token is null. WDYT?
+
+---------------------------------------------------------------------------
+
+by GDIBass at 2017-08-17T15:02:16Z
+
+@lyrixx Hrmm, that makes sense.
+
+In my own implementation, I'm only writing expressions that check the subject.   It would be nice if we could only throw an exception only if the expression required the user (like it used an is_granted check), but that would mean modifying the Expression language, right?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-17T15:14:45Z
+
+It is possible but it will need more work (I mean much more CPU work). Not sure it worth it.
+
+---------------------------------------------------------------------------
+
+by GDIBass at 2017-08-17T15:17:40Z
+
+How about something like this?
+
+https://pastebin.com/34hgUi7j
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-17T15:23:08Z
+
+it will lead to PHP warnings in the expression evaluation.
+
+---------------------------------------------------------------------------
+
+by GDIBass at 2017-08-17T15:33:59Z
+
+Ok, gotcha.  So I guess just something like this:
+
+https://pastebin.com/cc9iazXs
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-17T21:23:28Z
+
+~~Do you want to create a pull request ?~~
+
+**Edit**: oups, it's already a PR. :D sorry
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-08-24T06:59:39Z
+
+Travis failure seems unrelated
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-10-05T16:42:26Z
+
+:+1:

@@ -49,7 +49,7 @@ class TextDescriptor extends Descriptor
                 $name,
                 $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
                 $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
-                '' !== $route->getHost() ? $route->getHost() : 'ANY',
+                $route->getHost() ?: 'ANY',
                 $route->getPath(),
             );
 
@@ -85,7 +85,7 @@ class TextDescriptor extends Descriptor
             array('Route Name', isset($options['name']) ? $options['name'] : ''),
             array('Path', $route->getPath()),
             array('Path Regex', $route->compile()->getRegex()),
-            array('Host', ('' !== $route->getHost() ? $route->getHost() : 'ANY')),
+            array('Host', ($route->getHost() ?: 'ANY')),
             array('Host Regex', ('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')),
             array('Scheme', ($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')),
             array('Method', ($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')),
@@ -314,7 +314,7 @@ class TextDescriptor extends Descriptor
         }
 
         if ($definition->getFile()) {
-            $tableRows[] = array('Required File', $definition->getFile() ? $definition->getFile() : '-');
+            $tableRows[] = array('Required File', $definition->getFile() ?: '-');
         }
 
         if ($factory = $definition->getFactory()) {

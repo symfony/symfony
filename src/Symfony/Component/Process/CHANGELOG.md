@@ -5,7 +5,7 @@ CHANGELOG
 -----
 
  * deprecated the ProcessBuilder class
- * Passing a not existing working directory to the constructor of the `Symfony\Component\Process\Process` class is deprecated and will not be supported anymore in Symfony 4.0.
+ * deprecated calling `Process::start()` without setting a valid working directory beforehand (via `setWorkingDirectory()` or constructor)
 
 3.3.0
 -----

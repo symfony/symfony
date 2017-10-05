@@ -210,7 +210,7 @@ Process
  * The `Symfony\Component\Process\ProcessBuilder` class has been deprecated,
    use the `Symfony\Component\Process\Process` class directly instead.
 
- * Passing a not existing working directory to the constructor of the `Symfony\Component\Process\Process` class is deprecated and will not be supported anymore in Symfony 4.0.
+ * Calling `Process::start()` without setting a valid working directory (via `setWorkingDirectory()` or constructor) beforehand is deprecated and will throw an exception in 4.0.
 
 Profiler
 --------

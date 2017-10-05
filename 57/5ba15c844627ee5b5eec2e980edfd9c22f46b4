@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-01T17:33:04Z
+
+Just wondering: should we make PdoSessionHandler accept DBAL connections?

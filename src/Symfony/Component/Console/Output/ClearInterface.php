@@ -13,7 +13,7 @@ namespace Symfony\Component\Console\Output;
 
 /**
  * ClearInterface is an interface implemented by ConsoleOutput class.
- * This allows the console to be cleared
+ * This allows the console to be cleared.
  *
  * @author Alex Bowers <bowersbros@gmail.com>
  */

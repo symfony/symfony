@@ -545,6 +545,9 @@ HttpFoundation
  * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler` does not work with the legacy
    mongo extension anymore. It requires mongodb/mongodb package and ext-mongodb.
 
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler` class has been removed.
+   Use `Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler` instead.
+
 HttpKernel
 ----------
 

@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2017-09-30T22:46:17Z
+
+I've rebased the branch in order to resolve merge conflicts.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-09-30T22:46:40Z
+
+@nicolas-grekas Lets continue the discussion from https://github.com/symfony/symfony/pull/24289#discussion_r141839335 here.
+
+> in a kernel loop, re-enabling at reset time means collecting timings from end of previous request to end of next request, isn't it?
+
+Since the event handler runs very late on the `kernel.terminate` event, there should not be much that runs after it. In fact, there must not be any code run after the reset listener that feeds a data collector. The profiler for the next request would be tainted otherwise. That's why in https://github.com/symfony/symfony/issues/23984#issuecomment-324967999 I noted that `kernel.terminate` might not be the best place for the whole reset feature.
+
+> But next request might come very long after, so timings won't mean anything.
+
+Timings are done by the stopwatch. As of #24193, we're resetting the stopwatch, but that only clears all collected timings from it. Resetting does not start a new timing.
+
+The only remaining issue would be the `$startTime` propery of `Symfony\Component\HttpKernel\Kernel`. This propery is currently set in the constructor and I haven't found a good way to reset it. PHP-PM has a workaround for this in place:
+
+https://github.com/php-pm/php-pm-httpkernel/blob/b373b0384f74e72d5cd8e8b3bef3f3ae08fd0dfa/Bootstraps/Symfony.php#L99-L100
+
+My best guess would be to move setting `$startTime` to the very top of the `handle()` method, but I don't know if that might have some impact elsewhere.
+
+> Btw, the Twig profiler has the same issue, don't you think? I mean, calling "enter()" at reset time also?
+
+That's what happens in the Twig Profile's constructor and it would be pretty strange if we leave the class after reset in a different state than after construction. Also, the Twig profile that we have in the service container is (as far as I can tell) only used for appending child profiles to it, and not for timing purposes.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-09-30T22:48:30Z
+
+I've tested this branch with the Symfony demo application and PHP-PM. I've configured PHP-PM to use a single worker to make sure I'm really testing my reset feature. I've also removed the workaround code from PHP-PM's Symfony adapter locally:
+
+https://github.com/php-pm/php-pm-httpkernel/blob/b373b0384f74e72d5cd8e8b3bef3f3ae08fd0dfa/Bootstraps/Symfony.php#L128-L198
+
+So far, the profiler looked okay to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-04T18:18:36Z
+
+Just pushed https://github.com/nicolas-grekas/symfony/tree/3.4-reset-profiler
+see last commit
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T04:27:30Z
+
+Some comments posted in this last commit:
+https://github.com/nicolas-grekas/symfony/commit/10c16917d719d53990fd4965c6d95373c7734ea5
+
+@derrabus If OK, I invite you to cherry-pick it and squash it with yours. Then it'll LGTM.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-10-05T08:15:18Z
+
+@nicolas-grekas About your comment there:
+
+> why should we care at all about resetting the enabled/disabled state?
+
+Because the profiler is pretty much unusable, if we don't re-enable it.
+
+> That's not a leak, so doesn't fit "reset" use case.
+
+I wouldn't see this feature for leaks only. The main issue with the profiler is that if the kernel handles multiple requests, the profiler partly still contains data from previous requests. Because of this, it displays inaccurate data. Slowly leaking memory is more or less a side effect of this and not such a big deal since the profiler is supposed to be disabled on prod anyway.
+
+> If this is for reverting to initial state and we want to do that, then we're in much deeper trouble, because many services can be mutated, isn't it?
+
+Not so many, actually. The Symfony contributors did a pretty good job on creating stateless non-leaking services. 😎 But yes, there are a few services that carry request-related state that needs to be reset (see #24291).
+
+> I would instead expect ppl to not alter services in any way,
+
+Actually, we're the ones disabling the profiler, so we don't profile the profiler and render a debug toolbar inside, you know, the debug toolbar. 😉
+
+https://github.com/symfony/symfony/blob/d6b68e19e5075b808c615dc7cb1d7c2b63e0b2d7/src/Symfony/Bundle/WebProfilerBundle/Controller/ProfilerController.php#L154
+
+So, if you revert the re-enabling of the profiler (as you did in your commit), the effect is that you get a debug toolbar on the first request, but not on any subsequent ones handled by the same kernel.
+
+> and use reset only for anti-leaking purpose.
+
+To me, reset is meant to be used to purge any (master-)request-related state from services that otherwise would alter the processing on subsequent requests handled by the same kernel.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T08:25:41Z
+
+> Actually, we're the ones disabling the profiler, so we don't profile the profiler and render a debug toolbar inside, you know, the debug toolbar.
+
+Oh cool, that's the piece I was missing :)
+
+Instead of requiring several calls, which is still something I think we should avoid, I propose to add an "$enable" argument to the constructor of `Profiler`, store it in an `$originallyEnabled` property (or similar name) and reset to its value on `reset()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T09:22:54Z
+
+@derrabus here is what I have in mind:
+https://github.com/nicolas-grekas/symfony/commit/2e3be87992b04d0cb7b6224fc40cde5fdf6bb88b
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-10-05T09:36:54Z
+
+Yes, that's what I mentioned in https://github.com/symfony/symfony/pull/24289#discussion_r140757025 already:
+
+> If I wanted to do this, the profiler would need to know its initial state (enabled or disabled) so it can reset itself to that state. I don't feel comfortable with saving that information inside the profiler.
+
+But that's merely a matter of taste, I guess. If it's more important to you to not allow multiple reset methods, we can go that way. I'm going to merge your changes now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T09:55:47Z
+
+But tests are failing for now :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-10-05T10:06:55Z
+
+Yeah, you broke them. 😜
+
+https://github.com/nicolas-grekas/symfony/commit/10c16917d719d53990fd4965c6d95373c7734ea5#diff-3c1b20ab38677b0407a30d2c83278e66R60
+
+I'm on it. 😃
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-10-05T10:34:22Z
+
+Tests are green again. The failure on Travis should be resolved when merging the PR.

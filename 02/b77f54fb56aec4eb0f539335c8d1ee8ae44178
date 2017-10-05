@@ -1,0 +1,502 @@
+---------------------------------------------------------------------------
+
+by Amo at 2015-12-04T13:29:32Z
+
+Note: as being not familiar with the recent deprecation mechanisms, i'm not sure i did it well in `src/Symfony/Component/Security/Guard/Firewall/GuardAuthenticationListener.php`, line 109
+
+---------------------------------------------------------------------------
+
+by Amo at 2015-12-04T14:07:51Z
+
+About tests, i get, i'm not sure how is this wrong or ok.
+
+```
+$ ./phpunit --filter GuardAuthenticationListenerTest
+PHPUnit 4.8.19 by Sebastian Bergmann and contributors.
+
+Testing Symfony Test Suite
+.......
+
+Time: 4.1 seconds, Memory: 173.00Mb
+
+OK (7 tests, 22 assertions)
+
+Remaining deprecation notices (6)
+
+Class Mock_GuardAuthenticatorInterface_a5f0cf1d should provide a method <supports(Request $request)>. see GuardAuthenticatorSupportInterface: 6x
+    2x in GuardAuthenticationListenerTest::testReturnNullToSkipAuth from Symfony\Component\Security\Guard\Tests\Firewall
+    1x in GuardAuthenticationListenerTest::testHandleCatchesAuthenticationException from Symfony\Component\Security\Guard\Tests\Firewall
+    1x in GuardAuthenticationListenerTest::testHandleSuccessStopsAfterResponseIsSet from Symfony\Component\Security\Guard\Tests\Firewall
+    1x in GuardAuthenticationListenerTest::testHandleSuccess from Symfony\Component\Security\Guard\Tests\Firewall
+    1x in GuardAuthenticationListenerTest::testHandleSuccessWithRememberMe from Symfony\Component\Security\Guard\Tests\Firewall
+
+KO symfony
+```
+
+---------------------------------------------------------------------------
+
+by Amo at 2015-12-04T17:34:35Z
+
+by the way @weaverryan , that's what i was talking with you this morning.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T10:04:59Z
+
+I'm not sure we need this. It would probably have to duplicate some of the work done in getCredentials in many time.
+
+@weaverryan what do you think ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-05T10:05:48Z
+
+@Amo tests are failing because you are using the deprecated way in a non-legacy test.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-12-07T12:30:49Z
+
+It's "clearer" in some ways because supports() can return a clean true/false value and then getCredentials() can cause an AuthException if it returns null, which would make it more consistent with getUser and checkCredentials.
+
+I discussed this at the conference - I'm mixed on it - the only negative I see is exactly what Stof mentions, but that is a practical concern. For an API token auth, I'll either have to duplicate code that gets/checks for the API token value in supports() and getUser() or just always return true from supports, which defeats the purpose.
+
+@amo Can you convince us that this will be a better user experience?
+
+Thx!
+
+---------------------------------------------------------------------------
+
+by Amo at 2015-12-07T13:26:50Z
+
+The idea is to separate the responsabilities of
+- Identifying if the authentication context is elligible/supported
+- Extracting the credentials from the context
+
+and doing so, improve the readability, support of variations and testability of an authentication method.
+
+`Supports` would be responsible to detect a specific context, guaranteeing that when `getCredentials` is called, this context has been met.
+
+As @stof said, it could end-up in duplicating the same checks in `supports` and `getCredentials`. But, imho, that would occurs if the authentication system supports many context and is poorly designed.
+
+Let's take an example :
+
+Access to `/api` requires a `X-API-Token` header.
+An authenticator is created :
+
+``` PHP
+    // ...
+
+    /**
+     * Ensure the given request provides an API token in the headers
+     *
+     * @param  Request $request
+     *
+     * @return null|mixed
+     */
+    public function supports(Request $request)
+    {
+        if (false === $request->headers->has('X-API-Token')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Extract the credentials from the request.
+     *
+     * @param  Request $request
+     *
+     * @return string
+     */
+    public function getCredentials(Request $request)
+    {
+        return $request->headers->get('X-API-Token'));
+    }
+
+```
+
+If additional credentials retrieval methods are required (qs, payload ...) it is likely that the `getCredentials` method will get many `if` and `else`, which would make the code harder to read, maintain, test ...
+
+This separation `supports` vs `getCredentials` will spur the developer to create dedicated guard authenticator for each specificities. A common abstract class or a trait could be used to share the common stages of the authentication. But concrete final classes will explicitly indicates with use-cases they manage :
+
+```
+Security
+└── Authenticator
+    ├── ApiBaseAuthenticator.php
+    ├── ApiHeaderAuthenticator.php
+    ├── ApiPayloadAuthenticator.php
+    └── ApiQueryAuthenticator.php
+```
+
+Where `ApiBaseAuthenticator.php` handles the common logic for
+
+```
+getUser
+checkCredentials
+createAuthenticatedToken
+onAuthenticationFailure
+onAuthenticationSuccess
+supportsRememberMe
+```
+
+And each dedicated authenticator provides the dedicated logic to retrieve credentials from header, query string or payload
+
+---------------------------------------------------------------------------
+
+by Amo at 2015-12-07T13:29:07Z
+
+> @Amo tests are failing because you are using the deprecated way in a non-legacy test.
+
+How can i avoid it ? googling about Symfony 3 and deprecation conventions didn't give any results.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-12-08T13:57:12Z
+
+@Amo I think your arguments are quite good. So, let's see if we can complete this PR :).
+
+Forgetting about BC, how would you want the interface to look in 4.0? You added a new `GuardAuthenticatorSupportsInterface`, but I imagine that you'd really want `supports()` to be in the GuardAuthenticatorInterface, correct? There will be some work that will need to be done to create a new interface (that has the new method) and deprecate the old interface.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-12-08T13:59:45Z
+
+@Amo about the tests, the GuardAuthenticationListenerTest is mocking the GuardAuthenticatorInterface, which then triggers your deprecation warning. This mock should be changed to `GuardAuthenticatorSupportsInterface` so that the deprecated functionality isn't triggered (or changed to whatever final interface we decide on that has the new `supports()` method). There should also be a test that verifies that if you use the original `GuardAuthenticatorInterface`, then the old behavior is used. Put an `@legacy` above tests that specifically test how legacy functionality works.
+
+---------------------------------------------------------------------------
+
+by Amo at 2015-12-08T15:15:08Z
+
+ok thanks, i'm on it
+
+---------------------------------------------------------------------------
+
+by Amo at 2015-12-08T21:13:37Z
+
+Tests are still running.
+But, (take a deep breath), i moved the interface into the Authenticator sub namespace, `Symfony\Component\Security\Guard\Authenticator\GuardAuthenticatorInterface` which makes sense to me.
+This interface adds the `supports` method and keep the same the signature as `Symfony\Component\Security\Guard\GuardAuthenticatorInterface`. It extends `Symfony\Component\Security\Guard\GuardAuthenticatorInterface`as `GuardAuthenticatorLegacyInterface` to avoid BC break. the `Symfony\Component\Security\Guard\GuardAuthenticatorInterface` has now a `@deprecated` annotation and is still used as type hint in `Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener` alongside the new `Symfony\Component\Security\Guard\Authenticator\GuardAuthenticatorInterface` interface.
+
+---------------------------------------------------------------------------
+
+by Amo at 2015-12-08T21:14:21Z
+
+Should i fixup and `git push --force` all the changes on the `Amo:symfony` branch ?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-12-09T07:07:01Z
+
+I notice the `handle()`/`executeGuardAuthenticator()` are becoming big_(ger with those changes)_. I think the flow and changes are good, but this will become harder and harder to maintain. Some suggestions I have for this method which could be done (_after_ this PR is merged):
+
+**Using a null logger instead of a PSR logger**
+It will improve readability and reduce complexity and would remove 8 if statements in just those 2 methods
+
+**Move code out of the try catch which is unrelated**
+This try catch is pretty much just a sort of "failsafe" at the moment. However, things like `supports()` should not throw an `AuthenticationException`.  A list of method calls:
+- `$this->logger->debug('...');`
+- `$guardAuthenticator->supports($request)`
+- `$guardAuthenticator->getCredentials($request)`
+- `$this->logger->debug('...');`
+- `$this->authenticationManager->authenticate($token)`
+- `$this->logger->info('...');`
+- `$this->guardHandler->authenticateWithToken($token, $request);`
+
+Out of all available methods in the authenticator, only `getUser()` and `checkCredentials()` throw an exception and they are not being called here. In fact, the only method that throws an exception is `$this->authenticationManager->authenticate($token)`. It's actually making it possible for people to throw all kinds of `AuthenticationExceptions` which can cause unwanted behavior or break when someone decides this try/catch can be narrowed down in say 3.4.
+
+**Make `GuardAuthenticationListener` final**
+We've created a very nice extension point which people _will_ abuse in the future. My suggestion is to make this class final as it makes it easier for people to fix things here. Behavioral changes should still be avoided as much as possible though.
+
+After this the code will still be quite massive but it will at least be easier to read and understand what it does.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T12:04:19Z
+
+@weaverryan What's the status of this one?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-18T16:24:40Z
+
+@weaverryan I'd like to move this one forward. Can you have a look at it? Thanks.
+
+---------------------------------------------------------------------------
+
+by Amo at 2016-02-18T17:04:23Z
+
+Updated.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-02-18T18:19:25Z
+
+Thanks for the quick update @Amo - and sorry for the extra comments - I had to pause in the middle of reviewing :). Btw, when I talked about Guard at the last conference, someone else suggested this exact change afterwards.
+
+---------------------------------------------------------------------------
+
+by Amo at 2016-02-23T10:15:27Z
+
+I've been updating the code according to the discussion about `getUserFromRequest`.
+Unit tests need to be updated.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-11T02:02:13Z
+
+Thanks @Amo!
+
+So, we have two choices with this:
+
+1) Revert your last commit (my suggestions related to `getUserFromRequest`) and finish the original intentions of this PR.
+
+2) Keep going with `getUserFromRequest`
+
+My concern is that it will take some work to get `getUserFromRequest` to be BC with all of the proper deprecation warnings. If you're willing to iterate on that with me over the next 2 weeks, let's do it! Or, we can go a slightly easier route and keep `getUserFromRequest` until later.
+
+Let me know - and I'll help push this along either way. Thanks for your work so far!
+
+---------------------------------------------------------------------------
+
+by Amo at 2016-03-11T06:01:01Z
+
+Edit : wrong user.
+
+My main issue here is that I don't have much time in the coming days/week.
+Reverting the last commit and iterate later could be a safer option
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-11T07:13:41Z
+
+@weaverryan what would have to be done for `getUserFromRequest()`?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-12T17:52:08Z
+
+Thanks @Amo (about the wrong user).
+
+@iltar it's "easy" in theory - even to get it working _both_ ways (the old and new way). The tricky part is getting the deprecation notices in the write spot and making sure the new interface is correct. Basically, not breaking BC and triggering deprecation is the tough part (but less tough for someone experienced in doing that).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-13T15:34:04Z
+
+@Amo let's do as you said then, revert that last commit and get this done for the original idea. If we can do it quickly enough, I may be able to iterate _again_ on the next solution... but this gives us at least the first step.
+
+---------------------------------------------------------------------------
+
+by Amo at 2016-03-14T18:07:35Z
+
+Last commit removed.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-24T23:37:46Z
+
+@Amo I just left some minor comments - but it's just meaningless wording stuff. Update that when you get a chance, but...
+
+:+1: ping @symfony/deciders The behavior looks good to me, but I'd like a double-check that the deprecation of the interface was done correctly.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Amo at 2016-03-28T18:26:28Z
+
+Wording updated.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-29T13:23:47Z
+
+Some tests need to be updated as they don't handle the deprecations properly.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-30T21:00:33Z
+
+@amo I just left some very minor comments, which will likely fix the failing tests :)
+
+---------------------------------------------------------------------------
+
+by Amo at 2016-03-31T11:49:04Z
+
+I added the `@group legacy` annotations instead of `@legacy`
+I changed the unit tests to avoid testing that the method `supports` is not called on legacy interface as it doesn't exists.
+
+Removed test : `testLegacyInterfaceAvoidSupportsCall`
+Added tests :
+- `testLegacyInterfaceNullCredentials`
+- `testLegacyInterfaceKeepsWorking`
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-31T21:30:14Z
+
+The one remaining test failure looks totally unrelated (from the Process component).
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T05:52:20Z
+
+Nice changes :) Thanks!
+
+---------------------------------------------------------------------------
+
+by Amo at 2016-04-18T08:02:30Z
+
+Is there anything else expected here ?
+(a squash perhaps)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T16:26:41Z
+
+This looks good, but I don't like the fact that we introduce a brand new interface with the same name but in a sub-namespace, that looks like a hack to me.
+
+---------------------------------------------------------------------------
+
+by romain-pierre at 2017-03-16T19:42:21Z
+
+Why not allow the `supports` method to determine if the user is authenticated? In many use cases, the authenticators are called even if the user is already authenticated.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-07-26T20:59:26Z
+
+Same concern as @fabpot, adding a sub interface with only `supports()` is probably the only alternative (can't help for naming, sorry).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-09-26T16:52:40Z
+
+How about simply: `AuthenticatorInterface`?
+
+@Amo I know this PR has been hanging for a long time - apologies for that. Feature freeze for 3.4 is this weekend. Would you have time to work on this before then?
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by Amo at 2017-09-26T17:06:22Z
+
+Sure, i'll do my best
+
+---------------------------------------------------------------------------
+
+by Amo at 2017-09-29T20:24:15Z
+
+I've been _finally_ able to work on this !
+
+`Symfony\Component\Security\Guard\Authenticator\GuardAuthenticatorInterface` has been moved/renamed to `Symfony\Component\Security\Guard\AuthenticatorInterface`
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-02T12:58:49Z
+
+Just a note: we may have missed feature freeze for 3.4 on this. But, I *do* think it's ready. If we *were* to delay this to 4.1, we could/should merge early in the process. @chalasr and I are also interested in investigating another change to the interface (removing the user provider). And so, doing that all at once in 4.1 has its advantages.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-02T14:04:18Z
+
+As a French guy, I don't think we missed anything. In the past, we merged some "old" PRs a week after code freeze. I think it's fair to give a bit more time for older PRs.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-02T17:03:43Z
+
+That would be arsh to refuse 3.4's milestone for a few days to a PR created in 2015 :smiley:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-03T08:34:07Z
+
+@sroze The issue is that any change made to an interface is a BC break since interfaces cannot trigger deprecations. Here, we have no other choice that deprecating the whole existing interface to replace it by a new one, just for introducing one method. And we won't do that twice, forcing users to switch to a new interface on the same code for two consecutive majors sucks, there's not enough good names also.
+
+@Amo We asked you to finish this for 3.4 and you did it. But, because we have another change in mind for the same interface (the one Ryan is talking about), I think it would be good to postpone this for 4.1 so that the interface switch happens only once. Apologies for that, it's all about improving guard authenticators API. This is 👍  for me as is, we just need a bit more time.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-03T13:16:17Z
+
+Btw, the issue we're talking about is #21391.
+
+But I just talked with @chalasr about this. We're +1 for merging to 3.4. Sorry for the back and forth.
+
+There *is* another change we may want to make to the guard interface, but it deals with user providers  making them optional. It's a very complex topic, and I'm afraid we will "tie up" this PR with a big, complex task that may not get done (I hope it does, but let's be pragmatic).
+
+So, a +1 for me
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-03T13:18:32Z
+
+@Amo Could you add a note in UPGRADE-3.4, UPGRADE-4.0 and Security CHANGELOG files? I'll do it tomorrow otherwise
+
+---------------------------------------------------------------------------
+
+by Amo at 2017-10-03T19:31:57Z
+
+I won't be able to perform these changes tonight.
+I'll do my best to work on it tomorrow morning.
+
+---------------------------------------------------------------------------
+
+by Amo at 2017-10-04T06:26:31Z
+
+@chalasr @weaverryan I've applied the last changes requested.
+It implies that the inheritance between `AuthenticatorInterface` and `GuardAuthenticatorInterface` is inverted and by default `AbstractGuardAuthenticator` provides a concrete implementation of the `supports` method.
+
+---------------------------------------------------------------------------
+
+by Amo at 2017-10-04T06:36:58Z
+
+In addition i've added a deprecation in `AbstractGuardAuthenticator::supports` method as it should not be used except for backward compatibility.
+
+---------------------------------------------------------------------------
+
+by Amo at 2017-10-04T06:42:49Z
+
+The error on AppVeyor is weirdly unrelated (Form component)
+
+---------------------------------------------------------------------------
+
+by Amo at 2017-10-04T06:48:26Z
+
+I've updated the UPGRADE files. CHANGELOG files do not exist yet for 3.4 / 4.0 unless i'm wrong.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-04T11:46:36Z
+
+@amo I fixed the remaining comments on my side but I can't push to your fork.
+Could you [enable push permissions for maintainers on your fork](https://help.github.com/articles/allowing-changes-to-a-pull-request-branch-created-from-a-fork/) or hard reset your branch on https://github.com/chalasr/symfony/tree/guard-supports ?
+Other alternative is to close this PR and reopen a new one from my fork, but it would be too bad to lose the discussion of this PR.
+
+---------------------------------------------------------------------------
+
+by Amo at 2017-10-04T11:55:17Z
+
+Hi, thank you for your changes.
+I've enable commits from maintainers on this PR
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-04T15:10:41Z
+
+@nicolas-grekas comments addressed, thanks
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-05T08:16:02Z
+
+Remaining FQCNs fixed

@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
  * The interface for all "guard" authenticators.
@@ -28,9 +29,9 @@ use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  *
- * @deprecated Symfony\Component\Security\Guard\AuthenticatorInterface must be used instead
+ * @deprecated since version 3.4, to be removed in 4.0. Use AuthenticatorInterface instead
  */
-interface GuardAuthenticatorInterface extends AuthenticatorInterface
+interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
 {
     /**
      * Get the authentication credentials from the request and return them

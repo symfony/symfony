@@ -659,9 +659,6 @@ Security
  * The `RoleInterface` has been removed. Extend the `Symfony\Component\Security\Core\Role\Role`
    class instead.
 
- * The `GuardAuthenticatorInterface` has been removed. Implement
-   `Symfony\Component\Security\Guard\AuthenticatorInterface` class instead.
-
  * The `LogoutUrlGenerator::registerListener()` method expects a 6th `string $context = null` argument.
 
  * The `AccessDecisionManager::setVoters()` method has been removed. Pass the
@@ -675,6 +672,9 @@ Security
  * Removed the HTTP digest authentication system. The `NonceExpiredException`,
    `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` classes
    have been removed. Use another authentication system like `http_basic` instead.
+
+ * The `GuardAuthenticatorInterface` interface has been removed.
+   Use `AuthenticatorInterface` instead.
 
 SecurityBundle
 --------------

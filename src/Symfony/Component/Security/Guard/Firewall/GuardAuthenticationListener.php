@@ -15,9 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
+use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -94,7 +94,7 @@ class GuardAuthenticationListener implements ListenerInterface
         }
     }
 
-    private function executeGuardAuthenticator($uniqueGuardKey, AuthenticatorInterface $guardAuthenticator, GetResponseEvent $event)
+    private function executeGuardAuthenticator($uniqueGuardKey, GuardAuthenticatorInterface $guardAuthenticator, GetResponseEvent $event)
     {
         $request = $event->getRequest();
         try {
@@ -102,38 +102,29 @@ class GuardAuthenticationListener implements ListenerInterface
                 $this->logger->debug('Calling getCredentials() on guard configurator.', array('firewall_key' => $this->providerKey, 'authenticator' => get_class($guardAuthenticator)));
             }
 
-            // abort the execution of the authenticator if it doesn't support the request.
-            if ($guardAuthenticator instanceof GuardAuthenticatorInterface) {
-                // it's a GuardAuthenticatorInterface
-                // we support the previous behaviour to avoid BC break.
-                $credentialsCanBeNull = true;
-                @trigger_error('The Symfony\Component\Security\Guard\GuardAuthenticatorInterface interface is deprecated since version 3.1 and will be removed in 4.0. Use Symfony\Component\Security\Guard\Authenticator\GuardAuthenticatorInterface instead.', E_USER_DEPRECATED);
-            } else {
-                if (true !== $guardAuthenticator->supports($request)) {
+            // abort the execution of the authenticator if it doesn't support the request
+            if ($guardAuthenticator instanceof AuthenticatorInterface) {
+                if (!$guardAuthenticator->supports($request)) {
                     return;
                 }
                 // as there was a support for given request,
                 // authenticator is expected to give not-null credentials.
                 $credentialsCanBeNull = false;
+            } else {
+                // deprecated since version 3.4, to be removed in 4.0
+                $credentialsCanBeNull = true;
             }
 
             // allow the authenticator to fetch authentication info from the request
             $credentials = $guardAuthenticator->getCredentials($request);
 
             if (null === $credentials) {
-                // if GuardAuthenticatorInterface is used
-                // allow null to skip authentication.
+                // deprecated since version 3.4, to be removed in 4.0
                 if ($credentialsCanBeNull) {
                     return;
                 }
 
-                // otherwise something went wrong and the authentication must fail
-                throw new \UnexpectedValueException(sprintf(
-                    'You must return some credentials from %s:getCredentials().
-                    To skip authentication, return false from %s::supports().',
-                    get_class($guardAuthenticator),
-                    get_class($guardAuthenticator)
-                ));
+                throw new \UnexpectedValueException(sprintf('The return value of "%s::getCredentials()" must not be null. Return false from "%s::supports()" instead.', get_class($guardAuthenticator), get_class($guardAuthenticator)));
             }
 
             // create a token with the unique key, so that the provider knows which authenticator to use
@@ -205,7 +196,7 @@ class GuardAuthenticationListener implements ListenerInterface
      * @param TokenInterface         $token
      * @param Response               $response
      */
-    private function triggerRememberMe(AuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
+    private function triggerRememberMe(GuardAuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
     {
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {

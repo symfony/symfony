@@ -23,17 +23,13 @@ use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
 abstract class AbstractGuardAuthenticator implements AuthenticatorInterface
 {
     /**
-     * Default implementation of the AuthenticatorInterface::supports method
-     * As we still have the deprecated GuardAuthenticatorInterface, this method must be implemented here
-     * Once GuardAuthenticatorInterface will be removed, this method should be removed too.
+     * {@inheritdoc}
      *
-     * @param Request $request
-     *
-     * @return bool
+     * @deprecated since version 3.4, to be removed in 4.0
      */
     public function supports(Request $request)
     {
-        @trigger_error('The Symfony\Component\Security\Guard\AbstractGuardAuthenticator::supports default implementation is used. This is provided for backward compatibility on GuardAuthenticationInterface that is deprecated since version 3.1 and will be removed in 4.0. Provide your own implementation of the supports method instead.', E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.4 and will be removed in 4.0. Implement the "%s::supports()" method in class "%s" instead.', __METHOD__, AuthenticatorInterface::class, get_class($this)), E_USER_DEPRECATED);
 
         return true;
     }

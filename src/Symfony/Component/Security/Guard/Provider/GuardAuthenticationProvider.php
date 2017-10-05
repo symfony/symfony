@@ -56,7 +56,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
     /**
      * Finds the correct authenticator for the token and calls it.
      *
-     * @param TokenInterface|GuardTokenInterface $token
+     * @param GuardTokenInterface $token
      *
      * @return TokenInterface
      */
@@ -101,7 +101,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
         // instances that will be checked if you have multiple firewalls.
     }
 
-    private function authenticateViaGuard(AuthenticatorInterface $guardAuthenticator, PreAuthenticationGuardToken $token)
+    private function authenticateViaGuard($guardAuthenticator, PreAuthenticationGuardToken $token)
     {
         // get the user from the GuardAuthenticator
         $user = $guardAuthenticator->getUser($token->getCredentials(), $this->userProvider);
@@ -142,6 +142,6 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
 
     public function supports(TokenInterface $token)
     {
-        return $token instanceof TokenInterface;
+        return $token instanceof GuardTokenInterface;
     }
 }

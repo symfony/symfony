@@ -295,15 +295,15 @@ Security
  * Deprecated the HTTP digest authentication: `NonceExpiredException`,
    `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` will be
    removed in 4.0. Use another authentication system like `http_basic` instead.
+   
+ * The `GuardAuthenticatorInterface` has been deprecated and will be removed in 4.0.
+   Use `AuthenticatorInterface` instead.
 
 SecurityBundle
 --------------
 
  * Using voters that do not implement the `VoterInterface`is now deprecated in
    the `AccessDecisionManager` and this functionality will be removed in 4.0.
-
- * Using guard authenticator that implement the `GuardAuthenticatorInterface` is now
-   deprecated, this will be removed in 4.0. `AuthenticatorInterface` must be used now.
 
  * `FirewallContext::getListeners()` now returns `\Traversable|array`
 

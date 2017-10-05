@@ -65,13 +65,6 @@ class ControllerResolver extends ContainerControllerResolver
     private function configureController($controller)
     {
         if ($controller instanceof ContainerAwareInterface) {
-            // @deprecated switch, to be removed in 4.0 where these classes
-            // won't implement ContainerAwareInterface anymore
-            switch (\get_class($controller)) {
-                case RedirectController::class:
-                case TemplateController::class:
-                    return $controller;
-            }
             $controller->setContainer($this->container);
         }
         if ($controller instanceof AbstractController && null !== $previousContainer = $controller->setContainer($this->container)) {

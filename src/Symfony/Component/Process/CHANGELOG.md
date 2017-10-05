@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated the ProcessBuilder class
+ * deprecated calling `Process::start()` without setting a valid working directory beforehand (via `setWorkingDirectory()` or constructor)
 
 3.3.0
 -----

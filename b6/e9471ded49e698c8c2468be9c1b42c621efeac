@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-02T16:22:02Z
+
+rebase needed (the DI part has been removed in another PR)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-03T21:13:40Z
+
+rebased and changelog files updated too, failures are not related
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-03T21:20:36Z
+
+Are you sure failures are not related? It looks like this may break 3.4, isn't it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-03T22:53:00Z
+
+I see two solutions: Either we don't throw the exception in `ContextListener::setLogoutOnUserChange()` and silently ignore any value being passed (probably deprecating any value that is not `true` in 4.1) or we need to update the `SecurityExtension` in 3.4 to not add the method call when the bundle is used with the Security component in version 4.0.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-05T11:56:02Z
+
+@symfony/deciders Any preferences how we resolve https://github.com/symfony/symfony/pull/24364#issuecomment-334002153? Basically, this is caused by the change I made based on the discussion in https://github.com/symfony/symfony/pull/24364#discussion_r141674076.
+
+The difference compared to the example in the Form component mentioned by @nicolas-grekas is that we did not have any cross-component usage of the `choices_as_values` option with a value other than `true` in Symfony 2.8.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-05T12:23:16Z
+
+My preference goes for the no-op in 4.0, deprecating the method in 4.1.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-06T10:15:08Z
+
+@chalasr done

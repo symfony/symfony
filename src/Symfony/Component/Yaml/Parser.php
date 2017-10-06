@@ -332,6 +332,11 @@ class Parser
                         $value = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(), $flags);
                         if ('<<' === $key) {
                             $this->refs[$refMatches['ref']] = $value;
+
+                            if (Yaml::PARSE_OBJECT_FOR_MAP & $flags && $value instanceof \stdClass) {
+                                $value = (array) $value;
+                            }
+
                             $data += $value;
                         } elseif ($allowOverwrite || !isset($data[$key])) {
                             // Spec: Keys MUST be unique; first one wins.

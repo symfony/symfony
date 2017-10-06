@@ -1941,6 +1941,34 @@ YAML;
 
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
+
+    public function testParseReferencesOnMergeKeysWithMappingsParsedAsObjects()
+    {
+        $yaml = <<<YAML
+mergekeyrefdef:
+    a: foo
+    <<: &quux
+        b: bar
+        c: baz
+mergekeyderef:
+    d: quux
+    <<: *quux
+YAML;
+        $expected = (object) array(
+            'mergekeyrefdef' => (object) array(
+                'a' => 'foo',
+                'b' => 'bar',
+                'c' => 'baz',
+            ),
+            'mergekeyderef' => (object) array(
+                'd' => 'quux',
+                'b' => 'bar',
+                'c' => 'baz',
+            ),
+        );
+
+        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+    }
 }
 
 class B

@@ -1,0 +1,145 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-14T07:49:02Z
+
+/cc @lyrixx
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-17T09:30:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by alain-flaus at 2017-07-18T07:53:51Z
+
+Hello @lyrixx is there something else i can do ?
+The build fails but it seems that it does not come from my developments.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-18T08:20:44Z
+
+@alain-flaus Nothing ;) I'm just waiting for the "[2 days](https://symfony.com/doc/current/contributing/code/core_team.html#pull-request-merging-policy)" ;)
+
+Actually, could you rebase and push -f ?
+
+---------------------------------------------------------------------------
+
+by alain-flaus at 2017-07-18T08:43:56Z
+
+@lyrixx ok rebase done. Thanks!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-20T16:38:45Z
+
+Sorry, I forgot to ask you to add a note in the CHANGELOG.
+Could you do it? I'm gonna merge it just after ;)
+
+---------------------------------------------------------------------------
+
+by alain-flaus at 2017-07-20T18:12:12Z
+
+@lyrixx Hi, I updated the CHANGELOG but I'm not sure about my modification, is it ok?
+
+---------------------------------------------------------------------------
+
+by alain-flaus at 2017-07-21T11:25:32Z
+
+@lyrixx ok done!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-21T14:00:24Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-21T14:11:01Z
+
+@xabbuh Is that OK for you?
+
+---------------------------------------------------------------------------
+
+by alain-flaus at 2017-07-28T07:18:28Z
+
+Hi, I have processed the points of the last code review and rebased the branch.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-07-28T08:30:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-28T12:48:06Z
+
+We would need some tests to cover this new feature before merging.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-04T05:41:52Z
+
+@alain-flaus I can finish this PR for you if you lake time, just tell me;)
+
+---------------------------------------------------------------------------
+
+by alain-flaus at 2017-08-04T07:44:19Z
+
+@lyrixx Hi! Yes I'm sorry but I'm missing a little time right now.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-04T08:01:17Z
+
+Don't worry. I will finish it for you ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-04T08:04:17Z
+
+Note: This PR will need to mimic https://github.com/symfony/symfony/pull/23638
+
+---------------------------------------------------------------------------
+
+by alain-flaus at 2017-08-04T08:17:50Z
+
+@lyrixx Thanks!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-18T14:11:23Z
+
+I have:
+
+* rebased the PR.
+* Squashed @alain-flaus's commit
+* Cleanup things
+* Add more tests
+
+I think it's ready.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-08-21T09:54:43Z
+
+Failures on AppVeyor are not related.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-10-05T16:52:25Z
+
+I totally forgot this PR. I rebased it on top of master (I guess it's toot late for 3.4?)
+And I addressed Fab's comments
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-06T14:35:52Z
+
+@lyrixx Can you fix fabbot error and rebase before I merge? Thanks.

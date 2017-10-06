@@ -28,7 +28,8 @@
         "symfony/dependency-injection": "~2.8|~3.0|~4.0",
         "symfony/event-dispatcher": "~2.1|~3.0|~4.0",
         "symfony/expression-language": "~2.8|~3.0|~4.0",
-        "symfony/security-core": "~2.8|~3.0|~4.0"
+        "symfony/security-core": "~2.8|~3.0|~4.0",
+        "symfony/validator": "~2.8|~3.4|~4.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Workflow\\": "" }

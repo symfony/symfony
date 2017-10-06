@@ -64,6 +64,11 @@ $container->loadFromExtension('framework', array(
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
+    'property_access' => array(
+        'magic_call' => false,
+        'throw_exception_on_invalid_index' => false,
+        'enable_annotations' => true,
+    ),
     'serializer' => array(
         'enabled' => true,
         'enable_annotations' => true,

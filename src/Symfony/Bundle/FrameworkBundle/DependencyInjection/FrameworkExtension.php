@@ -1391,10 +1391,36 @@ class FrameworkExtension extends Extension
 
         $loader->load('property_access.xml');
 
-        $container->getDefinition('property_accessor')->setPrivate(true);
+        $loaders = array();
+        $fileRecorder = function ($extension, $path) use (&$loaders) {
+            $definition = new Definition(in_array($extension, array('yaml', 'yml')) ? 'Symfony\Component\PropertyAccess\Mapping\Loader\YamlFileLoader' : 'Symfony\Component\PropertyAccess\Mapping\Loader\XmlFileLoader', array($path));
+            $definition->setPublic(false);
+            $loaders[] = $definition;
+        };
+
+        if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+            if (!$this->annotationsConfigEnabled) {
+                throw new \LogicException('"enable_annotations" on property access cannot be set as Annotations support is disabled.');
+            }
+            $annotationLoader = new Definition(
+                'Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader',
+                array(new Reference('annotation_reader'))
+            );
+            $annotationLoader->setPublic(false);
+            $loaders[] = $annotationLoader;
+        }
+
+        $this->registerComponentMapping($container, $fileRecorder, 'property_accessor');
+
+        $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
+
+        $chainLoader = $container->getDefinition('property_access.mapping.chain_loader');
+
+        $chainLoader->replaceArgument(0, $loaders);
 
         $container
             ->getDefinition('property_accessor')
+            ->setPrivate(true)
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
         ;

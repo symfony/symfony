@@ -28,6 +28,7 @@ CHANGELOG
    name as value, using it makes the command lazy
  * Added `cache:pool:prune` command to allow manual stale cache item pruning of supported PSR-6 and PSR-16 cache pool
    implementations
+ * Added custom property accessors support
  * Deprecated `Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader`, use 
    `Symfony\Component\Translation\Reader\TranslationReader` instead
  * Deprecated `translation.loader` service, use `translation.reader` instead

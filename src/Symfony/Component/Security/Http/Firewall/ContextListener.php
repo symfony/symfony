@@ -43,7 +43,7 @@ class ContextListener implements ListenerInterface
     private $dispatcher;
     private $registered;
     private $trustResolver;
-    private $logoutOnUserChange = false;
+    private $logoutOnUserChange = true;
 
     /**
      * @param TokenStorageInterface                     $tokenStorage
@@ -74,7 +74,7 @@ class ContextListener implements ListenerInterface
      */
     public function setLogoutOnUserChange($logoutOnUserChange)
     {
-        $this->logoutOnUserChange = (bool) $logoutOnUserChange;
+        // no-op, method to be deprecated in 4.1
     }
 
     /**
@@ -183,15 +183,11 @@ class ContextListener implements ListenerInterface
 
                 // tokens can be deauthenticated if the user has been changed.
                 if (!$token->isAuthenticated()) {
-                    if ($this->logoutOnUserChange) {
-                        if (null !== $this->logger) {
-                            $this->logger->debug('Token was deauthenticated after trying to refresh it.', array('username' => $refreshedUser->getUsername(), 'provider' => get_class($provider)));
-                        }
-
-                        return null;
+                    if (null !== $this->logger) {
+                        $this->logger->debug('Token was deauthenticated after trying to refresh it.', array('username' => $refreshedUser->getUsername(), 'provider' => get_class($provider)));
                     }
 
-                    @trigger_error('Refreshing a deauthenticated user is deprecated as of 3.4 and will trigger a logout in 4.0.', E_USER_DEPRECATED);
+                    return null;
                 }
 
                 if (null !== $this->logger) {

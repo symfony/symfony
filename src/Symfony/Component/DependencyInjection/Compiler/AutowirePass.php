@@ -253,8 +253,6 @@ class AutowirePass extends AbstractRecursivePass
         if (isset($this->autowired[$type])) {
             return $this->autowired[$type] ? new TypedReference($this->autowired[$type], $type) : null;
         }
-
-        return $this->createAutowiredDefinition($type);
     }
 
     /**
@@ -323,49 +321,6 @@ class AutowirePass extends AbstractRecursivePass
             unset($this->types[$type]);
         }
         $this->ambiguousServiceTypes[$type][] = $id;
-    }
-
-    /**
-     * Registers a definition for the type if possible or throws an exception.
-     *
-     * @param string $type
-     *
-     * @return TypedReference|null A reference to the registered definition
-     */
-    private function createAutowiredDefinition($type)
-    {
-        if (!($typeHint = $this->container->getReflectionClass($type, false)) || !$typeHint->isInstantiable()) {
-            return;
-        }
-
-        $currentId = $this->currentId;
-        $this->currentId = $type;
-        $this->autowired[$type] = $argumentId = sprintf('autowired.%s', $type);
-        $argumentDefinition = new Definition($type);
-        $argumentDefinition->setPublic(false);
-        $argumentDefinition->setAutowired(true);
-
-        try {
-            $originalThrowSetting = $this->throwOnAutowiringException;
-            $this->throwOnAutowiringException = true;
-            $this->processValue($argumentDefinition, true);
-            $this->container->setDefinition($argumentId, $argumentDefinition);
-        } catch (AutowiringFailedException $e) {
-            $this->autowired[$type] = false;
-            $this->lastFailure = $e->getMessage();
-            $this->container->log($this, $this->lastFailure);
-
-            return;
-        } finally {
-            $this->throwOnAutowiringException = $originalThrowSetting;
-            $this->currentId = $currentId;
-        }
-
-        @trigger_error(sprintf('Relying on service auto-registration for type "%s" is deprecated since version 3.4 and won\'t be supported in 4.0. Create a service named "%s" instead.', $type, $type), E_USER_DEPRECATED);
-
-        $this->container->log($this, sprintf('Type "%s" has been auto-registered for service "%s".', $type, $this->currentId));
-
-        return new TypedReference($argumentId, $type);
     }
 
     private function createTypeNotFoundMessage(TypedReference $reference, $label)

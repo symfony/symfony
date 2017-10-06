@@ -415,7 +415,6 @@ EOF;
     }
 
     /**
-     * @group legacy
      * @expectedException \LogicException
      * @expectedExceptionMessage Trying to register two bundles with the same name "DuplicateName"
      */

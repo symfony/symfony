@@ -15,6 +15,8 @@ CHANGELOG
  * support for passing `proc_open()` options has been removed
  * removed the `ProcessBuilder` class, use the `Process` class instead
  * removed the `getEnhanceWindowsCompatibility()` and `setEnhanceWindowsCompatibility()` methods of the `Process` class
+ * passing a not existing working directory to the constructor of the `Symfony\Component\Process\Process` class is not
+   supported anymore
 
 3.4.0
 -----

@@ -48,33 +48,11 @@ class ProcessTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd(). This behavior is deprecated since version 3.4 and will be removed in 4.0.
-     */
-    public function testInvalidCwd()
-    {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Windows handles this automatically.');
-        }
-
-        // Check that it works fine if the CWD exists
-        $cmd = new Process('echo test', __DIR__);
-        $cmd->run();
-
-        $cmd = new Process('echo test', __DIR__.'/notfound/');
-        $cmd->run();
-    }
-
-    /**
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      * @expectedExceptionMessage The provided cwd does not exist.
      */
-    public function testInvalidCwdOnWindows()
+    public function testInvalidCwd()
     {
-        if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('Unix handles this automatically.');
-        }
-
         try {
             // Check that it works fine if the CWD exists
             $cmd = new Process('echo test', __DIR__);

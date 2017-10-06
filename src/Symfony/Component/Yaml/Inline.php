@@ -225,6 +225,45 @@ class Inline
      */
     public static function parseScalar($scalar, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true, $references = array())
     {
+        // special treatment of serialized PHP structures as they look similar to the inline YAML mapping notation
+        if (strpos($scalar, '!php/object:') === $i) {
+            $output = '!php/object:';
+            $length = strlen($scalar);
+            $curlyBraces = 0;
+            $quoted = false;
+
+            for ($j = $i + 12; $j < $length; ++$j) {
+                if ('{' === $scalar[$j]) {
+                    ++$curlyBraces;
+                } elseif ('}' === $scalar[$j]) {
+                    --$curlyBraces;
+                }
+
+                if ('"' === $scalar[$j]) {
+                    $quoted = !$quoted;
+                }
+
+                // spaces and commas can only occur inside quoted parts
+                if (!$quoted && (',' === $scalar[$j] || ' ' === $scalar[$j])) {
+                    break;
+                }
+
+                if (0 > $curlyBraces) {
+                    break;
+                }
+
+                $output .= $scalar[$j];
+            }
+
+            $i = $j;
+
+            if ($evaluate) {
+                $output = self::evaluateScalar($output, $references);
+            }
+
+            return $output;
+        }
+
         if (in_array($scalar[$i], $stringDelimiters)) {
             // quoted scalar
             $output = self::parseQuotedScalar($scalar, $i);

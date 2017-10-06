@@ -432,4 +432,31 @@ class InlineTest extends TestCase
     {
         $this->assertSame(array('' => 'foo'), Inline::parse('{ "": foo }'));
     }
+
+    public function testParseInlineSerializedPhpObject()
+    {
+        $parsed = Inline::parse('{ foo: "baz", bar: !php/object:O:8:"DateTime":3:{s:4:"date";s:19:"2012-12-25 00:00:00";s:13:"timezone_type";i:3;s:8:"timezone";s:13:"Europe/London";}, baz: foobar }', false, true);
+
+        $this->assertSame('baz', $parsed['foo']);
+        $this->assertInstanceOf('\DateTime', $parsed['bar']);
+        $this->assertSame('foobar', $parsed['baz']);
+    }
+
+    public function testParseInlineSerializedPhpObjectAsNullIfObjectSupportIsDisabled()
+    {
+        $parsed = Inline::parse('{ foo: "baz", bar: !php/object:O:8:"DateTime":3:{s:4:"date";s:19:"2012-12-25 00:00:00";s:13:"timezone_type";i:3;s:8:"timezone";s:13:"Europe/London";}, baz: foobar }');
+
+        $this->assertSame('baz', $parsed['foo']);
+        $this->assertNull($parsed['bar']);
+        $this->assertSame('foobar', $parsed['baz']);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Object support when parsing a YAML file has been disabled.
+     */
+    public function testParseInlineSerializedPhpObjectThrowsExceptionIfObjectSupportIsDisabledAndThrowingOnInvalidTypesIsEnabled()
+    {
+        Inline::parse('{ foo: "baz", bar: !php/object:O:8:"DateTime":3:{s:4:"date";s:19:"2012-12-25 00:00:00";s:13:"timezone_type";i:3;s:8:"timezone";s:13:"Europe/London";}, baz: foobar }', true);
+    }
 }

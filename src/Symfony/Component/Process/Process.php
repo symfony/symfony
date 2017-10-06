@@ -297,11 +297,7 @@ class Process implements \IteratorAggregate
         }
 
         if (!is_dir($this->cwd)) {
-            if ('\\' === DIRECTORY_SEPARATOR) {
-                throw new RuntimeException('The provided cwd does not exist.');
-            }
-
-            @trigger_error('The provided cwd does not exist. Command is currently ran against getcwd(). This behavior is deprecated since version 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
+            throw new RuntimeException('The provided cwd does not exist.');
         }
 
         $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, null, $options);

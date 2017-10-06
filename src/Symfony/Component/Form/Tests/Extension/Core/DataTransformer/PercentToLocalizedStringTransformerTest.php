@@ -141,10 +141,10 @@ class PercentToLocalizedStringTransformerTest extends TestCase
      */
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
     {
-        // Since we test against "de_AT", we need the full implementation
+        // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
-        \Locale::setDefault('de_AT');
+        \Locale::setDefault('de_DE');
 
         $transformer = new PercentToLocalizedStringTransformer(1, 'integer');
 
@@ -235,5 +235,71 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
+    public function testReverseTransformDisallowsLeadingExtraCharacters()
+    {
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('foo123');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The number contains unrecognized characters: "foo3"
+     */
+    public function testReverseTransformDisallowsCenteredExtraCharacters()
+    {
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('12foo3');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The number contains unrecognized characters: "foo8"
+     * @requires extension mbstring
+     */
+    public function testReverseTransformDisallowsCenteredExtraCharactersMultibyte()
+    {
+        // Since we test against other locales, we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('ru');
+
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform("12\xc2\xa0345,67foo8");
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The number contains unrecognized characters: "foo"
+     */
+    public function testReverseTransformDisallowsTrailingExtraCharacters()
+    {
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform('123foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The number contains unrecognized characters: "foo"
+     * @requires extension mbstring
+     */
+    public function testReverseTransformDisallowsTrailingExtraCharactersMultibyte()
+    {
+        // Since we test against other locales, we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('ru');
+
+        $transformer = new PercentToLocalizedStringTransformer();
+
+        $transformer->reverseTransform("12\xc2\xa0345,678foo");
     }
 }

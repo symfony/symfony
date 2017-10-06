@@ -54,7 +54,7 @@ class SwitchUserTest extends WebTestCase
     public function testSwitchUserStateless()
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'switchuser_stateless.yml'));
-        $client->request('POST', '/chk', array('_switch_user' => 'dunglas'), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "user_can_switch", "password": "test"}}');
+        $client->request('POST', '/chk', array(), array(), array('HTTP_X_SWITCH_USER' => 'dunglas', 'CONTENT_TYPE' => 'application/json'), '{"user": {"login": "user_can_switch", "password": "test"}}');
         $response = $client->getResponse();
 
         $this->assertInstanceOf(JsonResponse::class, $response);

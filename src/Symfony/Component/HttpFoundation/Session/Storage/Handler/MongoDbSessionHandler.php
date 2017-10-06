@@ -116,7 +116,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function gc($maxlifetime)
     {
-        $this->getCollection()->deleteOne(array(
+        $this->getCollection()->deleteMany(array(
             $this->options['expiry_field'] => array('$lt' => new \MongoDB\BSON\UTCDateTime()),
         ));
 

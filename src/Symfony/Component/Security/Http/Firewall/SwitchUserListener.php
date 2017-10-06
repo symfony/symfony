@@ -79,16 +79,17 @@ class SwitchUserListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
+        $username = $request->get($this->usernameParameter) ?: $request->headers->get($this->usernameParameter);
 
-        if (!$request->get($this->usernameParameter)) {
+        if (!$username) {
             return;
         }
 
-        if (self::EXIT_VALUE === $request->get($this->usernameParameter)) {
+        if (self::EXIT_VALUE === $username) {
             $this->tokenStorage->setToken($this->attemptExitUser($request));
         } else {
             try {
-                $this->tokenStorage->setToken($this->attemptSwitchUser($request));
+                $this->tokenStorage->setToken($this->attemptSwitchUser($request, $username));
             } catch (AuthenticationException $e) {
                 throw new \LogicException(sprintf('Switch User failed: "%s"', $e->getMessage()));
             }
@@ -106,20 +107,21 @@ class SwitchUserListener implements ListenerInterface
     /**
      * Attempts to switch to another user.
      *
-     * @param Request $request A Request instance
+     * @param Request $request  A Request instance
+     * @param string  $username
      *
      * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
      *
      * @throws \LogicException
      * @throws AccessDeniedException
      */
-    private function attemptSwitchUser(Request $request)
+    private function attemptSwitchUser(Request $request, $username)
     {
         $token = $this->tokenStorage->getToken();
         $originalToken = $this->getOriginalToken($token);
 
         if (false !== $originalToken) {
-            if ($token->getUsername() === $request->get($this->usernameParameter)) {
+            if ($token->getUsername() === $username) {
                 return $token;
             }
 
@@ -132,8 +134,6 @@ class SwitchUserListener implements ListenerInterface
 
             throw $exception;
         }
-
-        $username = $request->get($this->usernameParameter);
 
         if (null !== $this->logger) {
             $this->logger->info('Attempting to switch to user.', array('username' => $username));

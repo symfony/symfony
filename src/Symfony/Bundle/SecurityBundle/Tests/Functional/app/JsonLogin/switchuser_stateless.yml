@@ -10,4 +10,5 @@ security:
     firewalls:
         main:
             switch_user:
+                parameter: X-Switch-User
                 stateless: true

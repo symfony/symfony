@@ -186,6 +186,13 @@ DependencyInjection
 
  * The `ExtensionCompilerPass` has been moved to before-optimization passes with priority -1000.
 
+DoctrineBridge
+--------------
+
+* The `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler` and
+  `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandlerSchema` have been removed. Use
+  `Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler` instead.
+
 EventDispatcher
 ---------------
 
@@ -638,6 +645,8 @@ Ldap
 
 Process
 -------
+
+ * Passing a not existing working directory to the constructor of the `Symfony\Component\Process\Process` class is not supported anymore.
 
  * The `Symfony\Component\Process\ProcessBuilder` class has been removed,
    use the `Symfony\Component\Process\Process` class directly instead.

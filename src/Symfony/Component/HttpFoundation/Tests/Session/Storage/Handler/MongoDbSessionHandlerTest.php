@@ -181,7 +181,7 @@ class MongoDbSessionHandlerTest extends TestCase
             ->will($this->returnValue($collection));
 
         $collection->expects($this->once())
-            ->method('deleteOne')
+            ->method('deleteMany')
             ->will($this->returnCallback(function ($criteria) {
                 $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $criteria[$this->options['expiry_field']]['$lt']);
                 $this->assertGreaterThanOrEqual(time() - 1, round((string) $criteria[$this->options['expiry_field']]['$lt'] / 1000));

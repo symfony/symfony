@@ -63,6 +63,13 @@ Debug
 
  * Support for stacked errors in the `ErrorHandler` is deprecated and will be removed in Symfony 4.0.
 
+DoctrineBridge
+--------------
+
+* Deprecated `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler` and
+  `Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandlerSchema`. Use
+  `Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler` instead.
+
 EventDispatcher
 ---------------
 
@@ -299,6 +306,8 @@ Process
 
  * The `Symfony\Component\Process\ProcessBuilder` class has been deprecated,
    use the `Symfony\Component\Process\Process` class directly instead.
+
+ * Calling `Process::start()` without setting a valid working directory (via `setWorkingDirectory()` or constructor) beforehand is deprecated and will throw an exception in 4.0.
 
 Profiler
 --------

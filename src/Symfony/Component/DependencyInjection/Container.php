@@ -50,6 +50,7 @@ class Container implements ResettableContainerInterface
     protected $aliases = array();
     protected $loading = array();
     protected $resolving = array();
+    protected $syntheticIds = array();
 
     /**
      * @internal
@@ -179,31 +180,34 @@ class Container implements ResettableContainerInterface
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }
 
-        if (isset($this->aliases[$id])) {
-            unset($this->aliases[$id]);
-        }
-
-        $wasSet = isset($this->services[$id]);
-        $this->services[$id] = $service;
-
-        if (null === $service) {
-            unset($this->services[$id]);
-        }
-
-        if (isset($this->privates[$id])) {
-            if (null === $service) {
+        if (isset($this->privates[$id]) || !(isset($this->fileMap[$id]) || isset($this->methodMap[$id]))) {
+            if (isset($this->syntheticIds[$id]) || (!isset($this->privates[$id]) && !isset($this->getRemovedIds()[$id]))) {
+                // no-op
+            } elseif (null === $service) {
                 @trigger_error(sprintf('The "%s" service is private, unsetting it is deprecated since Symfony 3.2 and will fail in 4.0.', $id), E_USER_DEPRECATED);
                 unset($this->privates[$id]);
             } else {
                 @trigger_error(sprintf('The "%s" service is private, replacing it is deprecated since Symfony 3.2 and will fail in 4.0.', $id), E_USER_DEPRECATED);
             }
-        } elseif ($wasSet && (isset($this->fileMap[$id]) || isset($this->methodMap[$id]))) {
+        } elseif (isset($this->services[$id])) {
             if (null === $service) {
                 @trigger_error(sprintf('The "%s" service is already initialized, unsetting it is deprecated since Symfony 3.3 and will fail in 4.0.', $id), E_USER_DEPRECATED);
             } else {
                 @trigger_error(sprintf('The "%s" service is already initialized, replacing it is deprecated since Symfony 3.3 and will fail in 4.0.', $id), E_USER_DEPRECATED);
             }
         }
+
+        if (isset($this->aliases[$id])) {
+            unset($this->aliases[$id]);
+        }
+
+        if (null === $service) {
+            unset($this->services[$id]);
+
+            return;
+        }
+
+        $this->services[$id] = $service;
     }
 
     /**
@@ -275,7 +279,7 @@ class Container implements ResettableContainerInterface
         // calling $this->normalizeId($id) unless necessary.
         for ($i = 2;;) {
             if (isset($this->privates[$id])) {
-                @trigger_error(sprintf('The "%s" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.', $id), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The "%s" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop using the container directly and use dependency injection instead.', $id), E_USER_DEPRECATED);
             }
             if (isset($this->aliases[$id])) {
                 $id = $this->aliases[$id];
@@ -324,6 +328,12 @@ class Container implements ResettableContainerInterface
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
             if (!$id) {
                 throw new ServiceNotFoundException($id);
+            }
+            if (isset($this->syntheticIds[$id])) {
+                throw new ServiceNotFoundException($id, null, null, array(), sprintf('The "%s" service is synthetic, it needs to be set at boot time before it can be used.', $id));
+            }
+            if (isset($this->getRemovedIds()[$id])) {
+                throw new ServiceNotFoundException($id, null, null, array(), sprintf('The "%s" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.', $id));
             }
 
             $alternatives = array();
@@ -395,6 +405,16 @@ class Container implements ResettableContainerInterface
         $ids[] = 'service_container';
 
         return array_unique(array_merge($ids, array_keys($this->methodMap), array_keys($this->fileMap), array_keys($this->services)));
+    }
+
+    /**
+     * Gets service ids that existed at compile time.
+     *
+     * @return array
+     */
+    public function getRemovedIds()
+    {
+        return array();
     }
 
     /**

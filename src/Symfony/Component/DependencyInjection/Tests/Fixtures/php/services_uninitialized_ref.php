@@ -35,6 +35,15 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $this->aliases = array();
     }
 
+    public function getRemovedIds()
+    {
+        return array(
+            'Psr\\Container\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'foo2' => true,
+        );
+    }
+
     public function compile()
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');

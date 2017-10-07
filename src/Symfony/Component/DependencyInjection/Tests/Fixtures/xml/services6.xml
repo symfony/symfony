@@ -43,8 +43,6 @@
         </argument>
       </call>
     </service>
-    <service id="alias_for_foo" alias="foo" />
-    <service id="another_alias_for_foo" alias="foo" public="false" />
     <service id="request" class="Request" synthetic="true" lazy="true"/>
     <service id="decorator_service" decorates="decorated" />
     <service id="decorator_service_with_name" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
@@ -61,5 +59,7 @@
     <service id="new_factory4" class="BazClass">
       <factory method="getInstance" />
     </service>
+    <service id="alias_for_foo" alias="foo" />
+    <service id="another_alias_for_foo" alias="foo" public="false" />
   </services>
 </container>

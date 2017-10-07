@@ -40,6 +40,17 @@ class ProjectServiceContainer extends Container
         $this->aliases = array();
     }
 
+    public function getRemovedIds()
+    {
+        return array(
+            'Psr\\Container\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'translator.loader_1_locator' => true,
+            'translator.loader_2_locator' => true,
+            'translator.loader_3_locator' => true,
+        );
+    }
+
     public function compile()
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');

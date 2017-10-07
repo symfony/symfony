@@ -24,6 +24,9 @@ class ProjectServiceContainer extends Container
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = array();
+        $this->syntheticIds = array(
+            'request' => true,
+        );
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',
@@ -55,6 +58,20 @@ class ProjectServiceContainer extends Container
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
             'decorated' => 'decorator_service_with_name',
+        );
+    }
+
+    public function getRemovedIds()
+    {
+        return array(
+            'Psr\\Container\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'configurator_service' => true,
+            'configurator_service_simple' => true,
+            'decorated.pif-pouf' => true,
+            'decorator_service.inner' => true,
+            'inlined' => true,
+            'new_factory' => true,
         );
     }
 

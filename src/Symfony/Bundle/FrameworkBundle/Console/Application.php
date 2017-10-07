@@ -190,7 +190,7 @@ class Application extends BaseApplication
             $output = $output->getErrorOutput();
         }
 
-        (new SymfonyStyle($input, $output))->warning('Some commands could not be registered.');
+        (new SymfonyStyle($input, $output))->warning('Some commands could not be registered:');
 
         foreach ($this->registrationErrors as $error) {
             $this->doRenderException($error, $output);

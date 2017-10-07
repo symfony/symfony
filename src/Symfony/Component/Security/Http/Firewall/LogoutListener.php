@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Core\Authentication\Token\DummyToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
@@ -109,10 +110,12 @@ class LogoutListener implements ListenerInterface
         }
 
         // handle multiple logout attempts gracefully
-        if ($token = $this->tokenStorage->getToken()) {
-            foreach ($this->handlers as $handler) {
-                $handler->logout($request, $response, $token);
-            }
+        $token = $this->tokenStorage->getToken();
+        if (null === $token) {
+            $token = new DummyToken();
+        }
+        foreach ($this->handlers as $handler) {
+            $handler->logout($request, $response, $token);
         }
 
         $this->tokenStorage->setToken(null);

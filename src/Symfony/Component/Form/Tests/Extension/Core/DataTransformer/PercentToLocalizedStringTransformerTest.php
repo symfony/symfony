@@ -144,6 +144,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
+
         \Locale::setDefault('de_AT');
 
         $transformer = new PercentToLocalizedStringTransformer(1, 'integer');

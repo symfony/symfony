@@ -101,6 +101,19 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertSame(array('BAZ', 'FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
         $this->assertSame(array('BAZ' => 1, 'FOO' => 0), $container->getEnvCounters());
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Using a cast in "env(int:FOO)" is incompatible with resolution at compile time in "Symfony\Component\DependencyInjection\Tests\Compiler\BarExtension". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.
+     */
+    public function testProcessedEnvsAreIncompatibleWithResolve()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new BarExtension());
+        $container->prependExtensionConfig('bar', array());
+
+        (new MergeExtensionConfigurationPass())->process($container);
+    }
 }
 
 class FooConfiguration implements ConfigurationInterface
@@ -140,5 +153,13 @@ class FooExtension extends Extension
             $container->getParameterBag()->get('env(BOZ)');
             $container->resolveEnvPlaceholders($config['baz']);
         }
+    }
+}
+
+class BarExtension extends Extension
+{
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        $container->resolveEnvPlaceholders('%env(int:FOO)%', true);
     }
 }

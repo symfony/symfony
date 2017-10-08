@@ -794,19 +794,8 @@ class OptionsResolver implements Options
             $valid = false;
 
             foreach ($this->allowedTypes[$option] as $type) {
-                $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
-
-                if (function_exists($isFunction = 'is_'.$type)) {
-                    if ($isFunction($value)) {
-                        $valid = true;
-                        break;
-                    }
-
-                    continue;
-                }
-
-                if ($value instanceof $type) {
-                    $valid = true;
+                $valid = $this->verifyAllowedType($type, $value);
+                if ($valid) {
                     break;
                 }
             }
@@ -818,7 +807,7 @@ class OptionsResolver implements Options
                     $option,
                     $this->formatValue($value),
                     implode('" or "', $this->allowedTypes[$option]),
-                    $this->formatTypeOf($value)
+                    $this->formatTypeOf($value, $option)
                 ));
             }
         }
@@ -896,6 +885,42 @@ class OptionsResolver implements Options
     }
 
     /**
+     * Verify value is of the allowed type. Recursive method to support
+     * typed array notation like ClassName[], or scalar arrays (int[]).
+     *
+     * @param string $type  the required allowedType string
+     * @param mixed  $value the value
+     *
+     * @return bool Whether the $value is of the allowed type
+     */
+    private function verifyAllowedType($type, $value)
+    {
+        if (mb_substr($type, -2) === '[]') {
+            //allowed type is typed array
+            if (!is_array($value)) {
+                return false;
+            }
+            $subType = mb_substr($type, 0, -2);
+            foreach ($value as $v) {
+                //recursive call -> check subtype
+                if (!$this->verifyAllowedType($subType, $v)) {
+                    return false;
+                }
+            }
+            //value was array, subtypes all matched -> allowed type OK
+            return true;
+        }
+
+        $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
+
+        if (function_exists($isFunction = 'is_'.$type)) {
+            return $isFunction($value);
+        }
+
+        return ($value instanceof $type);
+    }
+
+    /**
      * Returns whether a resolved option with the given name exists.
      *
      * @param string $option The option name
@@ -963,13 +988,66 @@ class OptionsResolver implements Options
      * parameters should usually not be included in messages aimed at
      * non-technical people.
      *
-     * @param mixed $value The value to return the type of
+     * @param mixed  $value  The value to return the type of
+     * @param string $option The option that holds the value
      *
      * @return string The type of the value
      */
-    private function formatTypeOf($value)
+    private function formatTypeOf($value, $option = null)
     {
+        if (is_array($value) && $option) {
+            foreach ($this->allowedTypes[$option] as $type) {
+                if (mb_substr($type, -2) === '[]') {
+                    return $this->formatComplexTypeOf($value, $type);
+                }
+            }
+        }
+
         return is_object($value) ? get_class($value) : gettype($value);
+    }
+
+    /**
+     * Returns a string representation of the complex type of the value.
+     *
+     * This method should be called in formatTypeOf, if there is a complex allowed type
+     * for an array value defined to get a more explicit exception message
+     *
+     * @param array  $value The value to return the complex type of
+     * @param string $type  the expected type
+     *
+     * @return string the complex type of the value
+     */
+    private function formatComplexTypeOf(array $value, $type)
+    {
+        $suffix = '[]';
+        $type = mb_substr($type, 0, -2);
+        while (mb_substr($type, -2) === '[]') {
+            $value = array_shift($value);
+            if (!is_array($value)) {
+                //expected a nested array, but we've already hit a scalar
+                break;
+            }
+            $type = mb_substr($type, 0, -2);
+            $suffix .= '[]';
+        }
+        if (is_array($value)) {
+            $subTypes = array();
+            foreach ($value as $v) {
+                $v = $this->formatTypeOf($v);
+                if (!isset($subTypes[$v])) {
+                    $subTypes[$v] = $v;//build unique map from the off
+                }
+            }
+            $vType = implode('|', $subTypes);
+        } else {
+            $vType = is_object($value) ? get_class($value) : gettype($value);
+        }
+
+        return sprintf(
+            '%s%s',
+            $vType,
+            $suffix
+        );
     }
 
     /**

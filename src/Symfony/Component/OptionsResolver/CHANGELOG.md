@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * Added typed array support as allowed type
+
 2.6.0
 -----
 

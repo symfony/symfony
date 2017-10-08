@@ -45,6 +45,8 @@ class FormRegistry implements FormRegistryInterface
      */
     private $resolvedTypeFactory;
 
+    private $checkedTypes = array();
+
     /**
      * @param FormExtensionInterface[]         $extensions          An array of FormExtensionInterface
      * @param ResolvedFormTypeFactoryInterface $resolvedTypeFactory The factory for resolved form types
@@ -103,25 +105,22 @@ class FormRegistry implements FormRegistryInterface
      */
     private function resolveType(FormTypeInterface $type)
     {
-        static $checkedTypes = array();
-
-        if (isset($checkedTypes[$type->getName()])) {
-            $types = implode(' > ', array_merge(array_keys($checkedTypes), array($type->getName())));
-            $checkedTypes = array();
+        if (isset($this->checkedTypes[$type->getName()])) {
+            $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($type->getName())));
             throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $type->getName(), $types));
         }
 
-        $checkedTypes[$type->getName()] = true;
+        $this->checkedTypes[$type->getName()] = true;
 
             if ($parentType->getName() === $type->getName()) {
-                $checkedTypes = array();
+                $this->checkedTypes = array();
                 throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
             }
 
         }
 
         if ($parentType === $type->getName()) {
-            $checkedTypes = array();
+            $this->checkedTypes = array();
             throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
         $typeExtensions = array();
         $parentType = $type->getParent();
@@ -140,7 +139,7 @@ class FormRegistry implements FormRegistryInterface
             $parentType ? $this->getType($parentType) : null
         );
 
-        unset($checkedTypes[$type->getName()]);
+        unset($this->checkedTypes[$type->getName()]);
     }
 
     /**

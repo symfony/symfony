@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\DataCollector;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\DataCollector\FormDataCollector;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormView;
 
-class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
+class FormDataCollectorTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -692,6 +693,36 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($child11Data['has_children_error']), 'The leaf data does not contains "has_children_error" property.');
         $this->assertFalse($child2Data['has_children_error']);
         $this->assertFalse(isset($child21Data['has_children_error']), 'The leaf data does not contains "has_children_error" property.');
+    }
+
+    public function testReset()
+    {
+        $form = $this->createForm('my_form');
+
+        $this->dataExtractor->expects($this->any())
+            ->method('extractConfiguration')
+            ->will($this->returnValue(array()));
+        $this->dataExtractor->expects($this->any())
+            ->method('extractDefaultData')
+            ->will($this->returnValue(array()));
+        $this->dataExtractor->expects($this->any())
+            ->method('extractSubmittedData')
+            ->with($form)
+            ->will($this->returnValue(array('errors' => array('baz'))));
+
+        $this->dataCollector->buildPreliminaryFormTree($form);
+        $this->dataCollector->collectSubmittedData($form);
+
+        $this->dataCollector->reset();
+
+        $this->assertSame(
+            array(
+                'forms' => array(),
+                'forms_by_hash' => array(),
+                'nb_errors' => 0,
+            ),
+            $this->dataCollector->getData()
+        );
     }
 
     private function createForm($name)

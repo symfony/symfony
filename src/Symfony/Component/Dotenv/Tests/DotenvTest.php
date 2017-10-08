@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Dotenv\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\FormatException;
 
-class DotenvTest extends \PHPUnit_Framework_TestCase
+class DotenvTest extends TestCase
 {
     /**
      * @dataProvider getEnvDataWithFormatErrors
@@ -62,6 +63,7 @@ class DotenvTest extends \PHPUnit_Framework_TestCase
     public function getEnvData()
     {
         putenv('LOCAL=local');
+        $_ENV['REMOTE'] = 'remote';
 
         $tests = array(
             // spaces
@@ -84,7 +86,6 @@ class DotenvTest extends \PHPUnit_Framework_TestCase
             array("FOO='bar'\n", array('FOO' => 'bar')),
             array("FOO='bar\"foo'\n", array('FOO' => 'bar"foo')),
             array("FOO=\"bar\\\"foo\"\n", array('FOO' => 'bar"foo')),
-            array("FOO='bar''foo'\n", array('FOO' => 'bar\'foo')),
             array('FOO="bar\nfoo"', array('FOO' => "bar\nfoo")),
             array('FOO="bar\rfoo"', array('FOO' => "bar\rfoo")),
             array('FOO=\'bar\nfoo\'', array('FOO' => 'bar\nfoo')),
@@ -93,8 +94,15 @@ class DotenvTest extends \PHPUnit_Framework_TestCase
             array('FOO="  "', array('FOO' => '  ')),
             array('PATH="c:\\\\"', array('PATH' => 'c:\\')),
             array("FOO=\"bar\nfoo\"", array('FOO' => "bar\nfoo")),
+            array('FOO=BAR\\"', array('FOO' => 'BAR"')),
+            array("FOO=BAR\\'BAZ", array('FOO' => "BAR'BAZ")),
+            array('FOO=\\"BAR', array('FOO' => '"BAR')),
 
             // concatenated values
+            array("FOO='bar''foo'\n", array('FOO' => 'barfoo')),
+            array("FOO='bar '' baz'", array('FOO' => 'bar  baz')),
+            array("FOO=bar\nBAR='baz'\"\$FOO\"", array('FOO' => 'bar', 'BAR' => 'bazbar')),
+            array("FOO='bar '\\'' baz'", array('FOO' => "bar ' baz")),
 
             // comments
             array("#FOO=bar\nBAR=foo", array('BAR' => 'foo')),
@@ -127,6 +135,7 @@ class DotenvTest extends \PHPUnit_Framework_TestCase
             array('FOO=" \\$ "', array('FOO' => ' $ ')),
             array('FOO=" $ "', array('FOO' => ' $ ')),
             array('BAR=$LOCAL', array('BAR' => 'local')),
+            array('BAR=$REMOTE', array('BAR' => 'remote')),
             array('FOO=$NOTDEFINED', array('FOO' => '')),
         );
 
@@ -143,5 +152,135 @@ class DotenvTest extends \PHPUnit_Framework_TestCase
         }
 
         return $tests;
+    }
+
+    public function testLoad()
+    {
+        unset($_ENV['FOO']);
+        unset($_ENV['BAR']);
+        unset($_SERVER['FOO']);
+        unset($_SERVER['BAR']);
+        putenv('FOO');
+        putenv('BAR');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, 'FOO=BAR');
+        file_put_contents($path2, 'BAR=BAZ');
+
+        (new DotEnv())->load($path1, $path2);
+
+        $foo = getenv('FOO');
+        $bar = getenv('BAR');
+
+        putenv('FOO');
+        putenv('BAR');
+        unlink($path1);
+        unlink($path2);
+        rmdir($tmpdir);
+
+        $this->assertSame('BAR', $foo);
+        $this->assertSame('BAZ', $bar);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Dotenv\Exception\PathException
+     */
+    public function testLoadDirectory()
+    {
+        $dotenv = new Dotenv();
+        $dotenv->load(__DIR__);
+    }
+
+    public function testServerSuperglobalIsNotOverriden()
+    {
+        $originalValue = $_SERVER['argc'];
+
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('argc' => 'new_value'));
+
+        $this->assertSame($originalValue, $_SERVER['argc']);
+    }
+
+    public function testEnvVarIsNotOverriden()
+    {
+        putenv('TEST_ENV_VAR=original_value');
+        $_SERVER['TEST_ENV_VAR'] = 'original_value';
+
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('TEST_ENV_VAR' => 'new_value'));
+
+        $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
+    }
+
+    public function testHttpVarIsPartiallyOverriden()
+    {
+        $_SERVER['HTTP_TEST_ENV_VAR'] = 'http_value';
+
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('HTTP_TEST_ENV_VAR' => 'env_value'));
+
+        $this->assertSame('env_value', getenv('HTTP_TEST_ENV_VAR'));
+        $this->assertSame('env_value', $_ENV['HTTP_TEST_ENV_VAR']);
+        $this->assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
+    }
+
+    public function testMemorizingLoadedVarsNamesInSpecialVar()
+    {
+        // Special variable not exists
+        unset($_ENV['SYMFONY_DOTENV_VARS']);
+        unset($_SERVER['SYMFONY_DOTENV_VARS']);
+        putenv('SYMFONY_DOTENV_VARS');
+
+        unset($_ENV['APP_DEBUG']);
+        unset($_SERVER['APP_DEBUG']);
+        putenv('APP_DEBUG');
+        unset($_ENV['DATABASE_URL']);
+        unset($_SERVER['DATABASE_URL']);
+        putenv('DATABASE_URL');
+
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('APP_DEBUG' => '1', 'DATABASE_URL' => 'mysql://root@localhost/db'));
+
+        $this->assertSame('APP_DEBUG,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
+
+        // Special variable has a value
+        $_ENV['SYMFONY_DOTENV_VARS'] = 'APP_ENV';
+        $_SERVER['SYMFONY_DOTENV_VARS'] = 'APP_ENV';
+        putenv('SYMFONY_DOTENV_VARS=APP_ENV');
+
+        $_ENV['APP_DEBUG'] = '1';
+        $_SERVER['APP_DEBUG'] = '1';
+        putenv('APP_DEBUG=1');
+        unset($_ENV['DATABASE_URL']);
+        unset($_SERVER['DATABASE_URL']);
+        putenv('DATABASE_URL');
+
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('APP_DEBUG' => '0', 'DATABASE_URL' => 'mysql://root@localhost/db'));
+        $dotenv->populate(array('DATABASE_URL' => 'sqlite:///somedb.sqlite'));
+
+        $this->assertSame('APP_ENV,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
+    }
+
+    public function testOverridingEnvVarsWithNamesMemorizedInSpecialVar()
+    {
+        putenv('SYMFONY_DOTENV_VARS=FOO,BAR,BAZ');
+
+        putenv('FOO=foo');
+        putenv('BAR=bar');
+        putenv('BAZ=baz');
+        putenv('DOCUMENT_ROOT=/var/www');
+
+        $dotenv = new DotEnv();
+        $dotenv->populate(array('FOO' => 'foo1', 'BAR' => 'bar1', 'BAZ' => 'baz1', 'DOCUMENT_ROOT' => '/boot'));
+
+        $this->assertSame('foo1', getenv('FOO'));
+        $this->assertSame('bar1', getenv('BAR'));
+        $this->assertSame('baz1', getenv('BAZ'));
+        $this->assertSame('/var/www', getenv('DOCUMENT_ROOT'));
     }
 }

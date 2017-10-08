@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * the first constructor argument of the `DoctrineChoiceLoader` class must be
+   an `ObjectManager` implementation
+ * removed the `MergeDoctrineCollectionListener::onBind()` method
+ * trying to reset a non-lazy manager service using the `ManagerRegistry::resetService()`
+   method throws an exception
+ * removed the `DoctrineParserCache` class
+
+3.4.0
+-----
+
+ * added support for doctrine/dbal v2.6 types
+ * added cause of UniqueEntity constraint violation
+ * deprecated `DbalSessionHandler` and `DbalSessionHandlerSchema` in favor of
+   `Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler`
+
 3.1.0
 -----
 

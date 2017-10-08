@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class NormalizationTest extends \PHPUnit_Framework_TestCase
+class NormalizationTest extends TestCase
 {
     /**
      * @dataProvider getEncoderTests

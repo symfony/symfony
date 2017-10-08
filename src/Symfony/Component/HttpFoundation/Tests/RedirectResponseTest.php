@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class RedirectResponseTest extends \PHPUnit_Framework_TestCase
+class RedirectResponseTest extends TestCase
 {
     public function testGenerateMetaRedirect()
     {

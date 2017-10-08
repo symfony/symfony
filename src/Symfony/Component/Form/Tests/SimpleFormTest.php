@@ -313,15 +313,6 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($form->isValid());
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Call Form::isValid() with an unsubmitted form %s.
-     */
-    public function testNotValidIfNotSubmitted()
-    {
-        $this->assertFalse($this->form->isValid());
-    }
-
     public function testNotValidIfErrors()
     {
         $form = $this->getBuilder()->getForm();
@@ -515,6 +506,22 @@ class SimpleFormTest extends AbstractFormTest
         $form->setData('foobar');
 
         $this->assertSame('default', $form->getData());
+    }
+
+    public function testPreSetDataChangesDataIfDataIsLocked()
+    {
+        $config = new FormConfigBuilder('name', null, $this->dispatcher);
+        $config
+            ->setData('default')
+            ->setDataLocked(true)
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+                $event->setData('foobar');
+            });
+        $form = new Form($config);
+
+        $this->assertSame('foobar', $form->getData());
+        $this->assertSame('foobar', $form->getNormData());
+        $this->assertSame('foobar', $form->getViewData());
     }
 
     public function testSubmitConvertsEmptyToNullIfNoTransformer()
@@ -880,6 +887,7 @@ class SimpleFormTest extends AbstractFormTest
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     * @expectedExceptionMessage A cycle was detected. Listeners to the PRE_SET_DATA event must not call setData(). You should call setData() on the FormEvent object instead.
      */
     public function testSetDataCannotInvokeItself()
     {
@@ -895,10 +903,11 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testSubmittingWrongDataIsIgnored()
     {
+        $called = 0;
+
         $child = $this->getBuilder('child', $this->dispatcher);
-        $child->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            // child form doesn't receive the wrong data that is submitted on parent
-            $this->assertNull($event->getData());
+        $child->addEventListener(FormEvents::PRE_SUBMIT, function () use (&$called) {
+            ++$called;
         });
 
         $parent = $this->getBuilder('parent', new EventDispatcher())
@@ -908,6 +917,8 @@ class SimpleFormTest extends AbstractFormTest
             ->getForm();
 
         $parent->submit('not-an-array');
+
+        $this->assertSame(0, $called, 'PRE_SUBMIT event listeners are not called for wrong data');
     }
 
     public function testHandleRequestForwardsToRequestHandler()
@@ -1010,14 +1021,17 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testSubmitIsNeverFiredIfInheritData()
     {
+        $called = 0;
         $form = $this->getBuilder()
-            ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-                $this->fail('The SUBMIT event should not be fired');
+            ->addEventListener(FormEvents::SUBMIT, function () use (&$called) {
+                ++$called;
             })
             ->setInheritData(true)
             ->getForm();
 
         $form->submit('foo');
+
+        $this->assertSame(0, $called, 'The SUBMIT event is not fired when data are inherited from the parent form');
     }
 
     public function testInitializeSetsDefaultData()
@@ -1044,6 +1058,51 @@ class SimpleFormTest extends AbstractFormTest
         $child->setParent($parent);
 
         $child->initialize();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     * @expectedExceptionMessage A cycle was detected. Listeners to the PRE_SET_DATA event must not call getData() if the form data has not already been set. You should call getData() on the FormEvent object instead.
+     */
+    public function testCannotCallGetDataInPreSetDataListenerIfDataHasNotAlreadyBeenSet()
+    {
+        $config = new FormConfigBuilder('name', 'stdClass', $this->dispatcher);
+        $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $event->getForm()->getData();
+        });
+        $form = new Form($config);
+
+        $form->setData('foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     * @expectedExceptionMessage A cycle was detected. Listeners to the PRE_SET_DATA event must not call getNormData() if the form data has not already been set.
+     */
+    public function testCannotCallGetNormDataInPreSetDataListener()
+    {
+        $config = new FormConfigBuilder('name', 'stdClass', $this->dispatcher);
+        $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $event->getForm()->getNormData();
+        });
+        $form = new Form($config);
+
+        $form->setData('foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\RuntimeException
+     * @expectedExceptionMessage A cycle was detected. Listeners to the PRE_SET_DATA event must not call getViewData() if the form data has not already been set.
+     */
+    public function testCannotCallGetViewDataInPreSetDataListener()
+    {
+        $config = new FormConfigBuilder('name', 'stdClass', $this->dispatcher);
+        $config->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $event->getForm()->getViewData();
+        });
+        $form = new Form($config);
+
+        $form->setData('foo');
     }
 
     protected function createForm()

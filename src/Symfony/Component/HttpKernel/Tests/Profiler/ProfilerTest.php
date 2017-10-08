@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\VarDumper\Cloner\Data;
 
-class ProfilerTest extends \PHPUnit_Framework_TestCase
+class ProfilerTest extends TestCase
 {
     private $tmp;
     private $storage;
@@ -33,10 +34,24 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         $profiler = new Profiler($this->storage);
         $profiler->add($collector);
         $profile = $profiler->collect($request, $response);
+        $profiler->saveProfile($profile);
 
         $this->assertSame(204, $profile->getStatusCode());
         $this->assertSame('GET', $profile->getMethod());
-        $this->assertInstanceOf(Data::class, $profiler->get('request')->getRequestQuery()->all()['foo']);
+        $this->assertSame('bar', $profile->getCollector('request')->getRequestQuery()->all()['foo']->getValue());
+    }
+
+    public function testReset()
+    {
+        $collector = $this->getMockBuilder(DataCollectorInterface::class)
+            ->setMethods(['collect', 'getName', 'reset'])
+            ->getMock();
+        $collector->expects($this->any())->method('getName')->willReturn('mock');
+        $collector->expects($this->once())->method('reset');
+
+        $profiler = new Profiler($this->storage);
+        $profiler->add($collector);
+        $profiler->reset();
     }
 
     public function testFindWorksWithDates()

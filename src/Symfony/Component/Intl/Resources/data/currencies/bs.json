@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.7",
+    "Version": "2.1.31.86",
     "Names": {
         "ADP": [
             "ADP",
@@ -27,11 +27,11 @@
         ],
         "AMD": [
             "AMD",
-            "Jermenski dram"
+            "Armenski dram"
         ],
         "ANG": [
             "ANG",
-            "Gulden Holandskih Antila"
+            "Holandskoantilski gulden"
         ],
         "AOA": [
             "AOA",
@@ -87,7 +87,7 @@
         ],
         "BAM": [
             "KM",
-            "Bosansko-Hercegovačka konvertibilna marka"
+            "Bosanskohercegovačka konvertibilna marka"
         ],
         "BBD": [
             "BBD",
@@ -201,9 +201,13 @@
             "BYB",
             "Beloruska nova rublja (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Bjeloruska rublja"
+        ],
         "BYR": [
             "BYR",
-            "Bjeloruska rublja"
+            "Bjeloruska rublja (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -347,7 +351,7 @@
         ],
         "FJD": [
             "FJD",
-            "Fidži dolar"
+            "Fidžijski dolar"
         ],
         "FKP": [
             "FKP",
@@ -423,7 +427,7 @@
         ],
         "HNL": [
             "HNL",
-            "Honduraska lempira"
+            "Honduraška lempira"
         ],
         "HRD": [
             "HRD",
@@ -487,7 +491,7 @@
         ],
         "JMD": [
             "JMD",
-            "Jamajski dolar"
+            "Jamajčanski dolar"
         ],
         "JOD": [
             "JOD",
@@ -603,11 +607,11 @@
         ],
         "MDL": [
             "MDL",
-            "Moldavski lev"
+            "Moldavski lej"
         ],
         "MGA": [
             "MGA",
-            "Malagaski ariari"
+            "Malagaški arijari"
         ],
         "MGF": [
             "MGF",
@@ -659,7 +663,7 @@
         ],
         "MWK": [
             "MWK",
-            "Malavska kvača"
+            "Malavijska kvača"
         ],
         "MXN": [
             "MXN",
@@ -735,7 +739,7 @@
         ],
         "PEN": [
             "PEN",
-            "Peruanski novi sol"
+            "Peruanski sol"
         ],
         "PES": [
             "PES",
@@ -783,7 +787,7 @@
         ],
         "RON": [
             "RON",
-            "Rumunski lev"
+            "Rumunski lej"
         ],
         "RSD": [
             "din.",
@@ -907,7 +911,7 @@
         ],
         "TND": [
             "TND",
-            "Tuniski dinar"
+            "Tuniški dinar"
         ],
         "TOP": [
             "TOP",
@@ -935,11 +939,11 @@
         ],
         "TZS": [
             "TZS",
-            "Tanzanski šiling"
+            "Tanzanijski šiling"
         ],
         "UAH": [
             "UAH",
-            "Ukrajinska grivna"
+            "Ukrajinska hrivnja"
         ],
         "UAK": [
             "UAK",
@@ -979,7 +983,7 @@
         ],
         "UZS": [
             "UZS",
-            "uzbekistanski som"
+            "Uzbekistanski som"
         ],
         "VEB": [
             "VEB",
@@ -1007,7 +1011,7 @@
         ],
         "XAF": [
             "FCFA",
-            "centralnoafrički franak CFA"
+            "Centralnoafrički franak (CFA)"
         ],
         "XCD": [
             "XCD",
@@ -1027,11 +1031,11 @@
         ],
         "XOF": [
             "CFA",
-            "zapadnoafrički franak CFA"
+            "Zapadnoafrički franak (CFA)"
         ],
         "XPF": [
             "XPF",
-            "CFP franak"
+            "Franak (CFP)"
         ],
         "XRE": [
             "XRE",

@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Validator\ValidatorBuilderInterface;
 
-class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
+class ValidatorBuilderTest extends TestCase
 {
     /**
      * @var ValidatorBuilderInterface

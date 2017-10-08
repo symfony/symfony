@@ -51,6 +51,9 @@ class CliDumper extends AbstractDumper
         "\033" => '\e',
     );
 
+    protected $collapseNextHash = false;
+    protected $expandNextHash = false;
+
     /**
      * {@inheritdoc}
      */
@@ -127,9 +130,9 @@ class CliDumper extends AbstractDumper
                 $style = 'num';
 
                 switch (true) {
-                    case INF === $value:  $value = 'INF';  break;
+                    case INF === $value:  $value = 'INF'; break;
                     case -INF === $value: $value = '-INF'; break;
-                    case is_nan($value):  $value = 'NAN';  break;
+                    case is_nan($value):  $value = 'NAN'; break;
                     default:
                         $value = (string) $value;
                         if (false === strpos($value, $this->decimalPoint)) {
@@ -155,7 +158,7 @@ class CliDumper extends AbstractDumper
 
         $this->line .= $this->style($style, $value, $attr);
 
-        $this->dumpLine($cursor->depth, true);
+        $this->endValue($cursor);
     }
 
     /**
@@ -171,7 +174,7 @@ class CliDumper extends AbstractDumper
         }
         if ('' === $str) {
             $this->line .= '""';
-            $this->dumpLine($cursor->depth, true);
+            $this->endValue($cursor);
         } else {
             $attr += array(
                 'length' => 0 <= $cut ? mb_strlen($str, 'UTF-8') + $cut : 0,
@@ -237,7 +240,11 @@ class CliDumper extends AbstractDumper
                     $lineCut = 0;
                 }
 
-                $this->dumpLine($cursor->depth, $i > $m);
+                if ($i > $m) {
+                    $this->endValue($cursor);
+                } else {
+                    $this->dumpLine($cursor->depth);
+                }
             }
         }
     }
@@ -248,6 +255,11 @@ class CliDumper extends AbstractDumper
     public function enterHash(Cursor $cursor, $type, $class, $hasChild)
     {
         $this->dumpKey($cursor);
+
+        if ($this->collapseNextHash) {
+            $cursor->skipChildren = true;
+            $this->collapseNextHash = $hasChild = false;
+        }
 
         $class = $this->utf8Encode($class);
         if (Cursor::HASH_OBJECT === $type) {
@@ -280,7 +292,7 @@ class CliDumper extends AbstractDumper
     {
         $this->dumpEllipsis($cursor, $hasChild, $cut);
         $this->line .= Cursor::HASH_OBJECT === $type ? '}' : (Cursor::HASH_RESOURCE !== $type ? ']' : ($hasChild ? '}' : ''));
-        $this->dumpLine($cursor->depth, true);
+        $this->endValue($cursor);
     }
 
     /**
@@ -324,6 +336,7 @@ class CliDumper extends AbstractDumper
                         break;
                     }
                     $style = 'index';
+                    // no break
                 case Cursor::HASH_ASSOC:
                     if (is_int($key)) {
                         $this->line .= $this->style($style, $key).' => ';
@@ -334,7 +347,7 @@ class CliDumper extends AbstractDumper
 
                 case Cursor::HASH_RESOURCE:
                     $key = "\0~\0".$key;
-                    // No break;
+                    // no break
                 case Cursor::HASH_OBJECT:
                     if (!isset($key[0]) || "\0" !== $key[0]) {
                         $this->line .= '+'.$bin.$this->style('public', $key).': ';
@@ -364,7 +377,15 @@ class CliDumper extends AbstractDumper
                                 break;
                         }
 
-                        $this->line .= $bin.$this->style($style, $key[1], $attr).': ';
+                        if (isset($attr['collapse'])) {
+                            if ($attr['collapse']) {
+                                $this->collapseNextHash = true;
+                            } else {
+                                $this->expandNextHash = true;
+                            }
+                        }
+
+                        $this->line .= $bin.$this->style($style, $key[1], $attr).(isset($attr['separator']) ? $attr['separator'] : ': ');
                     } else {
                         // This case should not happen
                         $this->line .= '-'.$bin.'"'.$this->style('private', $key, array('class' => '')).'": ';
@@ -391,6 +412,21 @@ class CliDumper extends AbstractDumper
     {
         if (null === $this->colors) {
             $this->colors = $this->supportsColors();
+        }
+
+        if (isset($attr['ellipsis'], $attr['ellipsis-type'])) {
+            $prefix = substr($value, 0, -$attr['ellipsis']);
+            if ('cli' === PHP_SAPI && 'path' === $attr['ellipsis-type'] && isset($_SERVER[$pwd = '\\' === DIRECTORY_SEPARATOR ? 'CD' : 'PWD']) && 0 === strpos($prefix, $_SERVER[$pwd])) {
+                $prefix = '.'.substr($prefix, strlen($_SERVER[$pwd]));
+            }
+            if (!empty($attr['ellipsis-tail'])) {
+                $prefix .= substr($value, -$attr['ellipsis'], $attr['ellipsis-tail']);
+                $value = substr($value, -$attr['ellipsis'] + $attr['ellipsis-tail']);
+            } else {
+                $value = substr($value, -$attr['ellipsis']);
+            }
+
+            return $this->style('default', $prefix).$this->style($style, $value);
         }
 
         $style = $this->styles[$style];
@@ -485,5 +521,16 @@ class CliDumper extends AbstractDumper
             $this->line = sprintf("\033[%sm%s\033[m", $this->styles['default'], $this->line);
         }
         parent::dumpLine($depth);
+    }
+
+    protected function endValue(Cursor $cursor)
+    {
+        if (self::DUMP_TRAILING_COMMA & $this->flags && 0 < $cursor->depth) {
+            $this->line .= ',';
+        } elseif (self::DUMP_COMMA_SEPARATOR & $this->flags && 1 < $cursor->hashLength - $cursor->hashIndex) {
+            $this->line .= ',';
+        }
+
+        $this->dumpLine($cursor->depth, true);
     }
 }

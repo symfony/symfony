@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Flash;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBag;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBa
  *
  * @author Drak <drak@zikula.org>
  */
-class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
+class AutoExpireFlashBagTest extends TestCase
 {
     /**
      * @var \Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag
@@ -61,7 +62,7 @@ class AutoExpireFlashBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStorageKey()
     {
-        $this->assertEquals('_sf2_flashes', $this->bag->getStorageKey());
+        $this->assertEquals('_symfony_flashes', $this->bag->getStorageKey());
         $attributeBag = new FlashBag('test');
         $this->assertEquals('test', $attributeBag->getStorageKey());
     }

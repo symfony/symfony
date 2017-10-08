@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Util\XmlUtils;
 
-class XmlUtilsTest extends \PHPUnit_Framework_TestCase
+class XmlUtilsTest extends TestCase
 {
     public function testLoadFile()
     {
@@ -54,11 +55,25 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             XmlUtils::loadFile($fixtures.'valid.xml', array($mock, 'validate'));
             $this->fail();
         } catch (\InvalidArgumentException $e) {
-            $this->assertContains('is not valid', $e->getMessage());
+            $this->assertRegExp('/The XML file "[\w:\/\\\.]+" is not valid\./', $e->getMessage());
         }
 
         $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile($fixtures.'valid.xml', array($mock, 'validate')));
         $this->assertSame(array(), libxml_get_errors());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Util\Exception\InvalidXmlException
+     * @expectedExceptionMessage The XML is not valid
+     */
+    public function testParseWithInvalidValidatorCallable()
+    {
+        $fixtures = __DIR__.'/../Fixtures/Util/';
+
+        $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();
+        $mock->expects($this->once())->method('validate')->willReturn(false);
+
+        XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), array($mock, 'validate'));
     }
 
     public function testLoadFileWithInternalErrorsEnabled()
@@ -150,7 +165,14 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
     public function testLoadEmptyXmlFile()
     {
         $file = __DIR__.'/../Fixtures/foo.xml';
-        $this->setExpectedException('InvalidArgumentException', sprintf('File %s does not contain valid XML, it is empty.', $file));
+
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('InvalidArgumentException');
+            $this->expectExceptionMessage(sprintf('File %s does not contain valid XML, it is empty.', $file));
+        } else {
+            $this->setExpectedException('InvalidArgumentException', sprintf('File %s does not contain valid XML, it is empty.', $file));
+        }
+
         XmlUtils::loadFile($file);
     }
 

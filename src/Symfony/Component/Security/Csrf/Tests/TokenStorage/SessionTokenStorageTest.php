@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Security\Csrf\Tests\TokenStorage;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class SessionTokenStorageTest extends \PHPUnit_Framework_TestCase
+class SessionTokenStorageTest extends TestCase
 {
     const SESSION_NAMESPACE = 'foobar';
 

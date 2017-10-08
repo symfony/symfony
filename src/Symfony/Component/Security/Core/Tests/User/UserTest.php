@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\User;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\User;
 
-class UserTest extends \PHPUnit_Framework_TestCase
+class UserTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException

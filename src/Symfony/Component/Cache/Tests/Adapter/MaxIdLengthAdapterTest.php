@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
-class MaxIdLengthAdapterTest extends \PHPUnit_Framework_TestCase
+class MaxIdLengthAdapterTest extends TestCase
 {
     public function testLongKey()
     {

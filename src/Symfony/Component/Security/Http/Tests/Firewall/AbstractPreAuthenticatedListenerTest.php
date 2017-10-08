@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-class AbstractPreAuthenticatedListenerTest extends \PHPUnit_Framework_TestCase
+class AbstractPreAuthenticatedListenerTest extends TestCase
 {
     public function testHandleWithValidValues()
     {

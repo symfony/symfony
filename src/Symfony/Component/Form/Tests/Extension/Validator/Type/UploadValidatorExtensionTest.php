@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Validator\Type\UploadValidatorExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 

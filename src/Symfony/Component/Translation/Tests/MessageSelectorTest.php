@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageSelector;
 
-class MessageSelectorTest extends \PHPUnit_Framework_TestCase
+class MessageSelectorTest extends TestCase
 {
     /**
      * @dataProvider getChooseTests

@@ -4,4 +4,4 @@ argument description
 
 * Is required: no
 * Is array: no
-* Default: `'<comment>style</>'`
+* Default: `'style'`

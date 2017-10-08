@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -76,7 +78,7 @@ class XmlDescriptor extends Descriptor
      */
     protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
     {
-        $this->writeDocument($this->getContainerServicesDocument($builder, isset($options['tag']) ? $options['tag'] : null, isset($options['show_private']) && $options['show_private'], isset($options['show_arguments']) && $options['show_arguments']));
+        $this->writeDocument($this->getContainerServicesDocument($builder, isset($options['tag']) ? $options['tag'] : null, isset($options['show_private']) && $options['show_private'], isset($options['show_arguments']) && $options['show_arguments'], isset($options['filter']) ? $options['filter'] : null));
     }
 
     /**
@@ -196,7 +198,7 @@ class XmlDescriptor extends Descriptor
             $methodXML->appendChild(new \DOMText($method));
         }
 
-        if (count($route->getDefaults())) {
+        if ($route->getDefaults()) {
             $routeXML->appendChild($defaultsXML = $dom->createElement('defaults'));
             foreach ($route->getDefaults() as $attribute => $value) {
                 $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
@@ -205,16 +207,18 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        if (count($route->getRequirements())) {
+        $originRequirements = $requirements = $route->getRequirements();
+        unset($requirements['_scheme'], $requirements['_method']);
+        if ($requirements) {
             $routeXML->appendChild($requirementsXML = $dom->createElement('requirements'));
-            foreach ($route->getRequirements() as $attribute => $pattern) {
+            foreach ($originRequirements as $attribute => $pattern) {
                 $requirementsXML->appendChild($requirementXML = $dom->createElement('requirement'));
                 $requirementXML->setAttribute('key', $attribute);
                 $requirementXML->appendChild(new \DOMText($pattern));
             }
         }
 
-        if (count($route->getOptions())) {
+        if ($route->getOptions()) {
             $routeXML->appendChild($optionsXML = $dom->createElement('options'));
             foreach ($route->getOptions() as $name => $value) {
                 $optionsXML->appendChild($optionXML = $dom->createElement('option'));
@@ -302,20 +306,25 @@ class XmlDescriptor extends Descriptor
      * @param string|null      $tag
      * @param bool             $showPrivate
      * @param bool             $showArguments
+     * @param callable         $filter
      *
      * @return \DOMDocument
      */
-    private function getContainerServicesDocument(ContainerBuilder $builder, $tag = null, $showPrivate = false, $showArguments = false)
+    private function getContainerServicesDocument(ContainerBuilder $builder, $tag = null, $showPrivate = false, $showArguments = false, $filter = null)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($containerXML = $dom->createElement('container'));
 
         $serviceIds = $tag ? array_keys($builder->findTaggedServiceIds($tag)) : $builder->getServiceIds();
 
+        if ($filter) {
+            $serviceIds = array_filter($serviceIds, $filter);
+        }
+
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
 
-            if ($service instanceof Definition && !($showPrivate || $service->isPublic())) {
+            if (($service instanceof Definition || $service instanceof Alias) && !($showPrivate || $service->isPublic())) {
                 continue;
             }
 
@@ -364,15 +373,10 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
-        if (method_exists($definition, 'isShared')) {
-            $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
-        }
+        $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
-
-        if (method_exists($definition, 'isAutowired')) {
-            $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
-        }
-
+        $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
+        $serviceXML->setAttribute('autoconfigured', $definition->isAutoconfigured() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
         $calls = $definition->getMethodCalls();
@@ -391,9 +395,7 @@ class XmlDescriptor extends Descriptor
         }
 
         if (!$omitTags) {
-            $tags = $definition->getTags();
-
-            if (count($tags) > 0) {
+            if ($tags = $definition->getTags()) {
                 $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
                 foreach ($tags as $tagName => $tagData) {
                     foreach ($tagData as $parameters) {
@@ -428,9 +430,19 @@ class XmlDescriptor extends Descriptor
                 $argumentXML->setAttribute('key', $argumentKey);
             }
 
+            if ($argument instanceof ServiceClosureArgument) {
+                $argument = $argument->getValues()[0];
+            }
+
             if ($argument instanceof Reference) {
                 $argumentXML->setAttribute('type', 'service');
                 $argumentXML->setAttribute('id', (string) $argument);
+            } elseif ($argument instanceof IteratorArgument) {
+                $argumentXML->setAttribute('type', 'iterator');
+
+                foreach ($this->getArgumentNodes($argument->getValues(), $dom) as $childArgumentXML) {
+                    $argumentXML->appendChild($childArgumentXML);
+                }
             } elseif ($argument instanceof Definition) {
                 $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, true)->childNodes->item(0), true));
             } elseif (is_array($argument)) {

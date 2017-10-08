@@ -12,18 +12,73 @@ Console
  * Setting unknown style options is deprecated and will throw an exception in
    Symfony 4.0.
 
+ * The `QuestionHelper::setInputStream()` method is deprecated and will be
+   removed in Symfony 4.0. Use `StreamableInputInterface::setStream()` or
+   `CommandTester::setInputs()` instead.
+
+   Before:
+
+   ```php
+   $input = new ArrayInput();
+
+   $questionHelper->setInputStream($stream);
+   $questionHelper->ask($input, $output, $question);
+   ```
+
+   After:
+
+   ```php
+   $input = new ArrayInput();
+   $input->setStream($stream);
+
+   $questionHelper->ask($input, $output, $question);
+   ```
+
+   Before:
+
+   ```php
+   $commandTester = new CommandTester($command);
+
+   $stream = fopen('php://memory', 'r+', false);
+   fputs($stream, "AppBundle\nYes");
+   rewind($stream);
+
+   $command->getHelper('question')->setInputStream($stream);
+
+   $commandTester->execute();
+   ```
+
+   After:
+
+   ```php
+   $commandTester = new CommandTester($command);
+
+   $commandTester->setInputs(array('AppBundle', 'Yes'));
+
+   $commandTester->execute();
+   ```
+
 DependencyInjection
 -------------------
 
  * Calling `get()` on a `ContainerBuilder` instance before compiling the
    container is deprecated and will throw an exception in Symfony 4.0.
 
+ * Setting or unsetting a private service with the `Container::set()` method is
+   deprecated. Only public services can be set or unset in Symfony 4.0.
+
+ * Checking the existence of a private service with the `Container::has()`
+   method is deprecated and will return `false` in Symfony 4.0.
+
+ * Requesting a private service with the `Container::get()` method is deprecated
+   and will no longer be supported in Symfony 4.0.
+
 ExpressionLanguage
 -------------------
 
-* Passing a `ParserCacheInterface` instance to the `ExpressionLanguage` has been
-  deprecated and will not be supported in Symfony 4.0. You should use the
-  `CacheItemPoolInterface` interface instead.
+ * Passing a `ParserCacheInterface` instance to the `ExpressionLanguage` has been
+   deprecated and will not be supported in Symfony 4.0. You should use the
+   `CacheItemPoolInterface` interface instead.
 
 Form
 ----

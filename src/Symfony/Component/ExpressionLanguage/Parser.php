@@ -99,7 +99,7 @@ class Parser
 
         $node = $this->parseExpression();
         if (!$stream->isEOF()) {
-            throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s"', $stream->current->type, $stream->current->value), $stream->current->cursor);
+            throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s"', $stream->current->type, $stream->current->value), $stream->current->cursor, $stream->getExpression());
         }
 
         return $node;
@@ -195,13 +195,13 @@ class Parser
                     default:
                         if ('(' === $this->stream->current->value) {
                             if (false === isset($this->functions[$token->value])) {
-                                throw new SyntaxError(sprintf('The function "%s" does not exist', $token->value), $token->cursor);
+                                throw new SyntaxError(sprintf('The function "%s" does not exist', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, array_keys($this->functions));
                             }
 
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
                             if (!in_array($token->value, $this->names, true)) {
-                                throw new SyntaxError(sprintf('Variable "%s" is not valid', $token->value), $token->cursor);
+                                throw new SyntaxError(sprintf('Variable "%s" is not valid', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, $this->names);
                             }
 
                             // is the name used in the compiled code different
@@ -227,7 +227,7 @@ class Parser
                 } elseif ($token->test(Token::PUNCTUATION_TYPE, '{')) {
                     $node = $this->parseHashExpression();
                 } else {
-                    throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s"', $token->type, $token->value), $token->cursor);
+                    throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s"', $token->type, $token->value), $token->cursor, $this->stream->getExpression());
                 }
         }
 
@@ -289,7 +289,7 @@ class Parser
             } else {
                 $current = $this->stream->current;
 
-                throw new SyntaxError(sprintf('A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token "%s" of value "%s"', $current->type, $current->value), $current->cursor);
+                throw new SyntaxError(sprintf('A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token "%s" of value "%s"', $current->type, $current->value), $current->cursor, $this->stream->getExpression());
             }
 
             $this->stream->expect(Token::PUNCTUATION_TYPE, ':', 'A hash key must be followed by a colon (:)');
@@ -305,14 +305,14 @@ class Parser
     public function parsePostfixExpression($node)
     {
         $token = $this->stream->current;
-        while ($token->type == Token::PUNCTUATION_TYPE) {
+        while (Token::PUNCTUATION_TYPE == $token->type) {
             if ('.' === $token->value) {
                 $this->stream->next();
                 $token = $this->stream->current;
                 $this->stream->next();
 
                 if (
-                    $token->type !== Token::NAME_TYPE
+                    Token::NAME_TYPE !== $token->type
                     &&
                     // Operators like "not" and "matches" are valid method or property names,
                     //
@@ -325,9 +325,9 @@ class Parser
                     // Other types, such as STRING_TYPE and NUMBER_TYPE, can't be parsed as property nor method names.
                     //
                     // As a result, if $token is NOT an operator OR $token->value is NOT a valid property or method name, an exception shall be thrown.
-                    ($token->type !== Token::OPERATOR_TYPE || !preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value))
+                    (Token::OPERATOR_TYPE !== $token->type || !preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value))
                 ) {
-                    throw new SyntaxError('Expected name', $token->cursor);
+                    throw new SyntaxError('Expected name', $token->cursor, $this->stream->getExpression());
                 }
 
                 $arg = new Node\ConstantNode($token->value, true);

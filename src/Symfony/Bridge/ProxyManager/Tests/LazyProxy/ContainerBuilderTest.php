@@ -13,6 +13,7 @@ namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy;
 
 require_once __DIR__.'/Fixtures/includes/foo.php';
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -22,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
-class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
+class ContainerBuilderTest extends TestCase
 {
     public function testCreateProxyServiceWithRuntimeInstantiator()
     {
@@ -30,13 +31,16 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $builder->setProxyInstantiator(new RuntimeInstantiator());
 
-        $builder->register('foo1', 'ProxyManagerBridgeFooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php');
+        $builder->register('foo1', 'ProxyManagerBridgeFooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php')->setPublic(true);
         $builder->getDefinition('foo1')->setLazy(true);
 
         $builder->compile();
 
         /* @var $foo1 \ProxyManager\Proxy\LazyLoadingInterface|\ProxyManager\Proxy\ValueHolderInterface */
         $foo1 = $builder->get('foo1');
+
+        $foo1->__destruct();
+        $this->assertSame(0, $foo1::$destructorCount);
 
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
         $this->assertInstanceOf('\ProxyManagerBridgeFooClass', $foo1);
@@ -49,5 +53,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($foo1->isProxyInitialized());
         $this->assertInstanceOf('\ProxyManagerBridgeFooClass', $foo1->getWrappedValueHolderValue());
         $this->assertNotInstanceOf('\ProxyManager\Proxy\LazyLoadingInterface', $foo1->getWrappedValueHolderValue());
+
+        $foo1->__destruct();
+        $this->assertSame(1, $foo1::$destructorCount);
     }
 }

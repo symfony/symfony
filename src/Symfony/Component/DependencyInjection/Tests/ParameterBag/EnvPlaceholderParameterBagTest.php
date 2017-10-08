@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 
-class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
+class EnvPlaceholderParameterBagTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
@@ -114,18 +115,18 @@ class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(INT_VAR)');
-        $bag->set('env(Int_Var)', 2);
+        $bag->set('env(INT_VAR)', 2);
         $bag->resolve();
-        $this->assertSame('2', $bag->all()['env(int_var)']);
+        $this->assertSame('2', $bag->all()['env(INT_VAR)']);
     }
 
     public function testResolveEnvAllowsNull()
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(NULL_VAR)');
-        $bag->set('env(Null_Var)', null);
+        $bag->set('env(NULL_VAR)', null);
         $bag->resolve();
-        $this->assertNull($bag->all()['env(null_var)']);
+        $this->assertNull($bag->all()['env(NULL_VAR)']);
     }
 
     /**
@@ -136,7 +137,7 @@ class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(ARRAY_VAR)');
-        $bag->set('env(Array_Var)', array());
+        $bag->set('env(ARRAY_VAR)', array());
         $bag->resolve();
     }
 
@@ -147,7 +148,7 @@ class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag->get('env(NULL_VAR)');
         $bag->resolve();
 
-        $this->assertNull($bag->all()['env(null_var)']);
+        $this->assertNull($bag->all()['env(NULL_VAR)']);
     }
 
     /**

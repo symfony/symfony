@@ -19,17 +19,22 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
  * Normalizer implementation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
+abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
+    use ObjectToPopulateTrait;
+    use SerializerAwareTrait;
+
     const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
     const OBJECT_TO_POPULATE = 'object_to_populate';
     const GROUPS = 'groups';
+    const ATTRIBUTES = 'attributes';
 
     /**
      * @var int
@@ -191,7 +196,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             return call_user_func($this->circularReferenceHandler, $object);
         }
 
-        throw new CircularReferenceException(sprintf('A circular reference has been detected (configured limit: %d).', $this->circularReferenceLimit));
+        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', get_class($object), $this->circularReferenceLimit));
     }
 
     /**
@@ -236,7 +241,20 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
     {
-        return !in_array($attribute, $this->ignoredAttributes);
+        if (in_array($attribute, $this->ignoredAttributes)) {
+            return false;
+        }
+
+        if (isset($context[self::ATTRIBUTES][$attribute])) {
+            // Nested attributes
+            return true;
+        }
+
+        if (isset($context[self::ATTRIBUTES]) && is_array($context[self::ATTRIBUTES])) {
+            return in_array($attribute, $context[self::ATTRIBUTES], true);
+        }
+
+        return true;
     }
 
     /**
@@ -288,27 +306,9 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      *
      * @throws RuntimeException
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes/*, $format = null*/)
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
-        if (func_num_args() >= 6) {
-            $format = func_get_arg(5);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a 6th `$format = null` argument in version 4.0. Not defining it is deprecated since 3.2.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-
-            $format = null;
-        }
-
-        if (
-            isset($context[static::OBJECT_TO_POPULATE]) &&
-            is_object($context[static::OBJECT_TO_POPULATE]) &&
-            $context[static::OBJECT_TO_POPULATE] instanceof $class
-        ) {
-            $object = $context[static::OBJECT_TO_POPULATE];
+        if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
             unset($context[static::OBJECT_TO_POPULATE]);
 
             return $object;
@@ -323,9 +323,9 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 $paramName = $constructorParameter->name;
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
 
-                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
-                $ignored = in_array($paramName, $this->ignoredAttributes);
-                if (method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic()) {
+                $allowed = false === $allowedAttributes || in_array($paramName, $allowedAttributes);
+                $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
+                if ($constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                         if (!is_array($data[$paramName])) {
                             throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
@@ -341,7 +341,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                                 throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $constructorParameter->getClass(), static::class));
                             }
                             $parameterClass = $constructorParameter->getClass()->getName();
-                            $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $context);
+                            $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $this->createChildContext($context, $paramName));
                         }
                     } catch (\ReflectionException $e) {
                         throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
@@ -371,5 +371,22 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         }
 
         return new $class();
+    }
+
+    /**
+     * @param array  $parentContext
+     * @param string $attribute
+     *
+     * @return array
+     *
+     * @internal
+     */
+    protected function createChildContext(array $parentContext, $attribute)
+    {
+        if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
+            $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];
+        }
+
+        return $parentContext;
     }
 }

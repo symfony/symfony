@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ResolveParameterPlaceHoldersPassTest extends \PHPUnit_Framework_TestCase
+class ResolveParameterPlaceHoldersPassTest extends TestCase
 {
     private $compilerPass;
     private $container;
@@ -40,12 +41,12 @@ class ResolveParameterPlaceHoldersPassTest extends \PHPUnit_Framework_TestCase
 
     public function testArgumentParametersShouldBeResolved()
     {
-        $this->assertSame(array('bar', 'baz'), $this->fooDefinition->getArguments());
+        $this->assertSame(array('bar', array('bar' => 'baz')), $this->fooDefinition->getArguments());
     }
 
     public function testMethodCallParametersShouldBeResolved()
     {
-        $this->assertSame(array(array('foobar', array('bar', 'baz'))), $this->fooDefinition->getMethodCalls());
+        $this->assertSame(array(array('foobar', array('bar', array('bar' => 'baz')))), $this->fooDefinition->getMethodCalls());
     }
 
     public function testPropertyParametersShouldBeResolved()
@@ -70,7 +71,7 @@ class ResolveParameterPlaceHoldersPassTest extends \PHPUnit_Framework_TestCase
         $containerBuilder->setParameter('foo.class', 'Foo');
         $containerBuilder->setParameter('foo.factory.class', 'FooFactory');
         $containerBuilder->setParameter('foo.arg1', 'bar');
-        $containerBuilder->setParameter('foo.arg2', 'baz');
+        $containerBuilder->setParameter('foo.arg2', array('%foo.arg1%' => 'baz'));
         $containerBuilder->setParameter('foo.method', 'foobar');
         $containerBuilder->setParameter('foo.property.name', 'bar');
         $containerBuilder->setParameter('foo.property.value', 'baz');
@@ -79,7 +80,7 @@ class ResolveParameterPlaceHoldersPassTest extends \PHPUnit_Framework_TestCase
 
         $fooDefinition = $containerBuilder->register('foo', '%foo.class%');
         $fooDefinition->setFactory(array('%foo.factory.class%', 'getFoo'));
-        $fooDefinition->setArguments(array('%foo.arg1%', '%foo.arg2%'));
+        $fooDefinition->setArguments(array('%foo.arg1%', array('%foo.arg1%' => 'baz')));
         $fooDefinition->addMethodCall('%foo.method%', array('%foo.arg1%', '%foo.arg2%'));
         $fooDefinition->setProperty('%foo.property.name%', '%foo.property.value%');
         $fooDefinition->setFile('%foo.file%');

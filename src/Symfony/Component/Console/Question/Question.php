@@ -31,8 +31,6 @@ class Question
     private $normalizer;
 
     /**
-     * Constructor.
-     *
      * @param string $question The question to ask to the user
      * @param mixed  $default  The default answer to return if the user enters nothing
      */
@@ -190,7 +188,7 @@ class Question
      *
      * @return $this
      *
-     * @throws InvalidArgumentException In case the number of attempts is invalid.
+     * @throws InvalidArgumentException in case the number of attempts is invalid
      */
     public function setMaxAttempts($attempts)
     {

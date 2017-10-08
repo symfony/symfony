@@ -12,13 +12,14 @@
 namespace Symfony\Component\HttpKernel\Tests\ControllerMetadata;
 
 use Fake\ImportedAndFake;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 
-class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class ArgumentMetadataFactoryTest extends TestCase
 {
     /**
      * @var ArgumentMetadataFactory
@@ -83,9 +84,6 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         ), $arguments);
     }
 
-    /**
-     * @requires PHP 5.6
-     */
     public function testVariadicSignature()
     {
         $arguments = $this->factory->createArgumentMetadata(array(new VariadicController(), 'action'));
@@ -96,9 +94,6 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         ), $arguments);
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testBasicTypesSignature()
     {
         $arguments = $this->factory->createArgumentMetadata(array(new BasicTypesController(), 'action'));
@@ -110,9 +105,6 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         ), $arguments);
     }
 
-    /**
-     * @requires PHP 7.1
-     */
     public function testNullableTypesSignature()
     {
         $arguments = $this->factory->createArgumentMetadata(array(new NullableController(), 'action'));

@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
+ * @property int $maxSize
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class File extends Constraint
@@ -88,23 +90,18 @@ class File extends Constraint
 
     private function normalizeBinaryFormat($maxSize)
     {
-        $sizeInt = (int) $maxSize;
-
+        $factors = array(
+            'k' => 1000,
+            'ki' => 1 << 10,
+            'm' => 1000000,
+            'mi' => 1 << 20,
+        );
         if (ctype_digit((string) $maxSize)) {
-            $this->maxSize = $sizeInt;
+            $this->maxSize = (int) $maxSize;
             $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
-        } elseif (preg_match('/^\d++k$/i', $maxSize)) {
-            $this->maxSize = $sizeInt * 1000;
-            $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
-        } elseif (preg_match('/^\d++M$/i', $maxSize)) {
-            $this->maxSize = $sizeInt * 1000000;
-            $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
-        } elseif (preg_match('/^\d++Ki$/i', $maxSize)) {
-            $this->maxSize = $sizeInt << 10;
-            $this->binaryFormat = null === $this->binaryFormat ? true : $this->binaryFormat;
-        } elseif (preg_match('/^\d++Mi$/i', $maxSize)) {
-            $this->maxSize = $sizeInt << 20;
-            $this->binaryFormat = null === $this->binaryFormat ? true : $this->binaryFormat;
+        } elseif (preg_match('/^(\d++)('.implode('|', array_keys($factors)).')$/i', $maxSize, $matches)) {
+            $this->maxSize = $matches[1] * $factors[$unit = strtolower($matches[2])];
+            $this->binaryFormat = null === $this->binaryFormat ? 2 === strlen($unit) : $this->binaryFormat;
         } else {
             throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $this->maxSize));
         }

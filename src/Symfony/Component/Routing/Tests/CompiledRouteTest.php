@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\CompiledRoute;
 
-class CompiledRouteTest extends \PHPUnit_Framework_TestCase
+class CompiledRouteTest extends TestCase
 {
     public function testAccessors()
     {

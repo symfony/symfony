@@ -35,7 +35,7 @@ final class Locale extends \Locale
      *
      * @see getFallback()
      */
-    public static function setDefaultFallback($locale)
+    public static function setDefaultFallback(string $locale)
     {
         self::$defaultFallback = $locale;
     }
@@ -48,7 +48,7 @@ final class Locale extends \Locale
      * @see setDefaultFallback()
      * @see getFallback()
      */
-    public static function getDefaultFallback()
+    public static function getDefaultFallback(): string
     {
         return self::$defaultFallback;
     }
@@ -65,23 +65,48 @@ final class Locale extends \Locale
      * @return string|null The ICU locale code of the fallback locale, or null
      *                     if no fallback exists
      */
-    public static function getFallback($locale)
+    public static function getFallback($locale): ?string
     {
-        if (false === $pos = strrpos($locale, '_')) {
-            if (self::$defaultFallback === $locale) {
-                return 'root';
+        if (function_exists('locale_parse')) {
+            $localeSubTags = locale_parse($locale);
+            if (1 === count($localeSubTags)) {
+                if (self::$defaultFallback === $localeSubTags['language']) {
+                    return 'root';
+                }
+
+                // Don't return default fallback for "root", "meta" or others
+                // Normal locales have two or three letters
+                if (strlen($locale) < 4) {
+                    return self::$defaultFallback;
+                }
+
+                return null;
             }
 
-            // Don't return default fallback for "root", "meta" or others
-            // Normal locales have two or three letters
-            if (strlen($locale) < 4) {
-                return self::$defaultFallback;
-            }
+            array_pop($localeSubTags);
 
-            return;
+            return locale_compose($localeSubTags);
         }
 
-        return substr($locale, 0, $pos);
+        if (false !== $pos = strrpos($locale, '_')) {
+            return substr($locale, 0, $pos);
+        }
+
+        if (false !== $pos = strrpos($locale, '-')) {
+            return substr($locale, 0, $pos);
+        }
+
+        if (self::$defaultFallback === $locale) {
+            return 'root';
+        }
+
+        // Don't return default fallback for "root", "meta" or others
+        // Normal locales have two or three letters
+        if (strlen($locale) < 4) {
+            return self::$defaultFallback;
+        }
+
+        return null;
     }
 
     /**

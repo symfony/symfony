@@ -67,6 +67,10 @@ abstract class Composite extends Constraint
 
         foreach ($nestedConstraints as $constraint) {
             if (!$constraint instanceof Constraint) {
+                if (is_object($constraint)) {
+                    $constraint = get_class($constraint);
+                }
+
                 throw new ConstraintDefinitionException(sprintf('The value %s is not an instance of Constraint in constraint %s', $constraint, get_class($this)));
             }
 

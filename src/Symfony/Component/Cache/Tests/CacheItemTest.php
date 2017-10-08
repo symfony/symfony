@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Cache\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
-class CacheItemTest extends \PHPUnit_Framework_TestCase
+class CacheItemTest extends TestCase
 {
     public function testValidKey()
     {
-        $this->assertNull(CacheItem::validateKey('foo'));
+        $this->assertSame('foo', CacheItem::validateKey('foo'));
     }
 
     /**

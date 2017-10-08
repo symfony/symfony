@@ -37,8 +37,6 @@ abstract class Input implements InputInterface, StreamableInputInterface
     protected $interactive = true;
 
     /**
-     * Constructor.
-     *
      * @param InputDefinition|null $definition A InputDefinition instance
      */
     public function __construct(InputDefinition $definition = null)
@@ -158,7 +156,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
             throw new InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
         }
 
-        return isset($this->options[$name]) ? $this->options[$name] : $this->definition->getOption($name)->getDefault();
+        return array_key_exists($name, $this->options) ? $this->options[$name] : $this->definition->getOption($name)->getDefault();
     }
 
     /**

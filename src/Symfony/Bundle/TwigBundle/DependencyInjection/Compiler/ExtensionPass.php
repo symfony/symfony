@@ -11,14 +11,11 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Component\Yaml\Parser as YamlParser;
+use Symfony\Component\Workflow\Workflow;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -38,9 +35,6 @@ class ExtensionPass implements CompilerPassInterface
         if (!interface_exists('Symfony\Component\Routing\Generator\UrlGeneratorInterface')) {
             $container->removeDefinition('twig.extension.routing');
         }
-        if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
-            $container->removeDefinition('twig.extension.trans');
-        }
 
         if (!class_exists('Symfony\Component\Yaml\Yaml')) {
             $container->removeDefinition('twig.extension.yaml');
@@ -52,10 +46,6 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.loader.native_filesystem')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
         }
 
-        if ($container->has('translator')) {
-            $container->getDefinition('twig.extension.trans')->addTag('twig.extension');
-        }
-
         if ($container->has('router')) {
             $container->getDefinition('twig.extension.routing')->addTag('twig.extension');
         }
@@ -64,10 +54,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
 
             // inject Twig in the hinclude service if Twig is the only registered templating engine
-            if (
-                !$container->hasParameter('templating.engines')
-                || array('twig') == $container->getParameter('templating.engines')
-            ) {
+            if ((!$container->hasParameter('templating.engines') || array('twig') == $container->getParameter('templating.engines')) && $container->hasDefinition('fragment.renderer.hinclude')) {
                 $container->getDefinition('fragment.renderer.hinclude')
                     ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))
                     ->replaceArgument(0, new Reference('twig'))
@@ -84,50 +71,37 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
         }
 
-        $composerRootDir = $this->getComposerRootDir($container->getParameter('kernel.root_dir'));
         $twigLoader = $container->getDefinition('twig.loader.native_filesystem');
         if ($container->has('templating')) {
             $loader = $container->getDefinition('twig.loader.filesystem');
-            $loader->setMethodCalls($twigLoader->getMethodCalls());
-            $loader->replaceArgument(2, $composerRootDir);
+            $loader->setMethodCalls(array_merge($twigLoader->getMethodCalls(), $loader->getMethodCalls()));
 
             $twigLoader->clearTag('twig.loader');
         } else {
-            $twigLoader->replaceArgument(1, $composerRootDir);
             $container->setAlias('twig.loader.filesystem', new Alias('twig.loader.native_filesystem', false));
+            $container->removeDefinition('templating.engine.twig');
         }
 
         if ($container->has('assets.packages')) {
             $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
         }
 
-        $container->addResource(new ClassExistenceResource(YamlParser::class));
-        if (class_exists(YamlParser::class)) {
+        if ($container->hasDefinition('twig.extension.yaml')) {
             $container->getDefinition('twig.extension.yaml')->addTag('twig.extension');
         }
 
-        $container->addResource(new ClassExistenceResource(Stopwatch::class));
-        if (class_exists(Stopwatch::class)) {
+        if (class_exists('Symfony\Component\Stopwatch\Stopwatch')) {
             $container->getDefinition('twig.extension.debug.stopwatch')->addTag('twig.extension');
         }
 
-        $container->addResource(new ClassExistenceResource(ExpressionLanguage::class));
-        if (class_exists(ExpressionLanguage::class)) {
+        if ($container->hasDefinition('twig.extension.expression')) {
             $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
         }
-    }
 
-    private function getComposerRootDir($rootDir)
-    {
-        $dir = $rootDir;
-        while (!file_exists($dir.'/composer.json')) {
-            if ($dir === dirname($dir)) {
-                return $rootDir;
-            }
-
-            $dir = dirname($dir);
+        if (!class_exists(Workflow::class) || !$container->has('workflow.registry')) {
+            $container->removeDefinition('workflow.twig_extension');
+        } else {
+            $container->getDefinition('workflow.twig_extension')->addTag('twig.extension');
         }
-
-        return $dir;
     }
 }

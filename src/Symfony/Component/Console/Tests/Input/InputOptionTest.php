@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputOption;
 
-class InputOptionTest extends \PHPUnit_Framework_TestCase
+class InputOptionTest extends TestCase
 {
     public function testConstructor()
     {
@@ -77,7 +78,12 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidModes($mode)
     {
-        $this->setExpectedException('InvalidArgumentException', sprintf('Option mode "%s" is not valid.', $mode));
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('InvalidArgumentException');
+            $this->expectExceptionMessage(sprintf('Option mode "%s" is not valid.', $mode));
+        } else {
+            $this->setExpectedException('InvalidArgumentException', sprintf('Option mode "%s" is not valid.', $mode));
+        }
 
         new InputOption('foo', 'f', $mode);
     }

@@ -34,7 +34,7 @@ class GenrbCompiler implements BundleCompilerInterface
      * @param string $envVars Optional. Environment variables to be loaded when
      *                        running "genrb".
      *
-     * @throws RuntimeException If the "genrb" cannot be found.
+     * @throws RuntimeException if the "genrb" cannot be found
      */
     public function __construct($genrb = 'genrb', $envVars = '')
     {
@@ -61,7 +61,7 @@ class GenrbCompiler implements BundleCompilerInterface
 
         exec($this->genrb.' --quiet -e UTF-8 -d '.$targetDir.' '.$sourcePath, $output, $status);
 
-        if ($status !== 0) {
+        if (0 !== $status) {
             throw new RuntimeException(sprintf(
                 'genrb failed with status %d while compiling %s to %s.',
                 $status,

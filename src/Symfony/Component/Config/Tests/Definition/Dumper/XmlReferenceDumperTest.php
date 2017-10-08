@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Dumper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Dumper\XmlReferenceDumper;
 use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
 
-class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
+class XmlReferenceDumperTest extends TestCase
 {
     public function testDumper()
     {
@@ -37,6 +38,8 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
         return str_replace("\n", PHP_EOL, <<<'EOL'
 <!-- Namespace: http://example.org/schema/dic/acme_root -->
 <!-- scalar-required: Required -->
+<!-- scalar-deprecated: Deprecated (The child node "scalar_deprecated" at path "acme_root.scalar_deprecated" is deprecated.) -->
+<!-- scalar-deprecated-with-message: Deprecated (Deprecation custom message for "scalar_deprecated_with_message" at "acme_root.scalar_deprecated_with_message") -->
 <!-- enum-with-default: One of "this"; "that" -->
 <!-- enum: One of "this"; "that" -->
 <config
@@ -49,6 +52,8 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
     scalar-array-empty=""
     scalar-array-defaults="elem1,elem2"
     scalar-required=""
+    scalar-deprecated=""
+    scalar-deprecated-with-message=""
     node-with-a-looong-name=""
     enum-with-default="this"
     enum=""

@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
@@ -22,7 +23,7 @@ use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class DoctrineChoiceLoaderTest extends \PHPUnit_Framework_TestCase
+class DoctrineChoiceLoaderTest extends TestCase
 {
     /**
      * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
@@ -110,37 +111,6 @@ class DoctrineChoiceLoaderTest extends \PHPUnit_Framework_TestCase
         // no further loads on subsequent calls
 
         $this->assertEquals($choiceList, $loader->loadChoiceList($value));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyLoadChoiceList()
-    {
-        $factory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
-        $loader = new DoctrineChoiceLoader(
-            $factory,
-            $this->om,
-            $this->class,
-            $this->idReader
-        );
-
-        $choices = array($this->obj1, $this->obj2, $this->obj3);
-        $value = function () {};
-        $choiceList = new ArrayChoiceList($choices, $value);
-
-        $this->repository->expects($this->once())
-            ->method('findAll')
-            ->willReturn($choices);
-
-        $factory->expects($this->never())
-            ->method('createListFromChoices');
-
-        $this->assertEquals($choiceList, $loaded = $loader->loadChoiceList($value));
-
-        // no further loads on subsequent calls
-
-        $this->assertSame($loaded, $loader->loadChoiceList($value));
     }
 
     public function testLoadChoiceListUsesObjectLoaderIfAvailable()

@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Console\Tests\Output;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
 
-class StreamOutputTest extends \PHPUnit_Framework_TestCase
+class StreamOutputTest extends TestCase
 {
     protected $stream;
 

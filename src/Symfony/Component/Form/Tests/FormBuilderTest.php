@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\SubmitButtonBuilder;
 
-class FormBuilderTest extends \PHPUnit_Framework_TestCase
+class FormBuilderTest extends TestCase
 {
     private $dispatcher;
     private $factory;
@@ -48,13 +49,13 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddNameNoStringAndNoInteger()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $this->builder->add(true);
     }
 
     public function testAddTypeNoString()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\UnexpectedTypeException');
         $this->builder->add('foo', 1234);
     }
 
@@ -160,11 +161,19 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->add(new ButtonBuilder('reset'));
         $this->builder->add(new SubmitButtonBuilder('submit'));
+
+        $this->assertCount(2, $this->builder->all());
     }
 
     public function testGetUnknown()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidArgumentException', 'The child with the name "foo" does not exist.');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('Symfony\Component\Form\Exception\InvalidArgumentException');
+            $this->expectExceptionMessage('The child with the name "foo" does not exist.');
+        } else {
+            $this->setExpectedException('Symfony\Component\Form\Exception\InvalidArgumentException', 'The child with the name "foo" does not exist.');
+        }
+
         $this->builder->get('foo');
     }
 

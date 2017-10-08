@@ -54,7 +54,7 @@
     <tbody>
     {% for trace in traces %}
         <tr class="{{ trace.level == 1 ? 'status-warning' : trace.level == 2 ? 'status-success' }}">
-            <td class="font-normal text-muted">{{ loop.index }}</td>
+            <td class="font-normal text-muted nowrap">{{ loop.index }}</td>
             <td>{{ trace.name }}</td>
             <td>{{ trace.path }}</td>
             <td class="font-normal">

@@ -55,4 +55,13 @@ class DebugProcessor implements DebugLoggerInterface
     {
         return $this->errorCount;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        $this->records = array();
+        $this->errorCount = 0;
+    }
 }

@@ -185,7 +185,7 @@ class ArrayChoiceList implements ChoiceListInterface
      *                                   corresponding values
      * @param array    $structuredValues The values indexed by the original keys
      *
-     * @internal Must not be used by user-land code
+     * @internal
      */
     protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues)
     {
@@ -216,8 +216,8 @@ class ArrayChoiceList implements ChoiceListInterface
      * @param array      $choices The choices
      * @param array|null $cache   The cache for previously checked entries. Internal
      *
-     * @return bool Returns true if the choices can be cast to strings and
-     *              false otherwise.
+     * @return bool returns true if the choices can be cast to strings and
+     *              false otherwise
      */
     private function castableToString(array $choices, array &$cache = array())
     {

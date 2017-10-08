@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\SecurityUserValueResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
@@ -20,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class SecurityUserValueResolverTest extends \PHPUnit_Framework_TestCase
+class SecurityUserValueResolverTest extends TestCase
 {
     public function testResolveNoToken()
     {

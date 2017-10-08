@@ -2,10 +2,11 @@
 
 namespace Symfony\Component\Workflow\Tests\MarkingStore;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 
-class MultipleStateMarkingStoreTest extends \PHPUnit_Framework_TestCase
+class MultipleStateMarkingStoreTest extends TestCase
 {
     public function testGetSetMarking()
     {

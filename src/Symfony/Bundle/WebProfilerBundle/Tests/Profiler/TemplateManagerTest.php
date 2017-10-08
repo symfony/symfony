@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Profiler;
 
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
+use Twig\Environment;
 
 /**
  * Test for TemplateManager class.
@@ -22,7 +23,7 @@ use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 class TemplateManagerTest extends TestCase
 {
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $twigEnvironment;
 
@@ -46,7 +47,7 @@ class TemplateManagerTest extends TestCase
             'data_collector.foo' => array('foo', 'FooBundle:Collector:foo'),
             'data_collector.bar' => array('bar', 'FooBundle:Collector:bar'),
             'data_collector.baz' => array('baz', 'FooBundle:Collector:baz'),
-            );
+        );
 
         $this->templateManager = new TemplateManager($profiler, $twigEnvironment, $templates);
     }
@@ -78,28 +79,6 @@ class TemplateManagerTest extends TestCase
         $this->assertEquals('FooBundle:Collector:foo.html.twig', $this->templateManager->getName($profile, 'foo'));
     }
 
-    /**
-     * template should be loaded for 'foo' because other collectors are
-     * missing in profile or in profiler.
-     */
-    public function testGetTemplates()
-    {
-        $profile = $this->mockProfile();
-        $profile->expects($this->any())
-            ->method('hasCollector')
-            ->will($this->returnCallback(array($this, 'profilerHasCallback')));
-
-        $this->profiler->expects($this->any())
-            ->method('has')
-            ->withAnyParameters()
-            ->will($this->returnCallback(array($this, 'profileHasCollectorCallback')));
-
-        $result = $this->templateManager->getTemplates($profile);
-        $this->assertArrayHasKey('foo', $result);
-        $this->assertArrayNotHasKey('bar', $result);
-        $this->assertArrayNotHasKey('baz', $result);
-    }
-
     public function profilerHasCallback($panel)
     {
         switch ($panel) {
@@ -129,16 +108,16 @@ class TemplateManagerTest extends TestCase
 
     protected function mockTwigEnvironment()
     {
-        $this->twigEnvironment = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
+        $this->twigEnvironment = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
 
         $this->twigEnvironment->expects($this->any())
             ->method('loadTemplate')
             ->will($this->returnValue('loadedTemplate'));
 
-        if (interface_exists('\Twig_SourceContextLoaderInterface')) {
-            $loader = $this->getMockBuilder('\Twig_SourceContextLoaderInterface')->getMock();
+        if (interface_exists('Twig\Loader\SourceContextLoaderInterface')) {
+            $loader = $this->getMockBuilder('Twig\Loader\SourceContextLoaderInterface')->getMock();
         } else {
-            $loader = $this->getMockBuilder('\Twig_LoaderInterface')->getMock();
+            $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
         }
         $this->twigEnvironment->expects($this->any())->method('getLoader')->will($this->returnValue($loader));
 

@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Output\StreamOutput;
 
-class TableTest extends \PHPUnit_Framework_TestCase
+class TableTest extends TestCase
 {
     protected $stream;
 
@@ -33,11 +34,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testRenderProvider
+     * @dataProvider renderProvider
      */
-    public function testRender($headers, $rows, $style, $expected)
+    public function testRender($headers, $rows, $style, $expected, $decorated = false)
     {
-        $table = new Table($output = $this->getOutputStream());
+        $table = new Table($output = $this->getOutputStream($decorated));
         $table
             ->setHeaders($headers)
             ->setRows($rows)
@@ -49,11 +50,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testRenderProvider
+     * @dataProvider renderProvider
      */
-    public function testRenderAddRows($headers, $rows, $style, $expected)
+    public function testRenderAddRows($headers, $rows, $style, $expected, $decorated = false)
     {
-        $table = new Table($output = $this->getOutputStream());
+        $table = new Table($output = $this->getOutputStream($decorated));
         $table
             ->setHeaders($headers)
             ->addRows($rows)
@@ -65,11 +66,11 @@ class TableTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testRenderProvider
+     * @dataProvider renderProvider
      */
-    public function testRenderAddRowsOneByOne($headers, $rows, $style, $expected)
+    public function testRenderAddRowsOneByOne($headers, $rows, $style, $expected, $decorated = false)
     {
-        $table = new Table($output = $this->getOutputStream());
+        $table = new Table($output = $this->getOutputStream($decorated));
         $table
             ->setHeaders($headers)
             ->setStyle($style)
@@ -82,7 +83,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testRenderProvider()
+    public function renderProvider()
     {
         $books = array(
             array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'),
@@ -298,10 +299,10 @@ TABLE
                 array(
                     array(
                         new TableCell('9971-5-0210-0', array('rowspan' => 3)),
-                        'Divine Comedy',
+                        new TableCell('Divine Comedy', array('rowspan' => 2)),
                         'Dante Alighieri',
                     ),
-                    array('A Tale of Two Cities', 'Charles Dickens'),
+                    array(),
                     array("The Lord of \nthe Rings", "J. R. \nR. Tolkien"),
                     new TableSeparator(),
                     array('80-902734-1-6', new TableCell("And Then \nThere \nWere None", array('rowspan' => 3)), 'Agatha Christie'),
@@ -309,18 +310,18 @@ TABLE
                 ),
                 'default',
 <<<'TABLE'
-+---------------+----------------------+-----------------+
-| ISBN          | Title                | Author          |
-+---------------+----------------------+-----------------+
-| 9971-5-0210-0 | Divine Comedy        | Dante Alighieri |
-|               | A Tale of Two Cities | Charles Dickens |
-|               | The Lord of          | J. R.           |
-|               | the Rings            | R. Tolkien      |
-+---------------+----------------------+-----------------+
-| 80-902734-1-6 | And Then             | Agatha Christie |
-| 80-902734-1-7 | There                | Test            |
-|               | Were None            |                 |
-+---------------+----------------------+-----------------+
++---------------+---------------+-----------------+
+| ISBN          | Title         | Author          |
++---------------+---------------+-----------------+
+| 9971-5-0210-0 | Divine Comedy | Dante Alighieri |
+|               |               |                 |
+|               | The Lord of   | J. R.           |
+|               | the Rings     | R. Tolkien      |
++---------------+---------------+-----------------+
+| 80-902734-1-6 | And Then      | Agatha Christie |
+| 80-902734-1-7 | There         | Test            |
+|               | Were None     |                 |
++---------------+---------------+-----------------+
 
 TABLE
             ),
@@ -485,6 +486,64 @@ TABLE
 
 TABLE
             ),
+            'Coslpan and table cells with comment style' => array(
+                array(
+                    new TableCell('<comment>Long Title</comment>', array('colspan' => 3)),
+                ),
+                array(
+                    array(
+                        new TableCell('9971-5-0210-0', array('colspan' => 3)),
+                    ),
+                    new TableSeparator(),
+                    array(
+                        'Dante Alighieri',
+                        'J. R. R. Tolkien',
+                        'J. R. R',
+                    ),
+                ),
+                'default',
+                <<<TABLE
++-----------------+------------------+---------+
+|\033[32m \033[39m\033[33mLong Title\033[39m\033[32m                                   \033[39m|
++-----------------+------------------+---------+
+| 9971-5-0210-0                                |
++-----------------+------------------+---------+
+| Dante Alighieri | J. R. R. Tolkien | J. R. R |
++-----------------+------------------+---------+
+
+TABLE
+            ,
+                true,
+            ),
+            'Row with formatted cells containing a newline' => array(
+                array(),
+                array(
+                    array(
+                        new TableCell('<error>Dont break'."\n".'here</error>', array('colspan' => 2)),
+                    ),
+                    new TableSeparator(),
+                    array(
+                        'foo',
+                         new TableCell('<error>Dont break'."\n".'here</error>', array('rowspan' => 2)),
+                    ),
+                    array(
+                        'bar',
+                    ),
+                ),
+                'default',
+                <<<'TABLE'
++-------+------------+
+[39;49m| [39;49m[37;41mDont break[39;49m[39;49m         |[39;49m
+[39;49m| [39;49m[37;41mhere[39;49m               |
++-------+------------+
+[39;49m| foo   | [39;49m[37;41mDont break[39;49m[39;49m |[39;49m
+[39;49m| bar   | [39;49m[37;41mhere[39;49m       |
++-------+------------+
+
+TABLE
+            ,
+                true,
+            ),
         );
     }
 
@@ -505,6 +564,42 @@ TABLE
 +------+
 | 1234 |
 +------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testTableCellWithNumericIntValue()
+    {
+        $table = new Table($output = $this->getOutputStream());
+
+        $table->setRows(array(array(new TableCell(12345))));
+        $table->render();
+
+        $expected =
+<<<'TABLE'
++-------+
+| 12345 |
++-------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testTableCellWithNumericFloatValue()
+    {
+        $table = new Table($output = $this->getOutputStream());
+
+        $table->setRows(array(array(new TableCell(12345.01))));
+        $table->render();
+
+        $expected =
+<<<'TABLE'
++----------+
+| 12345.01 |
++----------+
 
 TABLE;
 
@@ -713,9 +808,9 @@ TABLE;
         Table::getStyleDefinition('absent');
     }
 
-    protected function getOutputStream()
+    protected function getOutputStream($decorated = false)
     {
-        return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, false);
+        return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, $decorated);
     }
 
     protected function getOutputContent(StreamOutput $output)

@@ -14,8 +14,9 @@ namespace Symfony\Component\Form\Tests;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
-abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormIntegrationTestCase
+abstract class AbstractLayoutTest extends FormIntegrationTestCase
 {
     protected $csrfTokenManager;
     protected $testableFeatures = array();
@@ -77,11 +78,13 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             $this->fail(sprintf(
                 "Failed asserting that \n\n%s\n\nmatches exactly %s. Matches %s in \n\n%s",
                 $expression,
-                $count == 1 ? 'once' : $count.' times',
-                $nodeList->length == 1 ? 'once' : $nodeList->length.' times',
+                1 == $count ? 'once' : $count.' times',
+                1 == $nodeList->length ? 'once' : $nodeList->length.' times',
                 // strip away <root> and </root>
                 substr($dom->saveHTML(), 6, -8)
             ));
+        } else {
+            $this->addToAssertionCount(1);
         }
     }
 
@@ -2459,5 +2462,33 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $this->assertMatchesXpath($html, '/form//input[@title="Foo"]');
         $this->assertMatchesXpath($html, '/form//input[@placeholder="Bar"]');
+    }
+
+    public function testTel()
+    {
+        $tel = '0102030405';
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TelType', $tel);
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/input
+    [@type="tel"]
+    [@name="name"]
+    [@value="0102030405"]
+'
+        );
+    }
+
+    public function testColor()
+    {
+        $color = '#0000ff';
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ColorType', $color);
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/input
+    [@type="color"]
+    [@name="name"]
+    [@value="#0000ff"]
+'
+        );
     }
 }

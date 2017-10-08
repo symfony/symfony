@@ -11,15 +11,15 @@
 
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 
 /**
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
  */
-class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
+class BCryptPasswordEncoderTest extends TestCase
 {
     const PASSWORD = 'password';
-    const BYTES = '0123456789abcdef';
     const VALID_COST = '04';
 
     /**
@@ -38,11 +38,20 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
         new BCryptPasswordEncoder(32);
     }
 
-    public function testCostInRange()
+    /**
+     * @dataProvider validRangeData
+     */
+    public function testCostInRange($cost)
     {
-        for ($cost = 4; $cost <= 31; ++$cost) {
-            new BCryptPasswordEncoder($cost);
-        }
+        $this->assertInstanceOf('Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder', new BCryptPasswordEncoder($cost));
+    }
+
+    public function validRangeData()
+    {
+        $costs = range(4, 31);
+        array_walk($costs, function (&$cost) { $cost = array($cost); });
+
+        return $costs;
     }
 
     public function testResultLength()

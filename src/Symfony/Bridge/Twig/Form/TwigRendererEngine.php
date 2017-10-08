@@ -13,43 +13,27 @@ namespace Symfony\Bridge\Twig\Form;
 
 use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\FormView;
+use Twig\Environment;
+use Twig\Template;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererEngineInterface
+class TwigRendererEngine extends AbstractRendererEngine
 {
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     private $environment;
 
     /**
-     * @var \Twig_Template
+     * @var Template
      */
     private $template;
 
-    public function __construct(array $defaultThemes = array(), \Twig_Environment $environment = null)
+    public function __construct(array $defaultThemes, Environment $environment)
     {
-        if (null === $environment) {
-            @trigger_error(sprintf('Not passing a Twig Environment as the second argument for "%s" constructor is deprecated since version 3.2 and won\'t be possible in 4.0.', static::class), E_USER_DEPRECATED);
-        }
-
         parent::__construct($defaultThemes);
-        $this->environment = $environment;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated since version 3.3, to be removed in 4.0
-     */
-    public function setEnvironment(\Twig_Environment $environment)
-    {
-        if ($this->environment) {
-            @trigger_error(sprintf('The "%s()" method is deprecated since version 3.3 and will be removed in 4.0. Pass the Twig Environment as second argument of the constructor instead.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $this->environment = $environment;
     }
 
@@ -166,13 +150,13 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      */
     protected function loadResourcesFromTheme($cacheKey, &$theme)
     {
-        if (!$theme instanceof \Twig_Template) {
-            /* @var \Twig_Template $theme */
+        if (!$theme instanceof Template) {
+            /* @var Template $theme */
             $theme = $this->environment->loadTemplate($theme);
         }
 
         if (null === $this->template) {
-            // Store the first \Twig_Template instance that we find so that
+            // Store the first Template instance that we find so that
             // we can call displayBlock() later on. It doesn't matter *which*
             // template we use for that, since we pass the used blocks manually
             // anyway.

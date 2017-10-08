@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>Er is geen tijdelijke map geconfigureerd in php.ini.</target>
+                <target>Er is geen tijdelijke map geconfigureerd in php.ini, of de gespecificeerde map bestaat niet.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>

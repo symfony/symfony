@@ -1,12 +1,15 @@
 imports:
     - { resource: ../config/default.yml }
 
+parameters:
+    env(REDIS_HOST): 'localhost'
+
 services:
     cache.test_redis_connection:
         public: false
         class: Redis
         calls:
-            - [connect, ['%redis_host%']]
+            - [connect, ['%env(REDIS_HOST)%']]
 
     cache.app:
         parent: cache.adapter.redis
@@ -19,6 +22,7 @@ framework:
         pools:
             cache.pool1:
                 public: true
+                clearer: cache.system_clearer
             cache.pool2:
                 public: true
                 clearer: ~

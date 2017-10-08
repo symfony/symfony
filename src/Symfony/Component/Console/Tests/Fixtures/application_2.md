@@ -1,15 +1,21 @@
-My Symfony application <info>v1.0</info>
-========================================
+My Symfony application v1.0
+===========================
 
-* `alias1`
-* `alias2`
-* `help`
-* `list`
+* [`alias1`](#descriptorcommand1)
+* [`alias2`](#descriptorcommand1)
+* [`help`](#help)
+* [`list`](#list)
+
+**command4:**
+
+* [`command4:descriptor`](#descriptorcommand4)
 
 **descriptor:**
 
-* `descriptor:command1`
-* `descriptor:command2`
+* [`descriptor:alias_command4`](#descriptorcommand4)
+* [`descriptor:command1`](#descriptorcommand1)
+* [`descriptor:command2`](#descriptorcommand2)
+* [`descriptor:command4`](#descriptorcommand4)
 
 `help`
 ------
@@ -20,15 +26,15 @@ Displays help for a command
 
 * `help [--format FORMAT] [--raw] [--] [<command_name>]`
 
-The <info>help</info> command displays help for a given command:
+The help command displays help for a given command:
 
-  <info>php app/console help list</info>
+  php app/console help list
 
-You can also output the help in other formats by using the <comment>--format</comment> option:
+You can also output the help in other formats by using the --format option:
 
-  <info>php app/console help --format=xml list</info>
+  php app/console help --format=xml list
 
-To display the list of available commands, please use the <info>list</info> command.
+To display the list of available commands, please use the list command.
 
 ### Arguments
 
@@ -132,21 +138,21 @@ Lists commands
 
 * `list [--raw] [--format FORMAT] [--] [<namespace>]`
 
-The <info>list</info> command lists all commands:
+The list command lists all commands:
 
-  <info>php app/console list</info>
+  php app/console list
 
 You can also display the commands for a specific namespace:
 
-  <info>php app/console list test</info>
+  php app/console list test
 
-You can also output the information in other formats by using the <comment>--format</comment> option:
+You can also output the information in other formats by using the --format option:
 
-  <info>php app/console list --format=xml</info>
+  php app/console list --format=xml
 
 It's also possible to get raw list of commands (useful for embedding command runner):
 
-  <info>php app/console list --raw</info>
+  php app/console list --raw
 
 ### Arguments
 
@@ -285,6 +291,81 @@ command 2 help
 * Is value required: no
 * Is multiple: no
 * Default: `false`
+
+#### `--help|-h`
+
+Display this help message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--quiet|-q`
+
+Do not output any message
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--verbose|-v|-vv|-vvv`
+
+Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--version|-V`
+
+Display this application version
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--ansi`
+
+Force ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-ansi`
+
+Disable ANSI output
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+#### `--no-interaction|-n`
+
+Do not ask any interactive question
+
+* Accept value: no
+* Is value required: no
+* Is multiple: no
+* Default: `false`
+
+`descriptor:command4`
+---------------------
+
+### Usage
+
+* `descriptor:command4`
+* `descriptor:alias_command4`
+* `command4:descriptor`
+
+
+### Options
 
 #### `--help|-h`
 

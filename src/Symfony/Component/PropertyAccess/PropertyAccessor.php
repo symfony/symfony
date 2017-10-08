@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyAccess;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
@@ -32,90 +33,23 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
  */
 class PropertyAccessor implements PropertyAccessorInterface
 {
-    /**
-     * @internal
-     */
-    const VALUE = 0;
-
-    /**
-     * @internal
-     */
-    const REF = 1;
-
-    /**
-     * @internal
-     */
-    const IS_REF_CHAINED = 2;
-
-    /**
-     * @internal
-     */
-    const ACCESS_HAS_PROPERTY = 0;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE = 1;
-
-    /**
-     * @internal
-     */
-    const ACCESS_NAME = 2;
-
-    /**
-     * @internal
-     */
-    const ACCESS_REF = 3;
-
-    /**
-     * @internal
-     */
-    const ACCESS_ADDER = 4;
-
-    /**
-     * @internal
-     */
-    const ACCESS_REMOVER = 5;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_METHOD = 0;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_PROPERTY = 1;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_MAGIC = 2;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_ADDER_AND_REMOVER = 3;
-
-    /**
-     * @internal
-     */
-    const ACCESS_TYPE_NOT_FOUND = 4;
-
-    /**
-     * @internal
-     */
-    const CACHE_PREFIX_READ = 'r';
-
-    /**
-     * @internal
-     */
-    const CACHE_PREFIX_WRITE = 'w';
-
-    /**
-     * @internal
-     */
-    const CACHE_PREFIX_PROPERTY_PATH = 'p';
+    private const VALUE = 0;
+    private const REF = 1;
+    private const IS_REF_CHAINED = 2;
+    private const ACCESS_HAS_PROPERTY = 0;
+    private const ACCESS_TYPE = 1;
+    private const ACCESS_NAME = 2;
+    private const ACCESS_REF = 3;
+    private const ACCESS_ADDER = 4;
+    private const ACCESS_REMOVER = 5;
+    private const ACCESS_TYPE_METHOD = 0;
+    private const ACCESS_TYPE_PROPERTY = 1;
+    private const ACCESS_TYPE_MAGIC = 2;
+    private const ACCESS_TYPE_ADDER_AND_REMOVER = 3;
+    private const ACCESS_TYPE_NOT_FOUND = 4;
+    private const CACHE_PREFIX_READ = 'r';
+    private const CACHE_PREFIX_WRITE = 'w';
+    private const CACHE_PREFIX_PROPERTY_PATH = 'p';
 
     /**
      * @var bool
@@ -141,8 +75,6 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @var array
      */
     private $writePropertyCache = array();
-    private static $previousErrorHandler = false;
-    private static $errorHandler = array(__CLASS__, 'handleError');
     private static $resultProto = array(self::VALUE => null);
 
     /**
@@ -195,10 +127,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         $overwrite = true;
 
         try {
-            if (PHP_VERSION_ID < 70000 && false === self::$previousErrorHandler) {
-                self::$previousErrorHandler = set_error_handler(self::$errorHandler);
-            }
-
             for ($i = count($propertyValues) - 1; 0 <= $i; --$i) {
                 $zval = $propertyValues[$i];
                 unset($propertyValues[$i]);
@@ -244,30 +172,16 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         } catch (\TypeError $e) {
             self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0);
-        } finally {
-            if (PHP_VERSION_ID < 70000 && false !== self::$previousErrorHandler) {
-                restore_error_handler();
-                self::$previousErrorHandler = false;
-            }
-        }
-    }
 
-    /**
-     * @internal
-     */
-    public static function handleError($type, $message, $file, $line, $context)
-    {
-        if (E_RECOVERABLE_ERROR === $type) {
-            self::throwInvalidArgumentException($message, debug_backtrace(false), 1);
+            // It wasn't thrown in this class so rethrow it
+            throw $e;
         }
-
-        return null !== self::$previousErrorHandler && false !== call_user_func(self::$previousErrorHandler, $type, $message, $file, $line, $context);
     }
 
     private static function throwInvalidArgumentException($message, $trace, $i)
     {
-        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file']) {
-            $pos = strpos($message, $delim = 'must be of the type ') ?: strpos($message, $delim = 'must be an instance of ');
+        if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file'] && isset($trace[$i]['args'][0])) {
+            $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
             $pos += strlen($delim);
             $type = $trace[$i]['args'][0];
             $type = is_object($type) ? get_class($type) : gettype($type);
@@ -349,7 +263,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return array The values read in the path
      *
-     * @throws UnexpectedTypeException If a value within the path is neither object nor array.
+     * @throws UnexpectedTypeException if a value within the path is neither object nor array
      * @throws NoSuchIndexException    If a non-existing index is accessed
      */
     private function readPropertiesUntil($zval, PropertyPathInterface $propertyPath, $lastIndex, $ignoreInvalidIndices = true)
@@ -467,7 +381,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return array The array containing the value of the property
      *
-     * @throws NoSuchPropertyException If the property does not exist or is not public.
+     * @throws NoSuchPropertyException if the property does not exist or is not public
      */
     private function readProperty($zval, $property)
     {
@@ -523,7 +437,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getReadAccessInfo($class, $property)
     {
-        $key = $class.'..'.$property;
+        $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 
         if (isset($this->readPropertyCache[$key])) {
             return $this->readPropertyCache[$key];
@@ -618,7 +532,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string $property The property to write
      * @param mixed  $value    The value to write
      *
-     * @throws NoSuchPropertyException If the property does not exist or is not public.
+     * @throws NoSuchPropertyException if the property does not exist or is not public
      */
     private function writeProperty($zval, $property, $value)
     {
@@ -646,7 +560,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]}($value);
         } elseif (self::ACCESS_TYPE_NOT_FOUND === $access[self::ACCESS_TYPE]) {
-            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s".', $property));
+            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_class($object)));
         } else {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }
@@ -702,7 +616,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function getWriteAccessInfo($class, $property, $value)
     {
-        $key = $class.'..'.$property;
+        $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 
         if (isset($this->writePropertyCache[$key])) {
             return $this->writePropertyCache[$key];
@@ -925,7 +839,9 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $apcu = new ApcuAdapter($namespace, $defaultLifetime / 5, $version);
-        if (null !== $logger) {
+        if ('cli' === \PHP_SAPI && !ini_get('apc.enable_cli')) {
+            $apcu->setLogger(new NullLogger());
+        } elseif (null !== $logger) {
             $apcu->setLogger($logger);
         }
 

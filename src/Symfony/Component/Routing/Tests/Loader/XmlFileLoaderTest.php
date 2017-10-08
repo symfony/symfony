@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Tests\Fixtures\CustomXmlFileLoader;
 
-class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
+class XmlFileLoaderTest extends TestCase
 {
     public function testSupports()
     {
@@ -69,7 +70,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $loader->load('validresource.xml');
         $routes = $routeCollection->all();
 
-        $this->assertCount(3, $routes, 'Two routes are loaded');
+        $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
         foreach ($routes as $route) {
@@ -285,5 +286,79 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             ),
             $route->getDefault('map')
         );
+    }
+
+    public function testLoadRouteWithControllerAttribute()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $routeCollection = $loader->load('routing.xml');
+
+        $route = $routeCollection->get('app_homepage');
+
+        $this->assertSame('AppBundle:Homepage:show', $route->getDefault('_controller'));
+    }
+
+    public function testLoadRouteWithoutControllerAttribute()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $routeCollection = $loader->load('routing.xml');
+
+        $route = $routeCollection->get('app_logout');
+
+        $this->assertNull($route->getDefault('_controller'));
+    }
+
+    public function testLoadRouteWithControllerSetInDefaults()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $routeCollection = $loader->load('routing.xml');
+
+        $route = $routeCollection->get('app_blog');
+
+        $this->assertSame('AppBundle:Blog:list', $route->getDefault('_controller'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/
+     */
+    public function testOverrideControllerInDefaults()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader->load('override_defaults.xml');
+    }
+
+    /**
+     * @dataProvider provideFilesImportingRoutesWithControllers
+     */
+    public function testImportRouteWithController($file)
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $routeCollection = $loader->load($file);
+
+        $route = $routeCollection->get('app_homepage');
+        $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
+
+        $route = $routeCollection->get('app_blog');
+        $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
+
+        $route = $routeCollection->get('app_logout');
+        $this->assertSame('FrameworkBundle:Template:template', $route->getDefault('_controller'));
+    }
+
+    public function provideFilesImportingRoutesWithControllers()
+    {
+        yield array('import_controller.xml');
+        yield array('import__controller.xml');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/
+     */
+    public function testImportWithOverriddenController()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $loader->load('import_override_defaults.xml');
     }
 }

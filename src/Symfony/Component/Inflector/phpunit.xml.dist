@@ -5,7 +5,9 @@
          backupGlobals="false"
          colors="true"
          bootstrap="vendor/autoload.php"
-        >
+         failOnRisky="true"
+         failOnWarning="true"
+>
     <php>
         <ini name="error_reporting" value="-1" />
     </php>

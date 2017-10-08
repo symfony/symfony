@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
+class TraceableAccessDecisionManagerTest extends TestCase
 {
     /**
      * @dataProvider provideObjectsAndLogs
@@ -46,8 +47,6 @@ class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
 
-        if (!$adm instanceof DebugAccessDecisionManager) {
-            $this->fail('For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
-        }
+        $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm, 'For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
     }
 }

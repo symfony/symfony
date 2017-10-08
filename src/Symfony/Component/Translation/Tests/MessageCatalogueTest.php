@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class MessageCatalogueTest extends \PHPUnit_Framework_TestCase
+class MessageCatalogueTest extends TestCase
 {
     public function testGetLocale()
     {

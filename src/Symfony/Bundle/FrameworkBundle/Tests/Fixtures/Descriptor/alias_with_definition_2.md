@@ -1,11 +1,9 @@
-alias_2
-~~~~~~~
+### alias_2
 
 - Service: `service_2`
 - Public: no
 
-service_2
-~~~~~~~~~
+### service_2
 
 - Class: `Full\Qualified\Class2`
 - Public: no
@@ -14,6 +12,7 @@ service_2
 - Shared: yes
 - Abstract: no
 - Autowired: no
+- Autoconfigured: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`

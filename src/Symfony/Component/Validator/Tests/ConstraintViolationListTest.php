@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class ConstraintViolationListTest extends \PHPUnit_Framework_TestCase
+class ConstraintViolationListTest extends TestCase
 {
     protected $list;
 
@@ -127,8 +128,35 @@ EOF;
         $this->assertEquals($expected, (string) $this->list);
     }
 
-    protected function getViolation($message, $root = null, $propertyPath = null)
+    /**
+     * @dataProvider findByCodesProvider
+     */
+    public function testFindByCodes($code, $violationsCount)
     {
-        return new ConstraintViolation($message, $message, array(), $root, $propertyPath, null);
+        $violations = array(
+            $this->getViolation('Error', null, null, 'code1'),
+            $this->getViolation('Error', null, null, 'code1'),
+            $this->getViolation('Error', null, null, 'code2'),
+        );
+        $list = new ConstraintViolationList($violations);
+
+        $specificErrors = $list->findByCodes($code);
+
+        $this->assertInstanceOf(ConstraintViolationList::class, $specificErrors);
+        $this->assertCount($violationsCount, $specificErrors);
+    }
+
+    public function findByCodesProvider()
+    {
+        return array(
+            array('code1', 2),
+            array(array('code1', 'code2'), 3),
+            array('code3', 0),
+        );
+    }
+
+    protected function getViolation($message, $root = null, $propertyPath = null, $code = null)
+    {
+        return new ConstraintViolation($message, $message, array(), $root, $propertyPath, null, null, $code);
     }
 }

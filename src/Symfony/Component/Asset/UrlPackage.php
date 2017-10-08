@@ -81,6 +81,10 @@ class UrlPackage extends Package
 
         $url = $this->getVersionStrategy()->applyVersion($path);
 
+        if ($this->isAbsoluteUrl($url)) {
+            return $url;
+        }
+
         if ($url && '/' != $url[0]) {
             $url = '/'.$url;
         }

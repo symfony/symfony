@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\File\MimeType;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\FileBinaryMimeTypeGuesser;
 
 /**
  * @requires extension fileinfo
  */
-class MimeTypeTest extends \PHPUnit_Framework_TestCase
+class MimeTypeTest extends TestCase
 {
     protected $path;
 
@@ -28,7 +29,7 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGuessImageWithDirectory()
     {
-        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
 
         MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/directory');
     }
@@ -52,7 +53,7 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGuessWithIncorrectPath()
     {
-        $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
         MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/not_here');
     }
 
@@ -70,8 +71,8 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
         touch($path);
         @chmod($path, 0333);
 
-        if (substr(sprintf('%o', fileperms($path)), -4) == '0333') {
-            $this->setExpectedException('Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException');
+        if ('0333' == substr(sprintf('%o', fileperms($path)), -4)) {
+            $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException');
             MimeTypeGuesser::getInstance()->guess($path);
         } else {
             $this->markTestSkipped('Can not verify chmod operations, change of file permissions failed');

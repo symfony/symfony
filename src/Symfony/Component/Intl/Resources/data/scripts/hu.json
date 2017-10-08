@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.59",
     "Names": {
         "Arab": "Arab",
         "Armi": "Birodalmi arámi",
@@ -36,6 +36,7 @@
         "Grek": "Görög",
         "Gujr": "Gudzsaráti",
         "Guru": "Gurmuki",
+        "Hanb": "Hanb",
         "Hang": "Hangul",
         "Hani": "Han",
         "Hano": "Hanunoo",
@@ -48,6 +49,7 @@
         "Hung": "Ómagyar",
         "Inds": "Indus",
         "Ital": "Régi olasz",
+        "Jamo": "Jamo",
         "Java": "Jávai",
         "Jpan": "Japán",
         "Kali": "Kajah li",
@@ -126,6 +128,7 @@
         "Yiii": "Ji",
         "Zinh": "Származtatott",
         "Zmth": "Matematikai jelrendszer",
+        "Zsye": "Emoji",
         "Zsym": "Szimbólum",
         "Zxxx": "Íratlan nyelvek kódja",
         "Zyyy": "Meghatározatlan",

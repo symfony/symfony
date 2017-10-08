@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Bundle\WebServerBundle\WebServerConfig;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,7 +27,7 @@ use Symfony\Component\Process\Process;
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */
-class ServerRunCommand extends ServerCommand
+class ServerRunCommand extends Command
 {
     private $documentRoot;
     private $environment;
@@ -47,15 +48,21 @@ class ServerRunCommand extends ServerCommand
         $this
             ->setDefinition(array(
                 new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root'),
+                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root, usually where your front controllers are stored'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:run')
             ->setDescription('Runs a local web server')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> runs a local web server:
+<info>%command.name%</info> runs a local web server: By default, the server
+listens on <comment>127.0.0.1</> address and the port number is automatically selected
+as the first free port starting from <comment>8000</>:
 
   <info>%command.full_name%</info>
+
+This command blocks the console. If you want to run other commands, stop it by
+pressing <comment>Control+C</> or use the non-blocking <comment>server:start</>
+command instead.
 
 Change the default address and port by passing them as an argument:
 
@@ -80,7 +87,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         if (null === $documentRoot = $input->getOption('docroot')) {
             if (!$this->documentRoot) {
@@ -89,12 +96,6 @@ EOF
                 return 1;
             }
             $documentRoot = $this->documentRoot;
-        }
-
-        if (!is_dir($documentRoot)) {
-            $io->error(sprintf('The document root directory "%s" does not exist.', $documentRoot));
-
-            return 1;
         }
 
         if (!$env = $this->environment) {

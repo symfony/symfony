@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Templating\Tests\Storage;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Storage\Storage;
 
-class StorageTest extends \PHPUnit_Framework_TestCase
+class StorageTest extends TestCase
 {
     public function testMagicToString()
     {

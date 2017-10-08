@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\TranslatorListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class TranslatorListenerTest extends \PHPUnit_Framework_TestCase
+class TranslatorListenerTest extends TestCase
 {
     private $listener;
     private $translator;

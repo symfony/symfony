@@ -4,11 +4,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="debug.container.dump">%kernel.cache_dir%/%kernel.container_class%.xml</parameter>
-    </parameters>
-
     <services>
+        <defaults public="false" />
+
         <service id="debug.event_dispatcher" class="Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher" decorates="event_dispatcher">
             <tag name="monolog.logger" channel="event" />
             <argument type="service" id="debug.event_dispatcher.inner" />
@@ -19,7 +17,6 @@
         <service id="debug.controller_resolver" decorates="controller_resolver" class="Symfony\Component\HttpKernel\Controller\TraceableControllerResolver">
             <argument type="service" id="debug.controller_resolver.inner" />
             <argument type="service" id="debug.stopwatch" />
-            <argument type="service" id="argument_resolver" />
         </service>
 
         <service id="debug.argument_resolver" decorates="argument_resolver" class="Symfony\Component\HttpKernel\Controller\TraceableArgumentResolver">

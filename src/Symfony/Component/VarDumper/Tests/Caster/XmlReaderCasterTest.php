@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @author Baptiste Clavié <clavie.b@gmail.com>
  */
-class XmlReaderCasterTest extends \PHPUnit_Framework_TestCase
+class XmlReaderCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 

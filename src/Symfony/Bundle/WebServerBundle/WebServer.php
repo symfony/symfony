@@ -13,7 +13,6 @@ namespace Symfony\Bundle\WebServerBundle;
 
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
@@ -58,7 +57,8 @@ class WebServer
 
     public function start(WebServerConfig $config, $pidFile = null)
     {
-        if ($this->isRunning()) {
+        $pidFile = $pidFile ?: $this->getDefaultPidFile();
+        if ($this->isRunning($pidFile)) {
             throw new \RuntimeException(sprintf('A process is already listening on http://%s.', $config->getAddress()));
         }
 
@@ -84,7 +84,6 @@ class WebServer
             throw new \RuntimeException('Unable to start the server process.');
         }
 
-        $pidFile = $pidFile ?: $this->getDefaultPidFile();
         file_put_contents($pidFile, $config->getAddress());
 
         // stop the web server when the lock file is removed
@@ -151,11 +150,16 @@ class WebServer
             throw new \RuntimeException('Unable to find the PHP binary.');
         }
 
-        $builder = new ProcessBuilder(array($binary, '-S', $config->getAddress(), $config->getRouter()));
-        $builder->setWorkingDirectory($config->getDocumentRoot());
-        $builder->setTimeout(null);
+        $process = new Process(array($binary, '-S', $config->getAddress(), $config->getRouter()));
+        $process->setWorkingDirectory($config->getDocumentRoot());
+        $process->setTimeout(null);
 
-        return $builder->getProcess();
+        if (in_array('APP_ENV', explode(',', getenv('SYMFONY_DOTENV_VARS')))) {
+            $process->setEnv(array('APP_ENV' => false));
+            $process->inheritEnvironmentVariables();
+        }
+
+        return $process;
     }
 
     private function getDefaultPidFile()

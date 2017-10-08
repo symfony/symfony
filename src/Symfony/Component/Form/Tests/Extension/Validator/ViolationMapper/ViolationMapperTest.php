@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\ViolationMapper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\CallbackTransformer;
@@ -25,7 +26,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ViolationMapperTest extends \PHPUnit_Framework_TestCase
+class ViolationMapperTest extends TestCase
 {
     const LEVEL_0 = 0;
 
@@ -1259,7 +1260,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         // Only add it if we expect the error to come up on a different
         // level than LEVEL_0, because in this case the error would
         // (correctly) be mapped to the distraction field
-        if ($target !== self::LEVEL_0) {
+        if (self::LEVEL_0 !== $target) {
             $mapFromPath = new PropertyPath($mapFrom);
             $mapFromPrefix = $mapFromPath->isIndex(0)
                 ? '['.$mapFromPath->getElement(0).']'
@@ -1273,7 +1274,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        if ($target !== self::LEVEL_0) {
+        if (self::LEVEL_0 !== $target) {
             $this->assertCount(0, $distraction->getErrors(), 'distraction should not have an error, but has one');
         }
 

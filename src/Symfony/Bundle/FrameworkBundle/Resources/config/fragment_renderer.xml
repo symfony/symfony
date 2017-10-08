@@ -10,8 +10,10 @@
     </parameters>
 
     <services>
+        <defaults public="false" />
+
         <service id="fragment.handler" class="Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler">
-            <argument type="service" id="service_container" />
+            <argument /> <!-- fragment renderer locator -->
             <argument type="service" id="request_stack" />
             <argument>%kernel.debug%</argument>
         </service>

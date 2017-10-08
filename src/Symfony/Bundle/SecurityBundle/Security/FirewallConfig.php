@@ -27,21 +27,9 @@ final class FirewallConfig
     private $accessDeniedHandler;
     private $accessDeniedUrl;
     private $listeners;
+    private $switchUser;
 
-    /**
-     * @param string      $name
-     * @param string      $userChecker
-     * @param string|null $requestMatcher
-     * @param bool        $securityEnabled
-     * @param bool        $stateless
-     * @param string|null $provider
-     * @param string|null $context
-     * @param string|null $entryPoint
-     * @param string|null $accessDeniedHandler
-     * @param string|null $accessDeniedUrl
-     * @param string[]    $listeners
-     */
-    public function __construct($name, $userChecker, $requestMatcher = null, $securityEnabled = true, $stateless = false, $provider = null, $context = null, $entryPoint = null, $accessDeniedHandler = null, $accessDeniedUrl = null, $listeners = array())
+    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $listeners = array(), $switchUser = null)
     {
         $this->name = $name;
         $this->userChecker = $userChecker;
@@ -54,9 +42,10 @@ final class FirewallConfig
         $this->accessDeniedHandler = $accessDeniedHandler;
         $this->accessDeniedUrl = $accessDeniedUrl;
         $this->listeners = $listeners;
+        $this->switchUser = $switchUser;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -65,30 +54,27 @@ final class FirewallConfig
      * @return string|null The request matcher service id or null if neither the request matcher, pattern or host
      *                     options were provided
      */
-    public function getRequestMatcher()
+    public function getRequestMatcher(): ?string
     {
         return $this->requestMatcher;
     }
 
-    public function isSecurityEnabled()
+    public function isSecurityEnabled(): bool
     {
         return $this->securityEnabled;
     }
 
-    public function allowsAnonymous()
+    public function allowsAnonymous(): bool
     {
         return in_array('anonymous', $this->listeners, true);
     }
 
-    public function isStateless()
+    public function isStateless(): bool
     {
         return $this->stateless;
     }
 
-    /**
-     * @return string|null The provider service id
-     */
-    public function getProvider()
+    public function getProvider(): ?string
     {
         return $this->provider;
     }
@@ -96,48 +82,38 @@ final class FirewallConfig
     /**
      * @return string|null The context key (will be null if the firewall is stateless)
      */
-    public function getContext()
+    public function getContext(): ?string
     {
         return $this->context;
     }
 
-    /**
-     * @return string|null The entry_point service id if configured, null otherwise
-     */
-    public function getEntryPoint()
+    public function getEntryPoint(): ?string
     {
         return $this->entryPoint;
     }
 
-    /**
-     * @return string The user_checker service id
-     */
-    public function getUserChecker()
+    public function getUserChecker(): string
     {
         return $this->userChecker;
     }
 
-    /**
-     * @return string|null The access_denied_handler service id if configured, null otherwise
-     */
-    public function getAccessDeniedHandler()
+    public function getAccessDeniedHandler(): ?string
     {
         return $this->accessDeniedHandler;
     }
 
-    /**
-     * @return string|null The access_denied_handler URL if configured, null otherwise
-     */
-    public function getAccessDeniedUrl()
+    public function getAccessDeniedUrl(): ?string
     {
         return $this->accessDeniedUrl;
     }
 
-    /**
-     * @return string[] An array of listener keys
-     */
-    public function getListeners()
+    public function getListeners(): array
     {
         return $this->listeners;
+    }
+
+    public function getSwitchUser(): ?array
+    {
+        return $this->switchUser;
     }
 }

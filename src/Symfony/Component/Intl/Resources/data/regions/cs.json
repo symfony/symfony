@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.59",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -56,7 +56,7 @@
         "CW": "Curaçao",
         "CX": "Vánoční ostrov",
         "CY": "Kypr",
-        "CZ": "Česká republika",
+        "CZ": "Česko",
         "DE": "Německo",
         "DG": "Diego García",
         "DJ": "Džibutsko",
@@ -79,7 +79,7 @@
         "FO": "Faerské ostrovy",
         "FR": "Francie",
         "GA": "Gabon",
-        "GB": "Velká Británie",
+        "GB": "Spojené království",
         "GD": "Grenada",
         "GE": "Gruzie",
         "GF": "Francouzská Guyana",
@@ -236,6 +236,7 @@
         "UA": "Ukrajina",
         "UG": "Uganda",
         "UM": "Menší odlehlé ostrovy USA",
+        "UN": "OSN",
         "US": "Spojené státy",
         "UY": "Uruguay",
         "UZ": "Uzbekistán",

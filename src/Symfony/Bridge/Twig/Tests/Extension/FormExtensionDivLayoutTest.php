@@ -12,19 +12,23 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Bridge\Twig\Form\TwigRenderer;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
+use Twig\Environment;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 {
     use RuntimeLoaderProvider;
 
+    /**
+     * @var FormRenderer
+     */
     private $renderer;
 
     protected function setUp()
@@ -36,7 +40,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             __DIR__.'/Fixtures/templates/form',
         ));
 
-        $environment = new \Twig_Environment($loader, array('strict_variables' => true));
+        $environment = new Environment($loader, array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addGlobal('global', '');
         // the value can be any template that exists
@@ -47,7 +51,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ), $environment);
-        $this->renderer = new TwigRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
+        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
@@ -89,7 +93,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         ;
 
         $this->renderer->setTheme($view, array('page_dynamic_extends.html.twig'));
-        $this->renderer->searchAndRenderBlock($view, 'row');
+        $this->assertMatchesXpath(
+            $this->renderer->searchAndRenderBlock($view, 'row'),
+            '/div/label[text()="child"]'
+        );
     }
 
     public function isSelectedChoiceProvider()
@@ -149,7 +156,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        if ($label !== null) {
+        if (null !== $label) {
             $vars += array('label' => $label);
         }
 

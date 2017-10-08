@@ -11,14 +11,27 @@
 
 namespace Symfony\Component\Config\Tests\Exception;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\FileLoaderLoadException;
 
-class FileLoaderLoadExceptionTest extends \PHPUnit_Framework_TestCase
+class FileLoaderLoadExceptionTest extends TestCase
 {
     public function testMessageCannotLoadResource()
     {
         $exception = new FileLoaderLoadException('resource', null);
         $this->assertEquals('Cannot load resource "resource".', $exception->getMessage());
+    }
+
+    public function testMessageCannotLoadResourceWithType()
+    {
+        $exception = new FileLoaderLoadException('resource', null, null, null, 'foobar');
+        $this->assertEquals('Cannot load resource "resource". Make sure there is a loader supporting the "foobar" type.', $exception->getMessage());
+    }
+
+    public function testMessageCannotLoadResourceWithAnnotationType()
+    {
+        $exception = new FileLoaderLoadException('resource', null, null, null, 'annotation');
+        $this->assertEquals('Cannot load resource "resource". Make sure annotations are enabled.', $exception->getMessage());
     }
 
     public function testMessageCannotImportResourceFromSource()

@@ -12,18 +12,22 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Bridge\Twig\Form\TwigRenderer;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
+use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Tests\AbstractBootstrap3LayoutTest;
+use Twig\Environment;
 
 class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
 {
     use RuntimeLoaderProvider;
 
+    /**
+     * @var FormRenderer
+     */
     private $renderer;
 
     protected function setUp()
@@ -35,7 +39,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
             __DIR__.'/Fixtures/templates/form',
         ));
 
-        $environment = new \Twig_Environment($loader, array('strict_variables' => true));
+        $environment = new Environment($loader, array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
         $environment->addExtension(new FormExtension());
 
@@ -43,7 +47,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
             'bootstrap_3_layout.html.twig',
             'custom_widgets.html.twig',
         ), $environment);
-        $this->renderer = new TwigRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
+        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
@@ -78,7 +82,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
-        if ($label !== null) {
+        if (null !== $label) {
             $vars += array('label' => $label);
         }
 

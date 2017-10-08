@@ -62,7 +62,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
      *
      * @return array Interval array
      *
-     * @throws UnexpectedTypeException If the given value is not a \DateInterval instance.
+     * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
      */
     public function transform($dateInterval)
     {
@@ -108,8 +108,8 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
      *
      * @return \DateInterval Normalized date interval
      *
-     * @throws UnexpectedTypeException       If the given value is not an array.
-     * @throws TransformationFailedException If the value could not be transformed.
+     * @throws UnexpectedTypeException       if the given value is not an array
+     * @throws TransformationFailedException if the value could not be transformed
      */
     public function reverseTransform($value)
     {
@@ -135,7 +135,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
             throw new TransformationFailedException('The value of "invert" must be boolean');
         }
         foreach (self::$availableFields as $field => $char) {
-            if ($field !== 'invert' && isset($value[$field]) && !ctype_digit((string) $value[$field])) {
+            if ('invert' !== $field && isset($value[$field]) && !ctype_digit((string) $value[$field])) {
                 throw new TransformationFailedException(sprintf('This amount of "%s" is invalid', $field));
             }
         }

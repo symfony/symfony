@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToStringTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @author Steffen Roßkamp <steffen.rosskamp@gimmickmedia.de>
@@ -73,7 +75,7 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
     public function testTransformExpectsDateTime()
     {
         $transformer = new DateIntervalToStringTransformer();
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(UnexpectedTypeException::class);
         $transformer->transform('1234');
     }
 
@@ -94,7 +96,7 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
     {
         $reverseTransformer = new DateIntervalToStringTransformer($format, true);
         $interval = new \DateInterval($output);
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(TransformationFailedException::class);
         $this->assertDateIntervalEquals($interval, $reverseTransformer->reverseTransform($input));
     }
 
@@ -107,14 +109,14 @@ class DateIntervalToStringTransformerTest extends DateIntervalTestCase
     public function testReverseTransformExpectsString()
     {
         $reverseTransformer = new DateIntervalToStringTransformer();
-        $this->setExpectedException('Symfony\Component\Form\Exception\UnexpectedTypeException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(UnexpectedTypeException::class);
         $reverseTransformer->reverseTransform(1234);
     }
 
     public function testReverseTransformExpectsValidIntervalString()
     {
         $reverseTransformer = new DateIntervalToStringTransformer();
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(TransformationFailedException::class);
         $reverseTransformer->reverseTransform('10Y');
     }
 }

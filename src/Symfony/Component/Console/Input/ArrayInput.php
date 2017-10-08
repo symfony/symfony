@@ -28,8 +28,6 @@ class ArrayInput extends Input
     private $parameters;
 
     /**
-     * Constructor.
-     *
      * @param array                $parameters An array of parameters
      * @param InputDefinition|null $definition A InputDefinition instance
      */
@@ -66,7 +64,7 @@ class ArrayInput extends Input
                 $v = $k;
             }
 
-            if ($onlyParams && $v === '--') {
+            if ($onlyParams && '--' === $v) {
                 return false;
             }
 
@@ -86,7 +84,7 @@ class ArrayInput extends Input
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
-            if ($onlyParams && ($k === '--' || (is_int($k) && $v === '--'))) {
+            if ($onlyParams && ('--' === $k || (is_int($k) && '--' === $v))) {
                 return false;
             }
 
@@ -112,9 +110,15 @@ class ArrayInput extends Input
         $params = array();
         foreach ($this->parameters as $param => $val) {
             if ($param && '-' === $param[0]) {
-                $params[] = $param.('' != $val ? '='.$this->escapeToken($val) : '');
+                if (is_array($val)) {
+                    foreach ($val as $v) {
+                        $params[] = $param.('' != $v ? '='.$this->escapeToken($v) : '');
+                    }
+                } else {
+                    $params[] = $param.('' != $val ? '='.$this->escapeToken($val) : '');
+                }
             } else {
-                $params[] = $this->escapeToken($val);
+                $params[] = is_array($val) ? array_map(array($this, 'escapeToken'), $val) : $this->escapeToken($val);
             }
         }
 
@@ -127,7 +131,7 @@ class ArrayInput extends Input
     protected function parse()
     {
         foreach ($this->parameters as $key => $value) {
-            if ($key === '--') {
+            if ('--' === $key) {
                 return;
             }
             if (0 === strpos($key, '--')) {
@@ -179,7 +183,9 @@ class ArrayInput extends Input
                 throw new InvalidOptionException(sprintf('The "--%s" option requires a value.', $name));
             }
 
-            $value = $option->isValueOptional() ? $option->getDefault() : true;
+            if (!$option->isValueOptional()) {
+                $value = true;
+            }
         }
 
         $this->options[$name] = $value;

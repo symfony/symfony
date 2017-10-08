@@ -12,20 +12,23 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class TimezoneType extends AbstractType implements ChoiceLoaderInterface
+class TimezoneType extends AbstractType
 {
     /**
-     * Timezone loaded choice list.
-     *
-     * The choices are generated from the ICU function \DateTimeZone::listIdentifiers().
-     *
-     * @var ArrayChoiceList
+     * {@inheritdoc}
      */
-    private $choiceList;
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if ('datetimezone' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeZoneToStringTransformer($options['multiple']));
+        }
+    }
 
     /**
      * {@inheritdoc}
@@ -33,9 +36,21 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'choice_loader' => $this,
+            'choice_loader' => function (Options $options) {
+                $regions = $options['regions'];
+
+                return new CallbackChoiceLoader(function () use ($regions) {
+                    return self::getTimezones($regions);
+                });
+            },
             'choice_translation_domain' => false,
+            'input' => 'string',
+            'regions' => \DateTimeZone::ALL,
         ));
+
+        $resolver->setAllowedValues('input', array('string', 'datetimezone'));
+
+        $resolver->setAllowedTypes('regions', 'int');
     }
 
     /**
@@ -55,63 +70,17 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function loadChoiceList($value = null)
-    {
-        if (null !== $this->choiceList) {
-            return $this->choiceList;
-        }
-
-        return $this->choiceList = new ArrayChoiceList($this->getTimezones(), $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function loadChoicesForValues(array $values, $value = null)
-    {
-        // Optimize
-        if (empty($values)) {
-            return array();
-        }
-
-        // If no callable is set, values are the same as choices
-        if (null === $value) {
-            return $values;
-        }
-
-        return $this->loadChoiceList($value)->getChoicesForValues($values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function loadValuesForChoices(array $choices, $value = null)
-    {
-        // Optimize
-        if (empty($choices)) {
-            return array();
-        }
-
-        // If no callable is set, choices are the same as values
-        if (null === $value) {
-            return $choices;
-        }
-
-        return $this->loadChoiceList($value)->getValuesForChoices($choices);
-    }
-
-    /**
      * Returns a normalized array of timezone choices.
+     *
+     * @param int $regions
      *
      * @return array The timezone choices
      */
-    private static function getTimezones()
+    private static function getTimezones($regions)
     {
         $timezones = array();
 
-        foreach (\DateTimeZone::listIdentifiers() as $timezone) {
+        foreach (\DateTimeZone::listIdentifiers($regions) as $timezone) {
             $parts = explode('/', $timezone);
 
             if (count($parts) > 2) {
@@ -128,6 +97,6 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
             $timezones[$region][str_replace('_', ' ', $name)] = $timezone;
         }
 
-        return $timezones;
+        return 1 === count($timezones) ? reset($timezones) : $timezones;
     }
 }

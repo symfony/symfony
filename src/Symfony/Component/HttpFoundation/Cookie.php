@@ -46,7 +46,7 @@ class Cookie
             'path' => '/',
             'domain' => null,
             'secure' => false,
-            'httponly' => true,
+            'httponly' => false,
             'raw' => !$decode,
             'samesite' => null,
         );
@@ -81,8 +81,6 @@ class Cookie
     }
 
     /**
-     * Constructor.
-     *
      * @param string                        $name     The name of the cookie
      * @param string|null                   $value    The value of the cookie
      * @param int|string|\DateTimeInterface $expire   The time the cookie expires
@@ -126,6 +124,10 @@ class Cookie
         $this->httpOnly = (bool) $httpOnly;
         $this->raw = (bool) $raw;
 
+        if (null !== $sameSite) {
+            $sameSite = strtolower($sameSite);
+        }
+
         if (!in_array($sameSite, array(self::SAMESITE_LAX, self::SAMESITE_STRICT, null), true)) {
             throw new \InvalidArgumentException('The "sameSite" parameter value is not valid.');
         }
@@ -145,7 +147,7 @@ class Cookie
         if ('' === (string) $this->getValue()) {
             $str .= 'deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; max-age=-31536001';
         } else {
-            $str .= $this->isRaw() ? $this->getValue() : urlencode($this->getValue());
+            $str .= $this->isRaw() ? $this->getValue() : rawurlencode($this->getValue());
 
             if (0 !== $this->getExpiresTime()) {
                 $str .= '; expires='.gmdate('D, d-M-Y H:i:s T', $this->getExpiresTime()).'; max-age='.$this->getMaxAge();

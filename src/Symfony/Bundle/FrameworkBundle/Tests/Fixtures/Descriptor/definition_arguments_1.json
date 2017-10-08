@@ -6,7 +6,7 @@
     "shared": true,
     "abstract": true,
     "autowire": false,
-    "autowiring_types": [],
+    "autoconfigure": false,
     "arguments": [
         {
             "type": "service",
@@ -21,14 +21,44 @@
             "shared": true,
             "abstract": false,
             "autowire": false,
-            "autowiring_types": [],
+            "autoconfigure": false,
             "arguments": [
                 "arg1",
                 "arg2"
             ],
             "file": null,
             "tags": []
-        }
+        },
+        [
+            "foo",
+            {
+                "type": "service",
+                "id": "definition2"
+            },
+            {
+                "class": "inline_service",
+                "public": true,
+                "synthetic": false,
+                "lazy": false,
+                "shared": true,
+                "abstract": false,
+                "autowire": false,
+                "autoconfigure": false,
+                "arguments": [],
+                "file": null,
+                "tags": []
+            }
+        ],
+        [
+            {
+                "type": "service",
+                "id": "definition_1"
+            },
+            {
+                "type": "service",
+                "id": "definition_2"
+            }
+        ]
     ],
     "file": null,
     "factory_class": "Full\\Qualified\\FactoryClass",

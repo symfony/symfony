@@ -16,14 +16,12 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class MultiplePcreFilterIterator extends FilterIterator
+abstract class MultiplePcreFilterIterator extends \FilterIterator
 {
     protected $matchRegexps = array();
     protected $noMatchRegexps = array();
 
     /**
-     * Constructor.
-     *
      * @param \Iterator $iterator        The Iterator to filter
      * @param array     $matchPatterns   An array of patterns that need to match
      * @param array     $noMatchPatterns An array of patterns that need to not match

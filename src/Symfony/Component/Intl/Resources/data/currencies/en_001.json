@@ -1,13 +1,17 @@
 {
-    "Version": "2.1.22.91",
+    "Version": "2.1.31.33",
     "Names": {
         "BYB": [
             "BYB",
             "Belarusian New Rouble (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Belarusian Rouble"
+        ],
         "BYR": [
             "BYR",
-            "Belarusian Rouble"
+            "Belarusian Rouble (2000–2016)"
         ],
         "JPY": [
             "JP¥",

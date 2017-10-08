@@ -11,15 +11,15 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\WorkflowExtension;
 use Symfony\Component\Workflow\Definition;
-use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
-class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
+class WorkflowExtensionTest extends TestCase
 {
     private $extension;
 
@@ -73,5 +73,15 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->extension->hasMarkedPlace($subject, 'ordered'));
         $this->assertTrue($this->extension->hasMarkedPlace($subject, 'waiting_for_payment'));
         $this->assertFalse($this->extension->hasMarkedPlace($subject, 'processed'));
+    }
+
+    public function testGetMarkedPlaces()
+    {
+        $subject = new \stdClass();
+        $subject->marking = array();
+        $subject->marking = array('ordered' => 1, 'waiting_for_payment' => 1);
+
+        $this->assertSame(array('ordered', 'waiting_for_payment'), $this->extension->getMarkedPlaces($subject));
+        $this->assertSame($subject->marking, $this->extension->getMarkedPlaces($subject, false));
     }
 }

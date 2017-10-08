@@ -1,4 +1,5 @@
 <?php
+
 namespace Symfony\Component\DependencyInjection\Dump;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
@@ -10,8 +11,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * Container.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -21,29 +20,27 @@ class Container extends AbstractContainer
 {
     private $parameters;
     private $targetDirs = array();
+    private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
-        $this->services = array();
+        $this->services = $this->privates = array();
 
         $this->aliases = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function compile()
+    public function reset()
     {
-        throw new LogicException('You cannot compile a dumped frozen container.');
+        $this->privates = array();
+        parent::reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFrozen()
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
+    }
+
+    public function isCompiled()
     {
         return true;
     }

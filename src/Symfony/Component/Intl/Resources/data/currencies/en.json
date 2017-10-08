@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.24.18",
+    "Version": "2.1.32.59",
     "Names": {
         "ADP": [
             "ADP",
@@ -215,11 +215,15 @@
         ],
         "BYB": [
             "BYB",
-            "Belarusian New Ruble (1994–1999)"
+            "Belarusian Ruble (1994–1999)"
+        ],
+        "BYN": [
+            "BYN",
+            "Belarusian Ruble"
         ],
         "BYR": [
             "BYR",
-            "Belarusian Ruble"
+            "Belarusian Ruble (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -303,7 +307,7 @@
         ],
         "CZK": [
             "CZK",
-            "Czech Republic Koruna"
+            "Czech Koruna"
         ],
         "DDM": [
             "DDM",
@@ -483,11 +487,11 @@
         ],
         "ILR": [
             "ILR",
-            "Israeli Sheqel (1980–1985)"
+            "Israeli Shekel (1980–1985)"
         ],
         "ILS": [
             "₪",
-            "Israeli New Sheqel"
+            "Israeli New Shekel"
         ],
         "INR": [
             "₹",
@@ -775,7 +779,7 @@
         ],
         "PEN": [
             "PEN",
-            "Peruvian Nuevo Sol"
+            "Peruvian Sol"
         ],
         "PES": [
             "PES",

@@ -13,10 +13,9 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
@@ -32,9 +31,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 {
     const ENABLE_MAX_DEPTH = 'enable_max_depth';
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';
+    const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
+    const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
 
     private $propertyTypeExtractor;
     private $attributesCache = array();
+    private $cache = array();
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null)
     {
@@ -48,13 +50,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && !$data instanceof \Traversable;
+        return \is_object($data) && !$data instanceof \Traversable;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws CircularReferenceException
      */
     public function normalize($object, $format = null, array $context = array())
     {
@@ -95,7 +95,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer', $attribute));
             }
 
-            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $context));
+            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute)));
         }
 
         return $data;
@@ -164,7 +164,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return class_exists($type);
+        return isset($this->cache[$type]) ? $this->cache[$type] : $this->cache[$type] = class_exists($type);
     }
 
     /**
@@ -188,8 +188,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $attribute = $this->nameConverter->denormalize($attribute);
             }
 
-            if (($allowedAttributes !== false && !in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
-                if (isset($context['allow_extra_attributes']) && !$context['allow_extra_attributes']) {
+            if ((false !== $allowedAttributes && !in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
+                if (isset($context[self::ALLOW_EXTRA_ATTRIBUTES]) && !$context[self::ALLOW_EXTRA_ATTRIBUTES]) {
                     $extraAttributes[] = $attribute;
                 }
 
@@ -200,7 +200,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $context);
             } catch (InvalidArgumentException $e) {
-                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
+                throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
             }
         }
 
@@ -233,7 +233,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return mixed
      *
-     * @throws UnexpectedValueException
+     * @throws NotNormalizableValueException
      * @throws LogicException
      */
     private function validateAndDenormalize($currentClass, $attribute, $data, $format, array $context)
@@ -267,8 +267,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
                 }
 
-                if ($this->serializer->supportsDenormalization($data, $class, $format)) {
-                    return $this->serializer->denormalize($data, $class, $format, $context);
+                $childContext = $this->createChildContext($context, $attribute);
+                if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
+                    return $this->serializer->denormalize($data, $class, $format, $childContext);
                 }
             }
 
@@ -287,7 +288,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
         }
 
-        throw new UnexpectedValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), gettype($data)));
+        if (!empty($context[self::DISABLE_TYPE_ENFORCEMENT])) {
+            return $data;
+        }
+
+        throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), gettype($data)));
     }
 
     /**

@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Csp;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ContentSecurityPolicyHandlerTest extends \PHPUnit_Framework_TestCase
+class ContentSecurityPolicyHandlerTest extends TestCase
 {
     /**
      * @dataProvider provideRequestAndResponses
@@ -96,41 +97,48 @@ class ContentSecurityPolicyHandlerTest extends \PHPUnit_Framework_TestCase
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
                 $this->createRequest(),
                 $this->createResponse(),
-                array('Content-Security-Policy' => null, 'X-Content-Security-Policy' => null),
+                array('Content-Security-Policy' => null, 'Content-Security-Policy-Report-Only' => null, 'X-Content-Security-Policy' => null),
             ),
             array(
                 $nonce, array('csp_script_nonce' => $requestScriptNonce, 'csp_style_nonce' => $requestStyleNonce),
                 $this->createRequest($requestNonceHeaders),
                 $this->createResponse($responseNonceHeaders),
-                array('Content-Security-Policy' => null, 'X-Content-Security-Policy' => null),
+                array('Content-Security-Policy' => null, 'Content-Security-Policy-Report-Only' => null, 'X-Content-Security-Policy' => null),
             ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $requestScriptNonce, 'csp_style_nonce' => $requestStyleNonce),
                 $this->createRequest($requestNonceHeaders),
                 $this->createResponse(),
-                array('Content-Security-Policy' => null, 'X-Content-Security-Policy' => null),
+                array('Content-Security-Policy' => null, 'Content-Security-Policy-Report-Only' => null, 'X-Content-Security-Policy' => null),
             ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $responseScriptNonce, 'csp_style_nonce' => $responseStyleNonce),
                 $this->createRequest(),
                 $this->createResponse($responseNonceHeaders),
-                array('Content-Security-Policy' => null, 'X-Content-Security-Policy' => null),
+                array('Content-Security-Policy' => null, 'Content-Security-Policy-Report-Only' => null, 'X-Content-Security-Policy' => null),
             ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
                 $this->createRequest(),
-                $this->createResponse(array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-inline\'')),
-                array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-inline\'; style-src \'self\' domain.com \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null),
+                $this->createResponse(array('Content-Security-Policy' => 'frame-ancestors https: ; form-action: https:', 'Content-Security-Policy-Report-Only' => 'frame-ancestors http: ; form-action: http:')),
+                array('Content-Security-Policy' => 'frame-ancestors https: ; form-action: https:', 'Content-Security-Policy-Report-Only' => 'frame-ancestors http: ; form-action: http:', 'X-Content-Security-Policy' => null),
+            ),
+            array(
+                $nonce,
+                array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
+                $this->createRequest(),
+                $this->createResponse(array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-inline\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-inline\'')),
+                array('Content-Security-Policy' => 'default-src \'self\' domain.com; script-src \'self\' \'unsafe-inline\'; style-src \'self\' domain.com \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy-Report-Only' => 'default-src \'self\' domain-report-only.com; script-src \'self\' \'unsafe-inline\'; style-src \'self\' domain-report-only.com \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null),
             ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
                 $this->createRequest(),
                 $this->createResponse(array('Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'')),
-                array('Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'; style-src \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'X-Content-Security-Policy' => null),
+                array('Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'', 'X-Content-Security-Policy' => null),
             ),
             array(
                 $nonce,
@@ -144,21 +152,21 @@ class ContentSecurityPolicyHandlerTest extends \PHPUnit_Framework_TestCase
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
                 $this->createRequest(),
                 $this->createResponse(array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'')),
-                array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'; style-src \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy' => null),
+                array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\'', 'Content-Security-Policy' => null),
             ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
                 $this->createRequest(),
                 $this->createResponse(array('X-Content-Security-Policy' => 'script-src \'self\'')),
-                array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\' \'nonce-'.$nonce.'\'; style-src \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy' => null),
+                array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy' => null),
             ),
             array(
                 $nonce,
                 array('csp_script_nonce' => $nonce, 'csp_style_nonce' => $nonce),
                 $this->createRequest(),
                 $this->createResponse(array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\' \'sha384-LALALALALAAL\'')),
-                array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\' \'sha384-LALALALALAAL\' \'nonce-'.$nonce.'\'; style-src \'unsafe-inline\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy' => null),
+                array('X-Content-Security-Policy' => 'script-src \'self\' \'unsafe-inline\' \'sha384-LALALALALAAL\' \'nonce-'.$nonce.'\'', 'Content-Security-Policy' => null),
             ),
             array(
                 $nonce,

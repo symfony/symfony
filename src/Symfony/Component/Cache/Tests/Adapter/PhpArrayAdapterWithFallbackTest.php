@@ -25,10 +25,10 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
         'testHasItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testDeleteItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testDeleteItemsInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
-        'testDefaultLifeTime' => 'PhpArrayAdapter does not allow configuring a default lifetime.',
+        'testPrune' => 'PhpArrayAdapter just proxies',
     );
 
-    private static $file;
+    protected static $file;
 
     public static function setupBeforeClass()
     {
@@ -42,8 +42,8 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
         }
     }
 
-    public function createCachePool()
+    public function createCachePool($defaultLifetime = 0)
     {
-        return new PhpArrayAdapter(self::$file, new FilesystemAdapter('php-array-fallback'));
+        return new PhpArrayAdapter(self::$file, new FilesystemAdapter('php-array-fallback', $defaultLifetime));
     }
 }

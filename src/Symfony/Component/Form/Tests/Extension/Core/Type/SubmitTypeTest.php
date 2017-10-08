@@ -11,28 +11,28 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase as TestCase;
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class SubmitTypeTest extends TestCase
+class SubmitTypeTest extends ButtonTypeTest
 {
+    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\SubmitType';
+
     public function testCreateSubmitButtonInstances()
     {
-        $this->assertInstanceOf('Symfony\Component\Form\SubmitButton', $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType'));
+        $this->assertInstanceOf('Symfony\Component\Form\SubmitButton', $this->factory->create(static::TESTED_TYPE));
     }
 
     public function testNotClickedByDefault()
     {
-        $button = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType');
+        $button = $this->factory->create(static::TESTED_TYPE);
 
         $this->assertFalse($button->isClicked());
     }
 
     public function testNotClickedIfSubmittedWithNull()
     {
-        $button = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType');
+        $button = $this->factory->create(static::TESTED_TYPE);
         $button->submit(null);
 
         $this->assertFalse($button->isClicked());
@@ -40,7 +40,7 @@ class SubmitTypeTest extends TestCase
 
     public function testClickedIfSubmittedWithEmptyString()
     {
-        $button = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType');
+        $button = $this->factory->create(static::TESTED_TYPE);
         $button->submit('');
 
         $this->assertTrue($button->isClicked());
@@ -48,7 +48,7 @@ class SubmitTypeTest extends TestCase
 
     public function testClickedIfSubmittedWithUnemptyString()
     {
-        $button = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType');
+        $button = $this->factory->create(static::TESTED_TYPE);
         $button->submit('foo');
 
         $this->assertTrue($button->isClicked());
@@ -57,9 +57,9 @@ class SubmitTypeTest extends TestCase
     public function testSubmitCanBeAddedToForm()
     {
         $form = $this->factory
-            ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType')
+            ->createBuilder(FormTypeTest::TESTED_TYPE)
             ->getForm();
 
-        $this->assertSame($form, $form->add('send', 'Symfony\Component\Form\Extension\Core\Type\SubmitType'));
+        $this->assertSame($form, $form->add('send', static::TESTED_TYPE));
     }
 }

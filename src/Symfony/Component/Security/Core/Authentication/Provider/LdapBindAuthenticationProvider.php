@@ -33,10 +33,9 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
     private $userProvider;
     private $ldap;
     private $dnString;
+    private $queryString;
 
     /**
-     * Constructor.
-     *
      * @param UserProviderInterface $userProvider               A UserProvider
      * @param UserCheckerInterface  $userChecker                A UserChecker
      * @param string                $providerKey                The provider key
@@ -51,6 +50,16 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
         $this->userProvider = $userProvider;
         $this->ldap = $ldap;
         $this->dnString = $dnString;
+    }
+
+    /**
+     * Set a query string to use in order to find a DN for the username.
+     *
+     * @param string $queryString
+     */
+    public function setQueryString($queryString)
+    {
+        $this->queryString = $queryString;
     }
 
     /**
@@ -79,7 +88,18 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
 
         try {
             $username = $this->ldap->escape($username, '', LdapInterface::ESCAPE_DN);
-            $dn = str_replace('{username}', $username, $this->dnString);
+
+            if ($this->queryString) {
+                $query = str_replace('{username}', $username, $this->queryString);
+                $result = $this->ldap->query($this->dnString, $query)->execute();
+                if (1 !== $result->count()) {
+                    throw new BadCredentialsException('The presented username is invalid.');
+                }
+
+                $dn = $result[0]->getDn();
+            } else {
+                $dn = str_replace('{username}', $username, $this->dnString);
+            }
 
             $this->ldap->bind($dn, $password);
         } catch (ConnectionException $e) {

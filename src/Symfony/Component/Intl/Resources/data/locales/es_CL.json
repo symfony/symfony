@@ -1,5 +1,20 @@
 {
     "Names": {
-        "ar_EH": "árabe (Sahara Occidental)"
+        "ar_EH": "árabe (Sahara Occidental)",
+        "bs_BA": "bosnio (Bosnia y Herzegovina)",
+        "bs_Cyrl_BA": "bosnio (cirílico, Bosnia y Herzegovina)",
+        "bs_Latn_BA": "bosnio (latino, Bosnia y Herzegovina)",
+        "hr_BA": "croata (Bosnia y Herzegovina)",
+        "pa": "punyabí",
+        "pa_Arab": "punyabí (árabe)",
+        "pa_Arab_PK": "punyabí (árabe, Pakistán)",
+        "pa_Guru": "punyabí (gurmuji)",
+        "pa_Guru_IN": "punyabí (gurmuji, India)",
+        "pa_IN": "punyabí (India)",
+        "pa_PK": "punyabí (Pakistán)",
+        "sh_BA": "serbocroata (Bosnia y Herzegovina)",
+        "sr_BA": "serbio (Bosnia y Herzegovina)",
+        "sr_Cyrl_BA": "serbio (cirílico, Bosnia y Herzegovina)",
+        "sr_Latn_BA": "serbio (latino, Bosnia y Herzegovina)"
     }
 }

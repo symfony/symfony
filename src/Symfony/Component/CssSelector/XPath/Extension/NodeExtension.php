@@ -37,8 +37,6 @@ class NodeExtension extends AbstractExtension
     private $flags;
 
     /**
-     * Constructor.
-     *
      * @param int $flags
      */
     public function __construct($flags = 0)
@@ -72,7 +70,7 @@ class NodeExtension extends AbstractExtension
      */
     public function hasFlag($flag)
     {
-        return $this->flags & $flag;
+        return (bool) ($this->flags & $flag);
     }
 
     /**

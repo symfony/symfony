@@ -15,6 +15,8 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\ResettableInterface;
 
 /**
  * Chains several adapters together.
@@ -24,7 +26,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ChainAdapter implements AdapterInterface
+class ChainAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
 {
     private $adapters = array();
     private $adapterCount;
@@ -230,5 +232,33 @@ class ChainAdapter implements AdapterInterface
         }
 
         return $committed;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prune()
+    {
+        $pruned = true;
+
+        foreach ($this->adapters as $adapter) {
+            if ($adapter instanceof PruneableInterface) {
+                $pruned = $adapter->prune() && $pruned;
+            }
+        }
+
+        return $pruned;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        foreach ($this->adapters as $adapter) {
+            if ($adapter instanceof ResettableInterface) {
+                $adapter->reset();
+            }
+        }
     }
 }

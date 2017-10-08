@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added using options from Memcached DSN
+ * added PruneableInterface so PSR-6 or PSR-16 cache implementations can declare support for manual stale cache pruning
+ * added prune logic to FilesystemTrait, PhpFilesTrait, PdoTrait, TagAwareAdapter and ChainTrait
+ * now FilesystemAdapter, PhpFilesAdapter, FilesystemCache, PhpFilesCache, PdoAdapter, PdoCache, ChainAdapter, and
+   ChainCache implement PruneableInterface and support manual stale cache pruning
+
+3.3.0
+-----
+
+ * [EXPERIMENTAL] added CacheItem::getPreviousTags() to get bound tags coming from the pool storage if any
+ * added PSR-16 "Simple Cache" implementations for all existing PSR-6 adapters
+ * added Psr6Cache and SimpleCacheAdapter for bidirectional interoperability between PSR-6 and PSR-16
+ * added MemcachedAdapter (PSR-6) and MemcachedCache (PSR-16)
+ * added TraceableAdapter (PSR-6) and TraceableCache (PSR-16)
+
 3.2.0
 -----
 

@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -20,43 +18,38 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
+    private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = array();
+        $this->services = $this->privates = array();
 
         $this->aliases = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function compile()
+    public function reset()
     {
-        throw new LogicException('You cannot compile a dumped frozen container.');
+        $this->privates = array();
+        parent::reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFrozen()
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
+    }
+
+    public function isCompiled()
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameter($name)
     {
-        $name = strtolower($name);
+        $name = (string) $name;
 
-        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]))) {
+        if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
         if (isset($this->loadedDynamicParameters[$name])) {
@@ -66,27 +59,18 @@ class ProjectServiceContainer extends Container
         return $this->parameters[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameter($name)
     {
-        $name = strtolower($name);
+        $name = (string) $name;
 
-        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]);
+        return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParameter($name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {

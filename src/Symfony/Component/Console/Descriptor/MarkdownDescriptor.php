@@ -17,6 +17,7 @@ use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Markdown descriptor.
@@ -27,6 +28,27 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class MarkdownDescriptor extends Descriptor
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function describe(OutputInterface $output, $object, array $options = array())
+    {
+        $decorated = $output->isDecorated();
+        $output->setDecorated(false);
+
+        parent::describe($output, $object, $options);
+
+        $output->setDecorated($decorated);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function write($content, $decorated = true)
+    {
+        parent::write($content, $decorated);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -123,8 +145,9 @@ class MarkdownDescriptor extends Descriptor
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);
+        $title = $this->getApplicationTitle($application);
 
-        $this->write($application->getLongVersion()."\n".str_repeat('=', Helper::strlen($application->getLongVersion())));
+        $this->write($title."\n".str_repeat('=', Helper::strlen($title)));
 
         foreach ($description->getNamespaces() as $namespace) {
             if (ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {
@@ -133,8 +156,8 @@ class MarkdownDescriptor extends Descriptor
             }
 
             $this->write("\n\n");
-            $this->write(implode("\n", array_map(function ($commandName) {
-                return '* `'.$commandName.'`';
+            $this->write(implode("\n", array_map(function ($commandName) use ($description) {
+                return sprintf('* [`%s`](#%s)', $commandName, str_replace(':', '', $description->getCommand($commandName)->getName()));
             }, $namespace['commands'])));
         }
 
@@ -142,5 +165,18 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\n");
             $this->write($this->describeCommand($command));
         }
+    }
+
+    private function getApplicationTitle(Application $application)
+    {
+        if ('UNKNOWN' !== $application->getName()) {
+            if ('UNKNOWN' !== $application->getVersion()) {
+                return sprintf('%s %s', $application->getName(), $application->getVersion());
+            }
+
+            return $application->getName();
+        }
+
+        return 'Console Tool';
     }
 }

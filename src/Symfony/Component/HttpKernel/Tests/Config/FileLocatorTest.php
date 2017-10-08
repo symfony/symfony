@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Config;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
-class FileLocatorTest extends \PHPUnit_Framework_TestCase
+class FileLocatorTest extends TestCase
 {
     public function testLocate()
     {
@@ -29,7 +30,7 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
         $kernel
             ->expects($this->never())
             ->method('locateResource');
-        $this->setExpectedException('LogicException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('LogicException');
         $locator->locate('/some/path');
     }
 

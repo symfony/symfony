@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
 use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 
-class ChainEncoderTest extends \PHPUnit_Framework_TestCase
+class ChainEncoderTest extends TestCase
 {
     const FORMAT_1 = 'format1';
     const FORMAT_2 = 'format2';
@@ -33,9 +34,10 @@ class ChainEncoderTest extends \PHPUnit_Framework_TestCase
         $this->encoder1
             ->method('supportsEncoding')
             ->will($this->returnValueMap(array(
-                array(self::FORMAT_1, true),
-                array(self::FORMAT_2, false),
-                array(self::FORMAT_3, false),
+                array(self::FORMAT_1, array(), true),
+                array(self::FORMAT_2, array(), false),
+                array(self::FORMAT_3, array(), false),
+                array(self::FORMAT_3, array('foo' => 'bar'), true),
             )));
 
         $this->encoder2 = $this
@@ -45,9 +47,9 @@ class ChainEncoderTest extends \PHPUnit_Framework_TestCase
         $this->encoder2
             ->method('supportsEncoding')
             ->will($this->returnValueMap(array(
-                array(self::FORMAT_1, false),
-                array(self::FORMAT_2, true),
-                array(self::FORMAT_3, false),
+                array(self::FORMAT_1, array(), false),
+                array(self::FORMAT_2, array(), true),
+                array(self::FORMAT_3, array(), false),
             )));
 
         $this->chainEncoder = new ChainEncoder(array($this->encoder1, $this->encoder2));
@@ -58,6 +60,7 @@ class ChainEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_1));
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_2));
         $this->assertFalse($this->chainEncoder->supportsEncoding(self::FORMAT_3));
+        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, array('foo' => 'bar')));
     }
 
     public function testEncode()

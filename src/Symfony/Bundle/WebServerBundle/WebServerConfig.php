@@ -28,21 +28,35 @@ class WebServerConfig
             throw new \InvalidArgumentException(sprintf('The document root directory "%s" does not exist.', $documentRoot));
         }
 
-        if (null === $file = $this->guessFrontController($documentRoot, $env)) {
-            throw new \InvalidArgumentException(sprintf('Unable to guess the front controller under "%s".', $documentRoot));
+        if (null === $file = $this->findFrontController($documentRoot, $env)) {
+            throw new \InvalidArgumentException(sprintf('Unable to find the front controller under "%s" (none of these files exist: %s).', $documentRoot, implode(', ', $this->getFrontControllerFileNames($env))));
         }
 
         putenv('APP_FRONT_CONTROLLER='.$file);
 
         $this->documentRoot = $documentRoot;
         $this->env = $env;
-        $this->router = $router ?: __DIR__.'/Resources/router.php';
+
+        if (null !== $router) {
+            $absoluteRouterPath = realpath($router);
+
+            if (false === $absoluteRouterPath) {
+                throw new \InvalidArgumentException(sprintf('Router script "%s" does not exist.', $router));
+            }
+
+            $this->router = $absoluteRouterPath;
+        } else {
+            $this->router = __DIR__.'/Resources/router.php';
+        }
 
         if (null === $address) {
             $this->hostname = '127.0.0.1';
             $this->port = $this->findBestPort();
         } elseif (false !== $pos = strrpos($address, ':')) {
             $this->hostname = substr($address, 0, $pos);
+            if ('*' === $this->hostname) {
+                $this->hostname = '0.0.0.0';
+            }
             $this->port = substr($address, $pos + 1);
         } elseif (ctype_digit($address)) {
             $this->hostname = '127.0.0.1';
@@ -87,25 +101,26 @@ class WebServerConfig
         return $this->hostname.':'.$this->port;
     }
 
-    private function guessFrontController($documentRoot, $env)
+    private function findFrontController($documentRoot, $env)
     {
-        foreach (array('app', 'index') as $prefix) {
-            $file = sprintf('%s_%s.php', $prefix, $env);
-            if (file_exists($documentRoot.'/'.$file)) {
-                return $file;
-            }
+        $fileNames = $this->getFrontControllerFileNames($env);
 
-            $file = sprintf('%s.php', $prefix);
-            if (file_exists($documentRoot.'/'.$file)) {
-                return $file;
+        foreach ($fileNames as $fileName) {
+            if (file_exists($documentRoot.'/'.$fileName)) {
+                return $fileName;
             }
         }
+    }
+
+    private function getFrontControllerFileNames($env)
+    {
+        return array('app_'.$env.'.php', 'app.php', 'index_'.$env.'.php', 'index.php');
     }
 
     private function findBestPort()
     {
         $port = 8000;
-        while (false !== $fp = @fsockopen('127.0.0.1', $port, $errno, $errstr, 1)) {
+        while (false !== $fp = @fsockopen($this->hostname, $port, $errno, $errstr, 1)) {
             fclose($fp);
             if ($port++ >= 8100) {
                 throw new \RuntimeException('Unable to find a port available to run the web server.');

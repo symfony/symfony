@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Routing\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCompiler;
 
-class RouteCompilerTest extends \PHPUnit_Framework_TestCase
+class RouteCompilerTest extends TestCase
 {
     /**
      * @dataProvider provideCompileData
@@ -126,7 +127,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with a variable in last position',
                 array('/foo-{bar}'),
-                '/foo', '#^/foo\-(?P<bar>[^/]++)$#s', array('bar'), array(
+                '/foo-', '#^/foo\-(?P<bar>[^/]++)$#s', array('bar'), array(
                     array('variable', '-', '[^/]++', 'bar'),
                     array('text', '/foo'),
                 ),
@@ -183,9 +184,8 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
      * @dataProvider provideCompileImplicitUtf8Data
-     * @expectedDeprecation Using UTF-8 route %s without setting the "utf8" option is deprecated %s.
+     * @expectedException \LogicException
      */
     public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens, $deprecationType)
     {

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.73",
+    "Version": "2.1.32.59",
     "Names": {
         "Afak": "Afaka",
         "Aghb": "Kafkas Albanyası",
@@ -44,6 +44,7 @@
         "Grek": "Yunan",
         "Gujr": "Gücerat",
         "Guru": "Gurmukhi",
+        "Hanb": "Hanb",
         "Hang": "Hangıl",
         "Hani": "Han",
         "Hano": "Hanunoo",
@@ -57,6 +58,7 @@
         "Hung": "Eski Macar",
         "Inds": "Indus",
         "Ital": "Eski İtalyan",
+        "Jamo": "Jamo",
         "Java": "Cava Dili",
         "Jpan": "Japon",
         "Jurc": "Jurchen",
@@ -161,6 +163,7 @@
         "Yiii": "Yi",
         "Zinh": "Kalıtsal",
         "Zmth": "Matematiksel Gösterim",
+        "Zsye": "Emoji",
         "Zsym": "Sembol",
         "Zxxx": "Yazılı Olmayan",
         "Zyyy": "Ortak",

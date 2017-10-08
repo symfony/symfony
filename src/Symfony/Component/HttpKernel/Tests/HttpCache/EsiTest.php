@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EsiTest extends \PHPUnit_Framework_TestCase
+class EsiTest extends TestCase
 {
     public function testHasSurrogateEsiCapability()
     {

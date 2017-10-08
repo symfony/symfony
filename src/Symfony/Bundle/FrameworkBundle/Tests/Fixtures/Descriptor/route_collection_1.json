@@ -27,9 +27,7 @@
         "scheme": "http|https",
         "method": "PUT|POST",
         "class": "Symfony\\Component\\Routing\\Route",
-        "defaults": [
-
-        ],
+        "defaults": [],
         "requirements": "NO CUSTOM",
         "options": {
             "compiler_class": "Symfony\\Component\\Routing\\RouteCompiler",

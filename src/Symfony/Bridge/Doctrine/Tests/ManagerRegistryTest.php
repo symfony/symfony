@@ -11,13 +11,17 @@
 
 namespace Symfony\Bridge\Doctrine\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper\PhpDumperTest;
 
-class ManagerRegistryTest extends \PHPUnit_Framework_TestCase
+class ManagerRegistryTest extends TestCase
 {
     public static function setUpBeforeClass()
     {
+        if (!class_exists('PHPUnit_Framework_TestCase')) {
+            self::markTestSkipped('proxy-manager-bridge is not yet compatible with namespaced phpunit versions.');
+        }
         $test = new PhpDumperTest();
         $test->testDumpContainerWithProxyServiceWillShareProxies();
     }
@@ -27,7 +31,7 @@ class ManagerRegistryTest extends \PHPUnit_Framework_TestCase
         $container = new \LazyServiceProjectServiceContainer();
 
         $registry = new TestManagerRegistry('name', array(), array('defaultManager' => 'foo'), 'defaultConnection', 'defaultManager', 'proxyInterfaceName');
-        $registry->setContainer($container);
+        $registry->setTestContainer($container);
 
         $foo = $container->get('foo');
         $foo->bar = 123;
@@ -42,6 +46,11 @@ class ManagerRegistryTest extends \PHPUnit_Framework_TestCase
 
 class TestManagerRegistry extends ManagerRegistry
 {
+    public function setTestContainer($container)
+    {
+        $this->container = $container;
+    }
+
     public function getAliasNamespace($alias)
     {
         return 'Foo';

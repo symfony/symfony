@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:sec="http://symfony.com/schema/dic/security"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <sec:config>
+        <sec:providers>
+            <sec:provider name="default" id="foo" />
+        </sec:providers>
+
+        <sec:firewalls>
+            <sec:firewall name="main" logout-on-user-change="true">
+                <sec:form_login provider="default" />
+            </sec:firewall>
+        </sec:firewalls>
+    </sec:config>
+
+</container>

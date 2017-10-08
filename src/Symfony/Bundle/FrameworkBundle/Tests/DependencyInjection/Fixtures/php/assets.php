@@ -24,6 +24,9 @@ $container->loadFromExtension('framework', array(
                 'base_urls' => array('https://bar2.example.com'),
                 'version_strategy' => 'assets.custom_version_strategy',
             ),
+            'json_manifest_strategy' => array(
+                'json_manifest_path' => '/path/to/manifest.json',
+            ),
         ),
     ),
 ));

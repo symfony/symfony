@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class ArrayDenormalizerTest extends \PHPUnit_Framework_TestCase
+class ArrayDenormalizerTest extends TestCase
 {
     /**
      * @var ArrayDenormalizer

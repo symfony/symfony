@@ -28,6 +28,10 @@ class DoctrineDataCollector extends DataCollector
     private $registry;
     private $connections;
     private $managers;
+
+    /**
+     * @var DebugStack[]
+     */
     private $loggers = array();
 
     public function __construct(ManagerRegistry $registry)
@@ -63,6 +67,16 @@ class DoctrineDataCollector extends DataCollector
             'connections' => $this->connections,
             'managers' => $this->managers,
         );
+    }
+
+    public function reset()
+    {
+        $this->data = array();
+
+        foreach ($this->loggers as $logger) {
+            $logger->queries = array();
+            $logger->currentQuery = 0;
+        }
     }
 
     public function getManagers()
@@ -159,7 +173,11 @@ class DoctrineDataCollector extends DataCollector
     private function sanitizeParam($var)
     {
         if (is_object($var)) {
-            return array(sprintf('Object(%s)', get_class($var)), false);
+            $className = get_class($var);
+
+            return method_exists($var, '__toString') ?
+                array(sprintf('Object(%s): "%s"', $className, $var->__toString()), false) :
+                array(sprintf('Object(%s)', $className), false);
         }
 
         if (is_array($var)) {

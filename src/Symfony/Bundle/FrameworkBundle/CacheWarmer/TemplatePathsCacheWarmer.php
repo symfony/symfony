@@ -26,8 +26,6 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     protected $locator;
 
     /**
-     * Constructor.
-     *
      * @param TemplateFinderInterface $finder  A template finder
      * @param TemplateLocator         $locator The template locator
      */
@@ -35,7 +33,6 @@ class TemplatePathsCacheWarmer extends CacheWarmer
     {
         $this->finder = $finder;
         $this->locator = $locator;
-        $this->filesystem = new Filesystem();
     }
 
     /**
@@ -45,10 +42,11 @@ class TemplatePathsCacheWarmer extends CacheWarmer
      */
     public function warmUp($cacheDir)
     {
+        $filesystem = new Filesystem();
         $templates = array();
 
         foreach ($this->finder->findAllTemplates() as $template) {
-            $templates[$template->getLogicalName()] = rtrim($this->filesystem->makePathRelative($this->locator->locate($template), $cacheDir), '/');
+            $templates[$template->getLogicalName()] = rtrim($filesystem->makePathRelative($this->locator->locate($template), $cacheDir), '/');
         }
 
         $templates = str_replace("' => '", "' => __DIR__.'/", var_export($templates, true));

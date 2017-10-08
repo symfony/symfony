@@ -49,7 +49,7 @@ class ParameterBag implements ParameterBagInterface
     public function add(array $parameters)
     {
         foreach ($parameters as $key => $value) {
-            $this->parameters[strtolower($key)] = $value;
+            $this->set($key, $value);
         }
     }
 
@@ -66,7 +66,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function get($name)
     {
-        $name = strtolower($name);
+        $name = (string) $name;
 
         if (!array_key_exists($name, $this->parameters)) {
             if (!$name) {
@@ -111,7 +111,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function set($name, $value)
     {
-        $this->parameters[strtolower($name)] = $value;
+        $this->parameters[(string) $name] = $value;
     }
 
     /**
@@ -119,7 +119,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function has($name)
     {
-        return array_key_exists(strtolower($name), $this->parameters);
+        return array_key_exists((string) $name, $this->parameters);
     }
 
     /**
@@ -129,7 +129,7 @@ class ParameterBag implements ParameterBagInterface
      */
     public function remove($name)
     {
-        unset($this->parameters[strtolower($name)]);
+        unset($this->parameters[(string) $name]);
     }
 
     /**
@@ -167,7 +167,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
-     * @throws RuntimeException                    when a given parameter has a type problem.
+     * @throws RuntimeException                    when a given parameter has a type problem
      */
     public function resolveValue($value, array $resolving = array())
     {
@@ -197,7 +197,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
-     * @throws RuntimeException                    when a given parameter has a type problem.
+     * @throws RuntimeException                    when a given parameter has a type problem
      */
     public function resolveString($value, array $resolving = array())
     {
@@ -206,13 +206,12 @@ class ParameterBag implements ParameterBagInterface
         // a non-string in a parameter value
         if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
             $key = $match[1];
-            $lcKey = strtolower($key);
 
-            if (isset($resolving[$lcKey])) {
+            if (isset($resolving[$key])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
             }
 
-            $resolving[$lcKey] = true;
+            $resolving[$key] = true;
 
             return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
         }
@@ -224,8 +223,7 @@ class ParameterBag implements ParameterBagInterface
             }
 
             $key = $match[1];
-            $lcKey = strtolower($key);
-            if (isset($resolving[$lcKey])) {
+            if (isset($resolving[$key])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
             }
 
@@ -236,7 +234,7 @@ class ParameterBag implements ParameterBagInterface
             }
 
             $resolved = (string) $resolved;
-            $resolving[$lcKey] = true;
+            $resolving[$key] = true;
 
             return $this->isResolved() ? $resolved : $this->resolveString($resolved, $resolving);
         }, $value);

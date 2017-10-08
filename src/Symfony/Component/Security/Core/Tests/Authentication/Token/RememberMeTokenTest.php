@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Role\Role;
 
-class RememberMeTokenTest extends \PHPUnit_Framework_TestCase
+class RememberMeTokenTest extends TestCase
 {
     public function testConstructor()
     {

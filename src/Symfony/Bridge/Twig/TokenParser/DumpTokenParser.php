@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Twig\TokenParser;
 
 use Symfony\Bridge\Twig\Node\DumpNode;
+use Twig\Token;
+use Twig\TokenParser\AbstractTokenParser;
 
 /**
  * Token Parser for the 'dump' tag.
@@ -25,18 +27,18 @@ use Symfony\Bridge\Twig\Node\DumpNode;
  *
  * @author Julien Galenski <julien.galenski@gmail.com>
  */
-class DumpTokenParser extends \Twig_TokenParser
+class DumpTokenParser extends AbstractTokenParser
 {
     /**
      * {@inheritdoc}
      */
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token)
     {
         $values = null;
-        if (!$this->parser->getStream()->test(\Twig_Token::BLOCK_END_TYPE)) {
+        if (!$this->parser->getStream()->test(Token::BLOCK_END_TYPE)) {
             $values = $this->parser->getExpressionParser()->parseMultitargetExpression();
         }
-        $this->parser->getStream()->expect(\Twig_Token::BLOCK_END_TYPE);
+        $this->parser->getStream()->expect(Token::BLOCK_END_TYPE);
 
         return new DumpNode($this->parser->getVarName(), $values, $token->getLine(), $this->getTag());
     }

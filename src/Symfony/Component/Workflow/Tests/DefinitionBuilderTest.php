@@ -2,10 +2,11 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Transition;
 
-class DefinitionBuilderTest extends \PHPUnit_Framework_TestCase
+class DefinitionBuilderTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException

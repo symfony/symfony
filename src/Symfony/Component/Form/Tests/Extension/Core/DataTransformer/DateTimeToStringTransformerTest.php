@@ -110,7 +110,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $transformer->transform('1234');
     }
@@ -118,21 +118,9 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testReverseTransformUsingPipe($format, $input, $output)
+    public function testReverseTransform($format, $input, $output)
     {
-        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, true);
-
-        $output = new \DateTime($output);
-
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
-    }
-
-    /**
-     * @dataProvider dataProvider
-     */
-    public function testReverseTransformWithoutUsingPipe($format, $input, $output)
-    {
-        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, false);
+        $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
 
         $output = new \DateTime($output);
 
@@ -161,7 +149,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $reverseTransformer->reverseTransform(1234);
     }
@@ -170,7 +158,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $reverseTransformer->reverseTransform('2010-2010-2010');
     }
@@ -179,7 +167,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
-        $this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Exception\TransformationFailedException');
 
         $reverseTransformer->reverseTransform('2010-04-31');
     }

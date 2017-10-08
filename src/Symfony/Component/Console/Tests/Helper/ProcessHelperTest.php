@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Process\Process;
 
-class ProcessHelperTest extends \PHPUnit_Framework_TestCase
+class ProcessHelperTest extends TestCase
 {
     /**
      * @dataProvider provideCommandsAndOutput
@@ -83,9 +84,9 @@ EOT;
 EOT;
 
         $errorMessage = 'An error occurred';
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $successOutputProcessDebug = str_replace("'", '"', $successOutputProcessDebug);
-        }
+        $args = new Process(array('php', '-r', 'echo 42;'));
+        $args = $args->getCommandLine();
+        $successOutputProcessDebug = str_replace("'php' '-r' 'echo 42;'", $args, $successOutputProcessDebug);
 
         return array(
             array('', 'php -r "echo 42;"', StreamOutput::VERBOSITY_VERBOSE, null),

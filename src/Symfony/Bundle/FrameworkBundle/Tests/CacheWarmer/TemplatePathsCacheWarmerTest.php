@@ -35,7 +35,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
 
     private $tmpDir;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->templateFinder = $this
             ->getMockBuilder(TemplateFinderInterface::class)
@@ -56,7 +56,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
         $this->filesystem->mkdir($this->tmpDir);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->filesystem->remove($this->tmpDir);
     }

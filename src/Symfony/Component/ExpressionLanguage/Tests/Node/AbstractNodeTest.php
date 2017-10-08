@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Compiler;
 
-abstract class AbstractNodeTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractNodeTest extends TestCase
 {
     /**
      * @dataProvider getEvaluateData

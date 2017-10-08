@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Templating\DelegatingEngine as BaseDelegatingEngine;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -25,8 +25,6 @@ class DelegatingEngine extends BaseDelegatingEngine implements EngineInterface
     protected $container;
 
     /**
-     * Constructor.
-     *
      * @param ContainerInterface $container The DI container
      * @param array              $engineIds An array of engine Ids
      */

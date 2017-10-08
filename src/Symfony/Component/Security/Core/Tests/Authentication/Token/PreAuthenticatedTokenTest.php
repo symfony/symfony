@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Role\Role;
 
-class PreAuthenticatedTokenTest extends \PHPUnit_Framework_TestCase
+class PreAuthenticatedTokenTest extends TestCase
 {
     public function testConstructor()
     {

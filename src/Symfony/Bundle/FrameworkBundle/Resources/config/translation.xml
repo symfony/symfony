@@ -5,26 +5,31 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults public="false" />
+
         <service id="translator.default" class="Symfony\Bundle\FrameworkBundle\Translation\Translator">
-            <argument type="service" id="service_container" />
-            <argument type="service" id="translator.selector" />
-            <argument type="collection" /> <!-- translation loaders -->
+            <argument /> <!-- translation loaders locator -->
+            <argument type="service" id="translator.formatter" />
+            <argument>%kernel.default_locale%</argument>
+            <argument type="collection" /> <!-- translation loaders ids -->
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
-            <argument type="collection" /> <!-- translation resources -->
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
             </call>
-
-            <autowiring-type>Symfony\Component\Translation\TranslatorInterface</autowiring-type>
         </service>
+        <service id="Symfony\Component\Translation\TranslatorInterface" alias="translator" />
 
-        <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator" public="false">
+        <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator">
             <argument type="service" id="translator.logging.inner" />
             <argument type="service" id="logger" />
             <tag name="monolog.logger" channel="translation" />
+        </service>
+
+        <service id="translator.formatter.default" class="Symfony\Component\Translation\Formatter\MessageFormatter">
+            <argument type="service" id="translator.selector" />
         </service>
 
         <service id="translation.loader.php" class="Symfony\Component\Translation\Loader\PhpFileLoader">
@@ -32,7 +37,7 @@
         </service>
 
         <service id="translation.loader.yml" class="Symfony\Component\Translation\Loader\YamlFileLoader">
-            <tag name="translation.loader" alias="yml" />
+            <tag name="translation.loader" alias="yaml" legacy-alias="yml" />
         </service>
 
         <service id="translation.loader.xliff" class="Symfony\Component\Translation\Loader\XliffFileLoader">
@@ -91,6 +96,11 @@
             <tag name="translation.dumper" alias="yml" />
         </service>
 
+        <service id="translation.dumper.yaml" class="Symfony\Component\Translation\Dumper\YamlFileDumper">
+            <argument>yaml</argument>
+            <tag name="translation.dumper" alias="yaml" />
+        </service>
+
         <service id="translation.dumper.qt" class="Symfony\Component\Translation\Dumper\QtFileDumper">
             <tag name="translation.dumper" alias="ts" />
         </service>
@@ -111,19 +121,20 @@
             <tag name="translation.dumper" alias="res" />
         </service>
 
-        <service id="translation.extractor.php" class="Symfony\Bundle\FrameworkBundle\Translation\PhpExtractor">
+        <service id="translation.extractor.php" class="Symfony\Component\Translation\Extractor\PhpExtractor">
             <tag name="translation.extractor" alias="php" />
         </service>
 
-        <service id="translation.loader" class="Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader"/>
+        <service id="translation.reader" class="Symfony\Component\Translation\Reader\TranslationReader" />
 
-        <service id="translation.extractor" class="Symfony\Component\Translation\Extractor\ChainExtractor"/>
+        <service id="translation.extractor" class="Symfony\Component\Translation\Extractor\ChainExtractor" />
 
-        <service id="translation.writer" class="Symfony\Component\Translation\Writer\TranslationWriter"/>
+        <service id="translation.writer" class="Symfony\Component\Translation\Writer\TranslationWriter" />
 
-        <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer" public="false">
-            <argument type="service" id="translator" />
+        <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer">
+            <tag name="container.service_subscriber" id="translator" />
             <tag name="kernel.cache_warmer" />
+            <argument type="service" id="Psr\Container\ContainerInterface" />
         </service>
 
         <service id="translator_listener" class="Symfony\Component\HttpKernel\EventListener\TranslatorListener">

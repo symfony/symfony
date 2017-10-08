@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.59",
     "Names": {
         "ADP": [
             "ADP",
@@ -201,9 +201,13 @@
             "BYB",
             "Valgevene uus rubla (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Valgevene rubla"
+        ],
         "BYR": [
             "BYR",
-            "Valgevene rubla"
+            "Valgevene rubla (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -696,7 +700,7 @@
         ],
         "PEN": [
             "PEN",
-            "Peruu uus soll"
+            "Peruu soll"
         ],
         "PES": [
             "PES",

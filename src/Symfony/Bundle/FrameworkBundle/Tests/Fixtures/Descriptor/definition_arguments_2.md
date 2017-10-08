@@ -5,6 +5,7 @@
 - Shared: yes
 - Abstract: no
 - Autowired: no
+- Autoconfigured: no
 - Arguments: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`

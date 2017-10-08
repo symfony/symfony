@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -24,7 +25,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
+class ExceptionListenerTest extends TestCase
 {
     /**
      * @dataProvider getAuthenticationExceptionProvider
@@ -43,14 +44,19 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getAuthenticationExceptionProvider
      */
-    public function testAuthenticationExceptionWithEntryPoint(\Exception $exception, \Exception $eventException = null)
+    public function testAuthenticationExceptionWithEntryPoint(\Exception $exception)
     {
-        $event = $this->createEvent($exception = new AuthenticationException());
+        $event = $this->createEvent($exception);
 
-        $listener = $this->createExceptionListener(null, null, null, $this->createEntryPoint());
+        $response = new Response('Forbidden', 403);
+
+        $listener = $this->createExceptionListener(null, null, null, $this->createEntryPoint($response));
         $listener->onKernelException($event);
 
-        $this->assertEquals('OK', $event->getResponse()->getContent());
+        $this->assertTrue($event->isAllowingCustomResponseCode());
+
+        $this->assertEquals('Forbidden', $event->getResponse()->getContent());
+        $this->assertEquals(403, $event->getResponse()->getStatusCode());
         $this->assertSame($exception, $event->getException());
     }
 
@@ -99,7 +105,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithErrorPage(\Exception $exception, \Exception $eventException = null)
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
-        $kernel->expects($this->once())->method('handle')->will($this->returnValue(new Response('error')));
+        $kernel->expects($this->once())->method('handle')->will($this->returnValue(new Response('Unauthorized', 401)));
 
         $event = $this->createEvent($exception, $kernel);
 
@@ -109,7 +115,10 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $listener = $this->createExceptionListener(null, $this->createTrustResolver(true), $httpUtils, null, '/error');
         $listener->onKernelException($event);
 
-        $this->assertEquals('error', $event->getResponse()->getContent());
+        $this->assertTrue($event->isAllowingCustomResponseCode());
+
+        $this->assertEquals('Unauthorized', $event->getResponse()->getContent());
+        $this->assertEquals(401, $event->getResponse()->getStatusCode());
         $this->assertSame(null === $eventException ? $exception : $eventException, $event->getException()->getPrevious());
     }
 
@@ -158,10 +167,10 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    private function createEntryPoint()
+    private function createEntryPoint(Response $response = null)
     {
         $entryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
-        $entryPoint->expects($this->once())->method('start')->will($this->returnValue(new Response('OK')));
+        $entryPoint->expects($this->once())->method('start')->will($this->returnValue($response ?: new Response('OK')));
 
         return $entryPoint;
     }

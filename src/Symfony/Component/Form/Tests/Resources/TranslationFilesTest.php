@@ -11,14 +11,22 @@
 
 namespace Symfony\Component\Form\Tests\Resources;
 
-class TranslationFilesTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class TranslationFilesTest extends TestCase
 {
     /**
      * @dataProvider provideTranslationFiles
      */
     public function testTranslationFileIsValid($filePath)
     {
-        \PHPUnit_Util_XML::loadfile($filePath, false, false, true);
+        if (class_exists('PHPUnit_Util_XML')) {
+            \PHPUnit_Util_XML::loadfile($filePath, false, false, true);
+        } else {
+            \PHPUnit\Util\XML::loadfile($filePath, false, false, true);
+        }
+
+        $this->addToAssertionCount(1);
     }
 
     public function provideTranslationFiles()

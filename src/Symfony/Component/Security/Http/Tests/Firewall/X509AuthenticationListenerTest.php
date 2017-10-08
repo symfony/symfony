@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Firewall\X509AuthenticationListener;
 
-class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
+class X509AuthenticationListenerTest extends TestCase
 {
     /**
      * @dataProvider dataProviderGetPreAuthenticatedData

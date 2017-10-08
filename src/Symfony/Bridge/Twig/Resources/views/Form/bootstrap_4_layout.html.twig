@@ -1,0 +1,132 @@
+{% use "bootstrap_base_layout.html.twig" %}
+
+{# Widgets #}
+
+{% block form_widget_simple -%}
+    {% if type is not defined or type != 'hidden' %}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control' ~ (type|default('') == 'file' ? '-file' : ''))|trim}) -%}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
+{%- block widget_attributes -%}
+    {%- if not valid %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' is-invalid')|trim}) %}
+    {% endif -%}
+    {{ parent() }}
+{%- endblock widget_attributes -%}
+
+{% block button_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('btn-secondary') ~ ' btn')|trim}) -%}
+    {{- parent() -}}
+{%- endblock button_widget %}
+
+{% block checkbox_widget -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
+    {%- set attr = attr|merge({class: attr.class|default('form-check-input')}) -%}
+    {%- if 'checkbox-inline' in parent_label_class -%}
+        {{- form_label(form, null, { widget: parent() }) -}}
+    {%- else -%}
+        <div class="form-check">
+            {{- form_label(form, null, { widget: parent() }) -}}
+        </div>
+    {%- endif -%}
+{%- endblock checkbox_widget %}
+
+{% block radio_widget -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
+    {%- set attr = attr|merge({class: attr.class|default('form-check-input')}) -%}
+    {%- if 'radio-inline' in parent_label_class -%}
+        {{- form_label(form, null, { widget: parent() }) -}}
+    {%- else -%}
+        <div class="form-check">
+            {{- form_label(form, null, { widget: parent() }) -}}
+        </div>
+    {%- endif -%}
+{%- endblock radio_widget %}
+
+{% block choice_widget_expanded -%}
+    {% if '-inline' in label_attr.class|default('') -%}
+        {%- for child in form %}
+            {{- form_widget(child, {
+                parent_label_class: label_attr.class|default(''),
+                translation_domain: choice_translation_domain,
+                valid: valid,
+            }) -}}
+        {% endfor -%}
+    {%- else -%}
+        <div {{ block('widget_container_attributes') }}>
+            {%- for child in form %}
+                {{- form_widget(child, {
+                    parent_label_class: label_attr.class|default(''),
+                    translation_domain: choice_translation_domain,
+                    valid: valid,
+                }) -}}
+            {% endfor -%}
+        </div>
+    {%- endif %}
+{%- endblock choice_widget_expanded %}
+
+{# Labels #}
+
+{% block form_label -%}
+    {%- if expanded is defined and expanded -%}
+        {%- set element = 'legend' -%}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-legend')|trim}) -%}
+    {%- endif -%}
+    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_label %}
+
+{% block checkbox_radio_label -%}
+    {#- Do not display the label if widget is not defined in order to prevent double label rendering -#}
+    {%- if widget is defined -%}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-check-label')|trim}) -%}
+        {%- if required -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
+        {%- endif -%}
+        {%- if parent_label_class is defined -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|trim}) -%}
+        {%- endif -%}
+        {%- if label is not same as(false) and label is empty -%}
+            {%- if label_format is not empty -%}
+                {%- set label = label_format|replace({
+                    '%name%': name,
+                    '%id%': id,
+                }) -%}
+            {%- else -%}
+                {%- set label = name|humanize -%}
+            {%- endif -%}
+        {%- endif -%}
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {{- widget|raw }} {{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) -}}
+        </label>
+    {%- endif -%}
+{%- endblock checkbox_radio_label %}
+
+{# Rows #}
+
+{% block form_row -%}
+    {%- if expanded is defined and expanded -%}
+        {%- set element = 'fieldset' -%}
+    {%- endif -%}
+    <{{ element|default('div') }} class="form-group">
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+    </{{ element|default('div') }}>
+{%- endblock form_row %}
+
+{# Errors #}
+
+{% block form_errors -%}
+    {%- if errors|length > 0 -%}
+    <div class="{% if form.parent %}invalid-feedback{% else %}alert alert-danger{% endif %}">
+        <ul class="list-unstyled mb-0">
+            {%- for error in errors -%}
+                <li>{{ error.message }}</li>
+            {%- endfor -%}
+        </ul>
+    </div>
+    {%- endif %}
+{%- endblock form_errors %}

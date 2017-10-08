@@ -17,7 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 
-class NoTemplatingEntryTest extends \PHPUnit_Framework_TestCase
+class NoTemplatingEntryTest extends TestCase
 {
     public function test()
     {

@@ -100,8 +100,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @return string Localized value
      *
-     * @throws TransformationFailedException If the given value is not numeric
-     *                                       or if the value can not be transformed.
+     * @throws TransformationFailedException if the given value is not numeric
+     *                                       or if the value can not be transformed
      */
     public function transform($value)
     {
@@ -133,8 +133,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @return int|float The numeric value
      *
-     * @throws TransformationFailedException If the given value is not a string
-     *                                       or if the value can not be transformed.
+     * @throws TransformationFailedException if the given value is not a string
+     *                                       or if the value can not be transformed
      */
     public function reverseTransform($value)
     {
@@ -242,7 +242,8 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         if (null !== $this->scale && null !== $this->roundingMode) {
             // shift number to maintain the correct scale during rounding
             $roundingCoef = pow(10, $this->scale);
-            $number *= $roundingCoef;
+            // string representation to avoid rounding errors, similar to bcmul()
+            $number = (string) ($number * $roundingCoef);
 
             switch ($this->roundingMode) {
                 case self::ROUND_CEILING:

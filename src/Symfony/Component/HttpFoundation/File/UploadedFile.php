@@ -198,7 +198,7 @@ class UploadedFile extends File
      */
     public function isValid()
     {
-        $isOk = $this->error === UPLOAD_ERR_OK;
+        $isOk = UPLOAD_ERR_OK === $this->error;
 
         return $this->test ? $isOk : $isOk && is_uploaded_file($this->getPathname());
     }
@@ -259,8 +259,11 @@ class UploadedFile extends File
 
         switch (substr($iniMax, -1)) {
             case 't': $max *= 1024;
+            // no break
             case 'g': $max *= 1024;
+            // no break
             case 'm': $max *= 1024;
+            // no break
             case 'k': $max *= 1024;
         }
 
@@ -285,7 +288,7 @@ class UploadedFile extends File
         );
 
         $errorCode = $this->error;
-        $maxFilesize = $errorCode === UPLOAD_ERR_INI_SIZE ? self::getMaxFilesize() / 1024 : 0;
+        $maxFilesize = UPLOAD_ERR_INI_SIZE === $errorCode ? self::getMaxFilesize() / 1024 : 0;
         $message = isset($errors[$errorCode]) ? $errors[$errorCode] : 'The file "%s" was not uploaded due to an unknown error.';
 
         return sprintf($message, $this->getClientOriginalName(), $maxFilesize);

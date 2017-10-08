@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -22,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractDescriptorTest extends TestCase
 {
     /** @dataProvider getDescribeRouteCollectionTestData */
     public function testDescribeRouteCollection(RouteCollection $routes, $expectedDescription)
@@ -182,6 +183,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     private function assertDescription($expectedDescription, $describedObject, array $options = array())
     {
         $options['raw_output'] = true;
+        $options['raw_text'] = true;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
 
         if ('txt' === $this->getFormat()) {
@@ -191,9 +193,9 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         $this->getDescriptor()->describe($output, $describedObject, $options);
 
         if ('json' === $this->getFormat()) {
-            $this->assertEquals(json_decode($expectedDescription), json_decode($output->fetch()));
+            $this->assertEquals(json_encode(json_decode($expectedDescription), JSON_PRETTY_PRINT), json_encode(json_decode($output->fetch()), JSON_PRETTY_PRINT));
         } else {
-            $this->assertEquals(trim(preg_replace('/[\s\t\r]+/', ' ', $expectedDescription)), trim(preg_replace('/[\s\t\r]+/', ' ', str_replace(PHP_EOL, "\n", $output->fetch()))));
+            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
         }
     }
 

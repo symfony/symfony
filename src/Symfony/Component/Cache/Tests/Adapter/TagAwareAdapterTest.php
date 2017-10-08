@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
@@ -96,5 +97,89 @@ class TagAwareAdapterTest extends AdapterTestCase
         $pool->invalidateTags(array('foo'));
 
         $this->assertTrue($pool->getItem('k')->isHit());
+    }
+
+    public function testTagItemExpiry()
+    {
+        $pool = $this->createCachePool(10);
+
+        $item = $pool->getItem('foo');
+        $item->tag(array('baz'));
+        $item->expiresAfter(100);
+
+        $pool->save($item);
+        $pool->invalidateTags(array('baz'));
+        $this->assertFalse($pool->getItem('foo')->isHit());
+
+        sleep(20);
+
+        $this->assertFalse($pool->getItem('foo')->isHit());
+    }
+
+    public function testGetPreviousTags()
+    {
+        $pool = $this->createCachePool();
+
+        $i = $pool->getItem('k');
+        $pool->save($i->tag('foo'));
+
+        $i = $pool->getItem('k');
+        $this->assertSame(array('foo' => 'foo'), $i->getPreviousTags());
+    }
+
+    public function testPrune()
+    {
+        $cache = new TagAwareAdapter($this->getPruneableMock());
+        $this->assertTrue($cache->prune());
+
+        $cache = new TagAwareAdapter($this->getNonPruneableMock());
+        $this->assertFalse($cache->prune());
+
+        $cache = new TagAwareAdapter($this->getFailingPruneableMock());
+        $this->assertFalse($cache->prune());
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|PruneableCacheInterface
+     */
+    private function getPruneableMock()
+    {
+        $pruneable = $this
+            ->getMockBuilder(PruneableCacheInterface::class)
+            ->getMock();
+
+        $pruneable
+            ->expects($this->atLeastOnce())
+            ->method('prune')
+            ->will($this->returnValue(true));
+
+        return $pruneable;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|PruneableCacheInterface
+     */
+    private function getFailingPruneableMock()
+    {
+        $pruneable = $this
+            ->getMockBuilder(PruneableCacheInterface::class)
+            ->getMock();
+
+        $pruneable
+            ->expects($this->atLeastOnce())
+            ->method('prune')
+            ->will($this->returnValue(false));
+
+        return $pruneable;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|AdapterInterface
+     */
+    private function getNonPruneableMock()
+    {
+        return $this
+            ->getMockBuilder(AdapterInterface::class)
+            ->getMock();
     }
 }

@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Writer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\PhpBundleWriter;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class PhpBundleWriterTest extends \PHPUnit_Framework_TestCase
+class PhpBundleWriterTest extends TestCase
 {
     /**
      * @var PhpBundleWriter

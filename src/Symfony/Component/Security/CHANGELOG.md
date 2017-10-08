@@ -1,6 +1,42 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * The `AbstractFormLoginAuthenticator::onAuthenticationSuccess()` was removed.
+   You should implement this method yourself in your concrete authenticator.
+ * removed the `AccessDecisionManager::setVoters()` method
+ * removed the `RoleInterface`
+ * removed support for voters that don't implement the `VoterInterface`
+ * added a sixth `string $context` argument to `LogoutUrlGenerator::registerListener()`
+ * removed HTTP digest authentication
+ * removed `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
+ * removed `AbstractGuardAuthenticator::supports()`
+
+3.4.0
+-----
+
+ * Added `getUser`, `getToken` and `isGranted` methods to `Security`.
+ * added a `setToken()` method to the `SwitchUserEvent` class to allow to replace the created token while switching users
+   when custom token generation is required by application. 
+ * Using voters that do not implement the `VoterInterface`is now deprecated in
+   the `AccessDecisionManager` and this functionality will be removed in 4.0.
+ * Using the `ContextListener` without setting the `logoutOnUserChange`
+   property will trigger a deprecation when the user has changed. As of 4.0
+   the user will always be logged out when the user has changed between
+   requests.
+ * deprecated HTTP digest authentication
+ * Added a new password encoder for the Argon2i hashing algorithm
+ * deprecated `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
+
+3.3.0
+-----
+
+ * deprecated `AccessDecisionManager::setVoters()` in favor of passing the
+   voters to the constructor.
+ * [EXPERIMENTAL] added a `json_login` listener for stateless authentication
+
 3.2.0
 -----
 

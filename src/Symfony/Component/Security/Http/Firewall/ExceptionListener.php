@@ -72,7 +72,7 @@ class ExceptionListener
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
-        $dispatcher->addListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'));
+        $dispatcher->addListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'), 1);
     }
 
     /**
@@ -104,7 +104,7 @@ class ExceptionListener
         } while (null !== $exception = $exception->getPrevious());
     }
 
-    private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception)
+    private function handleAuthenticationException(GetResponseForExceptionEvent $event, AuthenticationException $exception): void
     {
         if (null !== $this->logger) {
             $this->logger->info('An AuthenticationException was thrown; redirecting to authentication entry point.', array('exception' => $exception));
@@ -112,6 +112,7 @@ class ExceptionListener
 
         try {
             $event->setResponse($this->startAuthentication($event->getRequest(), $exception));
+            $event->allowCustomResponseCode();
         } catch (\Exception $e) {
             $event->setException($e);
         }
@@ -155,6 +156,7 @@ class ExceptionListener
                 $subRequest->attributes->set(Security::ACCESS_DENIED_ERROR, $exception);
 
                 $event->setResponse($event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true));
+                $event->allowCustomResponseCode();
             }
         } catch (\Exception $e) {
             if (null !== $this->logger) {
@@ -165,22 +167,14 @@ class ExceptionListener
         }
     }
 
-    private function handleLogoutException(LogoutException $exception)
+    private function handleLogoutException(LogoutException $exception): void
     {
         if (null !== $this->logger) {
             $this->logger->info('A LogoutException was thrown.', array('exception' => $exception));
         }
     }
 
-    /**
-     * @param Request                 $request
-     * @param AuthenticationException $authException
-     *
-     * @return Response
-     *
-     * @throws AuthenticationException
-     */
-    private function startAuthentication(Request $request, AuthenticationException $authException)
+    private function startAuthentication(Request $request, AuthenticationException $authException): Response
     {
         if (null === $this->authenticationEntryPoint) {
             throw $authException;
@@ -214,9 +208,6 @@ class ExceptionListener
         return $response;
     }
 
-    /**
-     * @param Request $request
-     */
     protected function setTargetPath(Request $request)
     {
         // session isn't required when using HTTP basic authentication mechanism for example

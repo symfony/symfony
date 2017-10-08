@@ -91,7 +91,7 @@
 
     {% if collector.events is empty %}
         <div class="empty">
-            <p>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</p>
+            <p>No timing events have been recorded. Check that symfony/stopwatch is installed and debugging enabled in the kernel.</p>
         </div>
     {% else %}
         {{ block('panelContent') }}
@@ -107,8 +107,8 @@
     </form>
 
     {% if profile.parent %}
-        <h3>
-            Sub-Request {{ profile.getcollector('request').requestattributes.get('_controller') }}
+        <h3 class="dump-inline">
+            Sub-Request {{ profiler_dump(profile.getcollector('request').requestattributes.get('_controller')) }}
             <small>
                 {{ collector.events.__section__.duration }} ms
                 <a class="newline" href="{{ path('_profiler', { token: profile.parent.token, panel: 'time' }) }}">Return to parent request</a>

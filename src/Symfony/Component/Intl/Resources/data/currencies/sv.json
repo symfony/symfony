@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.66",
+    "Version": "2.1.32.59",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "vitrysk ny rubel (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "vitrysk rubel"
+        ],
         "BYR": [
             "BYR",
-            "vitrysk rubel"
+            "vitrysk rubel (2000–2016)"
         ],
         "BZD": [
             "BZ$",
@@ -443,7 +447,7 @@
         ],
         "GYD": [
             "GYD",
-            "guyanansk dollar"
+            "Guyanadollar"
         ],
         "HKD": [
             "HKD",
@@ -471,10 +475,10 @@
         ],
         "IDR": [
             "IDR",
-            "indonesisk rupiah"
+            "indonesisk rupie"
         ],
         "IEP": [
-            "IEP",
+            "IE£",
             "irländskt pund"
         ],
         "ILP": [
@@ -671,7 +675,7 @@
         ],
         "MOP": [
             "MOP",
-            "macaosk pataca"
+            "makanesisk pataca"
         ],
         "MRO": [
             "MRO",
@@ -775,7 +779,7 @@
         ],
         "PEN": [
             "PEN",
-            "peruansk nuevo sol"
+            "peruansk sol"
         ],
         "PES": [
             "PES",
@@ -1063,7 +1067,7 @@
         ],
         "XFU": [
             "XFU",
-            "French UIC-Franc"
+            "internationella järnvägsunionens franc"
         ],
         "XOF": [
             "CFA",

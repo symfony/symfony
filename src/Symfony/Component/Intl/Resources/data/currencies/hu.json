@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.59",
     "Names": {
         "ADP": [
             "ADP",
@@ -185,9 +185,13 @@
             "BYB",
             "Fehérorosz új rubel (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "fehérorosz rubel"
+        ],
         "BYR": [
             "BYR",
-            "fehérorosz rubel"
+            "fehérorosz rubel (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -699,15 +703,15 @@
         ],
         "PEI": [
             "PEI",
-            "Perui inti"
+            "perui inti"
         ],
         "PEN": [
             "PEN",
-            "perui sol nuevo"
+            "perui sol"
         ],
         "PES": [
             "PES",
-            "Perui sol"
+            "perui sol (1863–1965)"
         ],
         "PGK": [
             "PGK",

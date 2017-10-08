@@ -11,22 +11,21 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Twig\Compiler;
+use Twig\Node\Expression\AbstractExpression;
+use Twig\Node\Node;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TransDefaultDomainNode extends \Twig_Node
+class TransDefaultDomainNode extends Node
 {
-    public function __construct(\Twig_Node_Expression $expr, $lineno = 0, $tag = null)
+    public function __construct(AbstractExpression $expr, $lineno = 0, $tag = null)
     {
         parent::__construct(array('expr' => $expr), array(), $lineno, $tag);
     }
 
-    /**
-     * Compiles the node to PHP.
-     *
-     * @param \Twig_Compiler $compiler A Twig_Compiler instance
-     */
-    public function compile(\Twig_Compiler $compiler)
+    public function compile(Compiler $compiler)
     {
         // noop as this node is just a marker for TranslationDefaultDomainNodeVisitor
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,17 +27,25 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Gábor Egyed <gabor.egyed@gmail.com>
+ *
+ * @final since version 3.4
  */
-class AssetsInstallCommand extends ContainerAwareCommand
+class AssetsInstallCommand extends Command
 {
     const METHOD_COPY = 'copy';
     const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
     const METHOD_RELATIVE_SYMLINK = 'relative symlink';
 
-    /**
-     * @var Filesystem
-     */
+    protected static $defaultName = 'assets:install';
+
     private $filesystem;
+
+    public function __construct(Filesystem $filesystem)
+    {
+        parent::__construct();
+
+        $this->filesystem = $filesystem;
+    }
 
     /**
      * {@inheritdoc}
@@ -44,18 +53,17 @@ class AssetsInstallCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('assets:install')
             ->setDefinition(array(
-                new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', 'web'),
+                new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', 'public'),
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
-            ->setDescription('Installs bundles web assets under a public web directory')
+            ->setDescription('Installs bundles web assets under a public directory')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command installs bundle assets into a given
-directory (e.g. the <comment>web</comment> directory).
+directory (e.g. the <comment>public</comment> directory).
 
-  <info>php %command.full_name% web</info>
+  <info>php %command.full_name% public</info>
 
 A "bundles" directory will be created inside the target directory and the
 "Resources/public" directory of each bundle will be copied into it.
@@ -63,11 +71,11 @@ A "bundles" directory will be created inside the target directory and the
 To create a symlink to each bundle instead of copying its assets, use the
 <info>--symlink</info> option (will fall back to hard copies when symbolic links aren't possible:
 
-  <info>php %command.full_name% web --symlink</info>
+  <info>php %command.full_name% public --symlink</info>
 
 To make symlink relative, add the <info>--relative</info> option:
 
-  <info>php %command.full_name% web --symlink --relative</info>
+  <info>php %command.full_name% public --symlink --relative</info>
 
 EOT
             )
@@ -79,13 +87,16 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $kernel = $this->getApplication()->getKernel();
         $targetArg = rtrim($input->getArgument('target'), '/');
 
         if (!is_dir($targetArg)) {
-            throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
-        }
+            $targetArg = $kernel->getContainer()->getParameter('kernel.project_dir').'/'.$targetArg;
 
-        $this->filesystem = $this->getContainer()->get('filesystem');
+            if (!is_dir($targetArg)) {
+                throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+            }
+        }
 
         // Create the bundles directory otherwise symlink will fail.
         $bundlesDir = $targetArg.'/bundles/';
@@ -110,13 +121,16 @@ EOT
         $rows = array();
         $copyUsed = false;
         $exitCode = 0;
+        $validAssetDirs = array();
         /** @var BundleInterface $bundle */
-        foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
+        foreach ($kernel->getBundles() as $bundle) {
             if (!is_dir($originDir = $bundle->getPath().'/Resources/public')) {
                 continue;
             }
 
-            $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+            $assetDir = preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+            $targetDir = $bundlesDir.$assetDir;
+            $validAssetDirs[] = $assetDir;
 
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $message = sprintf("%s\n-> %s", $bundle->getName(), $targetDir);
@@ -149,6 +163,9 @@ EOT
                 $rows[] = array(sprintf('<fg=red;options=bold>%s</>', '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */), $message, $e->getMessage());
             }
         }
+        // remove the assets of the bundles that no longer exist
+        $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($bundlesDir);
+        $this->filesystem->remove($dirsToRemove);
 
         $io->table(array('', 'Bundle', 'Method / Error'), $rows);
 
@@ -216,7 +233,7 @@ EOT
      * @param string $targetDir
      * @param bool   $relative
      *
-     * @throws IOException If link can not be created.
+     * @throws IOException if link can not be created
      */
     private function symlink($originDir, $targetDir, $relative = false)
     {

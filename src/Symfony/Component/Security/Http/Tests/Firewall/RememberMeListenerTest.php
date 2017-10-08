@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Firewall\RememberMeListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
+class RememberMeListenerTest extends TestCase
 {
     public function testOnCoreSecurityDoesNotTryToPopulateNonEmptyTokenStorage()
     {
@@ -65,6 +66,8 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
     {
         list($listener, $tokenStorage, $service, $manager) = $this->getListener();
+        $request = new Request();
+        $exception = new AuthenticationException('Authentication failed.');
 
         $tokenStorage
             ->expects($this->once())
@@ -81,9 +84,9 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         $service
             ->expects($this->once())
             ->method('loginFail')
+            ->with($request, $exception)
         ;
 
-        $exception = new AuthenticationException('Authentication failed.');
         $manager
             ->expects($this->once())
             ->method('authenticate')
@@ -94,7 +97,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->will($this->returnValue(new Request()))
+            ->will($this->returnValue($request))
         ;
 
         $listener->handle($event);

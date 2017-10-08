@@ -27,9 +27,9 @@ final class PhpDocTypeHelper
     /**
      * Creates a {@see Type} from a PHPDoc type.
      *
-     * @return Type
+     * @return Type[]
      */
-    public function getTypes(DocType $varType)
+    public function getTypes(DocType $varType): array
     {
         $types = array();
         $nullable = false;
@@ -79,11 +79,11 @@ final class PhpDocTypeHelper
      *
      * @return Type|null
      */
-    private function createType($docType, $nullable)
+    private function createType(string $docType, bool $nullable): ?Type
     {
         // Cannot guess
         if (!$docType || 'mixed' === $docType) {
-            return;
+            return null;
         }
 
         if ($collection = '[]' === substr($docType, -2)) {
@@ -101,23 +101,16 @@ final class PhpDocTypeHelper
                 $collectionValueType = null;
             } else {
                 $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
-                $collectionValueType = new Type($phpType, false, $class);
+                $collectionValueType = new Type($phpType, $nullable, $class);
             }
 
-            return new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, $collectionKeyType, $collectionValueType);
+            return new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyType, $collectionValueType);
         }
 
         return new Type($phpType, $nullable, $class);
     }
 
-    /**
-     * Normalizes the type.
-     *
-     * @param string $docType
-     *
-     * @return string
-     */
-    private function normalizeType($docType)
+    private function normalizeType(string $docType): string
     {
         switch ($docType) {
             case 'integer':
@@ -141,14 +134,7 @@ final class PhpDocTypeHelper
         }
     }
 
-    /**
-     * Gets an array containing the PHP type and the class.
-     *
-     * @param string $docType
-     *
-     * @return array
-     */
-    private function getPhpTypeAndClass($docType)
+    private function getPhpTypeAndClass(string $docType): array
     {
         if (in_array($docType, Type::$builtinTypes)) {
             return array($docType, null);

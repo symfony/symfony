@@ -12,6 +12,8 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
+use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\ResettableInterface;
 
 /**
  * An adapter that collects data about all cache calls.
@@ -20,9 +22,9 @@ use Psr\Cache\CacheItemInterface;
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TraceableAdapter implements AdapterInterface
+class TraceableAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
 {
-    private $pool;
+    protected $pool;
     private $calls = array();
 
     public function __construct(AdapterInterface $pool)
@@ -35,18 +37,17 @@ class TraceableAdapter implements AdapterInterface
      */
     public function getItem($key)
     {
-        $event = $this->start(__FUNCTION__, $key);
+        $event = $this->start(__FUNCTION__);
         try {
             $item = $this->pool->getItem($key);
         } finally {
             $event->end = microtime(true);
         }
-        if ($item->isHit()) {
+        if ($event->result[$key] = $item->isHit()) {
             ++$event->hits;
         } else {
             ++$event->misses;
         }
-        $event->result = $item->get();
 
         return $item;
     }
@@ -56,9 +57,9 @@ class TraceableAdapter implements AdapterInterface
      */
     public function hasItem($key)
     {
-        $event = $this->start(__FUNCTION__, $key);
+        $event = $this->start(__FUNCTION__);
         try {
-            return $event->result = $this->pool->hasItem($key);
+            return $event->result[$key] = $this->pool->hasItem($key);
         } finally {
             $event->end = microtime(true);
         }
@@ -69,9 +70,9 @@ class TraceableAdapter implements AdapterInterface
      */
     public function deleteItem($key)
     {
-        $event = $this->start(__FUNCTION__, $key);
+        $event = $this->start(__FUNCTION__);
         try {
-            return $event->result = $this->pool->deleteItem($key);
+            return $event->result[$key] = $this->pool->deleteItem($key);
         } finally {
             $event->end = microtime(true);
         }
@@ -82,9 +83,9 @@ class TraceableAdapter implements AdapterInterface
      */
     public function save(CacheItemInterface $item)
     {
-        $event = $this->start(__FUNCTION__, $item);
+        $event = $this->start(__FUNCTION__);
         try {
-            return $event->result = $this->pool->save($item);
+            return $event->result[$item->getKey()] = $this->pool->save($item);
         } finally {
             $event->end = microtime(true);
         }
@@ -95,9 +96,9 @@ class TraceableAdapter implements AdapterInterface
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        $event = $this->start(__FUNCTION__, $item);
+        $event = $this->start(__FUNCTION__);
         try {
-            return $event->result = $this->pool->saveDeferred($item);
+            return $event->result[$item->getKey()] = $this->pool->saveDeferred($item);
         } finally {
             $event->end = microtime(true);
         }
@@ -108,7 +109,7 @@ class TraceableAdapter implements AdapterInterface
      */
     public function getItems(array $keys = array())
     {
-        $event = $this->start(__FUNCTION__, $keys);
+        $event = $this->start(__FUNCTION__);
         try {
             $result = $this->pool->getItems($keys);
         } finally {
@@ -117,12 +118,11 @@ class TraceableAdapter implements AdapterInterface
         $f = function () use ($result, $event) {
             $event->result = array();
             foreach ($result as $key => $item) {
-                if ($item->isHit()) {
+                if ($event->result[$key] = $item->isHit()) {
                     ++$event->hits;
                 } else {
                     ++$event->misses;
                 }
-                $event->result[$key] = $item->get();
                 yield $key => $item;
             }
         };
@@ -148,9 +148,10 @@ class TraceableAdapter implements AdapterInterface
      */
     public function deleteItems(array $keys)
     {
-        $event = $this->start(__FUNCTION__, $keys);
+        $event = $this->start(__FUNCTION__);
+        $event->result['keys'] = $keys;
         try {
-            return $event->result = $this->pool->deleteItems($keys);
+            return $event->result['result'] = $this->pool->deleteItems($keys);
         } finally {
             $event->end = microtime(true);
         }
@@ -169,6 +170,38 @@ class TraceableAdapter implements AdapterInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function prune()
+    {
+        if (!$this->pool instanceof PruneableInterface) {
+            return false;
+        }
+        $event = $this->start(__FUNCTION__);
+        try {
+            return $event->result = $this->pool->prune();
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        if (!$this->pool instanceof ResettableInterface) {
+            return;
+        }
+        $event = $this->start(__FUNCTION__);
+        try {
+            $this->pool->reset();
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
     public function getCalls()
     {
         try {
@@ -178,11 +211,10 @@ class TraceableAdapter implements AdapterInterface
         }
     }
 
-    private function start($name, $argument = null)
+    protected function start($name)
     {
         $this->calls[] = $event = new TraceableAdapterEvent();
         $event->name = $name;
-        $event->argument = $argument;
         $event->start = microtime(true);
 
         return $event;
@@ -192,7 +224,6 @@ class TraceableAdapter implements AdapterInterface
 class TraceableAdapterEvent
 {
     public $name;
-    public $argument;
     public $start;
     public $end;
     public $result;

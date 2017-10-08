@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -18,7 +19,7 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class HttpUtilsTest extends \PHPUnit_Framework_TestCase
+class HttpUtilsTest extends TestCase
 {
     public function testCreateRedirectResponseWithPath()
     {
@@ -143,7 +144,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         // Plus must not decoded to space
         $this->assertTrue($utils->checkRequestPath($this->getRequest('/foo+bar'), '/foo+bar'));
         // Checking unicode
-        $this->assertTrue($utils->checkRequestPath($this->getRequest(urlencode('/вход')), '/вход'));
+        $this->assertTrue($utils->checkRequestPath($this->getRequest('/'.urlencode('вход')), '/вход'));
     }
 
     public function testCheckRequestPathWithUrlMatcherAndResourceNotFound()
@@ -220,6 +221,19 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         $utils->checkRequestPath($this->getRequest(), 'foobar');
     }
 
+    public function testCheckPathWithoutRouteParam()
+    {
+        $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')->getMock();
+        $urlMatcher
+            ->expects($this->any())
+            ->method('match')
+            ->willReturn(array('_controller' => 'PathController'))
+        ;
+
+        $utils = new HttpUtils(null, $urlMatcher);
+        $this->assertFalse($utils->checkRequestPath($this->getRequest(), 'path/index.html'));
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Matcher must either implement UrlMatcherInterface or RequestMatcherInterface
@@ -236,6 +250,15 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
 
         $utils = new HttpUtils($this->getUrlGenerator('/foo/bar?param=value'));
         $this->assertEquals('/foo/bar', $utils->generateUri(new Request(), 'route_name'));
+    }
+
+    public function testGenerateUriPreservesFragment()
+    {
+        $utils = new HttpUtils($this->getUrlGenerator('/foo/bar?param=value#fragment'));
+        $this->assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
+
+        $utils = new HttpUtils($this->getUrlGenerator('/foo/bar#fragment'));
+        $this->assertEquals('/foo/bar#fragment', $utils->generateUri(new Request(), 'route_name'));
     }
 
     /**

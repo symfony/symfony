@@ -18,3 +18,4 @@ My Symfony application <info>v1.0</info>
  <comment>descriptor</comment>
   <info>descriptor:command1</info>  [alias1|alias2] command 1 description
   <info>descriptor:command2</info>  command 2 description
+  <info>descriptor:command4</info>  [descriptor:alias_command4|command4:descriptor]

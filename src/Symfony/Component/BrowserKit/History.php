@@ -49,7 +49,7 @@ class History
      */
     public function isEmpty()
     {
-        return count($this->stack) == 0;
+        return 0 == count($this->stack);
     }
 
     /**

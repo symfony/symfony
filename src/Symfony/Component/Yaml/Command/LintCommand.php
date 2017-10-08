@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Validates YAML files syntax and outputs encountered errors.
@@ -27,6 +28,8 @@ use Symfony\Component\Yaml\Parser;
  */
 class LintCommand extends Command
 {
+    protected static $defaultName = 'lint:yaml';
+
     private $parser;
     private $format;
     private $displayCorrectFiles;
@@ -47,7 +50,6 @@ class LintCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('lint:yaml')
             ->setDescription('Lints a file and outputs encountered errors')
             ->addArgument('filename', null, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
@@ -102,10 +104,20 @@ EOF
 
     private function validate($content, $file = null)
     {
+        $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
+            if (E_USER_DEPRECATED === $level) {
+                throw new ParseException($message, $this->getParser()->getRealCurrentLineNb() + 1);
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
+        });
+
         try {
-            $this->getParser()->parse($content);
+            $this->getParser()->parse($content, Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
-            return array('file' => $file, 'valid' => false, 'message' => $e->getMessage());
+            return array('file' => $file, 'line' => $e->getParsedLine(), 'valid' => false, 'message' => $e->getMessage());
+        } finally {
+            restore_error_handler();
         }
 
         return array('file' => $file, 'valid' => true);
@@ -138,7 +150,7 @@ EOF
             }
         }
 
-        if ($erroredFiles === 0) {
+        if (0 === $erroredFiles) {
             $io->success(sprintf('All %d YAML files contain valid syntax.', $countFiles));
         } else {
             $io->warning(sprintf('%d YAML files have valid syntax and %d contain errors.', $countFiles - $erroredFiles, $erroredFiles));

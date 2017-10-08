@@ -14,7 +14,6 @@ services:
         class: Foo
         public: true
         autowire: ~
-        inherit_tags: false
 
     no_defaults:
         class: Foo
@@ -22,20 +21,14 @@ services:
         autowire: false
         tags: []
 
-    no_defaults_child:
-        parent: no_defaults
-        autowire: ~
-        tags:
-            - name: bar
-
-    with_defaults_child:
-        parent: with_defaults
-        public: true
-        inherit_tags: true
-        tags:
-            - name: baz
-
     with_defaults_aliased:
         alias: with_defaults
 
     with_defaults_aliased_short: '@with_defaults'
+
+    Acme\WithShortCutArgs: [foo]
+
+    child_def:
+        parent: with_defaults
+        public: true
+        autowire: false

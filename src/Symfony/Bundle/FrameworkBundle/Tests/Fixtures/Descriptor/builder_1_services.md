@@ -4,8 +4,7 @@ Public and private services
 Definitions
 -----------
 
-definition_1
-~~~~~~~~~~~~
+### definition_1
 
 - Class: `Full\Qualified\Class1`
 - Public: yes
@@ -14,11 +13,11 @@ definition_1
 - Shared: yes
 - Abstract: yes
 - Autowired: no
+- Autoconfigured: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
 
-definition_2
-~~~~~~~~~~~~
+### definition_2
 
 - Class: `Full\Qualified\Class2`
 - Public: no
@@ -27,6 +26,7 @@ definition_2
 - Shared: yes
 - Abstract: no
 - Autowired: no
+- Autoconfigured: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
@@ -42,14 +42,12 @@ definition_2
 Aliases
 -------
 
-alias_1
-~~~~~~~
+### alias_1
 
 - Service: `service_1`
 - Public: yes
 
-alias_2
-~~~~~~~
+### alias_2
 
 - Service: `service_2`
 - Public: no

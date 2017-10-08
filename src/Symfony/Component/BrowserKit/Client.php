@@ -42,11 +42,10 @@ abstract class Client
 
     private $maxRedirects = -1;
     private $redirectCount = 0;
+    private $redirects = array();
     private $isMainRequest = true;
 
     /**
-     * Constructor.
-     *
      * @param array     $server    The server parameters (equivalent of $_SERVER)
      * @param History   $history   A History instance to store the browser history
      * @param CookieJar $cookieJar A CookieJar instance to store the cookies
@@ -328,6 +327,8 @@ abstract class Client
         }
 
         if ($this->followRedirects && $this->redirect) {
+            $this->redirects[serialize($this->history->current())] = true;
+
             return $this->crawler = $this->followRedirect();
         }
 
@@ -430,7 +431,11 @@ abstract class Client
      */
     public function back()
     {
-        return $this->requestFromRequest($this->history->back(), false);
+        do {
+            $request = $this->history->back();
+        } while (array_key_exists(serialize($request), $this->redirects));
+
+        return $this->requestFromRequest($request, false);
     }
 
     /**
@@ -440,7 +445,11 @@ abstract class Client
      */
     public function forward()
     {
-        return $this->requestFromRequest($this->history->forward(), false);
+        do {
+            $request = $this->history->forward();
+        } while (array_key_exists(serialize($request), $this->redirects));
+
+        return $this->requestFromRequest($request, false);
     }
 
     /**
@@ -468,13 +477,14 @@ abstract class Client
 
         if (-1 !== $this->maxRedirects) {
             if ($this->redirectCount > $this->maxRedirects) {
+                $this->redirectCount = 0;
                 throw new \LogicException(sprintf('The maximum number (%d) of redirections was reached.', $this->maxRedirects));
             }
         }
 
         $request = $this->internalRequest;
 
-        if (in_array($this->internalResponse->getStatus(), array(302, 303))) {
+        if (in_array($this->internalResponse->getStatus(), array(301, 302, 303))) {
             $method = 'GET';
             $files = array();
             $content = null;

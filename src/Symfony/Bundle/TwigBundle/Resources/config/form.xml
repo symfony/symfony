@@ -4,19 +4,21 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false">
+        <defaults public="false" />
+
+        <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension">
             <argument type="collection">
                 <argument type="service" id="service_container" />
                 <argument>twig.form.renderer</argument>
             </argument>
         </service>
 
-        <service id="twig.form.engine" class="Symfony\Bridge\Twig\Form\TwigRendererEngine" public="false">
+        <service id="twig.form.engine" class="Symfony\Bridge\Twig\Form\TwigRendererEngine">
             <argument>%twig.form.resources%</argument>
             <argument type="service" id="twig" />
         </service>
 
-        <service id="twig.form.renderer" class="Symfony\Bridge\Twig\Form\TwigRenderer">
+        <service id="twig.form.renderer" class="Symfony\Component\Form\FormRenderer">
             <argument type="service" id="twig.form.engine" />
             <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
             <tag name="twig.runtime" />

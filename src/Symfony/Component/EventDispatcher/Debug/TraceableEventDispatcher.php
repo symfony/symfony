@@ -34,8 +34,6 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     private $wrappedListeners;
 
     /**
-     * Constructor.
-     *
      * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      * @param Stopwatch                $stopwatch  A Stopwatch instance
      * @param LoggerInterface          $logger     A LoggerInterface instance
@@ -104,6 +102,16 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      */
     public function getListenerPriority($eventName, $listener)
     {
+        // we might have wrapped listeners for the event (if called while dispatching)
+        // in that case get the priority by wrapper
+        if (isset($this->wrappedListeners[$eventName])) {
+            foreach ($this->wrappedListeners[$eventName] as $index => $wrappedListener) {
+                if ($wrappedListener->getWrappedListener() === $listener) {
+                    return $this->dispatcher->getListenerPriority($eventName, $wrappedListener);
+                }
+            }
+        }
+
         return $this->dispatcher->getListenerPriority($eventName, $listener);
     }
 
@@ -202,6 +210,11 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         uasort($notCalled, array($this, 'sortListenersByPriority'));
 
         return $notCalled;
+    }
+
+    public function reset()
+    {
+        $this->called = array();
     }
 
     /**

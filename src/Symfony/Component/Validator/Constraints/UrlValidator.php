@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -33,7 +34,9 @@ class UrlValidator extends ConstraintValidator
                 \]  # an IPv6 address
             )
             (:[0-9]+)?                              # a port (optional)
-            (/?|/\S+|\?\S*|\#\S*)                   # a /, nothing, a / with something, a query or a fragment
+            (?:/ (?:[\pL\pN\-._\~!$&\'()*+,;=:@]|%%[0-9A-Fa-f]{2})* )*      # a path
+            (?:\? (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?   # a query (optional)
+            (?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?   # a fragment (optional)
         $~ixu';
 
     /**
@@ -45,7 +48,7 @@ class UrlValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Url');
         }
 
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return;
         }
 
@@ -70,9 +73,26 @@ class UrlValidator extends ConstraintValidator
         }
 
         if ($constraint->checkDNS) {
+            if (!in_array($constraint->checkDNS, array(
+                Url::CHECK_DNS_TYPE_ANY,
+                Url::CHECK_DNS_TYPE_A,
+                Url::CHECK_DNS_TYPE_A6,
+                Url::CHECK_DNS_TYPE_AAAA,
+                Url::CHECK_DNS_TYPE_CNAME,
+                Url::CHECK_DNS_TYPE_MX,
+                Url::CHECK_DNS_TYPE_NAPTR,
+                Url::CHECK_DNS_TYPE_NS,
+                Url::CHECK_DNS_TYPE_PTR,
+                Url::CHECK_DNS_TYPE_SOA,
+                Url::CHECK_DNS_TYPE_SRV,
+                Url::CHECK_DNS_TYPE_TXT,
+            ))) {
+                throw new InvalidOptionsException(sprintf('Invalid value for option "checkDNS" in constraint %s', get_class($constraint)), array('checkDNS'));
+            }
+
             $host = parse_url($value, PHP_URL_HOST);
 
-            if (!checkdnsrr($host, 'ANY')) {
+            if (!is_string($host) || !checkdnsrr($host, $constraint->checkDNS)) {
                 $this->context->buildViolation($constraint->dnsMessage)
                     ->setParameter('{{ value }}', $this->formatValue($host))
                     ->setCode(Url::INVALID_URL_ERROR)

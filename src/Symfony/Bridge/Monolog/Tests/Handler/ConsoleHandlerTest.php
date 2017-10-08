@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -26,7 +27,7 @@ use Symfony\Component\Console\Command\Command;
  *
  * @author Tobias Schultze <http://tobion.de>
  */
-class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
+class ConsoleHandlerTest extends TestCase
 {
     public function testConstructor()
     {
@@ -58,13 +59,19 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
 
         // check that the handler actually outputs the record if it handles it
         $levelName = Logger::getLevelName($level);
+        $levelName = sprintf('%-9s', $levelName);
 
         $realOutput = $this->getMockBuilder('Symfony\Component\Console\Output\Output')->setMethods(array('doWrite'))->getMock();
         $realOutput->setVerbosity($verbosity);
+        if ($realOutput->isDebug()) {
+            $log = "16:21:54 $levelName [app] My info message\n[]\n[]\n";
+        } else {
+            $log = "16:21:54 $levelName [app] My info message [] []\n";
+        }
         $realOutput
             ->expects($isHandling ? $this->once() : $this->never())
             ->method('doWrite')
-            ->with("[2013-05-29 16:21:54] app.$levelName: My info message  \n", false);
+            ->with($log, false);
         $handler = new ConsoleHandler($realOutput, true, $map);
 
         $infoRecord = array(
@@ -142,7 +149,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
         $output
             ->expects($this->once())
             ->method('write')
-            ->with('<info>[2013-05-29 16:21:54] app.INFO:</info> My info message  '."\n")
+            ->with("16:21:54 <fg=green>INFO     </> <comment>[app]</> My info message\n[]\n[]\n")
         ;
 
         $handler = new ConsoleHandler(null, false);

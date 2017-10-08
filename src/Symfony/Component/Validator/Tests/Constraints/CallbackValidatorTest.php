@@ -211,7 +211,9 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
     // Should succeed. Needed when defining constraints as annotations.
     public function testNoConstructorArguments()
     {
-        new Callback();
+        $constraint = new Callback();
+
+        $this->assertSame(array(Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT), $constraint->getTargets());
     }
 
     public function testAnnotationInvocationSingleValued()

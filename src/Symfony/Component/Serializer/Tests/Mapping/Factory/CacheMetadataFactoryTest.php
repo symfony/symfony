@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Mapping\Factory;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -20,7 +21,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CacheMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class CacheMetadataFactoryTest extends TestCase
 {
     public function testGetMetadataFor()
     {

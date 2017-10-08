@@ -1,120 +1,102 @@
-<div class="block-exception">
-    <div class="block-exception-detected clear-fix">
-        <div class="support">
-            <a href="http://symfony.com/support">Need support?</a>
+<div class="exception-summary {{ exception.message is empty ? 'exception-without-message' }}">
+    <div class="exception-metadata">
+        <div class="container">
+            <h2 class="exception-hierarchy">
+                {% for previousException in exception.allPrevious|reverse %}
+                    {{ previousException.class|abbr_class }}
+                    <span class="icon">{{ include('@Twig/images/chevron-right.svg') }}</span>
+                {% endfor %}
+                {{ exception.class|abbr_class }}
+            </h2>
+            <h2 class="exception-http">
+                HTTP {{ status_code }} <small>{{ status_text }}</small>
+            </h2>
         </div>
-        <div class="illustration-exception">
-            {{ include('@Twig/Exception/exception.svg') }}
-        </div>
-        <div class="text-exception">
-            <div class="open-quote">“</div>
+    </div>
 
-            <h1>{{ exception.message|nl2br|format_file_from_text }}</h1>
+    <div class="exception-message-wrapper">
+        <div class="container">
+            <h1 class="break-long-words exception-message {{ exception.message|length > 180 ? 'long' }}">
+                {{- exception.message|nl2br|format_file_from_text -}}
+            </h1>
 
-            <div>
-                <strong>{{ status_code }}</strong> {{ status_text }} - {{ exception.class|abbr_class }}
+            <div class="exception-illustration hidden-xs-down">
+                {{ include('@Twig/images/symfony-ghost.svg') }}
             </div>
-
-            {% set previous_count = exception.allPrevious|length %}
-            {% if previous_count %}
-                <div class="linked"><span><strong>{{ previous_count }}</strong> linked Exception{{ previous_count > 1 ? 's' : '' }}:</span>
-                    <ul>
-                        {% for i, previous in exception.allPrevious %}
-                            <li>
-                                {{ previous.class|abbr_class }} <a href="#traces-link-{{ i + 1 }}" onclick="toggle('traces-{{ i + 1 }}', 'traces'); switchIcons('icon-traces-{{ i + 1 }}-open', 'icon-traces-{{ i + 1 }}-close');">&#187;</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-
-            <div class="close-quote">”</div>
         </div>
     </div>
 </div>
 
-{% for position, e in exception.toarray %}
-    {% include '@Twig/Exception/traces.html.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
-{% endfor %}
+<div class="container">
+    <div class="sf-tabs">
+        <div class="tab">
+            {% set exception_as_array = exception.toarray %}
+            {% set _exceptions_with_user_code = [] %}
+            {% for i, e in exception_as_array %}
+                {% for trace in e.trace %}
+                    {% if (trace.file is not empty) and ('/vendor/' not in trace.file) and ('/var/cache/' not in trace.file) and not loop.last %}
+                        {% set _exceptions_with_user_code = _exceptions_with_user_code|merge([i]) %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+            <h3 class="tab-title">
+                {% if exception_as_array|length > 1 %}
+                    Exceptions <span class="badge">{{ exception_as_array|length }}</span>
+                {% else %}
+                    Exception
+                {% endif %}
+            </h3>
 
-{% if logger %}
-    <div class="block">
-        <div class="logs clear-fix">
-            {% spaceless %}
-            <h2>
-                Logs&nbsp;
-                <a href="#" onclick="toggle('logs'); switchIcons('icon-logs-open', 'icon-logs-close'); return false;">
-                    <img class="toggle" id="icon-logs-open" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display: none" />
-                    <img class="toggle" id="icon-logs-close" alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display: inline" />
-                </a>
-            </h2>
-            {% endspaceless %}
-
-            {% if logger.counterrors %}
-                <div class="error-count">
-                    <span>
-                        {{ logger.counterrors }} error{{ logger.counterrors > 1 ? 's' : ''}}
-                    </span>
-                </div>
-            {% endif %}
+            <div class="tab-content">
+                {% for i, e in exception_as_array %}
+                    {{ include('@Twig/Exception/traces.html.twig', { exception: e, index: loop.index, expand: i in _exceptions_with_user_code or (_exceptions_with_user_code is empty and loop.first) }, with_context = false) }}
+                {% endfor %}
+            </div>
         </div>
 
-        <div id="logs">
-            {% include '@Twig/Exception/logs.html.twig' with { 'logs': logger.logs } only %}
+        {% if logger %}
+        <div class="tab {{ logger.logs is empty ? 'disabled' }}">
+            <h3 class="tab-title">
+                Logs
+                {% if logger.counterrors ?? false %}<span class="badge status-error">{{ logger.counterrors }}</span>{% endif %}
+            </h3>
+
+            <div class="tab-content">
+                {% if logger.logs %}
+                    {{ include('@Twig/Exception/logs.html.twig', { logs: logger.logs }, with_context = false)  }}
+                {% else %}
+                    <div class="empty">
+                        <p>No log messages</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
+        {% endif %}
+
+        <div class="tab">
+            <h3 class="tab-title">
+                {% if exception_as_array|length > 1 %}
+                    Stack Traces <span class="badge">{{ exception_as_array|length }}</span>
+                {% else %}
+                    Stack Trace
+                {% endif %}
+            </h3>
+
+            <div class="tab-content">
+                {% for e in exception_as_array %}
+                    {{ include('@Twig/Exception/traces_text.html.twig', { exception: e, index: loop.index, num_exceptions: loop.length }, with_context = false) }}
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if currentContent is not empty %}
+        <div class="tab">
+            <h3 class="tab-title">Output content</h3>
+
+            <div class="tab-content">
+                {{ currentContent }}
+            </div>
+        </div>
+        {% endif %}
     </div>
-{% endif %}
-
-{% if currentContent %}
-    <div class="block">
-        {% spaceless %}
-        <h2>
-            Content of the Output&nbsp;
-            <a href="#" onclick="toggle('output-content'); switchIcons('icon-content-open', 'icon-content-close'); return false;">
-                <img class="toggle" id="icon-content-close" alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display: none" />
-                <img class="toggle" id="icon-content-open" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display: inline" />
-            </a>
-        </h2>
-        {% endspaceless %}
-
-        <div id="output-content" style="display: none">
-            {{ currentContent }}
-        </div>
-
-        <div style="clear: both"></div>
-    </div>
-{% endif %}
-
-{% include '@Twig/Exception/traces_text.html.twig' with { 'exception': exception } only %}
-
-<script type="text/javascript">//<![CDATA[
-    function toggle(id, clazz) {
-        var el = document.getElementById(id),
-            current = el.style.display,
-            i;
-
-        if (clazz) {
-            var tags = document.getElementsByTagName('*');
-            for (i = tags.length - 1; i >= 0; i--) {
-                if (tags[i].className === clazz) {
-                    tags[i].style.display = 'none';
-                }
-            }
-        }
-
-        el.style.display = current === 'none' ? 'block' : 'none';
-    }
-
-    function switchIcons(id1, id2) {
-        var icon1, icon2, display1, display2;
-
-        icon1 = document.getElementById(id1);
-        icon2 = document.getElementById(id2);
-
-        display1 = icon1.style.display;
-        display2 = icon2.style.display;
-
-        icon1.style.display = display2;
-        icon2.style.display = display1;
-    }
-//]]></script>
+</div>

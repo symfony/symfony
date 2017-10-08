@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.31.86",
     "Names": {
         "AC": "Acsencion island",
         "AD": "Andorra",
@@ -56,7 +56,7 @@
         "CW": "Curaçao",
         "CX": "Christmas Island",
         "CY": "Cyprus",
-        "CZ": "Czech Republic",
+        "CZ": "Czechia",
         "DE": "Germany",
         "DG": "Diego Garcia",
         "DJ": "Djibouti",
@@ -102,7 +102,7 @@
         "HR": "Croatia",
         "HT": "Haiti",
         "HU": "Hungary",
-        "IC": "Canary Island",
+        "IC": "Canary Islands",
         "ID": "Indonesia",
         "IE": "Ireland",
         "IL": "Israel",
@@ -236,6 +236,7 @@
         "UA": "Ukraine",
         "UG": "Uganda",
         "UM": "U.S. Outlying Islands",
+        "UN": "Nagkakaisang Bansa",
         "US": "Estados Unidos",
         "UY": "Uruguay",
         "UZ": "Uzbekistan",

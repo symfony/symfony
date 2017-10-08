@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
-use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
@@ -31,9 +30,7 @@ abstract class AbstractToken implements TokenInterface
     private $attributes = array();
 
     /**
-     * Constructor.
-     *
-     * @param (RoleInterface|string)[] $roles An array of roles
+     * @param (Role|string)[] $roles An array of roles
      *
      * @throws \InvalidArgumentException
      */
@@ -42,8 +39,8 @@ abstract class AbstractToken implements TokenInterface
         foreach ($roles as $role) {
             if (is_string($role)) {
                 $role = new Role($role);
-            } elseif (!$role instanceof RoleInterface) {
-                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, or RoleInterface instances, but got %s.', gettype($role)));
+            } elseif (!$role instanceof Role) {
+                throw new \InvalidArgumentException(sprintf('$roles must be an array of strings, or Role instances, but got %s.', gettype($role)));
             }
 
             $this->roles[] = $role;
@@ -150,7 +147,7 @@ abstract class AbstractToken implements TokenInterface
             array(
                 is_object($this->user) ? clone $this->user : $this->user,
                 $this->authenticated,
-                $this->roles,
+                array_map(function ($role) { return clone $role; }, $this->roles),
                 $this->attributes,
             )
         );

@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CasterTest extends \PHPUnit_Framework_TestCase
+class CasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
@@ -150,9 +151,6 @@ class CasterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testAnonymousClass()
     {
         $c = eval('return new class extends stdClass { private $foo = "foo"; };');

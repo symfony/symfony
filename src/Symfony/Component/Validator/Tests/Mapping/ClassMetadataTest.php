@@ -11,19 +11,20 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyConstraint;
 
-class ClassMetadataTest extends \PHPUnit_Framework_TestCase
+class ClassMetadataTest extends TestCase
 {
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
     const PROVIDERCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity';
+    const PROVIDERCHILDCLASS = 'Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity';
 
     protected $metadata;
 
@@ -39,14 +40,14 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
     public function testAddConstraintDoesNotAcceptValid()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new Valid());
     }
 
     public function testAddConstraintRequiresClassConstraints()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new PropertyConstraint());
     }
@@ -245,19 +246,23 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     public function testGroupSequencesWorkIfContainingDefaultGroup()
     {
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup()));
+
+        $this->assertInstanceOf('Symfony\Component\Validator\Constraints\GroupSequence', $this->metadata->getGroupSequence());
     }
 
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
     public function testGroupSequencesFailIfNotContainingDefaultGroup()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\GroupDefinitionException');
-
         $this->metadata->setGroupSequence(array('Foo', 'Bar'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
     public function testGroupSequencesFailIfContainingDefault()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\GroupDefinitionException');
-
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP));
     }
 
@@ -297,6 +302,17 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($metadata->isGroupSequenceProvider());
     }
 
+    public function testMergeConstraintsMergesGroupSequenceProvider()
+    {
+        $parent = new ClassMetadata(self::PROVIDERCLASS);
+        $parent->setGroupSequenceProvider(true);
+
+        $metadata = new ClassMetadata(self::PROVIDERCHILDCLASS);
+        $metadata->mergeConstraints($parent);
+
+        $this->assertTrue($metadata->isGroupSequenceProvider());
+    }
+
     /**
      * https://github.com/symfony/symfony/issues/11604.
      */
@@ -304,29 +320,4 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }
-
-    public function testMergeDoesOverrideConstraintsFromParentClassIfPropertyIsOverriddenInChildClass()
-    {
-        $parentMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ParentClass');
-        $parentMetadata->addPropertyConstraint('example', new GreaterThan(0));
-
-        $childMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
-        $childMetadata->addPropertyConstraint('example', new GreaterThan(1));
-        $childMetadata->mergeConstraints($parentMetadata);
-
-        $expectedMetadata = new ClassMetadata('\Symfony\Component\Validator\Tests\Mapping\ChildClass');
-        $expectedMetadata->addPropertyConstraint('example', new GreaterThan(1));
-
-        $this->assertEquals($expectedMetadata, $childMetadata);
-    }
-}
-
-class ParentClass
-{
-    public $example = 0;
-}
-
-class ChildClass extends ParentClass
-{
-    public $example = 1;    // overrides parent property of same name
 }

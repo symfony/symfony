@@ -12,10 +12,11 @@
 namespace Symfony\Component\Cache\Tests;
 
 use Doctrine\Common\Cache\CacheProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\DoctrineProvider;
 
-class DoctrineProviderTest extends \PHPUnit_Framework_TestCase
+class DoctrineProviderTest extends TestCase
 {
     public function testProvider()
     {

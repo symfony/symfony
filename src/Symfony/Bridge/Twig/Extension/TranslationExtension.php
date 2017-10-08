@@ -17,18 +17,22 @@ use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
+use Twig\Extension\AbstractExtension;
+use Twig\NodeVisitor\NodeVisitorInterface;
+use Twig\TokenParser\AbstractTokenParser;
+use Twig\TwigFilter;
 
 /**
  * Provides integration of the Translation component with Twig.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TranslationExtension extends \Twig_Extension
+class TranslationExtension extends AbstractExtension
 {
     private $translator;
     private $translationNodeVisitor;
 
-    public function __construct(TranslatorInterface $translator, \Twig_NodeVisitorInterface $translationNodeVisitor = null)
+    public function __construct(TranslatorInterface $translator = null, NodeVisitorInterface $translationNodeVisitor = null)
     {
         if (!$translationNodeVisitor) {
             $translationNodeVisitor = new TranslationNodeVisitor();
@@ -49,15 +53,15 @@ class TranslationExtension extends \Twig_Extension
     public function getFilters()
     {
         return array(
-            new \Twig_SimpleFilter('trans', array($this, 'trans')),
-            new \Twig_SimpleFilter('transchoice', array($this, 'transchoice')),
+            new TwigFilter('trans', array($this, 'trans')),
+            new TwigFilter('transchoice', array($this, 'transchoice')),
         );
     }
 
     /**
      * Returns the token parser instance to add to the existing list.
      *
-     * @return array An array of Twig_TokenParser instances
+     * @return AbstractTokenParser[]
      */
     public function getTokenParsers()
     {
@@ -90,11 +94,19 @@ class TranslationExtension extends \Twig_Extension
 
     public function trans($message, array $arguments = array(), $domain = null, $locale = null)
     {
+        if (null === $this->translator) {
+            return $message;
+        }
+
         return $this->translator->trans($message, $arguments, $domain, $locale);
     }
 
     public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
+        if (null === $this->translator) {
+            return $message;
+        }
+
         return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
     }
 

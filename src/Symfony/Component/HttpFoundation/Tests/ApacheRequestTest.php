@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ApacheRequest;
 
-class ApacheRequestTest extends \PHPUnit_Framework_TestCase
+class ApacheRequestTest extends TestCase
 {
     /**
      * @dataProvider provideServerVars

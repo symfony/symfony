@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -34,7 +35,7 @@ class ConcreteComposite extends Composite
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CompositeTest extends \PHPUnit_Framework_TestCase
+class CompositeTest extends TestCase
 {
     public function testMergeNestedGroupsIfNoExplicitParentGroup()
     {
@@ -121,6 +122,17 @@ class CompositeTest extends \PHPUnit_Framework_TestCase
         new ConcreteComposite(array(
             new NotNull(array('groups' => 'Default')),
             'NotBlank',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testFailIfNoConstraintObject()
+    {
+        new ConcreteComposite(array(
+            new NotNull(array('groups' => 'Default')),
+            new \ArrayObject(),
         ));
     }
 

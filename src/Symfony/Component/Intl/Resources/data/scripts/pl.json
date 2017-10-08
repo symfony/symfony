@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.59",
     "Names": {
         "Arab": "arabskie",
         "Armi": "armi",
@@ -25,7 +25,7 @@
         "Cprt": "cypryjskie",
         "Cyrl": "cyrylica",
         "Cyrs": "cyrylica staro-cerkiewno-słowiańska",
-        "Deva": "devanagari",
+        "Deva": "dewanagari",
         "Dsrt": "deseret",
         "Egyd": "egipskie demotyczne",
         "Egyh": "egipskie hieratyczne",
@@ -38,6 +38,7 @@
         "Grek": "greckie",
         "Gujr": "gudźarackie",
         "Guru": "gurmukhi",
+        "Hanb": "hanb",
         "Hang": "hangyl",
         "Hani": "han",
         "Hano": "hanunoo",
@@ -46,10 +47,11 @@
         "Hebr": "hebrajskie",
         "Hira": "hiragana",
         "Hmng": "pahawh hmong",
-        "Hrkt": "katakana lub hiragana",
+        "Hrkt": "sylabariusze japońskie",
         "Hung": "starowęgierskie",
         "Inds": "indus",
         "Ital": "starowłoskie",
+        "Jamo": "jamo",
         "Java": "jawajskie",
         "Jpan": "japońskie",
         "Kali": "kayah li",
@@ -128,9 +130,10 @@
         "Yiii": "yi",
         "Zinh": "dziedziczone",
         "Zmth": "notacja matematyczna",
+        "Zsye": "Emoji",
         "Zsym": "symbole",
         "Zxxx": "język bez systemu pisma",
         "Zyyy": "wspólne",
-        "Zzzz": "nieznane lub niepoprawne"
+        "Zzzz": "nieznany skrypt"
     }
 }

@@ -15,37 +15,17 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * TraceableControllerResolver.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TraceableControllerResolver implements ControllerResolverInterface, ArgumentResolverInterface
+class TraceableControllerResolver implements ControllerResolverInterface
 {
     private $resolver;
     private $stopwatch;
-    private $argumentResolver;
 
-    /**
-     * Constructor.
-     *
-     * @param ControllerResolverInterface $resolver         A ControllerResolverInterface instance
-     * @param Stopwatch                   $stopwatch        A Stopwatch instance
-     * @param ArgumentResolverInterface   $argumentResolver Only required for BC
-     */
-    public function __construct(ControllerResolverInterface $resolver, Stopwatch $stopwatch, ArgumentResolverInterface $argumentResolver = null)
+    public function __construct(ControllerResolverInterface $resolver, Stopwatch $stopwatch)
     {
         $this->resolver = $resolver;
         $this->stopwatch = $stopwatch;
-        $this->argumentResolver = $argumentResolver;
-
-        // BC
-        if (null === $this->argumentResolver) {
-            $this->argumentResolver = $resolver;
-        }
-
-        if (!$this->argumentResolver instanceof TraceableArgumentResolver) {
-            $this->argumentResolver = new TraceableArgumentResolver($this->argumentResolver, $this->stopwatch);
-        }
     }
 
     /**
@@ -58,20 +38,6 @@ class TraceableControllerResolver implements ControllerResolverInterface, Argume
         $ret = $this->resolver->getController($request);
 
         $e->stop();
-
-        return $ret;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated This method is deprecated as of 3.1 and will be removed in 4.0.
-     */
-    public function getArguments(Request $request, $controller)
-    {
-        @trigger_error(sprintf('The %s method is deprecated as of 3.1 and will be removed in 4.0. Please use the %s instead.', __METHOD__, TraceableArgumentResolver::class), E_USER_DEPRECATED);
-
-        $ret = $this->argumentResolver->getArguments($request, $controller);
 
         return $ret;
     }

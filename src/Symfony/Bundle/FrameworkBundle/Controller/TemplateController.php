@@ -11,18 +11,27 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * TemplateController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @final since version 3.4
  */
-class TemplateController implements ContainerAwareInterface
+class TemplateController
 {
-    use ContainerAwareTrait;
+    private $twig;
+    private $templating;
+
+    public function __construct(Environment $twig = null, EngineInterface $templating = null)
+    {
+        $this->twig = $twig;
+        $this->templating = $templating;
+    }
 
     /**
      * Renders a template.
@@ -36,10 +45,10 @@ class TemplateController implements ContainerAwareInterface
      */
     public function templateAction($template, $maxAge = null, $sharedAge = null, $private = null)
     {
-        if ($this->container->has('templating')) {
-            $response = $this->container->get('templating')->renderResponse($template);
-        } elseif ($this->container->has('twig')) {
-            $response = new Response($this->container->get('twig')->render($template));
+        if ($this->templating) {
+            $response = new Response($this->templating->render($template));
+        } elseif ($this->twig) {
+            $response = new Response($this->twig->render($template));
         } else {
             throw new \LogicException('You can not use the TemplateController if the Templating Component or the Twig Bundle are not available.');
         }
@@ -54,7 +63,7 @@ class TemplateController implements ContainerAwareInterface
 
         if ($private) {
             $response->setPrivate();
-        } elseif ($private === false || (null === $private && ($maxAge || $sharedAge))) {
+        } elseif (false === $private || (null === $private && ($maxAge || $sharedAge))) {
             $response->setPublic();
         }
 

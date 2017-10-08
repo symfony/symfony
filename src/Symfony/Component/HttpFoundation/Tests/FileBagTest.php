@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\FileBag;
 
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\FileBag;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
-class FileBagTest extends \PHPUnit_Framework_TestCase
+class FileBagTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException
@@ -57,6 +58,19 @@ class FileBagTest extends \PHPUnit_Framework_TestCase
         )));
 
         $this->assertNull($bag->get('file'));
+    }
+
+    public function testShouldRemoveEmptyUploadedFilesForMultiUpload()
+    {
+        $bag = new FileBag(array('file' => array(
+            'name' => array(''),
+            'type' => array(''),
+            'tmp_name' => array(''),
+            'error' => array(UPLOAD_ERR_NO_FILE),
+            'size' => array(0),
+        )));
+
+        $this->assertSame(array(), $bag->get('file'));
     }
 
     public function testShouldConvertUploadedFilesWithPhpBug()

@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class LocaleScannerTest extends \PHPUnit_Framework_TestCase
+class LocaleScannerTest extends TestCase
 {
     private $directory;
 

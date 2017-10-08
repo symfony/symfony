@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Tests\Definition\Builder\NodeBuilder as CustomNodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
@@ -18,7 +19,7 @@ require __DIR__.'/../../Fixtures/Builder/NodeBuilder.php';
 require __DIR__.'/../../Fixtures/Builder/BarNodeDefinition.php';
 require __DIR__.'/../../Fixtures/Builder/VariableNodeDefinition.php';
 
-class TreeBuilderTest extends \PHPUnit_Framework_TestCase
+class TreeBuilderTest extends TestCase
 {
     public function testUsingACustomNodeBuilder()
     {
@@ -70,6 +71,8 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
         $root = $builder->root('override', 'array', new CustomNodeBuilder());
 
         $root->prototype('bar')->end();
+
+        $this->assertInstanceOf('Symfony\Component\Config\Tests\Fixtures\BarNode', $root->getNode(true)->getPrototype());
     }
 
     public function testAnExtendedNodeBuilderGetsPropagatedToTheChildren()
@@ -78,7 +81,7 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
 
         $builder->root('propagation')
             ->children()
-                ->setNodeClass('extended', 'Symfony\Component\Config\Tests\Definition\Builder\VariableNodeDefinition')
+                ->setNodeClass('extended', 'Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition')
                 ->node('foo', 'extended')->end()
                 ->arrayNode('child')
                     ->children()
@@ -87,6 +90,15 @@ class TreeBuilderTest extends \PHPUnit_Framework_TestCase
                 ->end()
             ->end()
         ->end();
+
+        $node = $builder->buildTree();
+        $children = $node->getChildren();
+
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\BooleanNode', $children['foo']);
+
+        $childChildren = $children['child']->getChildren();
+
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\BooleanNode', $childChildren['foo']);
     }
 
     public function testDefinitionInfoGetsTransferredToNode()

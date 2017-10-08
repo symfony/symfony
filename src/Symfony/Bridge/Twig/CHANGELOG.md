@@ -1,10 +1,20 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * deprecated `Symfony\Bridge\Twig\Form\TwigRenderer`
+ * deprecated `DebugCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument  of the constructor instead
+ * deprecated `LintCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument of the constructor instead
+
 3.3.0
 -----
 
  * added a `workflow_has_marked_place` function
+ * added a `workflow_marked_places` function
 
 3.2.0
 -----
@@ -33,7 +43,7 @@ CHANGELOG
    // ...
    $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'), $twig);
    // require Twig 1.30+
-   $twig->addRuntimeLoader(new \Twig_FactoryRuntimeLoader(array(
+   $twig->addRuntimeLoader(new \Twig\RuntimeLoader\FactoryRuntimeLoader(array(
        TwigRenderer::class => function () use ($rendererEngine, $csrfTokenManager) {
            return new TwigRenderer($rendererEngine, $csrfTokenManager);
        },

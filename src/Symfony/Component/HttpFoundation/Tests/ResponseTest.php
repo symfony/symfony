@@ -276,8 +276,10 @@ class ResponseTest extends ResponseTestCase
         $this->assertEquals($now->getTimestamp(), $date->getTimestamp(), '->getDate() returns the date when the header has been modified');
 
         $response = new Response('', 200);
+        $now = $this->createDateTimeNow();
         $response->headers->remove('Date');
-        $this->assertInstanceOf('\DateTime', $response->getDate());
+        $date = $response->getDate();
+        $this->assertEquals($now->getTimestamp(), $date->getTimestamp(), '->getDate() returns the current Date when the header has previously been removed');
     }
 
     public function testGetMaxAge()
@@ -608,6 +610,12 @@ class ResponseTest extends ResponseTestCase
         $response->setCache(array('private' => false));
         $this->assertTrue($response->headers->hasCacheControlDirective('public'));
         $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+
+        $response->setCache(array('immutable' => true));
+        $this->assertTrue($response->headers->hasCacheControlDirective('immutable'));
+
+        $response->setCache(array('immutable' => false));
+        $this->assertFalse($response->headers->hasCacheControlDirective('immutable'));
     }
 
     public function testSendContent()
@@ -627,6 +635,22 @@ class ResponseTest extends ResponseTestCase
 
         $this->assertTrue($response->headers->hasCacheControlDirective('public'));
         $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+    }
+
+    public function testSetImmutable()
+    {
+        $response = new Response();
+        $response->setImmutable();
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('immutable'));
+    }
+
+    public function testIsImmutable()
+    {
+        $response = new Response();
+        $response->setImmutable();
+
+        $this->assertTrue($response->isImmutable());
     }
 
     public function testSetExpires()
@@ -847,19 +871,10 @@ class ResponseTest extends ResponseTestCase
     {
         new DefaultResponse();
         $this->getMockBuilder(Response::class)->getMock();
-    }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Extending Symfony\Component\HttpFoundation\Response::getDate() in Symfony\Component\HttpFoundation\Tests\ExtendedResponse is deprecated %s.
-     * @expectedDeprecation Extending Symfony\Component\HttpFoundation\Response::setLastModified() in Symfony\Component\HttpFoundation\Tests\ExtendedResponse is deprecated %s.
-     */
-    public function testDeprecations()
-    {
-        new ExtendedResponse();
-
-        // Deprecations should not be triggered twice
-        new ExtendedResponse();
+        // we just need to ensure that subclasses of Response can be created without any deprecations
+        // being triggered if the subclass does not override any final methods
+        $this->addToAssertionCount(1);
     }
 
     public function validContentProvider()
@@ -900,6 +915,67 @@ class ResponseTest extends ResponseTestCase
     protected function provideResponse()
     {
         return new Response();
+    }
+
+    /**
+     * @see       http://github.com/zendframework/zend-diactoros for the canonical source repository
+     *
+     * @author    Fábio Pacheco
+     * @copyright Copyright (c) 2015-2016 Zend Technologies USA Inc. (http://www.zend.com)
+     * @license   https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
+     */
+    public function ianaCodesReasonPhrasesProvider()
+    {
+        if (!in_array('https', stream_get_wrappers(), true)) {
+            $this->markTestSkipped('The "https" wrapper is not available');
+        }
+
+        $ianaHttpStatusCodes = new \DOMDocument();
+
+        libxml_set_streams_context(stream_context_create(array(
+            'http' => array(
+                'method' => 'GET',
+                'timeout' => 30,
+            ),
+        )));
+
+        $ianaHttpStatusCodes->load('https://www.iana.org/assignments/http-status-codes/http-status-codes.xml');
+        if (!$ianaHttpStatusCodes->relaxNGValidate(__DIR__.'/schema/http-status-codes.rng')) {
+            self::fail('Invalid IANA\'s HTTP status code list.');
+        }
+
+        $ianaCodesReasonPhrases = array();
+
+        $xpath = new \DomXPath($ianaHttpStatusCodes);
+        $xpath->registerNamespace('ns', 'http://www.iana.org/assignments');
+
+        $records = $xpath->query('//ns:record');
+        foreach ($records as $record) {
+            $value = $xpath->query('.//ns:value', $record)->item(0)->nodeValue;
+            $description = $xpath->query('.//ns:description', $record)->item(0)->nodeValue;
+
+            if (in_array($description, array('Unassigned', '(Unused)'), true)) {
+                continue;
+            }
+
+            if (preg_match('/^([0-9]+)\s*\-\s*([0-9]+)$/', $value, $matches)) {
+                for ($value = $matches[1]; $value <= $matches[2]; ++$value) {
+                    $ianaCodesReasonPhrases[] = array($value, $description);
+                }
+            } else {
+                $ianaCodesReasonPhrases[] = array($value, $description);
+            }
+        }
+
+        return $ianaCodesReasonPhrases;
+    }
+
+    /**
+     * @dataProvider ianaCodesReasonPhrasesProvider
+     */
+    public function testReasonPhraseDefaultsAgainstIana($code, $reasonPhrase)
+    {
+        $this->assertEquals($reasonPhrase, Response::$statusTexts[$code]);
     }
 }
 

@@ -12,8 +12,10 @@
 namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -22,7 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  */
-class ServerStopCommand extends ServerCommand
+class ServerStopCommand extends Command
 {
     /**
      * {@inheritdoc}
@@ -36,13 +38,9 @@ class ServerStopCommand extends ServerCommand
             ))
             ->setDescription('Stops the local web server that was started with the server:start command')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> stops the local web server:
+<info>%command.name%</info> stops the local web server:
 
   <info>php %command.full_name%</info>
-
-To change the default bind address and the default port use the <info>address</info> argument:
-
-  <info>php %command.full_name% 127.0.0.1:8080</info>
 EOF
             )
         ;
@@ -53,7 +51,7 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
 
         try {
             $server = new WebServer();

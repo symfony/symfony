@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener;
 
-class RemoteUserAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
+class RemoteUserAuthenticationListenerTest extends TestCase
 {
     public function testGetPreAuthenticatedData()
     {

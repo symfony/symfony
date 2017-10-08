@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Asset\Tests\Context;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Context\RequestStackContext;
 
-class RequestStackContextTest extends \PHPUnit_Framework_TestCase
+class RequestStackContextTest extends TestCase
 {
     public function testGetBasePathEmpty()
     {
@@ -58,6 +59,15 @@ class RequestStackContextTest extends \PHPUnit_Framework_TestCase
 
         $requestStackContext = new RequestStackContext($requestStack);
 
+        $this->assertTrue($requestStackContext->isSecure());
+    }
+
+    public function testDefaultContext()
+    {
+        $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
+        $requestStackContext = new RequestStackContext($requestStack, 'default-path', true);
+
+        $this->assertSame('default-path', $requestStackContext->getBasePath());
         $this->assertTrue($requestStackContext->isSecure());
     }
 }

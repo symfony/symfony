@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\FormatterHelper;
 
-class FormatterHelperTest extends \PHPUnit_Framework_TestCase
+class FormatterHelperTest extends TestCase
 {
     public function testFormatSection()
     {

@@ -123,7 +123,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @link https://github.com/egulias/EmailValidator/blob/1.2.8/tests/egulias/Tests/EmailValidator/EmailValidatorTest.php
+     * @see https://github.com/egulias/EmailValidator/blob/1.2.8/tests/egulias/Tests/EmailValidator/EmailValidatorTest.php
      */
     public function getInvalidEmailsForStrictChecks()
     {
@@ -228,5 +228,33 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         );
 
         $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider provideCheckTypes
+     */
+    public function testEmptyHostIsNotValid($checkType, $violation)
+    {
+        $this->validator->validate(
+            'foo@bar.fr@',
+            new Email(array(
+                'message' => 'myMessage',
+                $checkType => true,
+            ))
+        );
+
+        $this
+            ->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"foo@bar.fr@"')
+            ->setCode($violation)
+            ->assertRaised();
+    }
+
+    public function provideCheckTypes()
+    {
+        return array(
+            array('checkMX', Email::MX_CHECK_FAILED_ERROR),
+            array('checkHost', Email::HOST_CHECK_FAILED_ERROR),
+        );
     }
 }

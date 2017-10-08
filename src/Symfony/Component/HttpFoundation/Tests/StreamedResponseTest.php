@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class StreamedResponseTest extends \PHPUnit_Framework_TestCase
+class StreamedResponseTest extends TestCase
 {
     public function testConstructor()
     {
@@ -50,10 +51,12 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepareWithHeadRequest()
     {
-        $response = new StreamedResponse(function () { echo 'foo'; });
+        $response = new StreamedResponse(function () { echo 'foo'; }, 200, array('Content-Length' => '123'));
         $request = Request::create('/', 'HEAD');
 
         $response->prepare($request);
+
+        $this->assertSame('123', $response->headers->get('Content-Length'));
     }
 
     public function testPrepareWithCacheHeaders()

@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\SessionListener;
+use Symfony\Component\HttpKernel\EventListener\TestSessionListener;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -24,7 +28,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
-class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
+class TestSessionListenerTest extends TestCase
 {
     /**
      * @var TestSessionListener
@@ -38,7 +42,7 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\TestSessionListener');
+        $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener');
         $this->session = $this->getSession();
     }
 
@@ -76,6 +80,15 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
         $this->sessionMustNotBeSaved();
 
         $this->filterResponse(new Request());
+    }
+
+    public function testDoesNotImplementServiceSubscriberInterface()
+    {
+        $this->assertTrue(interface_exists(ServiceSubscriberInterface::class));
+        $this->assertTrue(class_exists(SessionListener::class));
+        $this->assertTrue(class_exists(TestSessionListener::class));
+        $this->assertFalse(is_subclass_of(SessionListener::class, ServiceSubscriberInterface::class), 'Implementing ServiceSubscriberInterface would create a dep on the DI component, which eg Silex cannot afford');
+        $this->assertFalse(is_subclass_of(TestSessionListener::class, ServiceSubscriberInterface::class, 'Implementing ServiceSubscriberInterface would create a dep on the DI component, which eg Silex cannot afford'));
     }
 
     private function filterResponse(Request $request, $type = HttpKernelInterface::MASTER_REQUEST)

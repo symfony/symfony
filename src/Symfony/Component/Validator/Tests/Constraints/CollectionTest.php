@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Optional;
@@ -20,7 +21,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CollectionTest extends \PHPUnit_Framework_TestCase
+class CollectionTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException

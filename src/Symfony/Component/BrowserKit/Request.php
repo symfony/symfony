@@ -12,8 +12,6 @@
 namespace Symfony\Component\BrowserKit;
 
 /**
- * Request object.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Request
@@ -27,8 +25,6 @@ class Request
     protected $content;
 
     /**
-     * Constructor.
-     *
      * @param string $uri        The request URI
      * @param string $method     The HTTP method request
      * @param array  $parameters The request parameters

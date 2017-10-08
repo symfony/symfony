@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -21,9 +19,6 @@ class ProjectServiceContainer extends Container
     private $parameters;
     private $targetDirs = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->services = array();
@@ -35,45 +30,26 @@ class ProjectServiceContainer extends Container
         $this->aliases = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compile()
     {
-        throw new LogicException('You cannot compile a dumped frozen container.');
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFrozen()
+    public function isCompiled()
     {
         return true;
     }
 
-    /**
-     * Gets the 'bar' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance
-     */
-    protected function getBarService()
+<<<<<<< HEAD
+=======
+    public function isFrozen()
     {
-        $this->services['bar'] = $instance = new \stdClass();
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
 
-        $instance->foo = array(0 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo::withNoArgs */ function () {
-            return ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withNoArgs();
-        }, 1 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo::withArgs */ function ($a, \Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo $b = NULL, $c = array(0 => 123)) {
-            return ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withArgs($a, $b, $c);
-        }, 2 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo::withRefs */ function &(&$a = NULL, &$b) {
-            return ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withRefs($a, $b);
-        });
-
-        return $instance;
+        return true;
     }
 
+>>>>>>> 3.4
     /**
      * Gets the 'foo' service.
      *

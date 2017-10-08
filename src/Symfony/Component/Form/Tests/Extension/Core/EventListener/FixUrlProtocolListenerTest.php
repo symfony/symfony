@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener;
 
-class FixUrlProtocolListenerTest extends \PHPUnit_Framework_TestCase
+class FixUrlProtocolListenerTest extends TestCase
 {
     public function testFixHttpUrl()
     {

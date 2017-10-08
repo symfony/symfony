@@ -108,6 +108,7 @@ class ContentSecurityPolicyHandler
     {
         $response->headers->remove('X-Content-Security-Policy');
         $response->headers->remove('Content-Security-Policy');
+        $response->headers->remove('Content-Security-Policy-Report-Only');
     }
 
     /**
@@ -135,7 +136,8 @@ class ContentSecurityPolicyHandler
                     if (isset($headers[$header]['default-src'])) {
                         $headers[$header][$type] = $headers[$header]['default-src'];
                     } else {
-                        $headers[$header][$type] = array();
+                        // If there is no script-src/style-src and no default-src, no additional rules required.
+                        continue;
                     }
                 }
                 $ruleIsSet = true;
@@ -177,7 +179,7 @@ class ContentSecurityPolicyHandler
     private function generateCspHeader(array $directives)
     {
         return array_reduce(array_keys($directives), function ($res, $name) use ($directives) {
-            return ($res !== '' ? $res.'; ' : '').sprintf('%s %s', $name, implode(' ', $directives[$name]));
+            return ('' !== $res ? $res.'; ' : '').sprintf('%s %s', $name, implode(' ', $directives[$name]));
         }, '');
     }
 
@@ -254,6 +256,10 @@ class ContentSecurityPolicyHandler
 
         if ($response->headers->has('Content-Security-Policy')) {
             $headers['Content-Security-Policy'] = $this->parseDirectives($response->headers->get('Content-Security-Policy'));
+        }
+
+        if ($response->headers->has('Content-Security-Policy-Report-Only')) {
+            $headers['Content-Security-Policy-Report-Only'] = $this->parseDirectives($response->headers->get('Content-Security-Policy-Report-Only'));
         }
 
         if ($response->headers->has('X-Content-Security-Policy')) {

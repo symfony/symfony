@@ -12,9 +12,14 @@
 namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\Yaml\Dumper as YmlDumper;
+use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Tag\TaggedValue;
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -70,8 +75,8 @@ class YamlDumper extends Dumper
             $code .= sprintf("        class: %s\n", $this->dumper->dump($class));
         }
 
-        if (!$definition->isPublic()) {
-            $code .= "        public: false\n";
+        if (!$definition->isPrivate()) {
+            $code .= sprintf("        public: %s\n", $definition->isPublic() ? 'true' : 'false');
         }
 
         $tagsCode = '';
@@ -95,7 +100,7 @@ class YamlDumper extends Dumper
         }
 
         if ($definition->isSynthetic()) {
-            $code .= sprintf("        synthetic: true\n");
+            $code .= "        synthetic: true\n";
         }
 
         if ($definition->isDeprecated()) {
@@ -106,16 +111,16 @@ class YamlDumper extends Dumper
             $code .= "        autowire: true\n";
         }
 
-        $autowiringTypesCode = '';
-        foreach ($definition->getAutowiringTypes() as $autowiringType) {
-            $autowiringTypesCode .= sprintf("            - %s\n", $this->dumper->dump($autowiringType));
+        if ($definition->isAutoconfigured()) {
+            $code .= "        autoconfigure: true\n";
         }
-        if ($autowiringTypesCode) {
-            $code .= sprintf("        autowiring_types:\n%s", $autowiringTypesCode);
+
+        if ($definition->isAbstract()) {
+            $code .= "        abstract: true\n";
         }
 
         if ($definition->isLazy()) {
-            $code .= sprintf("        lazy: true\n");
+            $code .= "        lazy: true\n";
         }
 
         if ($definition->getArguments()) {
@@ -166,11 +171,11 @@ class YamlDumper extends Dumper
      */
     private function addServiceAlias($alias, $id)
     {
-        if ($id->isPublic()) {
+        if ($id->isPrivate()) {
             return sprintf("    %s: '@%s'\n", $alias, $id);
         }
 
-        return sprintf("    %s:\n        alias: %s\n        public: false\n", $alias, $id);
+        return sprintf("    %s:\n        alias: %s\n        public: %s\n", $alias, $id, $id->isPublic() ? 'true' : 'false');
     }
 
     /**
@@ -211,7 +216,7 @@ class YamlDumper extends Dumper
             return '';
         }
 
-        $parameters = $this->prepareParameters($this->container->getParameterBag()->all(), $this->container->isFrozen());
+        $parameters = $this->prepareParameters($this->container->getParameterBag()->all(), $this->container->isCompiled());
 
         return $this->dumper->dump(array('parameters' => $parameters), 2);
     }
@@ -247,10 +252,20 @@ class YamlDumper extends Dumper
      */
     private function dumpValue($value)
     {
-        if ($value instanceof IteratorArgument) {
-            $value = array('=iterator' => $value->getValues());
-        } elseif ($value instanceof ClosureProxyArgument) {
-            $value = array('=closure_proxy' => $value->getValues());
+        if ($value instanceof ServiceClosureArgument) {
+            $value = $value->getValues()[0];
+        }
+        if ($value instanceof ArgumentInterface) {
+            if ($value instanceof TaggedIteratorArgument) {
+                return new TaggedValue('tagged', $value->getTag());
+            }
+            if ($value instanceof IteratorArgument) {
+                $tag = 'iterator';
+            } else {
+                throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', get_class($value)));
+            }
+
+            return new TaggedValue($tag, $this->dumpValue($value->getValues()));
         }
 
         if (is_array($value)) {
@@ -266,6 +281,8 @@ class YamlDumper extends Dumper
             return $this->getParameterCall((string) $value);
         } elseif ($value instanceof Expression) {
             return $this->getExpressionCall((string) $value);
+        } elseif ($value instanceof Definition) {
+            return new TaggedValue('service', (new Parser())->parse("_:\n".$this->addService('_', $value), Yaml::PARSE_CUSTOM_TAGS)['_']['_']);
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }
@@ -283,8 +300,12 @@ class YamlDumper extends Dumper
      */
     private function getServiceCall($id, Reference $reference = null)
     {
-        if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
-            return sprintf('@?%s', $id);
+        if (null !== $reference) {
+            switch ($reference->getInvalidBehavior()) {
+                case ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE: break;
+                case ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE: return sprintf('@!%s', $id);
+                default: return sprintf('@?%s', $id);
+            }
         }
 
         return sprintf('@%s', $id);

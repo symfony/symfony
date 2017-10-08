@@ -28,8 +28,6 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     private $calendar;
 
     /**
-     * Constructor.
-     *
      * @see BaseDateTimeTransformer::formats for available format options
      *
      * @param string $inputTimezone  The name of the input timezone
@@ -74,8 +72,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @return string|array Localized date string/array
      *
-     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
-     *                                       or if the date could not be transformed.
+     * @throws TransformationFailedException if the given value is not a \DateTimeInterface
+     *                                       or if the date could not be transformed
      */
     public function transform($dateTime)
     {
@@ -89,7 +87,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
         $value = $this->getIntlDateFormatter()->format($dateTime->getTimestamp());
 
-        if (intl_get_error_code() != 0) {
+        if (0 != intl_get_error_code()) {
             throw new TransformationFailedException(intl_get_error_message());
         }
 
@@ -122,7 +120,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
         $timestamp = $this->getIntlDateFormatter($dateOnly)->parse($value);
 
-        if (intl_get_error_code() != 0) {
+        if (0 != intl_get_error_code()) {
             throw new TransformationFailedException(intl_get_error_message());
         }
 
@@ -151,17 +149,21 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Returns a preconfigured IntlDateFormatter instance.
      *
-     * @param bool $ignoreTimezone Use UTC regardless of the configured timezone.
+     * @param bool $ignoreTimezone use UTC regardless of the configured timezone
      *
      * @return \IntlDateFormatter
      *
-     * @throws TransformationFailedException in case the date formatter can not be constructed.
+     * @throws TransformationFailedException in case the date formatter can not be constructed
      */
     protected function getIntlDateFormatter($ignoreTimezone = false)
     {
         $dateFormat = $this->dateFormat;
         $timeFormat = $this->timeFormat;
         $timezone = $ignoreTimezone ? 'UTC' : $this->outputTimezone;
+        if (class_exists('IntlTimeZone', false)) {
+            // see https://bugs.php.net/bug.php?id=66323
+            $timezone = \IntlTimeZone::createTimeZone($timezone);
+        }
         $calendar = $this->calendar;
         $pattern = $this->pattern;
 

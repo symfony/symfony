@@ -345,8 +345,8 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         );
 
         $form = $this->factory->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType')
-          ->add($collection)
-          ->getForm();
+            ->add($collection)
+            ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div

@@ -9,7 +9,7 @@ return function (InputInterface $input, OutputInterface $output) {
     $output = new SymfonyStyle($input, $output);
     $stream = fopen('php://memory', 'r+', false);
 
-    fputs($stream, "Foo\nBar\nBaz");
+    fwrite($stream, "Foo\nBar\nBaz");
     rewind($stream);
     $input->setStream($stream);
 

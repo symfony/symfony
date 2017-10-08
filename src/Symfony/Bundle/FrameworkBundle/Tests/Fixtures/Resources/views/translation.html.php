@@ -31,3 +31,19 @@ EOF
     10,
     array('%count%' => 10)
 ) ?>
+
+<?php echo $view['translator']->trans('other-domain-test-no-params-short-array', array(), 'not_messages'); ?>
+
+<?php echo $view['translator']->trans('other-domain-test-no-params-long-array', array(), 'not_messages'); ?>
+
+<?php echo $view['translator']->trans('other-domain-test-params-short-array', array('foo' => 'bar'), 'not_messages'); ?>
+
+<?php echo $view['translator']->trans('other-domain-test-params-long-array', array('foo' => 'bar'), 'not_messages'); ?>
+
+<?php echo $view['translator']->transChoice('other-domain-test-trans-choice-short-array-%count%', 10, array('%count%' => 10), 'not_messages'); ?>
+
+<?php echo $view['translator']->transChoice('other-domain-test-trans-choice-long-array-%count%', 10, array('%count%' => 10), 'not_messages'); ?>
+
+<?php echo $view['translator']->trans('typecast', array('a' => (int) '123'), 'not_messages'); ?>
+<?php echo $view['translator']->transChoice('msg1', 10 + 1, array(), 'not_messages'); ?>
+<?php echo $view['translator']->transChoice('msg2', ceil(4.5), array(), 'not_messages'); ?>

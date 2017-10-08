@@ -34,26 +34,6 @@ col-sm-2
 {##}</div>
 {%- endblock form_row %}
 
-{% block checkbox_row -%}
-    {{- block('checkbox_radio_row') -}}
-{%- endblock checkbox_row %}
-
-{% block radio_row -%}
-    {{- block('checkbox_radio_row') -}}
-{%- endblock radio_row %}
-
-{% block checkbox_radio_row -%}
-{% spaceless %}
-    <div class="form-group{% if not valid %} has-error{% endif %}">
-        <div class="{{ block('form_label_class') }}"></div>
-        <div class="{{ block('form_group_class') }}">
-            {{ form_widget(form) }}
-            {{ form_errors(form) }}
-        </div>
-    </div>
-{% endspaceless %}
-{%- endblock checkbox_radio_row %}
-
 {% block submit_row -%}
 {% spaceless %}
     <div class="form-group">

@@ -38,10 +38,10 @@ class MergeCollectionListener implements EventSubscriberInterface
     /**
      * Creates a new listener.
      *
-     * @param bool $allowAdd    Whether values might be added to the
-     *                          collection.
-     * @param bool $allowDelete Whether values might be removed from the
-     *                          collection.
+     * @param bool $allowAdd    whether values might be added to the
+     *                          collection
+     * @param bool $allowDelete whether values might be removed from the
+     *                          collection
      */
     public function __construct($allowAdd = false, $allowDelete = false)
     {
@@ -80,7 +80,7 @@ class MergeCollectionListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$dataToMergeInto) {
+        if (null === $dataToMergeInto) {
             // No original data was set. Set it if allowed
             if ($this->allowAdd) {
                 $dataToMergeInto = $data;

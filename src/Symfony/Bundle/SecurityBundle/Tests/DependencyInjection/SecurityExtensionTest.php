@@ -11,12 +11,13 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
+class SecurityExtensionTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
@@ -37,6 +38,7 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
                     'form_login' => array(
                         'check_path' => '/some_area/login_check',
                     ),
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -60,6 +62,7 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'firewalls' => array(
                 'some_firewall' => array(
                     'pattern' => '/.*',
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -87,6 +90,7 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
                 'some_firewall' => array(
                     'pattern' => '/.*',
                     'http_basic' => array(),
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -109,6 +113,7 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
                 'some_firewall' => array(
                     'pattern' => '/.*',
                     'http_basic' => null,
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -116,6 +121,30 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
+    }
+
+    public function testSwitchUserNotStatelessOnStatelessFirewall()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'stateless' => true,
+                    'http_basic' => null,
+                    'switch_user' => array('stateless' => false),
+                    'logout_on_user_change' => true,
+                ),
+            ),
+        ));
+
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('security.authentication.switchuser_listener.some_firewall')->getArgument(9));
     }
 
     protected function getRawContainer()

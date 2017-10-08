@@ -5,12 +5,10 @@
     "lazy": true,
     "shared": true,
     "abstract": true,
+    "autowire": false,
+    "autoconfigure": false,
     "file": null,
     "factory_class": "Full\\Qualified\\FactoryClass",
     "factory_method": "get",
-    "tags": [
-
-    ],
-    "autowire": false,
-    "autowiring_types": []
+    "tags": []
 }

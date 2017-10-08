@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.24.16",
+    "Version": "2.1.32.59",
     "Names": {
         "AC": "Pulau Ascension",
         "AD": "Andorra",
@@ -56,7 +56,7 @@
         "CW": "Curacao",
         "CX": "Pulau Krismas",
         "CY": "Cyprus",
-        "CZ": "Republik Czech",
+        "CZ": "Czechia",
         "DE": "Jerman",
         "DG": "Diego Garcia",
         "DJ": "Djibouti",
@@ -236,6 +236,7 @@
         "UA": "Ukraine",
         "UG": "Uganda",
         "UM": "Kepulauan Terpencil A.S.",
+        "UN": "Bangsa-bangsa Bersatu",
         "US": "Amerika Syarikat",
         "UY": "Uruguay",
         "UZ": "Uzbekistan",

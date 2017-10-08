@@ -11,84 +11,76 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigBuilder;
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormConfigTest extends \PHPUnit_Framework_TestCase
+class FormConfigTest extends TestCase
 {
     public function getHtml4Ids()
     {
         return array(
-            array('z0', true),
-            array('A0', true),
-            array('A9', true),
-            array('Z0', true),
-            array('#', false),
-            array('a#', false),
-            array('a$', false),
-            array('a%', false),
-            array('a ', false),
-            array("a\t", false),
-            array("a\n", false),
-            array('a-', true),
-            array('a_', true),
-            array('a:', true),
+            array('z0'),
+            array('A0'),
+            array('A9'),
+            array('Z0'),
+            array('#', 'Symfony\Component\Form\Exception\InvalidArgumentException'),
+            array('a#', 'Symfony\Component\Form\Exception\InvalidArgumentException'),
+            array('a$', 'Symfony\Component\Form\Exception\InvalidArgumentException'),
+            array('a%', 'Symfony\Component\Form\Exception\InvalidArgumentException'),
+            array('a ', 'Symfony\Component\Form\Exception\InvalidArgumentException'),
+            array("a\t", 'Symfony\Component\Form\Exception\InvalidArgumentException'),
+            array("a\n", 'Symfony\Component\Form\Exception\InvalidArgumentException'),
+            array('a-'),
+            array('a_'),
+            array('a:'),
             // Periods are allowed by the HTML4 spec, but disallowed by us
             // because they break the generated property paths
-            array('a.', false),
+            array('a.', 'Symfony\Component\Form\Exception\InvalidArgumentException'),
             // Contrary to the HTML4 spec, we allow names starting with a
             // number, otherwise naming fields by collection indices is not
             // possible.
             // For root forms, leading digits will be stripped from the
             // "id" attribute to produce valid HTML4.
-            array('0', true),
-            array('9', true),
+            array('0'),
+            array('9'),
             // Contrary to the HTML4 spec, we allow names starting with an
             // underscore, since this is already a widely used practice in
             // Symfony.
             // For root forms, leading underscores will be stripped from the
             // "id" attribute to produce valid HTML4.
-            array('_', true),
+            array('_'),
             // Integers are allowed
-            array(0, true),
-            array(123, true),
+            array(0),
+            array(123),
             // NULL is allowed
-            array(null, true),
+            array(null),
             // Other types are not
-            array(1.23, false),
-            array(5., false),
-            array(true, false),
-            array(new \stdClass(), false),
+            array(1.23, 'Symfony\Component\Form\Exception\UnexpectedTypeException'),
+            array(5., 'Symfony\Component\Form\Exception\UnexpectedTypeException'),
+            array(true, 'Symfony\Component\Form\Exception\UnexpectedTypeException'),
+            array(new \stdClass(), 'Symfony\Component\Form\Exception\UnexpectedTypeException'),
         );
     }
 
     /**
      * @dataProvider getHtml4Ids
      */
-    public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $accepted)
+    public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $expectedException = null)
     {
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
 
-        try {
-            new FormConfigBuilder($name, null, $dispatcher);
-            if (!$accepted) {
-                $this->fail(sprintf('The value "%s" should not be accepted', $name));
-            }
-        } catch (UnexpectedTypeException $e) {
-            // if the value was not accepted, but should be, rethrow exception
-            if ($accepted) {
-                throw $e;
-            }
-        } catch (InvalidArgumentException $e) {
-            // if the value was not accepted, but should be, rethrow exception
-            if ($accepted) {
-                throw $e;
-            }
+        if (null !== $expectedException && method_exists($this, 'expectException')) {
+            $this->expectException($expectedException);
+        } elseif (null !== $expectedException) {
+            $this->setExpectedException($expectedException);
         }
+
+        $formConfigBuilder = new FormConfigBuilder($name, null, $dispatcher);
+
+        $this->assertSame((string) $name, $formConfigBuilder->getName());
     }
 
     public function testGetRequestHandlerCreatesNativeRequestHandlerIfNotSet()
@@ -108,27 +100,42 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testSetMethodAllowsGet()
     {
-        $this->getConfigBuilder()->setMethod('GET');
+        $formConfigBuilder = $this->getConfigBuilder();
+        $formConfigBuilder->setMethod('GET');
+
+        self::assertSame('GET', $formConfigBuilder->getMethod());
     }
 
     public function testSetMethodAllowsPost()
     {
-        $this->getConfigBuilder()->setMethod('POST');
+        $formConfigBuilder = $this->getConfigBuilder();
+        $formConfigBuilder->setMethod('POST');
+
+        self::assertSame('POST', $formConfigBuilder->getMethod());
     }
 
     public function testSetMethodAllowsPut()
     {
-        $this->getConfigBuilder()->setMethod('PUT');
+        $formConfigBuilder = $this->getConfigBuilder();
+        $formConfigBuilder->setMethod('PUT');
+
+        self::assertSame('PUT', $formConfigBuilder->getMethod());
     }
 
     public function testSetMethodAllowsDelete()
     {
-        $this->getConfigBuilder()->setMethod('DELETE');
+        $formConfigBuilder = $this->getConfigBuilder();
+        $formConfigBuilder->setMethod('DELETE');
+
+        self::assertSame('DELETE', $formConfigBuilder->getMethod());
     }
 
     public function testSetMethodAllowsPatch()
     {
-        $this->getConfigBuilder()->setMethod('PATCH');
+        $formConfigBuilder = $this->getConfigBuilder();
+        $formConfigBuilder->setMethod('PATCH');
+
+        self::assertSame('PATCH', $formConfigBuilder->getMethod());
     }
 
     /**

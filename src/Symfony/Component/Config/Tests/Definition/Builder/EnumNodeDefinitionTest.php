@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\EnumNodeDefinition;
 
-class EnumNodeDefinitionTest extends \PHPUnit_Framework_TestCase
+class EnumNodeDefinitionTest extends TestCase
 {
     public function testWithOneValue()
     {
@@ -60,5 +61,17 @@ class EnumNodeDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $node = $def->getNode();
         $this->assertEquals(array('foo', 'bar'), $node->getValues());
+    }
+
+    public function testSetDeprecated()
+    {
+        $def = new EnumNodeDefinition('foo');
+        $def->values(array('foo', 'bar'));
+        $def->setDeprecated('The "%path%" node is deprecated.');
+
+        $node = $def->getNode();
+
+        $this->assertTrue($node->isDeprecated());
+        $this->assertSame('The "foo" node is deprecated.', $def->getNode()->getDeprecationMessage($node->getName(), $node->getPath()));
     }
 }

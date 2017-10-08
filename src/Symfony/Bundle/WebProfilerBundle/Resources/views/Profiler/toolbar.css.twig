@@ -250,6 +250,11 @@
     font-size: 12px;
     height: 17px;
     line-height: 17px;
+    margin-right: 5px;
+}
+
+.sf-toolbar-block-ajax .sf-toolbar-icon {
+    cursor: pointer;
 }
 
 .sf-toolbar-status-green .sf-toolbar-label,
@@ -295,15 +300,21 @@
     margin-left: 4px;
 }
 
-.sf-toolbar-block:hover {
+.sf-toolbar-block:hover,
+.sf-toolbar-block.hover {
     position: relative;
 }
-.sf-toolbar-block:hover .sf-toolbar-icon {
+.sf-toolbar-block:hover .sf-toolbar-icon,
+.sf-toolbar-block.hover .sf-toolbar-icon {
     background-color: #444;
     position: relative;
     z-index: 10002;
 }
-.sf-toolbar-block:hover .sf-toolbar-info {
+.sf-toolbar-block-ajax.hover .sf-toolbar-info {
+    z-index: 10001;
+}
+.sf-toolbar-block:hover .sf-toolbar-info,
+.sf-toolbar-block.hover .sf-toolbar-info {
     display: block;
     padding: 10px;
     max-width: 480px;
@@ -373,6 +384,14 @@
     100% { background: #222; }
 }
 
+.sf-toolbar-block.sf-toolbar-block-dump .sf-toolbar-info {
+    max-width: none;
+    width: 100%;
+    position: fixed;
+    box-sizing: border-box;
+    left: 0;
+}
+
 .sf-toolbar-block-dump pre.sf-dump {
     background-color: #222;
     border-color: #777;
@@ -381,6 +400,9 @@
 }
 .sf-toolbar-block-dump pre.sf-dump:last-child {
     margin-bottom: 0;
+}
+.sf-toolbar-block-dump pre.sf-dump .sf-dump-search-wrapper {
+    margin-bottom: 5px;
 }
 .sf-toolbar-block-dump pre.sf-dump span.sf-dump-search-count {
     color: #333;
@@ -396,34 +418,6 @@
 .sf-toolbar-block-dump .sf-toolbar-info img {
     display: none;
 }
-
-/* Override the setting when the toolbar is on the top */
-{% if position == 'top' %}
-    .sf-minitoolbar {
-        border-bottom-left-radius: 4px;
-        border-top-left-radius: 0;
-        bottom: auto;
-        right: 0;
-        top: 0;
-    }
-
-    .sf-toolbarreset {
-        bottom: auto;
-        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
-        top: 0;
-    }
-
-    .sf-toolbar-block .sf-toolbar-info {
-        bottom: auto;
-        top: 36px;
-    }
-{% endif %}
-
-{% if not floatable %}
-    .sf-toolbarreset {
-        position: static;
-    }
-{% endif %}
 
 /* Responsive Design */
 .sf-toolbar-icon .sf-toolbar-label,
@@ -518,6 +512,43 @@
 
     .sf-toolbar-block .sf-toolbar-info-piece-additional:empty,
     .sf-toolbar-block .sf-toolbar-info-piece-additional-detail:empty {
+        display: none;
+    }
+}
+
+/***** Error Toolbar *****/
+.sf-error-toolbar .sf-toolbarreset {
+    background: #222;
+    color: #f5f5f5;
+    font: 13px/36px Arial, sans-serif;
+    height: 36px;
+    padding: 0 15px;
+    text-align: left;
+}
+
+.sf-error-toolbar .sf-toolbarreset svg {
+    height: auto;
+}
+
+.sf-error-toolbar .sf-toolbarreset a {
+    color: #99cdd8;
+    margin-left: 5px;
+    text-decoration: underline;
+}
+
+.sf-error-toolbar .sf-toolbarreset a:hover {
+    text-decoration: none;
+}
+
+.sf-error-toolbar .sf-toolbarreset .sf-toolbar-icon {
+    float: left;
+    padding: 5px 0;
+    margin-right: 10px;
+}
+
+/***** Media query print: Do not print the Toolbar. *****/
+@media print {
+    .sf-toolbar {
         display: none;
     }
 }

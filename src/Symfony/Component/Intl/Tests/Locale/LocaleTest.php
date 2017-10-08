@@ -153,6 +153,8 @@ class LocaleTest extends AbstractLocaleTest
     public function testSetDefaultAcceptsEn()
     {
         $this->call('setDefault', 'en');
+
+        $this->assertSame('en', $this->call('getDefault'));
     }
 
     protected function call($methodName)

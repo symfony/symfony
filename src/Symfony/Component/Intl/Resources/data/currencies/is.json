@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.59",
     "Names": {
         "ADP": [
             "ADP",
@@ -129,9 +129,13 @@
             "BWP",
             "botsvönsk púla"
         ],
+        "BYN": [
+            "BYN",
+            "hvítrússnesk rúbla"
+        ],
         "BYR": [
             "BYR",
-            "hvítrússnesk rúbla"
+            "hvítrússnesk rúbla (2000–2016)"
         ],
         "BZD": [
             "BZD",

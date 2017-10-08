@@ -40,12 +40,12 @@ class SplCaster
             $prefix.'storage' => $c->getArrayCopy(),
         );
 
-        if ($class === 'ArrayObject') {
+        if ('ArrayObject' === $class) {
             $a = $b;
         } else {
             if (!($flags & \ArrayObject::STD_PROP_LIST)) {
                 $c->setFlags(\ArrayObject::STD_PROP_LIST);
-                $a = Caster::castObject($c, new \ReflectionClass($class));
+                $a = Caster::castObject($c, $class);
                 $c->setFlags($flags);
             }
 
@@ -184,7 +184,7 @@ class SplCaster
         $storage = array();
         unset($a[Caster::PREFIX_DYNAMIC."\0gcdata"]); // Don't hit https://bugs.php.net/65967
 
-        foreach ($c as $obj) {
+        foreach (clone $c as $obj) {
             $storage[spl_object_hash($obj)] = array(
                 'object' => $obj,
                 'info' => $c->getInfo(),

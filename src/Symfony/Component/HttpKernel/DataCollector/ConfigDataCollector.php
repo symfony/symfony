@@ -15,13 +15,12 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\VarDumper\Caster\LinkStub;
 
 /**
- * ConfigDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ConfigDataCollector extends DataCollector
+class ConfigDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     /**
      * @var KernelInterface
@@ -29,10 +28,9 @@ class ConfigDataCollector extends DataCollector
     private $kernel;
     private $name;
     private $version;
+    private $hasVarDumper;
 
     /**
-     * Constructor.
-     *
      * @param string $name    The name of the application using the web profiler
      * @param string $version The version of the application using the web profiler
      */
@@ -40,6 +38,7 @@ class ConfigDataCollector extends DataCollector
     {
         $this->name = $name;
         $this->version = $version;
+        $this->hasVarDumper = class_exists(LinkStub::class);
     }
 
     /**
@@ -79,7 +78,7 @@ class ConfigDataCollector extends DataCollector
 
         if (isset($this->kernel)) {
             foreach ($this->kernel->getBundles() as $name => $bundle) {
-                $this->data['bundles'][$name] = $bundle->getPath();
+                $this->data['bundles'][$name] = $this->hasVarDumper ? new LinkStub($bundle->getPath()) : $bundle->getPath();
             }
 
             $this->data['symfony_state'] = $this->determineSymfonyState();
@@ -94,6 +93,19 @@ class ConfigDataCollector extends DataCollector
             $this->data['php_version'] = $matches[1];
             $this->data['php_version_extra'] = $matches[2];
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->data = array();
+    }
+
+    public function lateCollect()
+    {
+        $this->data = $this->cloneVar($this->data);
     }
 
     public function getApplicationName()

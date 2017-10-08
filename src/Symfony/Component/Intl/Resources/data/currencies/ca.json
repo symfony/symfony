@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.59",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "nou ruble bielorús (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "ruble bielorús"
+        ],
         "BYR": [
             "BYR",
-            "ruble bielorús"
+            "ruble bielorús (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -768,11 +772,11 @@
         ],
         "PEN": [
             "PEN",
-            "nou sol peruà"
+            "sol peruà"
         ],
         "PES": [
             "PES",
-            "sol peruà"
+            "sol peruà (1863–1965)"
         ],
         "PGK": [
             "PGK",

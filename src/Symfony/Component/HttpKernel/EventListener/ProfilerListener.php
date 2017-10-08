@@ -37,8 +37,6 @@ class ProfilerListener implements EventSubscriberInterface
     protected $parents;
 
     /**
-     * Constructor.
-     *
      * @param Profiler                     $profiler           A Profiler instance
      * @param RequestStack                 $requestStack       A RequestStack instance
      * @param RequestMatcherInterface|null $matcher            A RequestMatcher instance
@@ -107,8 +105,7 @@ class ProfilerListener implements EventSubscriberInterface
     {
         // attach children to parents
         foreach ($this->profiles as $request) {
-            // isset call should be removed when requestStack is required
-            if (isset($this->parents[$request]) && null !== $parentRequest = $this->parents[$request]) {
+            if (null !== $parentRequest = $this->parents[$request]) {
                 if (isset($this->profiles[$parentRequest])) {
                     $this->profiles[$parentRequest]->addChild($this->profiles[$request]);
                 }

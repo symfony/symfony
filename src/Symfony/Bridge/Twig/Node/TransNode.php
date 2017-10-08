@@ -11,12 +11,23 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Twig\Compiler;
+use Twig\Node\Expression\AbstractExpression;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\NameExpression;
+use Twig\Node\Node;
+use Twig\Node\TextNode;
+
+// BC/FC with namespaced Twig
+class_exists('Twig\Node\Expression\ArrayExpression');
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TransNode extends \Twig_Node
+class TransNode extends Node
 {
-    public function __construct(\Twig_Node $body, \Twig_Node $domain = null, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, \Twig_Node_Expression $locale = null, $lineno = 0, $tag = null)
+    public function __construct(Node $body, Node $domain = null, AbstractExpression $count = null, AbstractExpression $vars = null, AbstractExpression $locale = null, $lineno = 0, $tag = null)
     {
         $nodes = array('body' => $body);
         if (null !== $domain) {
@@ -35,17 +46,12 @@ class TransNode extends \Twig_Node
         parent::__construct($nodes, array(), $lineno, $tag);
     }
 
-    /**
-     * Compiles the node to PHP.
-     *
-     * @param \Twig_Compiler $compiler A Twig_Compiler instance
-     */
-    public function compile(\Twig_Compiler $compiler)
+    public function compile(Compiler $compiler)
     {
         $compiler->addDebugInfo($this);
 
-        $defaults = new \Twig_Node_Expression_Array(array(), -1);
-        if ($this->hasNode('vars') && ($vars = $this->getNode('vars')) instanceof \Twig_Node_Expression_Array) {
+        $defaults = new ArrayExpression(array(), -1);
+        if ($this->hasNode('vars') && ($vars = $this->getNode('vars')) instanceof ArrayExpression) {
             $defaults = $this->getNode('vars');
             $vars = null;
         }
@@ -96,11 +102,11 @@ class TransNode extends \Twig_Node
         $compiler->raw(");\n");
     }
 
-    protected function compileString(\Twig_Node $body, \Twig_Node_Expression_Array $vars, $ignoreStrictCheck = false)
+    protected function compileString(Node $body, ArrayExpression $vars, $ignoreStrictCheck = false)
     {
-        if ($body instanceof \Twig_Node_Expression_Constant) {
+        if ($body instanceof ConstantExpression) {
             $msg = $body->getAttribute('value');
-        } elseif ($body instanceof \Twig_Node_Text) {
+        } elseif ($body instanceof TextNode) {
             $msg = $body->getAttribute('data');
         } else {
             return array($body, $vars);
@@ -109,18 +115,18 @@ class TransNode extends \Twig_Node
         preg_match_all('/(?<!%)%([^%]+)%/', $msg, $matches);
 
         foreach ($matches[1] as $var) {
-            $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getTemplateLine());
+            $key = new ConstantExpression('%'.$var.'%', $body->getTemplateLine());
             if (!$vars->hasElement($key)) {
                 if ('count' === $var && $this->hasNode('count')) {
                     $vars->addElement($this->getNode('count'), $key);
                 } else {
-                    $varExpr = new \Twig_Node_Expression_Name($var, $body->getTemplateLine());
+                    $varExpr = new NameExpression($var, $body->getTemplateLine());
                     $varExpr->setAttribute('ignore_strict_check', $ignoreStrictCheck);
                     $vars->addElement($varExpr, $key);
                 }
             }
         }
 
-        return array(new \Twig_Node_Expression_Constant(str_replace('%%', '%', trim($msg)), $body->getTemplateLine()), $vars);
+        return array(new ConstantExpression(str_replace('%%', '%', trim($msg)), $body->getTemplateLine()), $vars);
     }
 }

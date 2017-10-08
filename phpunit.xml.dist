@@ -5,6 +5,8 @@
          backupGlobals="false"
          colors="true"
          bootstrap="vendor/autoload.php"
+         failOnRisky="true"
+         failOnWarning="true"
 >
     <php>
         <ini name="error_reporting" value="-1" />
@@ -62,6 +64,8 @@
                         <array>
                             <element><string>Cache\IntegrationTests</string></element>
                             <element><string>Doctrine\Common\Cache</string></element>
+                            <element><string>Symfony\Component\Cache</string></element>
+                            <element><string>Symfony\Component\Cache\Traits</string></element>
                             <element><string>Symfony\Component\Console</string></element>
                             <element><string>Symfony\Component\HttpFoundation</string></element>
                         </array>

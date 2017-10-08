@@ -29,16 +29,15 @@ abstract class BaseNode implements NodeInterface
     protected $finalValidationClosures = array();
     protected $allowOverwrite = true;
     protected $required = false;
+    protected $deprecationMessage = null;
     protected $equivalentValues = array();
     protected $attributes = array();
 
     /**
-     * Constructor.
-     *
      * @param string        $name   The name of the node
      * @param NodeInterface $parent The parent of this node
      *
-     * @throws \InvalidArgumentException if the name contains a period.
+     * @throws \InvalidArgumentException if the name contains a period
      */
     public function __construct($name, NodeInterface $parent = null)
     {
@@ -142,6 +141,19 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * Sets this node as deprecated.
+     *
+     * You can use %node% and %path% placeholders in your message to display,
+     * respectively, the node name and its complete path.
+     *
+     * @param string|null $message Deprecated message
+     */
+    public function setDeprecated($message)
+    {
+        $this->deprecationMessage = $message;
+    }
+
+    /**
      * Sets if this node can be overridden.
      *
      * @param bool $allow
@@ -179,6 +191,29 @@ abstract class BaseNode implements NodeInterface
     public function isRequired()
     {
         return $this->required;
+    }
+
+    /**
+     * Checks if this node is deprecated.
+     *
+     * @return bool
+     */
+    public function isDeprecated()
+    {
+        return null !== $this->deprecationMessage;
+    }
+
+    /**
+     * Returns the deprecated message.
+     *
+     * @param string $node the configuration node name
+     * @param string $path the path of the node
+     *
+     * @return string
+     */
+    public function getDeprecationMessage($node, $path)
+    {
+        return strtr($this->deprecationMessage, array('%node%' => $node, '%path%' => $path));
     }
 
     /**

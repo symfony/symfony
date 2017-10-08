@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Util;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Util\OrderedHashMap;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class OrderedHashMapTest extends \PHPUnit_Framework_TestCase
+class OrderedHashMapTest extends TestCase
 {
     public function testGet()
     {
@@ -113,8 +114,11 @@ class OrderedHashMapTest extends \PHPUnit_Framework_TestCase
     public function testUnsetNonExistingSucceeds()
     {
         $map = new OrderedHashMap();
+        $map['second'] = 2;
 
         unset($map['first']);
+
+        $this->assertSame(array('second' => 2), iterator_to_array($map));
     }
 
     public function testEmptyIteration()

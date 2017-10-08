@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -20,49 +18,52 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
+    private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
-        $this->services = array();
-        $this->normalizedIds = array(
-            'symfony\\component\\dependencyinjection\\tests\\fixtures\\container33\\foo' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Container33\\Foo',
-        );
+        $this->services = $this->privates = array();
         $this->methodMap = array(
-            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Container33\\Foo' => 'getSymfony_Component_DependencyInjection_Tests_Fixtures_Container33_FooService',
+            'Bar\\Foo' => 'getFooService',
+            'Foo\\Foo' => 'getFoo2Service',
         );
 
         $this->aliases = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function compile()
+    public function reset()
     {
-        throw new LogicException('You cannot compile a dumped frozen container.');
+        $this->privates = array();
+        parent::reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFrozen()
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
+    }
+
+    public function isCompiled()
     {
         return true;
     }
 
     /**
-     * Gets the 'Symfony\Component\DependencyInjection\Tests\Fixtures\Container33\Foo' service.
+     * Gets the public 'Bar\Foo' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\Container33\Foo A Symfony\Component\DependencyInjection\Tests\Fixtures\Container33\Foo instance
+     * @return \Bar\Foo
      */
-    protected function getSymfony_Component_DependencyInjection_Tests_Fixtures_Container33_FooService()
+    protected function getFooService()
     {
-        return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\Container33\Foo'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Container33\Foo();
+        return $this->services['Bar\Foo'] = new \Bar\Foo();
+    }
+
+    /**
+     * Gets the public 'Foo\Foo' shared service.
+     *
+     * @return \Foo\Foo
+     */
+    protected function getFoo2Service()
+    {
+        return $this->services['Foo\Foo'] = new \Foo\Foo();
     }
 }

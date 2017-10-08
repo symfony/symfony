@@ -5,6 +5,7 @@
 - Shared: yes
 - Abstract: yes
 - Autowired: no
+- Autoconfigured: no
 - Arguments: yes
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`

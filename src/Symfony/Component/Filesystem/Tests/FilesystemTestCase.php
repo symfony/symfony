@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class FilesystemTestCase extends \PHPUnit_Framework_TestCase
+class FilesystemTestCase extends TestCase
 {
     private $umask;
 

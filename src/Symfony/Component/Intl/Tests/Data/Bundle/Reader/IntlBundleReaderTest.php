@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Reader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @requires extension intl
  */
-class IntlBundleReaderTest extends \PHPUnit_Framework_TestCase
+class IntlBundleReaderTest extends TestCase
 {
     /**
      * @var IntlBundleReader
@@ -50,10 +51,6 @@ class IntlBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadDoesNotFollowFallback()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('ResourceBundle does not support disabling fallback properly on HHVM.');
-        }
-
         // "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro_MD');
 
@@ -66,10 +63,6 @@ class IntlBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadDoesNotFollowFallbackAlias()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('ResourceBundle does not support disabling fallback properly on HHVM.');
-        }
-
         // "mo" = "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'mo');
 

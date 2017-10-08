@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Templating\Tests\Storage;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Storage\StringStorage;
 
-class StringStorageTest extends \PHPUnit_Framework_TestCase
+class StringStorageTest extends TestCase
 {
     public function testGetContent()
     {

@@ -15,36 +15,23 @@ namespace Symfony\Component\PropertyInfo;
  * Default {@see PropertyInfoExtractorInterface} implementation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since version 3.3
  */
 class PropertyInfoExtractor implements PropertyInfoExtractorInterface
 {
-    /**
-     * @var PropertyListExtractorInterface[]
-     */
     private $listExtractors;
-
-    /**
-     * @var PropertyTypeExtractorInterface[]
-     */
     private $typeExtractors;
-
-    /**
-     * @var PropertyDescriptionExtractorInterface[]
-     */
     private $descriptionExtractors;
-
-    /**
-     * @var PropertyAccessExtractorInterface[]
-     */
     private $accessExtractors;
 
     /**
-     * @param PropertyListExtractorInterface[]        $listExtractors
-     * @param PropertyTypeExtractorInterface[]        $typeExtractors
-     * @param PropertyDescriptionExtractorInterface[] $descriptionExtractors
-     * @param PropertyAccessExtractorInterface[]      $accessExtractors
+     * @param iterable|PropertyListExtractorInterface[]        $listExtractors
+     * @param iterable|PropertyTypeExtractorInterface[]        $typeExtractors
+     * @param iterable|PropertyDescriptionExtractorInterface[] $descriptionExtractors
+     * @param iterable|PropertyAccessExtractorInterface[]      $accessExtractors
      */
-    public function __construct(array $listExtractors = array(), array $typeExtractors = array(),  array $descriptionExtractors = array(), array $accessExtractors = array())
+    public function __construct($listExtractors = array(), $typeExtractors = array(), $descriptionExtractors = array(), $accessExtractors = array())
     {
         $this->listExtractors = $listExtractors;
         $this->typeExtractors = $typeExtractors;
@@ -103,13 +90,13 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
     /**
      * Iterates over registered extractors and return the first value found.
      *
-     * @param array  $extractors
-     * @param string $method
-     * @param array  $arguments
+     * @param iterable $extractors
+     * @param string   $method
+     * @param array    $arguments
      *
      * @return mixed
      */
-    private function extract(array $extractors, $method, array $arguments)
+    private function extract($extractors, $method, array $arguments)
     {
         foreach ($extractors as $extractor) {
             $value = call_user_func_array(array($extractor, $method), $arguments);

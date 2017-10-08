@@ -24,6 +24,8 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
  * Extracts data using a PHPDoc parser.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final since version 3.3
  */
 class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface
 {
@@ -51,11 +53,35 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     private $phpDocTypeHelper;
 
-    public function __construct(DocBlockFactoryInterface $docBlockFactory = null)
+    /**
+     * @var string[]
+     */
+    private $mutatorPrefixes;
+
+    /**
+     * @var string[]
+     */
+    private $accessorPrefixes;
+
+    /**
+     * @var string[]
+     */
+    private $arrayMutatorPrefixes;
+
+    /**
+     * @param DocBlockFactoryInterface $docBlockFactory
+     * @param string[]|null            $mutatorPrefixes
+     * @param string[]|null            $accessorPrefixes
+     * @param string[]|null            $arrayMutatorPrefixes
+     */
+    public function __construct(DocBlockFactoryInterface $docBlockFactory = null, array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
     {
         $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
         $this->contextFactory = new ContextFactory();
         $this->phpDocTypeHelper = new PhpDocTypeHelper();
+        $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : ReflectionExtractor::$defaultMutatorPrefixes;
+        $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : ReflectionExtractor::$defaultAccessorPrefixes;
+        $this->arrayMutatorPrefixes = null !== $arrayMutatorPrefixes ? $arrayMutatorPrefixes : ReflectionExtractor::$defaultArrayMutatorPrefixes;
     }
 
     /**
@@ -135,7 +161,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             return;
         }
 
-        if (!in_array($prefix, ReflectionExtractor::$arrayMutatorPrefixes)) {
+        if (!in_array($prefix, $this->arrayMutatorPrefixes)) {
             return $types;
         }
 
@@ -211,11 +237,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      * @param string $ucFirstProperty
      * @param int    $type
      *
-     * @return array
+     * @return array|null
      */
     private function getDocBlockFromMethod($class, $ucFirstProperty, $type)
     {
-        $prefixes = $type === self::ACCESSOR ? ReflectionExtractor::$accessorPrefixes : ReflectionExtractor::$mutatorPrefixes;
+        $prefixes = self::ACCESSOR === $type ? $this->accessorPrefixes : $this->mutatorPrefixes;
         $prefix = null;
 
         foreach ($prefixes as $prefix) {
@@ -223,6 +249,9 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
             try {
                 $reflectionMethod = new \ReflectionMethod($class, $methodName);
+                if ($reflectionMethod->isStatic()) {
+                    continue;
+                }
 
                 if (
                     (self::ACCESSOR === $type && 0 === $reflectionMethod->getNumberOfRequiredParameters()) ||

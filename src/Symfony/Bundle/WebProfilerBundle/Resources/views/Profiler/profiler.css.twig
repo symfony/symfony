@@ -204,6 +204,9 @@ table tbody ul {
 .nowrap {
     white-space: pre;
 }
+.prewrap {
+    white-space: pre-wrap;
+}
 .newline {
     display: block;
 }
@@ -441,7 +444,7 @@ tr.status-warning td {
 }
 #main {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     min-height: 100%;
 }
 #sidebar {
@@ -468,6 +471,7 @@ tr.status-warning td {
 }
 #header h1 {
     color: #FFF;
+    flex: 1;
     font-weight: normal;
     font-size: 21px;
     margin: 0;
@@ -528,7 +532,8 @@ tr.status-warning td {
     color: #FFF;
 }
 
-#summary dl.metadata {
+#summary dl.metadata,
+#summary dl.metadata a {
     margin: 5px 0 0;
     color: rgba(255, 255, 255, 0.75);
 }
@@ -827,6 +832,8 @@ tr.status-warning td {
 .tab-navigation li .badge.status-warning { background: {{ colors.warning|raw }}; color: #FFF; }
 .tab-navigation li .badge.status-error { background: {{ colors.error|raw }}; color: #FFF; }
 
+.sf-tabs .tab:not(:first-child) { display: none; }
+
 {# Toggles
    ========================================================================= #}
 .sf-toggle-content {
@@ -869,10 +876,42 @@ table.logs .metadata {
     margin: .5em 0;
     padding: 1em;
 }
+.sql-explain {
+    overflow-x: auto;
+    max-width: 920px;
+}
+.sql-explain table td, .sql-explain table tr {
+    word-break: normal;
+}
 .queries-table pre {
     {{ mixins.break_long_words|raw }}
     margin: 0;
     white-space: pre-wrap;
+}
+
+{# Validator panel
+   ========================================================================= #}
+
+#collector-content .sf-validator {
+    margin-bottom: 2em;
+}
+
+#collector-content .sf-validator .sf-validator-context,
+#collector-content .sf-validator .trace {
+    border: 1px solid #DDD;
+    background: #FFF;
+    padding: 10px;
+    margin: 0.5em 0;
+}
+#collector-content .sf-validator .trace {
+    font-size: 12px;
+}
+#collector-content .sf-validator .trace li {
+    margin-bottom: 0;
+    padding: 0;
+}
+#collector-content .sf-validator .trace li.selected {
+    background: rgba(255, 255, 153, 0.5);
 }
 
 {# Dump panel
@@ -909,6 +948,7 @@ table.logs .metadata {
 #collector-content .sf-dump-key { color: #789339; }
 #collector-content .sf-dump-ref { color: #6E6E6E; }
 #collector-content .sf-dump-ellipsis { color: #CC7832; max-width: 100em; }
+#collector-content .sf-dump-ellipsis-path { max-width: 5em; }
 
 #collector-content .sf-dump {
     margin: 0;
@@ -984,6 +1024,18 @@ table.logs .metadata {
     }
     #sidebar:hover .module, #sidebar.expanded .module {
         display: block;
+    }
+
+    #sidebar:not(:hover):not(.expanded) .label .count {
+        border-radius: 50%;
+        border: 1px solid #eee;
+        height: 8px;
+        min-width: 0;
+        padding: 0;
+        right: 4px;
+        text-indent: -9999px;
+        top: 50%;
+        width: 8px;
     }
 
     .visible-small {

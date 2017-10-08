@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Loader\JsonFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 
-class JsonFileLoaderTest extends \PHPUnit_Framework_TestCase
+class JsonFileLoaderTest extends TestCase
 {
     public function testLoad()
     {

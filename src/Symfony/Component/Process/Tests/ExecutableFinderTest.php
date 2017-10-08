@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\ExecutableFinder;
 
 /**
  * @author Chris Smith <chris@cs278.org>
  */
-class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
+class ExecutableFinderTest extends TestCase
 {
     private $path;
 
@@ -90,7 +91,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        $this->iniSet('open_basedir', dirname(PHP_BINARY).(!defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? PATH_SEPARATOR.'/' : ''));
+        $this->iniSet('open_basedir', dirname(PHP_BINARY).PATH_SEPARATOR.'/');
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
@@ -108,7 +109,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->setPath('');
-        $this->iniSet('open_basedir', PHP_BINARY.(!defined('HHVM_VERSION') || HHVM_VERSION_ID >= 30800 ? PATH_SEPARATOR.'/' : ''));
+        $this->iniSet('open_basedir', PHP_BINARY.PATH_SEPARATOR.'/');
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), false);

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.24.17",
+    "Version": "2.1.32.73",
     "Names": {
         "ADP": [
             "ADP",
@@ -110,7 +110,7 @@
             "Bugarski tvrdi lev"
         ],
         "BGN": [
-            "[BGN]",
+            "BGN",
             "Bugarski lev"
         ],
         "BHD": [
@@ -185,9 +185,13 @@
             "BYB",
             "Beloruska nova rublja (1994–1999)"
         ],
-        "BYR": [
-            "[BYR]",
+        "BYN": [
+            "BYN",
             "Beloruska rublja"
+        ],
+        "BYR": [
+            "BYR",
+            "Beloruska rublja (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -507,7 +511,7 @@
         ],
         "KRW": [
             "KRW",
-            "Južnokorejski Von"
+            "Južnokorejski von"
         ],
         "KWD": [
             "KWD",
@@ -711,11 +715,11 @@
         ],
         "PEN": [
             "PEN",
-            "Peruanski novi sol"
+            "Peruanski sol"
         ],
         "PES": [
             "PES",
-            "Peruanski sol"
+            "Peruanski sol (1863–1965)"
         ],
         "PGK": [
             "PGK",
@@ -871,7 +875,7 @@
         ],
         "TJS": [
             "TJS",
-            "Tadžihistanski somon"
+            "Tadžikistanski somon"
         ],
         "TMM": [
             "TMM",

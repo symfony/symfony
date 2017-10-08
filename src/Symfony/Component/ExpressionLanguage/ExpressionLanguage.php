@@ -13,8 +13,6 @@ namespace Symfony\Component\ExpressionLanguage;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheAdapter;
-use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface;
 
 /**
  * Allows to compile and evaluate expressions written in your own DSL.
@@ -37,17 +35,8 @@ class ExpressionLanguage
      * @param CacheItemPoolInterface                $cache
      * @param ExpressionFunctionProviderInterface[] $providers
      */
-    public function __construct($cache = null, array $providers = array())
+    public function __construct(CacheItemPoolInterface $cache = null, array $providers = array())
     {
-        if (null !== $cache) {
-            if ($cache instanceof ParserCacheInterface) {
-                @trigger_error(sprintf('Passing an instance of %s as constructor argument for %s is deprecated as of 3.2 and will be removed in 4.0. Pass an instance of %s instead.', ParserCacheInterface::class, self::class, CacheItemPoolInterface::class), E_USER_DEPRECATED);
-                $cache = new ParserCacheAdapter($cache);
-            } elseif (!$cache instanceof CacheItemPoolInterface) {
-                throw new \InvalidArgumentException(sprintf('Cache argument has to implement %s.', CacheItemPoolInterface::class));
-            }
-        }
-
         $this->cache = $cache ?: new ArrayAdapter();
         $this->registerFunctions();
         foreach ($providers as $provider) {
@@ -122,10 +111,16 @@ class ExpressionLanguage
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
      *
+     * @throws \LogicException when registering a function after calling evaluate(), compile() or parse()
+     *
      * @see ExpressionFunction
      */
     public function register($name, callable $compiler, callable $evaluator)
     {
+        if (null !== $this->parser) {
+            throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
+        }
+
         $this->functions[$name] = array('compiler' => $compiler, 'evaluator' => $evaluator);
     }
 
@@ -143,14 +138,10 @@ class ExpressionLanguage
 
     protected function registerFunctions()
     {
-        $this->register('constant', function ($constant) {
-            return sprintf('constant(%s)', $constant);
-        }, function (array $values, $constant) {
-            return constant($constant);
-        });
+        $this->addFunction(ExpressionFunction::fromPhp('constant'));
     }
 
-    private function getLexer()
+    private function getLexer(): Lexer
     {
         if (null === $this->lexer) {
             $this->lexer = new Lexer();
@@ -159,7 +150,7 @@ class ExpressionLanguage
         return $this->lexer;
     }
 
-    private function getParser()
+    private function getParser(): Parser
     {
         if (null === $this->parser) {
             $this->parser = new Parser($this->functions);
@@ -168,7 +159,7 @@ class ExpressionLanguage
         return $this->parser;
     }
 
-    private function getCompiler()
+    private function getCompiler(): Compiler
     {
         if (null === $this->compiler) {
             $this->compiler = new Compiler($this->functions);

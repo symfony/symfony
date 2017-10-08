@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.24.13",
+    "Version": "2.1.31.33",
     "Names": {
         "ARS": [
             "ARS",
@@ -64,6 +64,10 @@
         "ILS": [
             "ILS",
             "nouveau shekel israélien"
+        ],
+        "INR": [
+            "INR",
+            "roupie indienne"
         ],
         "JPY": [
             "¥",

@@ -35,6 +35,8 @@ class ExampleConfiguration implements ConfigurationInterface
                 ->scalarNode('scalar_array_empty')->defaultValue(array())->end()
                 ->scalarNode('scalar_array_defaults')->defaultValue(array('elem1', 'elem2'))->end()
                 ->scalarNode('scalar_required')->isRequired()->end()
+                ->scalarNode('scalar_deprecated')->setDeprecated()->end()
+                ->scalarNode('scalar_deprecated_with_message')->setDeprecated('Deprecation custom message for "%node%" at "%path%"')->end()
                 ->scalarNode('node_with_a_looong_name')->end()
                 ->enumNode('enum_with_default')->values(array('this', 'that'))->defaultValue('this')->end()
                 ->enumNode('enum')->values(array('this', 'that'))->end()

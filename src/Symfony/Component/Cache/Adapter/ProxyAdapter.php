@@ -14,23 +14,32 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\ResettableInterface;
+use Symfony\Component\Cache\Traits\ProxyTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ProxyAdapter implements AdapterInterface
+class ProxyAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
 {
-    private $pool;
+    use ProxyTrait;
+
     private $namespace;
     private $namespaceLen;
     private $createCacheItem;
     private $poolHash;
 
+    /**
+     * @param CacheItemPoolInterface $pool
+     * @param string                 $namespace
+     * @param int                    $defaultLifetime
+     */
     public function __construct(CacheItemPoolInterface $pool, $namespace = '', $defaultLifetime = 0)
     {
         $this->pool = $pool;
         $this->poolHash = $poolHash = spl_object_hash($pool);
-        $this->namespace = '' === $namespace ? '' : $this->getId($namespace);
+        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace);
         $this->namespaceLen = strlen($namespace);
         $this->createCacheItem = \Closure::bind(
             function ($key, $innerItem) use ($defaultLifetime, $poolHash) {

@@ -11,9 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper;
 
-class StopwatchHelperTest extends \PHPUnit_Framework_TestCase
+class StopwatchHelperTest extends TestCase
 {
     public function testDevEnvironment()
     {
@@ -29,11 +30,10 @@ class StopwatchHelperTest extends \PHPUnit_Framework_TestCase
     public function testProdEnvironment()
     {
         $helper = new StopwatchHelper(null);
+        $helper->start('foo');
 
-        try {
-            $helper->start('foo');
-        } catch (\BadMethodCallException $e) {
-            $this->fail('Assumed stopwatch is not called when not provided');
-        }
+        // add a dummy assertion here to satisfy PHPUnit, the only thing we want to test is that the code above
+        // can be executed without throwing any exceptions
+        $this->addToAssertionCount(1);
     }
 }

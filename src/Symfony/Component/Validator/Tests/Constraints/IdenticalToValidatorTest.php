@@ -24,7 +24,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         return new IdenticalToValidator();
     }
 
-    protected function createConstraint(array $options)
+    protected function createConstraint(array $options = null)
     {
         return new IdenticalTo($options);
     }
@@ -67,6 +67,16 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         $comparisons[] = array($immutableDate, $immutableDate);
 
         return $comparisons;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function provideValidComparisonsToPropertyPath()
+    {
+        return array(
+            array(5),
+        );
     }
 
     /**

@@ -20,14 +20,14 @@ namespace Symfony\Component\Config;
 class ResourceCheckerConfigCacheFactory implements ConfigCacheFactoryInterface
 {
     /**
-     * @var ResourceCheckerInterface[]
+     * @var iterable|ResourceCheckerInterface[]
      */
     private $resourceCheckers = array();
 
     /**
-     * @param ResourceCheckerInterface[] $resourceCheckers
+     * @param iterable|ResourceCheckerInterface[] $resourceCheckers
      */
-    public function __construct(array $resourceCheckers = array())
+    public function __construct($resourceCheckers = array())
     {
         $this->resourceCheckers = $resourceCheckers;
     }

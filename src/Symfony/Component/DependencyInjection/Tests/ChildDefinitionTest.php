@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
-class ChildDefinitionTest extends \PHPUnit_Framework_TestCase
+class ChildDefinitionTest extends TestCase
 {
     public function testConstructor()
     {
@@ -70,14 +70,14 @@ class ChildDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('lazy' => true), $def->getChanges());
     }
 
-    public function testSetAutowiredMethods()
+    public function testSetAutowired()
     {
         $def = new ChildDefinition('foo');
 
         $this->assertFalse($def->isAutowired());
-        $this->assertSame($def, $def->setAutowiredMethods(array('foo', 'bar')));
-        $this->assertEquals(array('foo', 'bar'), $def->getAutowiredMethods());
-        $this->assertSame(array('autowired_methods' => true), $def->getChanges());
+        $this->assertSame($def, $def->setAutowired(true));
+        $this->assertTrue($def->isAutowired());
+        $this->assertSame(array('autowired' => true), $def->getChanges());
     }
 
     public function testSetArgument()
@@ -112,6 +112,10 @@ class ChildDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('baz', $def->getArgument(1));
 
         $this->assertSame(array(0 => 'foo', 1 => 'bar', 'index_1' => 'baz'), $def->getArguments());
+
+        $this->assertSame($def, $def->replaceArgument('$bar', 'val'));
+        $this->assertSame('val', $def->getArgument('$bar'));
+        $this->assertSame(array(0 => 'foo', 1 => 'bar', 'index_1' => 'baz', '$bar' => 'val'), $def->getArguments());
     }
 
     /**
@@ -127,8 +131,21 @@ class ChildDefinitionTest extends \PHPUnit_Framework_TestCase
         $def->getArgument(1);
     }
 
-    public function testDefinitionDecoratorAliasExistsForBackwardsCompatibility()
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
+     */
+    public function testCannotCallSetAutoconfigured()
     {
-        $this->assertInstanceOf(ChildDefinition::class, new DefinitionDecorator('foo'));
+        $def = new ChildDefinition('foo');
+        $def->setAutoconfigured(true);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
+     */
+    public function testCannotCallSetInstanceofConditionals()
+    {
+        $def = new ChildDefinition('foo');
+        $def->setInstanceofConditionals(array('Foo' => new ChildDefinition('')));
     }
 }

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.59",
     "Names": {
         "AC": "Ascensioneiland",
         "AD": "Andorra",
@@ -56,7 +56,7 @@
         "CW": "Curaçao",
         "CX": "Kerseiland",
         "CY": "Siprus",
-        "CZ": "Tjeggiese Republiek",
+        "CZ": "Tjeggië",
         "DE": "Duitsland",
         "DG": "Diego Garcia",
         "DJ": "Djiboeti",
@@ -236,6 +236,7 @@
         "UA": "Oekraïne",
         "UG": "Uganda",
         "UM": "VS klein omliggende eilande",
+        "UN": "verenigde nasies",
         "US": "Verenigde State van Amerika",
         "UY": "Uruguay",
         "UZ": "Oesbekistan",

@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 
-class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
+class AbstractExtensionTest extends TestCase
 {
     public function testHasType()
     {

@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
 
-class Pbkdf2PasswordEncoderTest extends \PHPUnit_Framework_TestCase
+class Pbkdf2PasswordEncoderTest extends TestCase
 {
     public function testIsPasswordValid()
     {

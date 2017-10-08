@@ -11,19 +11,21 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingSession;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 use Symfony\Component\HttpFoundation\Request;
 
-class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
+class ArgumentResolverTest extends TestCase
 {
     /** @var ArgumentResolver */
     private static $resolver;
@@ -31,14 +33,8 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         $factory = new ArgumentMetadataFactory();
-        $argumentValueResolvers = array(
-            new RequestAttributeValueResolver(),
-            new RequestValueResolver(),
-            new DefaultValueResolver(),
-            new VariadicValueResolver(),
-        );
 
-        self::$resolver = new ArgumentResolver($factory, $argumentValueResolvers);
+        self::$resolver = new ArgumentResolver($factory);
     }
 
     public function testDefaultState()
@@ -156,9 +152,6 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($request), self::$resolver->getArguments($request, $controller), '->getArguments() injects the request when extended');
     }
 
-    /**
-     * @requires PHP 5.6
-     */
     public function testGetVariadicArguments()
     {
         $request = Request::create('/');
@@ -170,7 +163,6 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @requires PHP 5.6
      * @expectedException \InvalidArgumentException
      */
     public function testGetVariadicArgumentsWithoutArrayInRequest()
@@ -184,7 +176,6 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @requires PHP 5.6
      * @expectedException \InvalidArgumentException
      */
     public function testGetArgumentWithoutArray()
@@ -214,9 +205,6 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
         self::$resolver->getArguments($request, $controller);
     }
 
-    /**
-     * @requires PHP 7.1
-     */
     public function testGetNullableArguments()
     {
         $request = Request::create('/');
@@ -228,9 +216,6 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo', new \stdClass(), 'value', 'mandatory'), self::$resolver->getArguments($request, $controller));
     }
 
-    /**
-     * @requires PHP 7.1
-     */
     public function testGetNullableArgumentsWithDefaults()
     {
         $request = Request::create('/');
@@ -238,6 +223,73 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
         $controller = array(new NullableController(), 'action');
 
         $this->assertEquals(array(null, null, 'value', 'mandatory'), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetSessionArguments()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $request = Request::create('/');
+        $request->setSession($session);
+        $controller = array($this, 'controllerWithSession');
+
+        $this->assertEquals(array($session), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetSessionArgumentsWithExtendedSession()
+    {
+        $session = new ExtendingSession(new MockArraySessionStorage());
+        $request = Request::create('/');
+        $request->setSession($session);
+        $controller = array($this, 'controllerWithExtendingSession');
+
+        $this->assertEquals(array($session), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetSessionArgumentsWithInterface()
+    {
+        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
+        $request = Request::create('/');
+        $request->setSession($session);
+        $controller = array($this, 'controllerWithSessionInterface');
+
+        $this->assertEquals(array($session), self::$resolver->getArguments($request, $controller));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetSessionMissMatchWithInterface()
+    {
+        $session = $this->getMockBuilder(SessionInterface::class)->getMock();
+        $request = Request::create('/');
+        $request->setSession($session);
+        $controller = array($this, 'controllerWithExtendingSession');
+
+        self::$resolver->getArguments($request, $controller);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetSessionMissMatchWithImplementation()
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $request = Request::create('/');
+        $request->setSession($session);
+        $controller = array($this, 'controllerWithExtendingSession');
+
+        self::$resolver->getArguments($request, $controller);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetSessionMissMatchOnNull()
+    {
+        $request = Request::create('/');
+        $controller = array($this, 'controllerWithExtendingSession');
+
+        self::$resolver->getArguments($request, $controller);
     }
 
     public function __invoke($foo, $bar = null)
@@ -265,6 +317,18 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     protected function controllerWithExtendingRequest(ExtendingRequest $request)
+    {
+    }
+
+    protected function controllerWithSession(Session $session)
+    {
+    }
+
+    protected function controllerWithSessionInterface(SessionInterface $session)
+    {
+    }
+
+    protected function controllerWithExtendingSession(ExtendingSession $session)
     {
     }
 }

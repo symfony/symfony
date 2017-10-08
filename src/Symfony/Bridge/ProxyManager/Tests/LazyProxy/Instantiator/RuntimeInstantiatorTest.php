@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\Instantiator;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -19,7 +20,7 @@ use Symfony\Component\DependencyInjection\Definition;
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
-class RuntimeInstantiatorTest extends \PHPUnit_Framework_TestCase
+class RuntimeInstantiatorTest extends TestCase
 {
     /**
      * @var RuntimeInstantiator

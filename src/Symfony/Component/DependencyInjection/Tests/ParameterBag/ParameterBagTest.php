@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
-class ParameterBagTest extends \PHPUnit_Framework_TestCase
+class ParameterBagTest extends TestCase
 {
     public function testConstructor()
     {
@@ -45,8 +46,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         ));
         $bag->remove('foo');
         $this->assertEquals(array('bar' => 'bar'), $bag->all(), '->remove() removes a parameter');
-        $bag->remove('BAR');
-        $this->assertEquals(array(), $bag->all(), '->remove() converts key to lowercase before removing');
     }
 
     public function testGetSet()
@@ -57,10 +56,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $bag->set('foo', 'baz');
         $this->assertEquals('baz', $bag->get('foo'), '->set() overrides previously set parameter');
-
-        $bag->set('Foo', 'baz1');
-        $this->assertEquals('baz1', $bag->get('foo'), '->set() converts the key to lowercase');
-        $this->assertEquals('baz1', $bag->get('FOO'), '->get() converts the key to lowercase');
 
         try {
             $bag->get('baba');
@@ -83,7 +78,12 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             'fiz' => array('bar' => array('boo' => 12)),
         ));
 
-        $this->setExpectedException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $exceptionMessage);
+        if (method_exists($this, 'expectException')) {
+            $this->expectException(ParameterNotFoundException::class);
+            $this->expectExceptionMessage($exceptionMessage);
+        } else {
+            $this->setExpectedException(ParameterNotFoundException::class, $exceptionMessage);
+        }
 
         $bag->get($parameterKey);
     }
@@ -103,8 +103,23 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
         $this->assertTrue($bag->has('foo'), '->has() returns true if a parameter is defined');
-        $this->assertTrue($bag->has('Foo'), '->has() converts the key to lowercase');
         $this->assertFalse($bag->has('bar'), '->has() returns false if a parameter is not defined');
+    }
+
+    public function testMixedCase()
+    {
+        $bag = new ParameterBag(array(
+            'foo' => 'foo',
+            'bar' => 'bar',
+            'BAR' => 'baz',
+        ));
+
+        $bag->remove('BAR');
+        $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar'), $bag->all());
+
+        $bag->set('Foo', 'baz1');
+        $this->assertEquals('foo', $bag->get('foo'));
+        $this->assertEquals('baz1', $bag->get('Foo'));
     }
 
     public function testResolveValue()

@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\BrowserKit\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\Request;
 
-class HistoryTest extends \PHPUnit_Framework_TestCase
+class HistoryTest extends TestCase
 {
     public function testAdd()
     {

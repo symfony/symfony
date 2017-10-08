@@ -11,13 +11,16 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\JsonLoginBundle\Controller;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class TestController
 {
-    public function loginCheckAction()
+    public function loginCheckAction(UserInterface $user)
     {
-        throw new \RuntimeException(sprintf('%s should never be called.', __FUNCTION__));
+        return new JsonResponse(array('message' => sprintf('Welcome @%s!', $user->getUsername())));
     }
 }

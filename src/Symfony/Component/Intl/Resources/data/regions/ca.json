@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.59",
     "Names": {
         "AC": "Illa de l’Ascensió",
         "AD": "Andorra",
@@ -56,7 +56,7 @@
         "CW": "Curaçao",
         "CX": "Illa Christmas",
         "CY": "Xipre",
-        "CZ": "República Txeca",
+        "CZ": "Txèquia",
         "DE": "Alemanya",
         "DG": "Diego Garcia",
         "DJ": "Djibouti",
@@ -185,7 +185,7 @@
         "PM": "Saint-Pierre-et-Miquelon",
         "PN": "Illes Pitcairn",
         "PR": "Puerto Rico",
-        "PS": "Palestina",
+        "PS": "territoris palestins",
         "PT": "Portugal",
         "PW": "Palau",
         "PY": "Paraguai",
@@ -236,6 +236,7 @@
         "UA": "Ucraïna",
         "UG": "Uganda",
         "UM": "Illes Perifèriques Menors dels EUA",
+        "UN": "Nacions Unides",
         "US": "Estats Units",
         "UY": "Uruguai",
         "UZ": "Uzbekistan",

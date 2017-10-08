@@ -16,12 +16,13 @@ use Symfony\Component\Cache\Adapter\TraceableAdapterEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 
 /**
  * @author Aaron Scherer <aequasi@gmail.com>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class CacheDataCollector extends DataCollector
+class CacheDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     /**
      * @var TraceableAdapter[]
@@ -45,20 +46,25 @@ class CacheDataCollector extends DataCollector
         $empty = array('calls' => array(), 'config' => array(), 'options' => array(), 'statistics' => array());
         $this->data = array('instances' => $empty, 'total' => $empty);
         foreach ($this->instances as $name => $instance) {
-            $calls = $instance->getCalls();
-            foreach ($calls as $call) {
-                if (isset($call->result)) {
-                    $call->result = $this->cloneVar($call->result);
-                }
-                if (isset($call->argument)) {
-                    $call->argument = $this->cloneVar($call->argument);
-                }
-            }
-            $this->data['instances']['calls'][$name] = $calls;
+            $this->data['instances']['calls'][$name] = $instance->getCalls();
         }
 
         $this->data['instances']['statistics'] = $this->calculateStatistics();
         $this->data['total']['statistics'] = $this->calculateTotalStatistics();
+    }
+
+    public function reset()
+    {
+        $this->data = array();
+        foreach ($this->instances as $instance) {
+            // Calling getCalls() will clear the calls.
+            $instance->getCalls();
+        }
+    }
+
+    public function lateCollect()
+    {
+        $this->data = $this->cloneVar($this->data);
     }
 
     /**
@@ -110,10 +116,10 @@ class CacheDataCollector extends DataCollector
                 'calls' => 0,
                 'time' => 0,
                 'reads' => 0,
-                'hits' => 0,
-                'misses' => 0,
                 'writes' => 0,
                 'deletes' => 0,
+                'hits' => 0,
+                'misses' => 0,
             );
             /** @var TraceableAdapterEvent $call */
             foreach ($calls as $call) {
@@ -133,7 +139,7 @@ class CacheDataCollector extends DataCollector
                     $statistics[$name]['misses'] += $count - $call->misses;
                 } elseif ('hasItem' === $call->name) {
                     $statistics[$name]['reads'] += 1;
-                    if (false === $call->result->getRawData()[0][0]) {
+                    if (false === $call->result) {
                         $statistics[$name]['misses'] += 1;
                     } else {
                         $statistics[$name]['hits'] += 1;
@@ -145,9 +151,9 @@ class CacheDataCollector extends DataCollector
                 }
             }
             if ($statistics[$name]['reads']) {
-                $statistics[$name]['hits/reads'] = round(100 * $statistics[$name]['hits'] / $statistics[$name]['reads'], 2).'%';
+                $statistics[$name]['hit_read_ratio'] = round(100 * $statistics[$name]['hits'] / $statistics[$name]['reads'], 2);
             } else {
-                $statistics[$name]['hits/reads'] = 'N/A';
+                $statistics[$name]['hit_read_ratio'] = null;
             }
         }
 
@@ -164,10 +170,10 @@ class CacheDataCollector extends DataCollector
             'calls' => 0,
             'time' => 0,
             'reads' => 0,
-            'hits' => 0,
-            'misses' => 0,
             'writes' => 0,
             'deletes' => 0,
+            'hits' => 0,
+            'misses' => 0,
         );
         foreach ($statistics as $name => $values) {
             foreach ($totals as $key => $value) {
@@ -175,9 +181,9 @@ class CacheDataCollector extends DataCollector
             }
         }
         if ($totals['reads']) {
-            $totals['hits/reads'] = round(100 * $totals['hits'] / $totals['reads'], 2).'%';
+            $totals['hit_read_ratio'] = round(100 * $totals['hits'] / $totals['reads'], 2);
         } else {
-            $totals['hits/reads'] = 'N/A';
+            $totals['hit_read_ratio'] = null;
         }
 
         return $totals;

@@ -26,8 +26,6 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
     private $resource;
 
     /**
-     * Constructor.
-     *
      * @param string $resource The file path to the resource
      *
      * @throws \InvalidArgumentException

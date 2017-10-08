@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This is a lazy-loading firewall map implementation.
@@ -24,20 +24,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class FirewallMap implements FirewallMapInterface
 {
-    protected $container;
-    protected $map;
+    private $container;
+    private $map;
     private $contexts;
 
-    public function __construct(ContainerInterface $container, array $map)
+    public function __construct(ContainerInterface $container, $map)
     {
         $this->container = $container;
         $this->map = $map;
         $this->contexts = new \SplObjectStorage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getListeners(Request $request)
     {
         $context = $this->getFirewallContext($request);
@@ -46,7 +43,7 @@ class FirewallMap implements FirewallMapInterface
             return array(array(), null);
         }
 
-        return $context->getListeners();
+        return array($context->getListeners(), $context->getExceptionListener());
     }
 
     /**
@@ -63,15 +60,27 @@ class FirewallMap implements FirewallMapInterface
         return $context->getConfig();
     }
 
+    /**
+     * @return FirewallContext
+     */
     private function getFirewallContext(Request $request)
     {
-        if ($this->contexts->contains($request)) {
-            return $this->contexts[$request];
+        if ($request->attributes->has('_firewall_context')) {
+            $storedContextId = $request->attributes->get('_firewall_context');
+            foreach ($this->map as $contextId => $requestMatcher) {
+                if ($contextId === $storedContextId) {
+                    return $this->container->get($contextId);
+                }
+            }
+
+            $request->attributes->remove('_firewall_context');
         }
 
         foreach ($this->map as $contextId => $requestMatcher) {
             if (null === $requestMatcher || $requestMatcher->matches($request)) {
-                return $this->contexts[$request] = $this->container->get($contextId);
+                $request->attributes->set('_firewall_context', $contextId);
+
+                return $this->container->get($contextId);
             }
         }
     }

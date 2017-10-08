@@ -5,6 +5,8 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults public="false" />
+
         <service id="security.authentication.guard_handler"
                  class="Symfony\Component\Security\Guard\GuardAuthenticatorHandler"
             >
@@ -16,7 +18,6 @@
         <service id="security.authentication.provider.guard"
                  class="Symfony\Component\Security\Guard\Provider\GuardAuthenticationProvider"
                  abstract="true"
-                 public="false"
             >
             <argument /> <!-- Simple Authenticator -->
             <argument /> <!-- User Provider -->
@@ -26,7 +27,6 @@
 
         <service id="security.authentication.listener.guard"
                  class="Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener"
-                 public="false"
                  abstract="true"
             >
             <tag name="monolog.logger" channel="security" />

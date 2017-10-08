@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -20,13 +18,11 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
+    private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
-        $this->services = array();
+        $this->services = $this->privates = array();
         $this->methodMap = array(
             'service_from_anonymous_factory' => 'getServiceFromAnonymousFactoryService',
             'service_with_method_call_and_factory' => 'getServiceWithMethodCallAndFactoryService',
@@ -35,29 +31,26 @@ class ProjectServiceContainer extends Container
         $this->aliases = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function compile()
+    public function reset()
     {
-        throw new LogicException('You cannot compile a dumped frozen container.');
+        $this->privates = array();
+        parent::reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFrozen()
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
+    }
+
+    public function isCompiled()
     {
         return true;
     }
 
     /**
-     * Gets the 'service_from_anonymous_factory' service.
+     * Gets the public 'service_from_anonymous_factory' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \Bar\FooClass
      */
     protected function getServiceFromAnonymousFactoryService()
     {
@@ -65,12 +58,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'service_with_method_call_and_factory' service.
+     * Gets the public 'service_with_method_call_and_factory' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \Bar\FooClass
      */
     protected function getServiceWithMethodCallAndFactoryService()
     {

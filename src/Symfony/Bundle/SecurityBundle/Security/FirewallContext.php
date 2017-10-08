@@ -25,7 +25,7 @@ class FirewallContext
     private $exceptionListener;
     private $config;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
+    public function __construct(iterable $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
@@ -37,18 +37,13 @@ class FirewallContext
         return $this->config;
     }
 
-    /**
-     * @deprecated since version 3.3, will be removed in 4.0. Use {@link getListeners()} instead.
-     */
-    public function getContext()
+    public function getListeners(): iterable
     {
-        @trigger_error(sprintf('Method %s() is deprecated since version 3.3 and will be removed in 4.0. Use %s::getListeners() instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
-
-        return $this->getListeners();
+        return $this->listeners;
     }
 
-    public function getListeners()
+    public function getExceptionListener()
     {
-        return array($this->listeners, $this->exceptionListener);
+        return $this->exceptionListener;
     }
 }

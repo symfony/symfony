@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
   <parameters>
     <parameter>a string</parameter>
-    <parameter key="FOO">bar</parameter>
+    <parameter key="foo">bar</parameter>
     <parameter key="values" type="collection">
       <parameter>0</parameter>
       <parameter key="integer">4</parameter>
@@ -23,7 +23,7 @@
         <parameter>bar</parameter>
       </parameter>
     </parameter>
-    <parameter key="MixedCase" type="collection"> <!-- Should be lower cased -->
+    <parameter key="mixedcase" type="collection"> <!-- Should be lower cased -->
       <parameter key="MixedCaseKey">value</parameter> <!-- Should stay mixed case -->
     </parameter>
     <parameter key="constant" type="constant">PHP_EOL</parameter>

@@ -11,10 +11,7 @@ final class ClassInstanceSupportStrategy implements SupportStrategyInterface
 {
     private $className;
 
-    /**
-     * @param string $className a FQCN
-     */
-    public function __construct($className)
+    public function __construct(string $className)
     {
         $this->className = $className;
     }
@@ -25,5 +22,13 @@ final class ClassInstanceSupportStrategy implements SupportStrategyInterface
     public function supports(Workflow $workflow, $subject)
     {
         return $subject instanceof $this->className;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassName()
+    {
+        return $this->className;
     }
 }

@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Ldap\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Adapter\ConnectionInterface;
 use Symfony\Component\Ldap\Exception\DriverNotFoundException;
 use Symfony\Component\Ldap\Ldap;
 
-class LdapTest extends \PHPUnit_Framework_TestCase
+class LdapTest extends TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $adapter;
@@ -77,7 +78,7 @@ class LdapTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateWithInvalidAdapterName()
     {
-        $this->setExpectedException(DriverNotFoundException::class);
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(DriverNotFoundException::class);
         Ldap::create('foo');
     }
 }

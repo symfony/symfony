@@ -2,9 +2,10 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Transition;
 
-class TransitionTest extends \PHPUnit_Framework_TestCase
+class TransitionTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException

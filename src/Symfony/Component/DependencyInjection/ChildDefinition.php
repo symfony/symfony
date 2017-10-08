@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
@@ -22,21 +23,18 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 class ChildDefinition extends Definition
 {
     private $parent;
-    private $inheritTags = false;
-    private $changes = array();
 
     /**
      * @param string $parent The id of Definition instance to decorate
      */
     public function __construct($parent)
     {
-        parent::__construct();
-
         $this->parent = $parent;
+        $this->setPrivate(false);
     }
 
     /**
-     * Returns the Definition being decorated.
+     * Returns the Definition to inherit from.
      *
      * @return string
      */
@@ -46,127 +44,17 @@ class ChildDefinition extends Definition
     }
 
     /**
-     * Returns all changes tracked for the Definition object.
+     * Sets the Definition to inherit from.
      *
-     * @return array An array of changes for this Definition
-     */
-    public function getChanges()
-    {
-        return $this->changes;
-    }
-
-    /**
-     * Sets whether tags should be inherited from the parent or not.
-     *
-     * @param bool $boolean
+     * @param string $parent
      *
      * @return $this
      */
-    public function setInheritTags($boolean)
+    public function setParent($parent)
     {
-        $this->inheritTags = (bool) $boolean;
+        $this->parent = $parent;
 
         return $this;
-    }
-
-    /**
-     * Returns whether tags should be inherited from the parent or not.
-     *
-     * @return bool
-     */
-    public function getInheritTags()
-    {
-        return $this->inheritTags;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setClass($class)
-    {
-        $this->changes['class'] = true;
-
-        return parent::setClass($class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFactory($callable)
-    {
-        $this->changes['factory'] = true;
-
-        return parent::setFactory($callable);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConfigurator($callable)
-    {
-        $this->changes['configurator'] = true;
-
-        return parent::setConfigurator($callable);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFile($file)
-    {
-        $this->changes['file'] = true;
-
-        return parent::setFile($file);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setPublic($boolean)
-    {
-        $this->changes['public'] = true;
-
-        return parent::setPublic($boolean);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setLazy($boolean)
-    {
-        $this->changes['lazy'] = true;
-
-        return parent::setLazy($boolean);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDecoratedService($id, $renamedId = null, $priority = 0)
-    {
-        $this->changes['decorated_service'] = true;
-
-        return parent::setDecoratedService($id, $renamedId, $priority);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDeprecated($boolean = true, $template = null)
-    {
-        $this->changes['deprecated'] = true;
-
-        return parent::setDeprecated($boolean, $template);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAutowiredMethods(array $autowiredMethods)
-    {
-        $this->changes['autowired_methods'] = true;
-
-        return parent::setAutowiredMethods($autowiredMethods);
     }
 
     /**
@@ -175,7 +63,7 @@ class ChildDefinition extends Definition
      * If replaceArgument() has been used to replace an argument, this method
      * will return the replacement value.
      *
-     * @param int $index
+     * @param int|string $index
      *
      * @return mixed The argument value
      *
@@ -187,13 +75,7 @@ class ChildDefinition extends Definition
             return $this->arguments['index_'.$index];
         }
 
-        $lastIndex = count(array_filter(array_keys($this->arguments), 'is_int')) - 1;
-
-        if ($index < 0 || $index > $lastIndex) {
-            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, $lastIndex));
-        }
-
-        return $this->arguments[$index];
+        return parent::getArgument($index);
     }
 
     /**
@@ -204,8 +86,8 @@ class ChildDefinition extends Definition
      * certain conventions when you want to overwrite the arguments of the
      * parent definition, otherwise your arguments will only be appended.
      *
-     * @param int   $index
-     * @param mixed $value
+     * @param int|string $index
+     * @param mixed      $value
      *
      * @return self the current instance
      *
@@ -213,14 +95,38 @@ class ChildDefinition extends Definition
      */
     public function replaceArgument($index, $value)
     {
-        if (!is_int($index)) {
-            throw new InvalidArgumentException('$index must be an integer.');
+        if (is_int($index)) {
+            $this->arguments['index_'.$index] = $value;
+        } elseif (0 === strpos($index, '$')) {
+            $this->arguments[$index] = $value;
+        } else {
+            throw new InvalidArgumentException('The argument must be an existing index or the name of a constructor\'s parameter.');
         }
-
-        $this->arguments['index_'.$index] = $value;
 
         return $this;
     }
-}
 
-class_alias(ChildDefinition::class, DefinitionDecorator::class);
+    /**
+     * @internal
+     */
+    public function setAutoconfigured($autoconfigured)
+    {
+        throw new BadMethodCallException('A ChildDefinition cannot be autoconfigured.');
+    }
+
+    /**
+     * @internal
+     */
+    public function setInstanceofConditionals(array $instanceof)
+    {
+        throw new BadMethodCallException('A ChildDefinition cannot have instanceof conditionals set on it.');
+    }
+
+    /**
+     * @internal
+     */
+    public function setBindings(array $bindings)
+    {
+        throw new BadMethodCallException('A ChildDefinition cannot have bindings set on it.');
+    }
+}

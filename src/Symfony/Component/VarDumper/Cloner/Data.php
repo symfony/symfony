@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Caster\Caster;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Data
+class Data implements \ArrayAccess, \Countable, \IteratorAggregate
 {
     private $data;
     private $position = 0;
@@ -34,11 +34,135 @@ class Data
     }
 
     /**
-     * @return array The raw data structure
+     * @return string the type of the value
      */
-    public function getRawData()
+    public function getType()
     {
-        return $this->data;
+        $item = $this->data[$this->position][$this->key];
+
+        if ($item instanceof Stub && Stub::TYPE_REF === $item->type && !$item->position) {
+            $item = $item->value;
+        }
+        if (!$item instanceof Stub) {
+            return gettype($item);
+        }
+        if (Stub::TYPE_STRING === $item->type) {
+            return 'string';
+        }
+        if (Stub::TYPE_ARRAY === $item->type) {
+            return 'array';
+        }
+        if (Stub::TYPE_OBJECT === $item->type) {
+            return $item->class;
+        }
+        if (Stub::TYPE_RESOURCE === $item->type) {
+            return $item->class.' resource';
+        }
+    }
+
+    /**
+     * @param bool $recursive whether values should be resolved recursively or not
+     *
+     * @return scalar|array|null|Data[] a native representation of the original value
+     */
+    public function getValue($recursive = false)
+    {
+        $item = $this->data[$this->position][$this->key];
+
+        if ($item instanceof Stub && Stub::TYPE_REF === $item->type && !$item->position) {
+            $item = $item->value;
+        }
+        if (!($item = $this->getStub($item)) instanceof Stub) {
+            return $item;
+        }
+        if (Stub::TYPE_STRING === $item->type) {
+            return $item->value;
+        }
+
+        $children = $item->position ? $this->data[$item->position] : array();
+
+        foreach ($children as $k => $v) {
+            if ($recursive && !($v = $this->getStub($v)) instanceof Stub) {
+                continue;
+            }
+            $children[$k] = clone $this;
+            $children[$k]->key = $k;
+            $children[$k]->position = $item->position;
+
+            if ($recursive) {
+                if (Stub::TYPE_REF === $v->type && ($v = $this->getStub($v->value)) instanceof Stub) {
+                    $recursive = (array) $recursive;
+                    if (isset($recursive[$v->position])) {
+                        continue;
+                    }
+                    $recursive[$v->position] = true;
+                }
+                $children[$k] = $children[$k]->getValue($recursive);
+            }
+        }
+
+        return $children;
+    }
+
+    public function count()
+    {
+        return count($this->getValue());
+    }
+
+    public function getIterator()
+    {
+        if (!is_array($value = $this->getValue())) {
+            throw new \LogicException(sprintf('%s object holds non-iterable type "%s".', self::class, gettype($value)));
+        }
+
+        foreach ($value as $k => $v) {
+            yield $k => $v;
+        }
+    }
+
+    public function __get($key)
+    {
+        if (null !== $data = $this->seek($key)) {
+            $item = $this->getStub($data->data[$data->position][$data->key]);
+
+            return $item instanceof Stub || array() === $item ? $data : $item;
+        }
+    }
+
+    public function __isset($key)
+    {
+        return null !== $this->seek($key);
+    }
+
+    public function offsetExists($key)
+    {
+        return $this->__isset($key);
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->__get($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        throw new \BadMethodCallException(self::class.' objects are immutable.');
+    }
+
+    public function offsetUnset($key)
+    {
+        throw new \BadMethodCallException(self::class.' objects are immutable.');
+    }
+
+    public function __toString()
+    {
+        $value = $this->getValue();
+
+        if (!is_array($value)) {
+            return (string) $value;
+        }
+
+        return sprintf('%s (count=%d)', $this->getType(), count($value));
     }
 
     /**
@@ -97,7 +221,10 @@ class Data
     {
         $item = $this->data[$this->position][$this->key];
 
-        if (!$item instanceof Stub || !$item->position) {
+        if ($item instanceof Stub && Stub::TYPE_REF === $item->type && !$item->position) {
+            $item = $item->value;
+        }
+        if (!($item = $this->getStub($item)) instanceof Stub || !$item->position) {
             return;
         }
         $keys = array($key);
@@ -108,6 +235,7 @@ class Data
                 $keys[] = Caster::PREFIX_PROTECTED.$key;
                 $keys[] = Caster::PREFIX_VIRTUAL.$key;
                 $keys[] = "\0$item->class\0$key";
+                // no break
             case Stub::TYPE_ARRAY:
             case Stub::TYPE_RESOURCE:
                 break;
@@ -156,7 +284,10 @@ class Data
 
         if (!$item instanceof Stub) {
             $cursor->attr = array();
-            $type = gettype($item);
+            $type = \gettype($item);
+            if ($item && 'array' === $type) {
+                $item = $this->getStub($item);
+            }
         } elseif (Stub::TYPE_REF === $item->type) {
             if ($item->handle) {
                 if (!isset($refs[$r = $item->handle - (PHP_INT_MAX >> 1)])) {
@@ -170,7 +301,7 @@ class Data
             }
             $cursor->attr = $item->attr;
             $type = $item->class ?: gettype($item->value);
-            $item = $item->value;
+            $item = $this->getStub($item->value);
         }
         if ($item instanceof Stub) {
             if ($item->refCount) {
@@ -207,16 +338,22 @@ class Data
                     $item = clone $item;
                     $item->type = $item->class;
                     $item->class = $item->value;
-                    // No break;
+                    // no break
                 case Stub::TYPE_OBJECT:
                 case Stub::TYPE_RESOURCE:
                     $withChildren = $children && $cursor->depth !== $this->maxDepth && $this->maxItemsPerDepth;
                     $dumper->enterHash($cursor, $item->type, $item->class, $withChildren);
                     if ($withChildren) {
-                        $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type, null !== $item->class);
+                        if ($cursor->skipChildren) {
+                            $withChildren = false;
+                            $cut = -1;
+                        } else {
+                            $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type, null !== $item->class);
+                        }
                     } elseif ($children && 0 <= $cut) {
                         $cut += count($children);
                     }
+                    $cursor->skipChildren = false;
                     $dumper->leaveHash($cursor, $item->type, $item->class, $withChildren, $cut);
                     break;
 
@@ -256,7 +393,7 @@ class Data
         $cursor->hashCut = $hashCut;
         foreach ($children as $key => $child) {
             $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
-            $cursor->hashKey = $dumpKeys ? $key :  null;
+            $cursor->hashKey = $dumpKeys ? $key : null;
             $this->dumpItem($dumper, $cursor, $refs, $child);
             if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
                 $parentCursor->stop = true;
@@ -266,5 +403,23 @@ class Data
         }
 
         return $hashCut;
+    }
+
+    private function getStub($item)
+    {
+        if (!$item || !\is_array($item)) {
+            return $item;
+        }
+
+        $stub = new Stub();
+        $stub->type = Stub::TYPE_ARRAY;
+        foreach ($item as $stub->class => $stub->position) {
+        }
+        if (isset($item[0])) {
+            $stub->cut = $item[0];
+        }
+        $stub->value = $stub->cut + ($stub->position ? \count($this->data[$stub->position]) : 0);
+
+        return $stub;
     }
 }

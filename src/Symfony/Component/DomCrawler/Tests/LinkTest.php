@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Link;
 
-class LinkTest extends \PHPUnit_Framework_TestCase
+class LinkTest extends TestCase
 {
     /**
      * @expectedException \LogicException

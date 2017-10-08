@@ -20,7 +20,7 @@
                         </h2>
 
                         {% set request_collector = profile.collectors.request|default(false) %}
-                        {% if request_collector is defined and request_collector.redirect -%}
+                        {% if request_collector and request_collector.redirect -%}
                             {%- set redirect = request_collector.redirect -%}
                             {%- set controller = redirect.controller -%}
                             {%- set redirect_route = '@' ~ redirect.route %}
@@ -68,7 +68,9 @@
                             <dd>{{ status_code }}</dd>
 
                             <dt>IP</dt>
-                            <dd>{{ profile.ip }}</dd>
+                            <dd>
+                                <a href="{{ path('_profiler_search_results', { token: token, limit: 10, ip: profile.ip }) }}">{{ profile.ip }}</a>
+                            </dd>
 
                             <dt>Profiled on</dt>
                             <dd>{{ profile.time|date('r') }}</dd>
@@ -84,13 +86,6 @@
 
     <div id="content" class="container">
         <div id="main">
-            <div id="collector-wrapper">
-                <div id="collector-content">
-                    {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
-                    {% block panel '' %}
-                </div>
-            </div>
-
             <div id="sidebar">
                 <div id="sidebar-shortcuts">
                     <div class="shortcuts">
@@ -127,6 +122,13 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+            </div>
+
+            <div id="collector-wrapper">
+                <div id="collector-content">
+                    {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
+                    {% block panel '' %}
+                </div>
             </div>
         </div>
     </div>

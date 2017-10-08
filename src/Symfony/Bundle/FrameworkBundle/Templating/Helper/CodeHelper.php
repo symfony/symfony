@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
- * CodeHelper.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class CodeHelper extends Helper
@@ -26,8 +24,6 @@ class CodeHelper extends Helper
     protected $charset;
 
     /**
-     * Constructor.
-     *
      * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
      * @param string                   $rootDir        The project root directory
      * @param string                   $charset        The charset
@@ -133,7 +129,7 @@ class CodeHelper extends Helper
             $code = @highlight_file($file, true);
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
-            $content = preg_split('#<br />#', $code);
+            $content = explode('<br />', $code);
 
             $lines = array();
             for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; ++$i) {

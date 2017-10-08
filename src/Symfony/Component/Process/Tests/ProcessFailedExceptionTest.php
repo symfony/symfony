@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 /**
  * @author Sebastian Marek <proofek@gmail.com>
  */
-class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
+class ProcessFailedExceptionTest extends TestCase
 {
     /**
      * tests ProcessFailedException throws exception if the process was successful.
@@ -28,7 +29,7 @@ class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
             ->method('isSuccessful')
             ->will($this->returnValue(true));
 
-        $this->setExpectedException(
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(
             '\InvalidArgumentException',
             'Expected a failed process, but the given process was successful.'
         );

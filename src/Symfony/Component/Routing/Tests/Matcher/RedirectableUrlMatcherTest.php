@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 
-class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
+class RedirectableUrlMatcherTest extends TestCase
 {
     public function testRedirectWhenNoSlash()
     {
@@ -23,7 +24,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('foo', new Route('/foo/'));
 
         $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
-        $matcher->expects($this->once())->method('redirect');
+        $matcher->expects($this->once())->method('redirect')->will($this->returnValue(array()));
         $matcher->match('/foo');
     }
 
@@ -64,8 +65,37 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
         $matcher
             ->expects($this->never())
-            ->method('redirect')
-        ;
+            ->method('redirect');
         $matcher->match('/foo');
+    }
+
+    public function testSchemeRedirectWithParams()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{bar}', array(), array(), array(), '', array('https')));
+
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher
+            ->expects($this->once())
+            ->method('redirect')
+            ->with('/foo/baz', 'foo', 'https')
+            ->will($this->returnValue(array('redirect' => 'value')))
+        ;
+        $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'), $matcher->match('/foo/baz'));
+    }
+
+    public function testSlashRedirectWithParams()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{bar}/'));
+
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher
+            ->expects($this->once())
+            ->method('redirect')
+            ->with('/foo/baz/', 'foo', null)
+            ->will($this->returnValue(array('redirect' => 'value')))
+        ;
+        $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'), $matcher->match('/foo/baz'));
     }
 }

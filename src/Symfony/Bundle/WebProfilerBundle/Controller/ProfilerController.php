@@ -20,10 +20,9 @@ use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 /**
- * ProfilerController.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ProfilerController
@@ -33,27 +32,23 @@ class ProfilerController
     private $profiler;
     private $twig;
     private $templates;
-    private $toolbarPosition;
     private $cspHandler;
     private $baseDir;
 
     /**
-     * Constructor.
-     *
-     * @param UrlGeneratorInterface $generator       The URL Generator
-     * @param Profiler              $profiler        The profiler
-     * @param \Twig_Environment     $twig            The twig environment
-     * @param array                 $templates       The templates
-     * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
-     * @param string                $baseDir         The project root directory
+     * @param UrlGeneratorInterface        $generator  The URL Generator
+     * @param Profiler                     $profiler   The profiler
+     * @param Environment                  $twig       The twig environment
+     * @param array                        $templates  The templates
+     * @param ContentSecurityPolicyHandler $cspHandler The Content-Security-Policy handler
+     * @param string                       $baseDir    The project root directory
      */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal', ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->templates = $templates;
-        $this->toolbarPosition = $toolbarPosition;
         $this->cspHandler = $cspHandler;
         $this->baseDir = $baseDir;
     }
@@ -127,34 +122,6 @@ class ProfilerController
     }
 
     /**
-     * Displays information page.
-     *
-     * @param Request $request The current HTTP Request
-     * @param string  $about   The about message
-     *
-     * @return Response A Response instance
-     *
-     * @throws NotFoundHttpException
-     */
-    public function infoAction(Request $request, $about)
-    {
-        if (null === $this->profiler) {
-            throw new NotFoundHttpException('The profiler must be enabled.');
-        }
-
-        $this->profiler->disable();
-
-        if (null !== $this->cspHandler) {
-            $this->cspHandler->disableCsp();
-        }
-
-        return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array(
-            'about' => $about,
-            'request' => $request,
-        )), 200, array('Content-Type' => 'text/html'));
-    }
-
-    /**
      * Renders the Web Debug Toolbar.
      *
      * @param Request $request The current HTTP Request
@@ -187,11 +154,6 @@ class ProfilerController
             return new Response('', 404, array('Content-Type' => 'text/html'));
         }
 
-        // the toolbar position (top, bottom, normal, or null -- use the configuration)
-        if (null === $position = $request->query->get('position')) {
-            $position = $this->toolbarPosition;
-        }
-
         $url = null;
         try {
             $url = $this->generator->generate('_profiler', array('token' => $token));
@@ -201,7 +163,6 @@ class ProfilerController
 
         return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/toolbar.html.twig', array(
             'request' => $request,
-            'position' => $position,
             'profile' => $profile,
             'templates' => $this->getTemplateManager()->getNames($profile),
             'profiler_url' => $url,

@@ -129,8 +129,6 @@ class IntlDateFormatter
     private $timeZoneId;
 
     /**
-     * Constructor.
-     *
      * @param string $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      * @param int    $datetype Type of date formatting, one of the format type constants
      * @param int    $timetype Type of time formatting, one of the format type constants
@@ -169,8 +167,8 @@ class IntlDateFormatter
      * @param int    $datetype Type of date formatting, one of the format type constants
      * @param int    $timetype Type of time formatting, one of the format type constants
      * @param string $timezone Timezone identifier
-     * @param int    $calendar Calendar to use for formatting or parsing; default is Gregorian
-     *                         One of the calendar constants.
+     * @param int    $calendar calendar to use for formatting or parsing; default is Gregorian
+     *                         One of the calendar constants
      * @param string $pattern  Optional pattern to use when formatting
      *
      * @return self
@@ -346,7 +344,7 @@ class IntlDateFormatter
     /**
      * Returns the formatter's time type.
      *
-     * @return string The time type used by the formatter
+     * @return int The time type used by the formatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.gettimetype.php
      */
@@ -428,7 +426,7 @@ class IntlDateFormatter
      *                         contain -1 otherwise it will contain the position at which parsing
      *                         ended. If $parse_pos > strlen($value), the parse fails immediately.
      *
-     * @return string Parsed value as a timestamp
+     * @return int Parsed value as a timestamp
      *
      * @see http://www.php.net/manual/en/intldateformatter.parse.php
      *
@@ -519,7 +517,7 @@ class IntlDateFormatter
     /**
      * Set the formatter's timezone identifier.
      *
-     * @param string $timeZoneId The time zone ID string of the time zone to use
+     * @param string $timeZoneId The time zone ID string of the time zone to use.
      *                           If NULL or the empty string, the default time zone for the
      *                           runtime is used.
      *
@@ -541,7 +539,7 @@ class IntlDateFormatter
         // Get an Etc/GMT time zone that is accepted for \DateTimeZone
         if ('GMT' !== $timeZoneId && 0 === strpos($timeZoneId, 'GMT')) {
             try {
-                $timeZoneId = DateFormat\TimeZoneTransformer::getEtcTimeZoneId($timeZoneId);
+                $timeZoneId = DateFormat\TimezoneTransformer::getEtcTimeZoneId($timeZoneId);
             } catch (\InvalidArgumentException $e) {
                 // Does nothing, will fallback to UTC
             }

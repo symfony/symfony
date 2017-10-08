@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\BooleanNode;
 
-class BooleanNodeTest extends \PHPUnit_Framework_TestCase
+class BooleanNodeTest extends TestCase
 {
     /**
      * @dataProvider getValidValues

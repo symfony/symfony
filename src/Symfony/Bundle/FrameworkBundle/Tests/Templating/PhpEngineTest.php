@@ -38,8 +38,7 @@ class PhpEngineTest extends TestCase
         $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
         $engine = new PhpEngine(new TemplateNameParser(), $container, $loader, new GlobalVariables($container));
 
-        $container->set('request_stack', null);
-
+        $this->assertFalse($container->has('request_stack'));
         $globals = $engine->getGlobals();
         $this->assertEmpty($globals['app']->getRequest());
     }

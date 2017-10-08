@@ -97,7 +97,7 @@ class Reader
     /**
      * @param string $pattern
      *
-     * @return bool
+     * @return array|false
      */
     public function findPattern($pattern)
     {

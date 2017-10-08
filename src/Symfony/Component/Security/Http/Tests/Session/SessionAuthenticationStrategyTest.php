@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Http\Tests\Session;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
-class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
+class SessionAuthenticationStrategyTest extends TestCase
 {
     public function testSessionIsNotChanged()
     {

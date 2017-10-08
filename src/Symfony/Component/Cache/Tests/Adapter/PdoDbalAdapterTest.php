@@ -13,18 +13,21 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
+use Symfony\Component\Cache\Tests\Traits\PdoPruneableTrait;
 
 /**
  * @group time-sensitive
  */
 class PdoDbalAdapterTest extends AdapterTestCase
 {
+    use PdoPruneableTrait;
+
     protected static $dbFile;
 
     public static function setupBeforeClass()
     {
         if (!extension_loaded('pdo_sqlite')) {
-            throw new \PHPUnit_Framework_SkippedTestError('Extension pdo_sqlite required.');
+            self::markTestSkipped('Extension pdo_sqlite required.');
         }
 
         self::$dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_cache');

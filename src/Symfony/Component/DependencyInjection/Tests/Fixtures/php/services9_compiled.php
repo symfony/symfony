@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -20,19 +18,19 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
+    private $privates = array();
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->parameters = $this->getDefaultParameters();
 
-        $this->services = array();
+        $this->services = $this->privates = array();
         $this->methodMap = array(
-            'bar' => 'getBarService',
+            'BAR' => 'getBARService',
+            'BAR2' => 'getBAR2Service',
+            'bar' => 'getBar3Service',
+            'bar2' => 'getBar22Service',
             'baz' => 'getBazService',
-            'closure_proxy' => 'getClosureProxyService',
             'configured_service' => 'getConfiguredServiceService',
             'configured_service_simple' => 'getConfiguredServiceSimpleService',
             'decorator_service' => 'getDecoratorServiceService',
@@ -49,6 +47,7 @@ class ProjectServiceContainer extends Container
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
+            'tagged_iterator' => 'getTaggedIteratorService',
         );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
@@ -57,33 +56,54 @@ class ProjectServiceContainer extends Container
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function compile()
+    public function reset()
     {
-        throw new LogicException('You cannot compile a dumped frozen container.');
+        $this->privates = array();
+        parent::reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isFrozen()
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped container that was already compiled.');
+    }
+
+    public function isCompiled()
     {
         return true;
     }
 
     /**
-     * Gets the 'bar' service.
+     * Gets the public 'BAR' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \stdClass
      */
-    protected function getBarService()
+    protected function getBARService()
     {
-        $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
+        $this->services['BAR'] = $instance = new \stdClass();
+
+        $instance->bar = ($this->services['bar'] ?? $this->getBar3Service());
+
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'BAR2' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getBAR2Service()
+    {
+        return $this->services['BAR2'] = new \stdClass();
+    }
+
+    /**
+     * Gets the public 'bar' shared service.
+     *
+     * @return \Bar\FooClass
+     */
+    protected function getBar3Service()
+    {
+        $a = ($this->services['foo.baz'] ?? $this->getFoo_BazService());
 
         $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
 
@@ -93,49 +113,38 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'baz' service.
+     * Gets the public 'bar2' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
+     * @return \stdClass
+     */
+    protected function getBar22Service()
+    {
+        return $this->services['bar2'] = new \stdClass();
+    }
+
+    /**
+     * Gets the public 'baz' shared service.
      *
-     * @return \Baz A Baz instance
+     * @return \Baz
      */
     protected function getBazService()
     {
         $this->services['baz'] = $instance = new \Baz();
 
-        $instance->setFoo(${($_ = isset($this->services['foo_with_inline']) ? $this->services['foo_with_inline'] : $this->get('foo_with_inline')) && false ?: '_'});
+        $instance->setFoo(($this->services['foo_with_inline'] ?? $this->getFooWithInlineService()));
 
         return $instance;
     }
 
     /**
-     * Gets the 'closure_proxy' service.
+     * Gets the public 'configured_service' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \BarClass A BarClass instance
-     */
-    protected function getClosureProxyService()
-    {
-        return $this->services['closure_proxy'] = new \BarClass(/** @closure-proxy BarClass::getBaz */ function () {
-            return ${($_ = isset($this->services['closure_proxy']) ? $this->services['closure_proxy'] : $this->get('closure_proxy')) && false ?: '_'}->getBaz();
-        });
-    }
-
-    /**
-     * Gets the 'configured_service' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance
+     * @return \stdClass
      */
     protected function getConfiguredServiceService()
     {
         $a = new \ConfClass();
-        $a->setFoo(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->get('baz')) && false ?: '_'});
+        $a->setFoo(($this->services['baz'] ?? $this->getBazService()));
 
         $this->services['configured_service'] = $instance = new \stdClass();
 
@@ -145,12 +154,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'configured_service_simple' service.
+     * Gets the public 'configured_service_simple' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance
+     * @return \stdClass
      */
     protected function getConfiguredServiceSimpleService()
     {
@@ -162,12 +168,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'decorator_service' service.
+     * Gets the public 'decorator_service' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance
+     * @return \stdClass
      */
     protected function getDecoratorServiceService()
     {
@@ -175,12 +178,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'decorator_service_with_name' service.
+     * Gets the public 'decorator_service_with_name' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance
+     * @return \stdClass
      */
     protected function getDecoratorServiceWithNameService()
     {
@@ -188,12 +188,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'deprecated_service' service.
+     * Gets the public 'deprecated_service' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance
+     * @return \stdClass
      *
      * @deprecated The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.
      */
@@ -205,49 +202,40 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'factory_service' service.
+     * Gets the public 'factory_service' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar A Bar instance
+     * @return \Bar
      */
     protected function getFactoryServiceService()
     {
-        return $this->services['factory_service'] = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'}->getInstance();
+        return $this->services['factory_service'] = ($this->services['foo.baz'] ?? $this->getFoo_BazService())->getInstance();
     }
 
     /**
-     * Gets the 'factory_service_simple' service.
+     * Gets the public 'factory_service_simple' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar A Bar instance
+     * @return \Bar
      */
     protected function getFactoryServiceSimpleService()
     {
-        return $this->services['factory_service_simple'] = (new \SimpleFactoryClass('foo'))->getInstance();
+        return $this->services['factory_service_simple'] = ($this->privates['factory_simple'] ?? $this->getFactorySimpleService())->getInstance();
     }
 
     /**
-     * Gets the 'foo' service.
+     * Gets the public 'foo' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \Bar\FooClass
      */
     protected function getFooService()
     {
-        $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
+        $a = ($this->services['foo.baz'] ?? $this->getFoo_BazService());
 
         $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 
         $instance->foo = 'bar';
         $instance->moo = $a;
         $instance->qux = array('bar' => 'foo is bar', 'foobar' => 'bar');
-        $instance->setBar(${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->get('bar')) && false ?: '_'});
+        $instance->setBar(($this->services['bar'] ?? $this->getBar3Service()));
         $instance->initialize();
         sc_configure($instance);
 
@@ -255,12 +243,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'foo.baz' service.
+     * Gets the public 'foo.baz' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \BazClass A BazClass instance
+     * @return \BazClass
      */
     protected function getFoo_BazService()
     {
@@ -272,22 +257,19 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'foo_bar' service.
+     * Gets the public 'foo_bar' service.
      *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \Bar\FooClass
      */
     protected function getFooBarService()
     {
-        return new \Bar\FooClass();
+        return new \Bar\FooClass(($this->services['deprecated_service'] ?? $this->getDeprecatedServiceService()));
     }
 
     /**
-     * Gets the 'foo_with_inline' service.
+     * Gets the public 'foo_with_inline' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Foo A Foo instance
+     * @return \Foo
      */
     protected function getFooWithInlineService()
     {
@@ -296,7 +278,7 @@ class ProjectServiceContainer extends Container
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
         $a->pub = 'pub';
-        $a->setBaz(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->get('baz')) && false ?: '_'});
+        $a->setBaz(($this->services['baz'] ?? $this->getBazService()));
 
         $instance->setBar($a);
 
@@ -304,46 +286,38 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'lazy_context' service.
+     * Gets the public 'lazy_context' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \LazyContext A LazyContext instance
+     * @return \LazyContext
      */
     protected function getLazyContextService()
     {
-        return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function() {
-            yield 0 => 'foo';
-            yield 1 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
-            yield 2 => array('bar' => 'foo is '.'bar'.'', 'foobar' => 'bar');
-            yield 3 => true;
-            yield 4 => $this;
-        }));
+        return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () {
+            yield 'k1' => ($this->services['foo.baz'] ?? $this->getFoo_BazService());
+            yield 'k2' => $this;
+        }, 2), new RewindableGenerator(function () {
+            return new \EmptyIterator();
+        }, 0));
     }
 
     /**
-     * Gets the 'lazy_context_ignore_invalid_ref' service.
+     * Gets the public 'lazy_context_ignore_invalid_ref' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \LazyContext A LazyContext instance
+     * @return \LazyContext
      */
     protected function getLazyContextIgnoreInvalidRefService()
     {
-        return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function() {
-            yield 0 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
-        }));
+        return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () {
+            yield 0 => ($this->services['foo.baz'] ?? $this->getFoo_BazService());
+        }, 1), new RewindableGenerator(function () {
+            return new \EmptyIterator();
+        }, 0));
     }
 
     /**
-     * Gets the 'method_call1' service.
+     * Gets the public 'method_call1' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \Bar\FooClass
      */
     protected function getMethodCall1Service()
     {
@@ -351,20 +325,17 @@ class ProjectServiceContainer extends Container
 
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
-        $instance->setBar(${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'});
+        $instance->setBar(($this->services['foo'] ?? $this->getFooService()));
         $instance->setBar(NULL);
-        $instance->setBar(($this->get("foo")->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
+        $instance->setBar((($this->services['foo'] ?? $this->getFooService())->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
 
         return $instance;
     }
 
     /**
-     * Gets the 'new_factory_service' service.
+     * Gets the public 'new_factory_service' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \FooBarBaz A FooBarBaz instance
+     * @return \FooBarBaz
      */
     protected function getNewFactoryServiceService()
     {
@@ -379,12 +350,9 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'service_from_static_method' service.
+     * Gets the public 'service_from_static_method' shared service.
      *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Bar\FooClass A Bar\FooClass instance
+     * @return \Bar\FooClass
      */
     protected function getServiceFromStaticMethodService()
     {
@@ -392,13 +360,37 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the public 'tagged_iterator' shared service.
+     *
+     * @return \Bar
      */
+    protected function getTaggedIteratorService()
+    {
+        return $this->services['tagged_iterator'] = new \Bar(new RewindableGenerator(function () {
+            yield 0 => ($this->services['foo'] ?? $this->getFooService());
+            yield 1 => ($this->privates['tagged_iterator_foo'] ?? $this->privates['tagged_iterator_foo'] = new \Bar());
+        }, 2));
+    }
+
+    /**
+     * Gets the private 'factory_simple' shared service.
+     *
+     * @return \SimpleFactoryClass
+     *
+     * @deprecated The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.
+     */
+    protected function getFactorySimpleService()
+    {
+        @trigger_error('The "factory_simple" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
+
+        return $this->privates['factory_simple'] = new \SimpleFactoryClass('foo');
+    }
+
     public function getParameter($name)
     {
-        $name = strtolower($name);
+        $name = (string) $name;
 
-        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]))) {
+        if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
         if (isset($this->loadedDynamicParameters[$name])) {
@@ -408,27 +400,18 @@ class ProjectServiceContainer extends Container
         return $this->parameters[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasParameter($name)
     {
-        $name = strtolower($name);
+        $name = (string) $name;
 
-        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]);
+        return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParameter($name, $value)
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {

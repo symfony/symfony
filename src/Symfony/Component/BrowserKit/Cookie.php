@@ -62,7 +62,7 @@ class Cookie
             $this->rawValue = $value;
         } else {
             $this->value = $value;
-            $this->rawValue = urlencode($value);
+            $this->rawValue = rawurlencode($value);
         }
         $this->name = $name;
         $this->path = empty($path) ? '/' : $path;
@@ -213,8 +213,6 @@ class Cookie
         if (false !== $date = date_create($dateValue, new \DateTimeZone('GMT'))) {
             return $date->format('U');
         }
-
-        throw new \InvalidArgumentException(sprintf('Could not parse date "%s".', $dateValue));
     }
 
     /**

@@ -12,20 +12,22 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * Provides integration with the HttpKernel component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class HttpKernelExtension extends \Twig_Extension
+class HttpKernelExtension extends AbstractExtension
 {
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('render', array(HttpKernelRuntime::class, 'renderFragment'), array('is_safe' => array('html'))),
-            new \Twig_SimpleFunction('render_*', array(HttpKernelRuntime::class, 'renderFragmentStrategy'), array('is_safe' => array('html'))),
-            new \Twig_SimpleFunction('controller', static::class.'::controller'),
+            new TwigFunction('render', array(HttpKernelRuntime::class, 'renderFragment'), array('is_safe' => array('html'))),
+            new TwigFunction('render_*', array(HttpKernelRuntime::class, 'renderFragmentStrategy'), array('is_safe' => array('html'))),
+            new TwigFunction('controller', static::class.'::controller'),
         );
     }
 

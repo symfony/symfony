@@ -44,18 +44,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     public function normalize($propertyName)
     {
         if (null === $this->attributes || in_array($propertyName, $this->attributes)) {
-            $snakeCasedName = '';
-
-            $len = strlen($propertyName);
-            for ($i = 0; $i < $len; ++$i) {
-                if (ctype_upper($propertyName[$i])) {
-                    $snakeCasedName .= '_'.strtolower($propertyName[$i]);
-                } else {
-                    $snakeCasedName .= strtolower($propertyName[$i]);
-                }
-            }
-
-            return $snakeCasedName;
+            return strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($propertyName)));
         }
 
         return $propertyName;
@@ -75,7 +64,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
         }
 
         if (null === $this->attributes || in_array($camelCasedName, $this->attributes)) {
-            return $this->lowerCamelCase ? lcfirst($camelCasedName) : $camelCasedName;
+            return $camelCasedName;
         }
 
         return $propertyName;

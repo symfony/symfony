@@ -151,7 +151,7 @@ abstract class DoctrineType extends AbstractType
                     $entityLoader
                 );
 
-                if ($hash !== null) {
+                if (null !== $hash) {
                     $this->choiceLoaders[$hash] = $doctrineChoiceLoader;
                 }
 
@@ -279,5 +279,10 @@ abstract class DoctrineType extends AbstractType
     public function getParent()
     {
         return 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
+    }
+
+    public function reset()
+    {
+        $this->choiceLoaders = array();
     }
 }

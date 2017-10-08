@@ -32,8 +32,6 @@ class CommandTester
     private $statusCode;
 
     /**
-     * Constructor.
-     *
      * @param Command $command A Command instance to test
      */
     public function __construct(Command $command)
@@ -76,9 +74,7 @@ class CommandTester
         }
 
         $this->output = new StreamOutput(fopen('php://memory', 'w', false));
-        if (isset($options['decorated'])) {
-            $this->output->setDecorated($options['decorated']);
-        }
+        $this->output->setDecorated(isset($options['decorated']) ? $options['decorated'] : false);
         if (isset($options['verbosity'])) {
             $this->output->setVerbosity($options['verbosity']);
         }
@@ -139,8 +135,8 @@ class CommandTester
     /**
      * Sets the user inputs.
      *
-     * @param array An array of strings representing each input
-     *              passed to the command input stream.
+     * @param array an array of strings representing each input
+     *              passed to the command input stream
      *
      * @return CommandTester
      */
@@ -155,7 +151,7 @@ class CommandTester
     {
         $stream = fopen('php://memory', 'r+', false);
 
-        fputs($stream, implode(PHP_EOL, $inputs));
+        fwrite($stream, implode(PHP_EOL, $inputs));
         rewind($stream);
 
         return $stream;

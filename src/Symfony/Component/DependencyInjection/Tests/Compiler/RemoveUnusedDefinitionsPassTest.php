@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class RemoveUnusedDefinitionsPassTest extends \PHPUnit_Framework_TestCase
+class RemoveUnusedDefinitionsPassTest extends TestCase
 {
     public function testProcess()
     {
@@ -103,6 +105,28 @@ class RemoveUnusedDefinitionsPassTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->hasDefinition('foo'));
         $this->assertTrue($container->hasDefinition('bar'));
         $this->assertTrue($container->hasDefinition('foobar'));
+    }
+
+    public function testProcessConsiderEnvVariablesAsUsedEvenInPrivateServices()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FOOBAR)', 'test');
+        $container
+            ->register('foo')
+            ->setArguments(array('%env(FOOBAR)%'))
+            ->setPublic(false)
+        ;
+
+        $resolvePass = new ResolveParameterPlaceHoldersPass();
+        $resolvePass->process($container);
+
+        $this->process($container);
+
+        $this->assertFalse($container->hasDefinition('foo'));
+
+        $envCounters = $container->getEnvCounters();
+        $this->assertArrayHasKey('FOOBAR', $envCounters);
+        $this->assertSame(1, $envCounters['FOOBAR']);
     }
 
     protected function process(ContainerBuilder $container)

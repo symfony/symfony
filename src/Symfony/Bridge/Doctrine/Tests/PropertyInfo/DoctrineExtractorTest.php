@@ -14,13 +14,14 @@ namespace Symfony\Bridge\Doctrine\PropertyInfo\Tests;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
+class DoctrineExtractorTest extends TestCase
 {
     /**
      * @var DoctrineExtractor
@@ -47,6 +48,8 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
                 'id',
                 'guid',
                 'time',
+                'timeImmutable',
+                'dateInterval',
                 'json',
                 'simpleArray',
                 'float',
@@ -54,11 +57,27 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
                 'bool',
                 'binary',
                 'customFoo',
+                'bigint',
                 'foo',
                 'bar',
                 'indexedBar',
             ),
             $this->extractor->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy')
+        );
+    }
+
+    public function testGetPropertiesWithEmbedded()
+    {
+        if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
+            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
+        }
+
+        $this->assertEquals(
+            array(
+                'id',
+                'embedded',
+            ),
+            $this->extractor->getProperties('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded')
         );
     }
 
@@ -70,11 +89,36 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy', $property, array()));
     }
 
+    public function testExtractWithEmbedded()
+    {
+        if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
+            $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
+        }
+
+        $expectedTypes = array(new Type(
+            Type::BUILTIN_TYPE_OBJECT,
+            false,
+            'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineEmbeddable'
+        ));
+
+        $actualTypes = $this->extractor->getTypes(
+            'Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineWithEmbedded',
+            'embedded',
+            array()
+        );
+
+        $this->assertEquals($expectedTypes, $actualTypes);
+    }
+
     public function typesProvider()
     {
         return array(
             array('id', array(new Type(Type::BUILTIN_TYPE_INT))),
             array('guid', array(new Type(Type::BUILTIN_TYPE_STRING))),
+            array('bigint', array(new Type(Type::BUILTIN_TYPE_STRING))),
+            array('time', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))),
+            array('timeImmutable', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable'))),
+            array('dateInterval', array(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateInterval'))),
             array('float', array(new Type(Type::BUILTIN_TYPE_FLOAT))),
             array('decimal', array(new Type(Type::BUILTIN_TYPE_STRING))),
             array('bool', array(new Type(Type::BUILTIN_TYPE_BOOL))),

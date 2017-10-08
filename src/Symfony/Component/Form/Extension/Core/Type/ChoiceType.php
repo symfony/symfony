@@ -116,6 +116,7 @@ class ChoiceType extends AbstractType
                 // Reconstruct the data as mapping from child names to values
                 $data = array();
 
+                /** @var FormInterface $child */
                 foreach ($form as $child) {
                     $value = $child->getConfig()->getOption('value');
 
@@ -156,6 +157,22 @@ class ChoiceType extends AbstractType
             // transformation is merged back into the original collection
             $builder->addEventSubscriber(new MergeCollectionListener(true, true));
         }
+
+        // To avoid issues when the submitted choices are arrays (i.e. array to string conversions),
+        // we have to ensure that all elements of the submitted choice data are NULL, strings or ints.
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+
+            if (!is_array($data)) {
+                return;
+            }
+
+            foreach ($data as $v) {
+                if (null !== $v && !is_string($v) && !is_int($v)) {
+                    throw new TransformationFailedException('All choices submitted must be NULL, strings or ints.');
+                }
+            }
+        }, 256);
     }
 
     /**
@@ -257,22 +274,6 @@ class ChoiceType extends AbstractType
             return $options['required'] ? null : '';
         };
 
-        $choicesAsValuesNormalizer = function (Options $options, $choicesAsValues) {
-            // Not set by the user
-            if (null === $choicesAsValues) {
-                return true;
-            }
-
-            // Set by the user
-            if (true !== $choicesAsValues) {
-                throw new \RuntimeException(sprintf('The "choices_as_values" option of the %s should not be used. Remove it and flip the contents of the "choices" option instead.', get_class($this)));
-            }
-
-            @trigger_error('The "choices_as_values" option is deprecated since version 3.1 and will be removed in 4.0. You should not use it anymore.', E_USER_DEPRECATED);
-
-            return true;
-        };
-
         $placeholderNormalizer = function (Options $options, $placeholder) {
             if ($options['multiple']) {
                 // never use an empty value for this case
@@ -308,7 +309,6 @@ class ChoiceType extends AbstractType
             'multiple' => false,
             'expanded' => false,
             'choices' => array(),
-            'choices_as_values' => null, // deprecated since 3.1
             'choice_loader' => null,
             'choice_label' => null,
             'choice_name' => null,
@@ -329,7 +329,6 @@ class ChoiceType extends AbstractType
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
-        $resolver->setNormalizer('choices_as_values', $choicesAsValuesNormalizer);
 
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));

@@ -58,13 +58,11 @@ class MockArraySessionStorage implements SessionStorageInterface
     protected $metadataBag;
 
     /**
-     * @var array
+     * @var array|SessionBagInterface[]
      */
-    protected $bags;
+    protected $bags = array();
 
     /**
-     * Constructor.
-     *
      * @param string      $name    Session name
      * @param MetadataBag $metaBag MetadataBag instance
      */

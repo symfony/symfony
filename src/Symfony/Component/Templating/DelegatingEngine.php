@@ -24,8 +24,6 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     protected $engines = array();
 
     /**
-     * Constructor.
-     *
      * @param EngineInterface[] $engines An array of EngineInterface instances to add
      */
     public function __construct(array $engines = array())

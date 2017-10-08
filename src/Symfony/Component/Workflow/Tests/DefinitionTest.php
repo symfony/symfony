@@ -2,10 +2,11 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Transition;
 
-class DefinitionTest extends \PHPUnit_Framework_TestCase
+class DefinitionTest extends TestCase
 {
     public function testAddPlaces()
     {

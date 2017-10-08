@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Console\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Terminal;
 
-class TerminalTest extends \PHPUnit_Framework_TestCase
+class TerminalTest extends TestCase
 {
     public function test()
     {
@@ -28,5 +29,16 @@ class TerminalTest extends \PHPUnit_Framework_TestCase
         $terminal = new Terminal();
         $this->assertSame(120, $terminal->getWidth());
         $this->assertSame(60, $terminal->getHeight());
+    }
+
+    public function test_zero_values()
+    {
+        putenv('COLUMNS=0');
+        putenv('LINES=0');
+
+        $terminal = new Terminal();
+
+        $this->assertSame(0, $terminal->getWidth());
+        $this->assertSame(0, $terminal->getHeight());
     }
 }

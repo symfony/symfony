@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Asset\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
-class PackagesTest extends \PHPUnit_Framework_TestCase
+class PackagesTest extends TestCase
 {
     public function testGetterSetters()
     {

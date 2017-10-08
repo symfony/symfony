@@ -12,13 +12,14 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class MergeDoctrineCollectionListenerTest extends \PHPUnit_Framework_TestCase
+class MergeDoctrineCollectionListenerTest extends TestCase
 {
     /** @var \Doctrine\Common\Collections\ArrayCollection */
     private $collection;
@@ -76,38 +77,5 @@ class MergeDoctrineCollectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->dispatch(FormEvents::SUBMIT, $event);
 
         $this->assertTrue($this->collection->isEmpty());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyChildClassOnSubmitCallParent()
-    {
-        $form = $this->getBuilder('name')
-            ->setData($this->collection)
-            ->addEventSubscriber(new TestClassExtendingMergeDoctrineCollectionListener())
-            ->getForm();
-        $submittedData = array();
-        $event = new FormEvent($form, $submittedData);
-
-        $this->dispatcher->dispatch(FormEvents::SUBMIT, $event);
-
-        $this->assertTrue($this->collection->isEmpty());
-        $this->assertTrue(TestClassExtendingMergeDoctrineCollectionListener::$onBindCalled);
-    }
-}
-
-/**
- * @group legacy
- */
-class TestClassExtendingMergeDoctrineCollectionListener extends MergeDoctrineCollectionListener
-{
-    public static $onBindCalled = false;
-
-    public function onBind(FormEvent $event)
-    {
-        self::$onBindCalled = true;
-
-        parent::onBind($event);
     }
 }

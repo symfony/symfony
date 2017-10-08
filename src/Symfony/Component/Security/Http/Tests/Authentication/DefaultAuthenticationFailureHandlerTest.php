@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCase
+class DefaultAuthenticationFailureHandlerTest extends TestCase
 {
     private $httpKernel;
     private $httpUtils;

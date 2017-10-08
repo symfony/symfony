@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.32.60",
     "Names": {
         "Afak": "afaka",
         "Arab": "arabo",
@@ -42,6 +42,7 @@
         "Grek": "greco",
         "Gujr": "gujarati",
         "Guru": "gurmukhi",
+        "Hanb": "hanb",
         "Hang": "hangul",
         "Hani": "han",
         "Hano": "hanunoo",
@@ -55,6 +56,7 @@
         "Hung": "antico ungherese",
         "Inds": "indu",
         "Ital": "italico antico",
+        "Jamo": "jamo",
         "Java": "javanese",
         "Jpan": "giapponese",
         "Jurc": "jurchen",
@@ -155,6 +157,7 @@
         "Yiii": "yi",
         "Zinh": "ereditato",
         "Zmth": "notazione matematica",
+        "Zsye": "emoji",
         "Zsym": "simboli",
         "Zxxx": "non scritto",
         "Zyyy": "comune",

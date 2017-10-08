@@ -44,8 +44,6 @@ class Profile
     private $children = array();
 
     /**
-     * Constructor.
-     *
      * @param string $token The token
      */
     public function __construct($token)
@@ -156,7 +154,7 @@ class Profile
     /**
      * Returns the time.
      *
-     * @return string The time
+     * @return int The time
      */
     public function getTime()
     {
@@ -167,6 +165,9 @@ class Profile
         return $this->time;
     }
 
+    /**
+     * @param int The time
+     */
     public function setTime($time)
     {
         $this->time = $time;

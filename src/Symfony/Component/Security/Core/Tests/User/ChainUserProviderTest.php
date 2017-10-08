@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Security\Core\Tests\User;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
-class ChainUserProviderTest extends \PHPUnit_Framework_TestCase
+class ChainUserProviderTest extends TestCase
 {
     public function testLoadUserByUsername()
     {
@@ -169,6 +170,26 @@ class ChainUserProviderTest extends \PHPUnit_Framework_TestCase
 
         $provider = new ChainUserProvider(array($provider1, $provider2));
         $this->assertFalse($provider->supportsClass('foo'));
+    }
+
+    public function testAcceptsTraversable()
+    {
+        $provider1 = $this->getProvider();
+        $provider1
+            ->expects($this->once())
+            ->method('refreshUser')
+            ->will($this->throwException(new UnsupportedUserException('unsupported')))
+        ;
+
+        $provider2 = $this->getProvider();
+        $provider2
+            ->expects($this->once())
+            ->method('refreshUser')
+            ->will($this->returnValue($account = $this->getAccount()))
+        ;
+
+        $provider = new ChainUserProvider(new \ArrayObject(array($provider1, $provider2)));
+        $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
     protected function getAccount()

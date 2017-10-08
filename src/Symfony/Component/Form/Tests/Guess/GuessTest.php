@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Form\Tests\Guess;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Guess\Guess;
 
 class TestGuess extends Guess
 {
 }
 
-class GuessTest extends \PHPUnit_Framework_TestCase
+class GuessTest extends TestCase
 {
     public function testGetBestGuessReturnsGuessWithHighestConfidence()
     {

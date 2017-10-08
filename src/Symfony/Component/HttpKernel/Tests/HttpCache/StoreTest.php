@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 
-class StoreTest extends \PHPUnit_Framework_TestCase
+class StoreTest extends TestCase
 {
     protected $request;
     protected $response;
@@ -233,6 +234,33 @@ class StoreTest extends \PHPUnit_Framework_TestCase
 
         $this->store->unlock($req);
         $this->assertFalse($this->store->isLocked($req));
+    }
+
+    public function testPurgeHttps()
+    {
+        $request = Request::create('https://example.com/foo');
+        $this->store->write($request, new Response('foo'));
+
+        $this->assertNotEmpty($this->getStoreMetadata($request));
+
+        $this->assertTrue($this->store->purge('https://example.com/foo'));
+        $this->assertEmpty($this->getStoreMetadata($request));
+    }
+
+    public function testPurgeHttpAndHttps()
+    {
+        $requestHttp = Request::create('https://example.com/foo');
+        $this->store->write($requestHttp, new Response('foo'));
+
+        $requestHttps = Request::create('http://example.com/foo');
+        $this->store->write($requestHttps, new Response('foo'));
+
+        $this->assertNotEmpty($this->getStoreMetadata($requestHttp));
+        $this->assertNotEmpty($this->getStoreMetadata($requestHttps));
+
+        $this->assertTrue($this->store->purge('http://example.com/foo'));
+        $this->assertEmpty($this->getStoreMetadata($requestHttp));
+        $this->assertEmpty($this->getStoreMetadata($requestHttps));
     }
 
     protected function storeSimpleEntry($path = null, $headers = array())

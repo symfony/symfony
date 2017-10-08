@@ -15,6 +15,7 @@ class Alias
 {
     private $id;
     private $public;
+    private $private;
 
     /**
      * @param string $id     Alias identifier
@@ -22,13 +23,9 @@ class Alias
      */
     public function __construct($id, $public = true)
     {
-        if (!is_string($id)) {
-            $type = is_object($id) ? get_class($id) : gettype($id);
-            $id = (string) $id;
-            @trigger_error(sprintf('Non-string identifiers are deprecated since Symfony 3.3 and won\'t be supported in 4.0 for Alias to "%s" ("%s" given.) Cast it to string beforehand.', $id, $type), E_USER_DEPRECATED);
-        }
-        $this->id = $id;
+        $this->id = (string) $id;
         $this->public = $public;
+        $this->private = 2 > func_num_args();
     }
 
     /**
@@ -45,10 +42,44 @@ class Alias
      * Sets if this Alias is public.
      *
      * @param bool $boolean If this Alias should be public
+     *
+     * @return $this
      */
     public function setPublic($boolean)
     {
         $this->public = (bool) $boolean;
+        $this->private = false;
+
+        return $this;
+    }
+
+    /**
+     * Sets if this Alias is private.
+     *
+     * When set, the "private" state has a higher precedence than "public".
+     * In version 3.4, a "private" alias always remains publicly accessible,
+     * but triggers a deprecation notice when accessed from the container,
+     * so that the alias can be made really private in 4.0.
+     *
+     * @param bool $boolean
+     *
+     * @return $this
+     */
+    public function setPrivate($boolean)
+    {
+        $this->private = (bool) $boolean;
+
+        return $this;
+    }
+
+    /**
+     * Whether this alias is private.
+     *
+     * @return bool
+     */
+    public function isPrivate()
+    {
+        return $this->private;
     }
 
     /**

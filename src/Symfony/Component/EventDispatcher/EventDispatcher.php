@@ -24,6 +24,7 @@ namespace Symfony\Component\EventDispatcher;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Jordan Alliot <jordan.alliot@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 class EventDispatcher implements EventDispatcherInterface
 {
@@ -52,7 +53,7 @@ class EventDispatcher implements EventDispatcherInterface
     public function getListeners($eventName = null)
     {
         if (null !== $eventName) {
-            if (!isset($this->listeners[$eventName])) {
+            if (empty($this->listeners[$eventName])) {
                 return array();
             }
 
@@ -77,13 +78,23 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function getListenerPriority($eventName, $listener)
     {
-        if (!isset($this->listeners[$eventName])) {
+        if (empty($this->listeners[$eventName])) {
             return;
         }
 
+        if (is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure) {
+            $listener[0] = $listener[0]();
+        }
+
         foreach ($this->listeners[$eventName] as $priority => $listeners) {
-            if (false !== in_array($listener, $listeners, true)) {
-                return $priority;
+            foreach ($listeners as $k => $v) {
+                if ($v !== $listener && is_array($v) && isset($v[0]) && $v[0] instanceof \Closure) {
+                    $v[0] = $v[0]();
+                    $this->listeners[$eventName][$priority][$k] = $v;
+                }
+                if ($v === $listener) {
+                    return $priority;
+                }
             }
         }
     }
@@ -93,7 +104,17 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function hasListeners($eventName = null)
     {
-        return (bool) count($this->getListeners($eventName));
+        if (null !== $eventName) {
+            return !empty($this->listeners[$eventName]);
+        }
+
+        foreach ($this->listeners as $eventListeners) {
+            if ($eventListeners) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -110,13 +131,30 @@ class EventDispatcher implements EventDispatcherInterface
      */
     public function removeListener($eventName, $listener)
     {
-        if (!isset($this->listeners[$eventName])) {
+        if (empty($this->listeners[$eventName])) {
             return;
         }
 
+        if (is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure) {
+            $listener[0] = $listener[0]();
+        }
+
         foreach ($this->listeners[$eventName] as $priority => $listeners) {
-            if (false !== ($key = array_search($listener, $listeners, true))) {
-                unset($this->listeners[$eventName][$priority][$key], $this->sorted[$eventName]);
+            foreach ($listeners as $k => $v) {
+                if ($v !== $listener && is_array($v) && isset($v[0]) && $v[0] instanceof \Closure) {
+                    $v[0] = $v[0]();
+                }
+                if ($v === $listener) {
+                    unset($listeners[$k], $this->sorted[$eventName]);
+                } else {
+                    $listeners[$k] = $v;
+                }
+            }
+
+            if ($listeners) {
+                $this->listeners[$eventName][$priority] = $listeners;
+            } else {
+                unset($this->listeners[$eventName][$priority]);
             }
         }
     }
@@ -183,6 +221,16 @@ class EventDispatcher implements EventDispatcherInterface
     private function sortListeners($eventName)
     {
         krsort($this->listeners[$eventName]);
-        $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
+        $this->sorted[$eventName] = array();
+
+        foreach ($this->listeners[$eventName] as $priority => $listeners) {
+            foreach ($listeners as $k => $listener) {
+                if (is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure) {
+                    $listener[0] = $listener[0]();
+                    $this->listeners[$eventName][$priority][$k] = $listener;
+                }
+                $this->sorted[$eventName][] = $listener;
+            }
+        }
     }
 }

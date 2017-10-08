@@ -128,15 +128,20 @@ class MarkdownDescriptor extends Descriptor
         $this->write($title."\n".str_repeat('=', strlen($title)));
 
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
-        $showPrivate = isset($options['show_private']) && $options['show_private'];
         $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $services = array('definitions' => array(), 'aliases' => array(), 'services' => array());
+
+        if (isset($options['filter'])) {
+            $serviceIds = array_filter($serviceIds, $options['filter']);
+        }
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
 
             if ($service instanceof Alias) {
-                $services['aliases'][$serviceId] = $service;
+                if ($showPrivate || $service->isPublic()) {
+                    $services['aliases'][$serviceId] = $service;
+                }
             } elseif ($service instanceof Definition) {
                 if (($showPrivate || $service->isPublic())) {
                     $services['definitions'][$serviceId] = $service;
@@ -180,21 +185,11 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
             ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no')
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
+            ."\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no')
+            ."\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no')
+            ."\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no')
+            ."\n".'- Autoconfigured: '.($definition->isAutoconfigured() ? 'yes' : 'no')
         ;
-
-        if (method_exists($definition, 'isShared')) {
-            $output .= "\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no');
-        }
-
-        $output .= "\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
-
-        if (method_exists($definition, 'isAutowired')) {
-            $output .= "\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no');
-
-            foreach ($definition->getAutowiringTypes() as $autowiringType) {
-                $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
-            }
-        }
 
         if (isset($options['show_arguments']) && $options['show_arguments']) {
             $output .= "\n".'- Arguments: '.($definition->getArguments() ? 'yes' : 'no');
@@ -235,7 +230,7 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
-        $this->write(isset($options['id']) ? sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output) : $output);
+        $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
     /**
@@ -250,7 +245,7 @@ class MarkdownDescriptor extends Descriptor
             return $this->write($output);
         }
 
-        $this->write(sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output));
+        $this->write(sprintf("### %s\n\n%s\n", $options['id'], $output));
 
         if (!$builder) {
             return;
@@ -372,7 +367,7 @@ class MarkdownDescriptor extends Descriptor
      */
     private function formatRouterConfig(array $array)
     {
-        if (!count($array)) {
+        if (!$array) {
             return 'NONE';
         }
 

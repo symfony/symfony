@@ -31,6 +31,7 @@ class PathPackage extends Package
     /**
      * @param string                   $basePath        The base path to be prepended to relative paths
      * @param VersionStrategyInterface $versionStrategy The version strategy
+     * @param ContextInterface|null    $context         The context
      */
     public function __construct($basePath, VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {
@@ -56,7 +57,14 @@ class PathPackage extends Package
             return $path;
         }
 
-        return $this->getBasePath().ltrim($this->getVersionStrategy()->applyVersion($path), '/');
+        $versionedPath = $this->getVersionStrategy()->applyVersion($path);
+
+        // if absolute or begins with /, we're done
+        if ($this->isAbsoluteUrl($versionedPath) || ($versionedPath && '/' === $versionedPath[0])) {
+            return $versionedPath;
+        }
+
+        return $this->getBasePath().ltrim($versionedPath, '/');
     }
 
     /**

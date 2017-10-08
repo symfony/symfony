@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -24,7 +25,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 
-class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
+class GetSetMethodNormalizerTest extends TestCase
 {
     /**
      * @var GetSetMethodNormalizer
@@ -145,9 +146,6 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $obj->getBar());
     }
 
-    /**
-     * @requires PHP 5.6
-     */
     public function testConstructorDenormalizeWithVariadicArgument()
     {
         $obj = $this->normalizer->denormalize(
@@ -156,9 +154,6 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1, 2, 3), $obj->getFoo());
     }
 
-    /**
-     * @requires PHP 5.6
-     */
     public function testConstructorDenormalizeWithMissingVariadicArgument()
     {
         $obj = $this->normalizer->denormalize(
@@ -496,6 +491,23 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->getFoo());
     }
 
+    public function testHasGetterDenormalize()
+    {
+        $obj = $this->normalizer->denormalize(array('foo' => true), ObjectWithHasGetterDummy::class);
+        $this->assertTrue($obj->hasFoo());
+    }
+
+    public function testHasGetterNormalize()
+    {
+        $obj = new ObjectWithHasGetterDummy();
+        $obj->setFoo(true);
+
+        $this->assertEquals(
+            array('foo' => true),
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
     public function testMaxDepth()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -804,5 +816,20 @@ class ObjectWithJustStaticSetterDummy
     public static function setFoo($foo)
     {
         self::$foo = $foo;
+    }
+}
+
+class ObjectWithHasGetterDummy
+{
+    private $foo;
+
+    public function setFoo($foo)
+    {
+        $this->foo = $foo;
+    }
+
+    public function hasFoo()
+    {
+        return $this->foo;
     }
 }

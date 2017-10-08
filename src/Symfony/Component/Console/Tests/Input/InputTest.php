@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-class InputTest extends \PHPUnit_Framework_TestCase
+class InputTest extends TestCase
 {
     public function testConstructor()
     {
@@ -36,6 +37,14 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input = new ArrayInput(array('--name' => 'foo'), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default'))));
         $this->assertEquals('default', $input->getOption('bar'), '->getOption() returns the default value for optional options');
         $this->assertEquals(array('name' => 'foo', 'bar' => 'default'), $input->getOptions(), '->getOptions() returns all option values, even optional ones');
+
+        $input = new ArrayInput(array('--name' => 'foo', '--bar' => ''), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default'))));
+        $this->assertEquals('', $input->getOption('bar'), '->getOption() returns null for options explicitly passed without value (or an empty value)');
+        $this->assertEquals(array('name' => 'foo', 'bar' => ''), $input->getOptions(), '->getOptions() returns all option values.');
+
+        $input = new ArrayInput(array('--name' => 'foo', '--bar' => null), new InputDefinition(array(new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default'))));
+        $this->assertNull($input->getOption('bar'), '->getOption() returns null for options explicitly passed without value (or an empty value)');
+        $this->assertEquals(array('name' => 'foo', 'bar' => null), $input->getOptions(), '->getOptions() returns all option values');
     }
 
     /**

@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Asset\Tests\Context;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Context\NullContext;
 
-class NullContextTest extends \PHPUnit_Framework_TestCase
+class NullContextTest extends TestCase
 {
     public function testGetBasePath()
     {

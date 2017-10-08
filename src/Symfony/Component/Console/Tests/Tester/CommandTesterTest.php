@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Tester;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\Output;
@@ -20,7 +21,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CommandTesterTest extends \PHPUnit_Framework_TestCase
+class CommandTesterTest extends TestCase
 {
     protected $command;
     protected $tester;

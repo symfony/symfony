@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Extension;
 
-class ExtensionTest extends \PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ExtensionTest extends TestCase
 {
     /**
      * @dataProvider getResolvedEnabledFixtures

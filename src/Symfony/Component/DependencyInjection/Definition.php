@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
@@ -26,20 +27,27 @@ class Definition
     private $factory;
     private $shared = true;
     private $deprecated = false;
-    private $deprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
+    private $deprecationTemplate;
     private $properties = array();
     private $calls = array();
+    private $instanceof = array();
+    private $autoconfigured = false;
     private $configurator;
     private $tags = array();
     private $public = true;
+    private $private = true;
     private $synthetic = false;
     private $abstract = false;
     private $lazy = false;
     private $decoratedService;
-    private $autowiredMethods = array();
-    private $autowiringTypes = array();
+    private $autowired = false;
+    private $changes = array();
+    private $bindings = array();
+    private $errors = array();
 
-    protected $arguments;
+    protected $arguments = array();
+
+    private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
 
     /**
      * @param string|null $class     The service class
@@ -47,8 +55,34 @@ class Definition
      */
     public function __construct($class = null, array $arguments = array())
     {
-        $this->class = $class;
+        if (null !== $class) {
+            $this->setClass($class);
+        }
         $this->arguments = $arguments;
+    }
+
+    /**
+     * Returns all changes tracked for the Definition object.
+     *
+     * @return array An array of changes for this Definition
+     */
+    public function getChanges()
+    {
+        return $this->changes;
+    }
+
+    /**
+     * Sets the tracked changes for the Definition object.
+     *
+     * @param array $changes An array of changes for this Definition
+     *
+     * @return $this
+     */
+    public function setChanges(array $changes)
+    {
+        $this->changes = $changes;
+
+        return $this;
     }
 
     /**
@@ -60,7 +94,9 @@ class Definition
      */
     public function setFactory($factory)
     {
-        if (is_string($factory) && strpos($factory, '::') !== false) {
+        $this->changes['factory'] = true;
+
+        if (is_string($factory) && false !== strpos($factory, '::')) {
             $factory = explode('::', $factory, 2);
         }
 
@@ -88,13 +124,15 @@ class Definition
      *
      * @return $this
      *
-     * @throws InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
+     * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
     public function setDecoratedService($id, $renamedId = null, $priority = 0)
     {
         if ($renamedId && $id == $renamedId) {
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
         }
+
+        $this->changes['decorated_service'] = true;
 
         if (null === $id) {
             $this->decoratedService = null;
@@ -106,7 +144,7 @@ class Definition
     }
 
     /**
-     * Gets the service that decorates this service.
+     * Gets the service that this service is decorating.
      *
      * @return null|array An array composed of the decorated service id, the new id for it and the priority of decoration, null if no service is decorated
      */
@@ -124,6 +162,8 @@ class Definition
      */
     public function setClass($class)
     {
+        $this->changes['class'] = true;
+
         $this->class = $class;
 
         return $this;
@@ -153,6 +193,13 @@ class Definition
         return $this;
     }
 
+    /**
+     * Sets the properties to define when creating the service.
+     *
+     * @param array $properties
+     *
+     * @return $this
+     */
     public function setProperties(array $properties)
     {
         $this->properties = $properties;
@@ -160,11 +207,24 @@ class Definition
         return $this;
     }
 
+    /**
+     * Gets the properties to define when creating the service.
+     *
+     * @return array
+     */
     public function getProperties()
     {
         return $this->properties;
     }
 
+    /**
+     * Sets a specific property.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
     public function setProperty($name, $value)
     {
         $this->properties[$name] = $value;
@@ -187,10 +247,10 @@ class Definition
     }
 
     /**
-     * Sets a specific argument.
+     * Replaces a specific argument.
      *
-     * @param int   $index
-     * @param mixed $argument
+     * @param int|string $index
+     * @param mixed      $argument
      *
      * @return $this
      *
@@ -198,11 +258,34 @@ class Definition
      */
     public function replaceArgument($index, $argument)
     {
-        if ($index < 0 || $index > count($this->arguments) - 1) {
+        if (0 === count($this->arguments)) {
+            throw new OutOfBoundsException('Cannot replace arguments if none have been configured yet.');
+        }
+
+        if (is_int($index) && ($index < 0 || $index > count($this->arguments) - 1)) {
             throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
         }
 
+        if (!array_key_exists($index, $this->arguments)) {
+            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist.', $index));
+        }
+
         $this->arguments[$index] = $argument;
+
+        return $this;
+    }
+
+    /**
+     * Sets a specific argument.
+     *
+     * @param int|string $key
+     * @param mixed      $value
+     *
+     * @return $this
+     */
+    public function setArgument($key, $value)
+    {
+        $this->arguments[$key] = $value;
 
         return $this;
     }
@@ -220,7 +303,7 @@ class Definition
     /**
      * Gets an argument to pass to the service constructor/factory method.
      *
-     * @param int $index
+     * @param int|string $index
      *
      * @return mixed The argument value
      *
@@ -228,8 +311,8 @@ class Definition
      */
     public function getArgument($index)
     {
-        if ($index < 0 || $index > count($this->arguments) - 1) {
-            throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
+        if (!array_key_exists($index, $this->arguments)) {
+            throw new OutOfBoundsException(sprintf('The argument "%s" doesn\'t exist.', $index));
         }
 
         return $this->arguments[$index];
@@ -265,7 +348,7 @@ class Definition
     public function addMethodCall($method, array $arguments = array())
     {
         if (empty($method)) {
-            throw new InvalidArgumentException(sprintf('Method name cannot be empty.'));
+            throw new InvalidArgumentException('Method name cannot be empty.');
         }
         $this->calls[] = array($method, $arguments);
 
@@ -317,6 +400,54 @@ class Definition
     public function getMethodCalls()
     {
         return $this->calls;
+    }
+
+    /**
+     * Sets the definition templates to conditionally apply on the current definition, keyed by parent interface/class.
+     *
+     * @param $instanceof ChildDefinition[]
+     *
+     * @return $this
+     */
+    public function setInstanceofConditionals(array $instanceof)
+    {
+        $this->instanceof = $instanceof;
+
+        return $this;
+    }
+
+    /**
+     * Gets the definition templates to conditionally apply on the current definition, keyed by parent interface/class.
+     *
+     * @return ChildDefinition[]
+     */
+    public function getInstanceofConditionals()
+    {
+        return $this->instanceof;
+    }
+
+    /**
+     * Sets whether or not instanceof conditionals should be prepended with a global set.
+     *
+     * @param bool $autoconfigured
+     *
+     * @return $this
+     */
+    public function setAutoconfigured($autoconfigured)
+    {
+        $this->changes['autoconfigured'] = true;
+
+        $this->autoconfigured = $autoconfigured;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAutoconfigured()
+    {
+        return $this->autoconfigured;
     }
 
     /**
@@ -417,6 +548,8 @@ class Definition
      */
     public function setFile($file)
     {
+        $this->changes['file'] = true;
+
         $this->file = $file;
 
         return $this;
@@ -441,6 +574,8 @@ class Definition
      */
     public function setShared($shared)
     {
+        $this->changes['shared'] = true;
+
         $this->shared = (bool) $shared;
 
         return $this;
@@ -465,7 +600,10 @@ class Definition
      */
     public function setPublic($boolean)
     {
+        $this->changes['public'] = true;
+
         $this->public = (bool) $boolean;
+        $this->private = false;
 
         return $this;
     }
@@ -481,6 +619,35 @@ class Definition
     }
 
     /**
+     * Sets if this service is private.
+     *
+     * When set, the "private" state has a higher precedence than "public".
+     * In version 3.4, a "private" service always remains publicly accessible,
+     * but triggers a deprecation notice when accessed from the container,
+     * so that the service can be made really private in 4.0.
+     *
+     * @param bool $boolean
+     *
+     * @return $this
+     */
+    public function setPrivate($boolean)
+    {
+        $this->private = (bool) $boolean;
+
+        return $this;
+    }
+
+    /**
+     * Whether this service is private.
+     *
+     * @return bool
+     */
+    public function isPrivate()
+    {
+        return $this->private;
+    }
+
+    /**
      * Sets the lazy flag of this service.
      *
      * @param bool $lazy
@@ -489,6 +656,8 @@ class Definition
      */
     public function setLazy($lazy)
     {
+        $this->changes['lazy'] = true;
+
         $this->lazy = (bool) $lazy;
 
         return $this;
@@ -565,7 +734,7 @@ class Definition
      *
      * @return $this
      *
-     * @throws InvalidArgumentException When the message template is invalid.
+     * @throws InvalidArgumentException when the message template is invalid
      */
     public function setDeprecated($status = true, $template = null)
     {
@@ -580,6 +749,8 @@ class Definition
 
             $this->deprecationTemplate = $template;
         }
+
+        $this->changes['deprecated'] = true;
 
         $this->deprecated = (bool) $status;
 
@@ -606,7 +777,7 @@ class Definition
      */
     public function getDeprecationMessage($id)
     {
-        return str_replace('%service_id%', $id, $this->deprecationTemplate);
+        return str_replace('%service_id%', $id, $this->deprecationTemplate ?: self::$defaultDeprecationTemplate);
     }
 
     /**
@@ -618,7 +789,9 @@ class Definition
      */
     public function setConfigurator($configurator)
     {
-        if (is_string($configurator) && strpos($configurator, '::') !== false) {
+        $this->changes['configurator'] = true;
+
+        if (is_string($configurator) && false !== strpos($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
         }
 
@@ -638,49 +811,17 @@ class Definition
     }
 
     /**
-     * Sets types that will default to this definition.
-     *
-     * @param string[] $types
-     *
-     * @return $this
-     */
-    public function setAutowiringTypes(array $types)
-    {
-        $this->autowiringTypes = array();
-
-        foreach ($types as $type) {
-            $this->autowiringTypes[$type] = true;
-        }
-
-        return $this;
-    }
-
-    /**
      * Is the definition autowired?
      *
      * @return bool
      */
     public function isAutowired()
     {
-        return !empty($this->autowiredMethods);
+        return $this->autowired;
     }
 
     /**
-     * Gets autowired methods.
-     *
-     * @return string[]
-     */
-    public function getAutowiredMethods()
-    {
-        return $this->autowiredMethods;
-    }
-
-    /**
-     * Sets autowired.
-     *
-     * Allowed values:
-     *   - true: constructor autowiring, same as $this->setAutowiredMethods(array('__construct'))
-     *   - false: no autowiring, same as $this->setAutowiredMethods(array())
+     * Enables/disables autowiring.
      *
      * @param bool $autowired
      *
@@ -688,75 +829,64 @@ class Definition
      */
     public function setAutowired($autowired)
     {
-        $this->autowiredMethods = $autowired ? array('__construct') : array();
+        $this->changes['autowired'] = true;
+
+        $this->autowired = (bool) $autowired;
 
         return $this;
     }
 
     /**
-     * Sets autowired methods.
+     * Gets bindings.
      *
-     * Example of allowed value:
-     *   - array('__construct', 'set*', 'initialize'): autowire whitelisted methods only
-     *
-     * @param string[] $autowiredMethods
-     *
-     * @return Definition The current instance
+     * @return array
      */
-    public function setAutowiredMethods(array $autowiredMethods)
+    public function getBindings()
     {
-        $this->autowiredMethods = $autowiredMethods;
-
-        return $this;
+        return $this->bindings;
     }
 
     /**
-     * Gets autowiring types that will default to this definition.
+     * Sets bindings.
      *
-     * @return string[]
-     */
-    public function getAutowiringTypes()
-    {
-        return array_keys($this->autowiringTypes);
-    }
-
-    /**
-     * Adds a type that will default to this definition.
+     * Bindings map $named or FQCN arguments to values that should be
+     * injected in the matching parameters (of the constructor, of methods
+     * called and of controller actions).
      *
-     * @param string $type
+     * @param array $bindings
      *
      * @return $this
      */
-    public function addAutowiringType($type)
+    public function setBindings(array $bindings)
     {
-        $this->autowiringTypes[$type] = true;
+        foreach ($bindings as $key => $binding) {
+            if (!$binding instanceof BoundArgument) {
+                $bindings[$key] = new BoundArgument($binding);
+            }
+        }
+
+        $this->bindings = $bindings;
 
         return $this;
     }
 
     /**
-     * Removes a type.
+     * Add an error that occurred when building this Definition.
      *
-     * @param string $type
-     *
-     * @return $this
+     * @param string $error
      */
-    public function removeAutowiringType($type)
+    public function addError($error)
     {
-        unset($this->autowiringTypes[$type]);
-
-        return $this;
+        $this->errors[] = $error;
     }
 
     /**
-     * Will this definition default for the given type?
+     * Returns any errors that occurred while building this Definition.
      *
-     * @param string $type
-     *
-     * @return bool
+     * @return array
      */
-    public function hasAutowiringType($type)
+    public function getErrors()
     {
-        return isset($this->autowiringTypes[$type]);
+        return $this->errors;
     }
 }

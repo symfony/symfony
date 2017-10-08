@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 
-class StringInputTest extends \PHPUnit_Framework_TestCase
+class StringInputTest extends TestCase
 {
     /**
      * @dataProvider getTokenizeData

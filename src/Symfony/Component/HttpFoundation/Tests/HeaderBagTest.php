@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
-class HeaderBagTest extends \PHPUnit_Framework_TestCase
+class HeaderBagTest extends TestCase
 {
     public function testConstructor()
     {

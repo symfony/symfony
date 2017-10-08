@@ -24,7 +24,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         parent::setUp();
 
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, '57.1');
 
         \Locale::setDefault('de_AT');
 
@@ -61,11 +61,13 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
             array(\IntlDateFormatter::FULL, \IntlDateFormatter::NONE, null, 'Mittwoch, 3. Februar 2010', '2010-02-03 00:00:00 UTC'),
             array(null, \IntlDateFormatter::SHORT, null, '03.02.2010, 04:05', '2010-02-03 04:05:00 UTC'),
             array(null, \IntlDateFormatter::MEDIUM, null, '03.02.2010, 04:05:06', '2010-02-03 04:05:06 UTC'),
-            array(null, \IntlDateFormatter::LONG, null, '03.02.2010, 04:05:06 GMT', '2010-02-03 04:05:06 UTC'),
+            array(null, \IntlDateFormatter::LONG, null, '03.02.2010, 04:05:06 UTC', '2010-02-03 04:05:06 UTC'),
+            array(null, \IntlDateFormatter::LONG, null, '03.02.2010, 04:05:06 UTC', '2010-02-03 04:05:06 GMT'),
             // see below for extra test case for time format FULL
             array(\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, null, '04:05', '1970-01-01 04:05:00 UTC'),
             array(\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, null, '04:05:06', '1970-01-01 04:05:06 UTC'),
-            array(\IntlDateFormatter::NONE, \IntlDateFormatter::LONG, null, '04:05:06 GMT', '1970-01-01 04:05:06 UTC'),
+            array(\IntlDateFormatter::NONE, \IntlDateFormatter::LONG, null, '04:05:06 UTC', '1970-01-01 04:05:06 GMT'),
+            array(\IntlDateFormatter::NONE, \IntlDateFormatter::LONG, null, '04:05:06 UTC', '1970-01-01 04:05:06 UTC'),
             array(null, null, 'yyyy-MM-dd HH:mm:00', '2010-02-03 04:05:00', '2010-02-03 04:05:00 UTC'),
             array(null, null, 'yyyy-MM-dd HH:mm', '2010-02-03 04:05', '2010-02-03 04:05:00 UTC'),
             array(null, null, 'yyyy-MM-dd HH', '2010-02-03 04', '2010-02-03 04:00:00 UTC'),
@@ -85,6 +87,9 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
      */
     public function testTransform($dateFormat, $timeFormat, $pattern, $output, $input)
     {
+        IntlTestHelper::requireFullIntl($this, '59.1');
+        \Locale::setDefault('de_AT');
+
         $transformer = new DateTimeToLocalizedStringTransformer(
             'UTC',
             'UTC',
@@ -101,9 +106,12 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
     public function testTransformFullTime()
     {
+        IntlTestHelper::requireFullIntl($this, '59.1');
+        \Locale::setDefault('de_AT');
+
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, \IntlDateFormatter::FULL);
 
-        $this->assertEquals('03.02.2010, 04:05:06 GMT', $transformer->transform($this->dateTime));
+        $this->assertEquals('03.02.2010, 04:05:06 Koordinierte Weltzeit', $transformer->transform($this->dateTime));
     }
 
     public function testTransformToDifferentLocale()
@@ -187,7 +195,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
 
         // HOW TO REPRODUCE?
 
-        //$this->setExpectedException('Symfony\Component\Form\Extension\Core\DataTransformer\TransformationFailedException');
+        //$this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Form\Extension\Core\DataTransformer\TransformationFailedException');
 
         //$transformer->transform(1.5);
     }

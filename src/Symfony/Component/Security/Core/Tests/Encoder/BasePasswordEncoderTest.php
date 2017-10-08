@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Encoder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
 
 class PasswordEncoder extends BasePasswordEncoder
@@ -24,7 +25,7 @@ class PasswordEncoder extends BasePasswordEncoder
     }
 }
 
-class BasePasswordEncoderTest extends \PHPUnit_Framework_TestCase
+class BasePasswordEncoderTest extends TestCase
 {
     public function testComparePassword()
     {

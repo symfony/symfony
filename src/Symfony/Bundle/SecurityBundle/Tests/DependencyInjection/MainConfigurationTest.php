@@ -11,10 +11,11 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 
-class MainConfigurationTest extends \PHPUnit_Framework_TestCase
+class MainConfigurationTest extends TestCase
 {
     /**
      * The minimal, required config needed to not have any required validation
@@ -30,6 +31,7 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
         ),
         'firewalls' => array(
             'stub' => array(),
+            'logout_on_user_change' => true,
         ),
     );
 
@@ -77,6 +79,7 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
                         'csrf_token_generator' => 'a_token_generator',
                         'csrf_token_id' => 'a_token_id',
                     ),
+                    'logout_on_user_change' => true,
                 ),
             ),
         );
@@ -106,6 +109,7 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
             'firewalls' => array(
                 'stub' => array(
                     'user_checker' => 'app.henk_checker',
+                    'logout_on_user_change' => true,
                 ),
             ),
         );

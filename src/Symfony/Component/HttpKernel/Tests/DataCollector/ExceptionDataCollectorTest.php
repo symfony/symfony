@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ExceptionDataCollectorTest extends \PHPUnit_Framework_TestCase
+class ExceptionDataCollectorTest extends TestCase
 {
     public function testCollect()
     {
@@ -35,5 +36,24 @@ class ExceptionDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(500, $c->getCode());
         $this->assertSame('exception', $c->getName());
         $this->assertSame($trace, $c->getTrace());
+    }
+
+    public function testCollectWithoutException()
+    {
+        $c = new ExceptionDataCollector();
+        $c->collect(new Request(), new Response());
+
+        $this->assertFalse($c->hasException());
+    }
+
+    public function testReset()
+    {
+        $c = new ExceptionDataCollector();
+
+        $c->collect(new Request(), new Response(), new \Exception());
+        $c->reset();
+        $c->collect(new Request(), new Response());
+
+        $this->assertFalse($c->hasException());
     }
 }

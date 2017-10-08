@@ -13,9 +13,11 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -29,6 +31,7 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
@@ -41,6 +44,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
 {
     private $tokenStorage;
     private $authenticationManager;
+    private $httpUtils;
     private $providerKey;
     private $successHandler;
     private $failureHandler;
@@ -49,10 +53,11 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     private $eventDispatcher;
     private $propertyAccessor;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler = null, AuthenticationFailureHandlerInterface $failureHandler = null, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
+        $this->httpUtils = $httpUtils;
         $this->providerKey = $providerKey;
         $this->successHandler = $successHandler;
         $this->failureHandler = $failureHandler;
@@ -68,43 +73,61 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
+        if (false === strpos($request->getRequestFormat(), 'json')
+            && false === strpos($request->getContentType(), 'json')
+        ) {
+            return;
+        }
+
+        if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            return;
+        }
+
         $data = json_decode($request->getContent());
 
-        if (!$data instanceof \stdClass) {
-            throw new BadCredentialsException('Invalid JSON.');
-        }
-
         try {
-            $username = $this->propertyAccessor->getValue($data, $this->options['username_path']);
-        } catch (AccessException $e) {
-            throw new BadCredentialsException(sprintf('The key "%s" must be provided.', $this->options['username_path']));
-        }
+            if (!$data instanceof \stdClass) {
+                throw new BadRequestHttpException('Invalid JSON.');
+            }
 
-        try {
-            $password = $this->propertyAccessor->getValue($data, $this->options['password_path']);
-        } catch (AccessException $e) {
-            throw new BadCredentialsException(sprintf('The key "%s" must be provided.', $this->options['password_path']));
-        }
+            try {
+                $username = $this->propertyAccessor->getValue($data, $this->options['username_path']);
+            } catch (AccessException $e) {
+                throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['username_path']), $e);
+            }
 
-        if (!is_string($username)) {
-            throw new BadCredentialsException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
-        }
+            try {
+                $password = $this->propertyAccessor->getValue($data, $this->options['password_path']);
+            } catch (AccessException $e) {
+                throw new BadRequestHttpException(sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);
+            }
 
-        if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
-            throw new BadCredentialsException('Invalid username.');
-        }
+            if (!is_string($username)) {
+                throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['username_path']));
+            }
 
-        if (!is_string($password)) {
-            throw new BadCredentialsException(sprintf('The key "%s" must be a string.', $this->options['password_path']));
-        }
+            if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
+                throw new BadCredentialsException('Invalid username.');
+            }
 
-        try {
+            if (!is_string($password)) {
+                throw new BadRequestHttpException(sprintf('The key "%s" must be a string.', $this->options['password_path']));
+            }
+
             $token = new UsernamePasswordToken($username, $password, $this->providerKey);
 
             $authenticatedToken = $this->authenticationManager->authenticate($token);
             $response = $this->onSuccess($request, $authenticatedToken);
         } catch (AuthenticationException $e) {
             $response = $this->onFailure($request, $e);
+        } catch (BadRequestHttpException $e) {
+            $request->setRequestFormat('json');
+
+            throw $e;
+        }
+
+        if (null === $response) {
+            return;
         }
 
         $event->setResponse($response);
@@ -121,6 +144,10 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         if (null !== $this->eventDispatcher) {
             $loginEvent = new InteractiveLoginEvent($request, $token);
             $this->eventDispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+        }
+
+        if (!$this->successHandler) {
+            return; // let the original request succeeds
         }
 
         $response = $this->successHandler->onAuthenticationSuccess($request, $token);
@@ -141,6 +168,10 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $token = $this->tokenStorage->getToken();
         if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
             $this->tokenStorage->setToken(null);
+        }
+
+        if (!$this->failureHandler) {
+            return new JsonResponse(array('error' => $failed->getMessageKey()), 401);
         }
 
         $response = $this->failureHandler->onAuthenticationFailure($request, $failed);

@@ -105,14 +105,13 @@ class FormRegistry implements FormRegistryInterface
     {
         static $checkedTypes = array();
 
-        $searchKey = array_search($type->getName(), $checkedTypes);
-        $checkedTypes[] = $type->getName();
-
-        if (false !== $searchKey) {
-            $types = implode(' > ', $checkedTypes);
+        if (isset($checkedTypes[$type->getName()])) {
+            $types = implode(' > ', array_merge(array_keys($checkedTypes), array($type->getName())));
             $checkedTypes = array();
             throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $type->getName(), $types));
         }
+
+        $checkedTypes[$type->getName()] = true;
 
             if ($parentType->getName() === $type->getName()) {
                 $checkedTypes = array();
@@ -141,7 +140,7 @@ class FormRegistry implements FormRegistryInterface
             $parentType ? $this->getType($parentType) : null
         );
 
-        unset($checkedTypes[array_search($type->getName(), $checkedTypes)]);
+        unset($checkedTypes[$type->getName()]);
     }
 
     /**

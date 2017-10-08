@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-07T18:21:57Z
+
+@nicolas-grekas would be less obvious IMO. But we are touching subjective PoVs here :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-07T18:54:27Z
+
+👍  for Nicolas suggestion (there can also be only one error, let's keep it simple).
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-08T11:59:01Z
+
+I prefer your option @chalasr, what about just the actual rendered error? i.e. we remove this message.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T12:58:33Z
+
+I think the message is good as an intro to hint this does not directly relate to the command being run.
+A colon looks fine to me :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-08T13:06:01Z
+
+2 against 1, fair play, changed it 😛

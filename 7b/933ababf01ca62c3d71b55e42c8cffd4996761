@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-03T08:22:15Z
+
+All the array_merge could be replaced by a simple affectation: `$headers['Foo'] = 'bar';`
+
+---------------------------------------------------------------------------
+
+by gsdevme at 2017-04-07T10:22:32Z
+
+@nicolas-grekas Thanks! Good spot, will update.
+
+---------------------------------------------------------------------------
+
+by gsdevme at 2017-04-09T13:23:26Z
+
+An oversight, will fix the others up also.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-04-11T06:50:16Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by gsdevme at 2017-04-20T15:44:13Z
+
+Updated.

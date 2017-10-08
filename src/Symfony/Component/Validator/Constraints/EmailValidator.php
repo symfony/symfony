@@ -23,6 +23,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EmailValidator extends ConstraintValidator
 {
+    const PATTERN_LOOSE = '/^.+\@\S+\.\S+$/';
+    const PATTERN_HTML5 = '/^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/';
+
     /**
      * @var bool
      */
@@ -78,7 +81,11 @@ class EmailValidator extends ConstraintValidator
 
                 return;
             }
-        } elseif (!preg_match('/^.+\@\S+\.\S+$/', $value)) {
+        } elseif (!preg_match(self::PATTERN_LOOSE, $value)) {
+            if (!preg_match(self::PATTERN_HTML5, $value)) {
+                @trigger_error('The loose email pattern is deprecated since version 3.4 and will be switched to the html5 email elements pattern in 4.0');
+            }
+
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Email::INVALID_FORMAT_ERROR)

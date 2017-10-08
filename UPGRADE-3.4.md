@@ -411,6 +411,8 @@ Validator
  * Not setting the `strict` option of the `Choice` constraint to `true` is
    deprecated and will throw an exception in Symfony 4.0.
 
+ * The pattern for used by the `Email` validator will use the html5 email input pattern in Symfony 4.0.
+
 Yaml
 ----
 

@@ -54,7 +54,7 @@ final class ReplaceOperation extends AbstractOperation
             if (!$this->target->has($id, $domain)) {
                 $this->messages[$domain]['new'][$id] = $message;
 
-                // Make sure to add it to the source if even if empty($message)
+                // Make sure to add it to the source even if empty($message)
                 $this->messages[$domain]['all'][$id] = $message;
             }
         }
@@ -77,7 +77,7 @@ final class ReplaceOperation extends AbstractOperation
      *
      * @return array
      */
-    private function mergeMetadata($source, $target)
+    private function mergeMetadata(array $source = null, array $target = null)
     {
         if (empty($source) && empty($target)) {
             return array();

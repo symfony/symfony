@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-06T09:40:03Z
+
+What about markdown formatter? should we use htmlspecialchars there?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-06T10:20:07Z
+
+@ro0NL I'm not sure we should change anything on the Markdown usage for now, I don't see any issue with such arguments.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-06T11:11:44Z
+
+AFAIK markdown will render it as HTML tags;
+
+```
+<argument>       # shown as HTML; thus not visible
+`<argument>`     # shown as code
+&lt;argument&gt; # shown as text
+```
+
+If we already quote using backticks we're good :)
+
+edit: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Tests/Fixtures/command_2.md looks good already, i think we're fine :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-07T11:42:38Z
+
+ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-08T09:32:40Z
+
+I also think this should be merged as a bugfix in 2.7. @sroze Can you retarget and rebase?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-08T12:01:20Z
+
+Good point. @chalasr rebased and changed target 👍

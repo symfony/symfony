@@ -149,23 +149,6 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidChoiceSplEnum()
-    {
-        if (!class_exists('\SplEnum')) {
-            $this->markTestSkipped('SplEnum is not installed on this system.');
-        }
-
-        $constraint = new Choice(array('enum' => new class extends \SplEnum {
-            const __default = 'foo';
-            const FOO = 'foo';
-            const BAR = 'bar';
-        }));
-
-        $this->validator->validate('foo', $constraint);
-
-        $this->assertNoViolation();
-    }
-
     public function testValidChoiceClassConstantsEnum()
     {
         $constraint = new Choice(array('enum' => __CLASS__));

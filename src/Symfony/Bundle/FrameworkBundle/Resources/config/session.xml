@@ -45,6 +45,11 @@
 
         <service id="session.attribute_bag" class="%session.attribute_bag.class%" public="false" />
 
+        <service id="session.storage.mock_array" class="Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage">
+            <argument>MOCKSESSID</argument>
+            <argument type="service" id="session.storage.metadata_bag" />
+        </service>
+
         <service id="session.storage.mock_file" class="%session.storage.mock_file.class%" public="false">
             <argument>%kernel.cache_dir%/sessions</argument>
             <argument>MOCKSESSID</argument>

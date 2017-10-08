@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-10-05T10:56:34Z
+
+Thank you for the review. Yeah you might be correct. This could be considered a bugfix.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-05T11:21:11Z
+
+To me that's a bugfix.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-05T12:07:46Z
+
+@Nyholm Can you change the base branch to 2.7 (I think that should be considered as a bug fix).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-10-05T14:57:19Z
+
+Tried to do it on the phone and failed. Will fix this when I get to a computer.
+
+Thank you for the reviews.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-10-06T01:38:05Z
+
+Added the fix for branch 2.7
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-06T08:18:40Z
+
+I wonder if we don't have to update any test fixtures.

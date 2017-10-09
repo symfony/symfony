@@ -81,11 +81,18 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
 
 define('PHPUNIT_COMPOSER_INSTALL', __DIR__.'/vendor/autoload.php');
 require PHPUNIT_COMPOSER_INSTALL;
-if (class_exists('PHPUnit_Util_Blacklist')) {
-    PHPUnit_Util_Blacklist::$blacklistedClassNames['\PHPUnit\Framework\TestCase'] = 3;
-} else {
-    PHPUnit\Util\Blacklist::$blacklistedClassNames['\PHPUnit\Framework\TestCase'] = 3;
+
+if (!class_exists('SymfonyBlacklistPhpunit', false)) {
+    class SymfonyBlacklistPhpunit {}
 }
+if (class_exists('PHPUnit_Util_Blacklist')) {
+    PHPUnit_Util_Blacklist::$blacklistedClassNames['SymfonyBlacklistPhpunit'] = 1;
+    PHPUnit_Util_Blacklist::$blacklistedClassNames['SymfonyBlacklistSimplePhpunit'] = 1;
+} else {
+    PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyBlacklistPhpunit'] = 1;
+    PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyBlacklistSimplePhpunit'] = 1;
+}
+
 Symfony\Bridge\PhpUnit\TextUI\Command::main();
 
 EOPHP
@@ -204,6 +211,9 @@ if ($components) {
         }
     }
 } elseif (!isset($argv[1]) || 'install' !== $argv[1] || file_exists('install')) {
+    if (!class_exists('SymfonyBlacklistSimplePhpunit', false)) {
+        class SymfonyBlacklistSimplePhpunit {}
+    }
     array_splice($argv, 1, 0, array('--colors=always'));
     $_SERVER['argv'] = $argv;
     $_SERVER['argc'] = ++$argc;

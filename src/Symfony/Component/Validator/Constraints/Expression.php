@@ -32,7 +32,7 @@ class Expression extends Constraint
 
     public $message = 'This value is not valid.';
     public $expression;
-    public $dataPath;
+    private $dataPath;
 
     /**
      * {@inheritdoc}
@@ -41,9 +41,18 @@ class Expression extends Constraint
     {
         parent::__construct($options);
 
-        if (null !== $this->dataPath && '' !== $this->dataPath && !class_exists(PropertyAccess::class)) {
+        if ($this->dataPath && !class_exists(PropertyAccess::class)) {
             throw new RuntimeException('Unable to use expressions with data path as the Symfony PropertyAccess component is not installed.');
         }
+    }
+
+    public function __get($option)
+    {
+        if ('dataPath' === $option) {
+            return $this->dataPath;
+        }
+
+        return parent::__get($option);
     }
 
     /**

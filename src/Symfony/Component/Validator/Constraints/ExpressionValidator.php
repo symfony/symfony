@@ -46,8 +46,8 @@ class ExpressionValidator extends ConstraintValidator
         $variables = array();
         $variables['value'] = $value;
 
-        if (null !== $constraint->dataPath && '' !== $constraint->dataPath) {
-            $variables['this'] = $this->getPropertyAccessor()->getValue($this->context, $constraint->dataPath);
+        if ($constraint->dataPath) {
+            $variables['this'] = PropertyAccess::createPropertyAccessor()->getValue($this->context, $constraint->dataPath);
         } else {
             $variables['this'] = $this->context->getObject();
         }
@@ -70,10 +70,5 @@ class ExpressionValidator extends ConstraintValidator
         }
 
         return $this->expressionLanguage;
-    }
-
-    private function getPropertyAccessor()
-    {
-        return PropertyAccess::createPropertyAccessor();
     }
 }

@@ -32,7 +32,7 @@ class Expression extends Constraint
 
     public $message = 'This value is not valid.';
     public $expression;
-    private $dataPath;
+    protected $dataPath;
 
     /**
      * {@inheritdoc}

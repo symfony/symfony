@@ -21,7 +21,7 @@ class InlineTest extends TestCase
 {
     protected function setUp()
     {
-        Inline::initialize(0);
+        Inline::initialize(0, 0);
     }
 
     /**

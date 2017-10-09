@@ -601,6 +601,7 @@ class FrameworkExtension extends Extension
                     new Reference('security.authorization_checker'),
                     new Reference('security.authentication.trust_resolver'),
                     new Reference('security.role_hierarchy'),
+                    new Reference('validator', ContainerInterface::NULL_ON_INVALID_REFERENCE),
                 ));
 
                 $container->setDefinition(sprintf('%s.listener.guard', $workflowId), $guard);

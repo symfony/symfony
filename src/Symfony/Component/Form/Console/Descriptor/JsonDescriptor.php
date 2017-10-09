@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Console\Descriptor;
 
 use Symfony\Component\Form\ResolvedFormTypeInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
@@ -20,10 +21,10 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
  */
 class JsonDescriptor extends Descriptor
 {
-    protected function describeDefaults(array $options = array())
+    protected function describeDefaults(array $options)
     {
-        $data['builtin_form_types'] = $this->getCoreTypes();
-        $data['service_form_types'] = array_values(array_diff($options['types'], $data['builtin_form_types']));
+        $data['builtin_form_types'] = $options['core_types'];
+        $data['service_form_types'] = $options['service_types'];
         $data['type_extensions'] = $options['extensions'];
         $data['type_guessers'] = $options['guessers'];
 
@@ -50,6 +51,30 @@ class JsonDescriptor extends Descriptor
             'parent_types' => $this->parents,
             'type_extensions' => $this->extensions,
         );
+
+        $this->writeData($data, $options);
+    }
+
+    protected function describeOption(OptionsResolver $optionsResolver, array $options)
+    {
+        $definition = $this->getOptionDefinition($optionsResolver, $options['option']);
+
+        $map = array(
+            'required' => 'required',
+            'default' => 'default',
+            'allowed_types' => 'allowedTypes',
+            'allowed_values' => 'allowedValues',
+        );
+        foreach ($map as $label => $name) {
+            if (array_key_exists($name, $definition)) {
+                $data[$label] = $definition[$name];
+
+                if ('default' === $name) {
+                    $data['is_lazy'] = isset($definition['lazy']);
+                }
+            }
+        }
+        $data['has_normalizer'] = isset($definition['normalizer']);
 
         $this->writeData($data, $options);
     }

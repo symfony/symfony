@@ -107,7 +107,7 @@ class FormRegistry implements FormRegistryInterface
     {
         try {
             if (isset($this->checkedTypes[$type->getName()])) {
-                $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$type->getName()]));
+                $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($type->getName())));
                 throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $type->getName(), $types));
             }
 
@@ -126,7 +126,7 @@ class FormRegistry implements FormRegistryInterface
             if ($parentType === $type->getName()) {
                 throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
             }
-            $typeExtensions = [];
+            $typeExtensions = array();
         $parentType = $type->getParent();
         $fqcn = get_class($type);
 

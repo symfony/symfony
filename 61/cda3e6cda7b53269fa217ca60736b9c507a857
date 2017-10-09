@@ -1,0 +1,309 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-14T19:43:57Z
+
+I've used `CliDumper` to dump some values but the output is not colored (see Normalizer value) @nicolas-grekas am I probably missing something?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-14T20:06:27Z
+
+Color is auto-enabled only when writing to a color-enabled output stream. You can force it, but then it's your responsibility to do it appropriately, see eg
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/VarDumper/Dumper/CliDumper.php#L85
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-14T20:27:04Z
+
+@nicolas-grekas perfect thanks! color enabled.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-15T16:31:22Z
+
+Is dumping a closure like the normalizer ones really useful? At least perhaps registering a dedicated caster to only keep file and line no?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-15T17:39:45Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-15T18:02:40Z
+
+Unrelated to this command argument but I added type alternatives if typo on `debug:form <type>`:
+![type-alternatives](https://user-images.githubusercontent.com/2028198/30496734-5a607dee-9a1e-11e7-898d-8d2f8736ae14.png)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-15T22:48:15Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-18T03:19:59Z
+
+I wondering if the use case where [default values depend on another option](http://symfony.com/doc/current/components/options_resolver.html#default-values-that-depend-on-another-option) the dumped data is clear enough?
+
+For instance, the `FormType` define its lazy default for `empty_data` option and any other child type define its lazy default too for the same option. The definition of the default value for this option will be like this:
+<details>
+<summary>Screenshot (before)</summary>
+
+![debug-empty_data](https://user-images.githubusercontent.com/2028198/30527409-31a27144-9bf6-11e7-914a-9045000e3152.png)
+</details>
+<br>
+I'm thinking of splitting this information in two properties "Default" and "Default lazy" to improve its understanding:
+<details>
+<summary>Screenshot (after)</summary>
+
+![debug-empty_data2](https://user-images.githubusercontent.com/2028198/30527994-9b644a70-9bfc-11e7-912d-9ee74e460029.png)
+</details>
+<br>
+But I'm not sure whether it would be more confusing or not, what do you think? Perhaps adding some comment under this "Default lazy" to explain it?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-18T08:05:44Z
+
+THB in both cases i have no clue what the closures mean. Either way i'd only dump closures with `-v` and a simple `<closure>` otherwise. Not sure splitting in 2 fields clarifies; if we have a lazy default then "Default: null" is simply not true.
+
+Also please consider to expose the real default value, i.e. what's the lazy default value if we would have passed no / unrelated options to the form type. Sorry; i keep coming back to this.. hope something is possible :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-18T12:51:24Z
+
+> Also please consider to expose the real default value, i.e. what's the lazy default value if we would have passed no / unrelated options to the form type. Sorry; i keep coming back to this.. hope something is possible :)
+
+AFAIK not possible, because all the inputs will be `string` values and we wouldn't know what is the right cast as its definition could allow multiple scalar types.
+
+> if we have a lazy default then "Default: null" is simply not true.
+
+"Default: null" is true, at the beginning of the option resolution and maybe "null" at the end, depend of what returns each configured closures: http://symfony.com/doc/current/components/options_resolver.html#default-values-that-depend-on-another-option
+
+> Either way i'd only dump closures with -v and a simple `<closure>` otherwise.
+
+Same for lazy defaults https://github.com/symfony/symfony/pull/24208#discussion_r139286360
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-18T17:47:08Z
+
+> >if we have a lazy default then "Default: null" is simply not true.
+>
+>"Default: null" is true, at the beginning of the option resolution and maybe "null" at the end,
+
+I agree with @ro0NL here: the default `null` value will never be used. The lazy closure(s) result will be. It may be `null` at the end, but only because the closure did return `null`.
+Either a default value is set, either a lazy closure (or more) is used.
+
+I'm not sure neither splitting default and default lazy would clarify much, and as said before, the `Default: null` does not really mean something to me.
+So...what about displaying `Default: default_value` when a default value is set, and `Default (lazy): Closure dump` when a lazy closure is set?
+That would also allow to differentiate a (non-lazy) closure as default value from a lazy closure.
+I also think it's either a terminology or a documentation issue that the `lazy` term is never employed in http://symfony.com/doc/current/components/options_resolver.html#default-values-that-depend-on-another-option. The command should not have to explain this.
+
+About dumping the closure itself: https://github.com/symfony/symfony/pull/24208#issuecomment-329832845 is still a good option to me. But I can provide a PR to tweak this later if you prefer.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-18T17:56:45Z
+
+> Then, we need show all the possible information (that can affect this value) to solve the uncertainty.
+
+:+1: from the debugging pov, thus verbose by default.
+
+>  the default null value will never be used.
+
+Not really true actually :) https://github.com/symfony/symfony/blob/master/src/Symfony/Component/OptionsResolver/OptionsResolver.php#L168
+
+So there can be a _previous_ default other then null, or null set explicitly (which we cant detect).
+
+> allow to differentiate a (non-lazy) closure
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-18T18:03:57Z
+
+> So there can be a previous default other then null,
+
+Hmm, good point. I overread this line and assumed it was always reset to null if a lazy closure was given. So we need both `Default` and `Default (lazy)` in this case. WDYT?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-18T18:10:47Z
+
+Dont like "lazy" =/ that's all technical, while docs explain the practical and use PHP terms;
+
+> you can implement this feature by passing a closure as the default value
+
+> The argument of the callable must be type hinted as Options
+
+So lets talk PHP/practical; `Default` + `Default callbacks` maybe?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-18T18:15:50Z
+
+> allow to differentiate a (non-lazy) closure
+
+Will happen out of the box no? It will always be the `Default` value.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-18T18:23:03Z
+
+> Will happen out of the box no? It will always be the Default value.
+
+If we keep a single field to display both, no: when the default value set is a closure, we won't be able to know if it's a lazy default (used by the OptionResolver component) or a real closure value (used by the form type).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-18T18:32:19Z
+
+2 fields would be explicit/consistent. Let's do that.
+
+```
+Default:           <mixed>
+Default callbacks: [<closure>[, ...]]
+```
+
+naming the 2nd field is hard :) but this has my pref so far.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-18T19:08:22Z
+
+@yceruto : If you like this suggestion, could you please try something like:
+
+```
+--------- --------------------------------
+ Default   Value: <mixed>
+           Closure(s): [<closure>[, ...]]
+--------- --------------------------------
+```
+
+?
+
+(keeping a single row for defaults, but prefixing dumps by "labels". Or even using row/colspans maybe.)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-18T20:45:58Z
+
+@ogizanagi, @ro0NL now this look like this:
+<details>
+<summary>null value + lazy default</summary>
+
+![ogi](https://user-images.githubusercontent.com/2028198/30564422-e50f765e-9c92-11e7-92e0-e30fe7a8ad24.png)
+</details>
+<details>
+<summary>closure value + lazy default</summary>
+
+![2](https://user-images.githubusercontent.com/2028198/30564470-fecf5d52-9c92-11e7-9086-7cbbb4393f7e.png)
+</details>
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-18T20:58:00Z
+
+Yes. This. :+1:
+
+Is showing the 3 blank fields useful btw? should they be dumped values (emty array, null)?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-18T21:21:50Z
+
+> Is showing the 3 blank fields useful btw? should they be dumped values (emty array, null)?
+
+As properties of the option definition I think so, `-` they are undefined, maybe `(Undefined)`, `(Any)` would be other possible placeholder, but I needed a short one that was consistent with all properties at the same time, I like the current one `-`, understandable for everyone?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-18T21:33:58Z
+
+> About dumping the closure itself: #24208 (comment) is still a good option to me. But I can provide a PR to tweak this later if you prefer.
+
+@ogizanagi Right now I don't know how to do that, but I can try tonight to see what comes out :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-18T23:34:07Z
+
+Custom `\Closure` caster added, description screenshot updated.
+
+Ready for me :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-19T11:31:22Z
+
+Done, more tests added.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-19T13:09:54Z
+
+Tests fixed, ready?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-19T13:15:17Z
+
+LGTM :+1:
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-25T14:18:54Z
+
+As said on Slack, I wouldn't change visibility of the `OptionResolver` properties. This is introducing maintenance burden as we'll need to support BC for those protected properties just for our debugging needs here. Instead, I would have simply created an `OptionResolverDebugger/Introspector` which will use reflection and has to be maintained in the `OptionResolver` component itself. So consumers of the introspector API would keep working whatever version of the `OptionResolver` component is used.
+
+But perhaps someone has a better idea.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-09-25T15:49:18Z
+
+Reverted for now.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-26T16:48:57Z
+
+I've pushed the `OptionResolverIntrospector` (relates to https://github.com/symfony/symfony/pull/24208#discussion_r140628302) and updated the code to use it.
+I'll add tests in the OptionResolver component to ensure we don't break anything in the future, but probably in another PR. First let's agree on this to get it merged before feature freeze :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-27T15:19:34Z
+
+@nicolas-grekas: Regarding https://github.com/symfony/symfony/pull/24208#discussion_r140628302, does this look okay to you? Thank you.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-29T17:14:08Z
+
+I'm going to merge this (unless there is any objection) before feature freeze, so the whole `debug:form` feature is complete for 3.4.
+Anyway, I'll create a PR to add tests and give more visibility to the introduced `OptionResolverIntrospector` hidden in this PR. We still have 2 months to tweak this if desired.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-29T17:16:12Z
+
+I'd prefer to finish everything properly instead of rushing out anything. That would not make sense. We can still merge things next week if needed. there is no hard date.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-29T17:18:45Z
+
+Alright :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-10-03T10:36:21Z
+
+Just rebasing & resolving conflicts :)

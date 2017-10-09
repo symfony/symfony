@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-09T09:47:32Z
+
+Where is this enforced? I only see a docblock, which is not really an enforced contract :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-09T09:48:59Z
+
+[Here](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Event/GetResponseEvent.php#L49) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-09T09:50:09Z
+
+But what if the setter is not called? ;)
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-09T09:52:13Z
+
+Then `$event->hasResponse()` is false ;-)
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-09T10:31:40Z
+
+@243083df could you rebase and retarget the PR on 2.7?

@@ -35,7 +35,7 @@ class Expression extends Constraint
     public $dataPath;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct($options = null)
     {

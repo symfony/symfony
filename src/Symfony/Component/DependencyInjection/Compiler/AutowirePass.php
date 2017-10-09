@@ -345,7 +345,7 @@ class AutowirePass extends AbstractRecursivePass
             unset($this->ambiguousServiceTypes[$type]);
         }
 
-        if ($definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass(), false)) {
+        if (preg_match('/^\d+_[^~]++~[._a-zA-Z\d]{7}$/', $id) || $definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass(), false)) {
             return;
         }
 

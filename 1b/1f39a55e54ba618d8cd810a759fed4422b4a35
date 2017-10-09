@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-10-09T09:36:15Z
+
+This option was introduced in PHP 7.0 (http://php.net/manual/en/migration70.new-features.php). Is there any problem by adding this to the Symfony 2.7 branch?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-09T09:39:55Z
+
+The list already contains 7.1-only options, so I'd say no, there is no pb.

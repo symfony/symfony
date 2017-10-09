@@ -81,6 +81,11 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
 
 define('PHPUNIT_COMPOSER_INSTALL', __DIR__.'/vendor/autoload.php');
 require PHPUNIT_COMPOSER_INSTALL;
+if (class_exists('PHPUnit_Util_Blacklist')) {
+    PHPUnit_Util_Blacklist::$blacklistedClassNames['\PHPUnit\Framework\TestCase'] = 3;
+} else {
+    PHPUnit\Util\Blacklist::$blacklistedClassNames['\PHPUnit\Framework\TestCase'] = 3;
+}
 Symfony\Bridge\PhpUnit\TextUI\Command::main();
 
 EOPHP

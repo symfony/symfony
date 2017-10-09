@@ -1,8 +1,6 @@
 CHANGELOG
 =========
 
- * PdoSessionHandler changes
-   - bugfix timestamp integer out of range in Postgres
 
 2.6.0
 -----

@@ -105,41 +105,50 @@ class FormRegistry implements FormRegistryInterface
      */
     private function resolveType(FormTypeInterface $type)
     {
-        if (isset($this->checkedTypes[$type->getName()])) {
-            $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($type->getName())));
-            throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $type->getName(), $types));
-        }
-
-        $this->checkedTypes[$type->getName()] = true;
-
-            if ($parentType->getName() === $type->getName()) {
-                $this->checkedTypes = array();
-                throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
+        try {
+            if (isset($this->checkedTypes[$type->getName()])) {
+                $types = implode(' > ', array_merge(array_keys($this->checkedTypes), [$type->getName()]));
+                throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $type->getName(), $types));
             }
 
-        }
+            $this->checkedTypes[$type->getName()] = true;
 
-        if ($parentType === $type->getName()) {
-            $this->checkedTypes = array();
-            throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
-        $typeExtensions = array();
+            $parentType = $type->getParent();
+            if ($parentType instanceof FormTypeInterface) {
+                if ($parentType->getName() === $type->getName()) {
+                    throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
+                }
+
+                $this->resolveAndAddType($parentType);
+                $parentType = $parentType->getName();
+            }
+
+            if ($parentType === $type->getName()) {
+                throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
+            }
+            $typeExtensions = [];
         $parentType = $type->getParent();
         $fqcn = get_class($type);
 
-        foreach ($this->extensions as $extension) {
-            $typeExtensions = array_merge(
+            foreach ($this->extensions as $extension) {
+                $typeExtensions = array_merge(
+                    $typeExtensions,
+                    $extension->getTypeExtensions($type->getName())
+                );
+            }
+
+            $this->types[$type->getName()] = $this->resolvedTypeFactory->createResolvedType(
+                $type,
                 $typeExtensions,
-                $extension->getTypeExtensions($fqcn)
+                $parentType ? $this->getType($parentType) : null
             );
+
+            unset($this->checkedTypes[$type->getName()]);
+        } catch (\Exception $e) {
+            $this->checkedTypes = array();
+
+            throw $e;
         }
-
-        return $this->resolvedTypeFactory->createResolvedType(
-            $type,
-            $typeExtensions,
-            $parentType ? $this->getType($parentType) : null
-        );
-
-        unset($this->checkedTypes[$type->getName()]);
     }
 
     /**

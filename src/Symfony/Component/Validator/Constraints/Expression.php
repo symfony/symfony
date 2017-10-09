@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\RuntimeException;
 
 /**
  * @Annotation
@@ -31,6 +33,18 @@ class Expression extends Constraint
     public $message = 'This value is not valid.';
     public $expression;
     public $dataPath;
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct($options = null)
+    {
+        parent::__construct($options);
+
+        if (null !== $this->dataPath && '' !== $this->dataPath && !class_exists(PropertyAccess::class)) {
+            throw new RuntimeException('Unable to use expressions with data path as the Symfony PropertyAccess component is not installed.');
+        }
+    }
 
     /**
      * {@inheritdoc}

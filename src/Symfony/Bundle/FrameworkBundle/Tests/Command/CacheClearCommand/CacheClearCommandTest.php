@@ -55,7 +55,7 @@ class CacheClearCommandTest extends TestCase
         $finder = new Finder();
         $metaFiles = $finder->files()->in($this->kernel->getCacheDir())->name('*.php.meta');
         // simply check that cache is warmed up
-        $this->assertGreaterThanOrEqual(1, count($metaFiles));
+        $this->assertNotEmpty($metaFiles);
         foreach ($metaFiles as $file) {
             $configCache = new ConfigCache(substr($file, 0, -5), true);
             $this->assertTrue(

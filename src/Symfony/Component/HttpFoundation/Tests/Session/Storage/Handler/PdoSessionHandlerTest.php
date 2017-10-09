@@ -269,12 +269,11 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('', $data, 'Destroyed session returns empty string');
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testSessionGC()
     {
-        if (\PHP_VERSION_ID >= 70200) {
-            $this->markTestSkipped('PHP version is 7.2');
-        }
-
         $previousLifeTime = ini_set('session.gc_maxlifetime', 1000);
         $pdo = $this->getMemorySqlitePdo();
         $storage = new PdoSessionHandler($pdo);
@@ -286,12 +285,10 @@ class PdoSessionHandlerTest extends TestCase
 
         $storage->open('', 'sid');
         $storage->read('gc_id');
-        // IN 7.2 this does not work
         ini_set('session.gc_maxlifetime', -1); // test that you can set lifetime of a session after it has been read
         $storage->write('gc_id', 'data');
         $storage->close();
         $this->assertEquals(2, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'No session pruned because gc not called');
-        $storage->destroy('gc_id');
 
         $storage->open('', 'sid');
         $data = $storage->read('gc_id');
@@ -299,39 +296,7 @@ class PdoSessionHandlerTest extends TestCase
         $storage->close();
 
         ini_set('session.gc_maxlifetime', $previousLifeTime);
-        $this->assertSame('', $data, 'Session already considered garbage, so not returning data even if it is not pruned yet');
-        $this->assertEquals(1, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'Expired session is pruned');
-    }
 
-    public function testSessionGC72()
-    {
-        if (\PHP_VERSION_ID <= 70200) {
-            $this->markTestSkipped('PHP version is  not 7.2');
-        }
-
-        $previousLifeTime = false === headers_sent() && ini_set('session.gc_maxlifetime', 1000);
-        $pdo = $this->getMemorySqlitePdo();
-        $storage = new PdoSessionHandler($pdo);
-
-        $storage->open('', 'sid');
-        $storage->read('id');
-        $storage->write('id', 'data');
-        $storage->close();
-
-        $storage->open('', 'sid');
-        $storage->read('gc_id');
-        false === headers_sent() && ini_set('session.gc_maxlifetime', -1); // test that you can set lifetime of a session after it has been read
-        $storage->write('gc_id', 'data');
-        $storage->close();
-        $this->assertEquals(2, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'No session pruned because gc not called');
-        true === headers_sent() && $storage->destroy('gc_id');
-
-        $storage->open('', 'sid');
-        $data = $storage->read('gc_id');
-        $storage->gc(-1);
-        $storage->close();
-
-        false === headers_sent() && ini_set('session.gc_maxlifetime', $previousLifeTime);
         $this->assertSame('', $data, 'Session already considered garbage, so not returning data even if it is not pruned yet');
         $this->assertEquals(1, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'Expired session is pruned');
     }

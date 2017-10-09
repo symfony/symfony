@@ -39,6 +39,15 @@ class DebugCommandTest extends TestCase
         $this->assertContains('Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")', $tester->getDisplay());
     }
 
+    public function testDebugFormTypeOption()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(array('class' => 'FormType', 'option' => 'method'), array('decorated' => false));
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertContains('Symfony\Component\Form\Extension\Core\Type\FormType (method)', $tester->getDisplay());
+    }
+
     /**
      * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Could not find type "NonExistentType"
@@ -90,7 +99,7 @@ TXT;
 
  The type "AmbiguousType" is ambiguous.
 
- Select one of the following form types to display its information: [%A\A\AmbiguousType]:
+Select one of the following form types to display its information: [%A\A\AmbiguousType]:
   [0] %A\A\AmbiguousType
   [1] %A\B\AmbiguousType
 %A

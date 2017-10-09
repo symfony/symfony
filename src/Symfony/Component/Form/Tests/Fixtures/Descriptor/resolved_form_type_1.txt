@@ -1,11 +1,11 @@
 
-[33mSymfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")[39m
-[33m==============================================================================[39m
+Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
+==============================================================================
 
  --------------------------- -------------------- ------------------------- ----------------------- 
- [32m Options                   [39m [32m Overridden options [39m [32m Parent options          [39m [32m Extension options     [39m 
+  Options                     Overridden options   Parent options            Extension options      
  --------------------------- -------------------- ------------------------- ----------------------- 
-  choice_attr                 [32mFormType[39m             [32mFormType[39m                  [32mFormTypeCsrfExtension[39m  
+  choice_attr                 FormType             FormType                  FormTypeCsrfExtension  
   choice_label               -------------------- ------------------------- ----------------------- 
   choice_loader               compound             action                    csrf_field_name        
   choice_name                 data_class           attr                      csrf_message           
@@ -28,13 +28,13 @@
                                                    upload_max_size_message                          
  --------------------------- -------------------- ------------------------- ----------------------- 
 
-[33mParent types[39m
-[33m------------[39m
+Parent types
+------------
 
  * Symfony\Component\Form\Extension\Core\Type\FormType
 
-[33mType extensions[39m
-[33m---------------[39m
+Type extensions
+---------------
 
  * Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension
 

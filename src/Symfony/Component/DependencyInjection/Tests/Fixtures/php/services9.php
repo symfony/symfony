@@ -26,6 +26,9 @@ class ProjectServiceContainer extends Container
             'psr\\container\\containerinterface' => 'Psr\\Container\\ContainerInterface',
             'symfony\\component\\dependencyinjection\\containerinterface' => 'Symfony\\Component\\DependencyInjection\\ContainerInterface',
         );
+        $this->syntheticIds = array(
+            'request' => true,
+        );
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',

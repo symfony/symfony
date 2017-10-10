@@ -55,6 +55,17 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
         );
     }
 
+    public function getRemovedIds()
+    {
+        return array(
+            'Psr\\Container\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'foo' => true,
+            'private_alias_decorator.inner' => true,
+            'private_decorator.inner' => true,
+        );
+    }
+
     public function compile()
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');

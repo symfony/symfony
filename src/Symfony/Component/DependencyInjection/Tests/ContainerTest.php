@@ -333,14 +333,26 @@ class ContainerTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent service "request".
+     * @expectedExceptionMessage The "request" service is synthetic, it needs to be set at boot time before it can be used.
      */
     public function testGetSyntheticServiceThrows()
     {
-        require_once __DIR__.'/Fixtures/php/services9.php';
+        require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
         $container = new \ProjectServiceContainer();
         $container->get('request');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.
+     */
+    public function testGetRemovedServiceThrows()
+    {
+        require_once __DIR__.'/Fixtures/php/services9_compiled.php';
+
+        $container = new \ProjectServiceContainer();
+        $container->get('inlined');
     }
 
     public function testHas()
@@ -505,7 +517,7 @@ class ContainerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "internal" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop getting services directly from the container and use dependency injection instead.
+     * @expectedDeprecation The "internal" service is private, getting it from the container is deprecated since Symfony 3.2 and will fail in 4.0. You should either make the service public, or stop using the container directly and use dependency injection instead.
      */
     public function testRequestAnInternalSharedPrivateServiceIsDeprecated()
     {

@@ -121,6 +121,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private $autoconfiguredInstanceof = array();
 
+    private $removedIds = array();
+
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
@@ -517,7 +519,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException(sprintf('Setting service "%s" for an unknown or non-synthetic service definition on a compiled container is not allowed.', $id));
         }
 
-        unset($this->definitions[$id], $this->aliasDefinitions[$id]);
+        unset($this->definitions[$id], $this->aliasDefinitions[$id], $this->removedIds[$id]);
 
         parent::set($id, $service);
     }
@@ -529,7 +531,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function removeDefinition($id)
     {
-        unset($this->definitions[$this->normalizeId($id)]);
+        if (isset($this->definitions[$id = $this->normalizeId($id)])) {
+            unset($this->definitions[$id]);
+            $this->removedIds[$id] = true;
+        }
     }
 
     /**
@@ -794,6 +799,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Gets removed service or alias ids.
+     *
+     * @return array
+     */
+    public function getRemovedIds()
+    {
+        return $this->removedIds;
+    }
+
+    /**
      * Adds the service aliases.
      *
      * @param array $aliases An array of aliases
@@ -841,7 +856,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new InvalidArgumentException(sprintf('An alias can not reference itself, got a circular reference on "%s".', $alias));
         }
 
-        unset($this->definitions[$alias]);
+        unset($this->definitions[$alias], $this->removedIds[$alias]);
 
         return $this->aliasDefinitions[$alias] = $id;
     }
@@ -853,7 +868,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function removeAlias($alias)
     {
-        unset($this->aliasDefinitions[$this->normalizeId($alias)]);
+        if (isset($this->aliasDefinitions[$alias = $this->normalizeId($alias)])) {
+            unset($this->aliasDefinitions[$alias]);
+            $this->removedIds[$alias] = true;
+        }
     }
 
     /**
@@ -981,7 +999,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $id = $this->normalizeId($id);
 
-        unset($this->aliasDefinitions[$id]);
+        unset($this->aliasDefinitions[$id], $this->removedIds[$id]);
 
         return $this->definitions[$id] = $definition;
     }

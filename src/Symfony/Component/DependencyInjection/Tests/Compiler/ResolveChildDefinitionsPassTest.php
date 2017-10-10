@@ -397,26 +397,6 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertFalse($container->getDefinition('child1')->isAutoconfigured());
     }
 
-    public function testPrivateHasHigherPrecedenceThanPublic()
-    {
-        $container = new ContainerBuilder();
-
-        $container->register('foo', 'stdClass')
-            ->setPublic(true)
-            ->setPrivate(true)
-        ;
-
-        $container->setAlias('bar', 'foo')
-            ->setPublic(false)
-            ->setPrivate(false)
-        ;
-
-        $this->process($container);
-
-        $this->assertFalse($container->getDefinition('foo')->isPublic());
-        $this->assertFalse($container->getAlias('bar')->isPublic());
-    }
-
     /**
      * @group legacy
      */

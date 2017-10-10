@@ -45,6 +45,9 @@ class AppVariableTest extends TestCase
         $this->assertEquals('dev', $this->appVariable->getEnvironment());
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testGetSession()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
@@ -166,6 +169,9 @@ class AppVariableTest extends TestCase
         $this->assertEquals(array(), $this->appVariable->getFlashes());
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testGetFlashesWithNoSessionStarted()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
@@ -177,6 +183,9 @@ class AppVariableTest extends TestCase
         $this->assertEquals(array(), $this->appVariable->getFlashes());
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testGetFlashes()
     {
         $flashMessages = $this->setFlashMessages();

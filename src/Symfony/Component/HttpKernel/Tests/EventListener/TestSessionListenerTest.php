@@ -65,8 +65,7 @@ class TestSessionListenerTest extends TestCase
     {
         $this->sessionHasBeenStarted();
 
-        $params = session_get_cookie_params();
-        session_set_cookie_params(0, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+        @ini_set('session.cookie_lifetime', 0);
 
         $response = $this->filterResponse(new Request(), HttpKernelInterface::MASTER_REQUEST);
         $cookies = $response->headers->getCookies();

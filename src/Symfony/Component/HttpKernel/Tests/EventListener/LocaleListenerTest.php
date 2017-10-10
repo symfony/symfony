@@ -38,8 +38,7 @@ class LocaleListenerTest extends TestCase
     public function testLocaleFromRequestAttribute()
     {
         $request = Request::create('/');
-        session_name('foo');
-        $request->cookies->set('foo', 'value');
+        $request->cookies->set(session_name(), 'value');
 
         $request->attributes->set('_locale', 'es');
         $listener = new LocaleListener($this->requestStack, 'fr');

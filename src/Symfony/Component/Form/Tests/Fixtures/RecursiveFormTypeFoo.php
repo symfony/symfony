@@ -13,15 +13,10 @@ namespace Symfony\Component\Form\Tests\Fixtures;
 
 use Symfony\Component\Form\AbstractType;
 
-class RecursiveFormTypeObjectFoo extends AbstractType
+class RecursiveFormTypeFoo extends AbstractType
 {
     public function getParent()
     {
-        return new RecursiveFormTypeObjectBar();
-    }
-
-    public function getName()
-    {
-        return 'foo_object_type';
+        return RecursiveFormTypeBar::class;
     }
 }

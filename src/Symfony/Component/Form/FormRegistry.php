@@ -106,48 +106,39 @@ class FormRegistry implements FormRegistryInterface
     private function resolveType(FormTypeInterface $type)
     {
         try {
-            if (isset($this->checkedTypes[$type->getName()])) {
-                $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($type->getName())));
-                throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $type->getName(), $types));
-            }
-
-            $this->checkedTypes[$type->getName()] = true;
-
-            $parentType = $type->getParent();
-            if ($parentType instanceof FormTypeInterface) {
-                if ($parentType->getName() === $type->getName()) {
-                    throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
-                }
-
-                $this->resolveAndAddType($parentType);
-                $parentType = $parentType->getName();
-            }
-
-            if ($parentType === $type->getName()) {
-                throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $type->getName()));
-            }
             $typeExtensions = array();
-        $parentType = $type->getParent();
-        $fqcn = get_class($type);
+            $parentType = $type->getParent();
+            $fqcn = get_class($type);
+
+            if (isset($this->checkedTypes[$fqcn])) {
+                $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($fqcn)));
+                throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $fqcn, $types));
+            }
+
+            $this->checkedTypes[$fqcn] = true;
+
+            if ($parentType === $fqcn) {
+                throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $fqcn));
+            }
 
             foreach ($this->extensions as $extension) {
                 $typeExtensions = array_merge(
                     $typeExtensions,
-                    $extension->getTypeExtensions($type->getName())
+                    $extension->getTypeExtensions($fqcn)
                 );
             }
 
-            $this->types[$type->getName()] = $this->resolvedTypeFactory->createResolvedType(
-                $type,
-                $typeExtensions,
-                $parentType ? $this->getType($parentType) : null
-            );
-
-            unset($this->checkedTypes[$type->getName()]);
-        } catch (\Exception $e) {
+            try {
+                return $this->resolvedTypeFactory->createResolvedType(
+                    $type,
+                    $typeExtensions,
+                    $parentType ? $this->getType($parentType) : null
+                );
+            } finally {
+                unset($this->checkedTypes[$fqcn]);
+            }
+        } finally {
             $this->checkedTypes = array();
-
-            throw $e;
         }
     }
 

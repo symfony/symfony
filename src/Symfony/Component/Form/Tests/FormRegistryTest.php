@@ -17,13 +17,13 @@ use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 use Symfony\Component\Form\Tests\Fixtures\FormWithSameParentTypeAsObject;
-use Symfony\Component\Form\Tests\Fixtures\FormWithSameParentTypeAsString;
+use Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType;
 use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeObjectBar;
 use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeObjectBaz;
 use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeObjectFoo;
-use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeStringBar;
-use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeStringBaz;
-use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeStringFoo;
+use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBar;
+use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBaz;
+use Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\Form\Tests\Fixtures\FooTypeBarExtension;
@@ -166,62 +166,32 @@ class FormRegistryTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage Form "foo_type" cannot have itself as a parent.
+     * @expectedExceptionMessage Form "Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType" cannot have itself as a parent.
      */
     public function testFormCannotHaveItselfAsAParent()
     {
-        $type = new FormWithSameParentTypeAsString();
+        $type = new FormWithSameParentType();
 
         $this->extension2->addType($type);
 
-        $this->registry->getType('foo_type');
+        $this->registry->getType(FormWithSameParentType::class);
     }
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage Form "foo_type" cannot have itself as a parent.
+     * @expectedExceptionMessage Circular reference detected for form "Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo" (Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBar > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBaz > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo).
      */
-    public function testFormCannotHaveItselfAsAParentIfGetParentReturnsInstance()
+    public function testRecursiveFormDependencies()
     {
-        $type = new FormWithSameParentTypeAsObject();
-
-        $this->extension2->addType($type);
-
-        $this->registry->getType('foo_type');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage Circular reference detected for form "foo_string_type" (foo_string_type > bar_string_type > baz_string_type > foo_string_type).
-     */
-    public function testRecursiveFormDependenciesWithStringParent()
-    {
-        $foo = new RecursiveFormTypeStringFoo();
-        $bar = new RecursiveFormTypeStringBar();
-        $baz = new RecursiveFormTypeStringBaz();
+        $foo = new RecursiveFormTypeFoo();
+        $bar = new RecursiveFormTypeBar();
+        $baz = new RecursiveFormTypeBaz();
 
         $this->extension2->addType($foo);
         $this->extension2->addType($bar);
         $this->extension2->addType($baz);
 
-        $this->registry->getType('foo_string_type');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage Circular reference detected for form "foo_object_type" (foo_object_type > bar_object_type > baz_object_type > foo_object_type).
-     */
-    public function testRecursiveFormDependenciesWithObjectParent()
-    {
-        $foo = new RecursiveFormTypeObjectFoo();
-        $bar = new RecursiveFormTypeObjectBar();
-        $baz = new RecursiveFormTypeObjectBaz();
-
-        $this->extension2->addType($foo);
-        $this->extension2->addType($bar);
-        $this->extension2->addType($baz);
-
-        $this->registry->getType('foo_object_type');
+        $this->registry->getType(RecursiveFormTypeFoo::class);
     }
 
     /**

@@ -102,6 +102,10 @@ EODUMP;
      */
     public function testDumpInterval($intervalSpec, $ms, $invert, $expected)
     {
+        if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc2', '<=')) {
+            $this->markTestSkipped('Skipped on 7.2 before rc3 because of php bug #75354.');
+        }
+
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP
@@ -118,6 +122,10 @@ EODUMP;
      */
     public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected)
     {
+        if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc2', '<=')) {
+            $this->markTestSkipped('Skipped on 7.2 before rc3 because of php bug #75354.');
+        }
+
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP

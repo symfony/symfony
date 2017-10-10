@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
@@ -152,7 +152,7 @@ class NativeSessionStorageTest extends TestCase
         $this->iniSet('session.cache_limiter', 'nocache');
 
         $storage = new NativeSessionStorage();
-        $this->assertEquals('', ini_get('session.cache_limiter'));
+        $this->assertEquals('private_no_expire', ini_get('session.cache_limiter'));
     }
 
     public function testExplicitSessionCacheLimiter()
@@ -201,9 +201,9 @@ class NativeSessionStorageTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
         $storage->setSaveHandler(null);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
-        $storage->setSaveHandler(new SessionHandlerProxy(new NativeSessionHandler()));
+        $storage->setSaveHandler(new SessionHandlerProxy(new NativeFileSessionHandler()));
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
-        $storage->setSaveHandler(new NativeSessionHandler());
+        $storage->setSaveHandler(new NativeFileSessionHandler());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
         $storage->setSaveHandler(new SessionHandlerProxy(new NullSessionHandler()));
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());

@@ -19,7 +19,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * @see https://packagist.org/packages/mongodb/mongodb
  * @see http://php.net/manual/en/set.mongodb.php
  */
-class MongoDbSessionHandler implements \SessionHandlerInterface
+class MongoDbSessionHandler extends AbstractSessionHandler
 {
     /**
      * @var \Mongo|\MongoClient|\MongoDB\Client
@@ -43,7 +43,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      *  * id_field: The field name for storing the session id [default: _id]
      *  * data_field: The field name for storing the session data [default: data]
      *  * time_field: The field name for storing the timestamp [default: time]
-     *  * expiry_field: The field name for storing the expiry-timestamp [default: expires_at]
+     *  * expiry_field: The field name for storing the expiry-timestamp [default: expires_at].
      *
      * It is strongly recommended to put an index on the `expiry_field` for
      * garbage-collection. Alternatively it's possible to automatically expire
@@ -95,14 +95,6 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function open($savePath, $sessionName)
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function close()
     {
         return true;
@@ -111,7 +103,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function destroy($sessionId)
+    protected function doDestroy($sessionId)
     {
         $methodName = $this->mongo instanceof \MongoDB\Client ? 'deleteOne' : 'remove';
 
@@ -139,7 +131,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function write($sessionId, $data)
+    protected function doWrite($sessionId, $data)
     {
         $expiry = $this->createDateTime(time() + (int) ini_get('session.gc_maxlifetime'));
 
@@ -171,7 +163,34 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function read($sessionId)
+    public function updateTimestamp($sessionId, $data)
+    {
+        $expiry = $this->createDateTime(time() + (int) ini_get('session.gc_maxlifetime'));
+
+        if ($this->mongo instanceof \MongoDB\Client) {
+            $methodName = 'updateOne';
+            $options = array();
+        } else {
+            $methodName = 'update';
+            $options = array('multiple' => false);
+        }
+
+        $this->getCollection()->$methodName(
+            array($this->options['id_field'] => $sessionId),
+            array('$set' => array(
+                $this->options['time_field'] => $this->createDateTime(),
+                $this->options['expiry_field'] => $expiry,
+            )),
+            $options
+        );
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doRead($sessionId)
     {
         $dbData = $this->getCollection()->findOne(array(
             $this->options['id_field'] => $sessionId,

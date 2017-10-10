@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 /**
  * Test class for AbstractProxy.
  *
- * @group legacy
- *
  * @author Drak <drak@zikula.org>
  */
 class AbstractProxyTest extends TestCase

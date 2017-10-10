@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": "^5.5.9|>=7.0.8",
-        "symfony/polyfill-mbstring": "~1.1"
+        "symfony/polyfill-mbstring": "~1.1",
+        "symfony/polyfill-php70": "~1.6"
     },
     "require-dev": {
         "symfony/expression-language": "~2.8|~3.0|~4.0"

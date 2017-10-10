@@ -261,11 +261,13 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         if (is_object($objectOrClass)) {
             $object = $objectOrClass;
+            $class = get_class($object);
             $cacheKey = spl_object_hash($objectOrClass);
             $propertyPath = PropertyPath::append($this->defaultPropertyPath, $propertyName);
         } else {
             // $objectOrClass contains a class name
             $object = null;
+            $class = $objectOrClass;
             $cacheKey = null;
             $propertyPath = $this->defaultPropertyPath;
         }
@@ -280,7 +282,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $this->validateGenericNode(
                 $value,
                 $object,
-                $cacheKey.':'.get_class($object).':'.$propertyName,
+                $cacheKey.':'.$class.':'.$propertyName,
                 $propertyMetadata,
                 $propertyPath,
                 $groups,

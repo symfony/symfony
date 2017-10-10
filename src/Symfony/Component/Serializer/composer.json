@@ -31,6 +31,7 @@
         "phpdocumentor/reflection-docblock": "^3.0|^4.0"
     },
     "conflict": {
+        "phpdocumentor/type-resolver": "<0.2.1",
         "symfony/dependency-injection": "<3.2",
         "symfony/property-access": ">=3.0,<3.0.4|>=2.8,<2.8.4",
         "symfony/property-info": "<3.1",

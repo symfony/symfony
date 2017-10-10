@@ -164,6 +164,9 @@ abstract class AbstractPipes implements PipesInterface
             unset($this->pipes[0]);
         } elseif (!$w) {
             return array($this->pipes[0]);
+        } elseif ($this->input instanceof \Iterator ? $this->input->valid() : !feof($this->input)) {
+            // If input iterator is not yet empty, continue writing
+            return $this->write();
         }
     }
 }

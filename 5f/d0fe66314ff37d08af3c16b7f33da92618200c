@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-08-01T16:09:34Z
+
+@nicolas-grekas
+I've got some `ini_set(): Headers already sent. You cannot change the session module's ini settings at this time`
+on the `\Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler\PdoSessionHandlerTest::testSessionGC`
+
+Could you give me insight on how to fix [this](http://news.php.net/php.cvs/98814) ?
+
+I need to look for the seg fault too.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-01T16:44:27Z
+
+Dunno sorry...
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-08-31T14:14:32Z
+
+Thanks @stof for the review ill do the changes
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-09-01T07:54:50Z
+
+Ok, I couldn't add || true on the phpunit running that would be wrong. But everything is triggering a segfault.
+
+@remicollet maybe you have an idea ?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-01T10:48:36Z
+
+@Simperfit please avoid mentioning me in your commit message when fixing the review. This sends me a notification when pushing the commit to Github. And anytime you amend or rebase the commit, this creates a new commit, and so pushing it sends me another notification.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-09-29T12:39:39Z
+
+@stof changes made.
+@nicolas-grekas Do you know if the appveyor failure is related ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-08T10:37:02Z
+
+(Tests are green)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-09T18:17:24Z
+
+Tests are now green and PR is ready.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-10-09T19:03:41Z
+
+thanks for the help !

@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-10-01T08:48:29Z
+
+Thanks for the PR, but I wouldn't qualify this as a bug. As an enhancement, so a new feature, this must target 4.1, where you'll use the form type FQCN rather than the name btw :)
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-01T09:08:07Z
+
+I had this issue on 3.4 with FOSUserBundle when I copy-pasted some code from the docs (https://symfony.com/doc/master/bundles/FOSUserBundle/overriding_forms.html), but my class name was the same as one of the core bundle class names (I changed the class strings to `RegistrationFormType::class` without adding a use alias, so it resolved to the same class name as my form).
+As a result, the page just hanged until it timed out, and there was no information in the logs (with xdebug, you would at least see the max-nesting level error in the logs, but I had xdebug disabled at that point). It took a while to debug and figure out that what was happening. So IMHO I don't think this is a new feature. Instead of ending in an endless recursive loop with no idea what is happening and no information given to the user that they did something wrong, we can exit early with a message that gives some more context about why the page suddenly bombs out.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-10-01T09:13:40Z
+
+Sure, I understand that. But that's not an issue within the form component itself, so it cannot be part of a patch release. This PR is a DX improvement. We're used to qualify those as features, and it lands on new minor versions.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-10-01T09:22:07Z
+
+I agree with @ogizanagi's statement, this is not a bug fix but a DX improvement. It allows users to better use the component. Maybe it needs a doc entry with a warning when you do that ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-01T09:26:22Z
+
+While this changes a behavior, I think the feature freeze period is fine for this kind of changes, where no new feature is really introduced (no new public anything).
+Saving debugging time is of primary importance to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-01T09:28:22Z
+
+Preventing an infinite loop also could legitimately qualify as a bug fix to me, so it's not obvious it must go on 4.1.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-10-01T09:34:34Z
+
+So talking a bit with @nicolas-grekas, and as it does not only enhance DX but prevents an infinite loop, I agree this must be qualified as a bug fix.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-02T12:25:58Z
+
+What about more complex infinite loops ? `A -> B -> A` instead of just `A -> A` ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-09T08:53:48Z
+
+(please mind fabbot also)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-10T04:33:32Z
+
+Sorry, but this does not qualify as a bug fix. It's a nice DX improvement for sure, but it does not fix anything (as having an infinite loop is a dev error, nothing wrong with the code). I would merge this in 3.4 instead as a new feature (which by the way is we added some similar circular refs checks in the past).
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-10T08:31:22Z
+
+Rebased against 3.4

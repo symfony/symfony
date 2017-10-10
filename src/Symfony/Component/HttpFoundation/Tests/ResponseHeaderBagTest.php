@@ -110,6 +110,17 @@ class ResponseHeaderBagTest extends TestCase
         $bag = new ResponseHeaderBag();
         $bag->set('Last-Modified', 'abcde');
         $this->assertEquals('private, must-revalidate', $bag->get('Cache-Control'));
+
+        $bag = new ResponseHeaderBag();
+        $bag->set('Cache-Control', array('public', 'must-revalidate'));
+        $this->assertCount(1, $bag->get('Cache-Control', null, false));
+        $this->assertEquals('must-revalidate, public', $bag->get('Cache-Control'));
+
+        $bag = new ResponseHeaderBag();
+        $bag->set('Cache-Control', 'public');
+        $bag->set('Cache-Control', 'must-revalidate', false);
+        $this->assertCount(1, $bag->get('Cache-Control', null, false));
+        $this->assertEquals('must-revalidate, public', $bag->get('Cache-Control'));
     }
 
     public function testCacheControlClone()

@@ -45,6 +45,9 @@ class AppVariableTest extends TestCase
         $this->assertEquals('dev', $this->appVariable->getEnvironment());
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testGetSession()
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();

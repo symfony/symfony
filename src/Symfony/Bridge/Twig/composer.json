@@ -24,6 +24,7 @@
         "symfony/asset": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",
         "symfony/form": "^3.2.10|^3.3.3",
+        "symfony/http-foundation": "^3.3.11",
         "symfony/http-kernel": "~3.2",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~2.8|~3.0",

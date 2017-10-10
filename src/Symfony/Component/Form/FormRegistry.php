@@ -105,18 +105,18 @@ class FormRegistry implements FormRegistryInterface
      */
     private function resolveType(FormTypeInterface $type)
     {
+        $typeExtensions = array();
+        $parentType = $type->getParent();
+        $fqcn = get_class($type);
+
+        if (isset($this->checkedTypes[$fqcn])) {
+            $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($fqcn)));
+            throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $fqcn, $types));
+        }
+
+        $this->checkedTypes[$fqcn] = true;
+
         try {
-            $typeExtensions = array();
-            $parentType = $type->getParent();
-            $fqcn = get_class($type);
-
-            if (isset($this->checkedTypes[$fqcn])) {
-                $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($fqcn)));
-                throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $fqcn, $types));
-            }
-
-            $this->checkedTypes[$fqcn] = true;
-
             if ($parentType === $fqcn) {
                 throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $fqcn));
             }
@@ -128,17 +128,13 @@ class FormRegistry implements FormRegistryInterface
                 );
             }
 
-            try {
-                return $this->resolvedTypeFactory->createResolvedType(
-                    $type,
-                    $typeExtensions,
-                    $parentType ? $this->getType($parentType) : null
-                );
-            } finally {
-                unset($this->checkedTypes[$fqcn]);
-            }
+            return $this->resolvedTypeFactory->createResolvedType(
+                $type,
+                $typeExtensions,
+                $parentType ? $this->getType($parentType) : null
+            );
         } finally {
-            $this->checkedTypes = array();
+            unset($this->checkedTypes[$fqcn]);
         }
     }
 

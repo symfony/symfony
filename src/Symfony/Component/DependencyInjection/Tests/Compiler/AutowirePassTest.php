@@ -12,11 +12,13 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -737,5 +739,17 @@ class AutowirePassTest extends TestCase
 
         $pass = new AutowirePass();
         $pass->process($container);
+    }
+
+    public function testInlineServicesAreNotCandidates()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures/xml')));
+        $loader->load('services_inline_not_candidate.xml');
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame(array(), $container->getDefinition('autowired')->getArguments());
     }
 }

@@ -47,6 +47,16 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
+    public function getRemovedIds()
+    {
+        return array(
+            'Psr\\Container\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
+            'service_locator.MtGsMEd' => true,
+        );
+    }
+
     /**
      * Gets the public 'Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber' shared service.
      *

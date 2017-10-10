@@ -149,12 +149,6 @@ services:
     BAR2:
         class: stdClass
         public: true
-    alias_for_foo:
-        alias: 'foo'
-        public: true
-    alias_for_alias:
-        alias: 'foo'
-        public: true
     tagged_iterator_foo:
         class: Bar
         tags:
@@ -171,3 +165,9 @@ services:
     Symfony\Component\DependencyInjection\ContainerInterface:
         alias: service_container
         public: false
+    alias_for_foo:
+        alias: 'foo'
+        public: true
+    alias_for_alias:
+        alias: 'foo'
+        public: true

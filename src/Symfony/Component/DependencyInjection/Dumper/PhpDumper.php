@@ -173,6 +173,22 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 
 EOF;
             $files = array();
+
+            $ids = $this->container->getRemovedIds();
+            foreach ($this->container->getDefinitions() as $id => $definition) {
+                if (!$definition->isPublic()) {
+                    $ids[$id] = true;
+                }
+            }
+            if ($ids = array_keys($ids)) {
+                sort($ids);
+                $c = "<?php\n\nreturn array(\n";
+                foreach ($ids as $id) {
+                    $c .= '    '.$this->export($id)." => true,\n";
+                }
+                $files['removed-ids.php'] = $c .= ");\n";
+            }
+
             foreach ($this->generateServiceFiles() as $file => $c) {
                 $files[$file] = $fileStart.$c;
             }
@@ -883,6 +899,7 @@ EOF;
         }
         $code .= "        \$this->services = \$this->privates = array();\n";
 
+        $code .= $this->addSyntheticIds();
         $code .= $this->addMethodMap();
         $code .= $this->asFiles ? $this->addFileMap() : '';
         $code .= $this->addAliases();
@@ -906,6 +923,7 @@ EOF;
     }
 
 EOF;
+        $code .= $this->addRemovedIds();
 
         if ($this->asFiles) {
             $code .= <<<EOF
@@ -945,6 +963,64 @@ EOF;
         }
 
         return $code;
+    }
+
+    /**
+     * Adds the syntheticIds definition.
+     *
+     * @return string
+     */
+    private function addSyntheticIds()
+    {
+        $code = '';
+        $definitions = $this->container->getDefinitions();
+        ksort($definitions);
+        foreach ($definitions as $id => $definition) {
+            if ($definition->isSynthetic() && 'service_container' !== $id) {
+                $code .= '            '.$this->export($id)." => true,\n";
+            }
+        }
+
+        return $code ? "        \$this->syntheticIds = array(\n{$code}        );\n" : '';
+    }
+
+    /**
+     * Adds the removedIds definition.
+     *
+     * @return string
+     */
+    private function addRemovedIds()
+    {
+        $ids = $this->container->getRemovedIds();
+        foreach ($this->container->getDefinitions() as $id => $definition) {
+            if (!$definition->isPublic()) {
+                $ids[$id] = true;
+            }
+        }
+        if (!$ids) {
+            return '';
+        }
+        if ($this->asFiles) {
+            $code = "require __DIR__.'/removed-ids.php'";
+        } else {
+            $code = '';
+            $ids = array_keys($ids);
+            sort($ids);
+            foreach ($ids as $id) {
+                $code .= '            '.$this->export($id)." => true,\n";
+            }
+
+            $code = "array(\n{$code}        )";
+        }
+
+        return <<<EOF
+
+    public function getRemovedIds()
+    {
+        return {$code};
+    }
+
+EOF;
     }
 
     /**

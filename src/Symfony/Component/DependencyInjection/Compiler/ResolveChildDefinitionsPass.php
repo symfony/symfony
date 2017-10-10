@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -26,28 +25,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class ResolveChildDefinitionsPass extends AbstractRecursivePass
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
-    {
-        parent::process($container);
-
-        foreach ($container->getDefinitions() as $definition) {
-            if ($definition->isPrivate()) {
-                $definition->setPublic(false);
-                $definition->setPrivate(true);
-            }
-        }
-
-        foreach ($container->getAliases() as $alias) {
-            if ($alias->isPrivate()) {
-                $alias->setPublic(false);
-                $alias->setPrivate(true);
-            }
-        }
-    }
-
     protected function processValue($value, $isRoot = false)
     {
         if (!$value instanceof Definition) {

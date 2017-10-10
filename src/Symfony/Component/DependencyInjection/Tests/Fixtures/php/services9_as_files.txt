@@ -1,5 +1,20 @@
 Array
 (
+    [Container%s/removed-ids.php] => <?php
+
+return array(
+    'Psr\\Container\\ContainerInterface' => true,
+    'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+    'configurator_service' => true,
+    'configurator_service_simple' => true,
+    'decorated.pif-pouf' => true,
+    'decorator_service.inner' => true,
+    'factory_simple' => true,
+    'inlined' => true,
+    'new_factory' => true,
+    'tagged_iterator_foo' => true,
+);
+
     [Container%s/getBARService.php] => <?php
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
@@ -318,6 +333,9 @@ class Container%s extends Container
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = array();
+        $this->syntheticIds = array(
+            'request' => true,
+        );
         $this->methodMap = array(
             'foo_bar' => 'getFooBarService',
         );
@@ -365,6 +383,11 @@ class Container%s extends Container
     public function isCompiled()
     {
         return true;
+    }
+
+    public function getRemovedIds()
+    {
+        return require __DIR__.'/removed-ids.php';
     }
 
     protected function load($file, $lazyLoad = true)

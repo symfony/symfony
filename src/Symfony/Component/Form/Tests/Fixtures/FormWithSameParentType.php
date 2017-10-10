@@ -9,12 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\DependencyInjection\Tests\Compiler;
+namespace Symfony\Component\Form\Tests\Fixtures;
 
-use Symfony\Bug\NotExistClass;
+use Symfony\Component\Form\AbstractType;
 
-if (!function_exists('__phpunit_run_isolated_test')) {
-    class OptionalServiceClass extends NotExistClass
+class FormWithSameParentType extends AbstractType
+{
+    public function getParent()
     {
+        return self::class;
     }
 }

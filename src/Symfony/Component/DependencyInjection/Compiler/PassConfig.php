@@ -70,6 +70,12 @@ class PassConfig
             new CheckArgumentsValidityPass(false),
         ));
 
+        $this->beforeRemovingPasses = array(
+            -100 => array(
+                new ResolvePrivatesPass(),
+            ),
+        );
+
         $this->removingPasses = array(array(
             new RemovePrivateAliasesPass(),
             new ReplaceAliasByActualDefinitionPass(),

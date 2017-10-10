@@ -50,6 +50,7 @@ class Container implements ResettableContainerInterface
     protected $aliases = array();
     protected $loading = array();
     protected $resolving = array();
+    protected $syntheticIds = array();
 
     private $envCache = array();
     private $compiled = false;
@@ -152,7 +153,15 @@ class Container implements ResettableContainerInterface
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }
 
-        if (isset($this->services[$id]) && (isset($this->fileMap[$id]) || isset($this->methodMap[$id]))) {
+        if (!(isset($this->fileMap[$id]) || isset($this->methodMap[$id]))) {
+            if (isset($this->syntheticIds[$id]) || !isset($this->getRemovedIds()[$id])) {
+                // no-op
+            } elseif (null === $service) {
+                throw new InvalidArgumentException(sprintf('The "%s" service is private, you cannot unset it.', $id));
+            } else {
+                throw new InvalidArgumentException(sprintf('The "%s" service is private, you cannot replace it.', $id));
+            }
+        } elseif (isset($this->services[$id])) {
             throw new InvalidArgumentException(sprintf('The "%s" service is already initialized, you cannot replace it.', $id));
         }
 
@@ -243,6 +252,12 @@ class Container implements ResettableContainerInterface
             if (!$id) {
                 throw new ServiceNotFoundException($id);
             }
+            if (isset($this->syntheticIds[$id])) {
+                throw new ServiceNotFoundException($id, null, null, array(), sprintf('The "%s" service is synthetic, it needs to be set at boot time before it can be used.', $id));
+            }
+            if (isset($this->getRemovedIds()[$id])) {
+                throw new ServiceNotFoundException($id, null, null, array(), sprintf('The "%s" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.', $id));
+            }
 
             $alternatives = array();
             foreach ($this->getServiceIds() as $knownId) {
@@ -292,6 +307,16 @@ class Container implements ResettableContainerInterface
     public function getServiceIds()
     {
         return array_unique(array_merge(array('service_container'), array_keys($this->fileMap), array_keys($this->methodMap), array_keys($this->services)));
+    }
+
+    /**
+     * Gets service ids that existed at compile time.
+     *
+     * @return array
+     */
+    public function getRemovedIds()
+    {
+        return array();
     }
 
     /**

@@ -261,7 +261,7 @@ class ContainerTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent service "request".
+     * @expectedExceptionMessage The "request" service is synthetic, it needs to be set at boot time before it can be used.
      */
     public function testGetSyntheticServiceThrows()
     {
@@ -269,6 +269,18 @@ class ContainerTest extends TestCase
 
         $container = new \ProjectServiceContainer();
         $container->get('request');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.
+     */
+    public function testGetRemovedServiceThrows()
+    {
+        require_once __DIR__.'/Fixtures/php/services9_compiled.php';
+
+        $container = new \ProjectServiceContainer();
+        $container->get('inlined');
     }
 
     public function testHas()

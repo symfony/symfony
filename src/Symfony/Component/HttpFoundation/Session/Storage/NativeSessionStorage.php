@@ -66,7 +66,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * gc_divisor, "100"
      * gc_maxlifetime, "1440"
      * gc_probability, "1"
-     * hash_bits_per_character, "4"
+     * lazy_write, "1"
      * name, "PHPSESSID"
      * referer_check, ""
      * serialize_handler, "php"
@@ -88,8 +88,11 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function __construct(array $options = array(), \SessionHandlerInterface $handler = null, MetadataBag $metaBag = null)
     {
-        session_cache_limiter(''); // disable by default because it's managed by HeaderBag (if used)
-        ini_set('session.use_cookies', 1);
+        $options += array(
+            // disable by default because it's managed by HeaderBag (if used)
+            'cache_limiter' => '',
+            'use_cookies' => 1,
+        );
 
         session_register_shutdown();
 
@@ -186,6 +189,10 @@ class NativeSessionStorage implements SessionStorageInterface
     {
         // Cannot regenerate the session ID for non-active sessions.
         if (\PHP_SESSION_ACTIVE !== session_status()) {
+            return false;
+        }
+
+        if (headers_sent()) {
             return false;
         }
 
@@ -325,12 +332,15 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function setOptions(array $options)
     {
+        if (headers_sent()) {
+            return;
+        }
+
         $validOptions = array_flip(array(
             'cache_limiter', 'cookie_domain', 'cookie_httponly',
             'cookie_lifetime', 'cookie_path', 'cookie_secure',
-            'gc_divisor',
-            'gc_maxlifetime', 'gc_probability',
-            'name', 'referer_check',
+            'gc_divisor', 'gc_maxlifetime', 'gc_probability',
+            'lazy_write', 'name', 'referer_check',
             'serialize_handler', 'use_strict_mode', 'use_cookies',
             'use_only_cookies', 'use_trans_sid', 'upload_progress.enabled',
             'upload_progress.cleanup', 'upload_progress.prefix', 'upload_progress.name',
@@ -366,6 +376,10 @@ class NativeSessionStorage implements SessionStorageInterface
     public function setSaveHandler(\SessionHandlerInterface $saveHandler = null)
     {
         $this->saveHandler = $saveHandler ?: new \SessionHandler();
+
+        if (headers_sent($file, $line)) {
+            throw new \RuntimeException(sprintf('Failed to set the session handler because headers have already been sent by "%s" at line %d.', $file, $line));
+        }
 
         session_set_save_handler($this->saveHandler, false);
     }

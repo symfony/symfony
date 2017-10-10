@@ -17,16 +17,10 @@ services:
         class: FooClass
         calls:
             - [ setBar, [ foo, '@foo', [true, false] ] ]
-    alias_for_foo: '@foo'
-    another_alias_for_foo:
-        alias: foo
-        public: false
     request:
         class: Request
         synthetic: true
         lazy: true
-    another_third_alias_for_foo:
-        alias: foo
     decorator_service:
         decorates: decorated
     decorator_service_with_name:
@@ -41,3 +35,9 @@ services:
     new_factory3: { class: FooBarClass, factory: [BazClass, getInstance]}
     new_factory4: { class: BazClass, factory: [~, getInstance]}
     Acme\WithShortCutArgs: [foo, '@baz']
+    alias_for_foo: '@foo'
+    another_alias_for_foo:
+        alias: foo
+        public: false
+    another_third_alias_for_foo:
+        alias: foo

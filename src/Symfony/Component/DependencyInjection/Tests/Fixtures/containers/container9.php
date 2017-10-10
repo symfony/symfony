@@ -48,8 +48,6 @@ $container->getParameterBag()->add(array(
     'foo_class' => 'Bar\FooClass',
     'foo' => 'bar',
 ));
-$container->setAlias('alias_for_foo', 'foo')->setPublic(true);
-$container->setAlias('alias_for_alias', 'alias_for_foo')->setPublic(true);
 $container
     ->register('method_call1', 'Bar\FooClass')
     ->setFile(realpath(__DIR__.'/../includes/foo.php'))
@@ -179,5 +177,7 @@ $container
     ->addArgument(new TaggedIteratorArgument('foo'))
     ->setPublic(true)
 ;
+$container->setAlias('alias_for_foo', 'foo')->setPublic(true);
+$container->setAlias('alias_for_alias', 'alias_for_foo')->setPublic(true);
 
 return $container;

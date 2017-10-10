@@ -286,16 +286,17 @@ class PhpDumperTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The "bar2" service is already initialized, you cannot replace it.
+     * @expectedExceptionMessage The "decorator_service" service is already initialized, you cannot replace it.
      */
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
         require_once self::$fixturesPath.'/php/services9_compiled.php';
-        require_once self::$fixturesPath.'/includes/foo.php';
 
         $container = new \ProjectServiceContainer();
-        $container->get('bar2');
-        $container->set('bar2', new \stdClass());
+        $container->get('decorator_service');
+        $container->set('decorator_service', $decorator = new \stdClass());
+
+        $this->assertSame($decorator, $container->get('decorator_service'), '->set() overrides an already defined service');
     }
 
     /**

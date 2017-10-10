@@ -47,6 +47,14 @@ class ProjectServiceContainer extends Container
         return true;
     }
 
+    public function getRemovedIds()
+    {
+        return array(
+            'Psr\\Container\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+        );
+    }
+
     /**
      * Gets the public 'Bar\Foo' shared service.
      *

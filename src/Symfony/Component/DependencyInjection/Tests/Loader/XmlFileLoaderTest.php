@@ -448,6 +448,9 @@ class XmlFileLoaderTest extends TestCase
         if (extension_loaded('suhosin') && false === strpos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
             $this->markTestSkipped('To run this test, add "phar" to the "suhosin.executor.include.whitelist" settings in your php.ini file.');
         }
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM makes this test conflict with those run in separate processes.');
+        }
 
         require_once self::$fixturesPath.'/includes/ProjectWithXsdExtensionInPhar.phar';
 

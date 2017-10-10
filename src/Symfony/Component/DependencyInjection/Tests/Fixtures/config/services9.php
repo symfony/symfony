@@ -41,9 +41,6 @@ return function (ContainerConfigurator $c) {
         ->args(array(ref('deprecated_service')))
         ->share(false);
 
-    $s->alias('alias_for_foo', 'foo')->private()->public();
-    $s->alias('alias_for_alias', ref('alias_for_foo'));
-
     $s->set('method_call1', 'Bar\FooClass')
         ->file(realpath(__DIR__.'/../includes/foo.php'))
         ->call('setBar', array(ref('foo')))
@@ -130,4 +127,7 @@ return function (ContainerConfigurator $c) {
     $s->set('tagged_iterator', 'Bar')
         ->public()
         ->args(array(tagged('foo')));
+
+    $s->alias('alias_for_foo', 'foo')->private()->public();
+    $s->alias('alias_for_alias', ref('alias_for_foo'));
 };

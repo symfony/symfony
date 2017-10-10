@@ -48,6 +48,16 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         return true;
     }
 
+    public function getRemovedIds()
+    {
+        return array(
+            'Psr\\Container\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'foo2' => true,
+            'foo3' => true,
+        );
+    }
+
     /**
      * Gets the public 'bar' shared service.
      *

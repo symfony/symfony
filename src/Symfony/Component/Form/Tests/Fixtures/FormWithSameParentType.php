@@ -17,6 +17,6 @@ class FormWithSameParentType extends AbstractType
 {
     public function getParent()
     {
-        return FormWithSameParentType::class;
+        return self::class;
     }
 }

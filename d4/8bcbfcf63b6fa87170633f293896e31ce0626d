@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-08T12:09:39Z
+
+Shouldn't we keep these synthetic and removed IDs in the container only for debug environments? Because here the value is only DX and the container is in theory taking more memory than before.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T12:52:10Z
+
+Introducing a different behavior between debug and non-debug is something that could led to subtle bugs, so should be prevented as much as possible.
+Fortunately, the reason why you asked for it does not exist in practice: removed ids are split in a separate file that is loaded on demand, and the number of synthetic ids is very small.

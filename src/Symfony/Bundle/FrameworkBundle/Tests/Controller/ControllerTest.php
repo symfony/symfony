@@ -223,6 +223,9 @@ class ControllerTest extends TestCase
         $this->assertSame(302, $response->getStatusCode());
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testAddFlash()
     {
         $flashBag = new FlashBag();

@@ -162,7 +162,7 @@ class FormRegistryTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage Form "Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType" cannot have itself as a parent.
+     * @expectedExceptionMessage Circular reference detected for form "Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType" (Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType > Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType).
      */
     public function testFormCannotHaveItselfAsAParent()
     {

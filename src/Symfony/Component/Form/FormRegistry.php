@@ -117,10 +117,6 @@ class FormRegistry implements FormRegistryInterface
         $this->checkedTypes[$fqcn] = true;
 
         try {
-            if ($parentType === $fqcn) {
-                throw new LogicException(sprintf('Form "%s" cannot have itself as a parent.', $fqcn));
-            }
-
             foreach ($this->extensions as $extension) {
                 $typeExtensions = array_merge(
                     $typeExtensions,

@@ -111,7 +111,7 @@ class FormRegistry implements FormRegistryInterface
 
         if (isset($this->checkedTypes[$fqcn])) {
             $types = implode(' > ', array_merge(array_keys($this->checkedTypes), array($fqcn)));
-            throw new LogicException(sprintf('Circular reference detected for form "%s" (%s).', $fqcn, $types));
+            throw new LogicException(sprintf('Circular reference detected for form type "%s" (%s).', $fqcn, $types));
         }
 
         $this->checkedTypes[$fqcn] = true;

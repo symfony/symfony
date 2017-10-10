@@ -102,8 +102,11 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
-        session_cache_limiter(''); // disable by default because it's managed by HeaderBag (if used)
-        ini_set('session.use_cookies', 1);
+        $options += array(
+            // disable by default because it's managed by HeaderBag (if used)
+            'cache_limiter' => '',
+            'use_cookies' => 1,
+        );
 
         if (\PHP_VERSION_ID >= 50400) {
             session_register_shutdown();
@@ -206,6 +209,10 @@ class NativeSessionStorage implements SessionStorageInterface
 
         // Check if session ID exists in PHP 5.3
         if (\PHP_VERSION_ID < 50400 && '' === session_id()) {
+            return false;
+        }
+
+        if (headers_sent()) {
             return false;
         }
 
@@ -333,6 +340,10 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function setOptions(array $options)
     {
+        if (headers_sent()) {
+            return;
+        }
+
         $validOptions = array_flip(array(
             'cache_limiter', 'cookie_domain', 'cookie_httponly',
             'cookie_lifetime', 'cookie_path', 'cookie_secure',
@@ -382,6 +393,10 @@ class NativeSessionStorage implements SessionStorageInterface
             !$saveHandler instanceof \SessionHandlerInterface &&
             null !== $saveHandler) {
             throw new \InvalidArgumentException('Must be instance of AbstractProxy or NativeSessionHandler; implement \SessionHandlerInterface; or be null.');
+        }
+
+        if (headers_sent($file, $line)) {
+            throw new \RuntimeException(sprintf('Failed to set the session handler because headers have already been sent by "%s" at line %d.', $file, $line));
         }
 
         // Wrap $saveHandler in proxy and prevent double wrapping of proxy

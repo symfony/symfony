@@ -162,7 +162,7 @@ class FormRegistryTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage Circular reference detected for form "Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType" (Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType > Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType).
+     * @expectedExceptionMessage Circular reference detected for form type "Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType" (Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType > Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType).
      */
     public function testFormCannotHaveItselfAsAParent()
     {
@@ -175,7 +175,7 @@ class FormRegistryTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage Circular reference detected for form "Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo" (Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBar > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBaz > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo).
+     * @expectedExceptionMessage Circular reference detected for form type "Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo" (Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBar > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBaz > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo).
      */
     public function testRecursiveFormDependencies()
     {

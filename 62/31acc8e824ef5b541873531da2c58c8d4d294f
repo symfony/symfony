@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-10-05T11:38:56Z
+
+The `Console\Application` class is doing a side effect on environment variables for usage in one implementation of the `Logger`.
+
+Reading and writing global variables inside classes looks like a bad practice. This should be delegated to a config/context layer.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T16:00:33Z
+
+@GromNaN it's not exactly for that, but to create an environment context that mirrors the `-vvv` verbosity flags. Then this context is leveraged by the logger yes, but this is independent (you could set the env var in a webserver context to control the logger's verbosity also.)
+I don't have much better idea for now that wouldn't imply a pile of code we don't need nor want.

@@ -11,6 +11,7 @@ CHANGELOG
    the `Url::CHECK_DNS_TYPE_*` constants values and will throw an exception in Symfony 4.0
  * added min/max amount of pixels check to `Image` constraint via `minPixels` and `maxPixels`
  * added a new "propertyPath" option to comparison constraints in order to get the value to compare from an array or object
+ * added magic method `__isset()` to `File` constraint class
 
 3.3.0
 -----

@@ -187,6 +187,15 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
     }
 
+    public function testDumpAsFilesWhenServicePropertiesContainSpaces()
+    {
+        $container = include self::$fixturesPath.'/containers/container_nl_in_argument.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(array('as_files' => true, 'file' => __DIR__)), true);
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/container_nl_in_argument_as_files.txt', $dump);
+    }
+
     public function testAddServiceIdWithUnsupportedCharacters()
     {
         $class = 'Symfony_DI_PhpDumper_Test_Unsupported_Characters';

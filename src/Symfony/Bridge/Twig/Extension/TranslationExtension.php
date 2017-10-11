@@ -95,7 +95,7 @@ class TranslationExtension extends AbstractExtension
     public function trans($message, array $arguments = array(), $domain = null, $locale = null)
     {
         if (null === $this->translator) {
-            return $message;
+            return strtr($message, $arguments);
         }
 
         return $this->translator->trans($message, $arguments, $domain, $locale);
@@ -104,7 +104,7 @@ class TranslationExtension extends AbstractExtension
     public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
         if (null === $this->translator) {
-            return $message;
+            return strtr($message, $arguments);
         }
 
         return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);

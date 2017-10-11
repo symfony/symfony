@@ -79,7 +79,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         }
 
         try {
-            $reflectionProperty = new \ReflectionProperty(is_string($classOrObject) ? $classOrObject : get_class($classOrObject), $attribute);
+            $reflectionProperty = $this->getReflectionProperty($classOrObject, $attribute);
             if ($reflectionProperty->isStatic()) {
                 return false;
             }
@@ -98,13 +98,15 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         $reflectionObject = new \ReflectionObject($object);
         $attributes = array();
 
-        foreach ($reflectionObject->getProperties() as $property) {
-            if (!$this->isAllowedAttribute($object, $property->name)) {
-                continue;
-            }
+        do {
+            foreach ($reflectionObject->getProperties() as $property) {
+                if (!$this->isAllowedAttribute($reflectionObject->getName(), $property->name)) {
+                    continue;
+                }
 
-            $attributes[] = $property->name;
-        }
+                $attributes[] = $property->name;
+            }
+        } while ($reflectionObject = $reflectionObject->getParentClass());
 
         return $attributes;
     }
@@ -115,7 +117,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     protected function getAttributeValue($object, $attribute, $format = null, array $context = array())
     {
         try {
-            $reflectionProperty = new \ReflectionProperty(get_class($object), $attribute);
+            $reflectionProperty = $this->getReflectionProperty($object, $attribute);
         } catch (\ReflectionException $reflectionException) {
             return;
         }
@@ -134,7 +136,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
     {
         try {
-            $reflectionProperty = new \ReflectionProperty(get_class($object), $attribute);
+            $reflectionProperty = $this->getReflectionProperty($object, $attribute);
         } catch (\ReflectionException $reflectionException) {
             return;
         }
@@ -149,5 +151,27 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         }
 
         $reflectionProperty->setValue($object, $value);
+    }
+
+    /**
+     * @param string|object $classOrObject
+     * @param string        $attribute
+     *
+     * @return \ReflectionProperty
+     *
+     * @throws \ReflectionException
+     */
+    private function getReflectionProperty($classOrObject, $attribute)
+    {
+        $reflectionClass = new \ReflectionClass($classOrObject);
+        while (true) {
+            try {
+                return $reflectionClass->getProperty($attribute);
+            } catch (\ReflectionException $e) {
+                if (!$reflectionClass = $reflectionClass->getParentClass()) {
+                    throw $e;
+                }
+            }
+        }
     }
 }

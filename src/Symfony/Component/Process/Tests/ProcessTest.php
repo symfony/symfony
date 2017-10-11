@@ -117,9 +117,14 @@ class ProcessTest extends TestCase
         $p = $this->getProcess(array(self::$phpBin, __DIR__.'/NonStopableProcess.php', 30));
         $p->start();
 
-        while (false === strpos($p->getOutput(), 'received')) {
+        while ($p->isRunning() && false === strpos($p->getOutput(), 'received')) {
             usleep(1000);
         }
+
+        if (!$p->isRunning()) {
+            throw new \LogicException('Process is not running: '.$p->getErrorOutput());
+        }
+
         $start = microtime(true);
         $p->stop(0.1);
 
@@ -1456,6 +1461,19 @@ Array
 )
 
 EOTXT;
+
+        if (\PHP_VERSION_ID >= 70200) {
+            $expected = <<<EOTXT
+Array
+(
+    [0] => Standard input code
+    [1] => a
+    [2] => 
+    [3] => b
+)
+
+EOTXT;
+        }
         $this->assertSame($expected, $p->getOutput());
     }
 

@@ -1,16 +1,22 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
- * Trait InterruptibleTrait
- *
- * This trait adds ability to interrupt safely long-running or endless commands in case "^C" is pressed or "$ kill -2"
+ * This trait adds ability to interrupt safely long-running or endless commands in case "^C" is pressed or "$ kill -2".
  *
  * @author Maksym Slesarenko <maks.slesarenko@gmail.com>
- * @package Symfony\Component\Console\Command
  *
  * @example
  * protected function execute(InputInterface $input, OutputInterface $output)
@@ -41,10 +47,12 @@ trait InterruptibleTrait
     }
 
     /**
-     * Check if command is interrupted
+     * Check if command is interrupted.
      *
      * @throws RuntimeException
+     *
      * @param bool $throwException
+     *
      * @return bool
      */
     public function isInterrupted($throwException = false)
@@ -54,6 +62,7 @@ trait InterruptibleTrait
         if ($this->isInterrupted && $throwException) {
             throw new RuntimeException('Command execution was interrupted');
         }
+
         return $this->isInterrupted;
     }
 }

@@ -40,10 +40,10 @@ class LockableSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
-        return [
+        return array(
             ConsoleEvents::COMMAND => 'onStart',
             ConsoleEvents::TERMINATE => 'onComplete',
-        ];
+        );
     }
 
     public function onStart(ConsoleCommandEvent $event)

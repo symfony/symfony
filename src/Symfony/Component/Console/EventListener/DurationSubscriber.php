@@ -17,7 +17,7 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * This Subscriber outputs total amount of seconds that took command to complete
+ * This Subscriber outputs total amount of seconds that took command to complete.
  *
  * Now can start command execution and go for a cup of coffee, when you back you will see how long it took
  * for command to complete.
@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class DurationSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var integer
+     * @var int
      */
     private $startedTime;
 

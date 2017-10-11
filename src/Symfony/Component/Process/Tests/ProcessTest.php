@@ -1456,6 +1456,19 @@ Array
 )
 
 EOTXT;
+
+        if (\PHP_VERSION_ID >= 70200) {
+            $expected = <<<EOTXT
+Array
+(
+    [0] => Standard input code
+    [1] => a
+    [2] => 
+    [3] => b
+)
+
+EOTXT;
+        }
         $this->assertSame($expected, $p->getOutput());
     }
 

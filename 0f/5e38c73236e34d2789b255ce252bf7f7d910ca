@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by kbond at 2017-09-27T12:12:15Z
+
+@ivoba I suggest adding a private method `getReflectionProperty` to reduce the duplication, ie:
+
+```php
+private function getReflectionProperty($classOrObject, $attribute)
+{
+    $class = is_string($classOrObject) ? $classOrObject : get_class($classOrObject);
+
+    try {
+        return new \ReflectionProperty($class, $attribute);
+    } catch (\ReflectionException $e) {
+        $class = new \ReflectionClass($class);
+
+        while ($parent = $class->getParentClass()) {
+            try {
+                return new \ReflectionProperty($parent->getName(), $attribute);
+            } catch (\ReflectionException $e) {
+                $class = $parent;
+            }
+        }
+
+        throw $e;
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by ivoba at 2017-09-28T14:14:16Z
+
+i updated the PR and took @kbond suggestion into account.
+@dunglas pls review if the changes fit your comments.
+
+i have no idea why the test in PHP7.1 fail, looks not really related??
+
+---------------------------------------------------------------------------
+
+by ivoba at 2017-10-10T07:02:12Z
+
+I added a new Dummy class with 3 level inheritance and applied suggested fixes.
+
+---------------------------------------------------------------------------
+
+by ivoba at 2017-10-11T06:33:31Z
+
+removed mentioned line.
+fabbot fails for License Headers but diff is empty. probably a fabbot bug?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-11T07:30:23Z
+
+your `GroupDummyChild.php` fixtures file is missing the license header
+
+---------------------------------------------------------------------------
+
+by ivoba at 2017-10-11T08:19:56Z
+
+ok thx, licence header is added

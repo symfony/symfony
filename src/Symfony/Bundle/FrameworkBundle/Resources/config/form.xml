@@ -74,7 +74,7 @@
         <!-- FormTypeHttpFoundationExtension -->
         <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
             <argument type="service" id="form.type_extension.form.request_handler" />
-            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+            <tag name="form.type_extension" />
         </service>
 
         <!-- HttpFoundationRequestHandler -->
@@ -92,13 +92,13 @@
             <argument type="service" id="validator" />
         </service>
         <service id="form.type_extension.repeated.validator" class="Symfony\Component\Form\Extension\Validator\Type\RepeatedTypeValidatorExtension">
-            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\RepeatedType" />
+            <tag name="form.type_extension" />
         </service>
         <service id="form.type_extension.submit.validator" class="Symfony\Component\Form\Extension\Validator\Type\SubmitTypeValidatorExtension">
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\SubmitType" />
         </service>
         <service id="form.type_extension.upload.validator" class="Symfony\Component\Form\Extension\Validator\Type\UploadValidatorExtension">
-            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+            <tag name="form.type_extension" />
             <argument type="service" id="translator"/>
             <argument type="string">%validator.translation_domain%</argument>
         </service>

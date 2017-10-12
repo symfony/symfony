@@ -33,6 +33,14 @@ class PreloadedExtension implements FormExtensionInterface
      */
     public function __construct(array $types, array $typeExtensions, FormTypeGuesserInterface $typeGuesser = null)
     {
+        foreach ($typeExtensions as $extensions) {
+            foreach ($extensions as $typeExtension) {
+                if (!method_exists($typeExtension, 'getExtendedTypes')) {
+                    @trigger_error(sprintf('Not implementing the static getExtendedTypes() method in %s when implementing the %s is deprecated since Symfony 4.2. The method will be added to the interface in 5.0.', \get_class($typeExtension), FormTypeExtensionInterface::class), E_USER_DEPRECATED);
+                }
+            }
+        }
+
         $this->typeExtensions = $typeExtensions;
         $this->typeGuesser = $typeGuesser;
 

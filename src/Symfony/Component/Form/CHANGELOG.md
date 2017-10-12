@@ -4,6 +4,36 @@ CHANGELOG
 4.2.0
 -----
 
+ * The `getExtendedType()` method of the `FormTypeExtensionInterface` is deprecated and will be removed in 5.0. Type
+   extensions must implement the static `getExtendedTypes()` method instead and return an iterable of extended types.
+
+   Before:
+
+   ```php
+   class FooTypeExtension extends AbstractTypeExtension
+   {
+       public function getExtendedType()
+       {
+           return FormType::class;
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class FooTypeExtension extends AbstractTypeExtension
+   {
+       public static function getExtendedTypes(): iterable
+       {
+           return array(FormType::class);
+       }
+
+       // ...
+   }
+   ```
  * deprecated the `$scale` argument of the `IntegerToLocalizedStringTransformer`
  * added `Symfony\Component\Form\ClearableErrorsInterface`
  * deprecated calling `FormRenderer::searchAndRenderBlock` for fields which were already rendered

@@ -52,6 +52,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
@@ -325,6 +326,8 @@ class FrameworkExtension extends Extension
             ->addTag('form.type');
         $container->registerForAutoconfiguration(FormTypeGuesserInterface::class)
             ->addTag('form.type_guesser');
+        $container->registerForAutoconfiguration(FormTypeExtensionInterface::class)
+            ->addTag('form.type_extension');
         $container->registerForAutoconfiguration(CacheClearerInterface::class)
             ->addTag('kernel.cache_clearer');
         $container->registerForAutoconfiguration(CacheWarmerInterface::class)

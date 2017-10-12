@@ -501,6 +501,65 @@ class OptionsResolverTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "DateTime[]".
+     */
+    public function testResolveFailsIfInvalidTypedArray()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[]');
+
+        $this->resolver->resolve(array('foo' => array(new \DateTime())));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value "bar" is expected to be of type "int[]", but is of type "string".
+     */
+    public function testResolveFailsWithNonArray()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[]');
+
+        $this->resolver->resolve(array('foo' => 'bar'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "integer|stdClass|array|DateTime[]".
+     */
+    public function testResolveFailsIfTypedArrayContainsInvalidTypes()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[]');
+        $values = range(1, 5);
+        $values[] = new \stdClass();
+        $values[] = array();
+        $values[] = new \DateTime();
+        $values[] = 123;
+
+        $this->resolver->resolve(array('foo' => $values));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but is of type "double[][]".
+     */
+    public function testResolveFailsWithCorrectLevelsButWrongScalar()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[][]');
+
+        $this->resolver->resolve(
+            array(
+                'foo' => array(
+                    array(1.2),
+                ),
+            )
+        );
+    }
+
+    /**
      * @dataProvider provideInvalidTypes
      */
     public function testResolveFailsIfInvalidType($actualType, $allowedType, $exceptionMessage)
@@ -566,6 +625,32 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setAllowedTypes('foo', '\stdClass');
 
         $this->assertNotEmpty($this->resolver->resolve());
+    }
+
+    public function testResolveSucceedsIfTypedArray()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->setAllowedTypes('foo', array('null', 'DateTime[]'));
+
+        $data = array(
+            'foo' => array(
+                new \DateTime(),
+                new \DateTime(),
+            ),
+        );
+        $result = $this->resolver->resolve($data);
+        $this->assertEquals($data, $result);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveFailsIfNotInstanceOfClass()
+    {
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setAllowedTypes('foo', '\stdClass');
+
+        $this->resolver->resolve();
     }
 
     ////////////////////////////////////////////////////////////////////////////

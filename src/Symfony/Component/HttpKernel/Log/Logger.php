@@ -39,7 +39,7 @@ class Logger extends AbstractLogger
 
     public function __construct($minLevel = null, $output = 'php://stderr', callable $formatter = null)
     {
-        if (!$minLevel) {
+        if (null === $minLevel) {
             $minLevel = LogLevel::WARNING;
 
             if (isset($_SERVER['SHELL_VERBOSITY'])) {

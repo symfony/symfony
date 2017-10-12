@@ -10,4 +10,10 @@ $container
     ->setPublic(true)
 ;
 
+$container
+    ->register('foo2', 'Foo')
+    ->addArgument("string with\nnl")
+    ->setPublic(true)
+;
+
 return $container;

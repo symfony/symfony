@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T11:36:12Z
+
+I think you can still create a simple test case that uses a "\n" and ensure the dumped result is OK (without trying to actually fit that with the case where it is required).
+
+---------------------------------------------------------------------------
+
+by Strate at 2017-10-12T12:40:33Z
+
+@nicolas-grekas done
+
+---------------------------------------------------------------------------
+
+by Strate at 2017-10-12T12:48:25Z
+
+Some optimizations could be done, for example now string like `"\n\n\n"` dumped as `''."\n".''."\n".''."\n".''`. Is it reasonable to improve that case?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T12:49:10Z
+
+PHP 7 will concat at compile time, so no need IMHO.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-12T13:46:40Z
+
+So `var_export` does not play well with them ? what about `\r` then ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T13:48:43Z
+
+`\r` is fine because the real issue is "explode" in "wrapServiceConditionals", which re-indents the code at `\n` points only.

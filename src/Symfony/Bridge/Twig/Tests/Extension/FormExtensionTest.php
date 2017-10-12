@@ -23,20 +23,20 @@ class FormExtensionTest extends TestCase
     /**
      * @dataProvider rendererDataProvider
      */
-    public function testInitRuntimeAndAccessRenderer($renderer)
+    public function testInitRuntimeAndAccessRenderer($rendererConstructor, $expectedAccessedRenderer)
     {
-        $extension = new FormExtension($renderer);
+        $extension = new FormExtension($rendererConstructor);
         $extension->initRuntime($this->createMock(Environment::class));
-        $extension->renderer;
+        $this->assertSame($expectedAccessedRenderer, $extension->renderer);
     }
 
     /**
      * @dataProvider rendererDataProvider
      */
-    public function testAccessRendererAndInitRuntime($renderer)
+    public function testAccessRendererAndInitRuntime($rendererConstructor, $expectedAccessedRenderer)
     {
-        $extension = new FormExtension($renderer);
-        $extension->renderer;
+        $extension = new FormExtension($rendererConstructor);
+        $this->assertSame($expectedAccessedRenderer, $extension->renderer);
         $extension->initRuntime($this->createMock(Environment::class));
     }
 
@@ -46,7 +46,7 @@ class FormExtensionTest extends TestCase
         $twigRenderer->expects($this->once())
             ->method('setEnvironment');
 
-        yield array($twigRenderer);
+        yield array($twigRenderer, $twigRenderer);
 
         $twigRenderer = $this->createMock(TwigRendererInterface::class);
         $twigRenderer->expects($this->once())
@@ -58,14 +58,16 @@ class FormExtensionTest extends TestCase
             ->with('service_id')
             ->willReturn($twigRenderer);
 
-        yield array(array($container, 'service_id'));
+        yield array(array($container, 'service_id'), $twigRenderer);
+
+        $formRenderer = $this->createMock(FormRendererInterface::class);
 
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->once())
             ->method('get')
             ->with('service_id')
-            ->willReturn($this->createMock(FormRendererInterface::class));
+            ->willReturn($formRenderer);
 
-        yield array(array($container, 'service_id'));
+        yield array(array($container, 'service_id'), $formRenderer);
     }
 }

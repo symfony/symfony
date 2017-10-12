@@ -18,6 +18,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Twig\Environment;
 
+/**
+ * @group legacy
+ */
 class FormExtensionTest extends TestCase
 {
     /**

@@ -314,17 +314,12 @@ class ResizeFormListenerTest extends TestCase
             $this->form->get($child)->setData($dat);
         }
         $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', array(), false, true, self::class.'::deleteEmptyCallback');
+        $callback = function ($data) {
+            return '' === $data['name'];
+        };
+        $listener = new ResizeFormListener('text', array(), false, true, $callback);
         $listener->onSubmit($event);
 
         $this->assertEquals(array('0' => array('name' => 'John')), $event->getData());
-    }
-
-    /**
-     * JUST FOR 5.6 FAILURE PURPOSE (REMOVED IN THE SECOND COMMIT)
-     */
-    public static function deleteEmptyCallback($data)
-    {
-        return '' === $data['name'];
     }
 }

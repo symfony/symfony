@@ -26,7 +26,7 @@ class FormExtensionTest extends TestCase
     public function testInitRuntimeAndAccessRenderer($rendererConstructor, $expectedAccessedRenderer)
     {
         $extension = new FormExtension($rendererConstructor);
-        $extension->initRuntime($this->createMock(Environment::class));
+        $extension->initRuntime($this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock());
         $this->assertSame($expectedAccessedRenderer, $extension->renderer);
     }
 
@@ -37,22 +37,22 @@ class FormExtensionTest extends TestCase
     {
         $extension = new FormExtension($rendererConstructor);
         $this->assertSame($expectedAccessedRenderer, $extension->renderer);
-        $extension->initRuntime($this->createMock(Environment::class));
+        $extension->initRuntime($this->getMockBuilder(Environment::class)->disableOriginalConstructor()->getMock());
     }
 
     public function rendererDataProvider()
     {
-        $twigRenderer = $this->createMock(TwigRendererInterface::class);
+        $twigRenderer = $this->getMockBuilder(TwigRendererInterface::class)->getMock();
         $twigRenderer->expects($this->once())
             ->method('setEnvironment');
 
         yield array($twigRenderer, $twigRenderer);
 
-        $twigRenderer = $this->createMock(TwigRendererInterface::class);
+        $twigRenderer = $this->getMockBuilder(TwigRendererInterface::class)->getMock();
         $twigRenderer->expects($this->once())
             ->method('setEnvironment');
 
-        $container = $this->createMock(ContainerInterface::class);
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $container->expects($this->once())
             ->method('get')
             ->with('service_id')
@@ -60,9 +60,9 @@ class FormExtensionTest extends TestCase
 
         yield array(array($container, 'service_id'), $twigRenderer);
 
-        $formRenderer = $this->createMock(FormRendererInterface::class);
+        $formRenderer = $this->getMockBuilder(FormRendererInterface::class)->getMock();
 
-        $container = $this->createMock(ContainerInterface::class);
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $container->expects($this->once())
             ->method('get')
             ->with('service_id')

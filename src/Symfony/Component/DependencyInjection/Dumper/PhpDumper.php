@@ -1578,7 +1578,7 @@ EOF;
             $cleanParts = explode("\n", $value);
             $cleanParts = array_map(function ($part) { return var_export($part, true); }, $cleanParts);
 
-            return implode(' . "\n" . ', $cleanParts);
+            return implode('."\n".', $cleanParts);
         }
 
         return var_export($value, true);

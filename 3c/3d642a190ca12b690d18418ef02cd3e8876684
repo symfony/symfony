@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-06-09T09:50:10Z
+
+What if I have an array of custom items?
+```php
+$resolver->setAllowedType('foo', Foo::class.'[]');
+// or
+$resolver->setAllowedType('foo', '\App\Bar\Foo[]');
+```
+
+This seems a bit annoying to write.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-06-09T13:57:35Z
+
+The syntax follows the standard phpdoc notation, which IMO is clear what it means. Even though it can be a bit annoying to write, just looking at the code still reads easily and is clear what it means
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-10T12:26:50Z
+
+This misses the case where the passed value isn't an array, doesn't it?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-06-10T12:41:53Z
+
+If the passed value isn't an array, then you'll get an exception saying, e.g, `... is expected to be of type "int[]", but is of type string`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-06-10T13:56:31Z
+
+Might be a good idea to add a test case for that too.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-06-20T02:47:46Z
+
+I'd greatly prefer this supported the whole test suite introduces in #17032, instead of a subset of those features. For example, nested values.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-06-22T20:39:33Z
+
+The syntax for the nested values just feels a bit weird to me. Looking at it initially took a moment or two to understand exactly what it means. And the further you nest it, the weirder it becomes, E.G `int[][][][]`. We can maybe limit the nesting to 2 levels only, or maybe there is a different syntax that we can use like for example `int[]+` to indicate multiple levels or `int[5]` to indicate for example 5 nested levels, or if we can just stick to appending `[]` indefinitely
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-06-23T09:20:03Z
+
+@pierredup I prefer the original phpdoc syntax of `int[][]`, but I'm also not again using a different syntax if you think it adds clarity. I'm not particularly hung-up on the syntax, as long as the functionality exists.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-06-23T09:27:10Z
+
+`int[][][][]` is the phpdoc syntax. So IMO, if we decide to support nesting, it should use this syntax rather than inventing our own syntax
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-20T11:24:15Z
+
+What about borrowing some inspiration of react proptypes, instead?
+
+Im thinking notNull(), oneOf(), oneOfType(), instanceOf() api =/
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-09-26T21:21:16Z
+
+Support for nested values added (E.G `int[][][]`).
+
+Status: needs review

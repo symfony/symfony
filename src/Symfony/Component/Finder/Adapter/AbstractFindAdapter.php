@@ -148,7 +148,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      */
     private function buildNamesFiltering(Command $command, array $names, $not = false)
     {
-        if (0 === count($names)) {
+        if (!$names) {
             return;
         }
 
@@ -196,7 +196,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
      */
     private function buildPathsFiltering(Command $command, $dir, array $paths, $not = false)
     {
-        if (0 === count($paths)) {
+        if (!$paths) {
             return;
         }
 

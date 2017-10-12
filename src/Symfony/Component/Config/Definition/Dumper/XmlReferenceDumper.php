@@ -197,7 +197,7 @@ class XmlReferenceDumper
 
         // render start tag + attributes
         $rootIsVariablePrototype = isset($prototypeValue);
-        $rootIsEmptyTag = (0 === count($rootChildren) && !$rootIsVariablePrototype);
+        $rootIsEmptyTag = !$rootChildren && !$rootIsVariablePrototype;
         $rootOpenTag = '<'.$rootName;
         if (1 >= ($attributesCount = count($rootAttributes))) {
             if (1 === $attributesCount) {

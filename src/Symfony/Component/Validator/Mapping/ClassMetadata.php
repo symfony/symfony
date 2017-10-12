@@ -527,7 +527,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      */
     public function hasGroupSequence()
     {
-        return $this->groupSequence && count($this->groupSequence->groups) > 0;
+        return $this->groupSequence && $this->groupSequence->groups;
     }
 
     /**

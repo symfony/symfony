@@ -98,7 +98,7 @@ EOF
 
         $filenames = $input->getArgument('filename');
 
-        if (0 === count($filenames)) {
+        if (!$filenames) {
             if (0 !== ftell(STDIN)) {
                 throw new \RuntimeException('Please provide a filename or pipe template content to STDIN.');
             }

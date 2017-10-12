@@ -167,7 +167,7 @@ class ChoiceList implements ChoiceListInterface
                     $choices[$i] = $this->choices[$j];
                     unset($values[$i]);
 
-                    if (0 === count($values)) {
+                    if (!$values) {
                         break 2;
                     }
                 }
@@ -191,7 +191,7 @@ class ChoiceList implements ChoiceListInterface
                     $values[$i] = $this->values[$j];
                     unset($choices[$i]);
 
-                    if (0 === count($choices)) {
+                    if (!$choices) {
                         break 2;
                     }
                 }
@@ -219,7 +219,7 @@ class ChoiceList implements ChoiceListInterface
                     $indices[$i] = $j;
                     unset($choices[$i]);
 
-                    if (0 === count($choices)) {
+                    if (!$choices) {
                         break 2;
                     }
                 }
@@ -247,7 +247,7 @@ class ChoiceList implements ChoiceListInterface
                     $indices[$i] = $j;
                     unset($values[$i]);
 
-                    if (0 === count($values)) {
+                    if (!$values) {
                         break 2;
                     }
                 }

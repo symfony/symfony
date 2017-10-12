@@ -105,7 +105,7 @@ class Route
     public function setRequirements($requirements)
     {
         if (isset($requirements['_method'])) {
-            if (0 === count($this->methods)) {
+            if (!$this->methods) {
                 $this->methods = explode('|', $requirements['_method']);
             }
 
@@ -113,7 +113,7 @@ class Route
         }
 
         if (isset($requirements['_scheme'])) {
-            if (0 === count($this->schemes)) {
+            if (!$this->schemes) {
                 $this->schemes = explode('|', $requirements['_scheme']);
             }
 

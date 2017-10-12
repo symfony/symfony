@@ -220,7 +220,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
             } else {
                 $propertyChanges['aces']->offsetUnset($ace);
 
-                if (0 === count($propertyChanges['aces'])) {
+                if (!$propertyChanges['aces']) {
                     unset($propertyChanges['aces']);
                 }
             }
@@ -240,7 +240,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
         $propertyChanges = $this->propertyChanges->offsetGet($acl);
         // check if any changes were made to this ACL
-        if (0 === count($propertyChanges)) {
+        if (!$propertyChanges) {
             return;
         }
 
@@ -678,7 +678,7 @@ QUERY;
      */
     protected function getUpdateObjectIdentitySql($pk, array $changes)
     {
-        if (0 === count($changes)) {
+        if (!$changes) {
             throw new \InvalidArgumentException('There are no changes.');
         }
 
@@ -728,7 +728,7 @@ QUERY;
      */
     protected function getUpdateAccessControlEntrySql($pk, array $sets)
     {
-        if (0 === count($sets)) {
+        if (!$sets) {
             throw new \InvalidArgumentException('There are no changes.');
         }
 

@@ -128,7 +128,7 @@ class XmlFileLoader extends FileLoader
         list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
         if (isset($requirements['_method'])) {
-            if (0 === count($methods)) {
+            if (!$methods) {
                 $methods = explode('|', $requirements['_method']);
             }
 
@@ -137,7 +137,7 @@ class XmlFileLoader extends FileLoader
         }
 
         if (isset($requirements['_scheme'])) {
-            if (0 === count($schemes)) {
+            if (!$schemes) {
                 $schemes = explode('|', $requirements['_scheme']);
             }
 

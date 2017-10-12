@@ -51,7 +51,7 @@ class FormValidator extends ConstraintValidator
             // Validate the data against its own constraints
             if (self::allowDataWalking($form)) {
                 if ($validator) {
-                    if (is_array($groups) && count($groups) > 0 || $groups instanceof GroupSequence && count($groups->groups) > 0) {
+                    if (is_array($groups) && $groups || $groups instanceof GroupSequence && $groups->groups) {
                         $validator->atPath('data')->validate($form->getData(), null, $groups);
                     }
                 } else {
@@ -142,7 +142,7 @@ class FormValidator extends ConstraintValidator
         }
 
         // Mark the form with an error if it contains extra fields
-        if (!$config->getOption('allow_extra_fields') && count($form->getExtraData()) > 0) {
+        if (!$config->getOption('allow_extra_fields') && $form->getExtraData()) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($config->getOption('extra_fields_message'))
                     ->setParameter('{{ extra_fields }}', implode('", "', array_keys($form->getExtraData())))

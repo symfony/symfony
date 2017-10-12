@@ -649,11 +649,11 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function getIterator()
     {
-        if (0 === count($this->dirs) && 0 === count($this->iterators)) {
+        if (!$this->dirs && !$this->iterators) {
             throw new \LogicException('You must call one of in() or append() methods before iterating over a Finder.');
         }
 
-        if (1 === count($this->dirs) && 0 === count($this->iterators)) {
+        if (1 === count($this->dirs) && !$this->iterators) {
             return $this->searchInDirectory($this->dirs[0]);
         }
 

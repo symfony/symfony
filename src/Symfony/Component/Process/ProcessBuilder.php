@@ -256,7 +256,7 @@ class ProcessBuilder
      */
     public function getProcess()
     {
-        if (0 === count($this->prefix) && 0 === count($this->arguments)) {
+        if (!$this->prefix && !$this->arguments) {
             throw new LogicException('You must add() command arguments before calling getProcess().');
         }
 

@@ -286,7 +286,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             }
         }
 
-        if (count($files) > 0) {
+        if ($files) {
             return $first && $isResource ? $files[0] : $files;
         }
 
@@ -448,7 +448,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         // look for orphans
-        if (!empty($directChildren) && count($diff = array_diff_key($directChildren, $this->bundles))) {
+        if (!empty($directChildren) && $diff = array_diff_key($directChildren, $this->bundles)) {
             $diff = array_keys($diff);
 
             throw new \LogicException(sprintf('Bundle "%s" extends bundle "%s", which is not registered.', $directChildren[$diff[0]], $diff[0]));

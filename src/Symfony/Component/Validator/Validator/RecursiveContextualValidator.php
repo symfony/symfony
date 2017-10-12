@@ -584,7 +584,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         // If no more groups should be validated for the property nodes,
         // we can safely quit
-        if (0 === count($groups)) {
+        if (!$groups) {
             return;
         }
 
@@ -720,7 +720,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $this->validateInGroup($value, $cacheKey, $metadata, $group, $context);
         }
 
-        if (0 === count($groups)) {
+        if (!$groups) {
             return;
         }
 

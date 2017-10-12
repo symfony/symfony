@@ -179,7 +179,7 @@ class ObjectChoiceList extends ChoiceList
                     $values[$i] = $value;
                     unset($choices[$i]);
 
-                    if (0 === count($choices)) {
+                    if (!$choices) {
                         break 2;
                     }
                 }
@@ -219,7 +219,7 @@ class ObjectChoiceList extends ChoiceList
                     $indices[$i] = $j;
                     unset($choices[$i]);
 
-                    if (0 === count($choices)) {
+                    if (!$choices) {
                         break 2;
                     }
                 }

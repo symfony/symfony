@@ -11,10 +11,12 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
+use Symfony\Bridge\Twig\Form\TwigRendererEngineInterface;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormRendererInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\InitRuntimeInterface;
@@ -54,6 +56,8 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     {
         if ($this->renderer instanceof TwigRendererInterface) {
             $this->renderer->setEnvironment($environment);
+        } elseif ($this->renderer instanceof FormRendererInterface && $this->renderer->getEngine() instanceof TwigRendererEngineInterface) {
+            $this->renderer->getEngine()->setEnvironment($environment);
         } elseif (null !== $this->renderer) {
             $this->renderer[2] = $environment;
         }
@@ -119,7 +123,11 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
             if (is_array($this->renderer)) {
                 $renderer = $this->renderer[0]->get($this->renderer[1]);
                 if (isset($this->renderer[2])) {
-                    $renderer->setEnvironment($this->renderer[2]);
+                    if ($renderer instanceof TwigRendererInterface) {
+                        $renderer->setEnvironment($this->renderer[2]);
+                    } elseif ($renderer instanceof FormRendererInterface && $renderer->getEngine() instanceof TwigRendererEngineInterface) {
+                        $renderer->getEngine()->setEnvironment($this->renderer[2]);
+                    }
                 }
                 $this->renderer = $renderer;
             }

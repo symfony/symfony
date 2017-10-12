@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T09:03:27Z
+
+Can you rebase and retarget your PR for 3.4? (+ update the CHANGELOG)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-12T16:18:31Z
+
+Sounds like a bug to me though. `__get()` is not implemented the right way if `__isset()` is not implemented.

@@ -322,7 +322,7 @@ class Definition
      */
     public function replaceArgument($index, $argument)
     {
-        if (0 === count($this->arguments)) {
+        if (!$this->arguments) {
             throw new OutOfBoundsException('Cannot replace arguments if none have been configured yet.');
         }
 

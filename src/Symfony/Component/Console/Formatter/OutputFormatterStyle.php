@@ -67,7 +67,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         if (null !== $background) {
             $this->setBackground($background);
         }
-        if (count($options)) {
+        if ($options) {
             $this->setOptions($options);
         }
     }
@@ -203,14 +203,12 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
             $setCodes[] = $this->background['set'];
             $unsetCodes[] = $this->background['unset'];
         }
-        if (count($this->options)) {
-            foreach ($this->options as $option) {
-                $setCodes[] = $option['set'];
-                $unsetCodes[] = $option['unset'];
-            }
+        foreach ($this->options as $option) {
+            $setCodes[] = $option['set'];
+            $unsetCodes[] = $option['unset'];
         }
 
-        if (0 === count($setCodes)) {
+        if (!$setCodes) {
             return $text;
         }
 

@@ -127,7 +127,7 @@ class YamlFileLoader extends FileLoader
         $condition = isset($config['condition']) ? $config['condition'] : null;
 
         if (isset($requirements['_method'])) {
-            if (0 === count($methods)) {
+            if (!$methods) {
                 $methods = explode('|', $requirements['_method']);
             }
 
@@ -136,7 +136,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($requirements['_scheme'])) {
-            if (0 === count($schemes)) {
+            if (!$schemes) {
                 $schemes = explode('|', $requirements['_scheme']);
             }
 

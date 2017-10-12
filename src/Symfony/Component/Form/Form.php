@@ -760,7 +760,7 @@ class Form implements \IteratorAggregate, FormInterface
 
         return FormUtil::isEmpty($this->modelData) ||
             // arrays, countables
-            ((is_array($this->modelData) || $this->modelData instanceof \Countable) && 0 === count($this->modelData)) ||
+            ((is_array($this->modelData) || $this->modelData instanceof \Countable) && !$this->modelData) ||
             // traversables that are not countable
             ($this->modelData instanceof \Traversable && 0 === iterator_count($this->modelData));
     }
@@ -778,7 +778,7 @@ class Form implements \IteratorAggregate, FormInterface
             return true;
         }
 
-        return 0 === count($this->getErrors(true));
+        return !$this->getErrors(true);
     }
 
     /**
@@ -815,7 +815,7 @@ class Form implements \IteratorAggregate, FormInterface
 
                 $iterator = $child->getErrors(true, $flatten);
 
-                if (0 === count($iterator)) {
+                if (!$iterator) {
                     continue;
                 }
 

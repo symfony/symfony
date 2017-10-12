@@ -121,7 +121,7 @@ class LocaleDataGenerator
             }
 
             // If no names remain to be saved for the current locale, skip it
-            if (0 === count($localeNames[$displayLocale])) {
+            if (!$localeNames[$displayLocale]) {
                 continue;
             }
 

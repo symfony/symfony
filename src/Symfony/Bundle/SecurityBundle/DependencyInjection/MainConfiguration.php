@@ -392,7 +392,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->thenInvalid('You cannot set multiple provider types for the same provider')
             ->end()
             ->validate()
-                ->ifTrue(function ($v) { return 0 === count($v); })
+                ->ifTrue(function ($v) { return !$v; })
                 ->thenInvalid('You must set a provider definition for the provider.')
             ->end()
         ;

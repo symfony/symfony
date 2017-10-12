@@ -60,13 +60,11 @@ class FormExtensionTest extends TestCase
 
         yield array(array($container, 'service_id'));
 
-        $formRenderer = $this->createMock(FormRendererInterface::class);
-
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->once())
             ->method('get')
             ->with('service_id')
-            ->willReturn($formRenderer);
+            ->willReturn($this->createMock(FormRendererInterface::class));
 
         yield array(array($container, 'service_id'));
     }

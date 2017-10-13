@@ -19,6 +19,6 @@ class ProcessIsolationTest extends TestCase
     public function testIsolation()
     {
         @trigger_error('Test abc', E_USER_DEPRECATED);
-        $test->addToAssertionCount(1);
+        $this->addToAssertionCount(1);
     }
 }

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-13T06:49:25Z
+
+should be merged into the `2.7` branch
+
+---------------------------------------------------------------------------
+
+by vinkla at 2017-10-13T08:13:29Z
+
+@Nyholm maybe we should remove `in` from the sentence?
+```diff
+- Försök att skicka in formuläret igen.
++ Försök att skicka formuläret igen.
+```
+
+Also, not sure about the token translation. Is `CSRF-symbol` the correct word here?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-10-13T16:40:28Z
+
+Thank you for the comments and feedback. I've updated the PR and changed the base.
+
+"CSRF-symbolen" is way wrong. I could only come up with some other translations.
+
+* "CSRF-token" but that is not really Swedish....
+* "CSRF-elementet" (en: element) which is abstract but kind correct
+* "CSRF-tecknen" (en: chars) which is more correct but also very confusing.

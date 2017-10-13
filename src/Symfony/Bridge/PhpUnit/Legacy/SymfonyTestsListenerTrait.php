@@ -260,7 +260,9 @@ class SymfonyTestsListenerTrait
         }
 
         if ($this->runsInSeparateProcess) {
-            foreach (unserialize(file_get_contents($this->runsInSeparateProcess)) as $deprecation) {
+            $deprecations = file_get_contents($this->runsInSeparateProcess);
+            unlink($this->runsInSeparateProcess);
+            foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
                 if ($deprecation[0]) {
                     trigger_error($deprecation[1], E_USER_DEPRECATED);
                 } else {

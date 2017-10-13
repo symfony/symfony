@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-10-12T23:23:33Z
+
+> Intermediate PHP version 5.6 is skipped for pull requests.
+
+So, failure for 5.5 https://travis-ci.org/symfony/symfony/jobs/287304044#L3074

@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-12T14:48:34Z
+
+Can't we create a test case that would fail without these changes?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-10-12T15:45:50Z
+
+I don't quite understand this test fail:
+
+```
+1) Warning
+The data provider specified for Symfony\Bridge\Twig\Tests\Extension\FormExtensionTest::testInitRuntimeAndAccessRenderer is invalid.
+Trying to configure method "get" which cannot be configured because it does not exist, has not been specified, is final, or is static
+2) Warning
+The data provider specified for Symfony\Bridge\Twig\Tests\Extension\FormExtensionTest::testAccessRendererAndInitRuntime is invalid.
+Trying to configure method "get" which cannot be configured because it does not exist, has not been specified, is final, or is static
+```
+
+I'm mocking `Symfony\Component\DependencyInjection\ContainerInterface`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-12T17:53:21Z
+
+Looks like you need to add your tests to the `legacy` group.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-10-12T18:15:12Z
+
+@xabbuh thanks looks better now. One test fail left: https://travis-ci.org/symfony/symfony/jobs/287174522
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-13T06:30:52Z
+
+You need to add `symfony/dependency-injection` to the `require-dev` section of TwigBridge's `composer.json` file.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-10-13T06:46:33Z
+
+thanks again @xabbuh :+1: Can be reviewed then

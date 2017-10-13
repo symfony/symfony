@@ -68,6 +68,7 @@ class PhpDumperTest extends TestCase
             'optimize concatenation with empty string' => 'string1%empty_value%string2',
             'optimize concatenation from the start' => '%empty_value%start',
             'optimize concatenation at the end' => 'end%empty_value%',
+            'new line' => "string with \nnew line",
         ));
 
         $container = new ContainerBuilder();

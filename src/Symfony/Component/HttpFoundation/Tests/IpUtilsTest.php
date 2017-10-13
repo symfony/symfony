@@ -82,4 +82,21 @@ class IpUtilsTest extends TestCase
 
         IpUtils::checkIp('2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65');
     }
+
+    /**
+     * @dataProvider invalidIpAddressData
+     */
+    public function testInvalidIpAddressesDoNotMatch($requestIp, $proxyIp)
+    {
+        $this->assertFalse(IpUtils::checkIp4($requestIp, $proxyIp));
+    }
+
+    public function invalidIpAddressData()
+    {
+        return array(
+            'invalid proxy wildcard' => array('192.168.20.13', '*'),
+            'invalid proxy missing netmask' => array('192.168.20.13', '0.0.0.0'),
+            'invalid request IP with invalid proxy wildcard' => array('0.0.0.0', '*'),
+        );
+    }
 }

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-13T12:28:17Z
+
+Can we fix the location that is reported (it's always `SymfonyTestsListener::endTest` instead of the actual test case)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-13T12:50:35Z
+
+@xabbuh cross-process stack trace communication, not trivial to implement.
+I'd like to merge this as is now, then fix the HttpFoundation layer.
+Then we could improve this a bit. OK to you?

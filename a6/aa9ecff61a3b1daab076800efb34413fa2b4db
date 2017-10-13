@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by emodric at 2017-09-25T12:16:14Z
+
+Hi, what is the status PR? Do you think it could end up in 3.4?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-01T17:40:05Z
+
+@emodric I like this feature, can you implement the suggestions made by @stof?
+
+---------------------------------------------------------------------------
+
+by emodric at 2017-10-01T17:46:28Z
+
+@fabpot Sure, but how do you want me to handle it?
+
+Open a new PR for deprecations only against 3.4 and target this one for master or did you have something else in mind?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-01T17:48:13Z
+
+You need to remove the argument and use `get_func_args()` to determine how it was called to handle the new arg and trigger a dep notice if needed. You can find quite a few examples in the code base doing exactly this.
+
+---------------------------------------------------------------------------
+
+by emodric at 2017-10-01T17:55:37Z
+
+Ah okay, I figured you wanted the feature to go in only in 4.0. I'll do it first thing tomorrow morning.
+
+---------------------------------------------------------------------------
+
+by emodric at 2017-10-02T00:35:18Z
+
+@fabpot I've updated the code to include requested deprecations. I updated the tests too in order not to trigger deprecation notices in them. There is a test failure in Twig bridge tests, but I don't see how it is related to this change.

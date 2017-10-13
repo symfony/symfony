@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-12T13:24:18Z
+
+I wonder if the fix should be that when you are logged in via `logout_on_user_change`, that somehow we clear the remember_me cookie (similar to what we must do when the user actually logs out manually) ? It seems that if we are logged out via `logout_on_user_change`, then the `AbstractRememberMeServices` really has no way to know whether or not this logout occurred because of an expired session cookie or because the user had changed on a previous request.
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-10-12T13:47:33Z
+
+Yeah, I jumped the gun on this PR... Discovered the remember me service has no way of knowing if the user has changed because the user isn't serialized.
+
+We could clear the remember me cookie as part of the `logout_on_user_change` logic but what about if the session is cleared and the user is only being authenticated by the `RememberMeListener` - a changed user could still be authenticated.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-12T14:18:23Z
+
+> We could clear the remember me cookie as part of the logout_on_user_change logic but what about if the session is cleared and the user is only being authenticated by the RememberMeListener - a changed user could still be authenticated.
+
+Hmm... but this seems like a separate issue, right? Right now, if my session expires, and I am "saved" by RememberMe, but my user has actually changed, then I will still be logged in. Aka, this is already an issue with remember me and unrelated, right? I don't think the "remember me" token could ever know if the user was changed... because (by its very nature), it is being activated because there is no user in the session... and so nothing to compare with. So is that fixable, or just the nature of remember_me? i.e. if you use remember_me, you're giving anyone with this cookie a "free pass" to login until that remember_me cookie expires (if you use the default way that remember_me works, where you just decode the cookie and load the user).
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-10-12T14:21:59Z
+
+What about running the user through the `UserChecker` in `RememberMeListener`?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-12T14:24:54Z
+
+@kbond Hmm, indeed, that's a good idea. Let's try it. We may need a BC layer, but maybe not - it smells like a bug that a "disabled" user could become logged in thanks to their remember_me token.
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-10-12T14:25:14Z
+
+Ok, I'll update this PR
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-10-12T14:48:52Z
+
+This ended up being a pretty simple fix. `RememberMeAuthenticationProvider::authenticate()` was only running the user through `UserCheckerInterface::checkPreAuth()` and not `checkPostAuth()`.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-12T14:54:37Z
+
+`checkPreAuth` was added as a bug fix in https://github.com/symfony/symfony/pull/11058.
+I think this should be done on 2.7.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-12T15:02:50Z
+
+Here are some details on why that old change was made: https://github.com/symfony/symfony/pull/11058/files#r18096092. Specifically, `checkPostAuth()` was actually removed from this at one point... so let's understand the full situation.
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-10-12T15:02:53Z
+
+Ok switched the base branch to 2.7
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-12T15:04:49Z
+
+Yea... to say more, if the User was disabled (as you mentioned https://github.com/symfony/symfony/issues/24525#issuecomment-336100738), that would be caught in `checkPreAuth()`... right?
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-10-12T15:07:39Z
+
+I do my disabled user check in `checkPostAuth()` because of a tiny security leak (#13994)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-12T15:09:53Z
+
+Well, that's a good enough reason for me. Just to verify, with this patch, do you get the desired effects if you try in your real app?
+
+---------------------------------------------------------------------------
+
+by kbond at 2017-10-12T15:20:57Z
+
+Yes, my real app works as expected.
+
+I think if you have different behavior based on an exception thrown in `checkPostAuth()` it would still be possible, just not when authenticating with a remember me token. The user would have to login again through the form to initiate that behavior.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-12T17:06:38Z
+
+👍 from me. This is a slight behavior change, but it's fixing a (security) bug imo: you should never want a remembe_me cookie to authenticate a user that fails the user checker (the default `UserChecker::postAuth()` checks for `$user->isCredentialsNonExpired()`.
+
+The distinction between pre-auth checks (checks that are done before checking credentials, and so are so errors are exposed to the user) and post-auth checks is not relevant here: both should be checked.

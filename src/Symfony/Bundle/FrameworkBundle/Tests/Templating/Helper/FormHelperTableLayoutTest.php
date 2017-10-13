@@ -122,8 +122,8 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         return (string) $this->engine->get('form')->end($view, $vars);
     }
 
-    protected function setTheme(FormView $view, array $themes)
+    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
     {
-        $this->engine->get('form')->setTheme($view, $themes);
+        $this->engine->get('form')->setTheme($view, $themes, $useDefaultThemes);
     }
 }

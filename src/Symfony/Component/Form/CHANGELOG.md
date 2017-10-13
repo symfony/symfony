@@ -7,6 +7,8 @@ CHANGELOG
  * added `DebugCommand`
  * deprecated `ChoiceLoaderInterface` implementation in `TimezoneType`
  * added options "input" and "regions" to `TimezoneType`
+ * added an option to ``Symfony\Component\Form\FormRendererEngineInterface::setTheme()`` and
+   ``Symfony\Component\Form\FormRendererInterface::setTheme()`` to disable usage of default themes when rendering a form
 
 3.3.0
 -----

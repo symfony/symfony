@@ -49,12 +49,13 @@ class FormHelper extends Helper
      *
      * The theme format is "<Bundle>:<Controller>".
      *
-     * @param FormView     $view   A FormView instance
-     * @param string|array $themes A theme or an array of theme
+     * @param FormView     $view             A FormView instance
+     * @param string|array $themes           A theme or an array of theme
+     * @param bool         $useDefaultThemes If true, will use default themes defined in the renderer
      */
-    public function setTheme(FormView $view, $themes)
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true)
     {
-        $this->renderer->setTheme($view, $themes);
+        $this->renderer->setTheme($view, $themes, $useDefaultThemes);
     }
 
     /**

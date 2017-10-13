@@ -125,7 +125,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     abstract protected function renderEnd(FormView $view, array $vars = array());
 
-    abstract protected function setTheme(FormView $view, array $themes);
+    abstract protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true);
 
     public function testLabel()
     {

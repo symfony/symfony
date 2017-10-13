@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * added an `only` keyword to `form_theme` tag to disable usage of default themes when rendering a form
  * deprecated `Symfony\Bridge\Twig\Form\TwigRenderer`
  * deprecated `DebugCommand::set/getTwigEnvironment`. Pass an instance of
    `Twig\Environment` as first argument  of the constructor instead

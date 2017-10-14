@@ -109,7 +109,7 @@ class RouteCollectionTest extends TestCase
         $collection1 = new RouteCollection();
         $collection1->addResource($foo1 = new FileResource(__DIR__.'/Fixtures/foo1.xml'));
         $collection->addCollection($collection1);
-        $this->assertEquals(array($foo, $foo1), $collection->getResources(), '->addCollection() merges resources');
+        $this->assertEquals(array($foo, $foo1), array_values($collection->getResources()), '->addCollection() merges resources');
     }
 
     public function testAddDefaultsAndRequirementsAndOptions()
@@ -180,7 +180,7 @@ class RouteCollectionTest extends TestCase
         $collection->addResource($bar = new FileResource(__DIR__.'/Fixtures/bar.xml'));
         $collection->addResource(new FileResource(__DIR__.'/Fixtures/foo.xml'));
 
-        $this->assertEquals(array($foo, $bar), $collection->getResources(),
+        $this->assertEquals(array($foo, $bar), array_values($collection->getResources()),
             '->addResource() adds a resource and getResources() only returns unique ones by comparing the string representation');
     }
 

@@ -262,7 +262,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function getResources()
     {
-        return array_unique($this->resources);
+        return $this->resources;
     }
 
     /**
@@ -272,6 +272,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     public function addResource(ResourceInterface $resource)
     {
-        $this->resources[] = $resource;
+        $this->resources[(string) $resource] = $resource;
     }
 }

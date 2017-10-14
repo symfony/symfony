@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\EventListener\ServiceResetListener;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -996,6 +997,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.baz', 'cache.adapter.filesystem', 7);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.foobar', 'cache.adapter.psr6', 10);
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 11);
+    }
+
+    public function testRemovesServiceResetListenerDefWhenOptionSetToFalse()
+    {
+        $container = $this->createContainerFromFile('default_config');
+        $this->assertFalse($container->hasDefinition(ServiceResetListener::class));
+    }
+
+    public function testDoesNotRemoveServiceResetListenerDefWhenOptionSetToTrue()
+    {
+        $container = $this->createContainerFromFile('reset_services');
+        $this->assertTrue($container->hasDefinition(ServiceResetListener::class));
     }
 
     protected function createContainer(array $data = array())

@@ -56,6 +56,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\HttpKernel\EventListener\ServiceResetListener;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockInterface;
@@ -315,6 +316,10 @@ class FrameworkExtension extends Extension
             }
 
             $loader->load('web_link.xml');
+        }
+
+        if (!$config['reset_services']) {
+            $container->removeDefinition(ServiceResetListener::class);
         }
 
         $this->addAnnotatedClassesToCompile(array(

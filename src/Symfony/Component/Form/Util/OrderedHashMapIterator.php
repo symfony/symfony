@@ -118,7 +118,13 @@ class OrderedHashMapIterator implements \Iterator
      */
     public function key()
     {
-        return $this->key;
+        if (null === $this->key) {
+            return null;
+        }
+
+        $array = array($this->key => null);
+
+        return key($array);
     }
 
     /**

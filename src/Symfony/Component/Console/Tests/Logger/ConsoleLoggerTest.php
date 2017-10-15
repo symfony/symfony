@@ -166,9 +166,7 @@ class ConsoleLoggerTest extends TestCase
         } else {
             $dummy = $this->getMock('Symfony\Component\Console\Tests\Logger\DummyTest', array('__toString'));
         }
-        $dummy->expects($this->once())
-            ->method('__toString')
-            ->will($this->returnValue('DUMMY'));
+        $dummy->method('__toString')->will($this->returnValue('DUMMY'));
 
         $this->getLogger()->warning($dummy);
 

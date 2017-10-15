@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-12T09:03:39Z
+
+Wouldn't it be better to share the code instead of copy/pasting it?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-12T09:05:06Z
+
+Where would stay this code? There is no dependency in common between `console` and `http-kernel`. And creating a new component just for this method looks overkill.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T09:05:09Z
+
+@sroze these are two independent components, so sharing is not possible without creating new deps, which we don't want to.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-12T13:58:55Z
+
+This seems to break the appveyor build :/ (ran twice, same breakage with no output)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-12T14:47:21Z
+
+Not a bug fix, should be merged in 3.4 instead.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-15T12:37:29Z
+
+Status: Needs Review

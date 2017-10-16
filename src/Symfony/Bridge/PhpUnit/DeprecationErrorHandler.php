@@ -258,7 +258,7 @@ class DeprecationErrorHandler
         // This can registered before the PHPUnit error handler.
         if (!$previousErrorHandler) {
             $UtilPrefix = class_exists('PHPUnit_Util_ErrorHandler') ? 'PHPUnit_Util_' : 'PHPUnit\Util\\';
-            $previousErrorHandler = $UtilPrefix . 'ErrorHandler::handleError';
+            $previousErrorHandler = $UtilPrefix.'ErrorHandler::handleError';
         }
 
         register_shutdown_function(function () use ($outputFile, &$deprecations) {

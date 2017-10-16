@@ -24,6 +24,7 @@ class ProcessIsolationTest extends TestCase
         DeprecationErrorHandler::collectDeprecations(getenv('SYMFONY_DEPRECATIONS_SERIALIZE'));
         parent::setUp();
     }
+
     /**
      * @expectedDeprecation Test abc
      */

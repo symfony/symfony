@@ -19,7 +19,6 @@ use PHPUnit\Framework\TestCase;
  */
 class ProcessIsolationTest extends TestCase
 {
-
     /**
      * @expectedDeprecation Test abc
      */

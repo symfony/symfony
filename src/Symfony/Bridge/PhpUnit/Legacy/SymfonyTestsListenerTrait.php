@@ -270,6 +270,7 @@ class SymfonyTestsListenerTrait
                 }
             }
             $this->runsInSeparateProcess = false;
+            putenv('SYMFONY_DEPRECATIONS_SERIALIZE=');
         }
 
         if ($this->expectedDeprecations) {
@@ -317,7 +318,6 @@ class SymfonyTestsListenerTrait
                 $result->addWarning($test, new $Warning('Using the "Legacy" prefix to mark all tests of a class as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
             }
         }
-        putenv('SYMFONY_DEPRECATIONS_SERIALIZE=');
     }
 
     public function handleError($type, $msg, $file, $line, $context = array())

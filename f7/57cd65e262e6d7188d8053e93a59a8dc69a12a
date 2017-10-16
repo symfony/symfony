@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-10-14T18:38:33Z
+
+For production environments this performance optimization does not really matter though? I mean the router/matcher is dumped anyway and this code is only executed once as far as I understand.
+
+---------------------------------------------------------------------------
+
+by endroid at 2017-10-14T18:47:35Z
+
+I think so. I encountered the issue in an application with a lot of routes where on my development environment it took 1.35s for each page load and with the optimization above it took only 250ms. So I think it is still relevant but for production it might not be, I agree.
+
+---------------------------------------------------------------------------
+
+by endroid at 2017-10-14T18:57:49Z
+
+I checked locally and when I change APP_ENV=dev, APP_DEBUG=1 to APP_ENV=prod, APP_DEBUG=0 and clear all caches, the performance issue still persists. So it seems like this is not executed only once but also for each call on production environments.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-10-16T01:39:15Z
+
+Shouldn't we instead make it throw when adding duplicate resource, instead of current behaviour which adds duplicate resource and silently ignores it upon retrieving?
+
+This patch might also be considered BC break, because if two resources which return same value in __toString are added, currently first one is returned. After this patch, last one replaces previous one.
+
+Additionally, array_unique didn't touch original keys. Now, array_values will cause to return array with renumbered keys. If this second slight BC break is ignored, we might as well just remove array_values call and return original array.
+
+---------------------------------------------------------------------------
+
+by endroid at 2017-10-16T07:27:55Z
+
+About the exception: I'm personally not sure if adding a duplicate resource is considered an error or if the code was intentionally designed to allow and ignore duplicates. As you stated only the first resource (in case of duplicates) is used, so I think it is not used for overriding resources or the like.
+
+And good point about the possible BC break, I didn't catch that, thank you :)
+I will make sure only new resources are added so the behavior remains the same.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-16T14:09:54Z
+
+For the record, RouteCollection should never be used in production. If that's the case, it means that either your code or a third-party bundle does not behave correctly. If that's because of Symfony, then there is a bug somewhere. It it comes from a third-party bundle, it should be fixed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-16T14:11:04Z
+
+If my hypotheses is confirmed, it should be merged in 3.4, not 2.7.
+
+---------------------------------------------------------------------------
+
+by endroid at 2017-10-16T15:00:25Z
+
+The large delay is caused by a third party bundle (not maintained by myself) that uses the RouteCollection in production but I think it is still good to make this improvement to the RouteCollection because it will be much more efficient than it is now, even for a small number of resources. Do you want me to move this PR for this on the 3.4 branch?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-16T15:19:35Z
+
+Thank for confirming this. So, the bug is in the third party bundle and should be fixed properly. Fixing this anyway is indeed a good idea, but as it cannot considered as a bug fix, it should be merged into the 3.4 branch. Can you change the target to 3.4? Thanks.

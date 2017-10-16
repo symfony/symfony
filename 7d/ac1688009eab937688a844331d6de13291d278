@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-16T06:51:33Z
+
+I think we should also not register the `ObjectNormalizer` as a service in the FrameworkBundle when the PropertyAccess component is not installed. We did that in several other places.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-16T07:38:28Z
+
+@xabbuh if we do that, will not it be very hard to debug?
+
+---------------------------------------------------------------------------
+
+by BoShurik at 2017-10-16T09:36:57Z
+
+@dunglas otherwise impossible to use
+```
+composer create-project symfony/skeleton
+composer req serializer
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-16T21:38:14Z
+
+@xabbuh, after double checking `ObjectNormalizer` is the only generic normalizer registered. It has a low property: it is called only if no other normalizer is matching. I think it's better in term of DX to get this exception than a silent fail like "no normalizer if able to handle "Foo\Bar".

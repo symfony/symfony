@@ -31,7 +31,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     public function __construct(Dumper $dumper = null, Parser $parser = null, array $defaultContext = array())
     {
         if (!class_exists(Dumper::class)) {
-            throw new RuntimeException('Unable to use YamlEncoder as the Symfony Yaml component is not installed.');
+            throw new RuntimeException('The YamlEncoder class requires the "Yaml" component. Install "symfony/yaml" to use it.');
         }
 
         $this->dumper = $dumper ?: new Dumper();

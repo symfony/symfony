@@ -277,7 +277,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     {
         $key = (string) $resource;
 
-        if (!array_key_exists($key, $this->resources)) {
+        if (!isset($this->resources[$key])) {
             $this->resources[$key] = $resource;
         }
     }

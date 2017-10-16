@@ -126,6 +126,8 @@ Form
 FrameworkBundle
 ---------------
 
+ * The `session.use_strict_mode` option has been deprecated and is enabled by default.
+
  * The `cache:clear` command doesn't clear "app" PSR-6 cache pools anymore,
    but still clears "system" ones.
    Use the `cache:pool:clear` command to clear "app" pools instead.
@@ -235,17 +237,12 @@ HttpFoundation
  * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler`
    class has been deprecated and will be removed in 4.0. Use the `\SessionHandler` class instead.
 
- * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy` class has been
-   deprecated and will be removed in 4.0. Use your `\SessionHandlerInterface` implementation directly.
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler` class has been
+   deprecated and will be removed in 4.0. Implement `SessionUpdateTimestampHandlerInterface` or
+   extend `AbstractSessionHandler` instead.
 
  * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` class has been
    deprecated and will be removed in 4.0. Use your `\SessionHandlerInterface` implementation directly.
-
- * The `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy` class has been
-   deprecated and will be removed in 4.0. Use your `\SessionHandlerInterface` implementation directly.
-
- * `NativeSessionStorage::setSaveHandler()` now takes an instance of `\SessionHandlerInterface` as argument.
-   Not passing it is deprecated and will throw a `TypeError` in 4.0.
 
  * Using `Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler` with the legacy mongo extension
    has been deprecated and will be removed in 4.0. Use it with the mongodb/mongodb package and ext-mongodb instead.

@@ -301,6 +301,7 @@ class ConfigurationTest extends TestCase
                 'gc_probability' => 1,
                 'save_path' => '%kernel.cache_dir%/sessions',
                 'metadata_update_threshold' => '0',
+                'use_strict_mode' => true,
             ),
             'request' => array(
                 'enabled' => false,

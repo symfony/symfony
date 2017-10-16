@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
-use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
@@ -26,7 +26,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * @var SessionBagInterface[]
      */
-    protected $bags;
+    protected $bags = array();
 
     /**
      * @var bool
@@ -100,9 +100,9 @@ class NativeSessionStorage implements SessionStorageInterface
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
         $options += array(
-            // disable by default because it's managed by HeaderBag (if used)
-            'cache_limiter' => '',
+            'cache_limiter' => 'private_no_expire',
             'use_cookies' => 1,
+            'lazy_write' => 1,
         );
 
         session_register_shutdown();
@@ -217,15 +217,31 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function save()
     {
+        $session = $_SESSION;
+
+        foreach ($this->bags as $bag) {
+            if (empty($_SESSION[$key = $bag->getStorageKey()])) {
+                unset($_SESSION[$key]);
+            }
+        }
+        if (array($key = $this->metadataBag->getStorageKey()) === array_keys($_SESSION)) {
+            unset($_SESSION[$key]);
+        }
+
         // Register custom error handler to catch a possible failure warning during session write
-        set_error_handler(function ($errno, $errstr, $errfile, $errline, $errcontext) {
-            throw new ContextErrorException($errstr, $errno, E_WARNING, $errfile, $errline, $errcontext);
+        set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+            throw new \ErrorException($errstr, $errno, E_WARNING, $errfile, $errline);
         }, E_WARNING);
 
         try {
+            $e = null;
             session_write_close();
+        } catch (\ErrorException $e) {
+        } finally {
             restore_error_handler();
-        } catch (ContextErrorException $e) {
+            $_SESSION = $session;
+        }
+        if (null !== $e) {
             // The default PHP error message is not very helpful, as it does not give any information on the current save handler.
             // Therefore, we catch this error and trigger a warning with a better error message
             $handler = $this->getSaveHandler();
@@ -233,7 +249,6 @@ class NativeSessionStorage implements SessionStorageInterface
                 $handler = $handler->getHandler();
             }
 
-            restore_error_handler();
             trigger_error(sprintf('session_write_close(): Failed to write session data with %s handler', get_class($handler)), E_USER_WARNING);
         }
 
@@ -386,13 +401,6 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException('Must be instance of AbstractProxy; implement \SessionHandlerInterface; or be null.');
         }
 
-        if ($saveHandler instanceof AbstractProxy) {
-            @trigger_error(
-                'Using session save handlers that are instances of AbstractProxy is deprecated since version 3.4 and will be removed in 4.0.',
-                E_USER_DEPRECATED
-            );
-        }
-
         if (headers_sent($file, $line)) {
             throw new \RuntimeException(sprintf('Failed to set the session handler because headers have already been sent by "%s" at line %d.', $file, $line));
         }
@@ -401,11 +409,13 @@ class NativeSessionStorage implements SessionStorageInterface
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);
         } elseif (!$saveHandler instanceof AbstractProxy) {
-            $saveHandler = new SessionHandlerProxy(new \SessionHandler());
+            $saveHandler = new SessionHandlerProxy(new StrictSessionHandler(new \SessionHandler()));
         }
         $this->saveHandler = $saveHandler;
 
-        if ($this->saveHandler instanceof \SessionHandlerInterface) {
+        if ($this->saveHandler instanceof SessionHandlerProxy) {
+            session_set_save_handler($this->saveHandler->getHandler(), false);
+        } elseif ($this->saveHandler instanceof \SessionHandlerInterface) {
             session_set_save_handler($this->saveHandler, false);
         }
     }

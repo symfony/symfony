@@ -60,6 +60,7 @@ CHANGELOG
  * Added `asset.request_context.base_path` and `asset.request_context.secure` parameters
    to provide a default request context in case the stack is empty (similar to `router.request_context.*` parameters)
  * Display environment variables managed by `Dotenv` in `AboutCommand`
+ * Added new `framework.reset_services_on_terminate` configuration option to enable resetting services tagged with `kernel.reset` on kernel termination
 
 3.3.0
 -----

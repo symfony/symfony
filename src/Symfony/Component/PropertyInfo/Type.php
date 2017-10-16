@@ -27,6 +27,7 @@ class Type
     const BUILTIN_TYPE_ARRAY = 'array';
     const BUILTIN_TYPE_NULL = 'null';
     const BUILTIN_TYPE_CALLABLE = 'callable';
+    const BUILTIN_TYPE_ITERABLE = 'iterable';
 
     /**
      * List of PHP builtin types.
@@ -43,6 +44,7 @@ class Type
         self::BUILTIN_TYPE_ARRAY,
         self::BUILTIN_TYPE_CALLABLE,
         self::BUILTIN_TYPE_NULL,
+        self::BUILTIN_TYPE_ITERABLE,
     );
 
     /**

@@ -11,19 +11,15 @@ use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
  * @group legacy
  *
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ *
+ * Note that for the deprecation handler to work in a separate process we need to disable the preservation of global
+ * state. This is because composer's autoloader stores which files have been autoloaded in the global
+ * '__composer_autoload_files'. If this is preserved then bootstrap.php will not run again meaning that deprecations
+ * won't be collected.
  */
 class ProcessIsolationTest extends TestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        // Ensure we are using the deprecation error handler. Unfortunately the code in bootstrap.php does not appear to
-        // be working.
-        DeprecationErrorHandler::collectDeprecations(getenv('SYMFONY_DEPRECATIONS_SERIALIZE'));
-        parent::setUp();
-    }
 
     /**
      * @expectedDeprecation Test abc

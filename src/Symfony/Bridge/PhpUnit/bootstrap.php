@@ -13,11 +13,8 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 // Detect if we're loaded by an actual run of phpunit
-if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists('PHPUnit_TextUI_Command', false) && !class_exists('PHPUnit\TextUI\Command', false)) {
-    if ($ser = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
-        DeprecationErrorHandler::collectDeprecations($ser);
-    }
-
+if ($ser = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
+    DeprecationErrorHandler::collectDeprecations($ser);
     return;
 }
 

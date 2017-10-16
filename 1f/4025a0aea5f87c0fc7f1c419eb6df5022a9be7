@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by eXtreme at 2017-10-11T21:12:46Z
+
+wow, there's literally nothing on google about `SessionUpdateTimestampHandlerInterface`, yet it exists for so long ..
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T15:17:15Z
+
+PR is green and ready. This is a significant improvement over the current session handlers, thanks to this new PHP 7.0 interface.
+
+This adds two main classes:
+- `AbstractSessionHandler`, which implements the logic to remove/delete cookies when needed + deal with `validateId()`+`updateTimestamp()`
+- `SessionHandlerProxy`, which turns any handler into an instance of `AbstractSessionHandler`, especially useful and required for the native session handler, which doesn't implement the special interface.
+
+The rest are related tweaks.
+
+---------------------------------------------------------------------------
+
+by TerjeBr at 2017-10-12T18:03:28Z
+
+Have you tested this with a full symfony stack?
+
+When a typical symfony SessionBag is empty it is not the empty string, it contains some metadata.
+A new session that is started with no data will contain an array with these 3 keys: `_sf2_attributes`, `_sf2_flashes` and `_sf2_meta`
+
+Because of this, this PR will not fix #6388
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T21:24:18Z
+
+@TerjeBr thanks for the hint, that's now fixed (but not tested yet).
+That allowed me to spot that the BC layer in place right now is broken. We didn't spot it because of #23003 (PhpUnit-Bridge can't deal with `@runTestsInSeparateProcesses`).
+Fixed also.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-13T17:15:36Z
+
+PR green and ready :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-13T17:19:57Z
+
+(fixes current failures on 3.4)
+
+---------------------------------------------------------------------------
+
+by TerjeBr at 2017-10-13T17:36:25Z
+
+@nicolas-grekas wrote:
+> I opened igbinary/igbinary#146 about igbinary, and meanwhile it is now handled in the code. All other serialization handlers store the empty session as the empty string.
+
+What about the `php_serialize` handler? From http://php.net/manual/en/session.configuration.php#ini.session.serialize-handler:
+>php_serialize uses plain serialize/unserialize function internally
+
+`serialize(array())` returns `"a:0:{}"` and not an empty string.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-13T20:14:21Z
+
+> What about the php_serialize handler?
+
+I wondered the same, so I tried: the empty session is serialized as the empty string.
+That's consistent with the source code:
+https://github.com/php/php-src/blob/master/ext/session/session.c#L843
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-14T15:07:59Z
+
+@Tobion the deprecation layer of `Session\Storage\Proxy\*` classes is completely broken: see `NativeSessionStorage::setId()` which calls `$this->saveHandler->setId($id)`.
+I'm going to revert this deprecation in this PR, could re-added later, but fixing is not trivial so not for this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-14T15:58:18Z
+
+Deprecations of `SessionHandlerProxy` and `AbstractProxy` now reverted. It's too much work for this PR to fix and keep them, so should be done in a separate one. For 4.1 is fine IMHO.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-14T16:13:47Z
+
+I confirm the broken BC layer, core classes still extend/use them. Deprecating them in 4.1 looks sensible to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-14T21:02:22Z
+
+comments addressed, still green :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-16T22:46:56Z
+
+comments addressed

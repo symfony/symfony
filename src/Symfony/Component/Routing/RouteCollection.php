@@ -268,12 +268,17 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Adds a resource for this collection.
+     * Adds a resource for this collection. If the resource already exists
+     * it is not added.
      *
      * @param ResourceInterface $resource A resource instance
      */
     public function addResource(ResourceInterface $resource)
     {
-        $this->resources[(string) $resource] = $resource;
+        $key = (string) $resource;
+
+        if (!array_key_exists($key, $this->resources)) {
+            $this->resources[$key] = $resource;
+        }
     }
 }

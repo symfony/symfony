@@ -999,16 +999,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 11);
     }
 
-    public function testRemovesServiceResetListenerDefWhenOptionSetToFalse()
+    public function testDoesNotAddServiceResetListenerDefWhenOptionSetToFalse()
     {
         $container = $this->createContainerFromFile('default_config');
         $this->assertFalse($container->hasDefinition(ServiceResetListener::class));
     }
 
-    public function testDoesNotRemoveServiceResetListenerDefWhenOptionSetToTrue()
+    public function testAddsServiceResetListenerDefWhenOptionSetToTrue()
     {
         $container = $this->createContainerFromFile('reset_services');
-        $this->assertTrue($container->hasDefinition(ServiceResetListener::class));
+        $this->assertEquals((new Definition(ServiceResetListener::class))->addTag('kernel.event_subscriber'), $container->getDefinition(ServiceResetListener::class));
     }
 
     protected function createContainer(array $data = array())

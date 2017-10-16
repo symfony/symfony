@@ -352,7 +352,7 @@ class ConfigurationTest extends TestCase
                     ),
                 ),
             ),
-            'reset_services' => false,
+            'reset_services_on_terminate' => false,
         );
     }
 }

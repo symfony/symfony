@@ -3,7 +3,6 @@
 namespace Symfony\Bridge\PhpUnit\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
 /**
  * Don't remove this test case, it tests the legacy group.

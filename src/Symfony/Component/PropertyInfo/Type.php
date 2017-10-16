@@ -104,7 +104,7 @@ class Type
     /**
      * Gets built-in type.
      *
-     * Can be bool, int, float, string, array, object, resource, null or callback.
+     * Can be bool, int, float, string, array, object, resource, null, callback or iterable.
      *
      * @return string
      */

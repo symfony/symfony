@@ -31,15 +31,17 @@ class ProcessIsolationTest extends TestCase
     public function testIsolation()
     {
         @trigger_error('Test abc', E_USER_DEPRECATED);
+        $this->addToAssertionCount(1);
     }
 
     public function testCallingOtherErrorHandler()
     {
+        $class = class_exists('PHPUnit\Framework\Exception') ? 'PHPUnit\Framework\Exception' : 'PHPUnit_Framework_Exception';
         if (method_exists($this, 'expectException')) {
-            $this->expectException('PHPUnit\Framework\Error\Warning');
+            $this->expectException($class);
             $this->expectExceptionMessage('Test that PHPUnit\'s error handler fires.');
         } else {
-            $this->setExpectedException('PHPUnit_Framework_Error_Warning', 'Test that PHPUnit\'s error handler fires.');
+            $this->setExpectedException($class, 'Test that PHPUnit\'s error handler fires.');
         }
 
         trigger_error('Test that PHPUnit\'s error handler fires.', E_USER_WARNING);

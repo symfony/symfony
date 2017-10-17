@@ -52,6 +52,7 @@
                 <argument type="service" id="event_dispatcher" />
             </call>
         </service>
+        <service id="Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface" alias="security.authentication.manager" />
 
         <service id="security.authentication.trust_resolver" class="Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver">
             <argument>%security.authentication.trust_resolver.anonymous_class%</argument>

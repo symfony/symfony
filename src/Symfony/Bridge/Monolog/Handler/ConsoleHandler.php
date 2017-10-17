@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Handler;
 
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
  * Writes logs to the console output depending on its verbosity setting.
@@ -162,6 +164,9 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      */
     protected function getDefaultFormatter()
     {
+        if (!class_exists(CliDumper::class)) {
+            return new LineFormatter();
+        }
         if (!$this->output) {
             return new ConsoleFormatter();
         }

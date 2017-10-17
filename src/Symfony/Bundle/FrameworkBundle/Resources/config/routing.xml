@@ -85,6 +85,7 @@
         <service id="Symfony\Component\Routing\RouterInterface" alias="router" />
         <service id="Symfony\Component\Routing\Generator\UrlGeneratorInterface" alias="router" />
         <service id="Symfony\Component\Routing\Matcher\UrlMatcherInterface" alias="router" />
+        <service id="Symfony\Component\Routing\RequestContextAwareInterface" alias="router" />
 
         <service id="router.request_context" class="Symfony\Component\Routing\RequestContext">
             <argument>%router.request_context.base_url%</argument>

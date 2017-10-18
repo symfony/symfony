@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-18T09:49:05Z
+
+Build failure unrelated.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-10-18T09:52:50Z
+
+Does this mean that in the example mentioned in #24559 the inlined `bar` service is not removed anymore within `RemoveUnusedDefinitionsPass` with this fix?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-18T09:54:17Z
+
+@dmaicher yes
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-10-18T09:58:39Z
+
+:+1: Should it not be merged into 3.4 instead of master?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-18T10:37:07Z
+
+Are you sure about it ? Bindings are used by the autowiring layer, which runs *before* the removal passes. If the autowiring has not used the binding to set a reference, we don't have a usage (and we don't need to prevent removal AFAIK). And if the binding was used to fill an argument, we will have a reference in the arguments (and so processed by the existing code)
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-10-18T10:39:16Z
+
+> And if the binding was used to fill an argument, we will have a reference in the arguments (and so processed by the existing code)
+
+@stof if the service was inlined this it not true I believe. It will have an inlined `Definition` in the arguments and not a `Reference`.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-18T10:45:02Z
+
+@dmaicher and this is fine as well, as the argument is still filled properly. It does not need the binding anymore.
+
+Actually, I think the issue is that AbstractRecursivePass is always processing bindings in the exact same way it processes arguments, method calls and so on.
+And so, it will treat any reference in a binding as a usage of the service. But once bindings are used to fill arguments, they become useless. So they should not be visited by the validator passes checking for circular references, invalid references and so on.
+I'm not even sure there is a single case where a recursive pass should visit them.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-10-18T10:47:55Z
+
+@stof ok I see :wink: Then we should indeed not check the References contained in bindings I guess. So the Definitions can be removed correctly for inlined services.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-18T11:08:46Z
+
+PR updated to not process bindings in AbstractRecursivePass.

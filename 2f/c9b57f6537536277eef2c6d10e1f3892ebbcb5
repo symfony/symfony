@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by rquadling at 2017-10-17T12:16:33Z
+
+Ahh. 2.3 is the first version to validate the basic auth part of a url. But that is failing due to the PHP5.3. Should I have made a PR against 2.7?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-17T12:53:36Z
+
+Yes, 2.7 is the lowest branch that is still maintained. 2.3 isn't maintained anymore.
+It's not too late, you can rebase your branch against 2.7 and change the target branch of your PR (https://github.com/blog/2224-change-the-base-branch-of-a-pull-request).

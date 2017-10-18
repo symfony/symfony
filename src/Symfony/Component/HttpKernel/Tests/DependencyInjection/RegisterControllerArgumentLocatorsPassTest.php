@@ -310,6 +310,22 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     {
         return array(array(ControllerDummy::class), array('$bar'));
     }
+
+    public function testDoNotBindScalarValueToControllerArgument()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument(array());
+
+        $container->register('foo', ArgumentWithoutTypeController::class)
+            ->setBindings(array('$someArg' => '%foo%'))
+            ->addTag('controller.service_arguments');
+
+        $pass = new RegisterControllerArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $this->assertEmpty($locator);
+    }
 }
 
 class RegisterTestController

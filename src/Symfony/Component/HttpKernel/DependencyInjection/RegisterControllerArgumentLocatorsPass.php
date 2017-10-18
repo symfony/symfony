@@ -135,6 +135,11 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         $binding = $bindings[$bindingName];
 
                         list($bindingValue, $bindingId) = $binding->getValues();
+
+                        if (!$bindingValue instanceof Reference) {
+                            continue;
+                        }
+
                         $binding->setValues(array($bindingValue, $bindingId, true));
                         $args[$p->name] = $bindingValue;
 

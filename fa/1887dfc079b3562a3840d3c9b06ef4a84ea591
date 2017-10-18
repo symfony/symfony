@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-17T02:02:07Z
+
+The class the alias points to would be interesting
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-17T08:38:18Z
+
+We need to remove the `--types` option from debug:container, right?
+👍 for 3.4.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-10-17T10:46:31Z
+
+This would be really great to have in 3.4
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-17T13:50:52Z
+
+> We need to remove the --types option from debug:container, right?
+👍 for 3.4.
+
+I'd like to keep it, and remove it later when we've thought more about what to do with the `debug:container` command in general. And as Stof pointed out, the new command does not have a `--format` option, on purpose, so that we have a bit more flexibility to change the command in the future (because we're not guaranteeing BC of the output of the new command). The `debug:container --types` *does* have an option, so people can continue to use that :).
+
+> My only concern is forward compatibility with #24562. If we add a "debug:services" command soon ... should this one be merged with it and renamed as debug:Services? Should this be an independent command? Thanks!
+
+I think I still like the independent `debug:autowiring`. But, it should be quite easy to deprecate & change this new command *if* that's what we want to do. It has a much lower BC-policy cost than most other pieces of code.
+
+All comments addressed!

@@ -359,7 +359,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
-     * @expectedExceptionMessage Cannot autowire service "a": argument "$r" of method "Symfony\Component\DependencyInjection\Tests\Compiler\BadTypeHintedArgument::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class cannot be loaded.
+     * @expectedExceptionMessage Cannot autowire service "a": argument "$r" of method "Symfony\Component\DependencyInjection\Tests\Compiler\BadTypeHintedArgument::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class was not found.
      */
     public function testClassNotFoundThrowsException()
     {
@@ -374,7 +374,7 @@ class AutowirePassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
-     * @expectedExceptionMessage Cannot autowire service "a": argument "$r" of method "Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass" but this class cannot be loaded.
+     * @expectedExceptionMessage Cannot autowire service "a": argument "$r" of method "Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass" but this class is missing a parent class (Class Symfony\Bug\NotExistClass not found).
      */
     public function testParentClassNotFoundThrowsException()
     {
@@ -761,7 +761,7 @@ class AutowirePassTest extends TestCase
     public function provideNotWireableCalls()
     {
         return array(
-            array('setNotAutowireable', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class cannot be loaded.'),
+            array('setNotAutowireable', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setNotAutowireable()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass" but this class was not found.'),
             array('setDifferentNamespace', 'Cannot autowire service "foo": argument "$n" of method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setDifferentNamespace()" references class "stdClass" but no such service exists. It cannot be auto-registered because it is from a different root namespace.'),
             array(null, 'Cannot autowire service "foo": method "Symfony\Component\DependencyInjection\Tests\Compiler\NotWireable::setProtectedMethod()" must be public.'),
         );

@@ -32,7 +32,7 @@
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "conflict": {
-        "symfony/config": "<3.3.1",
+        "symfony/config": "<3.3.7",
         "symfony/finder": "<3.3",
         "symfony/yaml": "<3.3"
     },

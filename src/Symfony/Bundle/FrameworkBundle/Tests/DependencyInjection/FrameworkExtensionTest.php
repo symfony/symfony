@@ -1008,7 +1008,10 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testAddsServiceResetListenerDefWhenOptionSetToTrue()
     {
         $container = $this->createContainerFromFile('reset_services');
-        $this->assertEquals((new Definition(ServiceResetListener::class))->addTag('kernel.event_subscriber'), $container->getDefinition(ServiceResetListener::class));
+        $this->assertEquals(
+            (new Definition(ServiceResetListener::class))->addTag('kernel.event_subscriber')->setPublic(false),
+            $container->getDefinition(ServiceResetListener::class)
+        );
     }
 
     protected function createContainer(array $data = array())

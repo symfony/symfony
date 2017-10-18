@@ -319,7 +319,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($config['reset_services_on_terminate']) {
-            $container->register(ServiceResetListener::class)->addTag('kernel.event_subscriber');
+            $container->register(ServiceResetListener::class)->addTag('kernel.event_subscriber')->setPublic(false);
         }
 
         $this->addAnnotatedClassesToCompile(array(

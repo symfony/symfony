@@ -903,6 +903,11 @@ class FrameworkExtension extends Extension
         $loader->load('serializer.xml');
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
+        if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccessor')) {
+            $container->removeAlias('serializer.property_accessor');
+            $container->removeDefinition('serializer.normalizer.object');
+        }
+
         $serializerLoaders = array();
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
             $annotationLoader = new Definition(

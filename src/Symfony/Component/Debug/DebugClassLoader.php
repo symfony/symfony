@@ -204,18 +204,11 @@ class DebugClassLoader
                 self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
             } else {
                 // Don't trigger deprecations for classes in the same vendor
-                if (2 > $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'))) {
+                if (2 > $len = 1 + (strpos($name, '\\') ?: strpos($name, '_'))) {
                     $len = 0;
                     $ns = '';
                 } else {
-                    switch ($ns = substr($name, 0, $len)) {
-                        case 'Symfony\Bridge\\':
-                        case 'Symfony\Bundle\\':
-                        case 'Symfony\Component\\':
-                            $ns = 'Symfony\\';
-                            $len = strlen($ns);
-                            break;
-                    }
+                    $ns = substr($name, 0, $len);
                 }
 
                 if (!$parent || strncmp($ns, $parent, $len)) {

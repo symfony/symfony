@@ -15,6 +15,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -32,6 +33,10 @@ class ObjectNormalizer extends AbstractObjectNormalizer
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null)
     {
+        if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccess')) {
+            throw new RuntimeException('The ObjectNormalizer class requires the "PropertyAccess" component. Install "symfony/property-access" to use it.');
+        }
+
         parent::__construct($classMetadataFactory, $nameConverter, $propertyTypeExtractor);
 
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();

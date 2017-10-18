@@ -55,10 +55,6 @@ class UriSigner
     /**
      * Checks that a URI contains the correct hash.
      *
-     * The _hash query string parameter must be the last one
-     * (as it is generated that way by the sign() method, it should
-     * never be a problem).
-     *
      * @param string $uri A signed URI
      *
      * @return bool True if the URI is signed correctly, false otherwise

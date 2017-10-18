@@ -270,7 +270,6 @@ class SymfonyTestsListenerTrait
                 }
             }
             $this->runsInSeparateProcess = false;
-            putenv('SYMFONY_DEPRECATIONS_SERIALIZE=');
         }
 
         if ($this->expectedDeprecations) {

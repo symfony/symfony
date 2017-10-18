@@ -19,11 +19,6 @@
         </testsuite>
     </testsuites>
 
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener">
-        </listener>
-    </listeners>
-
     <filter>
         <whitelist>
             <directory>./</directory>

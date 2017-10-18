@@ -485,7 +485,7 @@ class AutowirePass extends AbstractRecursivePass
     private function createTypeNotFoundMessage(TypedReference $reference, $label)
     {
         if (!$r = $this->container->getReflectionClass($type = $reference->getType(), false)) {
-            $message = sprintf('has type "%s" but this class cannot be loaded.', $type);
+            $message = sprintf('is type-hinted with "%s" but this class was not found.', $type);
         } else {
             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';
             $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($reference));

@@ -31,6 +31,8 @@ class ServerRunCommand extends ServerCommand
     private $documentRoot;
     private $environment;
 
+    protected static $defaultName = 'server:run';
+
     public function __construct($documentRoot = null, $environment = null)
     {
         $this->documentRoot = $documentRoot;
@@ -50,7 +52,6 @@ class ServerRunCommand extends ServerCommand
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root, usually where your front controllers are stored'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
-            ->setName('server:run')
             ->setDescription('Runs a local web server')
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> runs a local web server: By default, the server

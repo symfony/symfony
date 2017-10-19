@@ -27,7 +27,7 @@ interface AuthenticationManagerInterface
      *
      * @param TokenInterface $token The TokenInterface instance to authenticate
      *
-     * @return TokenInterface An authenticated TokenInterface instance, never null
+     * @return TokenInterface|null An authenticated TokenInterface instance, or null if the token is not supported
      *
      * @throws AuthenticationException if the authentication fails
      */

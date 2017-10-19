@@ -221,7 +221,6 @@ class Request
     protected static $requestFactory;
 
     private $isHostValid = true;
-    private $isClientIpsValid = true;
     private $isForwardedValid = true;
 
     private static $trustedHeaderSet = -1;

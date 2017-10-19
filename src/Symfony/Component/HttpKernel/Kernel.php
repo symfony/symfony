@@ -61,12 +61,12 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     private $projectDir;
     private $warmupDir;
 
-    const VERSION = '4.0.0-DEV';
+    const VERSION = '4.0.0-BETA1';
     const VERSION_ID = 40000;
     const MAJOR_VERSION = 4;
     const MINOR_VERSION = 0;
     const RELEASE_VERSION = 0;
-    const EXTRA_VERSION = 'DEV';
+    const EXTRA_VERSION = 'BETA1';
 
     const END_OF_MAINTENANCE = '07/2018';
     const END_OF_LIFE = '01/2019';

@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
@@ -45,10 +46,16 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
             }
         }
 
-        if ($processors) {
-            if ($bag instanceof EnvPlaceholderParameterBag) {
-                $bag->setProvidedTypes($types);
+        if ($bag instanceof EnvPlaceholderParameterBag) {
+            foreach (EnvVarProcessor::getProvidedTypes() as $prefix => $type) {
+                if (!isset($types[$prefix])) {
+                    $types[$prefix] = self::validateProvidedTypes($type, EnvVarProcessor::class);
+                }
             }
+            $bag->setProvidedTypes($types);
+        }
+
+        if ($processors) {
             $container->register('container.env_var_processors_locator', ServiceLocator::class)
                 ->setPublic(true)
                 ->setArguments(array($processors))

@@ -26,5 +26,9 @@
         <service id="web_server.command.server_status" class="Symfony\Bundle\WebServerBundle\Command\ServerStatusCommand">
             <tag name="console.command" command="server:status" />
         </service>
+
+        <service id="web_server.command.server_log" class="Symfony\Bundle\WebServerBundle\Command\ServerLogCommand">
+            <tag name="console.command" command="server:log" />
+        </service>
     </services>
 </container>

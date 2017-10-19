@@ -226,8 +226,9 @@ Finder
 Form
 ----
 
- * The constant values of `FormEvents::*` have been renamed to match with its name.
-   May break rare cases where the event name is used rather than the constant.
+* The values of the `FormEvents::*` constants have been updated to match the
+  constant names. You should only update your application if you relied on the
+  constant values instead of their names.
 
  * The `choices_as_values` option of the `ChoiceType` has been removed.
 

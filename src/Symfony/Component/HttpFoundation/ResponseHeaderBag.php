@@ -30,7 +30,7 @@ class ResponseHeaderBag extends HeaderBag
     protected $computedCacheControl = array();
 
     /**
-     * @var array
+     * @var Cookie[]
      */
     protected $cookies = array();
 
@@ -229,7 +229,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @param string $format
      *
-     * @return array
+     * @return Cookie[] An array of cookies
      *
      * @throws \InvalidArgumentException When the $format is invalid
      */

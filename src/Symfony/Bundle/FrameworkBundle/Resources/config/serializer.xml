@@ -25,6 +25,21 @@
         <service id="serializer.property_accessor" alias="property_accessor" />
 
         <!-- Normalizer -->
+        <service id="serializer.normalizer.data_uri" class="Symfony\Component\Serializer\Normalizer\DataUriNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-920" />
+        </service>
+
+        <service id="serializer.normalizer.datetime" class="Symfony\Component\Serializer\Normalizer\DateTimeNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-910" />
+        </service>
+
+        <service id="serializer.normalizer.json_serializable" class="Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-900" />
+        </service>
+
         <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
             <argument>null</argument> <!-- name converter -->
@@ -83,6 +98,14 @@
         </service>
 
         <service id="serializer.encoder.json" class="Symfony\Component\Serializer\Encoder\JsonEncoder">
+            <tag name="serializer.encoder" />
+        </service>
+
+        <service id="serializer.encoder.yaml" class="Symfony\Component\Serializer\Encoder\YamlEncoder">
+            <tag name="serializer.encoder" />
+        </service>
+
+        <service id="serializer.encoder.csv" class="Symfony\Component\Serializer\Encoder\CsvEncoder">
             <tag name="serializer.encoder" />
         </service>
 

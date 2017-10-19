@@ -728,10 +728,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testDataUriNormalizerRegistered()
     {
-        if (!class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
-            $this->markTestSkipped('The DataUriNormalizer has been introduced in the Serializer Component version 3.1.');
-        }
-
         $container = $this->createContainerFromFile('full');
 
         $definition = $container->getDefinition('serializer.normalizer.data_uri');
@@ -743,10 +739,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testDateTimeNormalizerRegistered()
     {
-        if (!class_exists('Symfony\Component\Serializer\Normalizer\DateTimeNormalizer')) {
-            $this->markTestSkipped('The DateTimeNormalizer has been introduced in the Serializer Component version 3.1.');
-        }
-
         $container = $this->createContainerFromFile('full');
 
         $definition = $container->getDefinition('serializer.normalizer.datetime');
@@ -758,10 +750,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testJsonSerializableNormalizerRegistered()
     {
-        if (!class_exists('Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer')) {
-            $this->markTestSkipped('The JsonSerializableNormalizer has been introduced in the Serializer Component version 3.1.');
-        }
-
         $container = $this->createContainerFromFile('full');
 
         $definition = $container->getDefinition('serializer.normalizer.json_serializable');

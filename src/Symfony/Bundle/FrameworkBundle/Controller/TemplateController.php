@@ -67,4 +67,9 @@ class TemplateController
 
         return $response;
     }
+
+    public function __invoke(string $template, int $maxAge = null, int $sharedAge = null, bool $private = null): Response
+    {
+        return $this->templateAction($template, $maxAge, $sharedAge, $private);
+    }
 }

@@ -35,7 +35,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
@@ -772,10 +771,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testSerializerCacheActivated()
     {
-        if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
-            $this->markTestSkipped('The Serializer default cache warmer has been introduced in the Serializer Component version 3.2.');
-        }
-
         $container = $this->createContainerFromFile('serializer_enabled');
 
         $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));

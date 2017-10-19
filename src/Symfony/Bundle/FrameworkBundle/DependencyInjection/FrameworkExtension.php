@@ -1329,7 +1329,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
-        } elseif (!$container->getParameter('kernel.debug') && class_exists(CacheClassMetadataFactory::class)) {
+        } elseif (!$container->getParameter('kernel.debug')) {
             $cacheMetadataFactory = new Definition(
                 CacheClassMetadataFactory::class,
                 array(

@@ -47,15 +47,10 @@ use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
-use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
@@ -1278,39 +1273,6 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
-            // Run before serializer.normalizer.object
-            $definition = $container->register('serializer.normalizer.data_uri', DataUriNormalizer::class);
-            $definition->setPublic(false);
-            $definition->addTag('serializer.normalizer', array('priority' => -920));
-        }
-
-        if (class_exists('Symfony\Component\Serializer\Normalizer\DateTimeNormalizer')) {
-            // Run before serializer.normalizer.object
-            $definition = $container->register('serializer.normalizer.datetime', DateTimeNormalizer::class);
-            $definition->setPublic(false);
-            $definition->addTag('serializer.normalizer', array('priority' => -910));
-        }
-
-        if (class_exists('Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer')) {
-            // Run before serializer.normalizer.object
-            $definition = $container->register('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class);
-            $definition->setPublic(false);
-            $definition->addTag('serializer.normalizer', array('priority' => -900));
-        }
-
-        if (class_exists(YamlEncoder::class) && defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
-            $definition = $container->register('serializer.encoder.yaml', YamlEncoder::class);
-            $definition->setPublic(false);
-            $definition->addTag('serializer.encoder');
-        }
-
-        if (class_exists(CsvEncoder::class)) {
-            $definition = $container->register('serializer.encoder.csv', CsvEncoder::class);
-            $definition->setPublic(false);
-            $definition->addTag('serializer.encoder');
-        }
-
         $loader->load('serializer.xml');
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
@@ -1367,7 +1329,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
-        } elseif (!$container->getParameter('kernel.debug') && class_exists(CacheClassMetadataFactory::class)) {
+        } elseif (!$container->getParameter('kernel.debug')) {
             $cacheMetadataFactory = new Definition(
                 CacheClassMetadataFactory::class,
                 array(

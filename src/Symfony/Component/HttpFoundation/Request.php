@@ -1288,6 +1288,8 @@ class Request
                 return $format;
             }
         }
+
+        return null;
     }
 
     /**

@@ -109,6 +109,7 @@ class StreamedResponse extends Response
         }
 
         call_user_func($this->callback);
+
         return $this;
     }
 

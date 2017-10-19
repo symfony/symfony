@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-18T21:26:14Z
+
+Can't it be merged in 2.7 as well?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-19T02:22:04Z
+
+Ok, fixed back to not introduce a new parameter. I just tried again, it still works fine.
+
+This applies only to 2.8 and above. In 2.7, the cache warmer doesn't have a third (paths) argument at all: https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/TwigBundle/Resources/config/twig.xml#L48
+
+So... it could technically be fixed in 2.7, but would be much different than this patch... the paths arg from 2.8 would need to be backported. Should we?

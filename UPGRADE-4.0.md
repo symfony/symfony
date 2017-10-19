@@ -326,6 +326,8 @@ Form
    }
    ```
 
+ * `FormRendererInterface::setTheme` and `FormRendererEngineInterface::setTheme` have a new optional argument `$useDefaultThemes` with a default value set to `true`.
+
 FrameworkBundle
 ---------------
 

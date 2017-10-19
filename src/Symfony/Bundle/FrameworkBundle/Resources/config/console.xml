@@ -89,10 +89,6 @@
             <tag name="console.command" command="translation:update" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand">
-            <tag name="console.command" command="workflow:dump" />
-        </service>
-
         <service id="Symfony\Bundle\FrameworkBundle\Command\XliffLintCommand">
             <tag name="console.command" command="lint:xliff" />
         </service>

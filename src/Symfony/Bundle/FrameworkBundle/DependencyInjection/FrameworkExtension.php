@@ -639,6 +639,7 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('workflow.marking_store.multiple_state')->setPrivate(true);
         $container->getDefinition('workflow.marking_store.single_state')->setPrivate(true);
+        $container->getDefinition('workflow.registry')->setPrivate(true);
 
         $registryDefinition = $container->getDefinition('workflow.registry');
 

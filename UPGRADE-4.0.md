@@ -226,6 +226,9 @@ Finder
 Form
 ----
 
+ * The constant values of `FormEvents::*` have been renamed to match with its name.
+   May break rare cases where the event name is used rather than the constant.
+
  * The `choices_as_values` option of the `ChoiceType` has been removed.
 
  * Support for data objects that implements both `Traversable` and

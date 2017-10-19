@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-19T19:20:53Z
+
+> allows the PhpStorm's Symfony plugin to properly detect and jump to them from classes
+
+which means we should always favor putting services in xml, then removing them when applicable, instead of adding them in the DI ext? We just did that the wrong way recently in another PR, isn't it?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-10-19T19:34:42Z
+
+> which means we should always favor putting services in xml, then removing them when applicable, instead of adding them in the DI ext?
+
+Yes indeed, would be better.
+For instance in https://github.com/symfony/symfony/commit/6185cb19913984c336f7aee389842bed958af73f#diff-0e793081ceb720201745c982a568903f, but it was consistent with the way other normalizers were registered so far.
+Did you have another PR in mind?

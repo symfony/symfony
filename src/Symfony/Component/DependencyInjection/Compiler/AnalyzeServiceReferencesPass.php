@@ -125,28 +125,21 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
         return $value;
     }
 
-    /**
-     * Returns a service definition given the full name or an alias.
-     *
-     * @param string $id A full id or alias for a service definition
-     *
-     * @return Definition|null The definition related to the supplied id
-     */
-    private function getDefinition($id)
+    private function getDefinition(string $id): ?Definition
     {
         $id = $this->getDefinitionId($id);
 
         return null === $id ? null : $this->container->getDefinition($id);
     }
 
-    private function getDefinitionId($id)
+    private function getDefinitionId(string $id): ?string
     {
         while ($this->container->hasAlias($id)) {
             $id = (string) $this->container->getAlias($id);
         }
 
         if (!$this->container->hasDefinition($id)) {
-            return;
+            return null;
         }
 
         return $id;

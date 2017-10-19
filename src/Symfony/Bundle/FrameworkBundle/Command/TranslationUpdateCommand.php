@@ -41,7 +41,7 @@ class TranslationUpdateCommand extends Command
     private $extractor;
     private $defaultLocale;
 
-    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, $defaultLocale)
+    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale)
     {
         parent::__construct();
 
@@ -242,7 +242,7 @@ EOF
         $errorIo->success($resultMessage.'.');
     }
 
-    private function filterCatalogue(MessageCatalogue $catalogue, $domain)
+    private function filterCatalogue(MessageCatalogue $catalogue, string $domain): MessageCatalogue
     {
         $filteredCatalogue = new MessageCatalogue($catalogue->getLocale());
 

@@ -30,7 +30,7 @@ class RedirectController
     private $httpPort;
     private $httpsPort;
 
-    public function __construct(UrlGeneratorInterface $router = null, $httpPort = null, $httpsPort = null)
+    public function __construct(UrlGeneratorInterface $router = null, int $httpPort = null, int $httpsPort = null)
     {
         $this->router = $router;
         $this->httpPort = $httpPort;
@@ -51,11 +51,9 @@ class RedirectController
      * @param bool       $permanent        Whether the redirection is permanent
      * @param bool|array $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
      *
-     * @return Response A Response instance
-     *
      * @throws HttpException In case the route name is empty
      */
-    public function redirectAction(Request $request, $route, $permanent = false, $ignoreAttributes = false)
+    public function redirectAction(Request $request, string $route, bool $permanent = false, $ignoreAttributes = false): Response
     {
         if ('' == $route) {
             throw new HttpException($permanent ? 410 : 404);
@@ -89,11 +87,9 @@ class RedirectController
      * @param int|null    $httpPort  The HTTP port (null to keep the current one for the same scheme or the default configured port)
      * @param int|null    $httpsPort The HTTPS port (null to keep the current one for the same scheme or the default configured port)
      *
-     * @return Response A Response instance
-     *
      * @throws HttpException In case the path is empty
      */
-    public function urlRedirectAction(Request $request, $path, $permanent = false, $scheme = null, $httpPort = null, $httpsPort = null)
+    public function urlRedirectAction(Request $request, string $path, bool $permanent = false, string $scheme = null, int $httpPort = null, int $httpsPort = null): Response
     {
         if ('' == $path) {
             throw new HttpException($permanent ? 410 : 404);

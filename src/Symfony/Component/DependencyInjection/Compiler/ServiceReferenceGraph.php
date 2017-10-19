@@ -30,14 +30,7 @@ class ServiceReferenceGraph
      */
     private $nodes = array();
 
-    /**
-     * Checks if the graph has a specific node.
-     *
-     * @param string $id Id to check
-     *
-     * @return bool
-     */
-    public function hasNode($id)
+    public function hasNode(string $id): bool
     {
         return isset($this->nodes[$id]);
     }
@@ -45,13 +38,9 @@ class ServiceReferenceGraph
     /**
      * Gets a node by identifier.
      *
-     * @param string $id The id to retrieve
-     *
-     * @return ServiceReferenceGraphNode
-     *
      * @throws InvalidArgumentException if no node matches the supplied identifier
      */
-    public function getNode($id)
+    public function getNode(string $id): ServiceReferenceGraphNode
     {
         if (!isset($this->nodes[$id])) {
             throw new InvalidArgumentException(sprintf('There is no node with id "%s".', $id));
@@ -65,7 +54,7 @@ class ServiceReferenceGraph
      *
      * @return ServiceReferenceGraphNode[]
      */
-    public function getNodes()
+    public function getNodes(): array
     {
         return $this->nodes;
     }
@@ -80,16 +69,8 @@ class ServiceReferenceGraph
 
     /**
      * Connects 2 nodes together in the Graph.
-     *
-     * @param string $sourceId
-     * @param mixed  $sourceValue
-     * @param string $destId
-     * @param mixed  $destValue
-     * @param string $reference
-     * @param bool   $lazy
-     * @param bool   $weak
      */
-    public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null, bool $lazy = false, bool $weak = false)
+    public function connect(?string $sourceId, $sourceValue, ?string $destId, $destValue = null, $reference = null, bool $lazy = false, bool $weak = false)
     {
         if (null === $sourceId || null === $destId) {
             return;
@@ -103,15 +84,7 @@ class ServiceReferenceGraph
         $destNode->addInEdge($edge);
     }
 
-    /**
-     * Creates a graph node.
-     *
-     * @param string $id
-     * @param mixed  $value
-     *
-     * @return ServiceReferenceGraphNode
-     */
-    private function createNode($id, $value)
+    private function createNode(string $id, $value): ServiceReferenceGraphNode
     {
         if (isset($this->nodes[$id]) && $this->nodes[$id]->getValue() === $value) {
             return $this->nodes[$id];

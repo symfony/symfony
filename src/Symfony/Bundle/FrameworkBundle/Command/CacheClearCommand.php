@@ -117,7 +117,7 @@ EOF
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }
 
-    private function warmupCache(InputInterface $input, OutputInterface $output, $realCacheDir, $oldCacheDir)
+    private function warmupCache(InputInterface $input, OutputInterface $output, string $realCacheDir, string $oldCacheDir)
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -145,12 +145,7 @@ EOF
         $this->filesystem->rename($warmupDir, $realCacheDir);
     }
 
-    /**
-     * @param string $warmupDir
-     * @param string $realCacheDir
-     * @param bool   $enableOptionalWarmers
-     */
-    private function warmup($warmupDir, $realCacheDir, $enableOptionalWarmers = true)
+    private function warmup(string $warmupDir, string $realCacheDir, bool $enableOptionalWarmers = true)
     {
         // create a temporary kernel
         $kernel = $this->getApplication()->getKernel();

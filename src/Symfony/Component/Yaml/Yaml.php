@@ -50,7 +50,7 @@ class Yaml
      *
      * @throws ParseException If the file could not be read or the YAML is not valid
      */
-    public static function parseFile($filename, $flags = 0)
+    public static function parseFile(string $filename, int $flags = 0)
     {
         $yaml = new Parser();
 

@@ -31,7 +31,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      * @param iterable|PropertyDescriptionExtractorInterface[] $descriptionExtractors
      * @param iterable|PropertyAccessExtractorInterface[]      $accessExtractors
      */
-    public function __construct($listExtractors = array(), $typeExtractors = array(), $descriptionExtractors = array(), $accessExtractors = array())
+    public function __construct(iterable $listExtractors = array(), iterable $typeExtractors = array(), iterable $descriptionExtractors = array(), iterable $accessExtractors = array())
     {
         $this->listExtractors = $listExtractors;
         $this->typeExtractors = $typeExtractors;
@@ -90,13 +90,9 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
     /**
      * Iterates over registered extractors and return the first value found.
      *
-     * @param iterable $extractors
-     * @param string   $method
-     * @param array    $arguments
-     *
      * @return mixed
      */
-    private function extract($extractors, $method, array $arguments)
+    private function extract(iterable $extractors, string $method, array $arguments)
     {
         foreach ($extractors as $extractor) {
             $value = call_user_func_array(array($extractor, $method), $arguments);

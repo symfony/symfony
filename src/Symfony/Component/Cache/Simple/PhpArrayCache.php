@@ -32,7 +32,7 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
      * @param string         $file         The PHP file were values are cached
      * @param CacheInterface $fallbackPool A pool to fallback on when an item is not hit
      */
-    public function __construct($file, CacheInterface $fallbackPool)
+    public function __construct(string $file, CacheInterface $fallbackPool)
     {
         $this->file = $file;
         $this->pool = $fallbackPool;

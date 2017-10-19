@@ -22,10 +22,12 @@ CHANGELOG
  * Removed the "framework.validation.cache" configuration option. Configure the "cache.validator" service under "framework.cache.pools" instead.
  * Removed `PhpStringTokenParser`, use `Symfony\Component\Translation\Extractor\PhpStringTokenParser` instead.
  * Removed `PhpExtractor`, use `Symfony\Component\Translation\Extractor\PhpExtractor` instead.
+ * Removed the `use_strict_mode` session option, it's is now enabled by default
 
 3.4.0
 -----
 
+ * Session `use_strict_mode` is now enabled by default and the corresponding option has been deprecated
  * Made the `cache:clear` command to *not* clear "app" PSR-6 cache pools anymore,
    but to still clear "system" ones; use the `cache:pool:clear` command to clear "app" pools instead
  * Always register a minimalist logger that writes in `stderr`

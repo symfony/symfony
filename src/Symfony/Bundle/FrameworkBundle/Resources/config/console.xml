@@ -55,6 +55,10 @@
             <tag name="console.command" command="debug:container" />
         </service>
 
+        <service id="Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand">
+            <tag name="console.command" command="debug:autowiring" />
+        </service>
+
         <service id="Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand">
             <argument type="service" id="event_dispatcher" />
             <tag name="console.command" command="debug:event-dispatcher" />

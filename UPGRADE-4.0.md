@@ -329,6 +329,8 @@ Form
 FrameworkBundle
 ---------------
 
+ * The `session.use_strict_mode` option has been removed and strict mode is always enabled.
+
  * The `validator.mapping.cache.doctrine.apc` service has been removed.
 
  * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter have been removed. Use the `Request::setTrustedProxies()` method in your front controller instead.
@@ -542,12 +544,11 @@ HttpFoundation
  * The ability to check only for cacheable HTTP methods using `Request::isMethodSafe()` is
    not supported anymore, use `Request::isMethodCacheable()` instead.
 
- * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler`,
-   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy`,
-   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` and
-   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy` classes have been removed.
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler` class has been
+   removed. Implement `SessionUpdateTimestampHandlerInterface` or extend `AbstractSessionHandler` instead.
 
- * `NativeSessionStorage::setSaveHandler()` now requires an instance of `\SessionHandlerInterface` as argument.
+ * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler` and
+   `Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy` classes have been removed.
 
  * The `Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler` does not work with the legacy
    mongo extension anymore. It requires mongodb/mongodb package and ext-mongodb.

@@ -48,11 +48,13 @@
             <argument type="service" id="session.storage.metadata_bag" />
         </service>
 
-        <service id="session.handler.native_file" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler">
-            <argument>%session.save_path%</argument>
+        <service id="session.handler.native_file" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler">
+            <argument type="service">
+                <service class="Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler">
+                    <argument>%session.save_path%</argument>
+                </service>
+            </argument>
         </service>
-
-        <service id="session.handler.write_check" class="Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler" />
 
         <service id="session_listener" class="Symfony\Component\HttpKernel\EventListener\SessionListener">
             <tag name="kernel.event_subscriber" />

@@ -728,7 +728,7 @@ class FrameworkExtension extends Extension
         // session storage
         $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
         $options = array();
-        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode') as $key) {
+        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
@@ -742,14 +742,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('session.storage.native')->replaceArgument(1, null);
             $container->getDefinition('session.storage.php_bridge')->replaceArgument(0, null);
         } else {
-            $handlerId = $config['handler_id'];
-
-            if ($config['metadata_update_threshold'] > 0) {
-                $container->getDefinition('session.handler.write_check')->addArgument(new Reference($handlerId));
-                $handlerId = 'session.handler.write_check';
-            }
-
-            $container->setAlias('session.handler', $handlerId)->setPrivate(true);
+            $container->setAlias('session.handler', $config['handler_id'])->setPrivate(true);
         }
 
         $container->setParameter('session.save_path', $config['save_path']);

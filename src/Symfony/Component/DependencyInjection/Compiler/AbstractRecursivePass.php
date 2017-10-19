@@ -67,7 +67,6 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
             $value->setArguments($this->processValue($value->getArguments()));
             $value->setProperties($this->processValue($value->getProperties()));
             $value->setMethodCalls($this->processValue($value->getMethodCalls()));
-            $value->setBindings($this->processValue($value->getBindings()));
 
             $changes = $value->getChanges();
             if (isset($changes['factory'])) {

@@ -17,7 +17,9 @@
     ],
     "require": {
         "php": "^7.1.3",
+        "symfony/config": "~3.4|~4.0",
         "symfony/console": "~3.4|~4.0",
+        "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0"
     },
@@ -26,9 +28,6 @@
         "exclude-from-classmap": [
             "/Tests/"
         ]
-    },
-    "conflict": {
-        "symfony/dependency-injection": "<3.4"
     },
     "minimum-stability": "dev",
     "extra": {

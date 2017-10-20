@@ -64,7 +64,7 @@ class FileLoaderLoadException extends \Exception
         } elseif (null !== $type) {
             // maybe there is no loader for this specific type
             if ('annotation' === $type) {
-                $message .= ' Make sure annotations are enabled.';
+                $message .= ' Make sure annotations are installed and enabled.';
             } else {
                 $message .= sprintf(' Make sure there is a loader supporting the "%s" type.', $type);
             }

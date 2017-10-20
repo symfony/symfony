@@ -31,6 +31,8 @@ class ServerStartCommand extends Command
     private $documentRoot;
     private $environment;
 
+    protected static $defaultName = 'server:start';
+
     public function __construct($documentRoot = null, $environment = null)
     {
         $this->documentRoot = $documentRoot;
@@ -45,7 +47,6 @@ class ServerStartCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('server:start')
             ->setDefinition(array(
                 new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root'),

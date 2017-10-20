@@ -311,6 +311,9 @@ class RouteCollectionBuilder
                 $subCollection->addPrefix($this->prefix);
 
                 $routeCollection->addCollection($subCollection);
+                foreach ($route->resources as $resource) {
+                    $routeCollection->addResource($resource);
+                }
             }
 
             foreach ($this->resources as $resource) {

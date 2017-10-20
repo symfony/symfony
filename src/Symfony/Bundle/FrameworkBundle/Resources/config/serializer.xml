@@ -25,6 +25,11 @@
         <service id="serializer.property_accessor" alias="property_accessor" />
 
         <!-- Normalizer -->
+        <service id="serializer.normalizer.dateinterval" class="Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-915" />
+        </service>
+
         <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
             <argument>null</argument> <!-- name converter -->

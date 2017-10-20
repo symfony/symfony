@@ -1071,7 +1071,7 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @return \ArrayIterator
+     * @return \ArrayIterator|\DOMElement[]
      */
     public function getIterator()
     {

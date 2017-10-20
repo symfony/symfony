@@ -133,7 +133,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
                     : 1 + (int) max($this->orderedKeys);
             }
 
-            $this->orderedKeys[] = $key;
+            $this->orderedKeys[] = (string) $key;
         }
 
         $this->elements[$key] = $value;
@@ -144,7 +144,7 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetUnset($key)
     {
-        if (false !== ($position = array_search($key, $this->orderedKeys))) {
+        if (false !== ($position = array_search((string) $key, $this->orderedKeys))) {
             array_splice($this->orderedKeys, $position, 1);
             unset($this->elements[$key]);
 

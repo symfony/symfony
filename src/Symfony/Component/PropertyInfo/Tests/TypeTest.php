@@ -37,6 +37,12 @@ class TypeTest extends TestCase
         $this->assertEquals(Type::BUILTIN_TYPE_STRING, $collectionValueType->getBuiltinType());
     }
 
+    public function testIterable()
+    {
+        $type = new Type('iterable');
+        $this->assertSame('iterable', $type->getBuiltinType());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage "foo" is not a valid PHP type.

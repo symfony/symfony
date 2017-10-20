@@ -27,9 +27,5 @@
         <service id="Symfony\Component\Workflow\Registry" alias="workflow.registry" />
 
         <service id="workflow.security.expression_language" class="Symfony\Component\Workflow\EventListener\ExpressionLanguage" />
-
-        <service id="Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand">
-            <tag name="console.command" command="workflow:dump" />
-        </service>
     </services>
 </container>

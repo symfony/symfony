@@ -144,7 +144,7 @@ class Request
     public $headers;
 
     /**
-     * @var string
+     * @var string|resource
      */
     protected $content;
 

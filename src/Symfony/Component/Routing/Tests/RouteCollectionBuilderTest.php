@@ -12,7 +12,9 @@
 namespace Symfony\Component\Routing\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouteCollectionBuilder;
@@ -59,7 +61,18 @@ class RouteCollectionBuilderTest extends TestCase
         $this->assertCount(1, $addedCollection->getResources());
 
         // make sure the routes were imported into the top-level builder
+        $routeCollection = $routes->build();
         $this->assertCount(1, $routes->build());
+        $this->assertCount(1, $routeCollection->getResources());
+    }
+
+    public function testImportAddResources()
+    {
+        $routeCollectionBuilder = new RouteCollectionBuilder(new YamlFileLoader(new FileLocator(array(__DIR__.'/Fixtures/'))));
+        $routeCollectionBuilder->import('file_resource.yml');
+        $routeCollection = $routeCollectionBuilder->build();
+
+        $this->assertCount(1, $routeCollection->getResources());
     }
 
     /**

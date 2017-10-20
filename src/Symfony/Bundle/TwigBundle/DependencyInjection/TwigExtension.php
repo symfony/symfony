@@ -100,6 +100,7 @@ class TwigExtension extends Extension
             }
         }
 
+        // paths are modified in ExtensionPass if forms are enabled
         $container->getDefinition('twig.cache_warmer')->replaceArgument(2, $config['paths']);
         $container->getDefinition('twig.template_iterator')->replaceArgument(2, $config['paths']);
 

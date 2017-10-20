@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Core\Authentication\Provider;
 
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -51,7 +52,7 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-            return;
+            throw new AuthenticationException('The token is not supported by this authentication provider.');
         }
 
         if (!$user = $token->getUser()) {

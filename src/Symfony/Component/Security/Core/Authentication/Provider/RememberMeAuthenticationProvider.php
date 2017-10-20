@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Authentication\Provider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 class RememberMeAuthenticationProvider implements AuthenticationProviderInterface
@@ -40,7 +41,7 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-            return;
+            throw new AuthenticationException('The token is not supported by this authentication provider.');
         }
 
         if ($this->key !== $token->getKey()) {

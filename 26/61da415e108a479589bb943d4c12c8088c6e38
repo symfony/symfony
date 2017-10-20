@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by glye at 2017-10-20T14:18:58Z
+
+Update: Use `AuthenticationException`. Add `@expectedExceptionMessage`.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-20T14:22:40Z
+
+@glye if you want to have the PR appearing as merged rather than closed, I suggest you to squash your fixup commit yourselves.
+Otherwise, we will squash it at the time of merging the PR, but Github will then not recognize it as a merged PR (we are not using the Github UI to squash the commits, but the git CLI)
+
+---------------------------------------------------------------------------
+
+by glye at 2017-10-20T14:24:40Z
+
+Right! Squashed.

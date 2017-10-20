@@ -312,10 +312,10 @@ class RouteCollectionBuilder
 
                 $routeCollection->addCollection($subCollection);
             }
+        }
 
-            foreach ($this->resources as $resource) {
-                $routeCollection->addResource($resource);
-            }
+        foreach ($this->resources as $resource) {
+            $routeCollection->addResource($resource);
         }
 
         return $routeCollection;

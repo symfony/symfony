@@ -318,8 +318,8 @@ class FrameworkExtension extends Extension
             $loader->load('web_link.xml');
         }
 
-        if ($config['reset_services_on_terminate']) {
-            $container->register(ServiceResetListener::class)->addTag('kernel.event_subscriber')->setPublic(false);
+        if (!$config['reset_services_on_terminate']) {
+            $container->removeDefinition(ServiceResetListener::class);
         }
 
         $this->addAnnotatedClassesToCompile(array(

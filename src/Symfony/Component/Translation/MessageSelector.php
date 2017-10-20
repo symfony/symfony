@@ -50,7 +50,7 @@ class MessageSelector
     public function choose($message, $number, $locale)
     {
         $parts = array();
-        if (preg_match('/^\|+$/', $message)) {
+        if (preg_match('/^\|++$/', $message)) {
             $parts = explode('|', $message);
         } elseif (preg_match_all('/(?:\|\||[^\|])++/', $message, $matches)) {
             $parts = $matches[0];

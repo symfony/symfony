@@ -65,6 +65,28 @@ class CachePoolPassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(3, $cachePool->getArgument(2));
     }
 
+
+    public function testArgsOrder()
+    {
+        $container = new ContainerBuilder();
+        $cachePool = new Definition();
+        $cachePool->addTag('cache.pool', array(
+            'default_lifetime' => 3,
+            'namespace' => 'foo'
+        ));
+        // This cache pool has 3 arguments: Provider, Namespace and DefaultLifetime
+        $cachePool->addArgument(null);
+        $cachePool->addArgument(null);
+        $cachePool->addArgument(null);
+        $container->setDefinition('app.cache_pool', $cachePool);
+
+        $this->cachePoolPass->process($container);
+
+        $this->assertNull($cachePool->getArgument(0));
+        $this->assertSame('foo', $cachePool->getArgument(1));
+        $this->assertSame(3, $cachePool->getArgument(2));
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are

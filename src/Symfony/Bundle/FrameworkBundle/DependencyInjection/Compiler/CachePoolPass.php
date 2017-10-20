@@ -65,10 +65,10 @@ class CachePoolPass implements CompilerPassInterface
             if (isset($tags[0]['provider'])) {
                 $tags[0]['provider'] = new Reference(static::getServiceProvider($container, $tags[0]['provider']));
             }
-            $i = 0;
-            foreach ($attributes as $attr) {
+
+            foreach ($attributes as $i => $attr) {
                 if (isset($tags[0][$attr])) {
-                    $pool->replaceArgument($i++, $tags[0][$attr]);
+                    $pool->replaceArgument($i, $tags[0][$attr]);
                 }
                 unset($tags[0][$attr]);
             }

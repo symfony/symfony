@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-10-19T12:33:47Z
+
+Well, forcing to keep the service as public just for the BC layer is bad, as it means that any people using the service in a public way would not be warned about that (and so we cannot make the service private at all in 4.0).
+
+A better solution would be to improve the way the command gets disabled in 3.4.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2017-10-20T08:20:52Z
+
+Thanks for your feedback @stof. So, I moved command in the conditionnally loaded `workflow.xml`.

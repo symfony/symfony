@@ -31,6 +31,7 @@ class ContainerConfigurator extends AbstractConfigurator
     private $instanceof;
     private $path;
     private $file;
+    private $anonymousCount = 0;
 
     public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path, string $file)
     {
@@ -70,7 +71,7 @@ class ContainerConfigurator extends AbstractConfigurator
 
     final public function services(): ServicesConfigurator
     {
-        return new ServicesConfigurator($this->container, $this->loader, $this->instanceof);
+        return new ServicesConfigurator($this->container, $this->loader, $this->instanceof, $this->path, $this->anonymousCount);
     }
 }
 

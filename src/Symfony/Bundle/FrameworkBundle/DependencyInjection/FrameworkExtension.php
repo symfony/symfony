@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
-use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\XliffLintCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -624,10 +623,6 @@ class FrameworkExtension extends Extension
     private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$config['enabled']) {
-            if (!class_exists(Workflow\Workflow::class)) {
-                $container->removeDefinition(WorkflowDumpCommand::class);
-            }
-
             return;
         }
 

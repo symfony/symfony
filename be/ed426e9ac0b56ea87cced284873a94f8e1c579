@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-10-17T12:53:36Z
+
+We should also ensure that the controller argument pass does not try to use a scalar binding in the service locator (otherwise, the user cannot get rid of the issue at all)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-17T12:55:36Z
+
+The advice to inject the param in the constructor in ServiceLocatorTagPass may be weird, as this may happen for other cases than controller arguments. The error specific to controller arguments may be easier to throw in the RegisterControllerArgumentLocatorsPass
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-18T01:25:02Z
+
+I agree that the controller argument locator needs to deal with non-services before this is hit.
+Yet, I'd still propose to merge this, as parameters should always be injected via the constructor, so the hint is 99% of the time correct, isn't it?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-10-18T03:48:42Z
+
+I think throwing an exception still feels unexpected. [e.g.](https://github.com/symfony/symfony/issues/24555#issuecomment-337071029) let's suppose we have this configuration:
+```yaml
+services:
+    _defaults:
+        # ...
+        bind:
+            $foo: '%foobar%'
+```
+`$foo` is bound correctly to any controller constructor, but in another controller I have this edit action (nothing to do with the intention of bind such a parameter, but it has the same name):
+```php
+/**
+ * @Route("/{foo}/edit")
+ */
+public function editAction(string $foo) {}
+```
+triggering:
+> Invalid service locator definition: only services can be referenced, "string" found for key "foo". Inject parameter values using constructors instead.
+
+oO! we won't know when it is really intentional or not.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-18T04:12:11Z
+
+@yceruto I agree, PR welcomed, but unrelated to this one now :)

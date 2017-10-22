@@ -46,7 +46,7 @@ class Table
     /**
      * Number of columns cache.
      *
-     * @var array
+     * @var int
      */
     private $numberOfColumns;
 

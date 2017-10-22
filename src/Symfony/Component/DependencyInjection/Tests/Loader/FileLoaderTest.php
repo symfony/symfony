@@ -91,6 +91,8 @@ class FileLoaderTest extends TestCase
             array('service_container', Bar::class),
             array_keys($container->getDefinitions())
         );
+
+        $this->assertTrue($container->getDefinition(Bar::class)->isRegisteredViaServiceDiscovery());
     }
 
     public function testRegisterClassesWithExclude()
@@ -111,6 +113,9 @@ class FileLoaderTest extends TestCase
         $this->assertTrue($container->has(Baz::class));
         $this->assertFalse($container->has(Foo::class));
         $this->assertFalse($container->has(DeeperBaz::class));
+
+        $this->assertTrue($container->getDefinition(Bar::class)->isRegisteredViaServiceDiscovery());
+        $this->assertTrue($container->getDefinition(Baz::class)->isRegisteredViaServiceDiscovery());
     }
 
     /**

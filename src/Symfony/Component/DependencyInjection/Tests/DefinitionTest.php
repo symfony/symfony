@@ -387,4 +387,16 @@ class DefinitionTest extends TestCase
         $def->setAutoconfigured(true);
         $this->assertTrue($def->isAutoconfigured());
     }
+
+    public function testRegisteredViaServiceDiscovery()
+    {
+        $def = new Definition('stdClass');
+        $this->assertFalse($def->isRegisteredViaServiceDiscovery());
+
+        $def->setRegisteredViaServiceDiscovery(true);
+        $this->assertTrue($def->isRegisteredViaServiceDiscovery());
+
+        $def->setRegisteredViaServiceDiscovery(false);
+        $this->assertFalse($def->isRegisteredViaServiceDiscovery());
+    }
 }

@@ -89,6 +89,7 @@ class WebDebugToolbarListenerTest extends TestCase
     public function testToolbarIsNotInjectedOnContentDispositionAttachment()
     {
         $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
         $response->headers->set('Content-Disposition', 'attachment; filename=test.html');
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(false, 'html'), HttpKernelInterface::MASTER_REQUEST, $response);
 

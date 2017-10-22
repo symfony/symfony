@@ -58,6 +58,16 @@
                         }
                     };
                 }
+
+                var dumpInfo = document.querySelector('.sf-toolbar-block-dump .sf-toolbar-info');
+                if (null !== dumpInfo) {
+                    Sfjs.addEventListener(dumpInfo, 'sfbeforedumpcollapse', function () {
+                        dumpInfo.style.minHeight = dumpInfo.getBoundingClientRect().height+'px';
+                    });
+                    Sfjs.addEventListener(dumpInfo, 'mouseleave', function () {
+                        dumpInfo.style.minHeight = '';
+                    });
+                }
             },
             function(xhr) {
                 if (xhr.status !== 0) {

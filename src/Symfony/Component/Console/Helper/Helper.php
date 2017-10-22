@@ -23,9 +23,7 @@ abstract class Helper implements HelperInterface
     protected $helperSet = null;
 
     /**
-     * Sets the helper set associated with this helper.
-     *
-     * @param HelperSet $helperSet A HelperSet instance
+     * {@inheritdoc}
      */
     public function setHelperSet(HelperSet $helperSet = null)
     {
@@ -33,9 +31,7 @@ abstract class Helper implements HelperInterface
     }
 
     /**
-     * Gets the helper set associated with this helper.
-     *
-     * @return HelperSet|null
+     * {@inheritdoc}
      */
     public function getHelperSet()
     {

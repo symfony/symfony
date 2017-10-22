@@ -65,8 +65,6 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      * Registers a new extension guesser.
      *
      * When guessing, this guesser is preferred over previously registered ones.
-     *
-     * @param ExtensionGuesserInterface $guesser
      */
     public function register(ExtensionGuesserInterface $guesser)
     {

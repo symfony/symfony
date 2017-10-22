@@ -49,8 +49,6 @@ class Tokenizer
     /**
      * Tokenize selector source code.
      *
-     * @param Reader $reader
-     *
      * @return TokenStream
      */
     public function tokenize(Reader $reader)

@@ -375,8 +375,6 @@ class TextDescriptor extends Descriptor
     }
 
     /**
-     * @param array $array
-     *
      * @return string
      */
     private function formatRouterConfig(array $array)

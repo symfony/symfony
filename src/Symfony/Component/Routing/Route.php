@@ -19,50 +19,19 @@ namespace Symfony\Component\Routing;
  */
 class Route implements \Serializable
 {
-    /**
-     * @var string
-     */
     private $path = '/';
-
-    /**
-     * @var string
-     */
     private $host = '';
-
-    /**
-     * @var string[]
-     */
     private $schemes = array();
-
-    /**
-     * @var string[]
-     */
     private $methods = array();
-
-    /**
-     * @var array
-     */
     private $defaults = array();
-
-    /**
-     * @var array
-     */
     private $requirements = array();
-
-    /**
-     * @var array
-     */
     private $options = array();
+    private $condition = '';
 
     /**
      * @var null|CompiledRoute
      */
     private $compiled;
-
-    /**
-     * @var string
-     */
-    private $condition = '';
 
     /**
      * Available options:

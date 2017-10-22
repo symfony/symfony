@@ -29,8 +29,6 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Array of arguments.
-     *
-     * @var array
      */
     protected $arguments;
 

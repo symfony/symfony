@@ -27,8 +27,6 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
 
     /**
      * Processes the ContainerBuilder to replace references to aliases with actual service references.
-     *
-     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {

@@ -27,22 +27,16 @@ class Locale extends \Locale
 {
     /**
      * Caches the countries in different locales.
-     *
-     * @var array
      */
     protected static $countries = array();
 
     /**
      * Caches the languages in different locales.
-     *
-     * @var array
      */
     protected static $languages = array();
 
     /**
      * Caches the different locales.
-     *
-     * @var array
      */
     protected static $locales = array();
 

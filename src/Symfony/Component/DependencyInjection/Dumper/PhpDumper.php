@@ -82,8 +82,6 @@ class PhpDumper extends Dumper
 
     /**
      * Sets the dumper to be used when dumping proxies in the generated container.
-     *
-     * @param ProxyDumper $proxyDumper
      */
     public function setProxyDumper(ProxyDumper $proxyDumper)
     {
@@ -98,8 +96,6 @@ class PhpDumper extends Dumper
      *  * class:      The class name
      *  * base_class: The base class name
      *  * namespace:  The class namespace
-     *
-     * @param array $options An array of options
      *
      * @return string A PHP class representing of the service container
      */
@@ -255,11 +251,9 @@ class PhpDumper extends Dumper
     /**
      * Generates the require_once statement for service includes.
      *
-     * @param Definition $definition
-     *
      * @return string
      */
-    private function addServiceInclude($definition)
+    private function addServiceInclude(Definition $definition)
     {
         $template = "        require_once %s;\n";
         $code = '';
@@ -292,7 +286,7 @@ class PhpDumper extends Dumper
      * @throws RuntimeException                  When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
      */
-    private function addServiceInlinedDefinitions($id, $definition)
+    private function addServiceInlinedDefinitions($id, Definition $definition)
     {
         $code = '';
         $variableMap = $this->definitionVariables;
@@ -354,7 +348,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      */
-    private function addServiceReturn($id, $definition)
+    private function addServiceReturn($id, Definition $definition)
     {
         if ($this->isSimpleInstance($id, $definition)) {
             return "    }\n";
@@ -1148,10 +1142,6 @@ EOF;
 
     /**
      * Builds service calls from arguments.
-     *
-     * @param array $arguments
-     * @param array &$calls    By reference
-     * @param array &$behavior By reference
      */
     private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {
@@ -1178,8 +1168,6 @@ EOF;
     /**
      * Returns the inline definition.
      *
-     * @param Definition $definition
-     *
      * @return array
      */
     private function getInlinedDefinitions(Definition $definition)
@@ -1203,8 +1191,6 @@ EOF;
 
     /**
      * Gets the definition from arguments.
-     *
-     * @param array $arguments
      *
      * @return array
      */

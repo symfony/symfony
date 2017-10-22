@@ -24,35 +24,20 @@ use Symfony\Component\Form\FormInterface;
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
     protected $type;
-
-    /**
-     * @var array
-     */
     protected $options;
-
-    /**
-     * Whether children could be added to the group.
-     *
-     * @var bool
-     */
     protected $allowAdd;
-
-    /**
-     * Whether children could be removed from the group.
-     *
-     * @var bool
-     */
     protected $allowDelete;
 
-    /**
-     * @var bool
-     */
     private $deleteEmpty;
 
+    /**
+     * @param string $type
+     * @param array  $options
+     * @param bool   $allowAdd    whether children could be added to the group
+     * @param bool   $allowDelete whether children could be removed from the group
+     * @param bool   $deleteEmpty
+     */
     public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
     {
         $this->type = $type;

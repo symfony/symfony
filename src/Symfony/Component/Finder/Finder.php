@@ -462,8 +462,6 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * This can be slow as all the matching files and directories must be retrieved for comparison.
      *
-     * @param \Closure $closure An anonymous function
-     *
      * @return $this
      *
      * @see SortableIterator
@@ -568,8 +566,6 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * The anonymous function receives a \SplFileInfo and must return false
      * to remove files.
-     *
-     * @param \Closure $closure An anonymous function
      *
      * @return $this
      *
@@ -757,8 +753,6 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param AdapterInterface $adapter
-     *
      * @return AdapterInterface
      */
     private function buildAdapter(AdapterInterface $adapter)

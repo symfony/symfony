@@ -27,8 +27,6 @@ interface ObjectIdentityInterface
      * Referential Equality: $object1 === $object2
      * Example for Object Equality: $object1->getId() === $object2->getId()
      *
-     * @param ObjectIdentityInterface $identity
-     *
      * @return bool
      */
     public function equals(ObjectIdentityInterface $identity);

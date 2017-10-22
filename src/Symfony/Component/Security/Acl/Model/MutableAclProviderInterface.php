@@ -23,8 +23,6 @@ interface MutableAclProviderInterface extends AclProviderInterface
     /**
      * Creates a new ACL for the given object identity.
      *
-     * @param ObjectIdentityInterface $oid
-     *
      * @return MutableAclInterface
      *
      * @throws AclAlreadyExistsException when there already is an ACL for the given
@@ -37,8 +35,6 @@ interface MutableAclProviderInterface extends AclProviderInterface
      *
      * This will automatically trigger a delete for any child ACLs. If you don't
      * want child ACLs to be deleted, you will have to set their parent ACL to null.
-     *
-     * @param ObjectIdentityInterface $oid
      */
     public function deleteAcl(ObjectIdentityInterface $oid);
 
@@ -47,8 +43,6 @@ interface MutableAclProviderInterface extends AclProviderInterface
      * access control entries.
      *
      * Changes to parent ACLs are not persisted.
-     *
-     * @param MutableAclInterface $acl
      */
     public function updateAcl(MutableAclInterface $acl);
 }

@@ -29,8 +29,6 @@ interface AclCacheInterface
      * Removes an ACL from the cache.
      *
      * The ACL which is returned, must reference the passed object identity.
-     *
-     * @param ObjectIdentityInterface $oid
      */
     public function evictFromCacheByIdentity(ObjectIdentityInterface $oid);
 
@@ -46,16 +44,12 @@ interface AclCacheInterface
     /**
      * Retrieves an ACL for the given object identity from the cache.
      *
-     * @param ObjectIdentityInterface $oid
-     *
      * @return AclInterface
      */
     public function getFromCacheByIdentity(ObjectIdentityInterface $oid);
 
     /**
      * Stores a new ACL in the cache.
-     *
-     * @param AclInterface $acl
      */
     public function putInCache(AclInterface $acl);
 

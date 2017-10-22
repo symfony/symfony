@@ -455,9 +455,6 @@ class MutableAclProviderTest extends TestCase
      *     ),
      * )
      *
-     * @param AclProvider $provider
-     * @param array       $data
-     *
      * @throws \InvalidArgumentException
      * @throws \Exception
      */

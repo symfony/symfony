@@ -79,11 +79,6 @@ interface OutputInterface
      */
     public function isDecorated();
 
-    /**
-     * Sets output formatter.
-     *
-     * @param OutputFormatterInterface $formatter
-     */
     public function setFormatter(OutputFormatterInterface $formatter);
 
     /**

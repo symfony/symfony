@@ -37,8 +37,6 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Set the parent node.
      *
-     * @param ParentNodeDefinitionInterface $parent The parent node
-     *
      * @return $this
      */
     public function setParent(ParentNodeDefinitionInterface $parent = null)
@@ -176,8 +174,6 @@ class NodeBuilder implements NodeParentInterface
      *             ->append($this->getBarNodeDefinition())
      *         ->end()
      *     ;
-     *
-     * @param NodeDefinition $node
      *
      * @return $this
      */

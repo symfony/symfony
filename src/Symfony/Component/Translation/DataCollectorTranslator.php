@@ -25,9 +25,6 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      */
     private $translator;
 
-    /**
-     * @var array
-     */
     private $messages = array();
 
     /**

@@ -63,11 +63,6 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
         $this->entriesInheriting = $entriesInheriting;
     }
 
-    /**
-     * Adds a property changed listener.
-     *
-     * @param PropertyChangedListener $listener
-     */
     public function addPropertyChangedListener(PropertyChangedListener $listener)
     {
         $this->listeners[] = $listener;

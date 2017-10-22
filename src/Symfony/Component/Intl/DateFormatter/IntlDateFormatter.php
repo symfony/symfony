@@ -73,8 +73,6 @@ class IntlDateFormatter
 
     /**
      * Patterns used to format the date when no pattern is provided.
-     *
-     * @var array
      */
     private $defaultDateFormats = array(
         self::NONE => '',
@@ -86,8 +84,6 @@ class IntlDateFormatter
 
     /**
      * Patterns used to format the time when no pattern is provided.
-     *
-     * @var array
      */
     private $defaultTimeFormats = array(
         self::FULL => 'h:mm:ss a zzzz',

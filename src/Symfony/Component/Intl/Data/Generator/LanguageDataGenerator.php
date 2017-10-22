@@ -28,8 +28,6 @@ class LanguageDataGenerator extends AbstractDataGenerator
 {
     /**
      * Source: http://www-01.sil.org/iso639-3/codes.asp.
-     *
-     * @var array
      */
     private static $preferredAlpha2ToAlpha3Mapping = array(
         'ak' => 'aka',

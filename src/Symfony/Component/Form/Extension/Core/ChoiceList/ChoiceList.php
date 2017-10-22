@@ -43,31 +43,23 @@ class ChoiceList implements ChoiceListInterface
 {
     /**
      * The choices with their indices as keys.
-     *
-     * @var array
      */
     protected $choices = array();
 
     /**
      * The choice values with the indices of the matching choices as keys.
-     *
-     * @var array
      */
     protected $values = array();
 
     /**
      * The preferred view objects as hierarchy containing also the choice groups
      * with the indices of the matching choices as bottom-level keys.
-     *
-     * @var array
      */
     private $preferredViews = array();
 
     /**
      * The non-preferred view objects as hierarchy containing also the choice
      * groups with the indices of the matching choices as bottom-level keys.
-     *
-     * @var array
      */
     private $remainingViews = array();
 

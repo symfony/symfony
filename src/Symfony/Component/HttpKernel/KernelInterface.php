@@ -33,8 +33,6 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
 
     /**
      * Loads the container configuration.
-     *
-     * @param LoaderInterface $loader A LoaderInterface instance
      */
     public function registerContainerConfiguration(LoaderInterface $loader);
 

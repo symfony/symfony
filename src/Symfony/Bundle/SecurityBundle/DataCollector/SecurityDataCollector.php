@@ -26,10 +26,6 @@ class SecurityDataCollector extends DataCollector
     private $tokenStorage;
     private $roleHierarchy;
 
-    /**
-     * @param TokenStorageInterface|null  $tokenStorage
-     * @param RoleHierarchyInterface|null $roleHierarchy
-     */
     public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null)
     {
         $this->tokenStorage = $tokenStorage;

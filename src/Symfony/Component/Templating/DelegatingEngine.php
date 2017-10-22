@@ -62,11 +62,6 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         return $this->getEngine($name)->exists($name);
     }
 
-    /**
-     * Adds an engine.
-     *
-     * @param EngineInterface $engine An EngineInterface instance
-     */
     public function addEngine(EngineInterface $engine)
     {
         $this->engines[] = $engine;

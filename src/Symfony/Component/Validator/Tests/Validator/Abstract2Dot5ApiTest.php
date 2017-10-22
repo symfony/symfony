@@ -40,9 +40,6 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
     protected $validator;
 
     /**
-     * @param MetadataFactoryInterface $metadataFactory
-     * @param array                    $objectInitializers
-     *
      * @return ValidatorInterface
      */
     abstract protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array());

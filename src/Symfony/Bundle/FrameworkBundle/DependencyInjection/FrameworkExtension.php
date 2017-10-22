@@ -45,9 +45,6 @@ class FrameworkExtension extends Extension
     /**
      * Responds to the app.config configuration parameter.
      *
-     * @param array            $configs
-     * @param ContainerBuilder $container
-     *
      * @throws LogicException
      */
     public function load(array $configs, ContainerBuilder $container)
@@ -194,16 +191,7 @@ class FrameworkExtension extends Extension
         return new Configuration($container->getParameter('kernel.debug'));
     }
 
-    /**
-     * Loads Form configuration.
-     *
-     * @param array            $config    A configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     *
-     * @throws \LogicException
-     */
-    private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerFormConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('form.xml');
         if (null === $config['form']['csrf_protection']['enabled']) {
@@ -225,13 +213,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    /**
-     * Loads the ESI configuration.
-     *
-     * @param array            $config    An ESI configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerEsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
@@ -241,13 +222,6 @@ class FrameworkExtension extends Extension
         $loader->load('esi.xml');
     }
 
-    /**
-     * Loads the SSI configuration.
-     *
-     * @param array            $config    An SSI configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerSsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
@@ -257,13 +231,6 @@ class FrameworkExtension extends Extension
         $loader->load('ssi.xml');
     }
 
-    /**
-     * Loads the fragments configuration.
-     *
-     * @param array            $config    A fragments configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
@@ -274,15 +241,6 @@ class FrameworkExtension extends Extension
         $container->setParameter('fragment.path', $config['path']);
     }
 
-    /**
-     * Loads the profiler configuration.
-     *
-     * @param array            $config    A profiler configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     *
-     * @throws \LogicException
-     */
     private function registerProfilerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
@@ -355,13 +313,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    /**
-     * Loads the router configuration.
-     *
-     * @param array            $config    A router configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerRouterConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('routing.xml');
@@ -388,13 +339,6 @@ class FrameworkExtension extends Extension
         ));
     }
 
-    /**
-     * Loads the session configuration.
-     *
-     * @param array            $config    A session configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerSessionConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('session.xml');
@@ -447,13 +391,6 @@ class FrameworkExtension extends Extension
         $container->setParameter('session.metadata.update_threshold', $config['metadata_update_threshold']);
     }
 
-    /**
-     * Loads the request configuration.
-     *
-     * @param array            $config    A request configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerRequestConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if ($config['formats']) {
@@ -465,14 +402,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    /**
-     * Loads the templating configuration.
-     *
-     * @param array            $config    A templating configuration array
-     * @param string           $ide
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerTemplatingConfiguration(array $config, $ide, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('templating.xml');
@@ -575,13 +504,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    /**
-     * Loads the assets configuration.
-     *
-     * @param array            $config    A assets configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerAssetsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('assets.xml');
@@ -645,12 +567,6 @@ class FrameworkExtension extends Extension
         return new Reference('assets._version_'.$name);
     }
 
-    /**
-     * Loads the translator configuration.
-     *
-     * @param array            $config    A translator configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     */
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container)
     {
         if (!$this->isConfigEnabled($container, $config)) {
@@ -728,13 +644,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    /**
-     * Loads the validator configuration.
-     *
-     * @param array            $config    A validation configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerValidationConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
@@ -861,15 +770,6 @@ class FrameworkExtension extends Extension
         ;
     }
 
-    /**
-     * Loads the security configuration.
-     *
-     * @param array            $config    A CSRF configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     *
-     * @throws \LogicException
-     */
     private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
@@ -884,13 +784,6 @@ class FrameworkExtension extends Extension
         $loader->load('security_csrf.xml');
     }
 
-    /**
-     * Loads the serializer configuration.
-     *
-     * @param array            $config    A serializer configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$config['enabled']) {
@@ -964,8 +857,6 @@ class FrameworkExtension extends Extension
 
     /**
      * Gets a hash of the kernel root directory.
-     *
-     * @param ContainerBuilder $container
      *
      * @return string
      */

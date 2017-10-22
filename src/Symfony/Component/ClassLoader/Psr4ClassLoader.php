@@ -20,9 +20,6 @@ namespace Symfony\Component\ClassLoader;
  */
 class Psr4ClassLoader
 {
-    /**
-     * @var array
-     */
     private $prefixes = array();
 
     /**

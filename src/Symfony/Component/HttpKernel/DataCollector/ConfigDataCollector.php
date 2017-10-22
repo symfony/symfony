@@ -41,8 +41,6 @@ class ConfigDataCollector extends DataCollector
 
     /**
      * Sets the Kernel associated with this Request.
-     *
-     * @param KernelInterface $kernel A KernelInterface instance
      */
     public function setKernel(KernelInterface $kernel = null)
     {

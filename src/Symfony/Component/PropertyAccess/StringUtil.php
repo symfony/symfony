@@ -21,8 +21,6 @@ class StringUtil
     /**
      * Map english plural to singular suffixes.
      *
-     * @var array
-     *
      * @see http://english-zone.com/spelling/plurals.html
      */
     private static $pluralMap = array(

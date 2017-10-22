@@ -55,8 +55,6 @@ class NativeSessionStorageTest extends TestCase
     }
 
     /**
-     * @param array $options
-     *
      * @return NativeSessionStorage
      */
     protected function getStorage(array $options = array())

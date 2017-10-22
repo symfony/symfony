@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-21T12:01:34Z
+
+Are these changes only affecting 3.3? It looks like some of them apply to older versions (2.7 and 2.8).
+
+---------------------------------------------------------------------------
+
+by TysonAndre at 2017-10-21T20:27:55Z
+
+Created separate PRs for 2.7 and 2.8

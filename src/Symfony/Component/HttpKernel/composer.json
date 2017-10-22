@@ -24,7 +24,6 @@
     },
     "require-dev": {
         "symfony/browser-kit": "~3.4|~4.0",
-        "symfony/class-loader": "~3.4|~4.0",
         "symfony/config": "~3.4|~4.0",
         "symfony/console": "~3.4|~4.0",
         "symfony/css-selector": "~3.4|~4.0",

@@ -60,10 +60,13 @@ abstract class FileLoader extends BaseFileLoader
 
         $classes = $this->findClasses($namespace, $resource, $exclude);
         // prepare for deep cloning
+        $prototype->setRegisteredViaServiceDiscovery(true);
         $prototype = serialize($prototype);
 
         foreach ($classes as $class) {
-            $this->setDefinition($class, unserialize($prototype));
+            if (!$this->container->hasDefinition($class) || $this->container->getDefinition($class)->isRegisteredViaServiceDiscovery()) {
+                $this->setDefinition($class, unserialize($prototype));
+            }
         }
     }
 

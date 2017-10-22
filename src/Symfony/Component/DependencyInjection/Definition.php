@@ -41,6 +41,7 @@ class Definition
     private $autowired = false;
     private $autowiringTypes = array();
     private $changes = array();
+    private $registeredViaServiceDiscovery = false;
 
     protected $arguments = array();
 
@@ -891,5 +892,25 @@ class Definition
         @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
 
         return isset($this->autowiringTypes[$type]);
+    }
+
+    /**
+     * Returns whether the definition was created by a service discovery mechanism.
+     *
+     * @return bool
+     */
+    public function isRegisteredViaServiceDiscovery()
+    {
+        return $this->registeredViaServiceDiscovery;
+    }
+
+    /**
+     * Marks the definition as created by a service discovery mechanism.
+     *
+     * @param bool $registeredViaServiceDiscovery
+     */
+    public function setRegisteredViaServiceDiscovery($registeredViaServiceDiscovery)
+    {
+        $this->registeredViaServiceDiscovery = $registeredViaServiceDiscovery;
     }
 }

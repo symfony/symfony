@@ -1,0 +1,8 @@
+services:
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar:
+        arguments: [foo, bar]
+        tags: [baz]
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\:
+        resource: ../Prototype
+        exclude: '../Prototype/{OtherDir}'

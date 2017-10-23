@@ -25,7 +25,7 @@ class LazyLoadingValueHolderFactoryV1 extends BaseFactory
     /**
      * {@inheritdoc}
      */
-    protected function getGenerator() : ProxyGeneratorInterface
+    protected function getGenerator(): ProxyGeneratorInterface
     {
         return $this->generatorV1 ?: $this->generatorV1 = new LazyLoadingValueHolderGenerator();
     }

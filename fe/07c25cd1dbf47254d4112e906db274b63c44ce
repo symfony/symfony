@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-19T19:31:20Z
+
+That's a BC break.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-19T19:36:27Z
+
+Against a BETA release? Affected code is a new 3.4 feat :thinking:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-19T19:41:01Z
+
+I would consider it as a bug fix also.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-19T19:47:50Z
+
+Right, the bugfix in disguise is calling setProvidedTypes(). Following gettype() names is just something i think we need to choose now and be future proof (or at least is the desired behavior we want).
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-10-19T20:11:37Z
+
+I think we should keep the current types,`int` and `bool` were chosen as the "correct" way of representing those types when scalar type hints were added to PHP. They are also the the standard way of using `is_*` function (even if `is_integer` exists as an alias).
+
+The problem is `typeof` returning non-standard type names. But that's not something that should imply changes in Symfony, it's more something that should be fixed in PHP (by deprecating `gettype` and introduction a replacement that return the correct strings).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-19T20:20:51Z
+
+Hm good point. We dont respect gettype() returning "double" either.
+
+:+1: for shortnames from me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-20T19:04:05Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-21T08:41:48Z
+
+Status: needs review
+
+cc @jvasseur

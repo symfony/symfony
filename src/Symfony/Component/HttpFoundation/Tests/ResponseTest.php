@@ -750,6 +750,10 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isRedirection());
         $this->assertFalse($response->isRedirect());
 
+        $response = new Response('', 201);
+        $this->assertFalse($response->isRedirection());
+        $this->assertTrue($response->isRedirect());
+
         $response = new Response('', 404);
         $this->assertFalse($response->isRedirection());
         $this->assertFalse($response->isRedirect());

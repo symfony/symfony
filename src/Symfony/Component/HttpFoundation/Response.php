@@ -1240,7 +1240,12 @@ class Response
      */
     public function isRedirect($location = null)
     {
-        return in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location == $this->headers->get('Location'));
+        $isRedirect = in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location == $this->headers->get('Location'));
+        if ($isRedirect && 201 === $this->statusCode) {
+            @trigger_error(sprintf('Considering 201 HTTP status code a redirect is deprecated since Symfony 4.1 and isRedirect() method will return false for 201 code in Symfony 5.0.'));
+        }
+
+        return $isRedirect;
     }
 
     /**

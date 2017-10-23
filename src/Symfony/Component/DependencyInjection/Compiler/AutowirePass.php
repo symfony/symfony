@@ -34,6 +34,7 @@ class AutowirePass extends AbstractRecursivePass
     private $lastFailure;
     private $throwOnAutowiringException;
     private $autowiringExceptions = array();
+    private $strictMode;
 
     /**
      * @param bool $throwOnAutowireException Errors can be retrieved via Definition::getErrors()
@@ -62,6 +63,7 @@ class AutowirePass extends AbstractRecursivePass
     {
         // clear out any possibly stored exceptions from before
         $this->autowiringExceptions = array();
+        $this->strictMode = $container->hasParameter('container.autowiring.strict_mode') && $container->getParameter('container.autowiring.strict_mode');
 
         try {
             parent::process($container);
@@ -290,7 +292,7 @@ class AutowirePass extends AbstractRecursivePass
             return new TypedReference($this->types[$type], $type);
         }
 
-        if (isset($this->types[$type])) {
+        if (!$this->strictMode && isset($this->types[$type])) {
             $message = 'Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won\'t be supported in version 4.0.';
             if ($aliasSuggestion = $this->getAliasesSuggestionForType($type = $reference->getType(), $deprecationMessage)) {
                 $message .= ' '.$aliasSuggestion;
@@ -311,7 +313,9 @@ class AutowirePass extends AbstractRecursivePass
             return $this->autowired[$type] ? new TypedReference($this->autowired[$type], $type) : null;
         }
 
-        return $this->createAutowiredDefinition($type);
+        if (!$this->strictMode) {
+            return $this->createAutowiredDefinition($type);
+        }
     }
 
     /**

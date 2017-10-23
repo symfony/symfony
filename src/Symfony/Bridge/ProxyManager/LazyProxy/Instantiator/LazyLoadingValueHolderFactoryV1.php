@@ -13,6 +13,7 @@ namespace Symfony\Bridge\ProxyManager\LazyProxy\Instantiator;
 
 use ProxyManager\Factory\LazyLoadingValueHolderFactory as BaseFactory;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\LazyLoadingValueHolderGenerator;
+use ProxyManager\ProxyGenerator\ProxyGeneratorInterface;
 
 /**
  * @internal
@@ -24,7 +25,7 @@ class LazyLoadingValueHolderFactoryV1 extends BaseFactory
     /**
      * {@inheritdoc}
      */
-    protected function getGenerator()
+    protected function getGenerator(): ProxyGeneratorInterface
     {
         return $this->generatorV1 ?: $this->generatorV1 = new LazyLoadingValueHolderGenerator();
     }

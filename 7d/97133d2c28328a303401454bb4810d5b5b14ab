@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-10-19T13:18:48Z
+
+Do we have a deprecation message when not implementing the new interface btw ? I don't see it in this code.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-19T13:39:53Z
+
+@stof we have https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Security/Guard/GuardAuthenticatorInterface.php#L32 which should be enough (per https://github.com/symfony/symfony/pull/16835#discussion_r142661313).

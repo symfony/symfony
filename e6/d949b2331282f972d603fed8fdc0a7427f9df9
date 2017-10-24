@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-24T16:02:55Z
+
+@alexpott #24597 now merged, what should we do with this PR?
+(yes, it's hard to test the test system, I usually check out locally to simulate the target bridge)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-24T16:17:24Z
+
+@alexpott, looks like you were right (tests are broken on 3.3 and above) Can you please rebase this PR on latest 3.3?

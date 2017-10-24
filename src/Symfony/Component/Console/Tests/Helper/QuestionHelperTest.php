@@ -156,6 +156,46 @@ class QuestionHelperTest extends TestCase
         $this->assertEquals('AsseticBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
+    public function testAutocompleteWithTrailingBackslash()
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        $inputStream = $this->getInputStream('E');
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($inputStream);
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new Question('');
+        $expectedCompletion = 'ExampleNamespace\\';
+        $question->setAutocompleterValues(array($expectedCompletion));
+
+        $output = $this->createOutputInterface();
+        $dialog->ask($this->createInputInterfaceMock(), $output, $question);
+
+        $outputStream = $output->getStream();
+        rewind($outputStream);
+        $actualOutput = stream_get_contents($outputStream);
+
+        // Shell control (esc) sequences are not so important: we only care that
+        // <hl> tag is interpreted correctly and replaced
+        $irrelevantEscSequences = array(
+            "\0337" => '', // Save cursor position
+            "\0338" => '', // Restore cursor position
+            "\033[K" => '', // Clear line from cursor till the end
+        );
+
+        $importantActualOutput = strtr($actualOutput, $irrelevantEscSequences);
+
+        // Remove colors (e.g. "\033[30m", "\033[31;41m")
+        $importantActualOutput = preg_replace('/\033\[\d+(;\d+)?m/', '', $importantActualOutput);
+
+        $this->assertEquals($expectedCompletion, $importantActualOutput);
+    }
+
     public function testAskHiddenResponse()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {

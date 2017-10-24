@@ -49,11 +49,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class Container implements ResettableContainerInterface
 {
-    /**
-     * @var ParameterBagInterface
-     */
     protected $parameterBag;
-
     protected $services = array();
     protected $methodMap = array();
     protected $aliases = array();
@@ -73,9 +69,6 @@ class Container implements ResettableContainerInterface
     private $envCache = array();
     private $compiled = false;
 
-    /**
-     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
-     */
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         $this->parameterBag = $parameterBag ?: new EnvPlaceholderParameterBag();

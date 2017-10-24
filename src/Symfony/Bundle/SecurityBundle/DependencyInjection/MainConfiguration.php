@@ -36,10 +36,6 @@ class MainConfiguration implements ConfigurationInterface
     private $factories;
     private $userProviderFactories;
 
-    /**
-     * @param array $factories
-     * @param array $userProviderFactories
-     */
     public function __construct(array $factories, array $userProviderFactories)
     {
         $this->factories = $factories;

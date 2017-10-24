@@ -42,14 +42,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 class ConsoleHandler extends AbstractProcessingHandler implements EventSubscriberInterface
 {
-    /**
-     * @var OutputInterface|null
-     */
     private $output;
-
-    /**
-     * @var array
-     */
     private $verbosityLevelMap = array(
         OutputInterface::VERBOSITY_QUIET => Logger::ERROR,
         OutputInterface::VERBOSITY_NORMAL => Logger::WARNING,
@@ -95,8 +88,6 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
 
     /**
      * Sets the console output to use for printing logs.
-     *
-     * @param OutputInterface $output The console output to use
      */
     public function setOutput(OutputInterface $output)
     {
@@ -116,8 +107,6 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * Before a command is executed, the handler gets activated and the console output
      * is set in order to know where to write the logs.
-     *
-     * @param ConsoleCommandEvent $event
      */
     public function onCommand(ConsoleCommandEvent $event)
     {
@@ -131,8 +120,6 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
 
     /**
      * After a command has been executed, it disables the output.
-     *
-     * @param ConsoleTerminateEvent $event
      */
     public function onTerminate(ConsoleTerminateEvent $event)
     {

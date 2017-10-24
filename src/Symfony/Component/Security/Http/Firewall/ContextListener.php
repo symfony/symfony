@@ -65,8 +65,6 @@ class ContextListener implements ListenerInterface
 
     /**
      * Reads the Security Token from the session.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)
     {
@@ -105,8 +103,6 @@ class ContextListener implements ListenerInterface
 
     /**
      * Writes the security token into the session.
-     *
-     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -139,8 +135,6 @@ class ContextListener implements ListenerInterface
 
     /**
      * Refreshes the user by reloading it from the user provider.
-     *
-     * @param TokenInterface $token
      *
      * @return TokenInterface|null
      *

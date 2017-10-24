@@ -232,8 +232,6 @@ abstract class Client
     /**
      * Clicks on a given link.
      *
-     * @param Link $link A Link instance
-     *
      * @return Crawler
      */
     public function click(Link $link)

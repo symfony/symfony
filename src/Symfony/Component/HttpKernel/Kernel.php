@@ -694,8 +694,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * Prepares the ContainerBuilder before it is compiled.
-     *
-     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function prepareContainer(ContainerBuilder $container)
     {
@@ -762,8 +760,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
     /**
      * Returns a loader for the container.
-     *
-     * @param ContainerInterface $container The service container
      *
      * @return DelegatingLoader The loader
      */

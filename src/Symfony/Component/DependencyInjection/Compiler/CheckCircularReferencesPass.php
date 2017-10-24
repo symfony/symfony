@@ -31,8 +31,6 @@ class CheckCircularReferencesPass implements CompilerPassInterface
 
     /**
      * Checks the ContainerBuilder object for circular references.
-     *
-     * @param ContainerBuilder $container The ContainerBuilder instances
      */
     public function process(ContainerBuilder $container)
     {

@@ -53,8 +53,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
 
     /**
      * Monetary units excluded from generation.
-     *
-     * @var array
      */
     private static $blacklist = array(
         self::UNKNOWN_CURRENCY_ID => true,
@@ -162,8 +160,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     }
 
     /**
-     * @param ArrayAccessibleResourceBundle $rootBundle
-     *
      * @return array
      */
     private function generateSymbolNamePairs(ArrayAccessibleResourceBundle $rootBundle)

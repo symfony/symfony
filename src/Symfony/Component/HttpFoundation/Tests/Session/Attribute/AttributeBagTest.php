@@ -21,10 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
  */
 class AttributeBagTest extends TestCase
 {
-    /**
-     * @var array
-     */
-    private $array;
+    private $array = array();
 
     /**
      * @var AttributeBag

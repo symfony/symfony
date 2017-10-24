@@ -69,9 +69,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
-     *
-     * @param ClassMetadataFactoryInterface|null $classMetadataFactory
-     * @param NameConverterInterface|null        $nameConverter
      */
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
     {
@@ -133,8 +130,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
     /**
      * Set ignored attributes for normalization and denormalization.
-     *
-     * @param array $ignoredAttributes
      *
      * @return self
      */

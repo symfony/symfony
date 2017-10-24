@@ -146,8 +146,6 @@ abstract class KernelTestCase extends TestCase
     /**
      * Boots the Kernel for this test.
      *
-     * @param array $options
-     *
      * @return KernelInterface A KernelInterface instance
      */
     protected static function bootKernel(array $options = array())
@@ -167,8 +165,6 @@ abstract class KernelTestCase extends TestCase
      *
      *  * environment
      *  * debug
-     *
-     * @param array $options An array of options
      *
      * @return KernelInterface A KernelInterface instance
      */

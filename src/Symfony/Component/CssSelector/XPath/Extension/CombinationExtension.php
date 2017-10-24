@@ -39,9 +39,6 @@ class CombinationExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param XPathExpr $combinedXpath
-     *
      * @return XPathExpr
      */
     public function translateDescendant(XPathExpr $xpath, XPathExpr $combinedXpath)
@@ -50,9 +47,6 @@ class CombinationExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param XPathExpr $combinedXpath
-     *
      * @return XPathExpr
      */
     public function translateChild(XPathExpr $xpath, XPathExpr $combinedXpath)
@@ -61,9 +55,6 @@ class CombinationExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param XPathExpr $combinedXpath
-     *
      * @return XPathExpr
      */
     public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath)
@@ -75,9 +66,6 @@ class CombinationExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param XPathExpr $combinedXpath
-     *
      * @return XPathExpr
      */
     public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath)

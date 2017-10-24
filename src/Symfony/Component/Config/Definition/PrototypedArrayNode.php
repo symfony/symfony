@@ -150,8 +150,6 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Sets the node prototype.
-     *
-     * @param PrototypeNodeInterface $node
      */
     public function setPrototype(PrototypeNodeInterface $node)
     {
@@ -170,8 +168,6 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Disable adding concrete children for prototyped nodes.
-     *
-     * @param NodeInterface $node The child node to add
      *
      * @throws Exception
      */

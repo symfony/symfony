@@ -27,8 +27,6 @@ use Symfony\Component\Console\Input\InputOption;
 class XmlDescriptor extends Descriptor
 {
     /**
-     * @param InputDefinition $definition
-     *
      * @return \DOMDocument
      */
     public function getInputDefinitionDocument(InputDefinition $definition)
@@ -50,8 +48,6 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param Command $command
-     *
      * @return \DOMDocument
      */
     public function getCommandDocument(Command $command)
@@ -173,9 +169,6 @@ class XmlDescriptor extends Descriptor
 
     /**
      * Appends document children to parent node.
-     *
-     * @param \DOMNode $parentNode
-     * @param \DOMNode $importedParent
      */
     private function appendDocument(\DOMNode $parentNode, \DOMNode $importedParent)
     {
@@ -187,8 +180,6 @@ class XmlDescriptor extends Descriptor
     /**
      * Writes DOM document.
      *
-     * @param \DOMDocument $dom
-     *
      * @return \DOMDocument|string
      */
     private function writeDocument(\DOMDocument $dom)
@@ -198,8 +189,6 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param InputArgument $argument
-     *
      * @return \DOMDocument
      */
     private function getInputArgumentDocument(InputArgument $argument)
@@ -224,8 +213,6 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param InputOption $option
-     *
      * @return \DOMDocument
      */
     private function getInputOptionDocument(InputOption $option)

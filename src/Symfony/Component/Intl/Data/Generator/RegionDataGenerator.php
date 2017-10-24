@@ -43,8 +43,6 @@ class RegionDataGenerator extends AbstractDataGenerator
 
     /**
      * Regions excluded from generation.
-     *
-     * @var array
      */
     private static $blacklist = array(
         self::UNKNOWN_REGION_ID => true,
@@ -135,8 +133,6 @@ class RegionDataGenerator extends AbstractDataGenerator
     }
 
     /**
-     * @param ArrayAccessibleResourceBundle $localeBundle
-     *
      * @return array
      */
     protected function generateRegionNames(ArrayAccessibleResourceBundle $localeBundle)

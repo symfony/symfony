@@ -111,9 +111,6 @@ class FunctionExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
      * @return XPathExpr
      */
     public function translateNthLastChild(XPathExpr $xpath, FunctionNode $function)
@@ -122,9 +119,6 @@ class FunctionExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
      * @return XPathExpr
      */
     public function translateNthOfType(XPathExpr $xpath, FunctionNode $function)
@@ -133,9 +127,6 @@ class FunctionExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
@@ -150,9 +141,6 @@ class FunctionExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
@@ -176,9 +164,6 @@ class FunctionExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr    $xpath
-     * @param FunctionNode $function
-     *
      * @return XPathExpr
      *
      * @throws ExpressionErrorException

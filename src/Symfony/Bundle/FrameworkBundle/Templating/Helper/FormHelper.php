@@ -23,14 +23,8 @@ use Symfony\Component\Form\FormView;
  */
 class FormHelper extends Helper
 {
-    /**
-     * @var FormRendererInterface
-     */
     private $renderer;
 
-    /**
-     * @param FormRendererInterface $renderer
-     */
     public function __construct(FormRendererInterface $renderer)
     {
         $this->renderer = $renderer;
@@ -176,8 +170,6 @@ class FormHelper extends Helper
 
     /**
      * Renders the errors of the given view.
-     *
-     * @param FormView $view The view to render the errors for
      *
      * @return string The HTML markup
      */

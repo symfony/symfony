@@ -106,8 +106,6 @@ class FileBag extends ParameterBag
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
      *
-     * @param array $data
-     *
      * @return array
      */
     protected function fixPhpFilesArray($data)

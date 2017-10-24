@@ -23,11 +23,6 @@ class TraceableControllerResolver implements ControllerResolverInterface, Argume
     private $stopwatch;
     private $argumentResolver;
 
-    /**
-     * @param ControllerResolverInterface $resolver         A ControllerResolverInterface instance
-     * @param Stopwatch                   $stopwatch        A Stopwatch instance
-     * @param ArgumentResolverInterface   $argumentResolver Only required for BC
-     */
     public function __construct(ControllerResolverInterface $resolver, Stopwatch $stopwatch, ArgumentResolverInterface $argumentResolver = null)
     {
         $this->resolver = $resolver;

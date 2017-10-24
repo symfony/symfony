@@ -334,8 +334,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 
     /**
      * Merges the constraints of the given metadata into this object.
-     *
-     * @param ClassMetadata $source The source metadata
      */
     public function mergeConstraints(ClassMetadata $source)
     {
@@ -502,11 +500,6 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
         return CascadingStrategy::NONE;
     }
 
-    /**
-     * Adds a property metadata.
-     *
-     * @param PropertyMetadataInterface $metadata
-     */
     private function addPropertyMetadata(PropertyMetadataInterface $metadata)
     {
         $property = $metadata->getPropertyName();

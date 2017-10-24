@@ -179,8 +179,6 @@ class Definition
     /**
      * Sets the arguments to pass to the service constructor/factory method.
      *
-     * @param array $arguments An array of arguments
-     *
      * @return $this
      */
     public function setArguments(array $arguments)
@@ -192,8 +190,6 @@ class Definition
 
     /**
      * Sets the properties to define when creating the service.
-     *
-     * @param array $properties
      *
      * @return $this
      */
@@ -317,8 +313,6 @@ class Definition
 
     /**
      * Sets the methods to call after service initialization.
-     *
-     * @param array $calls An array of method calls
      *
      * @return $this
      */
@@ -449,8 +443,6 @@ class Definition
 
     /**
      * Sets tags for this definition.
-     *
-     * @param array $tags
      *
      * @return $this
      */

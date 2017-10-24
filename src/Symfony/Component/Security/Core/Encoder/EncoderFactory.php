@@ -61,8 +61,6 @@ class EncoderFactory implements EncoderFactoryInterface
     /**
      * Creates the actual encoder instance.
      *
-     * @param array $config
-     *
      * @return PasswordEncoderInterface
      *
      * @throws \InvalidArgumentException

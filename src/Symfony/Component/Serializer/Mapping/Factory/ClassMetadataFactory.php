@@ -25,25 +25,10 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
     use ClassResolverTrait;
 
-    /**
-     * @var LoaderInterface
-     */
     private $loader;
-
-    /**
-     * @var Cache
-     */
     private $cache;
-
-    /**
-     * @var array
-     */
     private $loadedClasses;
 
-    /**
-     * @param LoaderInterface $loader
-     * @param Cache|null      $cache
-     */
     public function __construct(LoaderInterface $loader, Cache $cache = null)
     {
         $this->loader = $loader;

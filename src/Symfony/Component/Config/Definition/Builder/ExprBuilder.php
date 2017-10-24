@@ -25,9 +25,6 @@ class ExprBuilder
     public $ifPart;
     public $thenPart;
 
-    /**
-     * @param NodeDefinition $node The related node
-     */
     public function __construct(NodeDefinition $node)
     {
         $this->node = $node;
@@ -35,8 +32,6 @@ class ExprBuilder
 
     /**
      * Marks the expression as being always used.
-     *
-     * @param \Closure $then
      *
      * @return $this
      */
@@ -55,8 +50,6 @@ class ExprBuilder
      * Sets a closure to use as tests.
      *
      * The default one tests if the value is true.
-     *
-     * @param \Closure $closure
      *
      * @return $this
      */
@@ -122,8 +115,6 @@ class ExprBuilder
     /**
      * Tests if the value is in an array.
      *
-     * @param array $array
-     *
      * @return $this
      */
     public function ifInArray(array $array)
@@ -135,8 +126,6 @@ class ExprBuilder
 
     /**
      * Tests if the value is not in an array.
-     *
-     * @param array $array
      *
      * @return $this
      */
@@ -162,8 +151,6 @@ class ExprBuilder
 
     /**
      * Sets the closure to run if the test pass.
-     *
-     * @param \Closure $closure
      *
      * @return $this
      */

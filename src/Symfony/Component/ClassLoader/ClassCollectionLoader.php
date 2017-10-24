@@ -324,8 +324,6 @@ REGEX;
     /**
      * Gets an ordered array of passed classes including all their dependencies.
      *
-     * @param array $classes
-     *
      * @return \ReflectionClass[] An array of sorted \ReflectionClass instances (dependencies added if needed)
      *
      * @throws \InvalidArgumentException When a class can't be loaded

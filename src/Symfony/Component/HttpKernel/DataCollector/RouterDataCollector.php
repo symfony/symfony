@@ -60,8 +60,6 @@ class RouterDataCollector extends DataCollector
 
     /**
      * Remembers the controller associated to each request.
-     *
-     * @param FilterControllerEvent $event The filter controller event
      */
     public function onKernelController(FilterControllerEvent $event)
     {

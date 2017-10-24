@@ -25,30 +25,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ContainerAwareEventDispatcher extends EventDispatcher
 {
-    /**
-     * The container from where services are loaded.
-     *
-     * @var ContainerInterface
-     */
     private $container;
 
     /**
      * The service IDs of the event listeners and subscribers.
-     *
-     * @var array
      */
     private $listenerIds = array();
 
     /**
      * The services registered as listeners.
-     *
-     * @var array
      */
     private $listeners = array();
 
-    /**
-     * @param ContainerInterface $container A ContainerInterface instance
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

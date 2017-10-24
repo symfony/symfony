@@ -48,8 +48,6 @@ interface EventDispatcherInterface
      *
      * The subscriber is asked for all the events he is
      * interested in and added as a listener for these events.
-     *
-     * @param EventSubscriberInterface $subscriber The subscriber
      */
     public function addSubscriber(EventSubscriberInterface $subscriber);
 
@@ -61,11 +59,6 @@ interface EventDispatcherInterface
      */
     public function removeListener($eventName, $listener);
 
-    /**
-     * Removes an event subscriber.
-     *
-     * @param EventSubscriberInterface $subscriber The subscriber
-     */
     public function removeSubscriber(EventSubscriberInterface $subscriber);
 
     /**

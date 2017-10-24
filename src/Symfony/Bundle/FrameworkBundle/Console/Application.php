@@ -29,9 +29,6 @@ class Application extends BaseApplication
     private $kernel;
     private $commandsRegistered = false;
 
-    /**
-     * @param KernelInterface $kernel A KernelInterface instance
-     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
@@ -54,9 +51,6 @@ class Application extends BaseApplication
 
     /**
      * Runs the current application.
-     *
-     * @param InputInterface  $input  An Input instance
-     * @param OutputInterface $output An Output instance
      *
      * @return int 0 if everything went fine, or an error code
      */

@@ -159,8 +159,6 @@ interface SessionInterface
 
     /**
      * Registers a SessionBagInterface with the session.
-     *
-     * @param SessionBagInterface $bag
      */
     public function registerBag(SessionBagInterface $bag);
 

@@ -28,7 +28,7 @@ class ServiceReferenceGraphEdge
     /**
      * @param ServiceReferenceGraphNode $sourceNode
      * @param ServiceReferenceGraphNode $destNode
-     * @param string                    $value
+     * @param mixed                     $value
      * @param bool                      $lazy
      */
     public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, $value = null, $lazy = false)

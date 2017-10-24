@@ -24,37 +24,26 @@ interface FormDataCollectorInterface extends DataCollectorInterface
 {
     /**
      * Stores configuration data of the given form and its children.
-     *
-     * @param FormInterface $form A root form
      */
     public function collectConfiguration(FormInterface $form);
 
     /**
      * Stores the default data of the given form and its children.
-     *
-     * @param FormInterface $form A root form
      */
     public function collectDefaultData(FormInterface $form);
 
     /**
      * Stores the submitted data of the given form and its children.
-     *
-     * @param FormInterface $form A root form
      */
     public function collectSubmittedData(FormInterface $form);
 
     /**
      * Stores the view variables of the given form view and its children.
-     *
-     * @param FormView $view A root form view
      */
     public function collectViewVariables(FormView $view);
 
     /**
      * Specifies that the given objects represent the same conceptual form.
-     *
-     * @param FormInterface $form A form object
-     * @param FormView      $view A view object
      */
     public function associateFormWithView(FormInterface $form, FormView $view);
 
@@ -63,8 +52,6 @@ interface FormDataCollectorInterface extends DataCollectorInterface
      * a tree-like data structure.
      *
      * The result can be queried using {@link getData()}.
-     *
-     * @param FormInterface $form A root form
      */
     public function buildPreliminaryFormTree(FormInterface $form);
 
@@ -85,9 +72,6 @@ interface FormDataCollectorInterface extends DataCollectorInterface
      * tree, only the view data will be included in the result. If a
      * corresponding {@link FormInterface} exists otherwise, call
      * {@link associateFormWithView()} before calling this method.
-     *
-     * @param FormInterface $form A root form
-     * @param FormView      $view A root view
      */
     public function buildFinalFormTree(FormInterface $form, FormView $view);
 

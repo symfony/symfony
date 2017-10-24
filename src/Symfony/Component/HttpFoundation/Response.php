@@ -259,8 +259,6 @@ class Response
      * compliant with RFC 2616. Most of the changes are based on
      * the Request that is "associated" with this Response.
      *
-     * @param Request $request A Request instance
-     *
      * @return $this
      */
     public function prepare(Request $request)
@@ -660,8 +658,6 @@ class Response
 
     /**
      * Sets the Date header.
-     *
-     * @param \DateTime $date A \DateTime instance
      *
      * @return $this
      *
@@ -1074,8 +1070,6 @@ class Response
      *
      * If the Response is not modified, it sets the status code to 304 and
      * removes the actual content by calling the setNotModified() method.
-     *
-     * @param Request $request A Request instance
      *
      * @return bool true if the Response validators match the Request, false otherwise
      *

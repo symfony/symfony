@@ -26,10 +26,6 @@ class DbalLogger implements SQLLogger
     protected $logger;
     protected $stopwatch;
 
-    /**
-     * @param LoggerInterface $logger    A LoggerInterface instance
-     * @param Stopwatch       $stopwatch A Stopwatch instance
-     */
     public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
         $this->logger = $logger;

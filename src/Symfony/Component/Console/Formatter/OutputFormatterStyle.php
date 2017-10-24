@@ -172,9 +172,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Sets multiple style options at once.
-     *
-     * @param array $options
+     * {@inheritdoc}
      */
     public function setOptions(array $options)
     {

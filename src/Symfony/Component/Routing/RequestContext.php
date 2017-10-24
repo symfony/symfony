@@ -31,10 +31,6 @@ class RequestContext
     private $httpPort;
     private $httpsPort;
     private $queryString;
-
-    /**
-     * @var array
-     */
     private $parameters = array();
 
     /**
@@ -61,8 +57,6 @@ class RequestContext
 
     /**
      * Updates the RequestContext information based on a HttpFoundation Request.
-     *
-     * @param Request $request A Request instance
      *
      * @return $this
      */

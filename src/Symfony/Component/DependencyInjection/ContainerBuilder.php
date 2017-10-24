@@ -311,19 +311,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Retrieves the requested reflection class and registers it for resource tracking.
      *
-     * @param string $class
-     * @param bool   $throw
-     *
-     * @return \ReflectionClass|null
-     *
      * @throws \ReflectionException when a parent class/interface/trait is not found and $throw is true
      *
      * @final
      */
-    public function getReflectionClass($class, $throw = true)
+    public function getReflectionClass(?string $class, bool $throw = true): ?\ReflectionClass
     {
         if (!$class = $this->getParameterBag()->resolveValue($class)) {
-            return;
+            return null;
         }
         $resource = null;
 
@@ -368,7 +363,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @final
      */
-    public function fileExists($path, $trackContents = true)
+    public function fileExists(string $path, $trackContents = true): bool
     {
         $exists = file_exists($path);
 
@@ -1326,7 +1321,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * @final
      */
-    public function log(CompilerPassInterface $pass, $message)
+    public function log(CompilerPassInterface $pass, string $message)
     {
         $this->getCompiler()->log($pass, $message);
     }

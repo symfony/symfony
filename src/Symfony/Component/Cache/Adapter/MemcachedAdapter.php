@@ -29,7 +29,7 @@ class MemcachedAdapter extends AbstractAdapter
      *
      * Using a MemcachedAdapter as a pure items store is fine.
      */
-    public function __construct(\Memcached $client, $namespace = '', $defaultLifetime = 0)
+    public function __construct(\Memcached $client, string $namespace = '', int $defaultLifetime = 0)
     {
         $this->init($client, $namespace, $defaultLifetime);
     }

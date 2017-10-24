@@ -31,11 +31,7 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, Re
 
     private $defaultLifetime;
 
-    /**
-     * @param string $namespace
-     * @param int    $defaultLifetime
-     */
-    protected function __construct($namespace = '', $defaultLifetime = 0)
+    protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
         $this->defaultLifetime = max(0, (int) $defaultLifetime);
         $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).':';

@@ -194,7 +194,7 @@ class Process implements \IteratorAggregate
      *
      * @final since version 3.3
      */
-    public function run($callback = null, array $env = array())
+    public function run(callable $callback = null, array $env = array())
     {
         $this->start($callback, $env);
 

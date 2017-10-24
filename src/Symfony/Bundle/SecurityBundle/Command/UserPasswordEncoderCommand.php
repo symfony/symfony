@@ -164,10 +164,8 @@ EOF
 
     /**
      * Create the password question to ask the user for the password to be encoded.
-     *
-     * @return Question
      */
-    private function createPasswordQuestion()
+    private function createPasswordQuestion(): Question
     {
         $passwordQuestion = new Question('Type in your password to be encoded');
 

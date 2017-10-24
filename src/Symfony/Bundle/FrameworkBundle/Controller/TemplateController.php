@@ -40,10 +40,8 @@ class TemplateController
      * @param int|null  $maxAge    Max age for client caching
      * @param int|null  $sharedAge Max age for shared (proxy) caching
      * @param bool|null $private   Whether or not caching should apply for client caches only
-     *
-     * @return Response A Response instance
      */
-    public function templateAction($template, $maxAge = null, $sharedAge = null, $private = null)
+    public function templateAction(string $template, int $maxAge = null, int $sharedAge = null, bool $private = null): Response
     {
         if ($this->templating) {
             $response = new Response($this->templating->render($template));

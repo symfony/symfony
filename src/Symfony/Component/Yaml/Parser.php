@@ -46,7 +46,7 @@ class Parser
      *
      * @throws ParseException If the file could not be read or the YAML is not valid
      */
-    public function parseFile($filename, $flags = 0)
+    public function parseFile(string $filename, int $flags = 0)
     {
         if (!is_file($filename)) {
             throw new ParseException(sprintf('File "%s" does not exist.', $filename));

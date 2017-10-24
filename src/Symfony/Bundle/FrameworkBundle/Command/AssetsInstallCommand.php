@@ -185,13 +185,8 @@ EOT
      * Try to create relative symlink.
      *
      * Falling back to absolute symlink and finally hard copy.
-     *
-     * @param string $originDir
-     * @param string $targetDir
-     *
-     * @return string
      */
-    private function relativeSymlinkWithFallback($originDir, $targetDir)
+    private function relativeSymlinkWithFallback(string $originDir, string $targetDir): string
     {
         try {
             $this->symlink($originDir, $targetDir, true);
@@ -207,13 +202,8 @@ EOT
      * Try to create absolute symlink.
      *
      * Falling back to hard copy.
-     *
-     * @param string $originDir
-     * @param string $targetDir
-     *
-     * @return string
      */
-    private function absoluteSymlinkWithFallback($originDir, $targetDir)
+    private function absoluteSymlinkWithFallback(string $originDir, string $targetDir): string
     {
         try {
             $this->symlink($originDir, $targetDir);
@@ -229,13 +219,9 @@ EOT
     /**
      * Creates symbolic link.
      *
-     * @param string $originDir
-     * @param string $targetDir
-     * @param bool   $relative
-     *
      * @throws IOException if link can not be created
      */
-    private function symlink($originDir, $targetDir, $relative = false)
+    private function symlink(string $originDir, string $targetDir, bool $relative = false)
     {
         if ($relative) {
             $originDir = $this->filesystem->makePathRelative($originDir, realpath(dirname($targetDir)));
@@ -248,13 +234,8 @@ EOT
 
     /**
      * Copies origin to target.
-     *
-     * @param string $originDir
-     * @param string $targetDir
-     *
-     * @return string
      */
-    private function hardCopy($originDir, $targetDir)
+    private function hardCopy(string $originDir, string $targetDir): string
     {
         $this->filesystem->mkdir($targetDir, 0777);
         // We use a custom iterator to ignore VCS files

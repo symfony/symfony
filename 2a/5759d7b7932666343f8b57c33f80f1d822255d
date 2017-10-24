@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-10-23T15:09:30Z
+
+wouldn't this cause issues to use a parameter for that ? Wouldn't any bundle be free to overwrite it ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-23T15:22:10Z
+
+> Wouldn't any bundle be free to overwrite it ?
+
+that's true, but is this really an issue?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-23T16:01:07Z
+
+> that's true, but is this really an issue?
+
+Well, that's precisely the reason why our defaults are file-level.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-23T16:24:39Z
+
+Well ok. But we always advertised autowiring as a bad idea for bundles before 3.3. I don't think this would be an issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-23T17:33:52Z
+
+I think this is important as we already got several reports by ppl being biten by autoregistration.

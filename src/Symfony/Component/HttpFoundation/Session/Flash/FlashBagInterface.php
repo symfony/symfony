@@ -72,8 +72,6 @@ interface FlashBagInterface extends SessionBagInterface
 
     /**
      * Sets all flash messages.
-     *
-     * @param array $messages
      */
     public function setAll(array $messages);
 

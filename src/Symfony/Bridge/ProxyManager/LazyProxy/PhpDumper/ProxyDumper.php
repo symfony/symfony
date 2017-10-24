@@ -112,8 +112,6 @@ EOF;
     /**
      * Produces the proxy class name for the given definition.
      *
-     * @param Definition $definition
-     *
      * @return string
      */
     private function getProxyClassName(Definition $definition)
@@ -122,8 +120,6 @@ EOF;
     }
 
     /**
-     * @param Definition $definition
-     *
      * @return ClassGenerator
      */
     private function generateProxyClass(Definition $definition)

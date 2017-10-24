@@ -163,9 +163,6 @@ class JsonDescriptor extends Descriptor
     /**
      * Writes data as json.
      *
-     * @param array $data
-     * @param array $options
-     *
      * @return array|string
      */
     private function writeData(array $data, array $options)
@@ -180,8 +177,6 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param Route $route
-     *
      * @return array
      */
     protected function getRouteData(Route $route)
@@ -269,8 +264,6 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param Alias $alias
-     *
      * @return array
      */
     private function getContainerAliasData(Alias $alias)

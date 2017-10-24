@@ -215,8 +215,6 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
      * + 10 seconds) are added, then we have 86,400 seconds (24h * 60min * 60s)
      * + 10 seconds
      *
-     * @param array $dataSets
-     *
      * @return array
      */
     private function notImplemented(array $dataSets)

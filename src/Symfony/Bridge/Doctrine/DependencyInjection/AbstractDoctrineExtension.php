@@ -27,15 +27,11 @@ abstract class AbstractDoctrineExtension extends Extension
 {
     /**
      * Used inside metadata driver method to simplify aggregation of data.
-     *
-     * @var array
      */
     protected $aliasMap = array();
 
     /**
      * Used inside metadata driver method to simplify aggregation of data.
-     *
-     * @var array
      */
     protected $drivers = array();
 
@@ -141,10 +137,6 @@ abstract class AbstractDoctrineExtension extends Extension
      * If this is a bundle controlled mapping all the missing information can be autodetected by this method.
      *
      * Returns false when autodetection failed, an array of the completed information otherwise.
-     *
-     * @param array            $bundleConfig
-     * @param \ReflectionClass $bundle
-     * @param ContainerBuilder $container    A ContainerBuilder instance
      *
      * @return array|false
      */
@@ -402,9 +394,6 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * The manager called $autoMappedManager will map all bundles that are not mapped by other managers.
      *
-     * @param array $managerConfigs
-     * @param array $bundles
-     *
      * @return array The modified version of $managerConfigs
      */
     protected function fixManagersAutoMappings(array $managerConfigs, array $bundles)
@@ -463,8 +452,6 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Search for a manager that is declared as 'auto_mapping' = true.
-     *
-     * @param array $managerConfigs
      *
      * @return null|string The name of the manager. If no one manager is found, returns null
      *

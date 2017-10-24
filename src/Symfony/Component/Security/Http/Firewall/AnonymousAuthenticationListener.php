@@ -41,8 +41,6 @@ class AnonymousAuthenticationListener implements ListenerInterface
 
     /**
      * Handles anonymous authentication.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)
     {

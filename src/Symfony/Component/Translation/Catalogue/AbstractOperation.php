@@ -24,19 +24,8 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
  */
 abstract class AbstractOperation implements OperationInterface
 {
-    /**
-     * @var MessageCatalogueInterface The source catalogue
-     */
     protected $source;
-
-    /**
-     * @var MessageCatalogueInterface The target catalogue
-     */
     protected $target;
-
-    /**
-     * @var MessageCatalogue The result catalogue
-     */
     protected $result;
 
     /**
@@ -69,9 +58,6 @@ abstract class AbstractOperation implements OperationInterface
     protected $messages;
 
     /**
-     * @param MessageCatalogueInterface $source The source catalogue
-     * @param MessageCatalogueInterface $target The target catalogue
-     *
      * @throws \LogicException
      */
     public function __construct(MessageCatalogueInterface $source, MessageCatalogueInterface $target)

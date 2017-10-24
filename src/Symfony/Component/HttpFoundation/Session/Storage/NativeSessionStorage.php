@@ -292,11 +292,6 @@ class NativeSessionStorage implements SessionStorageInterface
         return $this->bags[$name];
     }
 
-    /**
-     * Sets the MetadataBag.
-     *
-     * @param MetadataBag $metaBag
-     */
     public function setMetadataBag(MetadataBag $metaBag = null)
     {
         if (null === $metaBag) {
@@ -427,8 +422,6 @@ class NativeSessionStorage implements SessionStorageInterface
      * are set to (either PHP's internal, or a custom save handler set with session_set_save_handler()).
      * PHP takes the return value from the read() handler, unserializes it
      * and populates $_SESSION with the result automatically.
-     *
-     * @param array|null $session
      */
     protected function loadSession(array &$session = null)
     {

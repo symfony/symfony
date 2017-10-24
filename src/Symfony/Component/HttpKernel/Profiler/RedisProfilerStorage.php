@@ -386,8 +386,6 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     /**
      * Removes the specified keys.
      *
-     * @param array $keys
-     *
      * @return bool
      */
     private function delete(array $keys)

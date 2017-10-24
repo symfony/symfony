@@ -24,9 +24,6 @@ class ControllerNameParser
 {
     protected $kernel;
 
-    /**
-     * @param KernelInterface $kernel A KernelInterface instance
-     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;

@@ -23,10 +23,6 @@ class InteractiveLoginEvent extends Event
     private $request;
     private $authenticationToken;
 
-    /**
-     * @param Request        $request             A Request instance
-     * @param TokenInterface $authenticationToken A TokenInterface instance
-     */
     public function __construct(Request $request, TokenInterface $authenticationToken)
     {
         $this->request = $request;

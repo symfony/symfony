@@ -63,8 +63,6 @@ class TemplateManager
     /**
      * Gets the templates for a given profile.
      *
-     * @param Profile $profile
-     *
      * @return Template[]
      *
      * @deprecated not used anymore internally
@@ -82,8 +80,6 @@ class TemplateManager
 
     /**
      * Gets template names of templates that are present in the viewed profile.
-     *
-     * @param Profile $profile
      *
      * @return array
      *

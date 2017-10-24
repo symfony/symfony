@@ -25,9 +25,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 class FormDataCollector extends DataCollector implements FormDataCollectorInterface
 {
-    /**
-     * @var FormDataExtractor
-     */
     private $dataExtractor;
 
     /**

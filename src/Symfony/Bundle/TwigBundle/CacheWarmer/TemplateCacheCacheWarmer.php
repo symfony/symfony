@@ -33,9 +33,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
     private $paths;
 
     /**
-     * @param ContainerInterface           $container The dependency injection container
-     * @param TemplateFinderInterface|null $finder    The template paths cache warmer
-     * @param array                        $paths     Additional twig paths to warm
+     * @param array $paths Additional twig paths to warm
      */
     public function __construct(ContainerInterface $container, TemplateFinderInterface $finder = null, array $paths = array())
     {

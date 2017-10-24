@@ -153,8 +153,6 @@ class ExceptionHandler
      * If you have the Symfony HttpFoundation component installed,
      * this method will use it to create and send the response. If not,
      * it will fallback to plain PHP functions.
-     *
-     * @param \Exception $exception An \Exception instance
      */
     private function failSafeHandle(\Exception $exception)
     {
@@ -238,8 +236,6 @@ class ExceptionHandler
     /**
      * Gets the HTML content associated with the given exception.
      *
-     * @param FlattenException $exception A FlattenException instance
-     *
      * @return string The content as a string
      */
     public function getContent(FlattenException $exception)
@@ -305,8 +301,6 @@ EOF;
 
     /**
      * Gets the stylesheet associated with the given exception.
-     *
-     * @param FlattenException $exception A FlattenException instance
      *
      * @return string The stylesheet as a string
      */

@@ -64,8 +64,6 @@ class ExceptionListener
 
     /**
      * Registers a onKernelException listener to take care of security exceptions.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      */
     public function register(EventDispatcherInterface $dispatcher)
     {
@@ -74,8 +72,6 @@ class ExceptionListener
 
     /**
      * Unregisters the dispatcher.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
      */
     public function unregister(EventDispatcherInterface $dispatcher)
     {
@@ -84,8 +80,6 @@ class ExceptionListener
 
     /**
      * Handles security related exceptions.
-     *
-     * @param GetResponseForExceptionEvent $event An GetResponseForExceptionEvent instance
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
@@ -170,9 +164,6 @@ class ExceptionListener
     }
 
     /**
-     * @param Request                 $request
-     * @param AuthenticationException $authException
-     *
      * @return Response
      *
      * @throws AuthenticationException
@@ -203,9 +194,6 @@ class ExceptionListener
         return $this->authenticationEntryPoint->start($request, $authException);
     }
 
-    /**
-     * @param Request $request
-     */
     protected function setTargetPath(Request $request)
     {
         // session isn't required when using HTTP basic authentication mechanism for example

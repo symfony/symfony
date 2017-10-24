@@ -60,8 +60,6 @@ class RememberMeListener implements ListenerInterface
 
     /**
      * Handles remember-me cookie based authentication.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)
     {

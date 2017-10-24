@@ -48,8 +48,6 @@ class InputDefinition
 
     /**
      * Sets the definition of the input.
-     *
-     * @param array $definition The definition array
      */
     public function setDefinition(array $definition)
     {
@@ -96,10 +94,6 @@ class InputDefinition
     }
 
     /**
-     * Adds an InputArgument object.
-     *
-     * @param InputArgument $argument An InputArgument object
-     *
      * @throws LogicException When incorrect argument is given
      */
     public function addArgument(InputArgument $argument)
@@ -233,10 +227,6 @@ class InputDefinition
     }
 
     /**
-     * Adds an InputOption object.
-     *
-     * @param InputOption $option An InputOption object
-     *
      * @throws LogicException When option given already exist
      */
     public function addOption(InputOption $option)

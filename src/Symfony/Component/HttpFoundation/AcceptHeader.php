@@ -97,8 +97,6 @@ class AcceptHeader
     /**
      * Adds an item.
      *
-     * @param AcceptHeaderItem $item
-     *
      * @return $this
      */
     public function add(AcceptHeaderItem $item)

@@ -39,8 +39,6 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
 
     /**
      * Processes the ContainerBuilder for inline service definitions.
-     *
-     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {

@@ -33,11 +33,6 @@ class AuthenticationException extends \RuntimeException implements \Serializable
         return $this->token;
     }
 
-    /**
-     * Set the token.
-     *
-     * @param TokenInterface $token
-     */
     public function setToken(TokenInterface $token)
     {
         $this->token = $token;

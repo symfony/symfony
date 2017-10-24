@@ -51,8 +51,6 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
 
     /**
      * Processes a ContainerBuilder object to populate the service reference graph.
-     *
-     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {

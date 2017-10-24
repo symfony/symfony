@@ -27,14 +27,8 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\Tokenizer;
  */
 class Parser implements ParserInterface
 {
-    /**
-     * @var Tokenizer
-     */
     private $tokenizer;
 
-    /**
-     * @param null|Tokenizer $tokenizer
-     */
     public function __construct(Tokenizer $tokenizer = null)
     {
         $this->tokenizer = $tokenizer ?: new Tokenizer();
@@ -103,8 +97,6 @@ class Parser implements ParserInterface
     /**
      * Parses selector nodes.
      *
-     * @param TokenStream $stream
-     *
      * @return array
      */
     private function parseSelectorList(TokenStream $stream)
@@ -128,8 +120,6 @@ class Parser implements ParserInterface
 
     /**
      * Parses next selector or combined node.
-     *
-     * @param TokenStream $stream
      *
      * @return Node\SelectorNode
      *
@@ -292,8 +282,6 @@ class Parser implements ParserInterface
     /**
      * Parses next element node.
      *
-     * @param TokenStream $stream
-     *
      * @return Node\ElementNode
      */
     private function parseElementNode(TokenStream $stream)
@@ -324,9 +312,6 @@ class Parser implements ParserInterface
 
     /**
      * Parses next attribute node.
-     *
-     * @param Node\NodeInterface $selector
-     * @param TokenStream        $stream
      *
      * @return Node\AttributeNode
      *

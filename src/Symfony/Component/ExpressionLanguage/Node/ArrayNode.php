@@ -38,8 +38,6 @@ class ArrayNode extends Node
 
     /**
      * Compiles the node to PHP.
-     *
-     * @param Compiler $compiler A Compiler instance
      */
     public function compile(Compiler $compiler)
     {

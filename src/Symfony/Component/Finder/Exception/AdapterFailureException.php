@@ -24,9 +24,6 @@ use Symfony\Component\Finder\Adapter\AdapterInterface;
  */
 class AdapterFailureException extends \RuntimeException implements ExceptionInterface
 {
-    /**
-     * @var \Symfony\Component\Finder\Adapter\AdapterInterface
-     */
     private $adapter;
 
     /**

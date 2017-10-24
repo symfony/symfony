@@ -23,16 +23,8 @@ use Symfony\Component\Finder\Shell\Command;
  */
 class ShellCommandFailureException extends AdapterFailureException
 {
-    /**
-     * @var Command
-     */
     private $command;
 
-    /**
-     * @param AdapterInterface $adapter
-     * @param Command          $command
-     * @param \Exception|null  $previous
-     */
     public function __construct(AdapterInterface $adapter, Command $command, \Exception $previous = null)
     {
         $this->command = $command;

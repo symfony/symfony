@@ -52,11 +52,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         parent::__construct($userProviders, $secret, $providerKey, $options, $logger);
     }
 
-    /**
-     * Sets the token provider.
-     *
-     * @param TokenProviderInterface $tokenProvider
-     */
     public function setTokenProvider(TokenProviderInterface $tokenProvider)
     {
         $this->tokenProvider = $tokenProvider;

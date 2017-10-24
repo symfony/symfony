@@ -169,8 +169,6 @@ class FormFactory implements FormFactoryInterface
      * Wraps a type into a ResolvedFormTypeInterface implementation and connects
      * it with its parent type.
      *
-     * @param FormTypeInterface $type The type to resolve
-     *
      * @return ResolvedFormTypeInterface The resolved type
      */
     private function resolveType(FormTypeInterface $type)

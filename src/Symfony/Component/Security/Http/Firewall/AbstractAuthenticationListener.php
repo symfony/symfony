@@ -108,8 +108,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     /**
      * Sets the RememberMeServices implementation to use.
-     *
-     * @param RememberMeServicesInterface $rememberMeServices
      */
     public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
     {
@@ -118,8 +116,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     /**
      * Handles form based authentication.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
      *
      * @throws \RuntimeException
      * @throws SessionUnavailableException
@@ -168,8 +164,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * but a subclass could change this to only authenticate requests where a
      * certain parameters is present.
      *
-     * @param Request $request
-     *
      * @return bool
      */
     protected function requiresAuthentication(Request $request)
@@ -179,8 +173,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
 
     /**
      * Performs authentication.
-     *
-     * @param Request $request A Request instance
      *
      * @return TokenInterface|Response|null The authenticated token, null if full authentication is not possible, or a Response
      *

@@ -73,8 +73,6 @@ class Profile
 
     /**
      * Sets the parent token.
-     *
-     * @param Profile $parent
      */
     public function setParent(Profile $parent)
     {
@@ -214,8 +212,6 @@ class Profile
 
     /**
      * Adds the child token.
-     *
-     * @param Profile $child
      */
     public function addChild(Profile $child)
     {
@@ -266,8 +262,6 @@ class Profile
 
     /**
      * Adds a Collector.
-     *
-     * @param DataCollectorInterface $collector A DataCollectorInterface instance
      */
     public function addCollector(DataCollectorInterface $collector)
     {

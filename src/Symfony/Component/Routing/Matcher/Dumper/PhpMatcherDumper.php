@@ -372,8 +372,6 @@ EOF;
      * Routes order is preserved such that traversing the tree will traverse the
      * routes in the origin order.
      *
-     * @param DumperCollection $collection A collection of routes
-     *
      * @return DumperPrefixCollection
      */
     private function buildPrefixTree(DumperCollection $collection)

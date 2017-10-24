@@ -27,14 +27,7 @@ use Psr\Log\LoggerInterface;
  */
 class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
 {
-    /**
-     * @var RouteCollection
-     */
     protected $routes;
-
-    /**
-     * @var RequestContext
-     */
     protected $context;
 
     /**
@@ -42,9 +35,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     protected $strictRequirements = true;
 
-    /**
-     * @var LoggerInterface|null
-     */
     protected $logger;
 
     /**
@@ -75,11 +65,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         '%7C' => '|',
     );
 
-    /**
-     * @param RouteCollection      $routes  A RouteCollection instance
-     * @param RequestContext       $context The context
-     * @param LoggerInterface|null $logger  A logger instance
-     */
     public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null)
     {
         $this->routes = $routes;

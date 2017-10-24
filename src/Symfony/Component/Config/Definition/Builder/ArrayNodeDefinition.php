@@ -49,8 +49,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Sets a custom children builder.
-     *
-     * @param NodeBuilder $builder A custom NodeBuilder
      */
     public function setBuilder(NodeBuilder $builder)
     {
@@ -378,8 +376,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *         ->append($this->getBarNodeDefinition())
      *     ;
      *
-     * @param NodeDefinition $node A NodeDefinition instance
-     *
      * @return $this
      */
     public function append(NodeDefinition $node)
@@ -477,8 +473,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Validate the configuration of a concrete node.
      *
-     * @param ArrayNode $node The related node
-     *
      * @throws InvalidDefinitionException
      */
     protected function validateConcreteNode(ArrayNode $node)
@@ -518,8 +512,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Validate the configuration of a prototype node.
-     *
-     * @param PrototypedArrayNode $node The related node
      *
      * @throws InvalidDefinitionException
      */

@@ -29,8 +29,6 @@ interface RequestMatcherInterface
      * If the matcher can not find information, it must throw one of the exceptions documented
      * below.
      *
-     * @param Request $request The request to match
-     *
      * @return array An array of parameters
      *
      * @throws NoConfigurationException  If no routing configuration could be found

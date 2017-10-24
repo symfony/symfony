@@ -67,11 +67,6 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
         return $this->options;
     }
 
-    /**
-     * Sets the options.
-     *
-     * @param array $options An array of options
-     */
     public function setOptions(array $options)
     {
         $this->options = array_merge($this->defaultOptions, $options);
@@ -99,8 +94,6 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 
     /**
      * Builds the target URL according to the defined options.
-     *
-     * @param Request $request
      *
      * @return string
      */

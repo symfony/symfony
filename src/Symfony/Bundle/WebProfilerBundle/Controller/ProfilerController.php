@@ -174,8 +174,6 @@ class ProfilerController
     /**
      * Renders the profiler search bar.
      *
-     * @param Request $request The current HTTP Request
-     *
      * @return Response A Response instance
      *
      * @throws NotFoundHttpException
@@ -279,8 +277,6 @@ class ProfilerController
 
     /**
      * Narrows the search bar.
-     *
-     * @param Request $request The current HTTP Request
      *
      * @return Response A Response instance
      *

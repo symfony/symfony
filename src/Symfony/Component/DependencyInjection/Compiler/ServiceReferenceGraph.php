@@ -82,15 +82,19 @@ class ServiceReferenceGraph
      * Connects 2 nodes together in the Graph.
      *
      * @param string $sourceId
-     * @param string $sourceValue
+     * @param mixed  $sourceValue
      * @param string $destId
-     * @param string $destValue
+     * @param mixed  $destValue
      * @param string $reference
      * @param bool   $lazy
      * @param bool   $weak
      */
     public function connect($sourceId, $sourceValue, $destId, $destValue = null, $reference = null, bool $lazy = false, bool $weak = false)
     {
+        if (null === $sourceId || null === $destId) {
+            return;
+        }
+
         $sourceNode = $this->createNode($sourceId, $sourceValue);
         $destNode = $this->createNode($destId, $destValue);
         $edge = new ServiceReferenceGraphEdge($sourceNode, $destNode, $reference, $lazy, $weak);
@@ -103,7 +107,7 @@ class ServiceReferenceGraph
      * Creates a graph node.
      *
      * @param string $id
-     * @param string $value
+     * @param mixed  $value
      *
      * @return ServiceReferenceGraphNode
      */

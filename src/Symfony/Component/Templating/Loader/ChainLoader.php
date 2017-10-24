@@ -35,8 +35,6 @@ class ChainLoader extends Loader
 
     /**
      * Adds a loader instance.
-     *
-     * @param LoaderInterface $loader A Loader instance
      */
     public function addLoader(LoaderInterface $loader)
     {
@@ -45,8 +43,6 @@ class ChainLoader extends Loader
 
     /**
      * Loads a template.
-     *
-     * @param TemplateReferenceInterface $template A template
      *
      * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
      */

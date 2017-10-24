@@ -20,37 +20,11 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  */
 class FormError implements \Serializable
 {
-    /**
-     * @var string
-     */
-    private $message;
-
-    /**
-     * The template for the error message.
-     *
-     * @var string
-     */
     protected $messageTemplate;
-
-    /**
-     * The parameters that should be substituted in the message template.
-     *
-     * @var array
-     */
     protected $messageParameters;
-
-    /**
-     * The value for error message pluralization.
-     *
-     * @var int|null
-     */
     protected $messagePluralization;
 
-    /**
-     * The cause for this error.
-     *
-     * @var mixed
-     */
+    private $message;
     private $cause;
 
     /**

@@ -73,9 +73,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
     /**
      * Sets the {@link ClassMetadataFactoryInterface} to use.
-     *
-     * @param ClassMetadataFactoryInterface|null $classMetadataFactory
-     * @param NameConverterInterface|null        $nameConverter
      */
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
     {
@@ -137,8 +134,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
     /**
      * Set ignored attributes for normalization and denormalization.
-     *
-     * @param array $ignoredAttributes
      *
      * @return self
      */

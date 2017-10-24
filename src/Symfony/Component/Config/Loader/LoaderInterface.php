@@ -47,8 +47,6 @@ interface LoaderInterface
 
     /**
      * Sets the loader resolver.
-     *
-     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
      */
     public function setResolver(LoaderResolverInterface $resolver);
 }

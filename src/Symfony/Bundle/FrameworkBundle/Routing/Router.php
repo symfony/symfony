@@ -84,8 +84,6 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      * - the route host,
      * - the route schemes,
      * - the route methods.
-     *
-     * @param RouteCollection $collection
      */
     private function resolveParameters(RouteCollection $collection)
     {

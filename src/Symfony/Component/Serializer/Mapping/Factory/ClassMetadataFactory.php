@@ -24,9 +24,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
     use ClassResolverTrait;
 
-    /**
-     * @var LoaderInterface
-     */
     private $loader;
 
     /**

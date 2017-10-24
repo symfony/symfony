@@ -44,8 +44,6 @@ class PseudoClassExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateRoot(XPathExpr $xpath)
@@ -54,8 +52,6 @@ class PseudoClassExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateFirstChild(XPathExpr $xpath)
@@ -67,8 +63,6 @@ class PseudoClassExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateLastChild(XPathExpr $xpath)
@@ -80,8 +74,6 @@ class PseudoClassExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
@@ -98,8 +90,6 @@ class PseudoClassExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
@@ -116,8 +106,6 @@ class PseudoClassExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateOnlyChild(XPathExpr $xpath)
@@ -129,8 +117,6 @@ class PseudoClassExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      *
      * @throws ExpressionErrorException
@@ -145,8 +131,6 @@ class PseudoClassExtension extends AbstractExtension
     }
 
     /**
-     * @param XPathExpr $xpath
-     *
      * @return XPathExpr
      */
     public function translateEmpty(XPathExpr $xpath)

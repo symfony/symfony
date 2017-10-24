@@ -144,8 +144,6 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * Subclasses may disable remember-me features for the listener, by
      * always returning false from this method.
      *
-     * @param array $config
-     *
      * @return bool Whether a possibly configured RememberMeServices should be set for this listener
      */
     protected function isRememberMeAware($config)

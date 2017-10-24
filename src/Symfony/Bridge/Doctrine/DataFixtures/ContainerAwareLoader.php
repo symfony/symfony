@@ -25,14 +25,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ContainerAwareLoader extends Loader
 {
-    /**
-     * @var ContainerInterface
-     */
     private $container;
 
-    /**
-     * @param ContainerInterface $container A ContainerInterface instance
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

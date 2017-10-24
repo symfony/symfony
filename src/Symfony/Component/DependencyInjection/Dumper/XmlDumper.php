@@ -38,8 +38,6 @@ class XmlDumper extends Dumper
     /**
      * Dumps the service container as an XML string.
      *
-     * @param array $options An array of options
-     *
      * @return string An xml string representing of the service container
      */
     public function dump(array $options = array())
@@ -61,11 +59,6 @@ class XmlDumper extends Dumper
         return $this->container->resolveEnvPlaceholders($xml);
     }
 
-    /**
-     * Adds parameters.
-     *
-     * @param \DOMElement $parent
-     */
     private function addParameters(\DOMElement $parent)
     {
         $data = $this->container->getParameterBag()->all();
@@ -82,12 +75,6 @@ class XmlDumper extends Dumper
         $this->convertParameters($data, 'parameter', $parameters);
     }
 
-    /**
-     * Adds method calls.
-     *
-     * @param array       $methodcalls
-     * @param \DOMElement $parent
-     */
     private function addMethodCalls(array $methodcalls, \DOMElement $parent)
     {
         foreach ($methodcalls as $methodcall) {
@@ -242,11 +229,6 @@ class XmlDumper extends Dumper
         $parent->appendChild($service);
     }
 
-    /**
-     * Adds services.
-     *
-     * @param \DOMElement $parent
-     */
     private function addServices(\DOMElement $parent)
     {
         $definitions = $this->container->getDefinitions();
@@ -329,8 +311,6 @@ class XmlDumper extends Dumper
 
     /**
      * Escapes arguments.
-     *
-     * @param array $arguments
      *
      * @return array
      */

@@ -153,8 +153,6 @@ EOF
     /**
      * Validates input arguments and options.
      *
-     * @param InputInterface $input
-     *
      * @throws \InvalidArgumentException
      */
     protected function validateInput(InputInterface $input)

@@ -23,16 +23,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class PropertyPathMapper implements DataMapperInterface
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
 
-    /**
-     * Creates a new property path mapper.
-     *
-     * @param PropertyAccessorInterface $propertyAccessor The property accessor
-     */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();

@@ -775,8 +775,6 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Loads from Extensions.
-     *
-     * @param array $content
      */
     private function loadFromExtensions(array $content)
     {

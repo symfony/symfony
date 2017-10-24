@@ -162,19 +162,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets the instantiator to be used when fetching proxies.
-     *
-     * @param InstantiatorInterface $proxyInstantiator
      */
     public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
     {
         $this->proxyInstantiator = $proxyInstantiator;
     }
 
-    /**
-     * Registers an extension.
-     *
-     * @param ExtensionInterface $extension An extension instance
-     */
     public function registerExtension(ExtensionInterface $extension)
     {
         $this->extensions[$extension->getAlias()] = $extension;
@@ -239,10 +232,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Adds a resource for this configuration.
-     *
-     * @param ResourceInterface $resource A resource instance
-     *
      * @return $this
      */
     public function addResource(ResourceInterface $resource)
@@ -584,8 +573,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * parameter, the value will still be 'bar' as defined in the ContainerBuilder
      * constructor.
      *
-     * @param ContainerBuilder $container The ContainerBuilder instance to merge
-     *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
     public function merge(ContainerBuilder $container)
@@ -747,8 +734,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Adds the service aliases.
-     *
-     * @param array $aliases An array of aliases
      */
     public function addAliases(array $aliases)
     {
@@ -759,8 +744,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Sets the service aliases.
-     *
-     * @param array $aliases An array of aliases
      */
     public function setAliases(array $aliases)
     {

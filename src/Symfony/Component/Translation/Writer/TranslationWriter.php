@@ -23,11 +23,6 @@ use Symfony\Component\Translation\Exception\RuntimeException;
  */
 class TranslationWriter implements TranslationWriterInterface
 {
-    /**
-     * Dumpers used for export.
-     *
-     * @var array
-     */
     private $dumpers = array();
 
     /**

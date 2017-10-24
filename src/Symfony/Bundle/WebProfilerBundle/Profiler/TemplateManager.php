@@ -63,8 +63,6 @@ class TemplateManager
     /**
      * Gets template names of templates that are present in the viewed profile.
      *
-     * @param Profile $profile
-     *
      * @return array
      *
      * @throws \UnexpectedValueException

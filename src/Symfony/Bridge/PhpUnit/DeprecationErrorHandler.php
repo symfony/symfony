@@ -254,12 +254,11 @@ class DeprecationErrorHandler
                 // This can be registered before the PHPUnit error handler.
                 if (!$previousErrorHandler) {
                     $ErrorHandler = class_exists('PHPUnit_Util_ErrorHandler') ? 'PHPUnit_Util_ErrorHandler' : 'PHPUnit\Util\ErrorHandler';
+
                     return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
-                }
-                else {
+                } else {
                     return $previousErrorHandler($type, $msg, $file, $line, $context);
                 }
-
             }
             $deprecations[] = array(error_reporting(), $msg);
         });

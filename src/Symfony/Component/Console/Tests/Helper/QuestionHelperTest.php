@@ -162,7 +162,6 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $inputStream = $this->getInputStream('E');
 
         $dialog = new QuestionHelper();
-        $dialog->setInputStream($inputStream);
         $helperSet = new HelperSet(array(new FormatterHelper()));
         $dialog->setHelperSet($helperSet);
 
@@ -171,7 +170,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $question->setAutocompleterValues(array($expectedCompletion));
 
         $output = $this->createOutputInterface();
-        $dialog->ask($this->createInputInterfaceMock(), $output, $question);
+        $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output, $question);
 
         $outputStream = $output->getStream();
         rewind($outputStream);

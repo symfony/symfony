@@ -116,8 +116,16 @@ class DeprecationErrorHandler
             }
 
             if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
-                $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
-                $method = $trace[$i]['function'];
+                if (isset($trace[$i]['class']) && in_array($trace[$i]['class'], array('Symfony\Bridge\PhpUnit\SymfonyTestsListener', 'Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener'), true)) {
+                    $parsedMsg = unserialize($msg);
+                    $msg = $parsedMsg['deprecation'];
+                    $class = $parsedMsg['class'];
+                    $method = $parsedMsg['method'];
+                } else {
+                    $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
+                    $method = $trace[$i]['function'];
+                }
+
                 $Test = $UtilPrefix.'Test';
 
                 if (0 !== error_reporting()) {

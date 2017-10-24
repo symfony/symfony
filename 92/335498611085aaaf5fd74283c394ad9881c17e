@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-19T01:36:02Z
+
+I'm sure there are more docblocks that could be removed on private methods, constructors and `@internal` classes/methods.
+Here are some I found by looking at all `@final` annotations.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-21T16:38:40Z
+
+comments addressed, some changes need to be applied to lower branches (I'll submit a PR next)

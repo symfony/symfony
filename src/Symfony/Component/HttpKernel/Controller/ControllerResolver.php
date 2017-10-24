@@ -219,7 +219,7 @@ class ControllerResolver implements ArgumentResolverInterface, ControllerResolve
         }
 
         if (2 !== count($callable)) {
-            return sprintf('Invalid format for controller, expected array(controller, method) or controller::method.');
+            return 'Invalid format for controller, expected array(controller, method) or controller::method.';
         }
 
         list($controller, $method) = $callable;

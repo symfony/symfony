@@ -78,6 +78,9 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     public static function register(ContainerBuilder $container, array $refMap)
     {
         foreach ($refMap as $id => $ref) {
+            if (!$ref instanceof Reference) {
+                throw new InvalidArgumentException(sprintf('Invalid service locator definition: only services can be referenced, "%s" found for key "%s". Inject parameter values using constructors instead.', is_object($ref) ? get_class($ref) : gettype($ref), $id));
+            }
             $refMap[$id] = new ServiceClosureArgument($ref);
         }
         ksort($refMap);

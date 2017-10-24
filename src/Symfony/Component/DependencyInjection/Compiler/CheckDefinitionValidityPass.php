@@ -75,6 +75,18 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                     }
                 }
             }
+
+            $resolvedId = $container->resolveEnvPlaceholders($id, null, $usedEnvs);
+            if (null !== $usedEnvs) {
+                throw new RuntimeException(sprintf('A service name ("%s") cannot contain dynamic values.', $resolvedId));
+            }
+        }
+
+        foreach ($container->getAliases() as $id => $alias) {
+            $resolvedId = $container->resolveEnvPlaceholders($id, null, $usedEnvs);
+            if (null !== $usedEnvs) {
+                throw new RuntimeException(sprintf('An alias name ("%s") cannot contain dynamic values.', $resolvedId));
+            }
         }
     }
 }

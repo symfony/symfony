@@ -15,6 +15,7 @@ use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 // Detect if we need to serialize deprecations.
 if ($ser = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
     DeprecationErrorHandler::collectDeprecations($ser);
+
     return;
 }
 

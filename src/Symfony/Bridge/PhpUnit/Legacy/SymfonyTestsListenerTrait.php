@@ -260,6 +260,7 @@ class SymfonyTestsListenerTrait
         }
 
         if ($this->runsInSeparateProcess) {
+            putenv('SYMFONY_DEPRECATIONS_SERIALIZE=');
             $deprecations = file_get_contents($this->runsInSeparateProcess);
             unlink($this->runsInSeparateProcess);
             foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {

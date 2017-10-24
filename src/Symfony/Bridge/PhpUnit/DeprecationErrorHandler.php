@@ -112,7 +112,11 @@ class DeprecationErrorHandler
 
             $i = count($trace);
             while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_') || 0 === strpos($trace[$i]['class'], 'PHPUnit\\')))) {
-                // No-op
+                // If the test is run isolation we don't have the actual test class therefore break on the test case
+                // class because that will have test object.
+                if (isset($trace[$i]['class']) && ($trace[$i]['class'] === 'PHPUnit_Framework_TestCase' || $trace[$i]['class'] === 'PHPUnit\Framework\TestCase')) {
+                    break;
+                }
             }
 
             if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {

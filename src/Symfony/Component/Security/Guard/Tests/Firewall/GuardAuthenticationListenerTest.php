@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Firewall\GuardAuthenticationListener;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
@@ -364,6 +365,37 @@ class GuardAuthenticationListenerTest extends TestCase
     public function testReturnNullFromGetCredentials()
     {
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
+        $providerKey = 'my_firewall4';
+
+        $authenticator
+            ->expects($this->once())
+            ->method('supports')
+            ->will($this->returnValue(true));
+
+        // this will raise exception
+        $authenticator
+            ->expects($this->once())
+            ->method('getCredentials')
+            ->will($this->returnValue(null));
+
+        $listener = new GuardAuthenticationListener(
+            $this->guardAuthenticatorHandler,
+            $this->authenticationManager,
+            $providerKey,
+            array($authenticator),
+            $this->logger
+        );
+
+        $listener->handle($this->event);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Returning null from "%s::getCredentials()" is deprecated since version 3.4 and will throw an \UnexpectedValueException in 4.0. Return false from "%s::supports()" instead.
+     */
+    public function testReturnNullFromGetCredentialsTriggersForAbstractGuardAuthenticatorInstances()
+    {
+        $authenticator = $this->getMockBuilder(AbstractGuardAuthenticator::class)->getMock();
         $providerKey = 'my_firewall4';
 
         $authenticator

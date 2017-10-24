@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Guard\Firewall;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
@@ -124,7 +125,13 @@ class GuardAuthenticationListener implements ListenerInterface
                     return;
                 }
 
-                throw new \UnexpectedValueException(sprintf('The return value of "%s::getCredentials()" must not be null. Return false from "%s::supports()" instead.', get_class($guardAuthenticator), get_class($guardAuthenticator)));
+                if ($guardAuthenticator instanceof AbstractGuardAuthenticator) {
+                    @trigger_error(sprintf('Returning null from "%1$s::getCredentials()" is deprecated since version 3.4 and will throw an \UnexpectedValueException in 4.0. Return false from "%1$s::supports()" instead.', get_class($guardAuthenticator)), E_USER_DEPRECATED);
+
+                    return;
+                }
+
+                throw new \UnexpectedValueException(sprintf('The return value of "%1$s::getCredentials()" must not be null. Return false from "%1$s::supports()" instead.', get_class($guardAuthenticator)));
             }
 
             // create a token with the unique key, so that the provider knows which authenticator to use

@@ -27,11 +27,6 @@ class AclCollectionCache
     private $objectIdentityRetrievalStrategy;
     private $securityIdentityRetrievalStrategy;
 
-    /**
-     * @param AclProviderInterface                       $aclProvider
-     * @param ObjectIdentityRetrievalStrategyInterface   $oidRetrievalStrategy
-     * @param SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy
-     */
     public function __construct(AclProviderInterface $aclProvider, ObjectIdentityRetrievalStrategyInterface $oidRetrievalStrategy, SecurityIdentityRetrievalStrategyInterface $sidRetrievalStrategy)
     {
         $this->aclProvider = $aclProvider;

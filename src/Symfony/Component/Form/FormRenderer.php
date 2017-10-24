@@ -27,35 +27,13 @@ class FormRenderer implements FormRendererInterface
 {
     const CACHE_KEY_VAR = 'unique_block_prefix';
 
-    /**
-     * @var FormRendererEngineInterface
-     */
     private $engine;
-
-    /**
-     * @var CsrfTokenManagerInterface
-     */
     private $csrfTokenManager;
-
-    /**
-     * @var array
-     */
     private $blockNameHierarchyMap = array();
-
-    /**
-     * @var array
-     */
     private $hierarchyLevelMap = array();
-
-    /**
-     * @var array
-     */
     private $variableStack = array();
 
     /**
-     * @param FormRendererEngineInterface    $engine
-     * @param CsrfTokenManagerInterface|null $csrfTokenManager
-     *
      * @throws UnexpectedTypeException
      */
     public function __construct(FormRendererEngineInterface $engine, $csrfTokenManager = null)

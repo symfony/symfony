@@ -22,14 +22,8 @@ use Symfony\Component\Translation\DataCollectorTranslator;
  */
 class TranslationDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    /**
-     * @var DataCollectorTranslator
-     */
     private $translator;
 
-    /**
-     * @param DataCollectorTranslator $translator
-     */
     public function __construct(DataCollectorTranslator $translator)
     {
         $this->translator = $translator;

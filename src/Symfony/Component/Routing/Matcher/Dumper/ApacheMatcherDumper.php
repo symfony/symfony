@@ -35,8 +35,6 @@ class ApacheMatcherDumper extends MatcherDumper
      *  * script_name: The script name (app.php by default)
      *  * base_uri:    The base URI ("" by default)
      *
-     * @param array $options An array of options
-     *
      * @return string A string to be used as Apache rewrite rules
      *
      * @throws \LogicException When the route regex is invalid
@@ -191,8 +189,6 @@ class ApacheMatcherDumper extends MatcherDumper
     /**
      * Returns methods allowed for a route.
      *
-     * @param Route $route The route
-     *
      * @return array The methods
      */
     private function getRouteMethods(Route $route)
@@ -255,8 +251,6 @@ class ApacheMatcherDumper extends MatcherDumper
 
     /**
      * Normalizes an array of values.
-     *
-     * @param array $values
      *
      * @return string[]
      */

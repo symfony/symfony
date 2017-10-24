@@ -27,8 +27,6 @@ interface SecurityIdentityRetrievalStrategyInterface
      * Typically, security identities should be ordered from most specific to
      * least specific.
      *
-     * @param TokenInterface $token
-     *
      * @return SecurityIdentityInterface[] An array of SecurityIdentityInterface implementations
      */
     public function getSecurityIdentities(TokenInterface $token);

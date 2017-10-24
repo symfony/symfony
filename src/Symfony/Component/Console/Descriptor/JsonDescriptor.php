@@ -81,9 +81,6 @@ class JsonDescriptor extends Descriptor
     /**
      * Writes data as json.
      *
-     * @param array $data
-     * @param array $options
-     *
      * @return array|string
      */
     private function writeData(array $data, array $options)
@@ -92,8 +89,6 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param InputArgument $argument
-     *
      * @return array
      */
     private function getInputArgumentData(InputArgument $argument)
@@ -108,8 +103,6 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param InputOption $option
-     *
      * @return array
      */
     private function getInputOptionData(InputOption $option)
@@ -126,8 +119,6 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param InputDefinition $definition
-     *
      * @return array
      */
     private function getInputDefinitionData(InputDefinition $definition)
@@ -146,8 +137,6 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param Command $command
-     *
      * @return array
      */
     private function getCommandData(Command $command)

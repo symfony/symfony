@@ -25,9 +25,6 @@ class SurrogateListener implements EventSubscriberInterface
 {
     private $surrogate;
 
-    /**
-     * @param SurrogateInterface $surrogate An SurrogateInterface instance
-     */
     public function __construct(SurrogateInterface $surrogate = null)
     {
         $this->surrogate = $surrogate;
@@ -35,8 +32,6 @@ class SurrogateListener implements EventSubscriberInterface
 
     /**
      * Filters the Response.
-     *
-     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {

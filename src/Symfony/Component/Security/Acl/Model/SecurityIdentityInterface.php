@@ -23,8 +23,6 @@ interface SecurityIdentityInterface
     /**
      * This method is used to compare two security identities in order to
      * not rely on referential equality.
-     *
-     * @param SecurityIdentityInterface $identity
      */
     public function equals(SecurityIdentityInterface $identity);
 }

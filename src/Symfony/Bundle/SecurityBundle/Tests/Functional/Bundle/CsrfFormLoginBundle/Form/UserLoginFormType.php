@@ -31,9 +31,6 @@ class UserLoginFormType extends AbstractType
 {
     private $request;
 
-    /**
-     * @param Request $request A request instance
-     */
     public function __construct(Request $request)
     {
         $this->request = $request;

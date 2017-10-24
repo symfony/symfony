@@ -123,8 +123,6 @@ class TranslationNodeVisitor extends AbstractNodeVisitor
     }
 
     /**
-     * @param Node $node
-     *
      * @return string|null
      */
     private function getReadDomainFromNode(Node $node)

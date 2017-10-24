@@ -282,7 +282,7 @@ class TextDescriptor extends Descriptor
      *
      * @return int
      */
-    private function calculateTotalWidthForOptions($options)
+    private function calculateTotalWidthForOptions(array $options)
     {
         $totalWidth = 0;
         foreach ($options as $option) {

@@ -80,8 +80,6 @@ class Process
      * Exit codes translation table.
      *
      * User-defined errors must use exit codes in the 64-113 range.
-     *
-     * @var array
      */
     public static $exitCodes = array(
         0 => 'OK',

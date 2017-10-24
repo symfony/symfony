@@ -29,15 +29,11 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
 
     /**
      * Prefix for new found message.
-     *
-     * @var string
      */
     private $prefix = '';
 
     /**
      * The sequence that captures translation messages.
-     *
-     * @var array
      */
     protected $sequences = array(
         array(

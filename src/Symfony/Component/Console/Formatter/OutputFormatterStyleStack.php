@@ -21,14 +21,8 @@ class OutputFormatterStyleStack
      */
     private $styles;
 
-    /**
-     * @var OutputFormatterStyleInterface
-     */
     private $emptyStyle;
 
-    /**
-     * @param OutputFormatterStyleInterface|null $emptyStyle
-     */
     public function __construct(OutputFormatterStyleInterface $emptyStyle = null)
     {
         $this->emptyStyle = $emptyStyle ?: new OutputFormatterStyle();
@@ -45,8 +39,6 @@ class OutputFormatterStyleStack
 
     /**
      * Pushes a style in the stack.
-     *
-     * @param OutputFormatterStyleInterface $style
      */
     public function push(OutputFormatterStyleInterface $style)
     {
@@ -55,8 +47,6 @@ class OutputFormatterStyleStack
 
     /**
      * Pops a style from the stack.
-     *
-     * @param OutputFormatterStyleInterface|null $style
      *
      * @return OutputFormatterStyleInterface
      *
@@ -98,8 +88,6 @@ class OutputFormatterStyleStack
     }
 
     /**
-     * @param OutputFormatterStyleInterface $emptyStyle
-     *
      * @return $this
      */
     public function setEmptyStyle(OutputFormatterStyleInterface $emptyStyle)

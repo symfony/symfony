@@ -31,9 +31,6 @@ class AuthenticatedVoter implements VoterInterface
 
     private $authenticationTrustResolver;
 
-    /**
-     * @param AuthenticationTrustResolverInterface $authenticationTrustResolver
-     */
     public function __construct(AuthenticationTrustResolverInterface $authenticationTrustResolver)
     {
         $this->authenticationTrustResolver = $authenticationTrustResolver;

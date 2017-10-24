@@ -96,25 +96,11 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     const ACCESS_TYPE_NOT_FOUND = 4;
 
-    /**
-     * @var bool
-     */
     private $magicCall;
-
-    /**
-     * @var bool
-     */
     private $ignoreInvalidIndices;
-
-    /**
-     * @var array
-     */
     private $readPropertyCache = array();
-
-    /**
-     * @var array
-     */
     private $writePropertyCache = array();
+
     private static $previousErrorHandler = false;
     private static $errorHandler = array(__CLASS__, 'handleError');
     private static $resultProto = array(self::VALUE => null);

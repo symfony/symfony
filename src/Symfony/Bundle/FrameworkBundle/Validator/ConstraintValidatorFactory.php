@@ -56,8 +56,6 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
     /**
      * Returns the validator for the supplied constraint.
      *
-     * @param Constraint $constraint A constraint
-     *
      * @return ConstraintValidatorInterface A validator for the supplied constraint
      *
      * @throws ValidatorException      When the validator class does not exist

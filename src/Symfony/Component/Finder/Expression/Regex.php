@@ -28,7 +28,7 @@ class Regex implements ValueInterface
     private $pattern;
 
     /**
-     * @var array
+     * @var string
      */
     private $options;
 
@@ -277,8 +277,6 @@ class Regex implements ValueInterface
     }
 
     /**
-     * @param array $replacement
-     *
      * @return $this
      */
     public function replaceJokers($replacement)

@@ -50,11 +50,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class Container implements IntrospectableContainerInterface
 {
-    /**
-     * @var ParameterBagInterface
-     */
     protected $parameterBag;
-
     protected $services = array();
     protected $methodMap = array();
     protected $aliases = array();
@@ -66,9 +62,6 @@ class Container implements IntrospectableContainerInterface
 
     private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
 
-    /**
-     * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
-     */
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         $this->parameterBag = $parameterBag ?: new ParameterBag();
@@ -453,8 +446,6 @@ class Container implements IntrospectableContainerInterface
 
     /**
      * Adds a scope to the container.
-     *
-     * @param ScopeInterface $scope
      *
      * @throws InvalidArgumentException
      */

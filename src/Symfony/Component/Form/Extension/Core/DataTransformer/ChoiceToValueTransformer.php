@@ -22,9 +22,6 @@ class ChoiceToValueTransformer implements DataTransformerInterface
 {
     private $choiceList;
 
-    /**
-     * @param ChoiceListInterface $choiceList
-     */
     public function __construct(ChoiceListInterface $choiceList)
     {
         $this->choiceList = $choiceList;

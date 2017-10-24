@@ -66,11 +66,6 @@ class LogoutListener implements ListenerInterface
         $this->handlers = array();
     }
 
-    /**
-     * Adds a logout handler.
-     *
-     * @param LogoutHandlerInterface $handler
-     */
     public function addHandler(LogoutHandlerInterface $handler)
     {
         $this->handlers[] = $handler;
@@ -81,8 +76,6 @@ class LogoutListener implements ListenerInterface
      *
      * If a CsrfTokenManagerInterface instance is available, it will be used to
      * validate the request.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
      *
      * @throws LogoutException   if the CSRF token is invalid
      * @throws \RuntimeException if the LogoutSuccessHandlerInterface instance does not return a response
@@ -126,8 +119,6 @@ class LogoutListener implements ListenerInterface
      * The default implementation only processed requests to a specific path,
      * but a subclass could change this to logout requests where
      * certain parameters is present.
-     *
-     * @param Request $request
      *
      * @return bool
      */

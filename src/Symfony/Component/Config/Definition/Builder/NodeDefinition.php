@@ -32,10 +32,6 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $nullEquivalent;
     protected $trueEquivalent = true;
     protected $falseEquivalent = false;
-
-    /**
-     * @var NodeParentInterface|null
-     */
     protected $parent;
     protected $attributes = array();
 
@@ -51,8 +47,6 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets the parent node.
-     *
-     * @param NodeParentInterface $parent The parent
      *
      * @return $this
      */

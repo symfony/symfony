@@ -113,8 +113,6 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * Deletes the security identity from the database.
      * ACL entries have the CASCADE option on their foreign key so they will also get deleted.
      *
-     * @param SecurityIdentityInterface $sid
-     *
      * @throws \InvalidArgumentException
      */
     public function deleteSecurityIdentity(SecurityIdentityInterface $sid)
@@ -552,8 +550,6 @@ QUERY;
     /**
      * Constructs the SQL for inserting a security identity.
      *
-     * @param SecurityIdentityInterface $sid
-     *
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -624,8 +620,6 @@ QUERY;
     /**
      * Constructs the SQL for selecting the primary key of a security identity.
      *
-     * @param SecurityIdentityInterface $sid
-     *
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -652,8 +646,6 @@ QUERY;
 
     /**
      * Constructs the SQL to delete a security identity.
-     *
-     * @param SecurityIdentityInterface $sid
      *
      * @return string
      *
@@ -742,8 +734,6 @@ QUERY;
 
     /**
      * Creates the ACL for the passed object identity.
-     *
-     * @param ObjectIdentityInterface $oid
      */
     private function createObjectIdentity(ObjectIdentityInterface $oid)
     {
@@ -777,8 +767,6 @@ QUERY;
      *
      * If the security identity does not yet exist in the database, it will be
      * created.
-     *
-     * @param SecurityIdentityInterface $sid
      *
      * @return int
      */
@@ -825,8 +813,6 @@ QUERY;
 
     /**
      * This regenerates the ancestor table which is used for fast read access.
-     *
-     * @param AclInterface $acl
      */
     private function regenerateAncestorRelations(AclInterface $acl)
     {
@@ -988,8 +974,6 @@ QUERY;
 
     /**
      * Persists the changes which were made to ACEs to the database.
-     *
-     * @param \SplObjectStorage $aces
      */
     private function updateAces(\SplObjectStorage $aces)
     {

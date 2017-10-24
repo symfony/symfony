@@ -203,8 +203,6 @@ class DoctrineAclCache implements AclCacheInterface
     /**
      * Returns the key for the object identity.
      *
-     * @param ObjectIdentityInterface $oid
-     *
      * @return string
      */
     private function getDataKeyByIdentity(ObjectIdentityInterface $oid)

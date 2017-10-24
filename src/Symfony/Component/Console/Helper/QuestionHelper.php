@@ -34,10 +34,6 @@ class QuestionHelper extends Helper
     /**
      * Asks a question to the user.
      *
-     * @param InputInterface  $input    An InputInterface instance
-     * @param OutputInterface $output   An OutputInterface instance
-     * @param Question        $question The question to ask
-     *
      * @return mixed The user answer
      *
      * @throws \RuntimeException If there is no data to read in the input stream
@@ -106,9 +102,6 @@ class QuestionHelper extends Helper
      *
      * This method is public for PHP 5.3 compatibility, it should be private.
      *
-     * @param OutputInterface $output
-     * @param Question        $question
-     *
      * @return bool|mixed|null|string
      *
      * @throws \Exception
@@ -155,9 +148,6 @@ class QuestionHelper extends Helper
 
     /**
      * Outputs the question prompt.
-     *
-     * @param OutputInterface $output
-     * @param Question        $question
      */
     protected function writePrompt(OutputInterface $output, Question $question)
     {
@@ -182,9 +172,6 @@ class QuestionHelper extends Helper
 
     /**
      * Outputs an error message.
-     *
-     * @param OutputInterface $output
-     * @param \Exception      $error
      */
     protected function writeError(OutputInterface $output, \Exception $error)
     {

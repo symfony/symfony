@@ -278,8 +278,6 @@ class Form extends Link implements \ArrayAccess
 
     /**
      * Sets a named field.
-     *
-     * @param FormField $field The field
      */
     public function set(FormField $field)
     {
@@ -365,8 +363,6 @@ class Form extends Link implements \ArrayAccess
      * Sets the node for the form.
      *
      * Expects a 'submit' button \DOMElement and finds the corresponding form element, or the form element itself.
-     *
-     * @param \DOMElement $node A \DOMElement instance
      *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */

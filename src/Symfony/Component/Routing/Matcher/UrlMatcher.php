@@ -31,21 +31,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     const REQUIREMENT_MISMATCH = 1;
     const ROUTE_MATCH = 2;
 
-    /**
-     * @var RequestContext
-     */
     protected $context;
-
-    /**
-     * @var array
-     */
     protected $allow = array();
-
-    /**
-     * @var RouteCollection
-     */
     protected $routes;
-
     protected $request;
     protected $expressionLanguage;
 
@@ -54,10 +42,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected $expressionLanguageProviders = array();
 
-    /**
-     * @param RouteCollection $routes  A RouteCollection instance
-     * @param RequestContext  $context The context
-     */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
         $this->routes = $routes;

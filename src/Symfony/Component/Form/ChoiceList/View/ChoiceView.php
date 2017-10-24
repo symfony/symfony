@@ -70,8 +70,6 @@ class ChoiceView extends LegacyChoiceView
 {
     /**
      * Additional attributes for the HTML tag.
-     *
-     * @var array
      */
     public $attr;
 

@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
+use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 
 class ChainEncoderTest extends TestCase
@@ -123,10 +124,14 @@ class ChainNormalizationAwareEncoder extends ChainEncoder implements Normalizati
 {
 }
 
-class NormalizationAwareEncoder implements NormalizationAwareInterface
+class NormalizationAwareEncoder implements EncoderInterface, NormalizationAwareInterface
 {
     public function supportsEncoding($format)
     {
         return true;
+    }
+
+    public function encode($data, $format, array $context = array())
+    {
     }
 }

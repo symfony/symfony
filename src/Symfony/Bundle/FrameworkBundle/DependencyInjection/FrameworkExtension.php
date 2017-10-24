@@ -476,9 +476,7 @@ class FrameworkExtension extends Extension
     private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$config['enabled']) {
-            if (!class_exists(Workflow\Workflow::class)) {
-                $container->removeDefinition(WorkflowDumpCommand::class);
-            }
+            $container->removeDefinition(WorkflowDumpCommand::class);
 
             return;
         }

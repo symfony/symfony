@@ -255,6 +255,12 @@ class DeprecationErrorHandler
             }
             $deprecations[] = array(error_reporting(), $msg);
         });
+        // This can be registered before the PHPUnit error handler.
+        if (!$previousErrorHandler) {
+            $UtilPrefix = class_exists('PHPUnit_Util_ErrorHandler') ? 'PHPUnit_Util_' : 'PHPUnit\Util\\';
+            $previousErrorHandler = $UtilPrefix.'ErrorHandler::handleError';
+        }
+
         register_shutdown_function(function () use ($outputFile, &$deprecations) {
             file_put_contents($outputFile, serialize($deprecations));
         });

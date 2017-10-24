@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-18T01:38:47Z
+
+Would that fix and replace #24575 also?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-18T05:36:14Z
+
+I am not sure. I did not fully understand the issue that is going to be fixed in #24575.
+
+ping @alexpott
+
+---------------------------------------------------------------------------
+
+by alexpott at 2017-10-18T08:40:59Z
+
+I don't think this will fix #24575 but I'm pretty certain it will fix #24568
+
+---------------------------------------------------------------------------
+
+by alexpott at 2017-10-18T09:31:23Z
+
+If we go this route of adding the test and method to the deprecation thrown by ::endTest() then we also need to parse out the message in \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::handleError() so that the @expectedDeprecation annotation works.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-18T10:40:26Z
+
+Do you have an example of what wouldn't work otherwise? I mean the message is never touched, is it?
+
+---------------------------------------------------------------------------
+
+by alexpott at 2017-10-18T11:33:51Z
+
+Here are the changes I think we need to address the points from my review:
+https://github.com/alexpott/symfony/commit/6f45707692f96751b5588613b603d3533ac72600

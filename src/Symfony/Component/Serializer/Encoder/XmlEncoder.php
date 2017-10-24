@@ -517,8 +517,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Get real XML root node name, taking serializer options into account.
      *
-     * @param array $context
-     *
      * @return string
      */
     private function resolveXmlRootName(array $context = array())

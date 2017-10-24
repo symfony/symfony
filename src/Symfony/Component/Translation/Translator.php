@@ -97,11 +97,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $this->debug = $debug;
     }
 
-    /**
-     * Sets the ConfigCache factory to use.
-     *
-     * @param ConfigCacheFactoryInterface $configCacheFactory
-     */
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
     {
         $this->configCacheFactory = $configCacheFactory;

@@ -31,8 +31,6 @@ class ResponseListener implements EventSubscriberInterface
 
     /**
      * Filters the Response.
-     *
-     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {

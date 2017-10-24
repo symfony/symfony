@@ -29,9 +29,6 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class FormDataCollector extends DataCollector implements FormDataCollectorInterface
 {
-    /**
-     * @var FormDataExtractor
-     */
     private $dataExtractor;
 
     /**

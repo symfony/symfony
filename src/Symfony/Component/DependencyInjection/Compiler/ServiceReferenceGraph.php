@@ -82,9 +82,9 @@ class ServiceReferenceGraph
      * Connects 2 nodes together in the Graph.
      *
      * @param string $sourceId
-     * @param string $sourceValue
+     * @param mixed  $sourceValue
      * @param string $destId
-     * @param string $destValue
+     * @param mixed  $destValue
      * @param string $reference
      * @param bool   $lazy
      * @param bool   $weak
@@ -93,6 +93,10 @@ class ServiceReferenceGraph
     {
         $lazy = func_num_args() >= 6 ? func_get_arg(5) : false;
         $weak = func_num_args() >= 7 ? func_get_arg(6) : false;
+
+        if (null === $sourceId || null === $destId) {
+            return;
+        }
 
         $sourceNode = $this->createNode($sourceId, $sourceValue);
         $destNode = $this->createNode($destId, $destValue);
@@ -106,7 +110,7 @@ class ServiceReferenceGraph
      * Creates a graph node.
      *
      * @param string $id
-     * @param string $value
+     * @param mixed  $value
      *
      * @return ServiceReferenceGraphNode
      */

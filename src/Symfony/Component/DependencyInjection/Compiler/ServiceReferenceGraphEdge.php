@@ -29,7 +29,7 @@ class ServiceReferenceGraphEdge
     /**
      * @param ServiceReferenceGraphNode $sourceNode
      * @param ServiceReferenceGraphNode $destNode
-     * @param string                    $value
+     * @param mixed                     $value
      * @param bool                      $lazy
      * @param bool                      $weak
      */

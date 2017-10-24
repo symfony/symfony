@@ -105,8 +105,6 @@ class JsonDecode implements DecoderInterface
     /**
      * Merges the default options of the Json Decoder with the passed context.
      *
-     * @param array $context
-     *
      * @return array
      */
     private function resolveContext(array $context)

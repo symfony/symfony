@@ -34,8 +34,6 @@ interface AuthenticationProviderInterface extends AuthenticationManagerInterface
     /**
      * Checks whether this provider supports the given token.
      *
-     * @param TokenInterface $token A TokenInterface instance
-     *
      * @return bool true if the implementation supports the Token, false otherwise
      */
     public function supports(TokenInterface $token);

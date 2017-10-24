@@ -23,29 +23,11 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      */
     const CACHE_KEY_VAR = 'cache_key';
 
-    /**
-     * @var array
-     */
     protected $defaultThemes;
-
-    /**
-     * @var array
-     */
     protected $themes = array();
-
-    /**
-     * @var array
-     */
     protected $useDefaultThemes = array();
-
-    /**
-     * @var array
-     */
     protected $resources = array();
 
-    /**
-     * @var array
-     */
     private $resourceHierarchyLevels = array();
 
     /**

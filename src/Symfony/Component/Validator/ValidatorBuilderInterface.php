@@ -27,8 +27,6 @@ interface ValidatorBuilderInterface
     /**
      * Adds an object initializer to the validator.
      *
-     * @param ObjectInitializerInterface $initializer The initializer
-     *
      * @return $this
      */
     public function addObjectInitializer(ObjectInitializerInterface $initializer);
@@ -36,7 +34,7 @@ interface ValidatorBuilderInterface
     /**
      * Adds a list of object initializers to the validator.
      *
-     * @param array $initializers The initializer
+     * @param ObjectInitializerInterface[] $initializers
      *
      * @return $this
      */
@@ -54,7 +52,7 @@ interface ValidatorBuilderInterface
     /**
      * Adds a list of XML constraint mapping files to the validator.
      *
-     * @param array $paths The paths to the mapping files
+     * @param string[] $paths The paths to the mapping files
      *
      * @return $this
      */
@@ -72,7 +70,7 @@ interface ValidatorBuilderInterface
     /**
      * Adds a list of YAML constraint mappings file to the validator.
      *
-     * @param array $paths The paths to the mapping files
+     * @param string[] $paths The paths to the mapping files
      *
      * @return $this
      */
@@ -90,7 +88,7 @@ interface ValidatorBuilderInterface
     /**
      * Enables constraint mapping using the given static methods.
      *
-     * @param array $methodNames The names of the methods
+     * @param string[] $methodNames The names of the methods
      *
      * @return $this
      */
@@ -98,8 +96,6 @@ interface ValidatorBuilderInterface
 
     /**
      * Enables annotation based constraint mapping.
-     *
-     * @param Reader $annotationReader The annotation reader to be used
      *
      * @return $this
      */
@@ -115,16 +111,12 @@ interface ValidatorBuilderInterface
     /**
      * Sets the class metadata factory used by the validator.
      *
-     * @param MetadataFactoryInterface $metadataFactory The metadata factory
-     *
      * @return $this
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory);
 
     /**
      * Sets the cache for caching class metadata.
-     *
-     * @param CacheInterface $cache The cache instance
      *
      * @return $this
      */
@@ -133,16 +125,12 @@ interface ValidatorBuilderInterface
     /**
      * Sets the constraint validator factory used by the validator.
      *
-     * @param ConstraintValidatorFactoryInterface $validatorFactory The validator factory
-     *
      * @return $this
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory);
 
     /**
      * Sets the translator used for translating violation messages.
-     *
-     * @param TranslatorInterface $translator The translator instance
      *
      * @return $this
      */

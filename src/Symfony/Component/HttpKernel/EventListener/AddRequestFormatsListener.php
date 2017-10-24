@@ -22,14 +22,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class AddRequestFormatsListener implements EventSubscriberInterface
 {
-    /**
-     * @var array
-     */
     protected $formats;
 
-    /**
-     * @param array $formats
-     */
     public function __construct(array $formats)
     {
         $this->formats = $formats;
@@ -37,8 +31,6 @@ class AddRequestFormatsListener implements EventSubscriberInterface
 
     /**
      * Adds request formats.
-     *
-     * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)
     {

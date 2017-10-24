@@ -238,8 +238,6 @@ class RouterTest extends TestCase
     }
 
     /**
-     * @param RouteCollection $routes
-     *
      * @return \Symfony\Component\DependencyInjection\Container
      */
     private function getServiceContainer(RouteCollection $routes)

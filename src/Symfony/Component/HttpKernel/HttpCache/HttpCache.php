@@ -503,9 +503,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Checks whether the cache entry is "fresh enough" to satisfy the Request.
      *
-     * @param Request  $request A Request instance
-     * @param Response $entry   A Response instance
-     *
      * @return bool true if the cache entry if fresh enough, false otherwise
      */
     protected function isFreshEnough(Request $request, Response $entry)
@@ -523,9 +520,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     /**
      * Locks a Request during the call to the backend.
-     *
-     * @param Request  $request A Request instance
-     * @param Response $entry   A Response instance
      *
      * @return bool true if the cache entry can be returned even if it is staled, false otherwise
      */
@@ -572,9 +566,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Writes the Response to the cache.
      *
-     * @param Request  $request  A Request instance
-     * @param Response $response A Response instance
-     *
      * @throws \Exception
      */
     protected function store(Request $request, Response $response)
@@ -599,9 +590,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
     /**
      * Restores the Response body.
-     *
-     * @param Request  $request  A Request instance
-     * @param Response $response A Response instance
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
@@ -642,8 +630,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Checks if the Request includes authorization or other sensitive information
      * that should cause the Response to be considered private by default.
-     *
-     * @param Request $request A Request instance
      *
      * @return bool true if the Request is private, false otherwise
      */

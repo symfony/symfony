@@ -91,8 +91,6 @@ class Token
     }
 
     /**
-     * @param array $values
-     *
      * @return bool
      */
     public function isDelimiter(array $values = array())

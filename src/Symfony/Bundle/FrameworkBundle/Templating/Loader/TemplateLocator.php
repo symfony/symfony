@@ -42,8 +42,6 @@ class TemplateLocator implements FileLocatorInterface
     /**
      * Returns a full path for a given file.
      *
-     * @param TemplateReferenceInterface $template A template
-     *
      * @return string The full path for the file
      */
     protected function getCacheKey($template)

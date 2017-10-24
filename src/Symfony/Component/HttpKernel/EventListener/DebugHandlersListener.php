@@ -60,8 +60,6 @@ class DebugHandlersListener implements EventSubscriberInterface
 
     /**
      * Configures the error handler.
-     *
-     * @param Event|null $event The triggering event
      */
     public function configure(Event $event = null)
     {

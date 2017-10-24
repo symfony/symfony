@@ -268,8 +268,6 @@ class DoctrineExtensionTest extends TestCase
     }
 
     /**
-     * @param array $data
-     *
      * @return \Symfony\Component\DependencyInjection\ContainerBuilder
      */
     protected function createContainer(array $data = array())

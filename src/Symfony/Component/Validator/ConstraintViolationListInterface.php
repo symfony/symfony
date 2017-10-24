@@ -20,15 +20,11 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
 {
     /**
      * Adds a constraint violation to this list.
-     *
-     * @param ConstraintViolationInterface $violation The violation to add
      */
     public function add(ConstraintViolationInterface $violation);
 
     /**
      * Merges an existing violation list into this list.
-     *
-     * @param ConstraintViolationListInterface $otherList The list to merge
      */
     public function addAll(ConstraintViolationListInterface $otherList);
 

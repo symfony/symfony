@@ -20,9 +20,6 @@ namespace Symfony\Component\HttpKernel\CacheClearer;
  */
 class ChainCacheClearer implements CacheClearerInterface
 {
-    /**
-     * @var array
-     */
     protected $clearers;
 
     /**
@@ -47,8 +44,6 @@ class ChainCacheClearer implements CacheClearerInterface
 
     /**
      * Adds a cache clearer to the aggregate.
-     *
-     * @param CacheClearerInterface $clearer
      *
      * @deprecated since version 3.4, to be removed in 4.0, inject the list of clearers as a constructor argument instead.
      */

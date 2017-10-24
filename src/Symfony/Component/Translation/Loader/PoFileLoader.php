@@ -123,9 +123,6 @@ class PoFileLoader extends FileLoader
      *
      * A .po file could contain by error missing plural indexes. We need to
      * fix these before saving them.
-     *
-     * @param array $messages
-     * @param array $item
      */
     private function addMessage(array &$messages, array $item)
     {

@@ -43,14 +43,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     private $firewall;
     private $hasVarDumper;
 
-    /**
-     * @param TokenStorageInterface|null          $tokenStorage
-     * @param RoleHierarchyInterface|null         $roleHierarchy
-     * @param LogoutUrlGenerator|null             $logoutUrlGenerator
-     * @param AccessDecisionManagerInterface|null $accessDecisionManager
-     * @param FirewallMapInterface|null           $firewallMap
-     * @param TraceableFirewallListener|null      $firewall
-     */
     public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null, TraceableFirewallListener $firewall = null)
     {
         $this->tokenStorage = $tokenStorage;

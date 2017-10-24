@@ -89,8 +89,6 @@ class PhpDumper extends Dumper
 
     /**
      * Sets the dumper to be used when dumping proxies in the generated container.
-     *
-     * @param ProxyDumper $proxyDumper
      */
     public function setProxyDumper(ProxyDumper $proxyDumper)
     {
@@ -106,8 +104,6 @@ class PhpDumper extends Dumper
      *  * base_class: The base class name
      *  * namespace:  The class namespace
      *  * as_files:   To split the container in several files
-     *
-     * @param array $options An array of options
      *
      * @return string|array A PHP class representing the service container or an array of PHP files if the "as_files" option is set
      *
@@ -325,9 +321,6 @@ EOF;
 
     /**
      * Generates the require_once statement for service includes.
-     *
-     * @param Definition $definition
-     * @param array      $inlinedDefinitions
      *
      * @return string
      */
@@ -1402,10 +1395,6 @@ EOF;
 
     /**
      * Builds service calls from arguments.
-     *
-     * @param array $arguments
-     * @param array &$calls    By reference
-     * @param array &$behavior By reference
      */
     private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {
@@ -1432,8 +1421,6 @@ EOF;
     /**
      * Returns the inline definition.
      *
-     * @param Definition $definition
-     *
      * @return array
      */
     private function getInlinedDefinitions(Definition $definition)
@@ -1457,8 +1444,6 @@ EOF;
 
     /**
      * Gets the definition from arguments.
-     *
-     * @param array $arguments
      *
      * @return array
      */

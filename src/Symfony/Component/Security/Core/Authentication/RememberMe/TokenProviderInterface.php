@@ -51,8 +51,6 @@ interface TokenProviderInterface
 
     /**
      * Creates a new token.
-     *
-     * @param PersistentTokenInterface $token
      */
     public function createNewToken(PersistentTokenInterface $token);
 }

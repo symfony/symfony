@@ -20,14 +20,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class UserPasswordEncoder implements UserPasswordEncoderInterface
 {
-    /**
-     * @var EncoderFactoryInterface
-     */
     private $encoderFactory;
 
-    /**
-     * @param EncoderFactoryInterface $encoderFactory The encoder factory
-     */
     public function __construct(EncoderFactoryInterface $encoderFactory)
     {
         $this->encoderFactory = $encoderFactory;

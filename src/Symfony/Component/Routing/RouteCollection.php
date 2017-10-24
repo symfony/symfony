@@ -116,8 +116,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Adds a route collection at the end of the current set by appending all
      * routes of the added collection.
-     *
-     * @param RouteCollection $collection A RouteCollection instance
      */
     public function addCollection(RouteCollection $collection)
     {
@@ -270,8 +268,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Adds a resource for this collection. If the resource already exists
      * it is not added.
-     *
-     * @param ResourceInterface $resource A resource instance
      */
     public function addResource(ResourceInterface $resource)
     {

@@ -57,8 +57,6 @@ class DigestAuthenticationListener implements ListenerInterface
     /**
      * Handles digest authentication.
      *
-     * @param GetResponseEvent $event A GetResponseEvent instance
-     *
      * @throws AuthenticationServiceException
      */
     public function handle(GetResponseEvent $event)

@@ -21,9 +21,6 @@ class TranslatorHelper extends Helper
 {
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator A TranslatorInterface instance
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

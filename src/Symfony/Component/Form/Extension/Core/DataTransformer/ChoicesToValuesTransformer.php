@@ -22,17 +22,12 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
 {
     private $choiceList;
 
-    /**
-     * @param ChoiceListInterface $choiceList
-     */
     public function __construct(ChoiceListInterface $choiceList)
     {
         $this->choiceList = $choiceList;
     }
 
     /**
-     * @param array $array
-     *
      * @return array
      *
      * @throws TransformationFailedException if the given value is not an array
@@ -51,8 +46,6 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param array $array
-     *
      * @return array
      *
      * @throws TransformationFailedException if the given value is not an array

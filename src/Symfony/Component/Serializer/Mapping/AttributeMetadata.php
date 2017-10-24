@@ -19,8 +19,6 @@ namespace Symfony\Component\Serializer\Mapping;
 class AttributeMetadata implements AttributeMetadataInterface
 {
     /**
-     * @var string
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getName()} instead.
@@ -28,8 +26,6 @@ class AttributeMetadata implements AttributeMetadataInterface
     public $name;
 
     /**
-     * @var array
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getGroups()} instead.

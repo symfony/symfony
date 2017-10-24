@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by kamazee at 2017-10-22T10:22:19Z
+
+Oops, adding "BC Break" label must be a mistake (that's either me leaving BC Break row with "yes/no" when submitting PR or just mentioning BC break in PR description text). I'd appreciate it being removed.
+
+---------------------------------------------------------------------------
+
+by kamazee at 2017-10-22T10:29:58Z
+
+Looks like CI consoles enable formatting. I'll do more cleanup for irrelevant sequences and update PR.
+
+---------------------------------------------------------------------------
+
+by kamazee at 2017-10-22T11:35:41Z
+
+Ready for review.

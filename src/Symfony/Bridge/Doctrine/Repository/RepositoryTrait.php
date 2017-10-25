@@ -50,18 +50,6 @@ trait RepositoryTrait
     }
 
     /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
-    {
-        if (null === $this->em) {
-            throw new \RuntimeException(sprintf('The setEntityManager() method must be called on the "%s" class before calling getEntityManager().', get_class($this)));
-        }
-
-        return $this->em;
-    }
-
-    /**
      * @see EntityRepository::createQueryBuilder()
      *
      * @param string $alias
@@ -169,7 +157,7 @@ trait RepositoryTrait
      */
     public function findOneBy(array $criteria, array $orderBy = null)
     {
-        return $this->findBy($criteria, $orderBy);
+        return $this->getRepository()->findOneBy($criteria, $orderBy);
     }
 
     /**
@@ -185,9 +173,21 @@ trait RepositoryTrait
     }
 
     /**
+     * @return EntityManagerInterface
+     */
+    protected function getEntityManager()
+    {
+        if (null === $this->em) {
+            throw new \RuntimeException(sprintf('The setEntityManager() method must be called on the "%s" class before calling getEntityManager().', get_class($this)));
+        }
+
+        return $this->em;
+    }
+
+    /**
      * @return EntityRepository
      */
-    private function getRepository()
+    protected function getRepository()
     {
         return $this->getEntityManager()->getRepository($this->getClassName());
     }

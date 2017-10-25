@@ -179,7 +179,7 @@ EODUMP;
             array('PT1S', 0, 0, '+ 00:00:01.0', '1s'),
             array('PT2M', 0, 0, '+ 00:02:00.0', '120s'),
             array('PT3H', 0, 0, '+ 03:00:00.0', '10 800s'),
-            array('P4D', 0, 0, '+ 4d', '345 600s'),
+            array('P4D', 0, 0, '+ 4d', '34%x %x00s'), // %x to account for DST
             array('P5M', 0, 0, '+ 5m', null),
             array('P6Y', 0, 0, '+ 6y', null),
             array('P1Y2M3DT4H5M6S', 0, 0, '+ 1y 2m 3d 04:05:06.0', null),

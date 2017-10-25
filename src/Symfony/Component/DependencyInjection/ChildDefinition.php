@@ -130,5 +130,3 @@ class ChildDefinition extends Definition
         throw new BadMethodCallException('A ChildDefinition cannot have bindings set on it.');
     }
 }
-
-class_alias(ChildDefinition::class, DefinitionDecorator::class);

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Bundle\WebServerBundle\WebServerConfig;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,7 +27,7 @@ use Symfony\Component\Process\Process;
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */
-class ServerRunCommand extends ServerCommand
+class ServerRunCommand extends Command
 {
     private $documentRoot;
     private $environment;
@@ -88,12 +89,6 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
-
-        // deprecated, logic to be removed in 4.0
-        // this allows the commands to work out of the box with web/ and public/
-        if ($this->documentRoot && !is_dir($this->documentRoot) && is_dir(dirname($this->documentRoot).'/web')) {
-            $this->documentRoot = dirname($this->documentRoot).'/web';
-        }
 
         if (null === $documentRoot = $input->getOption('docroot')) {
             if (!$this->documentRoot) {

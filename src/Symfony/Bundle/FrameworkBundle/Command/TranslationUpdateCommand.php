@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
@@ -31,7 +32,7 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  *
  * @final since version 3.4
  */
-class TranslationUpdateCommand extends ContainerAwareCommand
+class TranslationUpdateCommand extends Command
 {
     protected static $defaultName = 'translation:update';
 
@@ -40,22 +41,8 @@ class TranslationUpdateCommand extends ContainerAwareCommand
     private $extractor;
     private $defaultLocale;
 
-    /**
-     * @param TranslationWriterInterface $writer
-     * @param TranslationReaderInterface $reader
-     * @param ExtractorInterface         $extractor
-     * @param string                     $defaultLocale
-     */
-    public function __construct($writer = null, TranslationReaderInterface $reader = null, ExtractorInterface $extractor = null, $defaultLocale = null)
+    public function __construct(TranslationWriterInterface $writer, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultLocale)
     {
-        if (!$writer instanceof TranslationWriterInterface) {
-            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since version 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, TranslationWriterInterface::class), E_USER_DEPRECATED);
-
-            parent::__construct($writer);
-
-            return;
-        }
-
         parent::__construct();
 
         $this->writer = $writer;
@@ -74,7 +61,6 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
-                new InputOption('no-prefix', null, InputOption::VALUE_NONE, '[DEPRECATED] If set, no prefix is added to the translations'),
                 new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'yml'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
@@ -104,34 +90,9 @@ EOF
 
     /**
      * {@inheritdoc}
-     *
-     * BC to be removed in 4.0
-     */
-    public function isEnabled()
-    {
-        if (null !== $this->writer) {
-            return parent::isEnabled();
-        }
-        if (!class_exists('Symfony\Component\Translation\Translator')) {
-            return false;
-        }
-
-        return parent::isEnabled();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // BC to be removed in 4.0
-        if (null === $this->writer) {
-            $this->writer = $this->getContainer()->get('translation.writer');
-            $this->reader = $this->getContainer()->get('translation.reader');
-            $this->extractor = $this->getContainer()->get('translation.extractor');
-            $this->defaultLocale = $this->getContainer()->getParameter('kernel.default_locale');
-        }
-
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
@@ -181,13 +142,7 @@ EOF
         // load any messages from templates
         $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $errorIo->comment('Parsing templates...');
-        $prefix = $input->getOption('prefix');
-        // @deprecated since version 3.4, to be removed in 4.0 along with the --no-prefix option
-        if ($input->getOption('no-prefix')) {
-            @trigger_error('The "--no-prefix" option is deprecated since version 3.4 and will be removed in 4.0. Use the "--prefix" option with an empty string as value instead.', E_USER_DEPRECATED);
-            $prefix = '';
-        }
-        $this->extractor->setPrefix($prefix);
+        $this->extractor->setPrefix($input->getOption('prefix'));
         foreach ($transPaths as $path) {
             $path .= 'views';
             if (is_dir($path)) {
@@ -287,7 +242,7 @@ EOF
         $errorIo->success($resultMessage.'.');
     }
 
-    private function filterCatalogue(MessageCatalogue $catalogue, $domain)
+    private function filterCatalogue(MessageCatalogue $catalogue, string $domain): MessageCatalogue
     {
         $filteredCatalogue = new MessageCatalogue($catalogue->getLocale());
 

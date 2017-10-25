@@ -22,7 +22,7 @@ class RedisAdapter extends AbstractAdapter
      * @param string                                          $namespace       The default namespace
      * @param int                                             $defaultLifetime The default lifetime
      */
-    public function __construct($redisClient, $namespace = '', $defaultLifetime = 0)
+    public function __construct($redisClient, string $namespace = '', int $defaultLifetime = 0)
     {
         $this->init($redisClient, $namespace, $defaultLifetime);
     }

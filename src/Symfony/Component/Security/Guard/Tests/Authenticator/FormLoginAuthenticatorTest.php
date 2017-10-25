@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Guard\Tests\Authenticator;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -49,59 +50,6 @@ class FormLoginAuthenticatorTest extends TestCase
 
         $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\RedirectResponse', $failureResponse);
         $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAuthenticationSuccessWithoutSession()
-    {
-        $token = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $redirectResponse = $this->authenticator->onAuthenticationSuccess($this->requestWithoutSession, $token, 'providerkey');
-
-        $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\RedirectResponse', $redirectResponse);
-        $this->assertEquals(self::DEFAULT_SUCCESS_URL, $redirectResponse->getTargetUrl());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAuthenticationSuccessWithSessionButEmpty()
-    {
-        $token = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->requestWithSession->getSession()
-            ->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue(null));
-
-        $redirectResponse = $this->authenticator->onAuthenticationSuccess($this->requestWithSession, $token, 'providerkey');
-
-        $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\RedirectResponse', $redirectResponse);
-        $this->assertEquals(self::DEFAULT_SUCCESS_URL, $redirectResponse->getTargetUrl());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAuthenticationSuccessWithSessionAndTarget()
-    {
-        $token = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->requestWithSession->getSession()
-            ->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue(self::CUSTOM_SUCCESS_URL));
-
-        $redirectResponse = $this->authenticator->onAuthenticationSuccess($this->requestWithSession, $token, 'providerkey');
-
-        $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\RedirectResponse', $redirectResponse);
-        $this->assertEquals(self::CUSTOM_SUCCESS_URL, $redirectResponse->getTargetUrl());
     }
 
     public function testRememberMe()
@@ -155,6 +103,15 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
 {
     private $loginUrl;
     private $defaultSuccessRedirectUrl;
+
+    public function supports(Request $request)
+    {
+        return true;
+    }
+
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    {
+    }
 
     /**
      * @param mixed $defaultSuccessRedirectUrl

@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * `OutputFormatter` throws an exception when unknown options are used
+ * removed `QuestionHelper::setInputStream()/getInputStream()`
+ * removed `Application::getTerminalWidth()/getTerminalHeight()` and 
+  `Application::setTerminalDimensions()/getTerminalDimensions()`
+* removed `ConsoleExceptionEvent`
+* removed `ConsoleEvents::EXCEPTION`
+
 3.4.0
 -----
 

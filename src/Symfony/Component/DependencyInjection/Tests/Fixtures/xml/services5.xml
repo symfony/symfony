@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
   <services>
-    <service id="foo" class="FooClass">
+    <service id="foo" class="FooClass" public="true">
       <argument type="service">
         <service class="BarClass">
           <argument type="service">
@@ -18,8 +18,5 @@
       </property>
     </service>
     <service id="bar" parent="foo" />
-    <service id="biz" class="BizClass">
-        <tag name="biz_tag" />
-    </service>
   </services>
 </container>

@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed `FirewallContext::getContext()`
+ * made `FirewallMap::$container` and `::$map` private
+ * made the first `UserPasswordEncoderCommand::_construct()` argument mandatory
+ * `UserPasswordEncoderCommand` does not extend `ContainerAwareCommand` anymore
+ * removed support for voters that don't implement the `VoterInterface`
+ * removed HTTP digest authentication
+ * removed command `acl:set` along with `SetAclCommand` class
+ * removed command `init:acl` along with `InitAclCommand` class
+ * removed `acl` configuration key and related services, use symfony/acl-bundle instead
+ * removed auto picking the first registered provider when no configured provider on a firewall and ambiguous
+ * the firewall option `logout_on_user_change` is now always true, which will trigger a logout if the user changes
+   between requests
+ * the `switch_user.stateless` firewall option is `true` for stateless firewalls
+
 3.4.0
 -----
 

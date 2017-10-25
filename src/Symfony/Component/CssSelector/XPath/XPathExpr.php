@@ -38,13 +38,7 @@ class XPathExpr
      */
     private $condition;
 
-    /**
-     * @param string $path
-     * @param string $element
-     * @param string $condition
-     * @param bool   $starPrefix
-     */
-    public function __construct($path = '', $element = '*', $condition = '', $starPrefix = false)
+    public function __construct(string $path = '', string $element = '*', string $condition = '', bool $starPrefix = false)
     {
         $this->path = $path;
         $this->element = $element;
@@ -55,20 +49,12 @@ class XPathExpr
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getElement()
+    public function getElement(): string
     {
         return $this->element;
     }
 
-    /**
-     * @param $condition
-     *
-     * @return $this
-     */
-    public function addCondition($condition)
+    public function addCondition(string $condition): XPathExpr
     {
         $this->condition = $this->condition ? sprintf('%s and (%s)', $this->condition, $condition) : $condition;
 
@@ -78,15 +64,12 @@ class XPathExpr
     /**
      * @return string
      */
-    public function getCondition()
+    public function getCondition(): string
     {
         return $this->condition;
     }
 
-    /**
-     * @return $this
-     */
-    public function addNameTest()
+    public function addNameTest(): XPathExpr
     {
         if ('*' !== $this->element) {
             $this->addCondition('name() = '.Translator::getXpathLiteral($this->element));
@@ -96,10 +79,7 @@ class XPathExpr
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addStarPrefix()
+    public function addStarPrefix(): XPathExpr
     {
         $this->path .= '*/';
 
@@ -114,7 +94,7 @@ class XPathExpr
      *
      * @return $this
      */
-    public function join($combiner, XPathExpr $expr)
+    public function join(string $combiner, XPathExpr $expr): XPathExpr
     {
         $path = $this->__toString().$combiner;
 
@@ -129,10 +109,7 @@ class XPathExpr
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         $path = $this->path.$this->element;
         $condition = null === $this->condition || '' === $this->condition ? '' : '['.$this->condition.']';

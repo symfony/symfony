@@ -449,10 +449,6 @@ class FilesystemTest extends FilesystemTestCase
     {
         $this->markAsSkippedIfChmodIsMissing();
 
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('chmod() changes permissions even when passing invalid modes on HHVM');
-        }
-
         $dir = $this->workspace.DIRECTORY_SEPARATOR.'file';
         touch($dir);
 
@@ -1145,33 +1141,21 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
-     * @group legacy
-     * @dataProvider provideLegacyPathsForMakePathRelativeWithRelativePaths
-     * @expectedDeprecation Support for passing relative paths to Symfony\Component\Filesystem\Filesystem::makePathRelative() is deprecated since version 3.4 and will be removed in 4.0.
+     * @expectedException \Symfony\Component\Filesystem\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The start path "var/lib/symfony/src/Symfony/Component" is not absolute.
      */
-    public function testMakePathRelativeWithRelativePaths($endPath, $startPath, $expectedPath)
+    public function testMakePathRelativeWithRelativeStartPath()
     {
-        $path = $this->filesystem->makePathRelative($endPath, $startPath);
-
-        $this->assertEquals($expectedPath, $path);
+        $this->assertSame('../../../', $this->filesystem->makePathRelative('/var/lib/symfony/', 'var/lib/symfony/src/Symfony/Component'));
     }
 
-    public function provideLegacyPathsForMakePathRelativeWithRelativePaths()
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The end path "var/lib/symfony/" is not absolute.
+     */
+    public function testMakePathRelativeWithRelativeEndPath()
     {
-        return array(
-            array('usr/lib/symfony/', 'var/lib/symfony/src/Symfony/Component', '../../../../../../usr/lib/symfony/'),
-            array('aa/bb', 'aa/cc', '../bb/'),
-            array('aa/cc', 'bb/cc', '../../aa/cc/'),
-            array('aa/bb', 'aa/./cc', '../bb/'),
-            array('aa/./bb', 'aa/cc', '../bb/'),
-            array('aa/./bb', 'aa/./cc', '../bb/'),
-            array('../../', '../../', './'),
-            array('../aa/bb/', 'aa/bb/', '../../../aa/bb/'),
-            array('../../../', '../../', '../'),
-            array('', '', './'),
-            array('', 'aa/', '../'),
-            array('aa/', '', 'aa/'),
-        );
+        $this->assertSame('../../../', $this->filesystem->makePathRelative('var/lib/symfony/', '/var/lib/symfony/src/Symfony/Component'));
     }
 
     public function testMirrorCopiesFilesAndDirectoriesRecursively()
@@ -1502,10 +1486,6 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testDumpFileWithFileScheme()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM does not handle the file:// scheme correctly');
-        }
-
         $scheme = 'file://';
         $filename = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
 
@@ -1552,10 +1532,6 @@ class FilesystemTest extends FilesystemTestCase
 
     public function testAppendToFileWithScheme()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM does not handle the file:// scheme correctly');
-        }
-
         $scheme = 'file://';
         $filename = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
         $this->filesystem->dumpFile($filename, 'foo');

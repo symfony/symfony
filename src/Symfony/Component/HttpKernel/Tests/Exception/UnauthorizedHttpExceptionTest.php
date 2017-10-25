@@ -12,6 +12,19 @@ class UnauthorizedHttpExceptionTest extends HttpExceptionTest
         $this->assertSame(array('WWW-Authenticate' => 'Challenge'), $exception->getHeaders());
     }
 
+    public function testWithHeaderConstruct()
+    {
+        $headers = array(
+            'Cache-Control' => 'public, s-maxage=1200',
+        );
+
+        $exception = new UnauthorizedHttpException('Challenge', null, null, null, $headers);
+
+        $headers['WWW-Authenticate'] = 'Challenge';
+
+        $this->assertSame($headers, $exception->getHeaders());
+    }
+
     /**
      * @dataProvider headerDataProvider
      */

@@ -18,12 +18,7 @@ class FilesystemAdapter extends AbstractAdapter implements PruneableInterface
 {
     use FilesystemTrait;
 
-    /**
-     * @param string      $namespace
-     * @param int         $defaultLifetime
-     * @param string|null $directory
-     */
-    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
+    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null)
     {
         parent::__construct('', $defaultLifetime);
         $this->init($namespace, $directory);

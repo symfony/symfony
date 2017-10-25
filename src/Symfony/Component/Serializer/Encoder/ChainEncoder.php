@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  *
  * @final since version 3.3.
  */
-class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*/
+class ChainEncoder implements ContextAwareEncoderInterface
 {
     protected $encoders = array();
     protected $encoderByFormat = array();
@@ -43,10 +43,8 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format/*, array $context = array()*/)
+    public function supportsEncoding($format, array $context = array())
     {
-        $context = func_num_args() > 1 ? func_get_arg(1) : array();
-
         try {
             $this->getEncoder($format, $context);
         } catch (RuntimeException $e) {
@@ -64,9 +62,8 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
      *
      * @return bool
      */
-    public function needsNormalization($format/*, array $context = array()*/)
+    public function needsNormalization($format, array $context = array())
     {
-        $context = func_num_args() > 1 ? func_get_arg(1) : array();
         $encoder = $this->getEncoder($format, $context);
 
         if (!$encoder instanceof NormalizationAwareInterface) {
@@ -83,14 +80,9 @@ class ChainEncoder implements EncoderInterface /*, ContextAwareEncoderInterface*
     /**
      * Gets the encoder supporting the format.
      *
-     * @param string $format
-     * @param array  $context
-     *
-     * @return EncoderInterface
-     *
      * @throws RuntimeException if no encoder is found
      */
-    private function getEncoder($format, array $context)
+    private function getEncoder(string $format, array $context): EncoderInterface
     {
         if (isset($this->encoderByFormat[$format])
             && isset($this->encoders[$this->encoderByFormat[$format]])

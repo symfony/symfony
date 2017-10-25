@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Mapping\Factory;
 
-use Doctrine\Common\Cache\Cache;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
@@ -26,17 +25,18 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     use ClassResolverTrait;
 
     private $loader;
-    private $cache;
+
+    /**
+     * @var array
+     */
     private $loadedClasses;
 
-    public function __construct(LoaderInterface $loader, Cache $cache = null)
+    /**
+     * @param LoaderInterface $loader
+     */
+    public function __construct(LoaderInterface $loader)
     {
         $this->loader = $loader;
-        $this->cache = $cache;
-
-        if (null !== $cache) {
-            @trigger_error(sprintf('Passing a Doctrine Cache instance as 2nd parameter of the "%s" constructor is deprecated since version 3.1. This parameter will be removed in Symfony 4.0. Use the "%s" class instead.', __CLASS__, CacheClassMetadataFactory::class), E_USER_DEPRECATED);
-        }
     }
 
     /**
@@ -47,10 +47,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         $class = $this->getClass($value);
 
         if (isset($this->loadedClasses[$class])) {
-            return $this->loadedClasses[$class];
-        }
-
-        if ($this->cache && ($this->loadedClasses[$class] = $this->cache->fetch($class))) {
             return $this->loadedClasses[$class];
         }
 
@@ -67,10 +63,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         // Include metadata from all implemented interfaces
         foreach ($reflectionClass->getInterfaces() as $interface) {
             $classMetadata->merge($this->getMetadataFor($interface->name));
-        }
-
-        if ($this->cache) {
-            $this->cache->save($class, $classMetadata);
         }
 
         return $this->loadedClasses[$class] = $classMetadata;

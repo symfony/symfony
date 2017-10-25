@@ -139,6 +139,16 @@ services:
         class: LazyContext
         arguments: [!iterator ['@foo.baz', '@?invalid'], !iterator []]
         public: true
+    BAR:
+        class: stdClass
+        properties: { bar: '@bar' }
+        public: true
+    bar2:
+        class: stdClass
+        public: true
+    BAR2:
+        class: stdClass
+        public: true
     tagged_iterator_foo:
         class: Bar
         tags:

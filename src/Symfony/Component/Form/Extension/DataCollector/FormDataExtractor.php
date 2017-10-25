@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\DataCollector;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -23,16 +22,6 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  */
 class FormDataExtractor implements FormDataExtractorInterface
 {
-    /**
-     * Constructs a new data extractor.
-     */
-    public function __construct(ValueExporter $valueExporter = null, $triggerDeprecationNotice = true)
-    {
-        if (null !== $valueExporter && $triggerDeprecationNotice) {
-            @trigger_error('Passing a ValueExporter instance to '.__METHOD__.'() is deprecated in version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
-        }
-    }
-
     /**
      * {@inheritdoc}
      */

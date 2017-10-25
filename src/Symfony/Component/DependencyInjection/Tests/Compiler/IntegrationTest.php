@@ -40,6 +40,7 @@ class IntegrationTest extends TestCase
         $a = $container
             ->register('a', '\stdClass')
             ->addArgument(new Reference('c'))
+            ->setPublic(true)
         ;
 
         $b = $container
@@ -70,6 +71,7 @@ class IntegrationTest extends TestCase
         $a = $container
             ->register('a', '\stdClass')
             ->addArgument(new Reference('b'))
+            ->setPublic(true)
         ;
 
         $container->setAlias('b', new Alias('c', false));
@@ -97,6 +99,7 @@ class IntegrationTest extends TestCase
             ->register('a', '\stdClass')
             ->addArgument(new Reference('b'))
             ->addMethodCall('setC', array(new Reference('c')))
+            ->setPublic(true)
         ;
 
         $container

@@ -1,4 +1,6 @@
 services:
+    _defaults: {public: true}
+
     Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy: { 0: ~, $apiKey: ABCD }
 
     another_one:

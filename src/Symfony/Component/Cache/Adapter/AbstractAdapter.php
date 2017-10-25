@@ -33,11 +33,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     private $createCacheItem;
     private $mergeByLifetime;
 
-    /**
-     * @param string $namespace
-     * @param int    $defaultLifetime
-     */
-    protected function __construct($namespace = '', $defaultLifetime = 0)
+    protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
         $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).':';
         if (null !== $this->maxIdLength && strlen($namespace) > $this->maxIdLength - 24) {

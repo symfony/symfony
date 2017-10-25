@@ -14,16 +14,15 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\Tests\Authorization\Stub\VoterWithoutInterface;
 
 class AddSecurityVotersPassTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     * @expectedExceptionMessage No security voters found. You need to tag at least one with "security.voter".
      */
     public function testNoVoters()
     {
@@ -71,8 +70,8 @@ class AddSecurityVotersPassTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Using a security.voter tag on a class without implementing the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface is deprecated as of 3.4 and will be removed in 4.0. Implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface instead.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     * @expectedExceptionMessage stdClass must implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface when used as a voter.
      */
     public function testVoterMissingInterface()
     {
@@ -82,40 +81,7 @@ class AddSecurityVotersPassTest extends TestCase
             ->addArgument(array())
         ;
         $container
-            ->register('without_interface', VoterWithoutInterface::class)
-            ->addTag('security.voter')
-        ;
-        $compilerPass = new AddSecurityVotersPass();
-        $compilerPass->process($container);
-
-        $argument = $container->getDefinition('security.access.decision_manager')->getArgument(0);
-        $refs = $argument->getValues();
-        $this->assertEquals(new Reference('without_interface'), $refs[0]);
-        $this->assertCount(1, $refs);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testVoterMissingInterfaceAndMethod()
-    {
-        $exception = LogicException::class;
-        $message = 'stdClass should implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface interface when used as voter.';
-
-        if (method_exists($this, 'expectException')) {
-            $this->expectException($exception);
-            $this->expectExceptionMessage($message);
-        } else {
-            $this->setExpectedException($exception, $message);
-        }
-
-        $container = new ContainerBuilder();
-        $container
-            ->register('security.access.decision_manager', AccessDecisionManager::class)
-            ->addArgument(array())
-        ;
-        $container
-            ->register('without_method', 'stdClass')
+            ->register('without_interface', 'stdClass')
             ->addTag('security.voter')
         ;
         $compilerPass = new AddSecurityVotersPass();

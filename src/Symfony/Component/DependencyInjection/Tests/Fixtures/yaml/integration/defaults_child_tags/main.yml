@@ -10,6 +10,7 @@ services:
         autoconfigure: true
         # parent definitions are not applied to children
         tags: [from_parent]
+        public: true
 
     child_service:
         parent: parent_service

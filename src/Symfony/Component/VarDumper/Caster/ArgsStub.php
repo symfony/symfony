@@ -68,7 +68,7 @@ class ArgsStub extends EnumStub
             if ($v->isPassedByReference()) {
                 $k = '&'.$k;
             }
-            if (method_exists($v, 'isVariadic') && $v->isVariadic()) {
+            if ($v->isVariadic()) {
                 $variadic .= $k;
             } else {
                 $params[] = $k;

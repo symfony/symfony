@@ -16,10 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
-use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
+use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Symfony\Component\Security\Guard\Token\PreAuthenticationGuardToken;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Guard\AuthenticatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -95,7 +94,7 @@ class GuardAuthenticationListener implements ListenerInterface
         }
     }
 
-    private function executeGuardAuthenticator($uniqueGuardKey, GuardAuthenticatorInterface $guardAuthenticator, GetResponseEvent $event)
+    private function executeGuardAuthenticator($uniqueGuardKey, AuthenticatorInterface $guardAuthenticator, GetResponseEvent $event)
     {
         $request = $event->getRequest();
         try {
@@ -104,33 +103,14 @@ class GuardAuthenticationListener implements ListenerInterface
             }
 
             // abort the execution of the authenticator if it doesn't support the request
-            if ($guardAuthenticator instanceof AuthenticatorInterface) {
-                if (!$guardAuthenticator->supports($request)) {
-                    return;
-                }
-                // as there was a support for given request,
-                // authenticator is expected to give not-null credentials.
-                $credentialsCanBeNull = false;
-            } else {
-                // deprecated since version 3.4, to be removed in 4.0
-                $credentialsCanBeNull = true;
+            if (!$guardAuthenticator->supports($request)) {
+                return;
             }
 
             // allow the authenticator to fetch authentication info from the request
             $credentials = $guardAuthenticator->getCredentials($request);
 
             if (null === $credentials) {
-                // deprecated since version 3.4, to be removed in 4.0
-                if ($credentialsCanBeNull) {
-                    return;
-                }
-
-                if ($guardAuthenticator instanceof AbstractGuardAuthenticator) {
-                    @trigger_error(sprintf('Returning null from "%1$s::getCredentials()" is deprecated since version 3.4 and will throw an \UnexpectedValueException in 4.0. Return false from "%1$s::supports()" instead.', get_class($guardAuthenticator)), E_USER_DEPRECATED);
-
-                    return;
-                }
-
                 throw new \UnexpectedValueException(sprintf('The return value of "%1$s::getCredentials()" must not be null. Return false from "%1$s::supports()" instead.', get_class($guardAuthenticator)));
             }
 
@@ -203,7 +183,7 @@ class GuardAuthenticationListener implements ListenerInterface
      * @param TokenInterface         $token
      * @param Response               $response
      */
-    private function triggerRememberMe(GuardAuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
+    private function triggerRememberMe(AuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
     {
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {

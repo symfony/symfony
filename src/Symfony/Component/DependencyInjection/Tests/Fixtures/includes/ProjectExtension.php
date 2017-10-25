@@ -10,10 +10,10 @@ class ProjectExtension implements ExtensionInterface
     {
         $config = call_user_func_array('array_merge', $configs);
 
-        $configuration->setDefinition('project.service.bar', new Definition('FooClass'));
+        $configuration->register('project.service.bar', 'FooClass')->setPublic(true);
         $configuration->setParameter('project.parameter.bar', isset($config['foo']) ? $config['foo'] : 'foobar');
 
-        $configuration->setDefinition('project.service.foo', new Definition('FooClass'));
+        $configuration->register('project.service.foo', 'FooClass')->setPublic(true);
         $configuration->setParameter('project.parameter.foo', isset($config['foo']) ? $config['foo'] : 'foobar');
 
         return $configuration;

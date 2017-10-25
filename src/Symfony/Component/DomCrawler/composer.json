@@ -16,11 +16,11 @@
         }
     ],
     "require": {
-        "php": "^5.5.9|>=7.0.8",
+        "php": "^7.1.3",
         "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/css-selector": "~2.8|~3.0|~4.0"
+        "symfony/css-selector": "~3.4|~4.0"
     },
     "suggest": {
         "symfony/css-selector": ""
@@ -34,7 +34,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.4-dev"
+            "dev-master": "4.0-dev"
         }
     }
 }

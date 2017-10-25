@@ -4,3 +4,4 @@ services:
         # _defaults is applied to the parent, but autoconfigure: true
         # does not cascade to the child
         autoconfigure: false
+        public: true

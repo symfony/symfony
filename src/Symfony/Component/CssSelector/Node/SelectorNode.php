@@ -55,7 +55,7 @@ class SelectorNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function getSpecificity()
+    public function getSpecificity(): Specificity
     {
         return $this->tree->getSpecificity()->plus(new Specificity(0, 0, $this->pseudoElement ? 1 : 0));
     }
@@ -63,7 +63,7 @@ class SelectorNode extends AbstractNode
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf('%s[%s%s]', $this->getNodeName(), $this->tree, $this->pseudoElement ? '::'.$this->pseudoElement : '');
     }

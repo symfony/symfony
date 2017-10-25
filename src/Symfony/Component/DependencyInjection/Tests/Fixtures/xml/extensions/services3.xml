@@ -11,7 +11,7 @@
     </parameters>
 
     <services>
-        <service id="project.service.foo" class="BAR" />
+        <service id="project.service.foo" class="BAR" public="true"/>
     </services>
 
     <project:bar bar="bar" />

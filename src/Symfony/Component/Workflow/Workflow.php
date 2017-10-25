@@ -30,8 +30,18 @@ class Workflow
     private $dispatcher;
     private $name;
 
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
-    {
+    /**
+     * @param Definition                    $definition
+     * @param MarkingStoreInterface|null    $markingStore
+     * @param EventDispatcherInterface|null $dispatcher
+     * @param string                        $name
+     */
+    public function __construct(
+        Definition $definition,
+        MarkingStoreInterface $markingStore = null,
+        EventDispatcherInterface $dispatcher = null,
+        $name = 'unnamed'
+    ) {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
         $this->dispatcher = $dispatcher;
@@ -171,6 +181,9 @@ class Workflow
         return $enabled;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;

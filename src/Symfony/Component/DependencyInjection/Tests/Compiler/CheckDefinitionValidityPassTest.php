@@ -77,7 +77,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
      */
     public function testDynamicServiceName()
     {
@@ -89,7 +89,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
      */
     public function testDynamicAliasName()
     {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -78,14 +79,14 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
 
             $resolvedId = $container->resolveEnvPlaceholders($id, null, $usedEnvs);
             if (null !== $usedEnvs) {
-                throw new RuntimeException(sprintf('A service name ("%s") cannot contain dynamic values.', $resolvedId));
+                throw new EnvParameterException(array($resolvedId), null, 'A service name ("%s") cannot contain dynamic values.');
             }
         }
 
         foreach ($container->getAliases() as $id => $alias) {
             $resolvedId = $container->resolveEnvPlaceholders($id, null, $usedEnvs);
             if (null !== $usedEnvs) {
-                throw new RuntimeException(sprintf('An alias name ("%s") cannot contain dynamic values.', $resolvedId));
+                throw new EnvParameterException(array($resolvedId), null, 'An alias name ("%s") cannot contain dynamic values.');
             }
         }
     }

@@ -254,8 +254,10 @@ class DeprecationErrorHandler
                 if ($previousErrorHandler) {
                     return $previousErrorHandler($type, $msg, $file, $line, $context);
                 }
+                static $autoload = true;
 
-                $ErrorHandler = class_exists('PHPUnit_Util_ErrorHandler', false) ? 'PHPUnit_Util_ErrorHandler' : 'PHPUnit\Util\ErrorHandler';
+                $ErrorHandler = class_exists('PHPUnit_Util_ErrorHandler', $autoload) ? 'PHPUnit_Util_ErrorHandler' : 'PHPUnit\Util\ErrorHandler';
+                $autoload = false;
 
                 return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }

@@ -73,7 +73,7 @@ class FileBagTest extends TestCase
         $this->assertSame(array(), $bag->get('files'));
     }
 
-    public function testNotShouldRemoveEmptyUploadedFilesForAssociativeArray()
+    public function testShouldNotRemoveEmptyUploadedFilesForAssociativeArray()
     {
         $bag = new FileBag(array('files' => array(
             'name' => array('file1' => ''),

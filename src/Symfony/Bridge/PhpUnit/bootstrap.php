@@ -12,9 +12,11 @@
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
-// Detect if we need to serialize deprecations.
-if ($ser = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
-    DeprecationErrorHandler::collectDeprecations($ser);
+// Detect if we're loaded by an actual run of phpunit
+if (!class_exists('PHPUnit_TextUI_Command', false) && !class_exists('PHPUnit\TextUI\Command', false)) {
+    if ($ser = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
+        DeprecationErrorHandler::collectDeprecations($ser);
+    }
 
     return;
 }

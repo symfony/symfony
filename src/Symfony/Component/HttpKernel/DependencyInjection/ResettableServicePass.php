@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpKernel\EventListener\ServiceResetListener;
+use Symfony\Component\HttpKernel\Middleware\ServiceResetMiddleware;
 
 /**
  * @author Alexander M. Turek <me@derrabus.de>
@@ -39,7 +39,7 @@ class ResettableServicePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has(ServiceResetListener::class)) {
+        if (!$container->has(ServiceResetMiddleware::class)) {
             return;
         }
 
@@ -56,14 +56,8 @@ class ResettableServicePass implements CompilerPassInterface
             $methods[$id] = $attributes['method'];
         }
 
-        if (empty($services)) {
-            $container->removeDefinition(ServiceResetListener::class);
-
-            return;
-        }
-
-        $container->findDefinition(ServiceResetListener::class)
-            ->replaceArgument(0, new IteratorArgument($services))
-            ->replaceArgument(1, $methods);
+        $container->findDefinition(ServiceResetMiddleware::class)
+            ->replaceArgument('$services', new IteratorArgument($services))
+            ->replaceArgument('$resetMethods', $methods);
     }
 }

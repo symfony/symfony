@@ -29,8 +29,8 @@ class DebugAutowiringCommandTest extends WebTestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'debug:autowiring'));
 
-        $this->assertContains('Symfony\Component\HttpKernel\HttpKernelInterface', $tester->getDisplay());
-        $this->assertContains('alias to http_kernel', $tester->getDisplay());
+        $this->assertContains('Symfony\Component\DependencyInjection\ContainerInterface', $tester->getDisplay());
+        $this->assertContains('alias to service_container', $tester->getDisplay());
     }
 
     public function testSearchArgument()

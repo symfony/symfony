@@ -60,7 +60,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * ("auto_start", is not supported as it tells PHP to start a session before
      * PHP starts to execute user-land code. Setting during runtime has no effect).
      *
-     * cache_limiter, "" (use "0" to prevent headers from being sent entirely).
+     * cache_limiter, "private_no_expire" (use "0" to prevent headers from being sent entirely).
+     * cache_expire, "0"
      * cookie_domain, ""
      * cookie_httponly, ""
      * cookie_lifetime, "0"
@@ -101,6 +102,7 @@ class NativeSessionStorage implements SessionStorageInterface
     {
         $options += array(
             'cache_limiter' => 'private_no_expire',
+            'cache_expire' => 0,
             'use_cookies' => 1,
             'lazy_write' => 1,
         );
@@ -347,7 +349,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         $validOptions = array_flip(array(
-            'cache_limiter', 'cookie_domain', 'cookie_httponly',
+            'cache_limiter', 'cache_expire', 'cookie_domain', 'cookie_httponly',
             'cookie_lifetime', 'cookie_path', 'cookie_secure',
             'entropy_file', 'entropy_length', 'gc_divisor',
             'gc_maxlifetime', 'gc_probability', 'hash_bits_per_character',

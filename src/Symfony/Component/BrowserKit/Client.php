@@ -342,9 +342,8 @@ abstract class Client
     protected function doRequestInProcess($request)
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
-        $environment = getenv();
-        $environment['SYMFONY_DEPRECATIONS_SERIALIZE'] = $deprecationsFile;
-        $process = new PhpProcess($this->getScript($request), null, $environment);
+        putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
+        $process = new PhpProcess($this->getScript($request), null, null);
         $process->run();
 
         if (file_exists($deprecationsFile)) {

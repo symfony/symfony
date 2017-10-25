@@ -26,15 +26,40 @@ use Doctrine\ORM\QueryBuilder;
  */
 trait RepositoryTrait
 {
-    /**
-     * @return EntityManagerInterface
-     */
-    abstract protected function getEntityManager();
+    private $em;
 
     /**
      * @return string the class name for your entity
      */
     abstract protected function getClassName();
+
+    /**
+     * Setter to inject the EntityManager.
+     *
+     * If you are using the DependencyInjection component
+     * and this service is autowired, this method will automatically
+     * be called thanks to the "@required" annotation.
+     *
+     * @required
+     *
+     * @param EntityManagerInterface $em
+     */
+    public function setEntityManager(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
+    /**
+     * @return EntityManagerInterface
+     */
+    protected function getEntityManager()
+    {
+        if (null === $this->em) {
+            throw new \RuntimeException(sprintf('The setEntityManager() method must be called on the "%s" class before calling getEntityManager().', get_class($this)));
+        }
+
+        return $this->em;
+    }
 
     /**
      * @see EntityRepository::createQueryBuilder()

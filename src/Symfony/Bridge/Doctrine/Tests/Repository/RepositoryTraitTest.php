@@ -34,26 +34,25 @@ class RepositoryTraitTest extends TestCase
             ->with('cs')
             ->willReturn($qb);
 
-        $stubRepo = new StubRepository($em);
+        $stubRepo = new StubRepository();
+        $stubRepo->setEntityManager($em);
         $this->assertSame($qb, $stubRepo->createQueryBuilder('cs'));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The setEntityManager() method must be called on the "Symfony\Bridge\Doctrine\PropertyInfo\Tests\StubRepository" class before calling getEntityManager().
+     */
+    public function testExceptionWhenEmIsNotSet()
+    {
+        $stubRepo = new StubRepository();
+        $stubRepo->createQueryBuilder('cs');
     }
 }
 
 class StubRepository
 {
     use RepositoryTrait;
-
-    private $em;
-
-    public function __construct(EntityManagerInterface $em)
-    {
-        $this->em = $em;
-    }
-
-    protected function getEntityManager()
-    {
-        return $this->em;
-    }
 
     protected function getClassName()
     {

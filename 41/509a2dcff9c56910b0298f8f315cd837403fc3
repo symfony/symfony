@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-25T07:55:58Z
+
+I'm not sure I understand the technical purpose of this PR :)
+
+---------------------------------------------------------------------------
+
+by alexpott at 2017-10-25T08:42:59Z
+
+The technical purpose of this PR is to make PHPUnit Bridge's bootstrap.php not rely on assumptions about the environment. The problem is that we're doing
+```
+// We define the COMPOSER_INSTALL constant, so that PHPUnit knows where to
+// autoload from. This is needed for tests run in isolation mode, because
+// phpunit.xml.dist is located in a non-default directory relative to the
+// PHPUnit executable.
+if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
+  define('PHPUNIT_COMPOSER_INSTALL', __DIR__ . '/../../autoload.php');
+}
+```
+in our test bootstrap - so the assumption made by
+`if (!defined('PHPUNIT_COMPOSER_INSTALL') && !class_exists('PHPUnit_TextUI_Command', false) && !class_exists('PHPUnit\TextUI\Command', false)) {
+`
+is not correct for us.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-25T08:58:08Z
+
+@alexpott are you actually defining `PHPUNIT_COMPOSER_INSTALL` even when not running PHPUnit ?
+
+---------------------------------------------------------------------------
+
+by alexpott at 2017-10-25T09:32:43Z
+
+@stof nope we're not defining when not running PHPUnit - we define it when running PHPUnit and inside an isolated test. This is because in PHPUnit's src/Util/PHP/Template/TestCaseMethod.tpl.dist it does
+
+```
+$configurationFilePath = '{configurationFilePath}';
+
+if ('' !== $configurationFilePath) {
+    $configuration = PHPUnit\Util\Configuration::getInstance($configurationFilePath);
+    $configuration->handlePHPConfiguration();
+    unset($configuration);
+}
+
+```
+which needs to be able to autoload `PHPUnit\Util\Configuration` for drupal because we use a non-standard configurationFilePath. See https://www.drupal.org/node/2597814 for a bit more info.
+
+---------------------------------------------------------------------------
+
+by alexpott at 2017-10-25T10:56:24Z
+
+I've updated the PR to only remove the check against PHPUNIT_COMPOSER_INSTALL since this constant is necessary for PHPUnit isolated tests where you are using a custom configuration file. I've tested this approach with Drupal and it works great. I've also tested Symfony locally with 5.5, 5.6 and 7.1  and it passes.
+
+---------------------------------------------------------------------------
+
+by alexpott at 2017-10-25T14:38:32Z
+
+I'm just testing this with Drupal and I've found something more odd going on. Still investigating. :(

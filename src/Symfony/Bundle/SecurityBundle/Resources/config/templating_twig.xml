@@ -14,6 +14,10 @@
 
         <service id="twig.extension.security" class="Symfony\Bridge\Twig\Extension\SecurityExtension">
             <tag name="twig.extension" />
+        </service>
+
+        <service id="twig.runtime.security" class="Symfony\Bridge\Twig\Extension\SecurityRuntime">
+            <tag name="twig.runtime" />
             <argument type="service" id="security.authorization_checker" on-invalid="ignore" />
         </service>
     </services>

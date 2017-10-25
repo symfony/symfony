@@ -24,8 +24,6 @@ abstract class AbstractGuardAuthenticator implements AuthenticatorInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @deprecated since version 3.4, to be removed in 4.0
      */
     public function supports(Request $request)
     {

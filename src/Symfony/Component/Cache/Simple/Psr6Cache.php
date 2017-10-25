@@ -43,9 +43,8 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
                     } else {
                         CacheItem::validateKey($key);
                     }
-                    $f = $this->createCacheItem;
 
-                    return $f($key, $value, false);
+                    return ($this->createCacheItem)($key, $value, false);
                 },
                 $pool,
                 AbstractAdapter::class
@@ -75,8 +74,8 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
     public function set($key, $value, $ttl = null)
     {
         try {
-            if (null !== $f = $this->createCacheItem) {
-                $item = $f($key, $value);
+            if (null !== $this->createCacheItem) {
+                $item = ($this->createCacheItem)($key, $value);
             } else {
                 $item = $this->pool->getItem($key)->set($value);
             }
@@ -153,10 +152,10 @@ class Psr6Cache implements CacheInterface, PruneableInterface, ResettableInterfa
         $items = array();
 
         try {
-            if (null !== $f = $this->createCacheItem) {
+            if (null !== $this->createCacheItem) {
                 $valuesIsArray = false;
                 foreach ($values as $key => $value) {
-                    $items[$key] = $f($key, $value, true);
+                    $items[$key] = ($this->createCacheItem)($key, $value, true);
                 }
             } elseif ($valuesIsArray) {
                 $items = array();

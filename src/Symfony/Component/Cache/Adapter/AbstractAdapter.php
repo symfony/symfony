@@ -147,7 +147,6 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         }
         $id = $this->getId($key);
 
-        $f = $this->createCacheItem;
         $isHit = false;
         $value = null;
 
@@ -159,7 +158,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             CacheItem::log($this->logger, 'Failed to fetch key "{key}"', array('key' => $key, 'exception' => $e));
         }
 
-        return $f($key, $value, $isHit);
+        return ($this->createCacheItem)($key, $value, $isHit);
     }
 
     /**
@@ -276,8 +275,6 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
     private function generateItems($items, &$keys)
     {
-        $f = $this->createCacheItem;
-
         try {
             foreach ($items as $id => $value) {
                 if (!isset($keys[$id])) {
@@ -285,14 +282,14 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
                 }
                 $key = $keys[$id];
                 unset($keys[$id]);
-                yield $key => $f($key, $value, true);
+                yield $key => ($this->createCacheItem)($key, $value, true);
             }
         } catch (\Exception $e) {
             CacheItem::log($this->logger, 'Failed to fetch requested items', array('keys' => array_values($keys), 'exception' => $e));
         }
 
         foreach ($keys as $key) {
-            yield $key => $f($key, null, false);
+            yield $key => ($this->createCacheItem)($key, null, false);
         }
     }
 }

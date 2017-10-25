@@ -110,9 +110,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
             }
         }
 
-        $f = $this->createCacheItem;
-
-        return $f($key, $value, $isHit);
+        return ($this->createCacheItem)($key, $value, $isHit);
     }
 
     /**
@@ -233,7 +231,6 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
      */
     private function generateItems(array $keys)
     {
-        $f = $this->createCacheItem;
         $fallbackKeys = array();
 
         foreach ($keys as $key) {
@@ -241,17 +238,17 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
                 $value = $this->values[$key];
 
                 if ('N;' === $value) {
-                    yield $key => $f($key, null, true);
+                    yield $key => ($this->createCacheItem)($key, null, true);
                 } elseif (is_string($value) && isset($value[2]) && ':' === $value[1]) {
                     try {
-                        yield $key => $f($key, unserialize($value), true);
+                        yield $key => ($this->createCacheItem)($key, unserialize($value), true);
                     } catch (\Error $e) {
-                        yield $key => $f($key, null, false);
+                        yield $key => ($this->createCacheItem)($key, null, false);
                     } catch (\Exception $e) {
-                        yield $key => $f($key, null, false);
+                        yield $key => ($this->createCacheItem)($key, null, false);
                     }
                 } else {
-                    yield $key => $f($key, $value, true);
+                    yield $key => ($this->createCacheItem)($key, $value, true);
                 }
             } else {
                 $fallbackKeys[] = $key;

@@ -59,10 +59,9 @@ class ProxyAdapter implements AdapterInterface, PruneableInterface, ResettableIn
      */
     public function getItem($key)
     {
-        $f = $this->createCacheItem;
         $item = $this->pool->getItem($this->getId($key));
 
-        return $f($key, $item);
+        return ($this->createCacheItem)($key, $item);
     }
 
     /**
@@ -160,14 +159,12 @@ class ProxyAdapter implements AdapterInterface, PruneableInterface, ResettableIn
 
     private function generateItems($items)
     {
-        $f = $this->createCacheItem;
-
         foreach ($items as $key => $item) {
             if ($this->namespaceLen) {
                 $key = substr($key, $this->namespaceLen);
             }
 
-            yield $key => $f($key, $item);
+            yield $key => ($this->createCacheItem)($key, $item);
         }
     }
 

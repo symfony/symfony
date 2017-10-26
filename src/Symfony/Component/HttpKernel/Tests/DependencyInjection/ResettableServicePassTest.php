@@ -8,7 +8,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
-use Symfony\Component\HttpKernel\EventListener\ServiceResetListener;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\Middleware\ServiceResetMiddleware;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ClearableService;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
@@ -17,6 +18,7 @@ class ResettableServicePassTest extends TestCase
     public function testCompilerPass()
     {
         $container = new ContainerBuilder();
+        $container->register(HttpKernel::class)->setSynthetic(true);
         $container->register('one', ResettableService::class)
             ->setPublic(true)
             ->addTag('kernel.reset', array('method' => 'reset'));
@@ -24,17 +26,22 @@ class ResettableServicePassTest extends TestCase
             ->setPublic(true)
             ->addTag('kernel.reset', array('method' => 'clear'));
 
-        $container->register(ServiceResetListener::class)
+        $container->register(ServiceResetMiddleware::class)
             ->setPublic(true)
-            ->setArguments(array(null, array()));
+            ->setArguments(array(
+                '$httpKernel' => new Reference(HttpKernel::class),
+                '$services' => null,
+                '$resetMethods' => array()
+            ));
         $container->addCompilerPass(new ResettableServicePass('kernel.reset'));
 
         $container->compile();
 
-        $definition = $container->getDefinition(ServiceResetListener::class);
+        $definition = $container->getDefinition(ServiceResetMiddleware::class);
 
         $this->assertEquals(
             array(
+                new Reference(HttpKernel::class),
                 new IteratorArgument(array(
                     'one' => new Reference('one', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
                     'two' => new Reference('two', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE),
@@ -55,25 +62,18 @@ class ResettableServicePassTest extends TestCase
     public function testMissingMethod()
     {
         $container = new ContainerBuilder();
+        $container->register(HttpKernel::class)->setSynthetic(true);
         $container->register(ResettableService::class)
             ->addTag('kernel.reset');
-        $container->register(ServiceResetListener::class)
-            ->setArguments(array(null, array()));
+        $container->register(ServiceResetMiddleware::class)
+            ->setArguments(array(
+                '$httpKernel' => new Reference(HttpKernel::class),
+                '$services' => null,
+                '$resetMethods' => array()
+            ));
         $container->addCompilerPass(new ResettableServicePass('kernel.reset'));
 
         $container->compile();
-    }
-
-    public function testCompilerPassWithoutResetters()
-    {
-        $container = new ContainerBuilder();
-        $container->register(ServiceResetListener::class)
-            ->setArguments(array(null, array()));
-        $container->addCompilerPass(new ResettableServicePass());
-
-        $container->compile();
-
-        $this->assertFalse($container->has(ServiceResetListener::class));
     }
 
     public function testCompilerPassWithoutListener()
@@ -83,6 +83,6 @@ class ResettableServicePassTest extends TestCase
 
         $container->compile();
 
-        $this->assertFalse($container->has(ServiceResetListener::class));
+        $this->assertFalse($container->has(ServiceResetMiddleware::class));
     }
 }

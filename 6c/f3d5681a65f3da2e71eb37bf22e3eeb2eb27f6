@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-10-24T10:07:39Z
+
+Why the hell would `getRemovedIds` use `getEnv` ? Env placeholders are not resolved in service ids. Parameters are not supported there. If we have a case supporting env placeholders in *some* cases in references, we should identify in which case (I strongly suspect this can lead to other weird bugs).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-24T11:35:42Z
+
+> Why the hell would getRemovedIds use getEnv ?
+
+Here is an extract of the `removed-ids.php` file generated for the service definition I've pointed in the initial comment:
+
+```php
+return array(
+    // ...
+    'api_platform.http_cache.purger.varnish' => true,
+    'api_platform.http_cache.purger.varnish_client' => true,
+    'api_platform.http_cache.purger.varnish_client.'.$this->getEnv('string:VARNISH_URL') => true,
+    // ...
+);
+```
+
+It looks legit to me or the error generation cannot work properly:
+
+```php
+            if (isset($this->getRemovedIds()[$id])) {
+                throw new ServiceNotFoundException($id, null, null, array(), sprintf('The "%s" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.', $id));
+            }
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-24T12:00:44Z
+
+@stof is right: service ids cannot be dynamic, this is unsupported and should throw instead.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-24T12:01:41Z
+
+Ok got it, I'll change the patch to throw
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-24T13:33:35Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-24T14:50:22Z
+
+Broken tests are unrelated, rebasing will make this green. Fabbot complains though
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-24T15:06:48Z
+
+Do we need to do the check for aliases also?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-24T20:17:31Z
+
+@nicolas-grekas done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-24T20:55:43Z
+
+Also the commit+PR title should be updated
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-25T06:34:56Z
+
+Errors not related

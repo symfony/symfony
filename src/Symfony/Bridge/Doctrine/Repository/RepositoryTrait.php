@@ -20,7 +20,7 @@ use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * A helpful trait when creating your own repository.
+ * An optional trait that gives your class all the same methods as Doctrine's EntityRepository.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  */
@@ -175,7 +175,7 @@ trait RepositoryTrait
     /**
      * @return EntityManagerInterface
      */
-    protected function getEntityManager()
+    final protected function getEntityManager()
     {
         if (null === $this->em) {
             throw new \RuntimeException(sprintf('The setEntityManager() method must be called on the "%s" class before calling getEntityManager().', get_class($this)));
@@ -187,7 +187,7 @@ trait RepositoryTrait
     /**
      * @return EntityRepository
      */
-    protected function getRepository()
+    final protected function getRepository()
     {
         return $this->getEntityManager()->getRepository($this->getClassName());
     }

@@ -1,0 +1,2 @@
+framework:
+    reset_services_on_terminate: true

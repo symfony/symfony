@@ -107,6 +107,7 @@ class Configuration implements ConfigurationInterface
                     ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
                     ->prototype('scalar')->end()
                 ->end()
+                ->booleanNode('reset_services_on_terminate')->defaultFalse()->end()
             ->end()
         ;
 

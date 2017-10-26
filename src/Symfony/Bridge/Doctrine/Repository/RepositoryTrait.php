@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Repository;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -163,9 +164,9 @@ trait RepositoryTrait
     /**
      * @see EntityRepository::matching()
      *
-     * @param \Doctrine\Common\Collections\Criteria $criteria
+     * @param Criteria $criteria
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function matching(Criteria $criteria)
     {

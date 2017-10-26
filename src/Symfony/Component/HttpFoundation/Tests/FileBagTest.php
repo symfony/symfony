@@ -62,7 +62,7 @@ class FileBagTest extends TestCase
 
     public function testShouldRemoveEmptyUploadedFilesForMultiUpload()
     {
-        $bag = new FileBag(array('file' => array(
+        $bag = new FileBag(array('files' => array(
             'name' => array(''),
             'type' => array(''),
             'tmp_name' => array(''),
@@ -70,7 +70,20 @@ class FileBagTest extends TestCase
             'size' => array(0),
         )));
 
-        $this->assertSame(array(), $bag->get('file'));
+        $this->assertSame(array(), $bag->get('files'));
+    }
+
+    public function testShouldNotRemoveEmptyUploadedFilesForAssociativeArray()
+    {
+        $bag = new FileBag(array('files' => array(
+            'name' => array('file1' => ''),
+            'type' => array('file1' => ''),
+            'tmp_name' => array('file1' => ''),
+            'error' => array('file1' => UPLOAD_ERR_NO_FILE),
+            'size' => array('file1' => 0),
+        )));
+
+        $this->assertSame(array('file1' => null), $bag->get('files'));
     }
 
     public function testShouldConvertUploadedFilesWithPhpBug()

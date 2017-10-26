@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-25T07:52:36Z
+
+Shouldn't we also change the precedence in src/Symfony/Component/DependencyInjection/Container.php?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-26T01:38:29Z
+
+I've made the change in Container.php for better consistency. Should be ready now.

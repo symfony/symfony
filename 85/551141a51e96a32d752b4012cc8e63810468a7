@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-19T11:58:27Z
+
+This PR should be opened against 2.7 as it is wrong there as well.
+
+---------------------------------------------------------------------------
+
+by Aliance at 2017-10-19T14:51:56Z
+
+@Tobion there is different code in different branches:
+https://github.com/symfony/symfony/blob/v2.7.35/src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php#L74-L85
+
+https://github.com/symfony/symfony/blob/v2.8.28/src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php#L74-L85
+
+https://github.com/symfony/symfony/blob/v3.0.9/src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php#L67-L70
+
+https://github.com/symfony/symfony/blob/v3.1.10/src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php#L67-L74
+
+https://github.com/symfony/symfony/blob/v3.2.13/src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php#L74-L81
+
+https://github.com/symfony/symfony/blob/v3.3.10/src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php#L74-L81
+
+https://github.com/symfony/symfony/blob/v3.4.0-BETA1/src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php#L103-L110
+
+https://github.com/symfony/symfony/blob/v4.0.0-BETA1/src/Symfony/Bridge/Twig/Tests/Node/FormThemeTest.php#L103-L106
+
+So in some branches there is php version checks, in others – not. May be merge this pr to branches w/o php version checks and create another one for other branches?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-19T15:07:28Z
+
+@Aliance it's enough if you open a PR for 2.7. We then merge it upwards and will resolve conflicts.
+
+---------------------------------------------------------------------------
+
+by Aliance at 2017-10-20T09:52:27Z
+
+@Tobion I rebased it on 2.7, also changed duplicated arguments to `%1$s` and also tried to find all the same occurrences with regexp `sprintf\('(.*?)', \$(.*?), \$\2\)`

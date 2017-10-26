@@ -1,6 +1,11 @@
 UPGRADE FROM 3.3 to 3.4
 =======================
 
+Config
+------
+
+ * Using protected builder property of TreeBuilder is deprecated and property will be removed in 4.0.
+
 DependencyInjection
 -------------------
 

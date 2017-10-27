@@ -220,6 +220,10 @@ class XmlFileLoader extends FileLoader
                 $alias->setPublic($defaults['public']);
             }
 
+            if ($deprecated = $this->getChildren($service, 'deprecated')) {
+                $alias->setDeprecated(true, $deprecated[0]->nodeValue ?: null);
+            }
+
             return;
         }
 
@@ -667,8 +671,12 @@ EOF
             }
         }
 
+        $allowedTags = array('deprecated');
         foreach ($alias->childNodes as $child) {
-            if ($child instanceof \DOMElement && self::NS === $child->namespaceURI) {
+            if (!$child instanceof \DOMElement && self::NS !== $child->namespaceURI) {
+                continue;
+            }
+            if (!in_array($child->localName, $allowedTags, true)) {
                 throw new InvalidArgumentException(sprintf('Invalid child element "%s" defined for alias "%s" in "%s".', $child->localName, $alias->getAttribute('id'), $file));
             }
         }

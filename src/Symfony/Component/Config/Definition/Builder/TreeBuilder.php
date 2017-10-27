@@ -24,7 +24,7 @@ class TreeBuilder implements NodeParentInterface
     protected $root;
 
     /**
-     * @deprecates since 3.4. To be removed in 4.0
+     * @deprecated since 3.4. To be removed in 4.0
      */
     protected $builder;
 

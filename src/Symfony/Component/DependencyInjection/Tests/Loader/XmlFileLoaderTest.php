@@ -352,7 +352,7 @@ class XmlFileLoaderTest extends TestCase
     public function testDeprecatedAliases()
     {
         $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath . '/xml'));
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('deprecated_alias_definitions.xml');
 
         $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());

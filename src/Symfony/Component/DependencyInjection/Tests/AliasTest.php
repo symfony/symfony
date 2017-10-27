@@ -1,11 +1,13 @@
 <?php
-/**
- * (c) BKV
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
@@ -18,7 +20,7 @@ class AliasTest extends TestCase
     {
         $alias = new Alias('foo');
 
-        $this->assertEquals('foo', (string)$alias);
+        $this->assertEquals('foo', (string) $alias);
         $this->assertTrue($alias->isPublic());
     }
 
@@ -26,7 +28,7 @@ class AliasTest extends TestCase
     {
         $alias = new Alias('foo', false);
 
-        $this->assertEquals('foo', (string)$alias);
+        $this->assertEquals('foo', (string) $alias);
         $this->assertFalse($alias->isPublic());
     }
 
@@ -34,7 +36,7 @@ class AliasTest extends TestCase
     {
         $alias = new Alias('foo', false, false);
 
-        $this->assertEquals('foo', (string)$alias);
+        $this->assertEquals('foo', (string) $alias);
         $this->assertFalse($alias->isPublic());
         $this->assertFalse($alias->isPrivate());
     }
@@ -54,7 +56,7 @@ class AliasTest extends TestCase
 
         $this->assertTrue($alias->isDeprecated());
     }
-    
+
     public function testItHasADefaultDeprecationMessage()
     {
         $alias = new Alias('foo', false);

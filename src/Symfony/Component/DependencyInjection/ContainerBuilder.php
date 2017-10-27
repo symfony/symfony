@@ -547,7 +547,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if ($aliasDefinition->isDeprecated()) {
                 @trigger_error($aliasDefinition->getDeprecationMessage($id), E_USER_DEPRECATED);
             }
-            return $this->doGet((string) $this->aliasDefinitions[$id], $invalidBehavior, $inlineServices);
+
+            return $this->doGet((string) $aliasDefinition, $invalidBehavior, $inlineServices);
         }
 
         try {

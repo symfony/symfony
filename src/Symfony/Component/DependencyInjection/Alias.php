@@ -89,7 +89,7 @@ class Alias
      * Whether this alias is deprecated, that means it should not be called
      * anymore.
      *
-     * @param bool   $status Defaults to true
+     * @param bool   $status   Defaults to true
      * @param string $template Optional template message to use if the alias is deprecated
      *
      * @return $this
@@ -116,7 +116,7 @@ class Alias
     }
 
     /**
-     * Returns whether this alias is deprecated
+     * Returns whether this alias is deprecated.
      *
      * @return bool
      */

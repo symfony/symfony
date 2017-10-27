@@ -1,0 +1,27 @@
+@startuml
+title ComplexDiagram
+skinparam titleBorderRoundCorner 15
+skinparam titleBorderThickness 2
+skinparam state {
+    BackgroundColor<<initial>> #87b741
+    BackgroundColor<<marked>> #3887C6
+    BorderColor #3887C6
+    BorderColor<<marked>> Black
+    FontColor<<marked>> White
+}
+state a <<initial>>
+state b
+state c <<marked>>
+state d
+state e <<marked>>
+state f
+state g
+a --> b: t1
+a --> c: t1
+b --> d: t2
+c --> d: t2
+d --> e: t3
+d --> f: t4
+e --> g: t5
+f --> g: t6
+@enduml

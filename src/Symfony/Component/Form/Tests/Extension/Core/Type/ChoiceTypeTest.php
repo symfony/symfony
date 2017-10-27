@@ -2482,6 +2482,7 @@ class ChoiceTypeTest extends BaseTypeTest
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
+            'choices_as_values' => true,
             'choices' => array(
                 'foobar ' => 'foobar ',
             ),
@@ -2489,6 +2490,6 @@ class ChoiceTypeTest extends BaseTypeTest
 
         $form->submit('foobar ');
 
-        $this->assertEquals('foobar', $form->getData());
+        $this->assertEquals('foobar ', $form->getData());
     }
 }

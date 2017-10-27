@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\ChoiceList;
 @trigger_error('The '.__NAMESPACE__.'\ArrayKeyChoiceList class is deprecated since version 2.8 and will be removed in 3.0. Use '.__NAMESPACE__.'\ArrayChoiceList instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\Form\Util\StringUtil;
 
 /**
  * A list of choices that can be stored in the keys of a PHP array.
@@ -184,9 +183,8 @@ class ArrayKeyChoiceList extends ArrayChoiceList
             }
 
             $choiceValue = (string) call_user_func($value, $choice);
-            $trimmedKey = StringUtil::trim($choiceValue);
-            $choicesByValues[$trimmedKey] = $choice;
-            $keysByValues[$trimmedKey] = $key;
+            $choicesByValues[$choiceValue] = $choice;
+            $keysByValues[$choiceValue] = $key;
             $structuredValues[$key] = $choiceValue;
         }
     }

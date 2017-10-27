@@ -2484,7 +2484,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'multiple' => false,
             'choices' => array(
                 'foobar ' => 'foobar ',
-            )
+            ),
         ));
 
         $form->submit('foobar ');

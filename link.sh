@@ -31,6 +31,7 @@ do
             mv $vendor $vendor.back
             ln -s ${dirs[$i]} $vendor
             echo "$vendorName linked to ${dirs[$i]}"
+            continue
         fi
     done
 done

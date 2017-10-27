@@ -1,6 +1,5 @@
 #!/bin/bash
-# Link dependencies to components to a local clone of the monolithic Symfony repository
-# author: Kévin Dunglas
+# Author: Kévin Dunglas
 
 if [ $# -eq 0 ]
 then

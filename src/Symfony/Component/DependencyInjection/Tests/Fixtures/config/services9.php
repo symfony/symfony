@@ -88,6 +88,9 @@ return function (ContainerConfigurator $c) {
     $s->set('deprecated_service', 'stdClass')
         ->deprecate();
 
+    $s->set('deprecated_service_alias', 'stdClass')
+        ->deprecate('The "%service_id%" service alias is deprecated.');
+
     $s->set('new_factory', 'FactoryClass')
         ->property('foo', 'bar')
         ->private();

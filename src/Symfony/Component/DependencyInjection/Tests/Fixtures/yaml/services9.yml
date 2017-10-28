@@ -105,6 +105,10 @@ services:
         class: stdClass
         deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.
         public: true
+    deprecated_service_alias:
+        class: stdClass
+        deprecated: The "%service_id%" service alias is deprecated.
+        public: true
     new_factory:
         class: FactoryClass
         public: false

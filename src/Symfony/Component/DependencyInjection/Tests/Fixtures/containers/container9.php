@@ -119,6 +119,11 @@ $container
     ->setPublic(true)
 ;
 $container
+    ->register('deprecated_service_alias', 'stdClass')
+    ->setDeprecated(true, 'The "%service_id%" service alias is deprecated.')
+    ->setPublic(true)
+;
+$container
     ->register('new_factory', 'FactoryClass')
     ->setProperty('foo', 'bar')
     ->setPublic(false)

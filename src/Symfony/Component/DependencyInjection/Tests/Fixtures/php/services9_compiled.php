@@ -43,6 +43,7 @@ class ProjectServiceContainer extends Container
             'decorator_service' => 'getDecoratorServiceService',
             'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
             'deprecated_service' => 'getDeprecatedServiceService',
+            'deprecated_service_alias' => 'getDeprecatedServiceAliasService',
             'factory_service' => 'getFactoryServiceService',
             'factory_service_simple' => 'getFactoryServiceSimpleService',
             'foo' => 'getFooService',
@@ -222,6 +223,20 @@ class ProjectServiceContainer extends Container
         @trigger_error('The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
 
         return $this->services['deprecated_service'] = new \stdClass();
+    }
+
+    /**
+     * Gets the public 'deprecated_service_alias' shared service.
+     *
+     * @return \stdClass
+     *
+     * @deprecated The "deprecated_service_alias" service alias is deprecated.
+     */
+    protected function getDeprecatedServiceAliasService()
+    {
+        @trigger_error('The "deprecated_service_alias" service alias is deprecated.', E_USER_DEPRECATED);
+
+        return $this->services['deprecated_service_alias'] = new \stdClass();
     }
 
     /**

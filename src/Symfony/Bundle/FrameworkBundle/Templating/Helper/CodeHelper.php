@@ -61,9 +61,9 @@ class CodeHelper extends Helper
             list($class, $method) = explode('::', $method, 2);
             $result = sprintf('%s::%s()', $this->abbrClass($class), $method);
         } elseif ('Closure' === $method) {
-            $result = sprintf('<abbr title="%s">%s</abbr>', $method, $method);
+            $result = sprintf('<abbr title="%s">%1$s</abbr>', $method);
         } else {
-            $result = sprintf('<abbr title="%s">%s</abbr>()', $method, $method);
+            $result = sprintf('<abbr title="%s">%1$s</abbr>()', $method);
         }
 
         return $result;

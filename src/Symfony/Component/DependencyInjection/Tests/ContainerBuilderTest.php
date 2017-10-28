@@ -261,7 +261,7 @@ class ContainerBuilderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "foobar" service is deprecated. You should stop using it, as it will soon be removed.
+     * @expectedDeprecation The "foobar" service alias is deprecated. You should stop using it, as it will soon be removed.
      */
     public function testDeprecatedAlias()
     {

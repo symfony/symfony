@@ -356,11 +356,11 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('deprecated_alias_definitions.xml');
 
         $this->assertTrue($container->getAlias('alias_for_foo')->isDeprecated());
-        $message = 'The "alias_for_foo" service is deprecated. You should stop using it, as it will soon be removed.';
+        $message = 'The "alias_for_foo" service alias is deprecated. You should stop using it, as it will soon be removed.';
         $this->assertSame($message, $container->getAlias('alias_for_foo')->getDeprecationMessage('alias_for_foo'));
 
         $this->assertTrue($container->getAlias('alias_for_foobar')->isDeprecated());
-        $message = 'The "alias_for_foobar" service is deprecated.';
+        $message = 'The "alias_for_foobar" service alias is deprecated.';
         $this->assertSame($message, $container->getAlias('alias_for_foobar')->getDeprecationMessage('alias_for_foobar'));
     }
 

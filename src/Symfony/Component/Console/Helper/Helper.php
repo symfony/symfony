@@ -22,6 +22,11 @@ abstract class Helper implements HelperInterface
 {
     protected $helperSet = null;
 
+    const OS_UNKNOWN = 1;
+    const OS_WIN = 2;
+    const OS_LINUX = 3;
+    const OS_OSX = 4;
+
     /**
      * {@inheritdoc}
      */
@@ -120,5 +125,20 @@ abstract class Helper implements HelperInterface
         $formatter->setDecorated($isDecorated);
 
         return $string;
+    }
+
+    /**
+     * GET Os Terminal to define CLI's behavior
+     * Used especially for autocompletion
+     * @return string
+     */
+    public function getOSTerminal()
+    {
+        switch (true){
+            case stristr(PHP_OS, 'DAR'): return self::OS_OSX;
+            case stristr(PHP_OS, 'WIN'): return self::OS_WIN;
+            case stristr(PHP_OS, 'LINUX'): return self::OS_LINUX;
+            default : return self::OS_UNKNOWN;
+        }
     }
 }

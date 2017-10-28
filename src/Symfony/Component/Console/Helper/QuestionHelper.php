@@ -114,7 +114,7 @@ class QuestionHelper extends Helper
         $inputStream = $this->inputStream ?: STDIN;
         $autocomplete = $question->getAutocompleterValues();
 
-        if (null === $autocomplete || !$this->hasSttyAvailable()) {
+        if ((null === $autocomplete || self::OS_WIN == $this->getOSTerminal()) || !$this->hasSttyAvailable()) {
             $ret = false;
             if ($question->isHidden()) {
                 try {

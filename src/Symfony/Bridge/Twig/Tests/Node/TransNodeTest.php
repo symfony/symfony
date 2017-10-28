@@ -44,15 +44,15 @@ class TransNodeTest extends TestCase
 
     protected function getVariableGetterWithoutStrictCheck($name)
     {
-        return sprintf('($context["%s"] ?? null)', $name, $name);
+        return sprintf('($context["%s"] ?? null)', $name);
     }
 
     protected function getVariableGetterWithStrictCheck($name)
     {
         if (Environment::MAJOR_VERSION >= 2) {
-            return sprintf('(isset($context["%s"]) || array_key_exists("%s", $context) ? $context["%s"] : (function () { throw new Twig_Error_Runtime(\'Variable "%s" does not exist.\', 0, $this->getSourceContext()); })())', $name, $name, $name, $name);
+            return sprintf('(isset($context["%s"]) || array_key_exists("%1$s", $context) ? $context["%1$s"] : (function () { throw new Twig_Error_Runtime(\'Variable "%1$s" does not exist.\', 0, $this->getSourceContext()); })())', $name);
         }
 
-        return sprintf('($context["%s"] ?? $this->getContext($context, "%s"))', $name, $name, $name);
+        return sprintf('($context["%s"] ?? $this->getContext($context, "%1$s"))', $name);
     }
 }

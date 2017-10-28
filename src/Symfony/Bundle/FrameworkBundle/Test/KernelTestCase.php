@@ -41,7 +41,7 @@ abstract class KernelTestCase extends TestCase
             throw new \LogicException(sprintf('You must set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel in phpunit.xml / phpunit.xml.dist or override the %1$s::createKernel() or %1$s::getKernelClass() method.', static::class));
         }
 
-        if (!class_exists($class = $_SERVER['KERNEL_CLASS'] ?? $_ENV['KERNEL_CLASS'])) {
+        if (!class_exists($class = $_ENV['KERNEL_CLASS'] ?? $_SERVER['KERNEL_CLASS'])) {
             throw new \RuntimeException(sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the %s::createKernel() method.', $class, static::class));
         }
 
@@ -81,20 +81,20 @@ abstract class KernelTestCase extends TestCase
 
         if (isset($options['environment'])) {
             $env = $options['environment'];
-        } elseif (isset($_SERVER['APP_ENV'])) {
-            $env = $_SERVER['APP_ENV'];
         } elseif (isset($_ENV['APP_ENV'])) {
             $env = $_ENV['APP_ENV'];
+        } elseif (isset($_SERVER['APP_ENV'])) {
+            $env = $_SERVER['APP_ENV'];
         } else {
             $env = 'test';
         }
 
         if (isset($options['debug'])) {
             $debug = $options['debug'];
-        } elseif (isset($_SERVER['APP_DEBUG'])) {
-            $debug = $_SERVER['APP_DEBUG'];
         } elseif (isset($_ENV['APP_DEBUG'])) {
             $debug = $_ENV['APP_DEBUG'];
+        } elseif (isset($_SERVER['APP_DEBUG'])) {
+            $debug = $_SERVER['APP_DEBUG'];
         } else {
             $debug = true;
         }

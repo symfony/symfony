@@ -32,9 +32,6 @@ use Twig\Loader\LoaderInterface;
  */
 class TwigExtension extends Extension
 {
-    /**
-     * Responds to the twig configuration parameter.
-     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));

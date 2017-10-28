@@ -116,9 +116,6 @@ class SecurityExtension extends Extension
             ->addTag('security.voter');
     }
 
-    /**
-     * Loads the web configuration.
-     */
     private function createRoleHierarchy(array $config, ContainerBuilder $container)
     {
         if (!isset($config['role_hierarchy']) || 0 === count($config['role_hierarchy'])) {

@@ -123,10 +123,15 @@
 {%- endblock datetime_row %}
 
 {% block checkbox_row -%}
+{% spaceless %}
     <div class="form-group{% if not valid %} has-error{% endif %}">
-        {{- form_widget(form) -}}
-        {{- form_errors(form) -}}
+        <div class="{{ block('form_label_class') }}"></div>
+        <div class="{{ block('form_group_class') }}">
+            {{- form_widget(form) -}}
+            {{- form_errors(form) -}}
+        </div>
     </div>
+{% endspaceless %}
 {%- endblock checkbox_row %}
 
 {% block radio_row -%}

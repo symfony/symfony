@@ -6,6 +6,11 @@ ClassLoader
 
  * The component has been removed. Use Composer instead.
 
+Config
+------
+
+ * The protected `TreeBuilder::$builder` property has been removed.
+
 Console
 -------
 

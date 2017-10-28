@@ -155,7 +155,7 @@ class StopwatchEventTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \TypeError
      */
     public function testInvalidOriginThrowsAnException()
     {

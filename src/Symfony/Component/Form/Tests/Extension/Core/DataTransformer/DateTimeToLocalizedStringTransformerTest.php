@@ -307,7 +307,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \TypeError
      */
     public function testValidateDateFormatOption()
     {
@@ -315,7 +315,7 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \TypeError
      */
     public function testValidateTimeFormatOption()
     {

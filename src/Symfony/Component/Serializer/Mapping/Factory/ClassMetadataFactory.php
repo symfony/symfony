@@ -31,9 +31,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     private $loadedClasses;
 
-    /**
-     * @param LoaderInterface $loader
-     */
     public function __construct(LoaderInterface $loader)
     {
         $this->loader = $loader;

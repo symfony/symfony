@@ -22,9 +22,6 @@ final class Key
     private $expiringTime;
     private $state = array();
 
-    /**
-     * @param string $resource
-     */
     public function __construct(string $resource)
     {
         $this->resource = $resource;

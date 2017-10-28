@@ -23,7 +23,7 @@ class NotImplementedException extends RuntimeException
     /**
      * @param string $message The exception message. A note to install the intl extension is appended to this string
      */
-    public function __construct($message)
+    public function __construct(string $message)
     {
         parent::__construct($message.' '.self::INTL_INSTALL_MESSAGE);
     }

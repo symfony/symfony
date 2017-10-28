@@ -17,11 +17,9 @@ trait SyntheticTrait
      * Sets whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
-     * @param bool $synthetic
-     *
      * @return $this
      */
-    final public function synthetic($synthetic = true)
+    final public function synthetic(bool $synthetic = true)
     {
         $this->definition->setSynthetic($synthetic);
 

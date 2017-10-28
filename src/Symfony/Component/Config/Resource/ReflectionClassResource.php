@@ -22,7 +22,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
     private $excludedVendors = array();
     private $hash;
 
-    public function __construct(\ReflectionClass $classReflector, $excludedVendors = array())
+    public function __construct(\ReflectionClass $classReflector, array $excludedVendors = array())
     {
         $this->className = $classReflector->name;
         $this->classReflector = $classReflector;

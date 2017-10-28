@@ -1860,12 +1860,7 @@ class Request
         );
     }
 
-    /**
-     * Sets the default PHP locale.
-     *
-     * @param string $locale
-     */
-    private function setPhpDefaultLocale($locale)
+    private function setPhpDefaultLocale(string $locale)
     {
         // if either the class Locale doesn't exist, or an exception is thrown when
         // setting the default locale, the intl module is not installed, and
@@ -1882,12 +1877,9 @@ class Request
      * Returns the prefix as encoded in the string when the string starts with
      * the given prefix, false otherwise.
      *
-     * @param string $string The urlencoded string
-     * @param string $prefix The prefix not encoded
-     *
      * @return string|false The prefix as it is encoded in $string, or false
      */
-    private function getUrlencodedPrefix($string, $prefix)
+    private function getUrlencodedPrefix(string $string, string $prefix)
     {
         if (0 !== strpos(rawurldecode($string), $prefix)) {
             return false;

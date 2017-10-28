@@ -29,7 +29,7 @@ class UsernamePasswordToken extends AbstractToken
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, $credentials, $providerKey, array $roles = array())
+    public function __construct($user, $credentials, string $providerKey, array $roles = array())
     {
         parent::__construct($roles);
 

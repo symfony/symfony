@@ -41,12 +41,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public $maxDepth;
 
-    /**
-     * Constructs a metadata for the given attribute.
-     *
-     * @param string $name
-     */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }

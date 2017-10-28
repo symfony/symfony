@@ -28,7 +28,7 @@ class Response
      * @param int    $status  The response status code
      * @param array  $headers An array of headers
      */
-    public function __construct($content = '', $status = 200, array $headers = array())
+    public function __construct(string $content = '', int $status = 200, array $headers = array())
     {
         $this->content = $content;
         $this->status = $status;

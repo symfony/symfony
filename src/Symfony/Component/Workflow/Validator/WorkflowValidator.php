@@ -21,10 +21,7 @@ class WorkflowValidator implements DefinitionValidatorInterface
 {
     private $singlePlace;
 
-    /**
-     * @param bool $singlePlace
-     */
-    public function __construct($singlePlace = false)
+    public function __construct(bool $singlePlace = false)
     {
         $this->singlePlace = $singlePlace;
     }

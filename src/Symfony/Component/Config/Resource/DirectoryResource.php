@@ -27,7 +27,7 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($resource, $pattern = null)
+    public function __construct(string $resource, string $pattern = null)
     {
         $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
         $this->pattern = $pattern;

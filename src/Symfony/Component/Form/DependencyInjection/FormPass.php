@@ -36,7 +36,7 @@ class FormPass implements CompilerPassInterface
     private $formTypeGuesserTag;
     private $formDebugCommandService;
 
-    public function __construct($formExtensionService = 'form.extension', $formTypeTag = 'form.type', $formTypeExtensionTag = 'form.type_extension', $formTypeGuesserTag = 'form.type_guesser', $formDebugCommandService = DebugCommand::class)
+    public function __construct(string $formExtensionService = 'form.extension', string $formTypeTag = 'form.type', string $formTypeExtensionTag = 'form.type_extension', string $formTypeGuesserTag = 'form.type_guesser', string $formDebugCommandService = DebugCommand::class)
     {
         $this->formExtensionService = $formExtensionService;
         $this->formTypeTag = $formTypeTag;

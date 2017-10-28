@@ -36,7 +36,7 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
      * @throws UnexpectedTypeException  if a timezone is not a string
      * @throws InvalidArgumentException if a timezone is not valid
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null)
+    public function __construct(string $inputTimezone = null, string $outputTimezone = null)
     {
         if (null !== $inputTimezone && !is_string($inputTimezone)) {
             throw new UnexpectedTypeException($inputTimezone, 'string');

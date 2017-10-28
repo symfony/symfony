@@ -41,12 +41,12 @@ final class Lock implements LockInterface, LoggerAwareInterface
      * @param float|null     $ttl         Maximum expected lock duration in seconds
      * @param bool           $autoRelease Whether to automatically release the lock or not when the lock instance is destroyed
      */
-    public function __construct(Key $key, StoreInterface $store, $ttl = null, $autoRelease = true)
+    public function __construct(Key $key, StoreInterface $store, float $ttl = null, bool $autoRelease = true)
     {
         $this->store = $store;
         $this->key = $key;
         $this->ttl = $ttl;
-        $this->autoRelease = (bool) $autoRelease;
+        $this->autoRelease = $autoRelease;
 
         $this->logger = new NullLogger();
     }

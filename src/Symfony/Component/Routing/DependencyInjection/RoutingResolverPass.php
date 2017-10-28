@@ -28,7 +28,7 @@ class RoutingResolverPass implements CompilerPassInterface
     private $resolverServiceId;
     private $loaderTag;
 
-    public function __construct($resolverServiceId = 'routing.resolver', $loaderTag = 'routing.loader')
+    public function __construct(string $resolverServiceId = 'routing.resolver', string $loaderTag = 'routing.loader')
     {
         $this->resolverServiceId = $resolverServiceId;
         $this->loaderTag = $loaderTag;

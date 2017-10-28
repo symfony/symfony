@@ -34,7 +34,7 @@ class Question
      * @param string $question The question to ask to the user
      * @param mixed  $default  The default answer to return if the user enters nothing
      */
-    public function __construct($question, $default = null)
+    public function __construct(string $question, $default = null)
     {
         $this->question = $question;
         $this->default = $default;

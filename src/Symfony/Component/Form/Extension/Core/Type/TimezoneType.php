@@ -71,12 +71,8 @@ class TimezoneType extends AbstractType
 
     /**
      * Returns a normalized array of timezone choices.
-     *
-     * @param int $regions
-     *
-     * @return array The timezone choices
      */
-    private static function getTimezones($regions)
+    private static function getTimezones(int $regions): array
     {
         $timezones = array();
 

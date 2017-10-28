@@ -165,12 +165,8 @@ class DoctrineDataCollector extends DataCollector
      * The return value is an array with the sanitized value and a boolean
      * indicating if the original value was kept (allowing to use the sanitized
      * value to explain the query).
-     *
-     * @param mixed $var
-     *
-     * @return array
      */
-    private function sanitizeParam($var)
+    private function sanitizeParam($var): array
     {
         if (is_object($var)) {
             $className = get_class($var);

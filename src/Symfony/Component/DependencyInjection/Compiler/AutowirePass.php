@@ -32,10 +32,7 @@ class AutowirePass extends AbstractRecursivePass
     private $lastFailure;
     private $throwOnAutowiringException;
 
-    /**
-     * @param bool $throwOnAutowireException Errors can be retrieved via Definition::getErrors()
-     */
-    public function __construct($throwOnAutowireException = true)
+    public function __construct(bool $throwOnAutowireException = true)
     {
         $this->throwOnAutowiringException = $throwOnAutowireException;
     }
@@ -150,14 +147,11 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Autowires the constructor or a method.
      *
-     * @param \ReflectionFunctionAbstract $reflectionMethod
-     * @param array                       $arguments
-     *
      * @return array The autowired arguments
      *
      * @throws AutowiringFailedException
      */
-    private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments)
+    private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments): array
     {
         $class = $reflectionMethod instanceof \ReflectionMethod ? $reflectionMethod->class : $this->currentId;
         $method = $reflectionMethod->name;
@@ -269,11 +263,8 @@ class AutowirePass extends AbstractRecursivePass
 
     /**
      * Populates the list of available types for a given definition.
-     *
-     * @param string     $id
-     * @param Definition $definition
      */
-    private function populateAvailableType($id, Definition $definition)
+    private function populateAvailableType(string $id, Definition $definition)
     {
         // Never use abstract services
         if ($definition->isAbstract()) {
@@ -295,11 +286,8 @@ class AutowirePass extends AbstractRecursivePass
 
     /**
      * Associates a type and a service id if applicable.
-     *
-     * @param string $type
-     * @param string $id
      */
-    private function set($type, $id)
+    private function set(string $type, string $id)
     {
         // is this already a type/class that is known to match multiple services?
         if (isset($this->ambiguousServiceTypes[$type])) {

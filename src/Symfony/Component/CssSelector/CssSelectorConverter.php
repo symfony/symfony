@@ -31,7 +31,7 @@ class CssSelectorConverter
     /**
      * @param bool $html Whether HTML support should be enabled. Disable it for XML documents
      */
-    public function __construct($html = true)
+    public function __construct(bool $html = true)
     {
         $this->translator = new Translator();
 

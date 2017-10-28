@@ -24,7 +24,7 @@ class ReferenceConfigurator extends AbstractConfigurator
     /** @internal */
     protected $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
 
-    public function __construct($id)
+    public function __construct(string $id)
     {
         $this->id = $id;
     }

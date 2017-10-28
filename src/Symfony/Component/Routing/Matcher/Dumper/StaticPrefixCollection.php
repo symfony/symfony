@@ -132,10 +132,6 @@ class StaticPrefixCollection
 
     /**
      * Checks whether a prefix can be contained within the group.
-     *
-     * @param string $prefix
-     *
-     * @return bool Whether a prefix could belong in a given group
      */
     private function accepts(string $prefix): bool
     {
@@ -144,9 +140,6 @@ class StaticPrefixCollection
 
     /**
      * Detects whether there's a common prefix relative to the group prefix and returns it.
-     *
-     * @param string $prefix
-     * @param string $anotherPrefix
      *
      * @return false|string A common prefix, longer than the base/group prefix, or false when none available
      */
@@ -222,8 +215,6 @@ class StaticPrefixCollection
 
     /**
      * Guards against adding incompatible prefixes in a group.
-     *
-     * @param string $prefix
      *
      * @throws \LogicException when a prefix does not belong in a group
      */

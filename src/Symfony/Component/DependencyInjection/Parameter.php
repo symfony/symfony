@@ -20,10 +20,7 @@ class Parameter
 {
     private $id;
 
-    /**
-     * @param string $id The parameter key
-     */
-    public function __construct($id)
+    public function __construct(string $id)
     {
         $this->id = $id;
     }
@@ -33,6 +30,6 @@ class Parameter
      */
     public function __toString()
     {
-        return (string) $this->id;
+        return $this->id;
     }
 }

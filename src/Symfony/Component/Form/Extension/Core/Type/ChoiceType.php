@@ -368,7 +368,7 @@ class ChoiceType extends AbstractType
     /**
      * @return mixed
      */
-    private function addSubForm(FormBuilderInterface $builder, $name, ChoiceView $choiceView, array $options)
+    private function addSubForm(FormBuilderInterface $builder, string $name, ChoiceView $choiceView, array $options)
     {
         $choiceOpts = array(
             'value' => $choiceView->value,

@@ -38,9 +38,9 @@ class Configuration implements ConfigurationInterface
     /**
      * @param bool $debug Whether debugging is enabled or not
      */
-    public function __construct($debug)
+    public function __construct(bool $debug)
     {
-        $this->debug = (bool) $debug;
+        $this->debug = $debug;
     }
 
     /**

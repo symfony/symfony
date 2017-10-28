@@ -28,7 +28,7 @@ class RemoteUserAuthenticationListener extends AbstractPreAuthenticatedListener
 {
     private $userKey;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'REMOTE_USER', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, string $providerKey, string $userKey = 'REMOTE_USER', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         parent::__construct($tokenStorage, $authenticationManager, $providerKey, $logger, $dispatcher);
 

@@ -32,7 +32,7 @@ class GenrbCompiler implements BundleCompilerInterface
      *
      * @throws RuntimeException if the "genrb" cannot be found
      */
-    public function __construct($genrb = 'genrb', $envVars = '')
+    public function __construct(string $genrb = 'genrb', string $envVars = '')
     {
         exec('which '.$genrb, $output, $status);
 

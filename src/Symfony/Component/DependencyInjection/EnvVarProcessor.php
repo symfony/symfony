@@ -67,10 +67,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             if (null === $env = $getEnv($name)) {
                 return;
             }
-        } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
-            $env = $_SERVER[$name];
         } elseif (isset($_ENV[$name])) {
             $env = $_ENV[$name];
+        } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
+            $env = $_SERVER[$name];
         } elseif (false === ($env = getenv($name)) || null === $env) { // null is a possible value because of thread safety issues
             if (!$this->container->hasParameter("env($name)")) {
                 throw new EnvNotFoundException($name);

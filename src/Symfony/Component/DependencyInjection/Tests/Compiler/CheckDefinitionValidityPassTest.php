@@ -76,6 +76,30 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->process($container);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
+     */
+    public function testDynamicServiceName()
+    {
+        $container = new ContainerBuilder();
+        $env = $container->getParameterBag()->get('env(BAR)');
+        $container->register("foo.$env", 'class');
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
+     */
+    public function testDynamicAliasName()
+    {
+        $container = new ContainerBuilder();
+        $env = $container->getParameterBag()->get('env(BAR)');
+        $container->setAlias("foo.$env", 'class');
+
+        $this->process($container);
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new CheckDefinitionValidityPass();

@@ -37,12 +37,6 @@ use Doctrine\DBAL\Types\Type as DoctrineType;
  */
 class DoctrineTokenProvider implements TokenProviderInterface
 {
-    /**
-     * Doctrine DBAL database connection
-     * F.ex. service id: doctrine.dbal.default_connection.
-     *
-     * @var Connection
-     */
     private $conn;
 
     public function __construct(Connection $conn)

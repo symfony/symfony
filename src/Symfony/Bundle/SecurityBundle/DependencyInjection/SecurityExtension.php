@@ -207,9 +207,6 @@ class SecurityExtension extends Extension
         $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
     }
 
-    /**
-     * Loads the web configuration.
-     */
     private function createRoleHierarchy(array $config, ContainerBuilder $container)
     {
         if (!isset($config['role_hierarchy']) || 0 === count($config['role_hierarchy'])) {

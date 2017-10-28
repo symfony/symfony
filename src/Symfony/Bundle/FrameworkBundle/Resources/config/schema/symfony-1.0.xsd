@@ -138,6 +138,7 @@
             <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
+        <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="base-path" type="xsd:string" />
         <xsd:attribute name="version-strategy" type="xsd:string" />
         <xsd:attribute name="version" type="xsd:string" />

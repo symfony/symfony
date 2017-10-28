@@ -279,7 +279,9 @@ class SecurityExtension extends Extension
                 $customUserChecker = true;
             }
 
-            if (!isset($firewall['logout_on_user_change']) || !$firewall['logout_on_user_change']) {
+            if (!isset($firewall['logout_on_user_change'])) {
+                $firewall['logout_on_user_change'] = false;
+            } elseif (false === $firewall['logout_on_user_change']) {
                 @trigger_error('Setting logout_on_user_change to false is deprecated as of 3.4 and will always be true in 4.0. Set logout_on_user_change to true in your firewall configuration.', E_USER_DEPRECATED);
             }
 

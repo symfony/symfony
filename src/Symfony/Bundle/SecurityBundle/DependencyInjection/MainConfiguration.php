@@ -248,7 +248,6 @@ class MainConfiguration implements ConfigurationInterface
             ->booleanNode('stateless')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
             ->booleanNode('logout_on_user_change')
-                ->defaultFalse()
                 ->info('When true, it will trigger a logout for the user if something has changed. This will be the default behavior as of Syfmony 4.0.')
             ->end()
             ->arrayNode('logout')
@@ -338,17 +337,6 @@ class MainConfiguration implements ConfigurationInterface
                     }
 
                     return $firewall;
-                })
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) {
-                    return (isset($v['stateless']) && true === $v['stateless']) || (isset($v['security']) && false === $v['security']);
-                })
-                ->then(function ($v) {
-                    // this option doesn't change behavior when true when stateless, so prevent deprecations
-                    $v['logout_on_user_change'] = true;
-
-                    return $v;
                 })
             ->end()
         ;

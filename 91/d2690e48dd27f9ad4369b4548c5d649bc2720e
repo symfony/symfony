@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alexpott at 2017-10-26T10:07:26Z
+
+We tried this before in https://github.com/symfony/symfony/pull/24685 but got it wrong.
+
+---------------------------------------------------------------------------
+
+by alexpott at 2017-10-26T10:08:50Z
+
+I've run src/Symfony/Component/Process/Tests/ProcessTest.php locally and this version does not seem to cause the same problems

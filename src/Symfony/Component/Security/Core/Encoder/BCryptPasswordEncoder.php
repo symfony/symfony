@@ -21,9 +21,6 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
 {
     const MAX_PASSWORD_LENGTH = 72;
 
-    /**
-     * @var string
-     */
     private $cost;
 
     /**

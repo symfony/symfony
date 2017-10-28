@@ -19,7 +19,7 @@ namespace Symfony\Component\Translation\Extractor;
 abstract class AbstractFileExtractor
 {
     /**
-     * @param string|array $resource files, a file or a directory
+     * @param string|array $resource Files, a file or a directory
      *
      * @return array
      */
@@ -75,7 +75,7 @@ abstract class AbstractFileExtractor
     abstract protected function canBeExtracted($file);
 
     /**
-     * @param string|array $resource files, a file or a directory
+     * @param string|array $resource Files, a file or a directory
      *
      * @return array files to be extracted
      */

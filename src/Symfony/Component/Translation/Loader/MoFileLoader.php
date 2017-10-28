@@ -23,23 +23,17 @@ class MoFileLoader extends ArrayLoader
     /**
      * Magic used for validating the format of a MO file as well as
      * detecting if the machine used to create that file was little endian.
-     *
-     * @var float
      */
     const MO_LITTLE_ENDIAN_MAGIC = 0x950412de;
 
     /**
      * Magic used for validating the format of a MO file as well as
      * detecting if the machine used to create that file was big endian.
-     *
-     * @var float
      */
     const MO_BIG_ENDIAN_MAGIC = 0xde120495;
 
     /**
      * The size of the header of a MO file in bytes.
-     *
-     * @var int Number of bytes
      */
     const MO_HEADER_SIZE = 28;
 

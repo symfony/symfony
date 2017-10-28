@@ -19,21 +19,15 @@ use Symfony\Component\Form\Exception\ErrorMappingException;
  */
 class MappingRule
 {
-    /**
-     * @var FormInterface
-     */
     private $origin;
-
-    /**
-     * @var string
-     */
     private $propertyPath;
-
-    /**
-     * @var string
-     */
     private $targetPath;
 
+    /**
+     * @param FormInterface $origin
+     * @param string        $propertyPath
+     * @param string        $targetPath
+     */
     public function __construct(FormInterface $origin, $propertyPath, $targetPath)
     {
         $this->origin = $origin;

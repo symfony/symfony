@@ -19,19 +19,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class RegisterListenersPass implements CompilerPassInterface
 {
-    /**
-     * @var string
-     */
     protected $dispatcherService;
-
-    /**
-     * @var string
-     */
     protected $listenerTag;
-
-    /**
-     * @var string
-     */
     protected $subscriberTag;
 
     /**

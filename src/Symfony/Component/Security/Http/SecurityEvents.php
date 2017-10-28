@@ -24,8 +24,6 @@ final class SecurityEvents
      * Symfony\Component\Security\Http\Event\InteractiveLoginEvent instance.
      *
      * @Event
-     *
-     * @var string
      */
     const INTERACTIVE_LOGIN = 'security.interactive_login';
 
@@ -37,8 +35,6 @@ final class SecurityEvents
      * Symfony\Component\Security\Http\Event\SwitchUserEvent instance.
      *
      * @Event
-     *
-     * @var string
      */
     const SWITCH_USER = 'security.switch_user';
 }

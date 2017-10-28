@@ -27,9 +27,6 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  */
 class CsrfProviderAdapter implements CsrfTokenManagerInterface
 {
-    /**
-     * @var CsrfProviderInterface
-     */
     private $csrfProvider;
 
     public function __construct(CsrfProviderInterface $csrfProvider)

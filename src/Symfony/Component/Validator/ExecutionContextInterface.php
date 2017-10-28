@@ -150,9 +150,9 @@ interface ExecutionContextInterface
      * @param null|string|string[] $groups   The groups to validate in. If you don't pass any
      *                                       groups here, the current group of the context
      *                                       will be used.
-     * @param bool                 $traverse whether to traverse the value if it is an array
+     * @param bool                 $traverse Whether to traverse the value if it is an array
      *                                       or an instance of <tt>\Traversable</tt>
-     * @param bool                 $deep     whether to traverse the value recursively if
+     * @param bool                 $deep     Whether to traverse the value recursively if
      *                                       it is a collection of collections
      *
      * @deprecated since version 2.5, to be removed in 3.0.

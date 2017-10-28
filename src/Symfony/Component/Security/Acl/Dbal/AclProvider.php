@@ -38,14 +38,7 @@ class AclProvider implements AclProviderInterface
 {
     const MAX_BATCH_SIZE = 30;
 
-    /**
-     * @var AclCacheInterface|null
-     */
     protected $cache;
-
-    /**
-     * @var Connection
-     */
     protected $connection;
     protected $loadedAces = array();
     protected $loadedAcls = array();

@@ -48,7 +48,7 @@ class SecurityContext implements SecurityContextInterface
      *
      * @param TokenStorageInterface|AuthenticationManagerInterface         $tokenStorage
      * @param AuthorizationCheckerInterface|AccessDecisionManagerInterface $authorizationChecker
-     * @param bool                                                         $alwaysAuthenticate   only applicable with old signature
+     * @param bool                                                         $alwaysAuthenticate   Only applicable with old signature
      */
     public function __construct($tokenStorage, $authorizationChecker, $alwaysAuthenticate = false)
     {

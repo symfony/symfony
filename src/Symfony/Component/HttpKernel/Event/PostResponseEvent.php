@@ -23,15 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PostResponseEvent extends Event
 {
-    /**
-     * The kernel in which this event was thrown.
-     *
-     * @var HttpKernelInterface
-     */
     private $kernel;
-
     private $request;
-
     private $response;
 
     public function __construct(HttpKernelInterface $kernel, Request $request, Response $response)

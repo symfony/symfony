@@ -13,9 +13,9 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 class MockSplFileInfo extends \SplFileInfo
 {
-    const   TYPE_DIRECTORY = 1;
-    const   TYPE_FILE = 2;
-    const   TYPE_UNKNOWN = 3;
+    const TYPE_DIRECTORY = 1;
+    const TYPE_FILE = 2;
+    const TYPE_UNKNOWN = 3;
 
     private $contents = null;
     private $mode = null;

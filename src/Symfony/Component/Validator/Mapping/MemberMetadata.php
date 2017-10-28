@@ -30,8 +30,6 @@ use Symfony\Component\Validator\ValidationVisitorInterface;
 abstract class MemberMetadata extends ElementMetadata implements PropertyMetadataInterface
 {
     /**
-     * @var string
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getClassName()} instead.
@@ -39,8 +37,6 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     public $class;
 
     /**
-     * @var string
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getName()} instead.
@@ -48,8 +44,6 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     public $name;
 
     /**
-     * @var string
-     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getPropertyName()} instead.

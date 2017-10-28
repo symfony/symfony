@@ -18,16 +18,15 @@ namespace Symfony\Component\Process\Pipes;
  */
 abstract class AbstractPipes implements PipesInterface
 {
-    /** @var array */
     public $pipes = array();
 
-    /** @var string */
     private $inputBuffer = '';
-    /** @var resource|null */
     private $input;
-    /** @var bool */
     private $blocked = true;
 
+    /**
+     * @param resource|null $input
+     */
     public function __construct($input)
     {
         if (is_resource($input)) {

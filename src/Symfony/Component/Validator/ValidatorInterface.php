@@ -64,7 +64,7 @@ interface ValidatorInterface
      *
      * @param mixed      $containingValue The value containing the property
      * @param string     $property        The name of the property to validate
-     * @param string     $value           the value to validate against the
+     * @param string     $value           The value to validate against the
      *                                    constraints of the property
      * @param array|null $groups          The validation groups to validate
      *

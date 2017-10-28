@@ -24,7 +24,6 @@ use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTes
 abstract class UserPasswordValidatorTest extends AbstractConstraintValidatorTest
 {
     const PASSWORD = 's3Cr3t';
-
     const SALT = '^S4lt$';
 
     /**

@@ -26,9 +26,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 {
-    /**
-     * @var string|string[]
-     */
     private $connections;
     private $eventManagers;
     private $managerTemplate;

@@ -106,7 +106,7 @@ interface AclInterface extends \Serializable
     /**
      * Whether the ACL has loaded ACEs for all of the passed security identities.
      *
-     * @param mixed $securityIdentities an implementation of SecurityIdentityInterface, or an array thereof
+     * @param mixed $securityIdentities An implementation of SecurityIdentityInterface, or an array thereof
      *
      * @return bool
      */

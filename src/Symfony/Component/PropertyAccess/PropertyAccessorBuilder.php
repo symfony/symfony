@@ -18,14 +18,7 @@ namespace Symfony\Component\PropertyAccess;
  */
 class PropertyAccessorBuilder
 {
-    /**
-     * @var bool
-     */
     private $magicCall = false;
-
-    /**
-     * @var bool
-     */
     private $throwExceptionOnInvalidIndex = false;
 
     /**

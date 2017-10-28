@@ -30,11 +30,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class SessionCsrfProvider extends DefaultCsrfProvider
 {
-    /**
-     * The user session from which the session ID is returned.
-     *
-     * @var Session
-     */
     protected $session;
 
     /**
@@ -43,7 +38,7 @@ class SessionCsrfProvider extends DefaultCsrfProvider
      * A recommended value for the secret is a generated value with at least
      * 32 characters and mixed letters, digits and special characters.
      *
-     * @param Session $session The user session
+     * @param Session $session The user session from which the session ID is returned
      * @param string  $secret  A secret value included in the CSRF token
      */
     public function __construct(Session $session, $secret)

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-10-27T01:54:20Z
+
+Btw, can we safely remove the `compound is defined` check?

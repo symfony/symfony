@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Dëse Wäert aentsprécht kenger gëlteger Sprooch.</target>
+                <target>Dëse Wäert entsprécht kenger gëlteger Sprooch.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
@@ -180,7 +180,7 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>Dëse Wäert sollt exactly {{ limit }} Buschtaf hunn.|Dëse Wäert sollt exakt {{ limit }} Buschtawen hunn.</target>
+                <target>Dëse Wäert sollt exakt {{ limit }} Buschtaf hunn.|Dëse Wäert sollt exakt {{ limit }} Buschtawen hunn.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51">
                 <source>No temporary folder was configured in php.ini.</source>
-                <target>Et gouf keen temporären Dossier an der php.ini konfiguréiert.</target>
+                <target>Et gouf keen temporären Dossier an der php.ini konfiguréiert oder den temporären Dossier existéiert net.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -304,7 +304,7 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>Den Domain-Numm konnt net opgeléist ginn.</target>
+                <target>Den Host-Numm konnt net opgeléist ginn.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>

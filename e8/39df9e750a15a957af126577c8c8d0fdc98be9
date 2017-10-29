@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-28T22:06:17Z
+
+Why not use the final keyword instead of the annotation?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-28T22:10:45Z
+
+Because I really dislike the keyword: it's technically imperative, while we only need to state intend (like the private keyword allows).

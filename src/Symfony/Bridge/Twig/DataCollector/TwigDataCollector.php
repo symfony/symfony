@@ -63,9 +63,18 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $this->data['template_paths'] = array();
 
         $templateFinder = function (Profile $profile) use (&$templateFinder) {
-            if ($profile->isTemplate() && $template = $this->twig->load($profile->getName())->getSourceContext()->getPath()) {
-                $this->data['template_paths'][$profile->getName()] = $template;
+            if ($profile->isTemplate()) {
+                try {
+                    $template = $this->twig->load($name = $profile->getName());
+                } catch (\Twig_Error_Loader $e) {
+                    $template = null;
+                }
+
+                if (null !== $template && '' !== $path = $template->getSourceContext()->getPath()) {
+                    $this->data['template_paths'][$name] = $path;
+                }
             }
+
             foreach ($profile as $p) {
                 $templateFinder($p);
             }

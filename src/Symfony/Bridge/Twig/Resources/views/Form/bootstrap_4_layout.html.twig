@@ -70,11 +70,12 @@
 {# Labels #}
 
 {% block form_label -%}
-    {%- if expanded is defined and expanded -%}
+    {%- if compound is defined and compound -%}
         {%- set element = 'legend' -%}
         {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-legend')|trim}) -%}
+    {%- else -%}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
     {%- endif -%}
-    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
     {{- parent() -}}
 {%- endblock form_label %}
 
@@ -107,7 +108,7 @@
 {# Rows #}
 
 {% block form_row -%}
-    {%- if expanded is defined and expanded -%}
+    {%- if compound is defined and compound -%}
         {%- set element = 'fieldset' -%}
     {%- endif -%}
     <{{ element|default('div') }} class="form-group">

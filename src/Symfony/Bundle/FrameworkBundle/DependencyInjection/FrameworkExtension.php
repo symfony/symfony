@@ -127,9 +127,6 @@ class FrameworkExtension extends Extension
             }
         }
 
-        // Property access is used by both the Form and the Validator component
-        $loader->load('property_access.xml');
-
         // Load Cache configuration first as it is used by other components
         $loader->load('cache.xml');
 
@@ -237,7 +234,7 @@ class FrameworkExtension extends Extension
         $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
         $this->registerRouterConfiguration($config['router'], $container, $loader);
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
-        $this->registerPropertyAccessConfiguration($config['property_access'], $container);
+        $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
@@ -1096,8 +1093,14 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container)
+    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccessor')) {
+            return;
+        }
+
+        $loader->load('property_access.xml');
+
         $container
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $config['magic_call'])
@@ -1132,6 +1135,11 @@ class FrameworkExtension extends Extension
         }
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
+
+        if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccessor')) {
+            $container->removeAlias('serializer.property_accessor');
+            $container->removeDefinition('serializer.normalizer.object');
+        }
 
         $serializerLoaders = array();
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {

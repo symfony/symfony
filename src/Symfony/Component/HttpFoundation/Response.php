@@ -612,6 +612,8 @@ class Response
      * @param bool $immutable enables or disables the immutable directive
      *
      * @return $this
+     *
+     * @final
      */
     public function setImmutable($immutable = true)
     {
@@ -628,6 +630,8 @@ class Response
      * Returns true if the response is marked as "immutable".
      *
      * @return bool returns true if the response is marked as "immutable"; otherwise false
+     *
+     * @final
      */
     public function isImmutable()
     {

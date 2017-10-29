@@ -14,6 +14,6 @@ namespace Symfony\Component\Workflow\Exception;
 /**
  * Thrown by Workflow when an undefined transition is applied on a subject.
  */
-class UndefinedTransitionException extends SubjectTransitionException
+class UndefinedTransitionException extends LogicException
 {
 }

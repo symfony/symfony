@@ -142,8 +142,7 @@ class Workflow
 
             if ($transitionBlockerList->findByCode(TransitionBlocker::REASON_CODE_TRANSITION_NOT_DEFINED)) {
                 throw new UndefinedTransitionException(
-                    sprintf('Transition "%s" is not defined in workflow "%s".', $transitionName, $this->name),
-                    $transitionBlockerList
+                    sprintf('Transition "%s" is not defined in workflow "%s".', $transitionName, $this->name)
                 );
             }
 

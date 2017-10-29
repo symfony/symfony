@@ -241,7 +241,18 @@ EOF
             return false;
         }
 
-        // see if the class exists (only need to trigger autoload once)
-        return class_exists($serviceId) || interface_exists($serviceId, false);
+        // if the id has a \, assume it is a class
+        if (false !== strpos($serviceId, '\\')) {
+            return true;
+        }
+
+        try {
+            $r = new \ReflectionClass($serviceId);
+
+            return true;
+        } catch (\ReflectionException $e) {
+            // the service id is not a valid class/interface
+            return false;
+        }
     }
 }

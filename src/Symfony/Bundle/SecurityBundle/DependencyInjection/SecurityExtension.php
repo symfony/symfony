@@ -83,6 +83,10 @@ class SecurityExtension extends Extension
             $container->removeDefinition('security.access.expression_voter');
         }
 
+        if (!class_exists('Symfony\Component\HttpFoundation\RequestStack') || !class_exists('Symfony\Component\Routing\Generator\UrlGeneratorInterface')) {
+            $container->removeDefinition('security.impersonate_url_generator');
+        }
+
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);

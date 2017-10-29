@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Component\Security\Http\Logout\ImpersonateUrlGenerator;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -21,14 +22,17 @@ use Twig\TwigFunction;
  * SecurityExtension exposes security context features.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class SecurityExtension extends AbstractExtension
 {
     private $securityChecker;
+    private $impersonateUrlGenerator;
 
-    public function __construct(AuthorizationCheckerInterface $securityChecker = null)
+    public function __construct(AuthorizationCheckerInterface $securityChecker = null, ImpersonateUrlGenerator $impersonateUrlGenerator)
     {
         $this->securityChecker = $securityChecker;
+        $this->impersonateUrlGenerator = $impersonateUrlGenerator;
     }
 
     public function isGranted($role, $object = null, $field = null)
@@ -48,6 +52,16 @@ class SecurityExtension extends AbstractExtension
         }
     }
 
+    public function getImpersonateExitPath()
+    {
+        return $this->impersonateUrlGenerator->getImpersonateExitPath();
+    }
+
+    public function getImpersonateExitUrl()
+    {
+        return $this->impersonateUrlGenerator->getImpersonateExitUrl();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -55,6 +69,8 @@ class SecurityExtension extends AbstractExtension
     {
         return array(
             new TwigFunction('is_granted', array($this, 'isGranted')),
+            new TwigFunction('impersonation_exit_path', array($this, 'getImpersonateExitPath')),
+            new TwigFunction('impersonation_exit_url', array($this, 'getImpersonateExitUrl')),
         );
     }
 

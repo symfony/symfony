@@ -108,12 +108,12 @@ class ConsoleFormatter implements FormatterInterface
 
         $context = $this->dumpData($record['context']);
         if ($context) {
-            $context .= $separator;
+            $context = $separator . $context;
         }
 
         $extra = $this->dumpData($record['extra']);
         if ($extra) {
-            $extra .= $separator;
+            $extra = $separator . $extra;
         }
 
         $formatted = strtr($this->options['format'], array(

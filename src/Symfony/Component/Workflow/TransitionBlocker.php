@@ -27,10 +27,10 @@ class TransitionBlocker
     /**
      * Creates a new transition blocker.
      *
-     * @param string          $message         The blocker message
-     * @param string|null     $code            The error code of the blocker
-     * @param array           $parameters      The parameters that may be useful to pass
-     *                                         around with the blocker
+     * @param string      $message    The blocker message
+     * @param string|null $code       The error code of the blocker
+     * @param array       $parameters The parameters that may be useful to pass
+     *                                around with the blocker
      */
     public function __construct($message, $code = null, array $parameters = array())
     {
@@ -58,7 +58,7 @@ class TransitionBlocker
 
     /**
      * Create a blocker, that says the transition cannot be made because the subject
-     * is in wrong place (i.e. status)
+     * is in wrong place (i.e. status).
      *
      * @param string $transitionName
      *

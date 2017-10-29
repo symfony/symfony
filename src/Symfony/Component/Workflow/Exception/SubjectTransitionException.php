@@ -22,7 +22,7 @@ class SubjectTransitionException extends LogicException
     private $transitionBlockerList;
 
     /**
-     * @param string $message
+     * @param string                $message
      * @param TransitionBlockerList $transitionBlockerList
      */
     public function __construct(string $message, TransitionBlockerList $transitionBlockerList)

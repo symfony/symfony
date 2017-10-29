@@ -104,8 +104,8 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
     /**
      * Sets a blocker at a given offset.
      *
-     * @param int                          $offset    The blocker offset
-     * @param TransitionBlocker            $blocker   The blocker
+     * @param int               $offset  The blocker offset
+     * @param TransitionBlocker $blocker The blocker
      */
     public function set($offset, TransitionBlocker $blocker)
     {
@@ -181,7 +181,7 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @param string $code The code to find
      *
-     * @return TransitionBlocker|null The first blocker with the code.
+     * @return TransitionBlocker|null the first blocker with the code
      */
     public function findByCode(string $code)
     {

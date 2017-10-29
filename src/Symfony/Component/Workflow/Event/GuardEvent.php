@@ -43,6 +43,7 @@ class GuardEvent extends Event
     {
         if (!$blocked) {
             $this->transitionBlockerList = new TransitionBlockerList();
+
             return;
         }
 

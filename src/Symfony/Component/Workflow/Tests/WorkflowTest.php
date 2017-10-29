@@ -422,7 +422,7 @@ class WorkflowTest extends TestCase
         $dispatcher = new EventDispatcher();
         $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $dispatcher);
 
-        $guardsAddingTransitionBlockers = [
+        $guardsAddingTransitionBlockers = array(
             function (GuardEvent $event) {
                 $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 1', 'blocker_1'));
                 $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 2', 'blocker_2'));
@@ -430,7 +430,7 @@ class WorkflowTest extends TestCase
             function (GuardEvent $event) {
                 $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 3', 'blocker_3'));
             },
-        ];
+        );
 
         foreach ($guardsAddingTransitionBlockers as $guard) {
             $dispatcher->addListener('workflow.guard', $guard);

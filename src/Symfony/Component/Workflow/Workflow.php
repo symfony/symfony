@@ -222,8 +222,8 @@ class Workflow
     }
 
     /**
-     * @param object $subject
-     * @param Marking $marking
+     * @param object     $subject
+     * @param Marking    $marking
      * @param Transition $transition
      *
      * @return TransitionBlockerList
@@ -232,7 +232,7 @@ class Workflow
     {
         foreach ($transition->getFroms() as $place) {
             if (!$marking->has($place)) {
-                return new TransitionBlockerList([TransitionBlocker::createNotApplicable($transition->getName())]);
+                return new TransitionBlockerList(array(TransitionBlocker::createNotApplicable($transition->getName())));
             }
         }
 
@@ -379,7 +379,7 @@ class Workflow
     /**
      * Returns all enabled transitions or a transition blocker list of one of them.
      *
-     * @param object $subject A subject
+     * @param object $subject        A subject
      * @param string $transitionName
      *
      * @return Transition[]|TransitionBlockerList All enabled transitions or a blocker list
@@ -390,7 +390,7 @@ class Workflow
         $eligibleTransitions = $this->getTransitionsByName($transitionName);
 
         if (!$eligibleTransitions) {
-            return new TransitionBlockerList([TransitionBlocker::createNotDefined($transitionName, $this->name)]);
+            return new TransitionBlockerList(array(TransitionBlocker::createNotDefined($transitionName, $this->name)));
         }
 
         $marking = $this->getMarking($subject);

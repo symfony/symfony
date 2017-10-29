@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Workflow;
 
+use Symfony\Component\Workflow\Exception\BlockedTransitionException;
 use Symfony\Component\Workflow\Exception\LogicException;
+use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 
 /**
@@ -43,6 +45,16 @@ interface WorkflowInterface
     public function can($subject, $transitionName);
 
     /**
+     * Returns transition blockers explaining why a transition cannot be made.
+     *
+     * @param object $subject        A subject
+     * @param string $transitionName A transition
+     *
+     * @return TransitionBlockerList Empty if the transition is possible
+     */
+    public function buildTransitionBlockerList($subject, string $transitionName): TransitionBlockerList;
+
+    /**
      * Fire a transition.
      *
      * @param object $subject        A subject
@@ -50,10 +62,10 @@ interface WorkflowInterface
      *
      * @return Marking The new Marking
      *
-     * @throws LogicException If the transition is not applicable
-     * @throws LogicException If the transition does not exist
+     * @throws BlockedTransitionException   If the transition is not applicable
+     * @throws UndefinedTransitionException If the transition does not exist
      */
-    public function apply($subject, $transitionName);
+    public function apply($subject, string $transitionName);
 
     /**
      * Returns all enabled transitions.

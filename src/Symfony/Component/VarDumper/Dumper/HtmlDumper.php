@@ -383,8 +383,9 @@ return function (root, x) {
                 x += elt.parentNode.getAttribute('data-depth')/1;
             }
             elt.setAttribute('data-depth', x);
-            if (elt.className ? 'sf-dump-expanded' !== elt.className : (x > options.maxDepth)) {
-                elt.className = 'sf-dump-expanded';
+            var className = elt.className;
+            elt.className = 'sf-dump-expanded';
+            if (className ? 'sf-dump-expanded' !== className : (x > options.maxDepth)) {
                 toggle(a);
             }
         } else if (/\bsf-dump-ref\b/.test(elt.className) && (a = elt.getAttribute('href'))) {

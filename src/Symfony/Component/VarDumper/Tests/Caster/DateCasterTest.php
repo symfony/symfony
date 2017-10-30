@@ -187,10 +187,10 @@ EODUMP;
         return array(
             array('PT0S', 0, 0, '0s', '0s'),
             array('PT0S', 0.1, 0, $withMs ? '+ 00:00:00.100' : '0s', '%is'),
-            array('PT1S', 0, 0, '+ 00:00:01'.$ms, '1s'),
-            array('PT2M', 0, 0, '+ 00:02:00'.$ms, '120s'),
-            array('PT3H', 0, 0, '+ 03:00:00'.$ms, '10 800s'),
-            array('P4D', 0, 0, '+ 4d', '34%x %x00s'), // %x to account for DST
+            array('PT1S', 0, 0, '+ 00:00:01'.$ms, '%is'),
+            array('PT2M', 0, 0, '+ 00:02:00'.$ms, '%is'),
+            array('PT3H', 0, 0, '+ 03:00:00'.$ms, '%ss'),
+            array('P4D', 0, 0, '+ 4d', '%ss'),
             array('P5M', 0, 0, '+ 5m', null),
             array('P6Y', 0, 0, '+ 6y', null),
             array('P1Y2M3DT4H5M6S', 0, 0, '+ 1y 2m 3d 04:05:06'.$ms, null),
@@ -201,10 +201,10 @@ EODUMP;
 
             array('PT0S', 0, 1, '0s', '0s'),
             array('PT0S', 0.1, 1, $withMs ? '- 00:00:00.100' : '0s', '%is'),
-            array('PT1S', 0, 1, '- 00:00:01'.$ms, '-1s'),
-            array('PT2M', 0, 1, '- 00:02:00'.$ms, '-120s'),
-            array('PT3H', 0, 1, '- 03:00:00'.$ms, '-10 800s'),
-            array('P4D', 0, 1, '- 4d', '-345 600s'),
+            array('PT1S', 0, 1, '- 00:00:01'.$ms, '%is'),
+            array('PT2M', 0, 1, '- 00:02:00'.$ms, '%is'),
+            array('PT3H', 0, 1, '- 03:00:00'.$ms, '%ss'),
+            array('P4D', 0, 1, '- 4d', '%ss'),
             array('P5M', 0, 1, '- 5m', null),
             array('P6Y', 0, 1, '- 6y', null),
             array('P1Y2M3DT4H5M6S', 0, 1, '- 1y 2m 3d 04:05:06'.$ms, null),
@@ -252,7 +252,7 @@ DateTimeZone {
 }
 EODUMP;
 
-        $this->assertDumpEquals($xDump, $timezone, Caster::EXCLUDE_VERBOSE);
+        $this->assertDumpMatchesFormat($xDump, $timezone, Caster::EXCLUDE_VERBOSE);
     }
 
     /**
@@ -275,7 +275,7 @@ array:1 [
 ]
 EODUMP;
 
-        $this->assertDumpEquals($xDump, $cast);
+        $this->assertDumpMatchesFormat($xDump, $cast);
 
         $xDump = <<<EODUMP
 Symfony\Component\VarDumper\Caster\ConstStub {
@@ -310,13 +310,13 @@ EODUMP;
             array('z', '+00:00', ''),
 
             // type 3 (timezone identifier)
-            array('Africa/Tunis', 'Africa/Tunis (+01:00)', $xRegion),
-            array('America/Panama', 'America/Panama (-05:00)', $xRegion),
-            array('Asia/Jerusalem', 'Asia/Jerusalem (+03:00)', $xRegion),
-            array('Atlantic/Canary', 'Atlantic/Canary (+01:00)', $xRegion),
-            array('Australia/Perth', 'Australia/Perth (+08:00)', $xRegion),
-            array('Europe/Zurich', 'Europe/Zurich (+02:00)', $xRegion),
-            array('Pacific/Tahiti', 'Pacific/Tahiti (-10:00)', $xRegion),
+            array('Africa/Tunis', 'Africa/Tunis (%s:00)', $xRegion),
+            array('America/Panama', 'America/Panama (%s:00)', $xRegion),
+            array('Asia/Jerusalem', 'Asia/Jerusalem (%s:00)', $xRegion),
+            array('Atlantic/Canary', 'Atlantic/Canary (%s:00)', $xRegion),
+            array('Australia/Perth', 'Australia/Perth (%s:00)', $xRegion),
+            array('Europe/Zurich', 'Europe/Zurich (%s:00)', $xRegion),
+            array('Pacific/Tahiti', 'Pacific/Tahiti (%s:00)', $xRegion),
         );
     }
 

@@ -1,5 +1,13 @@
 {% use "bootstrap_4_layout.html.twig" %}
 
+{% block form_label_class -%}
+col-sm-2
+{%- endblock form_label_class %}
+
+{% block form_group_class -%}
+col-sm-10
+{%- endblock form_group_class %}
+
 {# Labels #}
 
 {% block form_label -%}
@@ -13,10 +21,6 @@
         {{- parent() -}}
     {%- endif -%}
 {%- endblock form_label %}
-
-{% block form_label_class -%}
-col-sm-2
-{%- endblock form_label_class %}
 
 {# Rows #}
 
@@ -47,23 +51,29 @@ col-sm-2
 {%- endblock fieldset_form_row %}
 
 {% block submit_row -%}
-    <div class="form-group row">
-        <div class="{{ block('form_label_class') }}"></div>
+    <div class="form-group row">{#--#}
+        <div class="{{ block('form_label_class') }}"></div>{#--#}
         <div class="{{ block('form_group_class') }}">
             {{- form_widget(form) -}}
-        </div>
+        </div>{#--#}
     </div>
 {%- endblock submit_row %}
 
 {% block reset_row -%}
-    <div class="form-group row">
-        <div class="{{ block('form_label_class') }}"></div>
+    <div class="form-group row">{#--#}
+        <div class="{{ block('form_label_class') }}"></div>{#--#}
         <div class="{{ block('form_group_class') }}">
             {{- form_widget(form) -}}
-        </div>
+        </div>{#--#}
     </div>
 {%- endblock reset_row %}
 
-{% block form_group_class -%}
-col-sm-10
-{%- endblock form_group_class %}
+{% block checkbox_row -%}
+    <div class="form-group row">{#--#}
+        <div class="{{ block('form_label_class') }}"></div>{#--#}
+        <div class="{{ block('form_group_class') }}">
+            {{- form_widget(form) -}}
+            {{- form_errors(form) -}}
+        </div>{#--#}
+    </div>
+{%- endblock checkbox_row %}

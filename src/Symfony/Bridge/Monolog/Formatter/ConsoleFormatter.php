@@ -130,7 +130,7 @@ class ConsoleFormatter implements FormatterInterface
         $extra = $this->dumpData($record['extra']);
         if ($extra) {
             $extra = $separator.$extra;
-        }		          }
+        }
 
         $formatted = strtr($this->options['format'], array(
             '%datetime%' => $record['datetime']->format($this->options['date_format']),

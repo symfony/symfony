@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by arkste at 2017-10-30T12:13:11Z
+
+I've added tests to make sure the checkbox row doesn't break again in bootstrap 3 & 4.
+
+TwigBridge tests were failing because of the changes made in #24703, so i fixed them as well.
+
+Tests are still failing, but this is related due to the timezone changes.
+
+Please let me know if there's anything else i can do to get this merged.
+
+---------------------------------------------------------------------------
+
+by arkste at 2017-10-30T14:07:02Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by arkste at 2017-10-30T14:35:00Z
+
+@stof i've added more whitespace control tags to remove indentation spaces.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T15:35:40Z
+
+deps=low tests should not fail: Form's lowest dep for the bridge should be bumped (or vice-versa, didn't look precisely)
+
+---------------------------------------------------------------------------
+
+by arkste at 2017-10-30T18:14:10Z
+
+@nicolas-grekas not sure what to do now, the deps are already on `~3.4|~4.0`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T18:17:39Z
+
+should be `~3.4-beta2|~4.0`
+
+---------------------------------------------------------------------------
+
+by arkste at 2017-10-30T18:23:52Z
+
+correct me if i'm wrong, but even changing the deps wont make the tests running green on deps=low, since travis runs the bridge tests from the vendor-folder (like `/home/travis/build/symfony/symfony/src/Symfony/Bridge/Twig/vendor/symfony/form/Tests/AbstractLayoutTest.php:84`) and the fixed tests are only in this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T18:24:20Z
+
+it will: the CI builds per PR packages for that situation
+
+---------------------------------------------------------------------------
+
+by arkste at 2017-10-30T18:41:23Z
+
+@fabpot i reverted the change for bootstrap 3 & 4.

@@ -40,19 +40,19 @@ col-sm-10
     <div class="form-group">{#--#}
         <div class="{{ block('form_label_class') }}"></div>{#--#}
         <div class="{{ block('form_group_class') }}">
-            {{ form_widget(form) }}
+            {{- form_widget(form) -}}
         </div>{#--#}
     </div>
-{% endblock submit_row %}
+{%- endblock submit_row %}
 
 {% block reset_row -%}
     <div class="form-group">{#--#}
         <div class="{{ block('form_label_class') }}"></div>{#--#}
         <div class="{{ block('form_group_class') }}">
-            {{ form_widget(form) }}
+            {{- form_widget(form) -}}
         </div>{#--#}
     </div>
-{% endblock reset_row %}
+{%- endblock reset_row %}
 
 {% block checkbox_row -%}
     <div class="form-group{% if not valid %} has-error{% endif %}">{#--#}

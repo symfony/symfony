@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
+use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
+use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class KernelTest extends TestCase
 {
@@ -528,6 +531,38 @@ EOF;
         $this->assertTrue($kernel->getContainer()->getParameter('test.processed'));
     }
 
+    public function testServicesResetter()
+    {
+        $httpKernelMock = $this->getMockBuilder(HttpKernelInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $httpKernelMock
+            ->expects($this->exactly(2))
+            ->method('handle');
+
+        $kernel = new CustomProjectDirKernel(function ($container) {
+            $container->addCompilerPass(new ResettableServicePass());
+            $container->register('one', ResettableService::class)
+                ->setPublic(true)
+                ->addTag('kernel.reset', array('method' => 'reset'));
+            $container->register('services_resetter', ServicesResetter::class)->setPublic(true);
+        }, $httpKernelMock, 'resetting');
+
+        ResettableService::$counter = 0;
+
+        $request = new Request();
+
+        $kernel->handle($request);
+        $kernel->getContainer()->get('one');
+
+        $this->assertEquals(0, ResettableService::$counter);
+        $this->assertFalse($kernel->getContainer()->initialized('services_resetter'));
+
+        $kernel->handle($request);
+
+        $this->assertEquals(1, ResettableService::$counter);
+    }
+
     /**
      * Returns a mock for the BundleInterface.
      *
@@ -629,13 +664,15 @@ class CustomProjectDirKernel extends Kernel
 {
     private $baseDir;
     private $buildContainer;
+    private $httpKernel;
 
-    public function __construct(\Closure $buildContainer = null)
+    public function __construct(\Closure $buildContainer = null, HttpKernelInterface $httpKernel = null, $name = 'custom')
     {
-        parent::__construct('custom', true);
+        parent::__construct($name, true);
 
         $this->baseDir = 'foo';
         $this->buildContainer = $buildContainer;
+        $this->httpKernel = $httpKernel;
     }
 
     public function registerBundles()
@@ -662,6 +699,11 @@ class CustomProjectDirKernel extends Kernel
         if ($build = $this->buildContainer) {
             $build($container);
         }
+    }
+
+    protected function getHttpKernel()
+    {
+        return $this->httpKernel;
     }
 }
 

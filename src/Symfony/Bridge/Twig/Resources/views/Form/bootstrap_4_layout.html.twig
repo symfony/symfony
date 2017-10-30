@@ -24,9 +24,9 @@
 {% block checkbox_widget -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
     {%- set attr = attr|merge({class: attr.class|default('form-check-input')}) -%}
-    {%- if 'checkbox-inline' in parent_label_class -%}
+    {% if 'checkbox-inline' in parent_label_class %}
         {{- form_label(form, null, { widget: parent() }) -}}
-    {%- else -%}
+    {% else -%}
         <div class="form-check">
             {{- form_label(form, null, { widget: parent() }) -}}
         </div>

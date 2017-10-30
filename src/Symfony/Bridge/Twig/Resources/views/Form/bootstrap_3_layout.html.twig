@@ -10,7 +10,7 @@
 {%- endblock form_widget_simple %}
 
 {% block button_widget -%}
-    {% set attr = attr|merge({class: (attr.class|default('btn-default') ~ ' btn')|trim}) %}
+    {%- set attr = attr|merge({class: (attr.class|default('btn-default') ~ ' btn')|trim}) -%}
     {{- parent() -}}
 {%- endblock button_widget %}
 
@@ -22,18 +22,18 @@
         <div class="checkbox">
             {{- form_label(form, null, { widget: parent() }) -}}
         </div>
-    {%- endif %}
+    {%- endif -%}
 {%- endblock checkbox_widget %}
 
 {% block radio_widget -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
-    {% if 'radio-inline' in parent_label_class %}
+    {%- if 'radio-inline' in parent_label_class -%}
         {{- form_label(form, null, { widget: parent() }) -}}
-    {% else -%}
+    {%- else -%}
         <div class="radio">
             {{- form_label(form, null, { widget: parent() }) -}}
         </div>
-    {%- endif %}
+    {%- endif -%}
 {%- endblock radio_widget %}
 
 {# Labels #}
@@ -61,30 +61,30 @@
     {{- block('checkbox_radio_label') -}}
 {%- endblock radio_label %}
 
-{% block checkbox_radio_label %}
+{% block checkbox_radio_label -%}
     {# Do not display the label if widget is not defined in order to prevent double label rendering #}
-    {% if widget is defined %}
-        {% if required %}
-            {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
-        {% endif %}
-        {% if parent_label_class is defined %}
-            {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|trim}) %}
-        {% endif %}
-        {% if label is not same as(false) and label is empty %}
+    {%- if widget is defined -%}
+        {%- if required -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
+        {%- endif -%}
+        {%- if parent_label_class is defined -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|trim}) -%}
+        {%- endif -%}
+        {%- if label is not same as(false) and label is empty -%}
             {%- if label_format is not empty -%}
-                {% set label = label_format|replace({
+                {%- set label = label_format|replace({
                     '%name%': name,
                     '%id%': id,
-                }) %}
+                }) -%}
             {%- else -%}
                 {% set label = name|humanize %}
             {%- endif -%}
-        {% endif %}
+        {%- endif -%}
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             {{- widget|raw }} {{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) -}}
         </label>
-    {% endif %}
-{% endblock checkbox_radio_label %}
+    {%- endif -%}
+{%- endblock checkbox_radio_label %}
 
 {# Rows #}
 
@@ -123,15 +123,10 @@
 {%- endblock datetime_row %}
 
 {% block checkbox_row -%}
-{% spaceless %}
     <div class="form-group{% if not valid %} has-error{% endif %}">
-        <div class="{{ block('form_label_class') }}"></div>
-        <div class="{{ block('form_group_class') }}">
-            {{- form_widget(form) -}}
-            {{- form_errors(form) -}}
-        </div>
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
     </div>
-{% endspaceless %}
 {%- endblock checkbox_row %}
 
 {% block radio_row -%}

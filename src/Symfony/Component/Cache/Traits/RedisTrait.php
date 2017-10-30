@@ -108,6 +108,9 @@ trait RedisTrait
             $params += $query;
         }
         $params += $options + self::$defaultConnectionOptions;
+        if ($params['class'] === null && !extension_loaded('redis') && !class_exists(\Predis\Client::class)) {
+            throw new \RuntimeException(sprintf("Cannot find the redis extension, and predis/predis is not installed: %s", $dsn));
+        }
         $class = null === $params['class'] ? (extension_loaded('redis') ? \Redis::class : \Predis\Client::class) : $params['class'];
 
         if (is_a($class, \Redis::class, true)) {

@@ -1,6 +1,17 @@
 UPGRADE FROM 3.0 to 3.1
 =======================
 
+# Table Of Contents
+
+- [Dependency Injection](#dependencyinjection)
+- [Form](#form)
+- [FrameworkBundle](#frameworkbundle)
+- [HttpKernel](#httpkernel)
+- [Serializer](#serializer)
+- [Translation](#translation)
+- [Validator](#validator)
+- [Yaml](#yaml)
+
 DependencyInjection
 -------------------
 
@@ -121,6 +132,12 @@ Translation
  * Deprecated the backup feature of the file dumper classes. It will be removed
    in Symfony 4.0.
 
+Validator
+---------
+
+* The `DateTimeValidator::PATTERN` constant has been deprecated and will be
+  removed in Symfony 4.0.
+
 Yaml
 ----
 
@@ -207,9 +224,3 @@ Yaml
 
  * The `!!php/object` tag to indicate dumped PHP objects has been deprecated
    and will be removed in Symfony 4.0. Use the `!php/object` tag instead.
-
-Validator
----------
-
- * The `DateTimeValidator::PATTERN` constant has been deprecated and will be
-   removed in Symfony 4.0.

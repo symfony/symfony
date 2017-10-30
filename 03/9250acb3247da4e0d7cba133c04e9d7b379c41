@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-28T14:41:10Z
+
+comments addressed, and tests green
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T15:18:13Z
+
+@derrabus @dmaicher ok for you here?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-10-30T15:39:46Z
+
+I have a very minor comment about the naming of `services_resetter` ID and `ServicesResetter` class name. It looks too specific to me. In the [latest "A month of PHP-FIG" post](https://medium.com/php-fig/a-month-of-php-fig-1-october-2017-af253682ef5b) @michaelcullum refers to this feature as *"Interface for State Resettable classes"*. So, maybe `StateResetter` would be a more appropriate generic name? Maybe not. Just saying. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T16:06:13Z
+
+@javiereguiluz I don't understand the consideration. Anyway, that's in the dI subnamespace, where we talk about "services", so I don't think we need to change the name.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T16:37:24Z
+
+Ok now I read the FIG's blog post :) Services is the term we use in Symfony, so the current naming is correct to me.

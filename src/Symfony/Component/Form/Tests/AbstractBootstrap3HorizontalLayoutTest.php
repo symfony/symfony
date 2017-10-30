@@ -154,4 +154,13 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
 
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar form-horizontal">', $html);
     }
+
+    public function testCheckboxRow()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
+        $view = $form->createView();
+        $html = $this->renderRow($view, array('label' => 'foo'));
+
+        $this->assertMatchesXpath($html, '/div[@class="form-group"]/div[@class="col-sm-2" or @class="col-sm-10"]', 2);
+    }
 }

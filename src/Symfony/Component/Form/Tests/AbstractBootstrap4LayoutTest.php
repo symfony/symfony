@@ -28,8 +28,8 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $html = $this->renderLabel($view);
 
         $this->assertMatchesXpath($html,
-'/label
-    [@class="form-control-label required"]
+'/legend
+    [@class="col-form-legend required"]
     [.="[trans]Name[/trans]"]
 '
         );
@@ -120,7 +120,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 
         $this->assertMatchesXpath($html,
 '/legend
-    [@class="col-form-legend form-control-label required"]
+    [@class="col-form-legend required"]
     [.="[trans]Custom label[/trans]"]
 '
         );

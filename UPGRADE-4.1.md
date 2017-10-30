@@ -16,3 +16,10 @@ Translation
 
  * The `FileDumper::setBackup()` method is deprecated and will be removed in 5.0.
  * The `TranslationWriter::disableBackup()` method is deprecated and will be removed in 5.0.
+
+Workflow
+--------
+
+ * Deprecated the `add` method in favor of the `addWorkflow` method in `Workflow\Registry`.
+ * Deprecated `SupportStrategyInterface` in favor of `WorkflowSupportStrategyInterface`.
+ * Deprecated the class `ClassInstanceSupportStrategy` in favor of the class `InstanceOfSupportStrategy`.

@@ -11,16 +11,13 @@
 
 namespace Symfony\Component\Workflow\SupportStrategy;
 
-@trigger_error(sprintf('"%s" is deprecated since Symfony 4.1. Use "%s" instead.', ClassInstanceSupportStrategy::class, InstanceOfSupportStrategy::class), E_USER_DEPRECATED);
-
-use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * @author Andreas Kleemann <akleemann@inviqa.com>
- *
- * @deprecated since version 4.1, to be removed in 5.0. Use InstanceOfSupportStrategy instead
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-final class ClassInstanceSupportStrategy implements SupportStrategyInterface
+final class InstanceOfSupportStrategy implements WorkflowSupportStrategyInterface
 {
     private $className;
 
@@ -32,15 +29,12 @@ final class ClassInstanceSupportStrategy implements SupportStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Workflow $workflow, $subject)
+    public function supports(WorkflowInterface $workflow, $subject): bool
     {
         return $subject instanceof $this->className;
     }
 
-    /**
-     * @return string
-     */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }

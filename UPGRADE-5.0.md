@@ -16,3 +16,10 @@ Translation
 
  * The `FileDumper::setBackup()` method has been removed.
  * The `TranslationWriter::disableBackup()` method has been removed.
+
+Workflow
+--------
+
+ * `add` method has been removed use `addWorkflow` method in `Workflow\Registry` instead.
+ * `SupportStrategyInterface` has been removed, use `WorkflowSupportStrategyInterface` instead.
+ * `ClassInstanceSupportStrategy` has been removed, use `InstanceOfSupportStrategy` instead.

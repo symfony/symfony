@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-10-31T07:09:22Z
+
+Travis seems broken.. :(
+
+EDIT: travis back up
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-31T12:16:24Z
+
+The test uses IANA HTTP codes as data provider, and phpdoc says it should be complete.
+Should this be considered as a bugfix on 2.7?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-31T12:31:02Z
+
+Should be merged in 2.7, indeed. 👍
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-10-31T12:55:12Z
+
+PR Rebased
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-10-31T13:31:34Z
+
+You should re-trigger a travis build by amending your commit.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-10-31T14:24:21Z
+
+done @ogizanagi

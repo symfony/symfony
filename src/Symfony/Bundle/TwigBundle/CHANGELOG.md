@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added priority to Twig extensions 
+
 4.0.0
 -----
 

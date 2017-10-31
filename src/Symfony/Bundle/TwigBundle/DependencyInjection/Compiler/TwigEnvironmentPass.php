@@ -28,7 +28,15 @@ class TwigEnvironmentPass implements CompilerPassInterface
             return;
         }
 
+        $prioritizedLoaders = array();
+
+        foreach ($container->findTaggedServiceIds('twig.extension', true) as $id => $attributes) {
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $prioritizedLoaders[$priority][] = $id;
+        }
+
         $definition = $container->getDefinition('twig');
+        krsort($prioritizedLoaders);
 
         // Extensions must always be registered before everything else.
         // For instance, global variable definitions must be registered
@@ -36,8 +44,10 @@ class TwigEnvironmentPass implements CompilerPassInterface
         // be registered.
         $calls = $definition->getMethodCalls();
         $definition->setMethodCalls(array());
-        foreach ($container->findTaggedServiceIds('twig.extension', true) as $id => $attributes) {
-            $definition->addMethodCall('addExtension', array(new Reference($id)));
+        foreach ($prioritizedLoaders as $loaders) {
+            foreach ($loaders as $loader) {
+                $definition->addMethodCall('addExtension', array(new Reference($loader)));
+            }
         }
         $definition->setMethodCalls(array_merge($definition->getMethodCalls(), $calls));
     }

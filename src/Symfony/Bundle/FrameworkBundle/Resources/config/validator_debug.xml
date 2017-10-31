@@ -9,6 +9,7 @@
 
         <service id="debug.validator" decorates="validator" decoration-priority="255" class="Symfony\Component\Validator\Validator\TraceableValidator">
             <argument type="service" id="debug.validator.inner" />
+            <tag name="kernel.reset" method="reset" />
         </service>
 
         <!-- DataCollector -->

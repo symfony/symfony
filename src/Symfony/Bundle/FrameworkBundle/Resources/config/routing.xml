@@ -5,9 +5,9 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="router.request_context.host">localhost</parameter>
-        <parameter key="router.request_context.scheme">http</parameter>
-        <parameter key="router.request_context.base_url"></parameter>
+        <parameter key="env(ROUTER_REQUEST_CONTEXT_HOST)">localhost</parameter>
+        <parameter key="env(ROUTER_REQUEST_CONTEXT_SCHEME)">http</parameter>
+        <parameter key="env(ROUTER_REQUEST_CONTEXT_BASE_URL)"></parameter>
     </parameters>
 
     <services>
@@ -80,10 +80,10 @@
         <service id="Symfony\Component\Routing\RequestContextAwareInterface" alias="router" />
 
         <service id="router.request_context" class="Symfony\Component\Routing\RequestContext">
-            <argument>%router.request_context.base_url%</argument>
+            <argument>%env(ROUTER_REQUEST_CONTEXT_BASE_URL)%</argument>
             <argument>GET</argument>
-            <argument>%router.request_context.host%</argument>
-            <argument>%router.request_context.scheme%</argument>
+            <argument>%env(ROUTER_REQUEST_CONTEXT_HOST)%</argument>
+            <argument>%env(ROUTER_REQUEST_CONTEXT_SCHEME)%</argument>
             <argument>%request_listener.http_port%</argument>
             <argument>%request_listener.https_port%</argument>
         </service>

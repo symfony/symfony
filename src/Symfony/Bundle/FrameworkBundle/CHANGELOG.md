@@ -4,6 +4,8 @@ CHANGELOG
 4.0.0
 -----
 
+ * Removed `router.request_context.*` parameters, use `env(ROUTER_REQUEST_CONTEXT_*)` instead. 
+ * Removed `asset.request_context.*` parameters, use `env(ASSET_REQUEST_CONTEXT_*)` instead. 
  * The default `type` option of the `framework.workflows.*` configuration entries is `state_machine`
  * removed `AddConsoleCommandPass`, `AddConstraintValidatorsPass`,
    `AddValidatorInitializersPass`, `CompilerDebugDumpPass`,  `ConfigCachePass`,

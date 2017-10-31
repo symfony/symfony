@@ -1474,6 +1474,34 @@ EOTXT;
         yield array('éÉèÈàÀöä');
     }
 
+    public function testPreparedCommand()
+    {
+        $p = new Process('echo {{ abc }}DEF');
+        $p->run(null, array('abc' => 'ABC'));
+
+        $this->assertSame('ABCDEF', rtrim($p->getOutput()));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid command line "echo {{ abc }}": no value provided for placeholder "abc", did you mean "bcd"?
+     */
+    public function testPreparedCommandWithMissingValue()
+    {
+        $p = new Process('echo {{ abc }}');
+        $p->run(null, array('bcd' => 'BCD'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid command line "echo {{ abc }}": no values provided for any placeholders.
+     */
+    public function testPreparedCommandWithNoValues()
+    {
+        $p = new Process('echo {{ abc }}');
+        $p->run();
+    }
+
     public function testEnvArgument()
     {
         $env = array('FOO' => 'Foo', 'BAR' => 'Bar');

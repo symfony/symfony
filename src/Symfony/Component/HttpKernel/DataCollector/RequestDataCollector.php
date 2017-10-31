@@ -131,7 +131,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             unset($this->controllers[$request]);
         }
 
-        if (null !== $session && $session->isStarted()) {
+        if (null !== $session) {
             if ($request->attributes->has('_redirected')) {
                 $this->data['redirect'] = $session->remove('sf_redirect');
             }
@@ -315,7 +315,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if (!$event->isMasterRequest() || !$event->getRequest()->hasSession() || !$event->getRequest()->getSession()->isStarted()) {
+        if (!$event->isMasterRequest() || !$event->getRequest()->hasSession()) {
             return;
         }
 

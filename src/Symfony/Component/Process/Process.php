@@ -291,6 +291,12 @@ class Process implements \IteratorAggregate
         $this->hasCallback = null !== $callback;
         $descriptors = $this->getDescriptors();
 
+        if ($this->env) {
+            $env += $this->env;
+        }
+
+        $env += $this->getDefaultEnv();
+
         if (\is_array($commandline = $this->commandline)) {
             $commandline = implode(' ', array_map([$this, 'escapeArgument'], $commandline));
 
@@ -298,12 +304,9 @@ class Process implements \IteratorAggregate
                 // exec is mandatory to deal with sending a signal to the process
                 $commandline = 'exec '.$commandline;
             }
+        } else {
+            $commandline = $this->replacePlaceholders($commandline, $env);
         }
-
-        if ($this->env) {
-            $env += $this->env;
-        }
-        $env += $this->getDefaultEnv();
 
         $options = ['suppress_errors' => true];
 
@@ -1630,6 +1633,17 @@ class Process implements \IteratorAggregate
         $argument = preg_replace('/(\\\\+)$/', '$1$1', $argument);
 
         return '"'.str_replace(['"', '^', '%', '!', "\n"], ['""', '"^^"', '"^%"', '"^!"', '!LF!'], $argument).'"';
+    }
+
+    private function replacePlaceholders(string $commandline, array $env)
+    {
+        return preg_replace_callback('/"\$([_a-zA-Z]++[_a-zA-Z0-9]*+)"/', function ($matches) use ($commandline, $env) {
+            if (!isset($env[$matches[1]]) || false === $env[$matches[1]]) {
+                throw new InvalidArgumentException(sprintf('Command line is missing a value for key %s: %s.', $matches[0], $commandline));
+            }
+
+            return '\\' === \DIRECTORY_SEPARATOR ? $this->escapeArgument($env[$matches[1]]) : $matches[0];
+        }, $commandline);
     }
 
     private function getDefaultEnv()

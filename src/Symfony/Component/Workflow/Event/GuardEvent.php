@@ -34,12 +34,12 @@ class GuardEvent extends Event
         $this->transitionBlockerList = new TransitionBlockerList();
     }
 
-    public function isBlocked()
+    public function isBlocked(): bool
     {
         return 0 !== count($this->transitionBlockerList);
     }
 
-    public function setBlocked($blocked)
+    public function setBlocked(bool $blocked): void
     {
         if (!$blocked) {
             $this->transitionBlockerList = new TransitionBlockerList();
@@ -50,17 +50,12 @@ class GuardEvent extends Event
         $this->transitionBlockerList->add(TransitionBlocker::createUnknownReason($this->getTransition()->getName()));
     }
 
-    /**
-     * Get transition blocker list.
-     *
-     * @return TransitionBlockerList
-     */
-    public function getTransitionBlockerList()
+    public function getTransitionBlockerList(): TransitionBlockerList
     {
         return $this->transitionBlockerList;
     }
 
-    public function addTransitionBlocker(TransitionBlocker $transitionBlocker)
+    public function addTransitionBlocker(TransitionBlocker $transitionBlocker): void
     {
         $this->transitionBlockerList->add($transitionBlocker);
     }

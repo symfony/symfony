@@ -105,7 +105,7 @@ class Workflow
      *
      * @return TransitionBlockerList Empty if the transition is possible
      */
-    public function whyCannot($subject, $transitionName)
+    public function whyCannot($subject, string $transitionName): TransitionBlockerList
     {
         $transitionsOrTransitionBlockerList = $this->getEnabledTransitionsByNameOrTransitionBlockerList(
             $subject,
@@ -127,10 +127,10 @@ class Workflow
      *
      * @return Marking The new Marking
      *
-     * @throws LogicException If the transition is not applicable
-     * @throws LogicException If the transition does not exist
+     * @throws SubjectTransitionException If the transition is not applicable
+     * @throws UndefinedTransitionException If the transition does not exist
      */
-    public function apply($subject, $transitionName)
+    public function apply($subject, string $transitionName): Marking
     {
         $transitionsOrTransitionBlockerList = $this->getEnabledTransitionsByNameOrTransitionBlockerList(
             $subject,
@@ -245,7 +245,7 @@ class Workflow
      *
      * @return TransitionBlockerList
      */
-    private function guardTransition($subject, Marking $marking, Transition $transition)
+    private function guardTransition($subject, Marking $marking, Transition $transition): TransitionBlockerList
     {
         if (null === $this->dispatcher) {
             return new TransitionBlockerList();
@@ -363,7 +363,7 @@ class Workflow
      *
      * @return Transition[]
      */
-    private function getTransitionsByName(string $transitionName)
+    private function getTransitionsByName(string $transitionName): array
     {
         $transitions = array_filter(
             $this->definition->getTransitions(),

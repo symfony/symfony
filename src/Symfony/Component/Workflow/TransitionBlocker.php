@@ -111,7 +111,7 @@ class TransitionBlocker
      *
      * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
@@ -121,7 +121,7 @@ class TransitionBlocker
      *
      * @return string|null The error code
      */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }
@@ -134,7 +134,7 @@ class TransitionBlocker
      *
      * @return array
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }

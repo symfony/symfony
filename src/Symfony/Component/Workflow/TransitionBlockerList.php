@@ -54,7 +54,7 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @param TransitionBlocker $blocker
      */
-    public function add(TransitionBlocker $blocker)
+    public function add(TransitionBlocker $blocker): void
     {
         $this->blockers[] = $blocker;
     }
@@ -64,7 +64,7 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @param TransitionBlockerList $otherList
      */
-    public function addAll(self $otherList)
+    public function addAll(self $otherList): void
     {
         foreach ($otherList as $blocker) {
             $this->blockers[] = $blocker;
@@ -80,7 +80,7 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @throws \OutOfBoundsException if the offset does not exist
      */
-    public function get($offset)
+    public function get($offset): TransitionBlocker
     {
         if (!isset($this->blockers[$offset])) {
             throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $offset));
@@ -96,7 +96,7 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @return bool Whether the offset exists
      */
-    public function has($offset)
+    public function has($offset): bool
     {
         return isset($this->blockers[$offset]);
     }
@@ -107,7 +107,7 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
      * @param int               $offset  The blocker offset
      * @param TransitionBlocker $blocker The blocker
      */
-    public function set($offset, TransitionBlocker $blocker)
+    public function set($offset, TransitionBlocker $blocker): void
     {
         $this->blockers[$offset] = $blocker;
     }
@@ -117,7 +117,7 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @param int $offset The offset to remove
      */
-    public function remove($offset)
+    public function remove($offset): void
     {
         unset($this->blockers[$offset]);
     }
@@ -183,7 +183,7 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @return TransitionBlocker|null the first blocker with the code
      */
-    public function findByCode(string $code)
+    public function findByCode(string $code): ?TransitionBlocker
     {
         foreach ($this as $transitionBlocker) {
             if ($transitionBlocker->getCode() === $code) {

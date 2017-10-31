@@ -1,10 +1,14 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+* Added TransitionBlockers as a way to convey why exactly transitions can't be made (#24501).
+
 4.0.0
 -----
 
- * Added TransitionBlockers as a way to convey why exactly transitions can't be made (#24501).
  * Removed class name support in `WorkflowRegistry::add()` as second parameter.
 
 3.4.0

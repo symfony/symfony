@@ -21,10 +21,6 @@ class SubjectTransitionException extends LogicException
 {
     private $transitionBlockerList;
 
-    /**
-     * @param string                $message
-     * @param TransitionBlockerList $transitionBlockerList
-     */
     public function __construct(string $message, TransitionBlockerList $transitionBlockerList)
     {
         parent::__construct($message);
@@ -32,10 +28,7 @@ class SubjectTransitionException extends LogicException
         $this->transitionBlockerList = $transitionBlockerList;
     }
 
-    /**
-     * @return TransitionBlockerList
-     */
-    public function getTransitionBlockerList()
+    public function getTransitionBlockerList(): TransitionBlockerList
     {
         return $this->transitionBlockerList;
     }

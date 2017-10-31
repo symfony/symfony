@@ -127,7 +127,7 @@ class Workflow
      *
      * @return Marking The new Marking
      *
-     * @throws SubjectTransitionException If the transition is not applicable
+     * @throws SubjectTransitionException   If the transition is not applicable
      * @throws UndefinedTransitionException If the transition does not exist
      */
     public function apply($subject, string $transitionName): Marking

@@ -45,7 +45,6 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
 
     public function reset()
     {
-        $this->validator->reset();
         $this->data = array(
             'calls' => $this->cloneVar(array()),
             'violations_count' => 0,

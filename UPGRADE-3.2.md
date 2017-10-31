@@ -1,5 +1,19 @@
 UPGRADE FROM 3.1 to 3.2
 =======================
+# Table of Contents
+- [BrowserKit](#browserkit)
+- [Console](#console)
+- [DependencyInjection](#dependencyinjection)
+- [ExpressionLanguage](#expressionlanguage)
+- [Form](#form)
+- [FrameworkBundle](#frameworkbundle)
+- [HttpFoundation](#httpfoundation)
+- [HttpKernel](#httpkernel)
+- [Router](#router)
+- [Serializer](#serializer)
+- [TwigBridge](#twigbridge)
+- [Validator](#validator)
+- [Yaml](#yaml)
 
 BrowserKit
 ----------

@@ -126,7 +126,7 @@ class ConsoleFormatter implements FormatterInterface
         if ($context) {
             $context = $separator.$context;
         }
- 
+
         $extra = $this->dumpData($record['extra']);
         if ($extra) {
             $extra = $separator.$extra;

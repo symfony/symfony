@@ -27,5 +27,5 @@ interface LogoutHandlerInterface
      * to be logged out. Usually, you would unset session variables, or remove
      * cookies, etc.
      */
-    public function logout(Request $request, Response $response, TokenInterface $token);
+    public function logout(Request $request, Response $response, TokenInterface $token = null);
 }

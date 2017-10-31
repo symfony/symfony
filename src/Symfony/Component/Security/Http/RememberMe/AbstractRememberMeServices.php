@@ -155,7 +155,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Implementation for LogoutHandlerInterface. Deletes the cookie.
      */
-    public function logout(Request $request, Response $response, TokenInterface $token)
+    public function logout(Request $request, Response $response, TokenInterface $token = null)
     {
         $this->cancelCookie($request);
     }

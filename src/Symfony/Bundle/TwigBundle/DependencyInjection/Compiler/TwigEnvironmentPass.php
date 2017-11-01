@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -22,21 +23,15 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class TwigEnvironmentPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     public function process(ContainerBuilder $container)
     {
         if (false === $container->hasDefinition('twig')) {
             return;
         }
 
-        $prioritizedLoaders = array();
-
-        foreach ($container->findTaggedServiceIds('twig.extension', true) as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $prioritizedLoaders[$priority][] = $id;
-        }
-
         $definition = $container->getDefinition('twig');
-        krsort($prioritizedLoaders);
 
         // Extensions must always be registered before everything else.
         // For instance, global variable definitions must be registered
@@ -44,10 +39,8 @@ class TwigEnvironmentPass implements CompilerPassInterface
         // be registered.
         $calls = $definition->getMethodCalls();
         $definition->setMethodCalls(array());
-        foreach ($prioritizedLoaders as $loaders) {
-            foreach ($loaders as $loader) {
-                $definition->addMethodCall('addExtension', array(new Reference($loader)));
-            }
+        foreach ($this->findAndSortTaggedServices('twig.extension', $container) as $extension) {
+            $definition->addMethodCall('addExtension', array(new Reference($extension)));
         }
         $definition->setMethodCalls(array_merge($definition->getMethodCalls(), $calls));
     }

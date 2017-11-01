@@ -69,7 +69,7 @@ class JsonResponse extends Response
         return new static($data, $status, $headers);
     }
 
-    /**
+    /*
      * Make easier the creation of JsonResponse from raw json.
      */
     public static function fromJsonString($data = null, $status = 200, $headers = array())
@@ -136,6 +136,7 @@ class JsonResponse extends Response
      * @return $this
      *
      * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function setData($data = array())
     {

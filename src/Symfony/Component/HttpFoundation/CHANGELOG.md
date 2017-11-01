@@ -8,6 +8,7 @@ CHANGELOG
    supported anymore in 5.0.
 
  * The `getClientSize()` method of the `UploadedFile` class is deprecated. Use `getSize()` instead.
+ * added `RedisSessionHandler` to use Redis as a session storage
 
 4.0.0
 -----

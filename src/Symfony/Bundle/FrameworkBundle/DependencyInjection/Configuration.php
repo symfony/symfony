@@ -622,7 +622,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                             ->defaultValue(array('en'))
                         ->end()
-                        ->booleanNode('logging')->defaultValue($this->debug)->end()
+                        ->booleanNode('logging')->defaultValue(false)->end()
                         ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
                         ->arrayNode('paths')
                             ->prototype('scalar')->end()

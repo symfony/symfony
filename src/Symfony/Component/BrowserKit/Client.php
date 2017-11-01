@@ -150,6 +150,16 @@ abstract class Client
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
+    public function switchToXHR()
+    {
+        $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
+    }
+
+    public function removeXHR()
+    {
+        unset($this->server['HTTP_X_REQUESTED_WITH']);
+    }
+
     /**
      * Returns the History instance.
      *

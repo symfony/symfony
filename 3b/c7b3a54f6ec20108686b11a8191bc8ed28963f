@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-29T08:56:35Z
+
+Not sure: as @lyrixx mentioned, the comma is needed when dumping on a single line. Then, it's also useful for objects, isn't it?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-10-29T09:50:06Z
+
+Perhaps, but [AFAIU, nested structures aren't dumped inlined](https://github.com/symfony/symfony/blob/d2226489f0949857d70d6e0623cf979169a9c3a6/src/Symfony/Bridge/Monolog/Formatter/ConsoleFormatter.php#L138-L150), and that's probably not something we should target as it'll be pretty unreadable and useless to me.
+
+<details>
+<summary>See <kbd>format.php</kbd> code</summary>
+
+```php
+#!/usr/bin/env php
+<?php
+
+use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+require __DIR__.'/vendor/autoload.php';
+
+$input = new ArgvInput(null, (new InputDefinition([new InputOption('multiline')])));
+
+$formatter = new ConsoleFormatter(['multiline' => $input->getOption('multiline')]);
+
+$std = new stdClass();
+$std->foo = 123;
+$std->bar = 'bar';
+
+(new ConsoleOutput())->writeln($formatter->format([
+    'level' => 100,
+    'level_name' => 'info',
+    'message' => 'foo',
+    'datetime' => new \DateTime(),
+    'channel' => 'app',
+    'context' => [
+        'date' => new \DateTime(),
+        'opt' => new OptionsResolver(),
+        'std' => $std,
+    ],
+    'extra' => [],
+]));
+```
+</details>
+
+`./format.php` will output:
+
+```php
+10:46:31 info      [app] foo ["date" => DateTime @1509270391 {date: 2017-10-29 10:46:31.987557 Europe/Zurich (+01:00)},"opt" => Symfony\Component\OptionsResolver\OptionsResolver { …},"std" => { …}] []
+```
+
+whereas `./format.php --multiline`:
+
+```php
+10:46:38 info      [app] foo
+[
+  "date" => DateTime @1509270398 {
+    date: 2017-10-29 10:46:38.564727 Europe/Zurich (+01:00)
+  },
+  "opt" => Symfony\Component\OptionsResolver\OptionsResolver {
+    -defined: []
+    -defaults: []
+    -required: []
+    -resolved: []
+    -normalizers: []
+    -allowedValues: []
+    -allowedTypes: []
+    -lazy: []
+    -calling: []
+    -locked: false
+  },
+  "std" => {
+    +"foo": 123
+    +"bar": "bar"
+  }
+]
+[]
+```
+
+So IMHO it's okay.

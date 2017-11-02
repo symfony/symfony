@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-10-31T16:13:40Z
+
+IMO that's not correct fix. Data collector should not start the session as the dev application behavior is then different from prod.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-31T16:14:54Z
+
+@mvrhov hehe, hence my last sentence 😉 Do you have a better option to fix #24730 ?
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-10-31T16:33:22Z
+
+Not, from the top of my head. But I know that I fixed something similar e.g DataCollector starting session somewhere in sf 2.0 times. As it was a great annoyance.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-31T16:38:01Z
+
+@nicolas-grekas can you check this to see what is the impact of the changes you made to the session and how this should best be solved ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-31T18:28:53Z
+
+The impact is meeting the expectations set then, nothing more: if the session is empty, it isn't written nor started. This "isStarted" check is strange, as it binds a feature of the profiler to the behavior of the page being monitored. Maybe legitimate of course. This PR looks ok to me thought.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-01T08:57:14Z
+
+Removed the test asserting that the session is not started, as obviously, this might be now...

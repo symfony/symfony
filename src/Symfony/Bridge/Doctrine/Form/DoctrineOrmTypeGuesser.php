@@ -17,6 +17,7 @@ use Doctrine\Common\Persistence\Proxy;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException as LegacyMappingException;
+use Symfony\Bridge\Doctrine\Form\Type\DecimalType;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -75,6 +76,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             case 'time_immutable':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', ['input' => 'datetime_immutable'], Guess::HIGH_CONFIDENCE);
             case Type::DECIMAL:
+                return new TypeGuess(DecimalType::class, array(), Guess::HIGH_CONFIDENCE);
             case Type::FLOAT:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\NumberType', [], Guess::MEDIUM_CONFIDENCE);
             case Type::INTEGER:

@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-11-02T16:15:07Z
+
+Hmm, I tried to add a test but it's not really possible.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-02T16:59:36Z
+
+When can it happen that this method does not exist?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-11-02T17:02:34Z
+
+Ah yes I removed the test. but it is still in the PR title and commit message ;)
+Try to throw an exception in the `setUpBeforeClass` and you will see.
+(Note I did not dig in PHPUnit to find the root cause. I'm not sure I want to :D )
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-02T17:10:24Z
+
+Could it be related to `$test` being an instance of `TestSuite` but not `TestCase`?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-11-02T17:20:30Z
+
+I don't know. What do you have in mind ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-02T17:29:42Z
+
+We could then use `instanceof` instead.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-11-02T18:32:50Z
+
+I was pretty sure you are going to say that.
+using instanceof will be a bit boring because we manage many PHPUnit version (pear convention vs namespace :/)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-02T19:53:27Z
+
+There is an alias for the namespaced class in PHPUnit 4.8 and 5.x. :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-11-03T10:05:38Z
+
+@xabbuh  It should be ok

@@ -98,8 +98,8 @@ acme_root:
         - elem1
         - elem2
     scalar_required:      ~ # Required
-    scalar_deprecated:    ~ # Deprecated (The child node "scalar_deprecated" at path "acme_root.scalar_deprecated" is deprecated.)
-    scalar_deprecated_with_message: ~ # Deprecated (Deprecation custom message for "scalar_deprecated_with_message" at "acme_root.scalar_deprecated_with_message")
+    scalar_deprecated:    ~ # Deprecated (The child node "scalar_deprecated" at path "acme_root" is deprecated.)
+    scalar_deprecated_with_message: ~ # Deprecated (Deprecation custom message for "scalar_deprecated_with_message" at "acme_root")
     node_with_a_looong_name: ~
     enum_with_default:    this # One of "this"; "that"
     enum:                 ~ # One of "this"; "that"

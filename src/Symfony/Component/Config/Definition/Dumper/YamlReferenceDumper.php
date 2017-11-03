@@ -70,11 +70,12 @@ class YamlReferenceDumper
     }
 
     /**
-     * @param NodeInterface $node
-     * @param int           $depth
-     * @param bool          $prototypedArray
+     * @param NodeInterface      $node
+     * @param NodeInterface|null $parentNode
+     * @param int                $depth
+     * @param bool               $prototypedArray
      */
-    private function writeNode(NodeInterface $node, $depth = 0, $prototypedArray = false)
+    private function writeNode(NodeInterface $node, NodeInterface $parentNode = null, $depth = 0, $prototypedArray = false)
     {
         $comments = array();
         $default = '';
@@ -125,7 +126,7 @@ class YamlReferenceDumper
 
         // deprecated?
         if ($node->isDeprecated()) {
-            $comments[] = sprintf('Deprecated (%s)', $node->getDeprecationMessage($node->getName(), $node->getPath()));
+            $comments[] = sprintf('Deprecated (%s)', $node->getDeprecationMessage($node->getName(), $parentNode ? $parentNode->getPath() : $node->getPath()));
         }
 
         // example
@@ -171,7 +172,7 @@ class YamlReferenceDumper
 
         if ($children) {
             foreach ($children as $childNode) {
-                $this->writeNode($childNode, $depth + 1, $node instanceof PrototypedArrayNode && !$node->getKeyAttribute());
+                $this->writeNode($childNode, $node, $depth + 1, $node instanceof PrototypedArrayNode && !$node->getKeyAttribute());
             }
         }
     }

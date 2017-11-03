@@ -51,6 +51,27 @@ class AbstractObjectNormalizerTest extends TestCase
             array('allow_extra_attributes' => false)
         );
     }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\ExtraAttributesException
+     * @expectedExceptionMessage Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).
+     */
+    public function testDenormalizeWithExtraAttributesWithXml()
+    {
+        $normalizer = new AbstractObjectNormalizerDummy();
+        $data = <<<EOF
+<dummy>
+    <fooFoo>foo</fooFoo>
+    <fooBar>99</fooBar>
+</dummy>
+EOF;
+        $normalizer->denormalize(
+            $data,
+            __NAMESPACE__.'\Dummy',
+            'xml',
+            array('allow_extra_attributes' => false)
+        );
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer

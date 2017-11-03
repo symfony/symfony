@@ -175,6 +175,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
+        if ('xml' === $format) {
+            $data = $this->parseXmlIntoArray($data);
+        }
         $normalizedData = $this->prepareForDenormalization($data);
         $extraAttributes = array();
 
@@ -361,5 +364,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // The context cannot be serialized, skip the cache
             return false;
         }
+    }
+
+    private function parseXmlIntoArray($data)
+    {
+        return json_decode(json_encode(new \SimpleXMLElement($data)), true);
     }
 }

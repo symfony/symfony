@@ -31,10 +31,10 @@ class ParseSecurityExpressionsPass implements CompilerPassInterface
         $expressionLanguage = $container->get('security.expression_language');
 
         foreach ($container->findTaggedServiceIds('security.expression') as $id => $attributes) {
-            $defition = $container->getDefinition($id);
-            $defition
+            $definition = $container->getDefinition($id);
+            $definition
                 ->setClass('Symfony\Component\ExpressionLanguage\SerializedParsedExpression')
-                ->addArgument(serialize($expressionLanguage->parse($defition->getArgument(0), array('token', 'user', 'object', 'roles', 'request', 'trust_resolver'))->getNodes()))
+                ->addArgument(serialize($expressionLanguage->parse($definition->getArgument(0), array('token', 'user', 'object', 'roles', 'request', 'trust_resolver'))->getNodes()))
                 ->setTags(array());
         }
     }

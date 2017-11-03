@@ -38,8 +38,8 @@ class XmlReferenceDumperTest extends TestCase
         return str_replace("\n", PHP_EOL, <<<'EOL'
 <!-- Namespace: http://example.org/schema/dic/acme_root -->
 <!-- scalar-required: Required -->
-<!-- scalar-deprecated: Deprecated (The child node "scalar_deprecated" at path "acme_root.scalar_deprecated" is deprecated.) -->
-<!-- scalar-deprecated-with-message: Deprecated (Deprecation custom message for "scalar_deprecated_with_message" at "acme_root.scalar_deprecated_with_message") -->
+<!-- scalar-deprecated: Deprecated (The child node "scalar_deprecated" at path "acme_root" is deprecated.) -->
+<!-- scalar-deprecated-with-message: Deprecated (Deprecation custom message for "scalar_deprecated_with_message" at "acme_root") -->
 <!-- enum-with-default: One of "this"; "that" -->
 <!-- enum: One of "this"; "that" -->
 <config

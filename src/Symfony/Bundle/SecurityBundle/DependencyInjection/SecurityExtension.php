@@ -590,7 +590,7 @@ class SecurityExtension extends Extension
             ->register($id, 'Symfony\Component\ExpressionLanguage\Expression')
             ->setPublic(false)
             ->addArgument($expression)
-            ->addTag('security.expression.unparsed')
+            ->addTag('security.expression')
         ;
 
         return $this->expressions[$id] = new Reference($id);

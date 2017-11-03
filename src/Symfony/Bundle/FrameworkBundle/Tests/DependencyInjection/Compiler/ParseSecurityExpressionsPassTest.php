@@ -25,11 +25,11 @@ class ParseSecurityExpressionsPassTest extends TestCase
 
         $container->register('security.expression.one', 'Symfony\Component\ExpressionLanguage\Expression')
             ->addArgument('true or false')
-            ->addTag('security.expression.unparsed');
+            ->addTag('security.expression');
 
         $container->register('security.expression.two', 'Symfony\Component\ExpressionLanguage\Expression')
             ->addArgument('false or true')
-            ->addTag('security.expression.unparsed');
+            ->addTag('security.expression');
 
         $container->compile();
 

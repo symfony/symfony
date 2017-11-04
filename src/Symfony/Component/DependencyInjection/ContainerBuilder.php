@@ -122,6 +122,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $autoconfiguredInstanceof = array();
 
     private $removedIds = array();
+    private $alreadyLoading = array();
 
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -594,12 +595,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw $e;
         }
 
-        $this->loading[$id] = true;
+        $loading = isset($this->alreadyLoading[$id]) ? 'loading' : 'alreadyLoading';
+        $this->{$loading}[$id] = true;
 
         try {
             $service = $this->createService($definition, $id);
         } finally {
-            unset($this->loading[$id]);
+            unset($this->{$loading}[$id]);
         }
 
         return $service;
@@ -1089,6 +1091,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
 
+        if (null !== $id && $definition->isShared() && isset($this->services[$id]) && ($tryProxy || !$definition->isLazy())) {
+            return $this->services[$id];
+        }
+
         if (null !== $factory = $definition->getFactory()) {
             if (is_array($factory)) {
                 $factory = array($this->resolveServices($parameterBag->resolveValue($factory[0])), $factory[1]);
@@ -1551,7 +1557,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private function shareService(Definition $definition, $service, $id)
     {
         if (null !== $id && $definition->isShared()) {
-            $this->services[$this->normalizeId($id)] = $service;
+            $this->services[$id] = $service;
+            unset($this->loading[$id], $this->alreadyLoading[$id]);
         }
     }
 

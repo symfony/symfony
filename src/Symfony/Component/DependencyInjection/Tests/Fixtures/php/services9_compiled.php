@@ -101,6 +101,10 @@ class ProjectServiceContainer extends Container
     {
         $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->getFoo_BazService()) && false ?: '_'};
 
+        if (isset($this->services['bar'])) {
+            return $this->services['bar'];
+        }
+
         $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
 
         $a->configure($instance);
@@ -129,12 +133,18 @@ class ProjectServiceContainer extends Container
      */
     protected function getConfiguredServiceService()
     {
-        $a = new \ConfClass();
-        $a->setFoo(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->getBazService()) && false ?: '_'});
+        $a = ${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->getBazService()) && false ?: '_'};
+
+        if (isset($this->services['configured_service'])) {
+            return $this->services['configured_service'];
+        }
+
+        $b = new \ConfClass();
+        $b->setFoo($a);
 
         $this->services['configured_service'] = $instance = new \stdClass();
 
-        $a->configureStdClass($instance);
+        $b->configureStdClass($instance);
 
         return $instance;
     }
@@ -194,7 +204,13 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceService()
     {
-        return $this->services['factory_service'] = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->getFoo_BazService()) && false ?: '_'}->getInstance();
+        $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->getFoo_BazService()) && false ?: '_'};
+
+        if (isset($this->services['factory_service'])) {
+            return $this->services['factory_service'];
+        }
+
+        return $this->services['factory_service'] = $a->getInstance();
     }
 
     /**
@@ -204,7 +220,13 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceSimpleService()
     {
-        return $this->services['factory_service_simple'] = ${($_ = isset($this->services['factory_simple']) ? $this->services['factory_simple'] : $this->getFactorySimpleService()) && false ?: '_'}->getInstance();
+        $a = ${($_ = isset($this->services['factory_simple']) ? $this->services['factory_simple'] : $this->getFactorySimpleService()) && false ?: '_'};
+
+        if (isset($this->services['factory_service_simple'])) {
+            return $this->services['factory_service_simple'];
+        }
+
+        return $this->services['factory_service_simple'] = $a->getInstance();
     }
 
     /**
@@ -215,6 +237,10 @@ class ProjectServiceContainer extends Container
     protected function getFooService()
     {
         $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->getFoo_BazService()) && false ?: '_'};
+
+        if (isset($this->services['foo'])) {
+            return $this->services['foo'];
+        }
 
         $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 

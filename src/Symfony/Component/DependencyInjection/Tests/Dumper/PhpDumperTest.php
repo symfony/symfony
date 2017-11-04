@@ -764,6 +764,22 @@ class PhpDumperTest extends TestCase
         $this->assertEquals(array('foo1' => new \stdClass(), 'foo3' => new \stdClass()), iterator_to_array($bar->iter));
     }
 
+    public function testAlmostCircular()
+    {
+        $container = include self::$fixturesPath.'/containers/container_almost_circular.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_almost_circular.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Almost_Circular')));
+
+        require self::$fixturesPath.'/php/container_almost_circular.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Almost_Circular();
+        $foo = $container->get('foo');
+
+        $this->assertSame($foo, $foo->bar->foobar->foo);
+    }
+
     public function testDumpHandlesLiteralClassWithRootNamespace()
     {
         $container = new ContainerBuilder();

@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class ProjectServiceContainer extends Container
+class Symfony_DI_PhpDumper_Test_Almost_Circular extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -23,12 +23,13 @@ class ProjectServiceContainer extends Container
     {
         $this->services = array();
         $this->methodMap = array(
-            'bar_service' => 'getBarServiceService',
-            'baz_service' => 'getBazServiceService',
-            'foo_service' => 'getFooServiceService',
+            'bar' => 'getBarService',
+            'foo' => 'getFooService',
+            'foobar' => 'getFoobarService',
         );
         $this->privates = array(
-            'baz_service' => true,
+            'bar' => true,
+            'foobar' => true,
         );
 
         $this->aliases = array();
@@ -60,44 +61,48 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the public 'bar_service' shared service.
+     * Gets the public 'foo' shared service.
      *
-     * @return \stdClass
+     * @return \FooCircular
      */
-    protected function getBarServiceService()
+    protected function getFooService()
     {
-        $a = ${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->services['baz_service'] = new \stdClass()) && false ?: '_'};
+        $a = ${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->getBarService()) && false ?: '_'};
 
-        if (isset($this->services['bar_service'])) {
-            return $this->services['bar_service'];
+        if (isset($this->services['foo'])) {
+            return $this->services['foo'];
         }
 
-        return $this->services['bar_service'] = new \stdClass($a);
+        return $this->services['foo'] = new \FooCircular($a);
     }
 
     /**
-     * Gets the public 'foo_service' shared service.
+     * Gets the private 'bar' shared service.
      *
-     * @return \stdClass
+     * @return \BarCircular
      */
-    protected function getFooServiceService()
+    protected function getBarService()
     {
-        $a = ${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->services['baz_service'] = new \stdClass()) && false ?: '_'};
+        $this->services['bar'] = $instance = new \BarCircular();
 
-        if (isset($this->services['foo_service'])) {
-            return $this->services['foo_service'];
-        }
+        $instance->addFoobar(${($_ = isset($this->services['foobar']) ? $this->services['foobar'] : $this->getFoobarService()) && false ?: '_'});
 
-        return $this->services['foo_service'] = new \stdClass($a);
+        return $instance;
     }
 
     /**
-     * Gets the private 'baz_service' shared service.
+     * Gets the private 'foobar' shared service.
      *
-     * @return \stdClass
+     * @return \FoobarCircular
      */
-    protected function getBazServiceService()
+    protected function getFoobarService()
     {
-        return $this->services['baz_service'] = new \stdClass();
+        $a = ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->getFooService()) && false ?: '_'};
+
+        if (isset($this->services['foobar'])) {
+            return $this->services['foobar'];
+        }
+
+        return $this->services['foobar'] = new \FoobarCircular($a);
     }
 }

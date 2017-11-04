@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,10 +24,9 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
  * Common features needed in controllers.
@@ -43,7 +43,7 @@ trait ControllerTrait
      * Generates a URL from the given parameters.
      *
      * @param string $route         The name of the route
-     * @param mixed  $parameters    An array of parameters
+     * @param array  $parameters    An array of parameters
      * @param int    $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The generated URL
@@ -324,7 +324,7 @@ trait ControllerTrait
      * @param mixed  $data    The initial data for the form
      * @param array  $options Options for the form
      *
-     * @return Form
+     * @return FormInterface
      */
     protected function createForm($type, $data = null, array $options = array())
     {
@@ -337,7 +337,7 @@ trait ControllerTrait
      * @param mixed $data    The initial data for the form
      * @param array $options Options for the form
      *
-     * @return FormBuilder
+     * @return FormBuilderInterface
      */
     protected function createFormBuilder($data = null, array $options = array())
     {
@@ -347,7 +347,7 @@ trait ControllerTrait
     /**
      * Shortcut to return the Doctrine Registry service.
      *
-     * @return Registry
+     * @return ManagerRegistry
      *
      * @throws \LogicException If DoctrineBundle is not available
      */

@@ -856,6 +856,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
 
         sort($languages);
 
+        $this->assertNotEmpty($languages);
         $this->assertEmpty(array_diff($languages, static::$languages));
     }
 

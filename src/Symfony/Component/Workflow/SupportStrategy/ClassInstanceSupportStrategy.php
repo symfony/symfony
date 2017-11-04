@@ -6,6 +6,8 @@ use Symfony\Component\Workflow\Workflow;
 
 /**
  * @author Andreas Kleemann <akleemann@inviqa.com>
+ *
+ * @internal
  */
 final class ClassInstanceSupportStrategy implements SupportStrategyInterface
 {

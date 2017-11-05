@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T18:40:12Z
+
+For 2.7? Merging that for 4.0 only is suspicious.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-10-30T21:48:47Z
+
+Is this a bc-break? Technically yes. Because I've changed the signature of the interface. But on the other hand null was possible because static typing was not used...
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-31T09:36:50Z
+
+Fine for me on 2.7.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-11-01T09:38:55Z
+
+@chalasr, rebased onto `2.7`

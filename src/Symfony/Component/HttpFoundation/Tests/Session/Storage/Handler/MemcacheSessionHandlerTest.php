@@ -23,6 +23,7 @@ class MemcacheSessionHandlerTest extends TestCase
 {
     const PREFIX = 'prefix_';
     const TTL = 1000;
+
     /**
      * @var MemcacheSessionHandler
      */

@@ -26,9 +26,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class ObjectNormalizer extends AbstractObjectNormalizer
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
     protected $propertyAccessor;
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null)

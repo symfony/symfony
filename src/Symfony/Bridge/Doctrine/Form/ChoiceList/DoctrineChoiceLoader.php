@@ -24,24 +24,9 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
  */
 class DoctrineChoiceLoader implements ChoiceLoaderInterface
 {
-    /**
-     * @var ObjectManager
-     */
     private $manager;
-
-    /**
-     * @var string
-     */
     private $class;
-
-    /**
-     * @var IdReader
-     */
     private $idReader;
-
-    /**
-     * @var null|EntityLoaderInterface
-     */
     private $objectLoader;
 
     /**
@@ -57,13 +42,10 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      * mapper implementations.
      *
      * @param ObjectManager              $manager      The object manager
-     * @param string                     $class        The class name of the
-     *                                                 loaded objects
-     * @param IdReader                   $idReader     the reader for the object
-     *                                                 IDs
+     * @param string                     $class        The class name of the loaded objects
+     * @param IdReader                   $idReader     The reader for the object IDs
      * @param null|EntityLoaderInterface $objectLoader The objects loader
-     * @param ChoiceListFactoryInterface $factory      The factory for creating
-     *                                                 the loaded choice list
+     * @param ChoiceListFactoryInterface $factory      The factory for creating the loaded choice list
      */
     public function __construct($manager, $class, $idReader = null, $objectLoader = null, $factory = null)
     {

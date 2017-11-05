@@ -23,9 +23,6 @@ use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface;
  */
 class ExpressionLanguage
 {
-    /**
-     * @var CacheItemPoolInterface
-     */
     private $cache;
     private $lexer;
     private $parser;

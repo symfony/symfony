@@ -28,10 +28,10 @@ interface DenormalizerInterface
     /**
      * Denormalizes data back into an object of the given class.
      *
-     * @param mixed  $data    data to restore
-     * @param string $class   the expected class to instantiate
-     * @param string $format  format the given data was extracted from
-     * @param array  $context options available to the denormalizer
+     * @param mixed  $data    Data to restore
+     * @param string $class   The expected class to instantiate
+     * @param string $format  Format the given data was extracted from
+     * @param array  $context Options available to the denormalizer
      *
      * @return object
      *

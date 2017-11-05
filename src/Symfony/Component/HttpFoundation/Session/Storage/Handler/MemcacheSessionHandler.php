@@ -20,9 +20,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class MemcacheSessionHandler implements \SessionHandlerInterface
 {
-    /**
-     * @var \Memcache Memcache driver
-     */
     private $memcache;
 
     /**

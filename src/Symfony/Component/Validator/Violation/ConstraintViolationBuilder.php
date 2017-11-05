@@ -26,59 +26,16 @@ use Symfony\Component\Validator\Util\PropertyPath;
  */
 class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
 {
-    /**
-     * @var ConstraintViolationList
-     */
     private $violations;
-
-    /**
-     * @var string
-     */
     private $message;
-
-    /**
-     * @var array
-     */
     private $parameters;
-
-    /**
-     * @var mixed
-     */
     private $root;
-
-    /**
-     * @var mixed
-     */
     private $invalidValue;
-
-    /**
-     * @var string
-     */
     private $propertyPath;
-
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
-
-    /**
-     * @var string|null
-     */
     private $translationDomain;
-
-    /**
-     * @var int|null
-     */
     private $plural;
-
-    /**
-     * @var Constraint
-     */
     private $constraint;
-
-    /**
-     * @var mixed
-     */
     private $code;
 
     /**

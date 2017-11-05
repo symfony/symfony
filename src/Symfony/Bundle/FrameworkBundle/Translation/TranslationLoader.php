@@ -24,8 +24,8 @@ class TranslationLoader extends TranslationReader
     /**
      * Loads translation messages from a directory to the catalogue.
      *
-     * @param string           $directory the directory to look into
-     * @param MessageCatalogue $catalogue the catalogue
+     * @param string           $directory The directory to look into
+     * @param MessageCatalogue $catalogue The catalogue
      */
     public function loadMessages($directory, MessageCatalogue $catalogue)
     {

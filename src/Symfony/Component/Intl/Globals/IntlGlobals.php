@@ -22,29 +22,21 @@ abstract class IntlGlobals
 {
     /**
      * Indicates that no error occurred.
-     *
-     * @var int
      */
     const U_ZERO_ERROR = 0;
 
     /**
      * Indicates that an invalid argument was passed.
-     *
-     * @var int
      */
     const U_ILLEGAL_ARGUMENT_ERROR = 1;
 
     /**
      * Indicates that the parse() operation failed.
-     *
-     * @var int
      */
     const U_PARSE_ERROR = 9;
 
     /**
      * All known error codes.
-     *
-     * @var array
      */
     private static $errorCodes = array(
         self::U_ZERO_ERROR => 'U_ZERO_ERROR',
@@ -54,15 +46,11 @@ abstract class IntlGlobals
 
     /**
      * The error code of the last operation.
-     *
-     * @var int
      */
     private static $errorCode = self::U_ZERO_ERROR;
 
     /**
      * The error code of the last operation.
-     *
-     * @var int
      */
     private static $errorMessage = 'U_ZERO_ERROR';
 

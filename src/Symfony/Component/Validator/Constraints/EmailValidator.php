@@ -23,11 +23,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EmailValidator extends ConstraintValidator
 {
-    /**
-     * @var bool
-     */
     private $isStrict;
 
+    /**
+     * @param bool $strict
+     */
     public function __construct($strict = false)
     {
         $this->isStrict = $strict;

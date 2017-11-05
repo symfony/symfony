@@ -26,29 +26,21 @@ abstract class Guess
 {
     /**
      * Marks an instance with a value that is extremely likely to be correct.
-     *
-     * @var int
      */
     const VERY_HIGH_CONFIDENCE = 3;
 
     /**
      * Marks an instance with a value that is very likely to be correct.
-     *
-     * @var int
      */
     const HIGH_CONFIDENCE = 2;
 
     /**
      * Marks an instance with a value that is likely to be correct.
-     *
-     * @var int
      */
     const MEDIUM_CONFIDENCE = 1;
 
     /**
      * Marks an instance with a value that may be correct.
-     *
-     * @var int
      */
     const LOW_CONFIDENCE = 0;
 

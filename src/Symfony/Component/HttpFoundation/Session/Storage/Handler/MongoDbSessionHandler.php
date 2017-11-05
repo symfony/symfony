@@ -21,9 +21,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class MongoDbSessionHandler extends AbstractSessionHandler
 {
-    /**
-     * @var \Mongo|\MongoClient|\MongoDB\Client
-     */
     private $mongo;
 
     /**

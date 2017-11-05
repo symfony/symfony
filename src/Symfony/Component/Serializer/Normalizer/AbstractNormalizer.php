@@ -33,6 +33,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     const OBJECT_TO_POPULATE = 'object_to_populate';
     const GROUPS = 'groups';
     const ATTRIBUTES = 'attributes';
+    const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
 
     /**
      * @var int
@@ -81,7 +82,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Set circular reference limit.
      *
-     * @param int $circularReferenceLimit limit of iterations for the same object
+     * @param int $circularReferenceLimit Limit of iterations for the same object
      *
      * @return self
      */
@@ -109,7 +110,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Set normalization callbacks.
      *
-     * @param callable[] $callbacks help normalize the result
+     * @param callable[] $callbacks Help normalize the result
      *
      * @return self
      *
@@ -203,7 +204,14 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
-        if (!$this->classMetadataFactory || !isset($context[static::GROUPS]) || !is_array($context[static::GROUPS])) {
+        if (!$this->classMetadataFactory) {
+            return false;
+        }
+
+        $groups = false;
+        if (isset($context[static::GROUPS]) && is_array($context[static::GROUPS])) {
+            $groups = $context[static::GROUPS];
+        } elseif (!isset($context[static::ALLOW_EXTRA_ATTRIBUTES]) || $context[static::ALLOW_EXTRA_ATTRIBUTES]) {
             return false;
         }
 
@@ -212,7 +220,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             $name = $attributeMetadata->getName();
 
             if (
-                count(array_intersect($attributeMetadata->getGroups(), $context[static::GROUPS])) &&
+                (false === $groups || count(array_intersect($attributeMetadata->getGroups(), $groups))) &&
                 $this->isAllowedAttribute($classOrObject, $name, null, $context)
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;

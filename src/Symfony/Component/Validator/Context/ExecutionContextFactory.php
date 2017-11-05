@@ -23,14 +23,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ExecutionContextFactory implements ExecutionContextFactoryInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
-
-    /**
-     * @var string|null
-     */
     private $translationDomain;
 
     /**

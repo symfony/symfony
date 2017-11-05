@@ -30,8 +30,6 @@ interface RememberMeServicesInterface
     /**
      * This attribute name can be used by the implementation if it needs to set
      * a cookie on the Request when there is no actual Response, yet.
-     *
-     * @var string
      */
     const COOKIE_ATTR_NAME = '_security_remember_me_cookie';
 

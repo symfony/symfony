@@ -24,7 +24,6 @@ use Symfony\Component\Console\Terminal;
  */
 final class ProgressBar
 {
-    // options
     private $barWidth = 28;
     private $barChar;
     private $emptyBarChar = '-';
@@ -32,10 +31,6 @@ final class ProgressBar
     private $format;
     private $internalFormat;
     private $redrawFreq = 1;
-
-    /**
-     * @var OutputInterface
-     */
     private $output;
     private $step = 0;
     private $max;

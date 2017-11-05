@@ -31,9 +31,6 @@ class NodeExtension extends AbstractExtension
     const ATTRIBUTE_NAME_IN_LOWER_CASE = 2;
     const ATTRIBUTE_VALUE_IN_LOWER_CASE = 4;
 
-    /**
-     * @var int
-     */
     private $flags;
 
     /**

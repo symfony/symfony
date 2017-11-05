@@ -1400,29 +1400,37 @@ EOF;
                 if ($this->hasReference($id, $argument, $deep, $visited)) {
                     return true;
                 }
+
+                continue;
             } elseif ($argument instanceof Reference) {
                 $argumentId = (string) $argument;
                 if ($id === $argumentId) {
                     return true;
                 }
 
-                if ($deep && !isset($visited[$argumentId]) && 'service_container' !== $argumentId) {
-                    $visited[$argumentId] = true;
-
-                    $service = $this->container->getDefinition($argumentId);
-
-                    // if the proxy manager is enabled, disable searching for references in lazy services,
-                    // as these services will be instantiated lazily and don't have direct related references.
-                    if ($service->isLazy() && !$this->getProxyDumper() instanceof NullDumper) {
-                        continue;
-                    }
-
-                    $arguments = array_merge($service->getMethodCalls(), $service->getArguments(), $service->getProperties());
-
-                    if ($this->hasReference($id, $arguments, $deep, $visited)) {
-                        return true;
-                    }
+                if (!$deep || isset($visited[$argumentId]) || 'service_container' === $argumentId) {
+                    continue;
                 }
+
+                $visited[$argumentId] = true;
+
+                $service = $this->container->getDefinition($argumentId);
+            } elseif ($argument instanceof Definition) {
+                $service = $argument;
+            } else {
+                continue;
+            }
+
+            // if the proxy manager is enabled, disable searching for references in lazy services,
+            // as these services will be instantiated lazily and don't have direct related references.
+            if ($service->isLazy() && !$this->getProxyDumper() instanceof NullDumper) {
+                continue;
+            }
+
+            $arguments = array_merge($service->getMethodCalls(), $service->getArguments(), $service->getProperties());
+
+            if ($this->hasReference($id, $arguments, $deep, $visited)) {
+                return true;
             }
         }
 

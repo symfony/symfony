@@ -10,10 +10,10 @@ $container = new ContainerBuilder();
 $container->register('foo', FooCircular::class)->setPublic(true)
    ->addArgument(new Reference('bar'));
 
-$container->register('bar', BarCircular::class)
+$container->register('bar', BarCircular::class)->setPublic($public)
     ->addMethodCall('addFoobar', array(new Reference('foobar')));
 
-$container->register('foobar', FoobarCircular::class)
+$container->register('foobar', FoobarCircular::class)->setPublic($public)
     ->addArgument(new Reference('foo'));
 
 return $container;

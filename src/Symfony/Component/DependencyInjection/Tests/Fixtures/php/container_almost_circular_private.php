@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class Symfony_DI_PhpDumper_Test_Almost_Circular extends Container
+class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -64,8 +64,12 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular extends Container
     protected function getFooService()
     {
         $a = new \BarCircular();
-        $a->addFoobar(new \FoobarCircular(($this->services['foo'] ?? $this->getFooService())));
 
-        return $this->services['foo'] = new \FooCircular($a);
+        $this->services['foo'] = $instance = new \FooCircular($a);
+
+        $a->addFoobar(new \FoobarCircular($instance));
+
+
+        return $instance;
     }
 }

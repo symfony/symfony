@@ -763,17 +763,35 @@ class PhpDumperTest extends TestCase
         $this->assertEquals(array('foo1' => new \stdClass(), 'foo3' => new \stdClass()), iterator_to_array($bar->iter));
     }
 
-    public function xtestAlmostCircular()
+    public function testAlmostCircularPrivate()
     {
+        $public = false;
         $container = include self::$fixturesPath.'/containers/container_almost_circular.php';
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_almost_circular.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Almost_Circular')));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_almost_circular_private.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Almost_Circular_Private')));
 
-        require self::$fixturesPath.'/php/container_almost_circular.php';
+        require self::$fixturesPath.'/php/container_almost_circular_private.php';
 
-        $container = new \Symfony_DI_PhpDumper_Test_Almost_Circular();
+        $container = new \Symfony_DI_PhpDumper_Test_Almost_Circular_Private();
+        $foo = $container->get('foo');
+
+        $this->assertSame($foo, $foo->bar->foobar->foo);
+    }
+
+    public function testAlmostCircularPublic()
+    {
+        $public = true;
+        $container = include self::$fixturesPath.'/containers/container_almost_circular.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_almost_circular_public.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Almost_Circular_Public')));
+
+        require self::$fixturesPath.'/php/container_almost_circular_public.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Almost_Circular_Public();
         $foo = $container->get('foo');
 
         $this->assertSame($foo, $foo->bar->foobar->foo);

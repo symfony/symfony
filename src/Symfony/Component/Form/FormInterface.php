@@ -171,7 +171,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the property path that the form is mapped to.
      *
-     * @return \Symfony\Component\PropertyAccess\PropertyPathInterface The property path
+     * @return \Symfony\Component\PropertyAccess\PropertyPathInterface|null The property path
      */
     public function getPropertyPath();
 

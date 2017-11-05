@@ -9,13 +9,13 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (empty_data)
                                         %s 
                    Closure(s): [        %s 
                      Closure {          %s 
-                       parameters: 1,   %s 
-                       file: "%s%eExtension%eCore%eType%eFormType.php",                     
+                       parameters: 1    %s 
+                       file: "%s%eExtension%eCore%eType%eFormType.php"                     
                        line: "%s to %s" %s 
                      },                 %s 
                      Closure {          %s 
-                       parameters: 2,   %s 
-                       file: "%s%eTests%eConsole%eDescriptor%eAbstractDescriptorTest.php",  
+                       parameters: 2    %s 
+                       file: "%s%eTests%eConsole%eDescriptor%eAbstractDescriptorTest.php"  
                        line: "%s to %s" %s 
                      }                  %s 
                    ]                    %s 

@@ -59,7 +59,6 @@
         </service>
 
         <service id="router.default" class="Symfony\Bundle\FrameworkBundle\Routing\Router">
-            <tag name="monolog.logger" channel="router" />
             <argument type="service" id="service_container" />
             <argument>%router.resource%</argument>
             <argument type="collection">
@@ -75,7 +74,6 @@
                 <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
             </argument>
             <argument type="service" id="router.request_context" on-invalid="ignore" />
-            <argument type="service" id="logger" on-invalid="ignore" />
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
             </call>

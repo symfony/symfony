@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-23T14:09:18Z
+
+I didn't try the behavior on a page where the dump is displayed inline. Does this change anything in this situation? (eg in the dump() panel, or when using `{{ dump() }}`)
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2017-10-23T14:12:06Z
+
+Didn't try either but it's worth checking before merging. I'll have a look.
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2017-10-23T21:26:53Z
+
+I updated the PR: previous version was not working with inline dumps (the `panel` variable was set to `null` with the first inline dump as the debug bar wasn't loaded yet, and then never updated).
+
+I also noticed that all dumps have a `z-index: 99999`. What's the reason for that?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-10-24T05:21:46Z
+
+@julienfalque : I still get a `Uncaught TypeError: Cannot read property 'style' of undefined at toggle` error in the profiler with your latest fix :/
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2017-10-24T05:48:51Z
+
+Woops. Should be fixed now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-28T16:28:00Z
+
+Status: needs work
+
+(should degrade gracefully on non-supported OSes)
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2017-10-30T18:31:32Z
+
+Rewritten using `document.createEvent()`. Support by older browsers should be better. Though I cannot confirm it right now. Can someone have a look?

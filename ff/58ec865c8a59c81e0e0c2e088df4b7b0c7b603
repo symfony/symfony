@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-13T13:28:34Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-14T13:11:10Z
+
+PR changed to be the first one of three. This one, on 2.7, simply ignores the extra options if the session is already started.
+
+Once merged, I'll issue two other ones:
+1. Instead of ignoring, we will send a deprecation on 3.4
+2. Instead of the deprecation, we will throw an exception on 4.0
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-14T13:11:30Z
+
+Status: Needs review
+
+ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-14T13:13:01Z
+
+And when merged we should finally be able to get green tests with PHP 7.2 in #24516.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-23T08:43:34Z
+
+👋 @symfony/mergers should we go ahead with this first PR for PHP 7.2 support (i.e. green tests) ?

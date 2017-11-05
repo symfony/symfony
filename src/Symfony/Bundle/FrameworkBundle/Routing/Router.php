@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Routing;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
@@ -33,17 +34,19 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
     private $collectedParameters = array();
 
     /**
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param mixed              $resource  The main resource to load
-     * @param array              $options   An array of options
-     * @param RequestContext     $context   The context
+     * @param ContainerInterface   $container A ContainerInterface instance
+     * @param mixed                $resource  The main resource to load
+     * @param array                $options   An array of options
+     * @param RequestContext       $context   The context
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null)
+    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null, LoggerInterface $logger = null)
     {
         $this->container = $container;
 
         $this->resource = $resource;
         $this->context = $context ?: new RequestContext();
+        $this->logger = $logger;
         $this->setOptions($options);
     }
 

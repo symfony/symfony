@@ -241,9 +241,10 @@ class FrameworkExtension extends Extension
         if ($this->isConfigEnabled($container, $config['form'])) {
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
-            $config['validation']['enabled'] = true;
 
-            if (!class_exists('Symfony\Component\Validator\Validation')) {
+            if (class_exists('Symfony\Component\Validator\Validation')) {
+                $config['validation']['enabled'] = true;
+            } else {
                 $container->setParameter('validator.translation_domain', 'validators');
 
                 $container->removeDefinition('form.type_extension.form.validator');

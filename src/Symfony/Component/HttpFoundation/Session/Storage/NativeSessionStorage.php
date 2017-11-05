@@ -100,6 +100,12 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
+        $this->setMetadataBag($metaBag);
+
+        if (\PHP_SESSION_ACTIVE === session_status()) {
+            return;
+        }
+
         $options += array(
             'cache_limiter' => 'private_no_expire',
             'cache_expire' => 0,
@@ -109,7 +115,6 @@ class NativeSessionStorage implements SessionStorageInterface
 
         session_register_shutdown();
 
-        $this->setMetadataBag($metaBag);
         $this->setOptions($options);
         $this->setSaveHandler($handler);
     }

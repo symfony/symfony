@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-04T23:41:54Z
+
+(fabbot failure is false positive)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-05T10:35:47Z
+
+That means `FooCircular` will get in its constructor a `BarCircular` instance not fully configured yet (without `foobar`), right? Isn't it an issue?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-05T10:45:36Z
+
+@ogizanagi how that? I don't think that's the case.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-05T10:56:13Z
+
+Just trying to dump `$bar` in `FooCircular`'s constructor:
+
+```php
+BarCircular {
+  +foobar: null
+}
+```
+
+but that's actually the only way to solve the circular dependency AFAIU. Or did I miss something?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-05T11:58:28Z
+
+@ogizanagi I'm sorry but I'm not able to reproduce your dump. I added type hints on the classes to ensure that `null` is not a possible value of the `foobar` property, and everything still works.

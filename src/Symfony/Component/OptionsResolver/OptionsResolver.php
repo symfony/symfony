@@ -28,29 +28,21 @@ class OptionsResolver implements Options
 {
     /**
      * The names of all defined options.
-     *
-     * @var array
      */
     private $defined = array();
 
     /**
      * The default option values.
-     *
-     * @var array
      */
     private $defaults = array();
 
     /**
      * The names of required options.
-     *
-     * @var array
      */
     private $required = array();
 
     /**
      * The resolved option values.
-     *
-     * @var array
      */
     private $resolved = array();
 
@@ -63,22 +55,16 @@ class OptionsResolver implements Options
 
     /**
      * A list of accepted values for each option.
-     *
-     * @var array
      */
     private $allowedValues = array();
 
     /**
      * A list of accepted types for each option.
-     *
-     * @var array
      */
     private $allowedTypes = array();
 
     /**
      * A list of closures for evaluating lazy options.
-     *
-     * @var array
      */
     private $lazy = array();
 
@@ -86,8 +72,6 @@ class OptionsResolver implements Options
      * A list of lazy options whose closure is currently being called.
      *
      * This list helps detecting circular dependencies between lazy options.
-     *
-     * @var array
      */
     private $calling = array();
 
@@ -98,8 +82,6 @@ class OptionsResolver implements Options
      * necessary in order to avoid inconsistencies during the resolving
      * process. If any option is changed after being read, all evaluated
      * lazy options that depend on this option would become invalid.
-     *
-     * @var bool
      */
     private $locked = false;
 

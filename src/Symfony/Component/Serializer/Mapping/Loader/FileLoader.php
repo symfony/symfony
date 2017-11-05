@@ -20,9 +20,6 @@ use Symfony\Component\Serializer\Exception\MappingException;
  */
 abstract class FileLoader implements LoaderInterface
 {
-    /**
-     * @var string
-     */
     protected $file;
 
     /**

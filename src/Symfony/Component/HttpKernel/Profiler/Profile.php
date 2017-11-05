@@ -164,7 +164,7 @@ class Profile
     }
 
     /**
-     * @param int The time
+     * @param int $time The time
      */
     public function setTime($time)
     {

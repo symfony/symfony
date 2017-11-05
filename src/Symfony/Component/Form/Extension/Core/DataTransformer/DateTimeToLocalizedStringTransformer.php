@@ -149,7 +149,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Returns a preconfigured IntlDateFormatter instance.
      *
-     * @param bool $ignoreTimezone use UTC regardless of the configured timezone
+     * @param bool $ignoreTimezone Use UTC regardless of the configured timezone
      *
      * @return \IntlDateFormatter
      *

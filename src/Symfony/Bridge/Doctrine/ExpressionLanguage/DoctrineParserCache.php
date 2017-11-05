@@ -24,9 +24,6 @@ use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface;
  */
 class DoctrineParserCache implements ParserCacheInterface
 {
-    /**
-     * @var Cache
-     */
     private $cache;
 
     public function __construct(Cache $cache)

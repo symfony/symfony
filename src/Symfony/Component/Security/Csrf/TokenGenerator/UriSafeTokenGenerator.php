@@ -18,11 +18,6 @@ namespace Symfony\Component\Security\Csrf\TokenGenerator;
  */
 class UriSafeTokenGenerator implements TokenGeneratorInterface
 {
-    /**
-     * The amount of entropy collected for each token (in bits).
-     *
-     * @var int
-     */
     private $entropy;
 
     /**

@@ -18,25 +18,8 @@ namespace Symfony\Component\Form\ChoiceList\View;
  */
 class ChoiceView
 {
-    /**
-     * The label displayed to humans.
-     *
-     * @var string
-     */
     public $label;
-
-    /**
-     * The view representation of the choice.
-     *
-     * @var string
-     */
     public $value;
-
-    /**
-     * The original choice value.
-     *
-     * @var mixed
-     */
     public $data;
 
     /**

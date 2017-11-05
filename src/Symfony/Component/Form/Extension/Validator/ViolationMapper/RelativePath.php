@@ -19,9 +19,6 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  */
 class RelativePath extends PropertyPath
 {
-    /**
-     * @var FormInterface
-     */
     private $root;
 
     /**

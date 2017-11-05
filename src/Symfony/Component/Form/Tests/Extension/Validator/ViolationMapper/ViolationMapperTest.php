@@ -29,11 +29,8 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 class ViolationMapperTest extends TestCase
 {
     const LEVEL_0 = 0;
-
     const LEVEL_1 = 1;
-
     const LEVEL_1B = 2;
-
     const LEVEL_2 = 3;
 
     /**

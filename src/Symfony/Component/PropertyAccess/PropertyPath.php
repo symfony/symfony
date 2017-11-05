@@ -24,8 +24,6 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 {
     /**
      * Character used for separating between plural and singular of an element.
-     *
-     * @var string
      */
     const SINGULAR_SEPARATOR = '|';
 

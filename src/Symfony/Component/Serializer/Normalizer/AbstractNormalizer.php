@@ -80,7 +80,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Set circular reference limit.
      *
-     * @param int $circularReferenceLimit limit of iterations for the same object
+     * @param int $circularReferenceLimit Limit of iterations for the same object
      *
      * @return self
      */
@@ -108,7 +108,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Set normalization callbacks.
      *
-     * @param callable[] $callbacks help normalize the result
+     * @param callable[] $callbacks Help normalize the result
      *
      * @return self
      *

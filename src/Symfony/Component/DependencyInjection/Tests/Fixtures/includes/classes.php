@@ -110,3 +110,27 @@ class LazyContext
         $this->lazyEmptyValues = $lazyEmptyValues;
     }
 }
+
+class FoobarCircular
+{
+    public function __construct(FooCircular $foo)
+    {
+        $this->foo = $foo;
+    }
+}
+
+class FooCircular
+{
+    public function __construct(BarCircular $bar)
+    {
+        $this->bar = $bar;
+    }
+}
+
+class BarCircular
+{
+    public function addFoobar(FoobarCircular $foobar)
+    {
+        $this->foobar = $foobar;
+    }
+}

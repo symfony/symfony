@@ -45,8 +45,8 @@ class Dumper
      * @param mixed $input                  The PHP value
      * @param int   $inline                 The level where you switch to inline YAML
      * @param int   $indent                 The level of indentation (used internally)
-     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     * @param bool  $exceptionOnInvalidType True if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool  $objectSupport          True if object support is enabled, false otherwise
      *
      * @return string The YAML representation of the PHP value
      */

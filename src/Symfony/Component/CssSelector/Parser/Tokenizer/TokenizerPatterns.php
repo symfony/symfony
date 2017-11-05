@@ -23,64 +23,17 @@ namespace Symfony\Component\CssSelector\Parser\Tokenizer;
  */
 class TokenizerPatterns
 {
-    /**
-     * @var string
-     */
     private $unicodeEscapePattern;
-
-    /**
-     * @var string
-     */
     private $simpleEscapePattern;
-
-    /**
-     * @var string
-     */
     private $newLineEscapePattern;
-
-    /**
-     * @var string
-     */
     private $escapePattern;
-
-    /**
-     * @var string
-     */
     private $stringEscapePattern;
-
-    /**
-     * @var string
-     */
     private $nonAsciiPattern;
-
-    /**
-     * @var string
-     */
     private $nmCharPattern;
-
-    /**
-     * @var string
-     */
     private $nmStartPattern;
-
-    /**
-     * @var string
-     */
     private $identifierPattern;
-
-    /**
-     * @var string
-     */
     private $hashPattern;
-
-    /**
-     * @var string
-     */
     private $numberPattern;
-
-    /**
-     * @var string
-     */
     private $quotedStringPattern;
 
     public function __construct()

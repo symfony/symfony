@@ -30,9 +30,6 @@ class TableHelper extends Helper
     const LAYOUT_BORDERLESS = 1;
     const LAYOUT_COMPACT = 2;
 
-    /**
-     * @var Table
-     */
     private $table;
 
     public function __construct($triggerDeprecationError = true)

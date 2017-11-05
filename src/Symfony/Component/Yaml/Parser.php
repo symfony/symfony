@@ -49,9 +49,9 @@ class Parser
      * Parses a YAML string to a PHP value.
      *
      * @param string $value                  A YAML string
-     * @param bool   $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool   $objectSupport          true if object support is enabled, false otherwise
-     * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
+     * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool   $objectSupport          True if object support is enabled, false otherwise
+     * @param bool   $objectForMap           True if maps should return a stdClass instead of array()
      *
      * @return mixed A PHP value
      *
@@ -503,7 +503,7 @@ class Parser
      * @param string $value                  A YAML value
      * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
      * @param bool   $objectSupport          True if object support is enabled, false otherwise
-     * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
+     * @param bool   $objectForMap           True if maps should return a stdClass instead of array()
      * @param string $context                The parser context (either sequence or mapping)
      *
      * @return mixed A PHP value

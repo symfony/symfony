@@ -28,39 +28,12 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class ExecutionContext implements ExecutionContextInterface
 {
-    /**
-     * @var GlobalExecutionContextInterface
-     */
     private $globalContext;
-
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
-
-    /**
-     * @var null|string
-     */
     private $translationDomain;
-
-    /**
-     * @var MetadataInterface
-     */
     private $metadata;
-
-    /**
-     * @var mixed
-     */
     private $value;
-
-    /**
-     * @var string
-     */
     private $group;
-
-    /**
-     * @var string
-     */
     private $propertyPath;
 
     /**

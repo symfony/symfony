@@ -68,7 +68,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets a prototype for child nodes.
      *
-     * @param string $type the type of node
+     * @param string $type The type of node
      *
      * @return NodeDefinition
      */
@@ -98,7 +98,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * This method is applicable to prototype nodes only.
      *
-     * @param int|string|array|null $children the number of children|The child name|The children names to be added
+     * @param int|string|array|null $children The number of children|The child name|The children names to be added
      *
      * @return $this
      */

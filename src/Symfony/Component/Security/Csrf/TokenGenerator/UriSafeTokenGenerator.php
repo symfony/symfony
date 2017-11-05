@@ -20,11 +20,6 @@ use Symfony\Component\Security\Core\Util\SecureRandomInterface;
  */
 class UriSafeTokenGenerator implements TokenGeneratorInterface
 {
-    /**
-     * The amount of entropy collected for each token (in bits).
-     *
-     * @var int
-     */
     private $entropy;
 
     /**

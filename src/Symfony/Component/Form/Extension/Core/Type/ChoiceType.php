@@ -44,11 +44,6 @@ class ChoiceType extends AbstractType
      */
     const DEPRECATED_EMPTY_VALUE = '__deprecated_empty_value__';
 
-    /**
-     * Caches created choice lists.
-     *
-     * @var ChoiceListFactoryInterface
-     */
     private $choiceListFactory;
 
     public function __construct(ChoiceListFactoryInterface $choiceListFactory = null)

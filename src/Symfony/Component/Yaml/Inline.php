@@ -31,9 +31,9 @@ class Inline
      * Converts a YAML string to a PHP value.
      *
      * @param string $value                  A YAML string
-     * @param bool   $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool   $objectSupport          true if object support is enabled, false otherwise
-     * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
+     * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool   $objectSupport          True if object support is enabled, false otherwise
+     * @param bool   $objectForMap           True if maps should return a stdClass instead of array()
      * @param array  $references             Mapping of variable names to values
      *
      * @return mixed A PHP value
@@ -87,8 +87,8 @@ class Inline
      * Dumps a given PHP variable to a YAML string.
      *
      * @param mixed $value                  The PHP variable to convert
-     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     * @param bool  $exceptionOnInvalidType True if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool  $objectSupport          True if object support is enabled, false otherwise
      *
      * @return string The YAML string representing the PHP value
      *
@@ -183,8 +183,8 @@ class Inline
      * Dumps a PHP array to a YAML string.
      *
      * @param array $value                  The PHP array to dump
-     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     * @param bool  $exceptionOnInvalidType True if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool  $objectSupport          True if object support is enabled, false otherwise
      *
      * @return string The YAML string representing the PHP array
      */

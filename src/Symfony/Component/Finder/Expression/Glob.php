@@ -20,9 +20,6 @@ use Symfony\Component\Finder\Glob as FinderGlob;
  */
 class Glob implements ValueInterface
 {
-    /**
-     * @var string
-     */
     private $pattern;
 
     /**

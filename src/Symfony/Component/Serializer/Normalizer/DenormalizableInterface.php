@@ -32,7 +32,7 @@ interface DenormalizableInterface
      * @param array|scalar          $data         The data from which to re-create the object
      * @param string|null           $format       The format is optionally given to be able to denormalize differently
      *                                            based on different input formats
-     * @param array                 $context      options for denormalizing
+     * @param array                 $context      Options for denormalizing
      *
      * @return object
      */

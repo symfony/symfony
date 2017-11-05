@@ -30,9 +30,6 @@ use Symfony\Component\Finder\Comparator\DateComparator;
  */
 abstract class AbstractFindAdapter extends AbstractAdapter
 {
-    /**
-     * @var Shell
-     */
     protected $shell;
 
     public function __construct()

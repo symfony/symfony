@@ -18,9 +18,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class WriteCheckSessionHandler implements \SessionHandlerInterface
 {
-    /**
-     * @var \SessionHandlerInterface
-     */
     private $wrappedSessionHandler;
 
     /**

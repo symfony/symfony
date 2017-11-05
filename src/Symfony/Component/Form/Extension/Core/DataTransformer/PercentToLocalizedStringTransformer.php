@@ -32,7 +32,6 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     );
 
     private $type;
-
     private $scale;
 
     /**

@@ -29,12 +29,12 @@ use Twig\Loader\ExistsLoaderInterface;
 class ExceptionController
 {
     protected $twig;
-
-    /**
-     * @var bool Show error (false) or exception (true) pages by default
-     */
     protected $debug;
 
+    /**
+     * @param Environment $twig
+     * @param bool        $debug Show error (false) or exception (true) pages by default
+     */
     public function __construct(Environment $twig, $debug)
     {
         $this->twig = $twig;

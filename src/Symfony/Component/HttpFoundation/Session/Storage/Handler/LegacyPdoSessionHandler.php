@@ -31,9 +31,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class LegacyPdoSessionHandler implements \SessionHandlerInterface
 {
-    /**
-     * @var \PDO PDO instance
-     */
     private $pdo;
 
     /**

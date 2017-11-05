@@ -27,9 +27,6 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface
 {
-    /**
-     * @var ClassMetadataFactory
-     */
     private $classMetadataFactory;
 
     public function __construct(ClassMetadataFactory $classMetadataFactory)

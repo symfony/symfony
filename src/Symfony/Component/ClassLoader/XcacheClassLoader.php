@@ -49,12 +49,6 @@ namespace Symfony\Component\ClassLoader;
 class XcacheClassLoader
 {
     private $prefix;
-
-    /**
-     * A class loader object that implements the findFile() method.
-     *
-     * @var object
-     */
     private $decorated;
 
     /**

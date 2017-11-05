@@ -25,14 +25,7 @@ class DoctrineOrmExtension extends AbstractExtension
 {
     protected $registry;
 
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
-
-    /**
-     * @var ChoiceListFactoryInterface
-     */
     private $choiceListFactory;
 
     public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)

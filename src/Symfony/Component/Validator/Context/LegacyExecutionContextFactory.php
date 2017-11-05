@@ -28,19 +28,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class LegacyExecutionContextFactory implements ExecutionContextFactoryInterface
 {
-    /**
-     * @var MetadataFactoryInterface
-     */
     private $metadataFactory;
-
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
-
-    /**
-     * @var string|null
-     */
     private $translationDomain;
 
     /**

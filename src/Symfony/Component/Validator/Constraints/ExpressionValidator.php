@@ -27,14 +27,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ExpressionValidator extends ConstraintValidator
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
-
-    /**
-     * @var ExpressionLanguage
-     */
     private $expressionLanguage;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null, ExpressionLanguage $expressionLanguage = null)

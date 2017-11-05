@@ -31,19 +31,8 @@ class Token
     const TYPE_NUMBER = 'number';
     const TYPE_STRING = 'string';
 
-    /**
-     * @var int
-     */
     private $type;
-
-    /**
-     * @var string
-     */
     private $value;
-
-    /**
-     * @var int
-     */
     private $position;
 
     /**

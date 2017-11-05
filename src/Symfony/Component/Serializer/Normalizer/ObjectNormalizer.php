@@ -29,9 +29,6 @@ class ObjectNormalizer extends AbstractNormalizer
 {
     private $attributesCache = array();
 
-    /**
-     * @var PropertyAccessorInterface
-     */
     protected $propertyAccessor;
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null)

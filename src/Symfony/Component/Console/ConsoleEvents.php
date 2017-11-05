@@ -27,8 +27,6 @@ final class ConsoleEvents
      * instance.
      *
      * @Event
-     *
-     * @var string
      */
     const COMMAND = 'console.command';
 
@@ -40,8 +38,6 @@ final class ConsoleEvents
      * instance.
      *
      * @Event
-     *
-     * @var string
      */
     const TERMINATE = 'console.terminate';
 
@@ -54,8 +50,6 @@ final class ConsoleEvents
      * instance.
      *
      * @Event
-     *
-     * @var string
      */
     const EXCEPTION = 'console.exception';
 }

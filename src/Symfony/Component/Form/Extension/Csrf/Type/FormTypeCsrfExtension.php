@@ -36,31 +36,20 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     private $defaultTokenManager;
 
-    /**
-     * @var bool
-     */
     private $defaultEnabled;
-
-    /**
-     * @var string
-     */
     private $defaultFieldName;
-
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
-
-    /**
-     * @var null|string
-     */
     private $translationDomain;
-
-    /**
-     * @var ServerParams
-     */
     private $serverParams;
 
+    /**
+     * @param CsrfTokenManagerInterface|CsrfProviderInterface $defaultTokenManager
+     * @param bool                                            $defaultEnabled
+     * @param string                                          $defaultFieldName
+     * @param TranslatorInterface                             $translator
+     * @param null|string                                     $translationDomain
+     * @param ServerParams                                    $serverParams
+     */
     public function __construct($defaultTokenManager, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null, ServerParams $serverParams = null)
     {
         if ($defaultTokenManager instanceof CsrfProviderInterface) {

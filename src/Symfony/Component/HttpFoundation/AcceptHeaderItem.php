@@ -18,24 +18,9 @@ namespace Symfony\Component\HttpFoundation;
  */
 class AcceptHeaderItem
 {
-    /**
-     * @var string
-     */
     private $value;
-
-    /**
-     * @var float
-     */
     private $quality = 1.0;
-
-    /**
-     * @var int
-     */
     private $index = 0;
-
-    /**
-     * @var array
-     */
     private $attributes = array();
 
     /**

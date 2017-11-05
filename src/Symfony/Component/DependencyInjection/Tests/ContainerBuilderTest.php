@@ -1203,8 +1203,19 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals(array('foo1' => new \stdClass(), 'foo3' => new \stdClass()), iterator_to_array($bar->iter));
     }
 
-    public function testAlmostCircular()
+    public function testAlmostCircularPrivate()
     {
+        $public = false;
+        $container = include __DIR__.'/Fixtures/containers/container_almost_circular.php';
+
+        $foo = $container->get('foo');
+
+        $this->assertSame($foo, $foo->bar->foobar->foo);
+    }
+
+    public function testAlmostCircularPublic()
+    {
+        $public = true;
         $container = include __DIR__.'/Fixtures/containers/container_almost_circular.php';
 
         $foo = $container->get('foo');

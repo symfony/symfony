@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class Symfony_DI_PhpDumper_Test_Almost_Circular extends Container
+class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -23,13 +23,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular extends Container
     {
         $this->services = array();
         $this->methodMap = array(
-            'bar' => 'getBarService',
             'foo' => 'getFooService',
-            'foobar' => 'getFoobarService',
-        );
-        $this->privates = array(
-            'bar' => true,
-            'foobar' => true,
         );
 
         $this->aliases = array();
@@ -40,6 +34,8 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular extends Container
         return array(
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'bar' => true,
+            'foobar' => true,
         );
     }
 
@@ -67,42 +63,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular extends Container
      */
     protected function getFooService()
     {
-        $a = ${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->getBarService()) && false ?: '_'};
+        $a = new \BarCircular();
 
-        if (isset($this->services['foo'])) {
-            return $this->services['foo'];
-        }
+        $this->services['foo'] = $instance = new \FooCircular($a);
 
-        return $this->services['foo'] = new \FooCircular($a);
-    }
+        $a->addFoobar(new \FoobarCircular($instance));
 
-    /**
-     * Gets the private 'bar' shared service.
-     *
-     * @return \BarCircular
-     */
-    protected function getBarService()
-    {
-        $this->services['bar'] = $instance = new \BarCircular();
-
-        $instance->addFoobar(${($_ = isset($this->services['foobar']) ? $this->services['foobar'] : $this->getFoobarService()) && false ?: '_'});
 
         return $instance;
-    }
-
-    /**
-     * Gets the private 'foobar' shared service.
-     *
-     * @return \FoobarCircular
-     */
-    protected function getFoobarService()
-    {
-        $a = ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->getFooService()) && false ?: '_'};
-
-        if (isset($this->services['foobar'])) {
-            return $this->services['foobar'];
-        }
-
-        return $this->services['foobar'] = new \FoobarCircular($a);
     }
 }

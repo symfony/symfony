@@ -194,9 +194,9 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * Returns a matching normalizer.
      *
-     * @param mixed  $data    data to get the serializer for
-     * @param string $format  format name, present to give the option to normalizers to act differently based on formats
-     * @param array  $context options available to the normalizer
+     * @param mixed  $data    Data to get the serializer for
+     * @param string $format  Format name, present to give the option to normalizers to act differently based on formats
+     * @param array  $context Options available to the normalizer
      *
      * @return NormalizerInterface|null
      */
@@ -212,10 +212,10 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * Returns a matching denormalizer.
      *
-     * @param mixed  $data    data to restore
-     * @param string $class   the expected class to instantiate
-     * @param string $format  format name, present to give the option to normalizers to act differently based on formats
-     * @param array  $context options available to the denormalizer
+     * @param mixed  $data    Data to restore
+     * @param string $class   The expected class to instantiate
+     * @param string $format  Format name, present to give the option to normalizers to act differently based on formats
+     * @param array  $context Options available to the denormalizer
      *
      * @return DenormalizerInterface|null
      */

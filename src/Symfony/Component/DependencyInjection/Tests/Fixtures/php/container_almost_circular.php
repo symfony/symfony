@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class ProjectServiceContainer extends Container
+class Symfony_DI_PhpDumper_Test_Almost_Circular extends Container
 {
     private $parameters;
     private $targetDirs = array();
@@ -24,8 +24,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services = $this->privates = array();
         $this->methodMap = array(
-            'bar_service' => 'getBarServiceService',
-            'foo_service' => 'getFooServiceService',
+            'foo' => 'getFooService',
         );
 
         $this->aliases = array();
@@ -52,39 +51,21 @@ class ProjectServiceContainer extends Container
         return array(
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-            'baz_service' => true,
+            'bar' => true,
+            'foobar' => true,
         );
     }
 
     /**
-     * Gets the public 'bar_service' shared service.
+     * Gets the public 'foo' shared service.
      *
-     * @return \stdClass
+     * @return \FooCircular
      */
-    protected function getBarServiceService()
+    protected function getFooService()
     {
-        $a = ($this->privates['baz_service'] ?? $this->privates['baz_service'] = new \stdClass());
+        $a = new \BarCircular();
+        $a->addFoobar(new \FoobarCircular(($this->services['foo'] ?? $this->getFooService())));
 
-        if (isset($this->services['bar_service'])) {
-            return $this->services['bar_service'];
-        }
-
-        return $this->services['bar_service'] = new \stdClass($a);
-    }
-
-    /**
-     * Gets the public 'foo_service' shared service.
-     *
-     * @return \stdClass
-     */
-    protected function getFooServiceService()
-    {
-        $a = ($this->privates['baz_service'] ?? $this->privates['baz_service'] = new \stdClass());
-
-        if (isset($this->services['foo_service'])) {
-            return $this->services['foo_service'];
-        }
-
-        return $this->services['foo_service'] = new \stdClass($a);
+        return $this->services['foo'] = new \FooCircular($a);
     }
 }

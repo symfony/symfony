@@ -43,15 +43,11 @@ class PhpDumper extends Dumper
 {
     /**
      * Characters that might appear in the generated variable name as first character.
-     *
-     * @var string
      */
     const FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz';
 
     /**
      * Characters that might appear in the generated variable name as any but the first character.
-     *
-     * @var string
      */
     const NON_FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 
@@ -268,13 +264,15 @@ EOF;
 
         array_unshift($inlinedDefinitions, $definition);
 
+        $isNonLazyShared = !$this->getProxyDumper()->isProxyCandidate($definition) && $definition->isShared();
         $calls = $behavior = array();
         foreach ($inlinedDefinitions as $iDefinition) {
-            $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior);
-            $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior);
-            $this->getServiceCallsFromArguments($iDefinition->getProperties(), $calls, $behavior);
-            $this->getServiceCallsFromArguments(array($iDefinition->getConfigurator()), $calls, $behavior);
-            $this->getServiceCallsFromArguments(array($iDefinition->getFactory()), $calls, $behavior);
+            $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior, $isNonLazyShared);
+            $isPreInstantiation = $isNonLazyShared && $iDefinition !== $definition && !$this->hasReference($cId, $iDefinition->getMethodCalls(), true) && !$this->hasReference($cId, $iDefinition->getProperties(), true);
+            $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior, $isPreInstantiation);
+            $this->getServiceCallsFromArguments($iDefinition->getProperties(), $calls, $behavior, $isPreInstantiation);
+            $this->getServiceCallsFromArguments(array($iDefinition->getConfigurator()), $calls, $behavior, $isPreInstantiation);
+            $this->getServiceCallsFromArguments(array($iDefinition->getFactory()), $calls, $behavior, $isNonLazyShared);
         }
 
         $code = '';
@@ -296,6 +294,17 @@ EOF;
         }
 
         if ('' !== $code) {
+            if ($isNonLazyShared) {
+                $code .= sprintf(<<<'EOTXT'
+
+        if (isset($this->%s['%s'])) {
+            return $this->%1$s['%2$s'];
+        }
+
+EOTXT
+                , $definition->isPublic() ? 'services' : 'privates', $cId);
+            }
+
             $code .= "\n";
         }
 
@@ -502,7 +511,7 @@ EOF;
         }
 
         foreach ($definition->getArguments() as $arg) {
-            if (!$arg || ($arg instanceof Reference && 'service_container' !== (string) $arg)) {
+            if (!$arg || ($arg instanceof Reference && 'service_container' === (string) $arg)) {
                 continue;
             }
             if (is_array($arg) && 3 >= count($arg)) {
@@ -510,7 +519,7 @@ EOF;
                     if ($this->dumpValue($k) !== $this->dumpValue($k, false)) {
                         return false;
                     }
-                    if (!$v || ($v instanceof Reference && 'service_container' !== (string) $v)) {
+                    if (!$v || ($v instanceof Reference && 'service_container' === (string) $v)) {
                         continue;
                     }
                     if (!is_scalar($v) || $this->dumpValue($v) !== $this->dumpValue($v, false)) {
@@ -1305,16 +1314,16 @@ EOF;
     /**
      * Builds service calls from arguments.
      */
-    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
+    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior, $isPreInstantiation)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
-                $this->getServiceCallsFromArguments($argument, $calls, $behavior);
+                $this->getServiceCallsFromArguments($argument, $calls, $behavior, $isPreInstantiation);
             } elseif ($argument instanceof Reference) {
                 $id = (string) $argument;
 
                 if (!isset($calls[$id])) {
-                    $calls[$id] = 0;
+                    $calls[$id] = (int) $isPreInstantiation;
                 }
                 if (!isset($behavior[$id])) {
                     $behavior[$id] = $argument->getInvalidBehavior();

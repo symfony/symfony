@@ -72,7 +72,13 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarServiceService()
     {
-        return $this->services['bar_service'] = new \stdClass(($this->privates['baz_service'] ?? $this->privates['baz_service'] = new \stdClass()));
+        $a = ($this->privates['baz_service'] ?? $this->privates['baz_service'] = new \stdClass());
+
+        if (isset($this->services['bar_service'])) {
+            return $this->services['bar_service'];
+        }
+
+        return $this->services['bar_service'] = new \stdClass($a);
     }
 
     /**
@@ -83,7 +89,7 @@ class ProjectServiceContainer extends Container
     protected function getFooServiceService()
     {
         return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\ServiceLocator(array('bar' => function () {
-            return ($this->services['bar_service'] ?? $this->services['bar_service'] = new \stdClass(($this->privates['baz_service'] ?? $this->privates['baz_service'] = new \stdClass())));
+            return ($this->services['bar_service'] ?? $this->getBarServiceService());
         }, 'baz' => function (): \stdClass {
             return ($this->privates['baz_service'] ?? $this->privates['baz_service'] = new \stdClass());
         }, 'nil' => function () {
@@ -157,6 +163,10 @@ class ProjectServiceContainer extends Container
     protected function getTranslator3Service()
     {
         $a = ($this->services['translator.loader_3'] ?? $this->services['translator.loader_3'] = new \stdClass());
+
+        if (isset($this->services['translator_3'])) {
+            return $this->services['translator_3'];
+        }
 
         $this->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_3' => function () {
             return ($this->services['translator.loader_3'] ?? $this->services['translator.loader_3'] = new \stdClass());

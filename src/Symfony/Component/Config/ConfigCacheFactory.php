@@ -22,9 +22,6 @@ namespace Symfony\Component\Config;
  */
 class ConfigCacheFactory implements ConfigCacheFactoryInterface
 {
-    /**
-     * @var bool Debug flag passed to the ConfigCache
-     */
     private $debug;
 
     /**

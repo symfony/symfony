@@ -121,6 +121,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $autoconfiguredInstanceof = array();
 
     private $removedIds = array();
+    private $alreadyLoading = array();
 
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -143,7 +144,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * If you are not using the loaders and therefore don't want
      * to depend on the Config component, set this flag to false.
      *
-     * @param bool $track true if you want to track resources, false otherwise
+     * @param bool $track True if you want to track resources, false otherwise
      */
     public function setResourceTracking($track)
     {
@@ -153,7 +154,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Checks if resources are tracked.
      *
-     * @return bool true if resources are tracked, false otherwise
+     * @return bool true If resources are tracked, false otherwise
      */
     public function isTrackingResources()
     {
@@ -539,12 +540,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw $e;
         }
 
-        $this->loading[$id] = true;
+        $loading = isset($this->alreadyLoading[$id]) ? 'loading' : 'alreadyLoading';
+        $this->{$loading}[$id] = true;
 
         try {
             $service = $this->createService($definition, $id);
         } finally {
-            unset($this->loading[$id]);
+            unset($this->{$loading}[$id]);
         }
 
         return $service;
@@ -1013,6 +1015,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
 
+        if (null !== $id && $definition->isShared() && isset($this->services[$id]) && ($tryProxy || !$definition->isLazy())) {
+            return $this->services[$id];
+        }
+
         if (null !== $factory = $definition->getFactory()) {
             if (is_array($factory)) {
                 $factory = array($this->resolveServices($parameterBag->resolveValue($factory[0])), $factory[1]);
@@ -1457,6 +1463,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         if (null !== $id && $definition->isShared()) {
             $this->services[$id] = $service;
+            unset($this->loading[$id], $this->alreadyLoading[$id]);
         }
     }
 

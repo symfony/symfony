@@ -193,9 +193,10 @@ class FrameworkExtension extends Extension
         if ($this->isConfigEnabled($container, $config['form'])) {
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
-            $config['validation']['enabled'] = true;
 
-            if (!class_exists('Symfony\Component\Validator\Validation')) {
+            if (class_exists('Symfony\Component\Validator\Validation')) {
+                $config['validation']['enabled'] = true;
+            } else {
                 $container->setParameter('validator.translation_domain', 'validators');
 
                 $container->removeDefinition('form.type_extension.form.validator');
@@ -312,6 +313,11 @@ class FrameworkExtension extends Extension
             ->addTag('validator.constraint_validator');
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
+
+        if (!$container->getParameter('kernel.debug')) {
+            // remove tagged iterator argument for resource checkers
+            $container->getDefinition('config_cache_factory')->setArguments(array());
+        }
     }
 
     /**

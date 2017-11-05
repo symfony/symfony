@@ -26,8 +26,6 @@ final class KernelEvents
      * other code in the framework is executed.
      *
      * @Event("Symfony\Component\HttpKernel\Event\GetResponseEvent")
-     *
-     * @var string
      */
     const REQUEST = 'kernel.request';
 
@@ -38,8 +36,6 @@ final class KernelEvents
      * to modify the thrown exception.
      *
      * @Event("Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent")
-     *
-     * @var string
      */
     const EXCEPTION = 'kernel.exception';
 
@@ -51,8 +47,6 @@ final class KernelEvents
      * controller.
      *
      * @Event("Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent")
-     *
-     * @var string
      */
     const VIEW = 'kernel.view';
 
@@ -64,8 +58,6 @@ final class KernelEvents
      * request.
      *
      * @Event("Symfony\Component\HttpKernel\Event\FilterControllerEvent")
-     *
-     * @var string
      */
     const CONTROLLER = 'kernel.controller';
 
@@ -76,8 +68,6 @@ final class KernelEvents
      * the controller.
      *
      * @Event("Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent")
-     *
-     * @var string
      */
     const CONTROLLER_ARGUMENTS = 'kernel.controller_arguments';
 
@@ -89,8 +79,6 @@ final class KernelEvents
      * replied.
      *
      * @Event("Symfony\Component\HttpKernel\Event\FilterResponseEvent")
-     *
-     * @var string
      */
     const RESPONSE = 'kernel.response';
 
@@ -100,8 +88,6 @@ final class KernelEvents
      * This event allows you to run expensive post-response jobs.
      *
      * @Event("Symfony\Component\HttpKernel\Event\PostResponseEvent")
-     *
-     * @var string
      */
     const TERMINATE = 'kernel.terminate';
 
@@ -112,8 +98,6 @@ final class KernelEvents
      * the application, when it was changed during the request.
      *
      * @Event("Symfony\Component\HttpKernel\Event\FinishRequestEvent")
-     *
-     * @var string
      */
     const FINISH_REQUEST = 'kernel.finish_request';
 }

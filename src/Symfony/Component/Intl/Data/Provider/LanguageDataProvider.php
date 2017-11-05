@@ -23,23 +23,14 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
  */
 class LanguageDataProvider
 {
-    /**
-     * @var string
-     */
     private $path;
-
-    /**
-     * @var BundleEntryReaderInterface
-     */
     private $reader;
 
     /**
      * Creates a data provider that reads locale-related data from .res files.
      *
-     * @param string                     $path   The path to the directory
-     *                                           containing the .res files.
-     * @param BundleEntryReaderInterface $reader The reader for reading the .res
-     *                                           files.
+     * @param string                     $path   The path to the directory containing the .res files
+     * @param BundleEntryReaderInterface $reader The reader for reading the .res files
      */
     public function __construct(string $path, BundleEntryReaderInterface $reader)
     {

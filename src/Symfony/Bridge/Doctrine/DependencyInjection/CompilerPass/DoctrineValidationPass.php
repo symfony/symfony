@@ -21,11 +21,11 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class DoctrineValidationPass implements CompilerPassInterface
 {
-    /**
-     * @var string
-     */
     private $managerType;
 
+    /**
+     * @param string $managerType
+     */
     public function __construct($managerType)
     {
         $this->managerType = $managerType;

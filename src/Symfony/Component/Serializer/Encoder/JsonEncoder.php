@@ -20,14 +20,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
 {
     const FORMAT = 'json';
 
-    /**
-     * @var JsonEncode
-     */
     protected $encodingImpl;
-
-    /**
-     * @var JsonDecode
-     */
     protected $decodingImpl;
 
     public function __construct(JsonEncode $encodingImpl = null, JsonDecode $decodingImpl = null)

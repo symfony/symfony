@@ -20,19 +20,8 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  */
 class PreloadedExtension implements FormExtensionInterface
 {
-    /**
-     * @var FormTypeInterface[]
-     */
     private $types = array();
-
-    /**
-     * @var array[FormTypeExtensionInterface[]]
-     */
     private $typeExtensions = array();
-
-    /**
-     * @var FormTypeGuesserInterface
-     */
     private $typeGuesser;
 
     /**

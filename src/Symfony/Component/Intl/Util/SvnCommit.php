@@ -18,16 +18,12 @@ namespace Symfony\Component\Intl\Util;
  */
 class SvnCommit
 {
-    /**
-     * @var \SimpleXMLElement
-     */
     private $svnInfo;
 
     /**
      * Creates a commit from the given "svn info" data.
      *
-     * @param \SimpleXMLElement $svnInfo the XML result from the "svn info"
-     *                                   command
+     * @param \SimpleXMLElement $svnInfo the XML result from the "svn info" command
      */
     public function __construct(\SimpleXMLElement $svnInfo)
     {

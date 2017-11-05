@@ -49,34 +49,11 @@ class Type
         self::BUILTIN_TYPE_ITERABLE,
     );
 
-    /**
-     * @var string
-     */
     private $builtinType;
-
-    /**
-     * @var bool
-     */
     private $nullable;
-
-    /**
-     * @var string|null
-     */
     private $class;
-
-    /**
-     * @var bool
-     */
     private $collection;
-
-    /**
-     * @var Type|null
-     */
     private $collectionKeyType;
-
-    /**
-     * @var Type|null
-     */
     private $collectionValueType;
 
     /**

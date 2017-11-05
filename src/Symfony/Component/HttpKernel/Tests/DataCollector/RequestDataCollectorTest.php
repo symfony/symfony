@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
@@ -69,20 +68,6 @@ class RequestDataCollectorTest extends TestCase
         $c->lateCollect();
 
         $this->assertEquals(array(), $c->getRouteParams());
-    }
-
-    public function testKernelResponseDoesNotStartSession()
-    {
-        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->getMock();
-        $request = new Request();
-        $session = new Session(new MockArraySessionStorage());
-        $request->setSession($session);
-        $response = new Response();
-
-        $c = new RequestDataCollector();
-        $c->onKernelResponse(new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
-
-        $this->assertFalse($session->isStarted());
     }
 
     /**

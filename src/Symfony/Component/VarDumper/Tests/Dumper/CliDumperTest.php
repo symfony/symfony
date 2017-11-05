@@ -147,10 +147,10 @@ RuntimeException {
   #file: "%ACliDumperTest.php"
   #line: %d
   trace: {
-    %ACliDumperTest.php:%d: {
-      : 
-      : $ex = new \RuntimeException('foo');
-      : 
+    %ACliDumperTest.php:%d {
+      › 
+      › $ex = new \RuntimeException('foo');
+      › 
     }
     %A
   }

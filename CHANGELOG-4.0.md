@@ -7,6 +7,27 @@ in 4.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.0.0...v4.0.1
 
+* 4.0.0-BETA3 (2017-11-05)
+
+ * bug #24531 [HttpFoundation] Fix forward-compat of NativeSessionStorage with PHP 7.2 (sroze)
+ * bug #24828 [DI] Fix the "almost-circular refs" fix (nicolas-grekas)
+ * bug #24665 Fix dump panel hidden when closing a dump (julienfalque)
+ * bug #24802 [TwigBridge] [Bootstrap 4] Fix hidden errors (ostrolucky)
+ * bug #24816 [Serializer] Fix extra attributes when no group specified (ogizanagi)
+ * bug #24822 [DI] Fix "almost-circular" dependencies handling (nicolas-grekas)
+ * bug #24821 symfony/form auto-enables symfony/validator, even when not present (weaverryan)
+ * bug #24824 [FrameworkBundle][Config] fix: do not add resource checkers for no-debug (dmaicher)
+ * bug #24814 [Intl] Make intl-data tests pass and save language aliases again (jakzal)
+ * bug #24810 [Serializer] readd default argument value (xabbuh)
+ * bug #24809 [Config] Fix dump of config references for deprecated nodes (chalasr)
+ * bug #24796 [PhpUnitBridge] Fixed fatal error in CoverageListener when something goes wrong in Test::setUpBeforeClass (lyrixx)
+ * bug #24774 [HttpKernel] Let the storage manage the session starts (sroze)
+ * bug #24735 [VarDumper] fix trailling comma when dumping an exception (Simperfit)
+ * bug #24770 [Validator] Fix TraceableValidator is reset on data collector instantiation (ogizanagi)
+ * bug #24764 [HttpFoundation] add Early Hints to Reponse to fix test (Simperfit)
+ * bug #24759 Removes \n or space when $context/$extra are empty (kirkmadera)
+ * bug #24758 Throwing exception if redis and predis unavailable (aequasi)
+
 * 4.0.0-BETA2 (2017-10-30)
 
  * bug #24728 [Bridge\Twig] fix bootstrap checkbox_row to render properly & remove spaceless (arkste)

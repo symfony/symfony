@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by mhujer at 2017-10-23T08:16:22Z
+
+Travis fails only on PHP 5.4 in `Symfony\Component\Process\Tests\ProcessTest` which seems unrelated

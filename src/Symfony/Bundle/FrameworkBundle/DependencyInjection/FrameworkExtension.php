@@ -361,6 +361,11 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
 
+        if (!$container->getParameter('kernel.debug')) {
+            // remove tagged iterator argument for resource checkers
+            $container->getDefinition('config_cache_factory')->setArguments(array());
+        }
+
         if (\PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
                 'Symfony\\Component\\Config\\ConfigCache',

@@ -988,6 +988,17 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCachePoolServiceDefinitionIsCreated($container, 'cache.def', 'cache.app', 11);
     }
 
+    public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()
+    {
+        $container = $this->createContainer(array('kernel.debug' => true));
+        (new FrameworkExtension())->load(array(), $container);
+        $this->assertCount(1, $container->getDefinition('config_cache_factory')->getArguments());
+
+        $container = $this->createContainer(array('kernel.debug' => false));
+        (new FrameworkExtension())->load(array(), $container);
+        $this->assertEmpty($container->getDefinition('config_cache_factory')->getArguments());
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(

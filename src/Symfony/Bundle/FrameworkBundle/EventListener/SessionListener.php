@@ -21,9 +21,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SessionListener extends BaseSessionListener
 {
-    /**
-     * @var ContainerInterface
-     */
     private $container;
 
     public function __construct(ContainerInterface $container)

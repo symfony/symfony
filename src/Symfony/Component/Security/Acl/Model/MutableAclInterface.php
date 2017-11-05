@@ -123,7 +123,7 @@ interface MutableAclInterface extends AclInterface
      *
      * @param int    $index
      * @param int    $mask
-     * @param string $strategy if null the strategy should not be changed
+     * @param string $strategy If null the strategy should not be changed
      */
     public function updateClassAce($index, $mask, $strategy = null);
 
@@ -133,7 +133,7 @@ interface MutableAclInterface extends AclInterface
      * @param int    $index
      * @param string $field
      * @param int    $mask
-     * @param string $strategy if null the strategy should not be changed
+     * @param string $strategy If null the strategy should not be changed
      */
     public function updateClassFieldAce($index, $field, $mask, $strategy = null);
 
@@ -142,7 +142,7 @@ interface MutableAclInterface extends AclInterface
      *
      * @param int    $index
      * @param int    $mask
-     * @param string $strategy if null the strategy should not be changed
+     * @param string $strategy If null the strategy should not be changed
      */
     public function updateObjectAce($index, $mask, $strategy = null);
 
@@ -152,7 +152,7 @@ interface MutableAclInterface extends AclInterface
      * @param int    $index
      * @param string $field
      * @param int    $mask
-     * @param string $strategy if null the strategy should not be changed
+     * @param string $strategy If null the strategy should not be changed
      */
     public function updateObjectFieldAce($index, $field, $mask, $strategy = null);
 }

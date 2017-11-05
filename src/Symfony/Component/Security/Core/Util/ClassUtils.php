@@ -26,15 +26,11 @@ class ClassUtils
 {
     /**
      * Marker for Proxy class names.
-     *
-     * @var string
      */
     const MARKER = '__CG__';
 
     /**
      * Length of the proxy marker.
-     *
-     * @var int
      */
     const MARKER_LENGTH = 6;
 

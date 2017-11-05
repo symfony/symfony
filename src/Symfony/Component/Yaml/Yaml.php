@@ -81,8 +81,8 @@ class Yaml
      * @param mixed $input                  The PHP value
      * @param int   $inline                 The level where you switch to inline YAML
      * @param int   $indent                 The amount of spaces to use for indentation of nested nodes
-     * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     * @param bool  $exceptionOnInvalidType True if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool  $objectSupport          True if object support is enabled, false otherwise
      *
      * @return string A YAML string representing the original PHP value
      */

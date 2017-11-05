@@ -309,7 +309,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * it triggers "miss" processing.
      *
      * @param Request $request A Request instance
-     * @param bool    $catch   whether to process exceptions
+     * @param bool    $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      *
@@ -426,7 +426,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * This methods is triggered when the cache missed or a reload is required.
      *
      * @param Request $request A Request instance
-     * @param bool    $catch   whether to process exceptions
+     * @param bool    $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      */

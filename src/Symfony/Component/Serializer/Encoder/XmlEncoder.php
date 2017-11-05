@@ -154,7 +154,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Sets the root node name.
      *
-     * @param string $name root node name
+     * @param string $name Root node name
      */
     public function setRootNodeName($name)
     {
@@ -252,8 +252,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Parse the input DOMNode into an array or a string.
      *
-     * @param \DOMNode $node xml to parse
-     *
      * @return array|string
      */
     private function parseXml(\DOMNode $node)
@@ -288,8 +286,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Parse the input DOMNode attributes into an array.
      *
-     * @param \DOMNode $node xml to parse
-     *
      * @return array
      */
     private function parseXmlAttributes(\DOMNode $node)
@@ -321,8 +317,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * Parse the input DOMNode value (content and children) into an array or a string.
-     *
-     * @param \DOMNode $node xml to parse
      *
      * @return array|string
      */
@@ -523,7 +517,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Create a DOM document, taking serializer options into account.
      *
-     * @param array $context options that the encoder has access to
+     * @param array $context Options that the encoder has access to
      *
      * @return \DOMDocument
      */

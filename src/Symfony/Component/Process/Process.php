@@ -1314,7 +1314,7 @@ class Process
     /**
      * Reads pipes for the freshest output.
      *
-     * @param $caller The name of the method that needs fresh outputs
+     * @param string $caller The name of the method that needs fresh outputs
      *
      * @throws LogicException in case output has been disabled or process is not started
      */

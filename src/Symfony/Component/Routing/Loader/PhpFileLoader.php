@@ -55,7 +55,7 @@ class PhpFileLoader extends FileLoader
      * Safe include. Used for scope isolation.
      *
      * @param string        $file   File to include
-     * @param PhpFileLoader $loader the loader variable is exposed to the included file below
+     * @param PhpFileLoader $loader The loader variable is exposed to the included file below
      *
      * @return RouteCollection
      */

@@ -25,9 +25,6 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  */
 class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInterface
 {
-    /**
-     * @var LocaleDataProvider
-     */
     private $localeProvider;
 
     /**

@@ -22,11 +22,8 @@ use Symfony\Component\Process\Process;
  */
 class UnixPipes extends AbstractPipes
 {
-    /** @var bool */
     private $ttyMode;
-    /** @var bool */
     private $ptyMode;
-    /** @var bool */
     private $disableOutput;
 
     public function __construct($ttyMode, $ptyMode, $input, $disableOutput)

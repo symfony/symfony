@@ -18,14 +18,7 @@ namespace Symfony\Component\Security\Csrf;
  */
 class CsrfToken
 {
-    /**
-     * @var string
-     */
     private $id;
-
-    /**
-     * @var string
-     */
     private $value;
 
     /**

@@ -25,14 +25,7 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
  */
 class ResolvedTypeDataCollectorProxy implements ResolvedFormTypeInterface
 {
-    /**
-     * @var ResolvedFormTypeInterface
-     */
     private $proxiedType;
-
-    /**
-     * @var FormDataCollectorInterface
-     */
     private $dataCollector;
 
     public function __construct(ResolvedFormTypeInterface $proxiedType, FormDataCollectorInterface $dataCollector)

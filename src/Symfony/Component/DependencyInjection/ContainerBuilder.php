@@ -104,7 +104,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * If you are not using the loaders and therefore don't want
      * to depend on the Config component, set this flag to false.
      *
-     * @param bool $track true if you want to track resources, false otherwise
+     * @param bool $track True if you want to track resources, false otherwise
      */
     public function setResourceTracking($track)
     {
@@ -114,7 +114,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Checks if resources are tracked.
      *
-     * @return bool true if resources are tracked, false otherwise
+     * @return bool true If resources are tracked, false otherwise
      */
     public function isTrackingResources()
     {

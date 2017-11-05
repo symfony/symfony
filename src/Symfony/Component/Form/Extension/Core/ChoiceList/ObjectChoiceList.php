@@ -80,7 +80,7 @@ class ObjectChoiceList extends ChoiceList
      *                                                    by calling the getter on the object. If the
      *                                                    path is NULL, the object's __toString() method
      *                                                    is used instead.
-     * @param array                     $preferredChoices a flat array of choices that should be
+     * @param array                     $preferredChoices A flat array of choices that should be
      *                                                    presented to the user with priority
      * @param string                    $groupPath        A property path pointing to the property used
      *                                                    to group the choices. Only allowed if

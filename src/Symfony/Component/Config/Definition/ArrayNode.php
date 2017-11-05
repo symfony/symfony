@@ -81,7 +81,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets the xml remappings that should be performed.
      *
-     * @param array $remappings an array of the form array(array(string, string))
+     * @param array $remappings An array of the form array(array(string, string))
      */
     public function setXmlRemappings(array $remappings)
     {

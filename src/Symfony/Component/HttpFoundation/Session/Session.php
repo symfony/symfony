@@ -24,21 +24,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
  */
 class Session implements SessionInterface, \IteratorAggregate, \Countable
 {
-    /**
-     * Storage driver.
-     *
-     * @var SessionStorageInterface
-     */
     protected $storage;
 
-    /**
-     * @var string
-     */
     private $flashName;
-
-    /**
-     * @var string
-     */
     private $attributeName;
 
     /**

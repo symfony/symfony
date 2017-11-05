@@ -27,8 +27,8 @@ final class UserSecurityIdentity implements SecurityIdentityInterface
     private $class;
 
     /**
-     * @param string $username the username representation
-     * @param string $class    the user's fully qualified class name
+     * @param string $username The username representation
+     * @param string $class    The user's fully qualified class name
      *
      * @throws \InvalidArgumentException
      */

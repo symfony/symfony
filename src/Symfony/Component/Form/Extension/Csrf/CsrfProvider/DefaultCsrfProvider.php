@@ -30,11 +30,6 @@ use Symfony\Component\Security\Core\Util\StringUtils;
  */
 class DefaultCsrfProvider implements CsrfProviderInterface
 {
-    /**
-     * A secret value used for generating the CSRF token.
-     *
-     * @var string
-     */
     protected $secret;
 
     /**

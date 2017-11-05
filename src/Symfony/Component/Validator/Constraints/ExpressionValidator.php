@@ -27,9 +27,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ExpressionValidator extends ConstraintValidator
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
 
     /**
@@ -38,16 +35,10 @@ class ExpressionValidator extends ConstraintValidator
     private $expressionLanguage;
 
     /**
-     * @param PropertyAccessorInterface|null $propertyAccessor Optional as of Symfony 2.5
-     *
      * @throws UnexpectedTypeException If the property accessor is invalid
      */
-    public function __construct($propertyAccessor = null)
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
-        if (null !== $propertyAccessor && !$propertyAccessor instanceof PropertyAccessorInterface) {
-            throw new UnexpectedTypeException($propertyAccessor, 'null or \Symfony\Component\PropertyAccess\PropertyAccessorInterface');
-        }
-
         $this->propertyAccessor = $propertyAccessor;
     }
 

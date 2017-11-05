@@ -40,7 +40,7 @@ interface OptionsResolverInterface
      *
      * The closures should return the lazily created option value.
      *
-     * @param array $defaultValues a list of option names as keys and default
+     * @param array $defaultValues A list of option names as keys and default
      *                             values or closures as values
      *
      * @return $this
@@ -55,7 +55,7 @@ interface OptionsResolverInterface
      * performance if the previous default value is calculated by an expensive
      * closure.
      *
-     * @param array $defaultValues a list of option names as keys and default
+     * @param array $defaultValues A list of option names as keys and default
      *                             values or closures as values
      *
      * @return $this
@@ -92,7 +92,7 @@ interface OptionsResolverInterface
     /**
      * Sets allowed values for a list of options.
      *
-     * @param array $allowedValues a list of option names as keys and arrays
+     * @param array $allowedValues A list of option names as keys and arrays
      *                             with values acceptable for that option as
      *                             values
      *
@@ -109,7 +109,7 @@ interface OptionsResolverInterface
      *
      * The values are merged with the allowed values defined previously.
      *
-     * @param array $allowedValues a list of option names as keys and arrays
+     * @param array $allowedValues A list of option names as keys and arrays
      *                             with values acceptable for that option as
      *                             values
      *
@@ -124,7 +124,7 @@ interface OptionsResolverInterface
     /**
      * Sets allowed types for a list of options.
      *
-     * @param array $allowedTypes a list of option names as keys and type
+     * @param array $allowedTypes A list of option names as keys and type
      *                            names passed as string or array as values
      *
      * @return $this
@@ -139,7 +139,7 @@ interface OptionsResolverInterface
      *
      * The types are merged with the allowed types defined previously.
      *
-     * @param array $allowedTypes a list of option names as keys and type
+     * @param array $allowedTypes A list of option names as keys and type
      *                            names passed as string or array as values
      *
      * @return $this

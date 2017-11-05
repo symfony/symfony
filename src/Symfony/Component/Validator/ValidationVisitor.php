@@ -27,44 +27,13 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionContextInterface
 {
-    /**
-     * @var mixed
-     */
     private $root;
-
-    /**
-     * @var MetadataFactoryInterface
-     */
     private $metadataFactory;
-
-    /**
-     * @var ConstraintValidatorFactoryInterface
-     */
     private $validatorFactory;
-
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
-
-    /**
-     * @var null|string
-     */
     private $translationDomain;
-
-    /**
-     * @var array
-     */
     private $objectInitializers;
-
-    /**
-     * @var ConstraintViolationList
-     */
     private $violations;
-
-    /**
-     * @var array
-     */
     private $validatedObjects = array();
 
     /**

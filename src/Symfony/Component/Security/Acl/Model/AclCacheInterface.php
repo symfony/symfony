@@ -21,7 +21,7 @@ interface AclCacheInterface
     /**
      * Removes an ACL from the cache.
      *
-     * @param string $primaryKey a serialized primary key
+     * @param string $primaryKey A serialized primary key
      */
     public function evictFromCacheById($primaryKey);
 

@@ -29,29 +29,14 @@ use Symfony\Component\Intl\Locale;
  */
 class LocaleDataGenerator
 {
-    /**
-     * @var string
-     */
     private $dirName;
-
-    /**
-     * @var LanguageDataProvider
-     */
     private $languageDataProvider;
-
-    /**
-     * @var ScriptDataProvider
-     */
     private $scriptDataProvider;
-
-    /**
-     * @var RegionDataProvider
-     */
     private $regionDataProvider;
 
     public function __construct($dirName, LanguageDataProvider $languageDataProvider, ScriptDataProvider $scriptDataProvider, RegionDataProvider $regionDataProvider)
     {
-        $this->dirName = $dirName;
+        $this->dirName = (string) $dirName;
         $this->languageDataProvider = $languageDataProvider;
         $this->scriptDataProvider = $scriptDataProvider;
         $this->regionDataProvider = $regionDataProvider;

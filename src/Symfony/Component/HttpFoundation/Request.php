@@ -714,9 +714,9 @@ class Request
      * It is better to explicitly get request parameters from the appropriate
      * public property instead (query, attributes, request).
      *
-     * @param string $key     the key
-     * @param mixed  $default the default value if the parameter key does not exist
-     * @param bool   $deep    is parameter deep in multidimensional array
+     * @param string $key     The key
+     * @param mixed  $default The default value if the parameter key does not exist
+     * @param bool   $deep    Is parameter deep in multidimensional array
      *
      * @return mixed
      */

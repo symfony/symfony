@@ -8,7 +8,7 @@
 {%- endblock textarea_widget %}
 
 {% block money_widget -%}
-    <div class="input-group">
+    <div class="input-group{{ group_class|default('') }}">
         {%- set append = money_pattern starts with '{{' -%}
         {%- if not append -%}
             <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>

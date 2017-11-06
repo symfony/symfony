@@ -64,7 +64,7 @@ class IsValidTemplateValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * Test validation that does not throw exception.
+     * Test validation that does throw exception.
      */
     public function testInvalidTemplate()
     {

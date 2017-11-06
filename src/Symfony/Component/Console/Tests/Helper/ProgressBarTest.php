@@ -433,6 +433,29 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testReset()
+    {
+        $memory = fopen('php://memory', 'r+', false);
+        fwrite($memory, $this->generateOutput('1')."\n".
+    $this->generateOutput('2')."\n".
+    $this->generateOutput('3')."\n");
+
+        $progressBar = new ProgressBar($output = new StreamOutput($memory), 100);
+        $progressBar->setFormat('hello'."\n");
+        $progressBar->display();
+        $progressBar->reset();
+        $progressBar->display();
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput('1')."\n".
+            $this->generateOutput('2')."\n".
+            $this->generateOutput('3')."\n".
+            'hello'."\n".
+            'hello'."\n",
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testPercentNotHundredBeforeComplete()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 200);

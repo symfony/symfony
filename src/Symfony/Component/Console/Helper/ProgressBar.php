@@ -328,6 +328,12 @@ final class ProgressBar
         $this->overwrite($this->buildLine());
     }
 
+    public function reset()
+    {
+        $this->firstRun = true;
+        $this->clear();
+    }
+
     /**
      * Removes the progress bar from the current line.
      *

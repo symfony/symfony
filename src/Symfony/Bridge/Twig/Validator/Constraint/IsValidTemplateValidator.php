@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
@@ -54,7 +54,7 @@ class IsValidTemplateValidator extends ConstraintValidator
 
         $realLoader = $this->environment->getLoader();
         try {
-            $temporaryLoader = new ArrayLoader(['template' => $value]);
+            $temporaryLoader = new ArrayLoader(array('template' => $value));
             $this->environment->setLoader($temporaryLoader);
             $nodeTree = $this->environment->parse($this->environment->tokenize(new Source($value, 'template')));
             $this->environment->compile($nodeTree);
@@ -62,12 +62,12 @@ class IsValidTemplateValidator extends ConstraintValidator
         } catch (Error $e) {
             $this->environment->setLoader($realLoader);
 
-            /** @var IsValidTemplate $constraint */
+            /* @var IsValidTemplate $constraint */
             $this->context->buildViolation($constraint->message)
-                ->setParameters([
+                ->setParameters(array(
                     '{{ line }}' => $e->getTemplateLine(),
                     '{{ error }}' => $e->getMessage(),
-                ])
+                ))
                 ->addViolation()
             ;
         }

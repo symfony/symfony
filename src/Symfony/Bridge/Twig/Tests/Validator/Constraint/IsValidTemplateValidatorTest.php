@@ -20,7 +20,7 @@ use Twig\Node\Node;
 use Twig\TokenStream;
 
 /**
- * Class Symfony\Bridge\Twig\Tests\Validator\Constraint\IsValidTemplateValidatorTest
+ * Class Symfony\Bridge\Twig\Tests\Validator\Constraint\IsValidTemplateValidatorTest.
  *
  * @author Gary PEGEOT <g.pegeot@highco-data.fr>
  */
@@ -30,7 +30,6 @@ class IsValidTemplateValidatorTest extends ConstraintValidatorTestCase
      * @var \Twig\Environment|\PHPUnit_Framework_MockObject_MockObject
      */
     private $environment;
-
 
     /**
      * Test null value does not trigger error.
@@ -77,10 +76,10 @@ class IsValidTemplateValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('{{ foo }', $constraint);
 
         $this->buildViolation($constraint->message)
-            ->setParameters([
+            ->setParameters(array(
                 '{{ line }}' => 42,
                 '{{ error }}' => 'Foo message at line 42',
-            ])
+            ))
             ->assertRaised();
     }
 
@@ -90,7 +89,7 @@ class IsValidTemplateValidatorTest extends ConstraintValidatorTestCase
     protected function createValidator()
     {
         $this->environment = $this->createMock('Twig\Environment');
-        $this->environment->method('tokenize')->willReturn(new TokenStream([]));
+        $this->environment->method('tokenize')->willReturn(new TokenStream(array()));
         $this->environment->method('getLoader')->willReturn($this->createMock(LoaderInterface::class));
 
         return new IsValidTemplateValidator($this->environment);

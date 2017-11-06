@@ -152,5 +152,10 @@
         <service id="twig.runtime_loader" class="Twig\RuntimeLoader\ContainerRuntimeLoader">
             <argument /> <!-- runtime locator -->
         </service>
+
+        <service id="twig.constraint.is_valid" class="Symfony\Bridge\Twig\Validator\Constraint\IsValidTemplateValidator">
+            <argument type="service" id="twig" />
+            <tag name="validator.constraint_validator" />
+        </service>
     </services>
 </container>

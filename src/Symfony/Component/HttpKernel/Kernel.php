@@ -348,9 +348,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * @param string $name      The cache name prefix
      * @param string $extension File extension of the resulting file
      *
-     * @deprecated The "loadClassCache()" method is deprecated since version 3.3 
-     *              and will be removed in 4.0 as the class cache is not needed anymore when using PHP 7.0.
-     * @see https://symfony.com/blog/new-in-symfony-3-3-deprecated-the-classloader-component
+     * @deprecated since version 3.3, to be removed in 4.0. The class cache is not needed anymore when using PHP 7.0.
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {

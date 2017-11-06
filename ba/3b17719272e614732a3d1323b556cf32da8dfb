@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-11T12:16:42Z
+
+Status: needs work
+Reason: tests are not actually running and it's only running PHP 7.2 for now
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-11T13:48:29Z
+
+you should avoid it being marked as an intermediary version though. You don't want it to be skipped.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-12T08:33:05Z
+
+@stof do you think we should prevent 7.2 to be marked as intermediate for all the PRs or it was just in the context of my debugging?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-12T08:42:00Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-12T10:57:23Z
+
+@nicolas-grekas as discussed, kept here only the process test change and travis configuration and moved the native session storage PR to https://github.com/symfony/symfony/pull/24531 to target 2.7.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-12T11:02:49Z
+
+And rebased. Tests are logically still failing because of the HttpFoundation bug fixed in #24531.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-06T08:31:07Z
+
+Rebased and now 💚.
+
+/cc @xabbuh

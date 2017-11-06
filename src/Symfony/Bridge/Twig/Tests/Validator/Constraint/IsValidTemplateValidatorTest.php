@@ -1,20 +1,12 @@
 <?php
+
 /**
- * This file is part of the symfony package.
+ * This file is part of the Symfony package.
  *
- *     __  ___       __    ______            ____        __
- *    / / / (_)___ _/ /_  / ____/___        / __ \____ _/ /_____ _
- *   / /_/ / / __ `/ __ \/ /   / __ \______/ / / / __ `/ __/ __ `/
- *  / __  / / /_/ / / / / /___/ /_/ /_____/ /_/ / /_/ / /_/ /_/ /
- * /_/ /_/_/\__, /_/ /_/\____/\____/     /_____/\__,_/\__/\__,_/
- *         /____/
- *
- * (c) HighCo-Data <it-build@highco-data.fr>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * Created at 06/11/2017 11:54
  */
 
 namespace Symfony\Bridge\Twig\Tests\Validator\Constraint;

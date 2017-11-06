@@ -433,6 +433,27 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testClearWithReDisplay()
+    {
+        $memory = fopen('php://memory', 'r+', false);
+        fwrite($memory, $this->generateOutput('1')."\n".
+            $this->generateOutput('2')."\n".
+            $this->generateOutput('3')."\n");
+        $progressBar = new ProgressBar($output = new StreamOutput($memory), 100);
+        $progressBar->setFormat($this->generateOutput('hello')."\n".$this->generateOutput('world')."\n");
+        $progressBar->display();
+        $progressBar->clear();
+        $progressBar->display();
+        rewind($output->getStream());
+
+        $this->assertEquals($this->generateOutput('1')."\n".
+            $this->generateOutput('2')."\n".
+            $this->generateOutput('3')."\n".
+            $this->generateOutput('hello')."\n".$this->generateOutput('world')."\n".
+            $this->generateOutput('hello')."\n".$this->generateOutput('world')."\n", stream_get_contents($output->getStream()));
+        fclose($memory);
+    }
+
     public function testPercentNotHundredBeforeComplete()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 200);
@@ -645,6 +666,7 @@ class ProgressBarTest extends TestCase
         $this->assertEquals(
             ">---------------------------\nfoobar".
             $this->generateOutput("=========>------------------\nfoobar").
+            "\n".
             "\x0D\x1B[2K\x1B[1A\x1B[2K".
             $this->generateOutput("============================\nfoobar"),
             stream_get_contents($output->getStream())

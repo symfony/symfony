@@ -46,7 +46,7 @@ class ServicesConfigurator extends AbstractConfigurator
      *
      * @return DefaultsConfigurator
      */
-    public function defaults()
+    final public function defaults()
     {
         return new DefaultsConfigurator($this, $this->defaults = new Definition());
     }

@@ -33,7 +33,7 @@
         </service>
 
         <service id="translation.loader.yml" class="Symfony\Component\Translation\Loader\YamlFileLoader" public="true">
-            <tag name="translation.loader" alias="yml" />
+            <tag name="translation.loader" alias="yaml" legacy-alias="yml" />
         </service>
 
         <service id="translation.loader.xliff" class="Symfony\Component\Translation\Loader\XliffFileLoader" public="true">

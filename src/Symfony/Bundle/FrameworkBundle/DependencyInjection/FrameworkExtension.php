@@ -1282,17 +1282,17 @@ class FrameworkExtension extends Extension
             $dirname = $bundle['path'];
 
             if (
-                $container->fileExists($file = $dirname . '/Resources/config/'.$component.'.yaml', false) ||
-                $container->fileExists($file = $dirname . '/Resources/config/'.$component.'.yml', false)
+                $container->fileExists($file = $dirname.'/Resources/config/'.$component.'.yaml', false) ||
+                $container->fileExists($file = $dirname.'/Resources/config/'.$component.'.yml', false)
             ) {
                 $fileRecorder('yml', $file);
             }
 
-            if ($container->fileExists($file = $dirname . '/Resources/config/'.$component.'.xml', false)) {
+            if ($container->fileExists($file = $dirname.'/Resources/config/'.$component.'.xml', false)) {
                 $fileRecorder('xml', $file);
             }
 
-            if ($container->fileExists($dir = $dirname . '/Resources/config/'.$component, '/^$/')) {
+            if ($container->fileExists($dir = $dirname.'/Resources/config/'.$component, '/^$/')) {
                 $this->registerMappingFilesFromDir($dir, $fileRecorder);
             }
         }

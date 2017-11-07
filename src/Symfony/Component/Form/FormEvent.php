@@ -21,12 +21,6 @@ class FormEvent extends Event
     private $form;
     protected $data;
 
-    /**
-     * Constructs an event.
-     *
-     * @param FormInterface $form The associated form
-     * @param mixed         $data The data
-     */
     public function __construct(FormInterface $form, $data)
     {
         $this->form = $form;

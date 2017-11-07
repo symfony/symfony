@@ -36,11 +36,6 @@ class Variable
         $this->name = $name;
     }
 
-    /**
-     * Converts the object to a string.
-     *
-     * @return string
-     */
     public function __toString()
     {
         return $this->name;

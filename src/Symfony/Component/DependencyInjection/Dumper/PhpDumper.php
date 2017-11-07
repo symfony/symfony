@@ -62,7 +62,7 @@ class PhpDumper extends Dumper
     private $expressionLanguageProviders = array();
 
     /**
-     * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
+     * @var ProxyDumper
      */
     private $proxyDumper;
 

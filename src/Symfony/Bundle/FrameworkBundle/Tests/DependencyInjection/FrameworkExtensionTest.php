@@ -543,9 +543,13 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testValidation()
     {
         $container = $this->createContainerFromFile('full');
+        $projectDir = $container->getParameter('kernel.project_dir');
 
         $ref = new \ReflectionClass('Symfony\Component\Form\Form');
-        $xmlMappings = array(dirname($ref->getFileName()).'/Resources/config/validation.xml');
+        $xmlMappings = array(
+            dirname($ref->getFileName()).'/Resources/config/validation.xml',
+            strtr($projectDir.'/config/validator/foo.xml', '/', DIRECTORY_SEPARATOR),
+        );
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
@@ -633,7 +637,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array(new Reference('validator.mapping.cache.symfony')), $calls[7][1]);
 
         $xmlMappings = $calls[3][1][0];
-        $this->assertCount(2, $xmlMappings);
+        $this->assertCount(3, $xmlMappings);
         try {
             // Testing symfony/symfony
             $this->assertStringEndsWith('Component'.DIRECTORY_SEPARATOR.'Form/Resources/config/validation.xml', $xmlMappings[0]);
@@ -659,7 +663,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
         $xmlMappings = $calls[3][1][0];
-        $this->assertCount(2, $xmlMappings);
+        $this->assertCount(3, $xmlMappings);
 
         try {
             // Testing symfony/symfony
@@ -701,7 +705,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
         $this->assertSame('addXmlMappings', $calls[3][0]);
-        $this->assertCount(2, $calls[3][1][0]);
+        $this->assertCount(3, $calls[3][1][0]);
 
         $this->assertSame('addYamlMappings', $calls[4][0]);
         $this->assertCount(3, $calls[4][1][0]);

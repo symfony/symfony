@@ -65,7 +65,7 @@ class PhpDumper extends Dumper
     private $asFiles;
 
     /**
-     * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
+     * @var ProxyDumper
      */
     private $proxyDumper;
 

@@ -409,8 +409,6 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param array $arguments
-     *
      * @return \DOMNode[]
      */
     private function getArgumentNodes(array $arguments, \DOMDocument $dom)
@@ -521,10 +519,6 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    /**
-     * @param \DOMElement $element
-     * @param array       $eventListeners
-     */
     private function appendEventListenerDocument(EventDispatcherInterface $eventDispatcher, $event, \DOMElement $element, array $eventListeners)
     {
         foreach ($eventListeners as $listener) {

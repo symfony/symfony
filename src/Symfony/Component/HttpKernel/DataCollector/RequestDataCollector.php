@@ -20,13 +20,10 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * RequestDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface
 {
-    /** @var \SplObjectStorage */
     protected $controllers;
 
     public function __construct()

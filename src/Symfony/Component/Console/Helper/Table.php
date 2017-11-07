@@ -576,10 +576,8 @@ class Table
 
     /**
      * Calculates columns widths.
-     *
-     * @param array $rows
      */
-    private function calculateColumnsWidth($rows)
+    private function calculateColumnsWidth(array $rows)
     {
         for ($column = 0; $column < $this->numberOfColumns; ++$column) {
             $lengths = array();

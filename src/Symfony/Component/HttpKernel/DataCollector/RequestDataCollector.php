@@ -24,7 +24,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface
 {
-    /** @var \SplObjectStorage */
     protected $controllers;
 
     public function __construct()

@@ -225,10 +225,6 @@ class PhpArrayAdapter implements AdapterInterface
     }
 
     /**
-     * Generator for items.
-     *
-     * @param array $keys
-     *
      * @return \Generator
      */
     private function generateItems(array $keys)

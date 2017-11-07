@@ -45,9 +45,6 @@ class FilterControllerArgumentsEvent extends FilterControllerEvent
         return $this->arguments;
     }
 
-    /**
-     * @param array $arguments
-     */
     public function setArguments(array $arguments)
     {
         $this->arguments = $arguments;

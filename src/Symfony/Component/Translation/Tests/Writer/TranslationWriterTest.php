@@ -27,7 +27,7 @@ class TranslationWriterTest extends TestCase
 
         $writer = new TranslationWriter();
         $writer->addDumper('test', $dumper);
-        $writer->writeTranslations(new MessageCatalogue(array()), 'test');
+        $writer->writeTranslations(new MessageCatalogue('en'), 'test');
     }
 
     public function testDisableBackup()

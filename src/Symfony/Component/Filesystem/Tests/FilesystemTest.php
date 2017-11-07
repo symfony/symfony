@@ -1093,9 +1093,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($expectedPath, $path);
     }
 
-    /**
-     * @return array
-     */
     public function providePathsForMakePathRelative()
     {
         $paths = array(
@@ -1333,9 +1330,6 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    /**
-     * @return array
-     */
     public function providePathsForIsAbsolutePath()
     {
         return array(

@@ -393,7 +393,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * @param string $name      The cache name prefix
      * @param string $extension File extension of the resulting file
      *
-     * @deprecated since version 3.3, to be removed in 4.0.
+     * @deprecated since version 3.3, to be removed in 4.0. The class cache is not needed anymore when using PHP 7.0.
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {

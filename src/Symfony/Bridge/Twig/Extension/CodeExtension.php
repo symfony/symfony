@@ -193,7 +193,7 @@ class CodeExtension extends AbstractExtension
      * @param string $file An absolute file path
      * @param int    $line The line number
      *
-     * @return string A link of false
+     * @return string|false A link or false
      */
     public function getFileLink($file, $line)
     {

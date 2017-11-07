@@ -32,7 +32,7 @@ class ContainerConfigurator extends AbstractConfigurator
     private $path;
     private $file;
 
-    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, &$instanceof, $path, $file)
+    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, $path, $file)
     {
         $this->container = $container;
         $this->loader = $loader;
@@ -66,7 +66,7 @@ class ContainerConfigurator extends AbstractConfigurator
     /**
      * @return ParametersConfigurator
      */
-    public function parameters()
+    final public function parameters()
     {
         return new ParametersConfigurator($this->container);
     }
@@ -74,7 +74,7 @@ class ContainerConfigurator extends AbstractConfigurator
     /**
      * @return ServicesConfigurator
      */
-    public function services()
+    final public function services()
     {
         return new ServicesConfigurator($this->container, $this->loader, $this->instanceof);
     }

@@ -24,8 +24,6 @@ trait RouteTrait
     /**
      * Adds defaults.
      *
-     * @param array $defaults
-     *
      * @return $this
      */
     final public function defaults(array $defaults)
@@ -38,8 +36,6 @@ trait RouteTrait
     /**
      * Adds requirements.
      *
-     * @param array $requirements
-     *
      * @return $this
      */
     final public function requirements(array $requirements)
@@ -51,8 +47,6 @@ trait RouteTrait
 
     /**
      * Adds options.
-     *
-     * @param array $options
      *
      * @return $this
      */

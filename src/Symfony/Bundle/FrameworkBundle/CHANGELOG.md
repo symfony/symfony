@@ -4,6 +4,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Added `translator.default_path` option and parameter
  * Session `use_strict_mode` is now enabled by default and the corresponding option has been deprecated
  * Made the `cache:clear` command to *not* clear "app" PSR-6 cache pools anymore,
    but to still clear "system" ones; use the `cache:pool:clear` command to clear "app" pools instead

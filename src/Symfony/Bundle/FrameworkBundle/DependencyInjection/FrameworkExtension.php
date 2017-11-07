@@ -1131,6 +1131,7 @@ class FrameworkExtension extends Extension
         $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));
 
         $container->setParameter('translator.logging', $config['logging']);
+        $container->setParameter('translator.default_path', $config['default_path']);
 
         // Discover translation directories
         $dirs = array();
@@ -1149,9 +1150,13 @@ class FrameworkExtension extends Extension
 
             $dirs[] = dirname(dirname($r->getFileName())).'/Resources/translations';
         }
+        $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
         $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if ($container->fileExists($dir = $bundle['path'].'/Resources/translations')) {
+                $dirs[] = $dir;
+            }
+            if ($container->fileExists($dir = $defaultDir.'/'.$name)) {
                 $dirs[] = $dir;
             }
             if ($container->fileExists($dir = $rootDir.sprintf('/Resources/%s/translations', $name))) {
@@ -1167,6 +1172,9 @@ class FrameworkExtension extends Extension
             }
         }
 
+        if ($container->fileExists($defaultDir)) {
+            $dirs[] = $defaultDir;
+        }
         if ($container->fileExists($dir = $rootDir.'/Resources/translations')) {
             $dirs[] = $dir;
         }

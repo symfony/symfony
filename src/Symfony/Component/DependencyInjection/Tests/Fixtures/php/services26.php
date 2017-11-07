@@ -29,6 +29,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 
         $this->services = array();
         $this->methodMap = array(
+            'bar' => 'getBarService',
             'test' => 'getTestService',
         );
 
@@ -58,6 +59,16 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
         @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
 
         return true;
+    }
+
+    /**
+     * Gets the public 'bar' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+     */
+    protected function getBarService()
+    {
+        return $this->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar($this->getEnv('QUZ'));
     }
 
     /**

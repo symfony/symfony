@@ -229,7 +229,7 @@ class XmlFileLoader extends FileLoader
                 }
                 if ('bind' === $k) {
                     if ($defaults['bind']) {
-                        throw new InvalidArgumentException(sprintf('Bound values on service "%s" cannot be inherited from "defaults" when a "parent" is set. Move your child definitions to a separate file.', $k, $service->getAttribute('id')));
+                        throw new InvalidArgumentException(sprintf('Bound values on service "%s" cannot be inherited from "defaults" when a "parent" is set. Move your child definitions to a separate file.', $service->getAttribute('id')));
                     }
 
                     continue;

@@ -340,7 +340,7 @@ class SymfonyTestsListenerTrait
     }
 
     /**
-     * @param Test $test
+     * @param TestCase $test
      *
      * @return bool
      */

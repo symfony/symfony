@@ -495,8 +495,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * The extension point similar to the Bundle::build() method.
      *
      * Use this method to register compiler passes and manipulate the container during the building process.
-     *
-     * @param ContainerBuilder $container
      */
     protected function build(ContainerBuilder $container)
     {

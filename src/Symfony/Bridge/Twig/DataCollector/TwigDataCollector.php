@@ -62,26 +62,28 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $this->data['profile'] = serialize($this->profile);
         $this->data['template_paths'] = array();
 
-        if (null !== $this->twig) {
-            $templateFinder = function (Profile $profile) use (&$templateFinder) {
-                if ($profile->isTemplate()) {
-                    try {
-                        $template = $this->twig->load($name = $profile->getName());
-                    } catch (\Twig_Error_Loader $e) {
-                        $template = null;
-                    }
-
-                    if (null !== $template && '' !== $path = $template->getSourceContext()->getPath()) {
-                        $this->data['template_paths'][$name] = $path;
-                    }
-                }
-
-                foreach ($profile as $p) {
-                    $templateFinder($p);
-                }
-            };
-            $templateFinder($this->profile);
+        if (null === $this->twig) {
+            return;
         }
+
+        $templateFinder = function (Profile $profile) use (&$templateFinder) {
+            if ($profile->isTemplate()) {
+                try {
+                    $template = $this->twig->load($name = $profile->getName());
+                } catch (\Twig_Error_Loader $e) {
+                    $template = null;
+                }
+
+                if (null !== $template && '' !== $path = $template->getSourceContext()->getPath()) {
+                    $this->data['template_paths'][$name] = $path;
+                }
+            }
+
+            foreach ($profile as $p) {
+                $templateFinder($p);
+            }
+        };
+        $templateFinder($this->profile);
     }
 
     public function getTime()

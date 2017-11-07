@@ -61,33 +61,6 @@ class DeprecationErrorHandler
             return $memoizedMode = $mode;
         };
 
-        $inVendors = function ($path) {
-            /** @var string[] absolute paths to vendor directories */
-            static $vendors;
-            if (null === $vendors) {
-                foreach (get_declared_classes() as $class) {
-                    if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
-                        $r = new \ReflectionClass($class);
-                        $v = dirname(dirname($r->getFileName()));
-                        if (file_exists($v.'/composer/installed.json')) {
-                            $vendors[] = $v;
-                        }
-                    }
-                }
-            }
-            $realPath = realpath($path);
-            if (false === $realPath && '-' !== $path && 'Standard input code' !== $path) {
-                return true;
-            }
-            foreach ($vendors as $vendor) {
-                if (0 === strpos($realPath, $vendor) && false !== strpbrk(substr($realPath, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
-                    return true;
-                }
-            }
-
-            return false;
-        };
-
         $deprecations = array(
             'unsilencedCount' => 0,
             'remainingCount' => 0,
@@ -100,7 +73,7 @@ class DeprecationErrorHandler
             'other' => array(),
             'remaining vendor' => array(),
         );
-        $deprecationHandler = function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, $getMode, $UtilPrefix, $inVendors) {
+        $deprecationHandler = function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, $getMode, $UtilPrefix) {
             $mode = $getMode();
             if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || DeprecationErrorHandler::MODE_DISABLED === $mode) {
                 $ErrorHandler = $UtilPrefix.'ErrorHandler';
@@ -111,7 +84,7 @@ class DeprecationErrorHandler
             $trace = debug_backtrace(true);
             $group = 'other';
             $isVendor = false;
-            $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode || (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = $inVendors($file));
+            $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode || (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = self::inVendors($file));
 
             $i = count($trace);
             while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_') || 0 === strpos($trace[$i]['class'], 'PHPUnit\\')))) {
@@ -128,7 +101,7 @@ class DeprecationErrorHandler
                     // \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest()
                     // then we need to use the serialized information to determine
                     // if the error has been triggered from vendor code.
-                    $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode || (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = isset($parsedMsg['triggering_file']) && $inVendors($parsedMsg['triggering_file']));
+                    $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode || (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = isset($parsedMsg['triggering_file']) && self::inVendors($parsedMsg['triggering_file']));
                 } else {
                     $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
                     $method = $trace[$i]['function'];
@@ -252,6 +225,34 @@ class DeprecationErrorHandler
                 }
             });
         }
+    }
+
+    private static function inVendors(string $path): bool
+    {
+        /** @var string[] absolute paths to vendor directories */
+        static $vendors;
+        if (null === $vendors) {
+            foreach (get_declared_classes() as $class) {
+                if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+                    $r = new \ReflectionClass($class);
+                    $v = dirname(dirname($r->getFileName()));
+                    if (file_exists($v.'/composer/installed.json')) {
+                        $vendors[] = $v;
+                    }
+                }
+            }
+        }
+        $realPath = realpath($path);
+        if (false === $realPath && '-' !== $path && 'Standard input code' !== $path) {
+            return true;
+        }
+        foreach ($vendors as $vendor) {
+            if (0 === strpos($realPath, $vendor) && false !== strpbrk(substr($realPath, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static function collectDeprecations($outputFile)

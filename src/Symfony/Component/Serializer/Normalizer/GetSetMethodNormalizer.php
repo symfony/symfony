@@ -162,8 +162,6 @@ class GetSetMethodNormalizer extends AbstractNormalizer
     /**
      * Checks if a method's name is get.* or is.*, and can be called without parameters.
      *
-     * @param \ReflectionMethod $method the method to check
-     *
      * @return bool whether the method is a getter or boolean getter
      */
     private function isGetMethod(\ReflectionMethod $method)

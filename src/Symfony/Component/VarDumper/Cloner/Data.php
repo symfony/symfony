@@ -22,7 +22,7 @@ class Data
     private $useRefHandles = -1;
 
     /**
-     * @param array $data A array as returned by ClonerInterface::cloneVar()
+     * @param array $data An array as returned by ClonerInterface::cloneVar()
      */
     public function __construct(array $data)
     {

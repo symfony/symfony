@@ -258,6 +258,26 @@ class DateTypeTest extends BaseTypeTest
         $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The DateTime format "dmm" is not supported in ICU. Please be aware that the data may not reflect the format.
+     */
+    public function testSubmitFromInputDateTimeInvalidFormat()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'format' => 'dmm',
+            'widget' => 'single_text',
+            'input' => 'datetime',
+        ));
+
+        $form->submit('102');
+
+        $this->assertDateTimeEquals(new \DateTime('1970-01-01 00:02:00 UTC'), $form->getData());
+        $this->assertEquals('102', $form->getViewData());
+    }
+
     public function testSubmitFromInputStringDifferentPattern()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -353,7 +373,7 @@ class DateTypeTest extends BaseTypeTest
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The "format" option should contain the letters "y", "M" and "d". Its current value is "yy".
+     * @expectedExceptionMessage The DateTime format "yy" is not supported in ICU. Please be aware that the data may not reflect the format.
      */
     public function testThrowExceptionIfFormatDoesNotContainYearMonthAndDay()
     {
@@ -365,7 +385,7 @@ class DateTypeTest extends BaseTypeTest
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The "format" option should contain the letters "y", "M" or "d". Its current value is "wrong".
+     * @expectedExceptionMessage The DateTime format "wrong" is not supported in ICU. Please be aware that the data may not reflect the format.
      */
     public function testThrowExceptionIfFormatMissesYearMonthAndDayWithSingleTextWidget()
     {

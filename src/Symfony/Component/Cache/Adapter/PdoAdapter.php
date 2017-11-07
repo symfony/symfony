@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Traits\PdoTrait;
 
 class PdoAdapter extends AbstractAdapter

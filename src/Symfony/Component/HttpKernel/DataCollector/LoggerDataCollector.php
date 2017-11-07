@@ -149,6 +149,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     private function sanitizeLogs($logs)
     {
         $sanitizedLogs = array();
+        $silencedLogs = array();
 
         foreach ($logs as $log) {
             if (!$this->isSilencedOrDeprecationErrorLog($log)) {

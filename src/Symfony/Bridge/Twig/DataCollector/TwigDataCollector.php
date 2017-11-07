@@ -31,7 +31,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     private $twig;
     private $computed;
 
-    public function __construct(Profile $profile, Environment $twig)
+    public function __construct(Profile $profile, Environment $twig = null)
     {
         $this->profile = $profile;
         $this->twig = $twig;
@@ -62,24 +62,26 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
         $this->data['profile'] = serialize($this->profile);
         $this->data['template_paths'] = array();
 
-        $templateFinder = function (Profile $profile) use (&$templateFinder) {
-            if ($profile->isTemplate()) {
-                try {
-                    $template = $this->twig->load($name = $profile->getName());
-                } catch (\Twig_Error_Loader $e) {
-                    $template = null;
+        if (null !== $this->twig) {
+            $templateFinder = function (Profile $profile) use (&$templateFinder) {
+                if ($profile->isTemplate()) {
+                    try {
+                        $template = $this->twig->load($name = $profile->getName());
+                    } catch (\Twig_Error_Loader $e) {
+                        $template = null;
+                    }
+
+                    if (null !== $template && '' !== $path = $template->getSourceContext()->getPath()) {
+                        $this->data['template_paths'][$name] = $path;
+                    }
                 }
 
-                if (null !== $template && '' !== $path = $template->getSourceContext()->getPath()) {
-                    $this->data['template_paths'][$name] = $path;
+                foreach ($profile as $p) {
+                    $templateFinder($p);
                 }
-            }
-
-            foreach ($profile as $p) {
-                $templateFinder($p);
-            }
-        };
-        $templateFinder($this->profile);
+            };
+            $templateFinder($this->profile);
+        }
     }
 
     public function getTime()

@@ -30,7 +30,7 @@ class Stopwatch
 
     public function __construct()
     {
-        $this->sections = $this->activeSections = array('__root__' => new Section('__root__'));
+        $this->sections = $this->activeSections = array('__root__' => new Section(null));
     }
 
     /**

@@ -69,7 +69,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * only do anything if the parameter is present. (But regardless of the
      * value of that parameter.
      *
-     * @var string
+     * @var string|false
      */
     protected $enabledParameter;
 

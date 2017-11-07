@@ -303,7 +303,7 @@ class DateType extends AbstractType
     private function formatTimestamps(\IntlDateFormatter $formatter, $regex, array $timestamps)
     {
         $pattern = $formatter->getPattern();
-        $timezone = $formatter->getTimezoneId();
+        $timezone = $formatter->getTimeZoneId();
         $formattedTimestamps = array();
 
         if ($setTimeZone = \PHP_VERSION_ID >= 50500 || method_exists($formatter, 'setTimeZone')) {

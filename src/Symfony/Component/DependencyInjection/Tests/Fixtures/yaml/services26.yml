@@ -15,3 +15,8 @@ services:
             - '%env(Bar)%'
             - 'foo%bar%baz'
             - '%baz%'
+    bar:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+        public: true
+        bind:
+            $quz: '%env(QUZ)%'

@@ -30,6 +30,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 
         $this->services = $this->privates = array();
         $this->methodMap = array(
+            'bar' => 'getBarService',
             'test' => 'getTestService',
         );
 
@@ -58,6 +59,16 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
         );
+    }
+
+    /**
+     * Gets the public 'bar' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+     */
+    protected function getBarService()
+    {
+        return $this->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar($this->getEnv('QUZ'));
     }
 
     /**

@@ -24,9 +24,6 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
 {
     const FORMAT_KEY = 'dateinterval_format';
 
-    /**
-     * @var string
-     */
     private $format;
 
     /**

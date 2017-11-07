@@ -25,9 +25,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     const FORMAT_KEY = 'datetime_format';
     const TIMEZONE_KEY = 'datetime_timezone';
 
-    /**
-     * @var string
-     */
     private $format;
     private $timezone;
 
@@ -121,8 +118,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 
     /**
      * Formats datetime errors.
-     *
-     * @param array $errors
      *
      * @return string[]
      */

@@ -66,7 +66,7 @@ class PhpDumper extends Dumper
     private $asFiles;
 
     /**
-     * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
+     * @var ProxyDumper
      */
     private $proxyDumper;
 
@@ -311,11 +311,6 @@ EOTXT
         return $code;
     }
 
-    /**
-     * Generates code for the proxies.
-     *
-     * @return string
-     */
     private function generateProxyClasses()
     {
         $definitions = $this->container->getDefinitions();
@@ -479,9 +474,9 @@ EOTXT
      *
      * @return bool
      */
-    private function isSimpleInstance($id, Definition $definition)
+    private function isSimpleInstance($id, Definition $definition, array $inlinedDefinitions)
     {
-        foreach (array_merge(array($definition), $this->getInlinedDefinitions($definition)) as $sDefinition) {
+        foreach (array_merge(array($definition), $inlinedDefinitions) as $sDefinition) {
             if ($definition !== $sDefinition && !$this->hasReference($id, $sDefinition->getMethodCalls())) {
                 continue;
             }

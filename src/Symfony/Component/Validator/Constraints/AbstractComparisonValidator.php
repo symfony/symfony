@@ -46,7 +46,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             if ($value instanceof \DateTimeImmutable) {
                 // If $value is immutable, convert the compared value to a
                 // DateTimeImmutable too
-                $comparedValue = new \DatetimeImmutable($comparedValue);
+                $comparedValue = new \DateTimeImmutable($comparedValue);
             } elseif ($value instanceof \DateTimeInterface) {
                 // Otherwise use DateTime
                 $comparedValue = new \DateTime($comparedValue);

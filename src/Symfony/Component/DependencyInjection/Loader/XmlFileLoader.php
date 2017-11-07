@@ -683,7 +683,7 @@ EOF
     }
 
     /**
-     * Converts a \DomElement object to a PHP array.
+     * Converts a \DOMElement object to a PHP array.
      *
      * The following rules applies during the conversion:
      *
@@ -697,7 +697,7 @@ EOF
      *
      *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
-     * @param \DomElement $element A \DomElement instance
+     * @param \DOMElement $element A \DOMElement instance
      *
      * @return array A PHP array
      */

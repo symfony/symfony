@@ -285,7 +285,7 @@ class DateType extends AbstractType
     private function formatTimestamps(\IntlDateFormatter $formatter, $regex, array $timestamps)
     {
         $pattern = $formatter->getPattern();
-        $timezone = $formatter->getTimezoneId();
+        $timezone = $formatter->getTimeZoneId();
         $formattedTimestamps = array();
 
         $formatter->setTimeZone('UTC');

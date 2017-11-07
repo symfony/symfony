@@ -11,20 +11,15 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator\Traits;
 
-/**
- * @method $this abstract(bool $abstract = true)
- */
 trait AbstractTrait
 {
     /**
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
      *
-     * @param bool $abstract
-     *
      * @return $this
      */
-    final protected function setAbstract($abstract = true)
+    final public function abstract(bool $abstract = true)
     {
         $this->definition->setAbstract($abstract);
 

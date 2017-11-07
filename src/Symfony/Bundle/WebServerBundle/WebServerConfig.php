@@ -22,7 +22,7 @@ class WebServerConfig
     private $env;
     private $router;
 
-    public function __construct($documentRoot, $env, $address = null, $router = null)
+    public function __construct(string $documentRoot, string $env, string $address = null, string $router = null)
     {
         if (!is_dir($documentRoot)) {
             throw new \InvalidArgumentException(sprintf('The document root directory "%s" does not exist.', $documentRoot));

@@ -166,13 +166,7 @@ class YamlFileLoader extends FileLoader
         return in_array($type, array('yaml', 'yml'), true);
     }
 
-    /**
-     * Parses all imports.
-     *
-     * @param array  $content
-     * @param string $file
-     */
-    private function parseImports(array $content, $file)
+    private function parseImports(array $content, string $file)
     {
         if (!isset($content['imports'])) {
             return;
@@ -196,13 +190,7 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    /**
-     * Parses definitions.
-     *
-     * @param array  $content
-     * @param string $file
-     */
-    private function parseDefinitions(array $content, $file)
+    private function parseDefinitions(array $content, string $file)
     {
         if (!isset($content['services'])) {
             return;
@@ -240,14 +228,9 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * @param array  $content
-     * @param string $file
-     *
-     * @return array
-     *
      * @throws InvalidArgumentException
      */
-    private function parseDefaults(array &$content, $file)
+    private function parseDefaults(array &$content, string $file): array
     {
         if (!array_key_exists('_defaults', $content['services'])) {
             return array();
@@ -304,12 +287,7 @@ class YamlFileLoader extends FileLoader
         return $defaults;
     }
 
-    /**
-     * @param array $service
-     *
-     * @return bool
-     */
-    private function isUsingShortSyntax(array $service)
+    private function isUsingShortSyntax(array $service): bool
     {
         foreach ($service as $key => $value) {
             if (is_string($key) && ('' === $key || '$' !== $key[0])) {

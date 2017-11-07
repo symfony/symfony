@@ -1424,10 +1424,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Retrieves the currently set proxy instantiator or instantiates one.
-     *
-     * @return InstantiatorInterface
      */
-    private function getProxyInstantiator()
+    private function getProxyInstantiator(): InstantiatorInterface
     {
         if (!$this->proxyInstantiator) {
             $this->proxyInstantiator = new RealServiceInstantiator();

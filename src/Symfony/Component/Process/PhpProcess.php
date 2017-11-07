@@ -30,7 +30,7 @@ class PhpProcess extends Process
      * @param array|null  $env     The environment variables or null to use the same environment as the current PHP process
      * @param int         $timeout The timeout in seconds
      */
-    public function __construct($script, $cwd = null, array $env = null, $timeout = 60)
+    public function __construct(string $script, string $cwd = null, array $env = null, int $timeout = 60)
     {
         $executableFinder = new PhpExecutableFinder();
         if (false === $php = $executableFinder->find(false)) {

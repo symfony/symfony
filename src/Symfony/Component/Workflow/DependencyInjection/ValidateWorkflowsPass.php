@@ -24,7 +24,7 @@ class ValidateWorkflowsPass implements CompilerPassInterface
 {
     private $definitionTag;
 
-    public function __construct($definitionTag = 'workflow.definition')
+    public function __construct(string $definitionTag = 'workflow.definition')
     {
         $this->definitionTag = $definitionTag;
     }

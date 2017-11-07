@@ -34,7 +34,7 @@ class ServerRunCommand extends Command
 
     protected static $defaultName = 'server:run';
 
-    public function __construct($documentRoot = null, $environment = null)
+    public function __construct(string $documentRoot = null, string $environment = null)
     {
         $this->documentRoot = $documentRoot;
         $this->environment = $environment;

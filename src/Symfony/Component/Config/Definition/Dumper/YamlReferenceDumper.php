@@ -69,13 +69,7 @@ class YamlReferenceDumper
         return $ref;
     }
 
-    /**
-     * @param NodeInterface      $node
-     * @param NodeInterface|null $parentNode
-     * @param int                $depth
-     * @param bool               $prototypedArray
-     */
-    private function writeNode(NodeInterface $node, NodeInterface $parentNode = null, $depth = 0, $prototypedArray = false)
+    private function writeNode(NodeInterface $node, NodeInterface $parentNode = null, int $depth = 0, bool $prototypedArray = false)
     {
         $comments = array();
         $default = '';
@@ -179,11 +173,8 @@ class YamlReferenceDumper
 
     /**
      * Outputs a single config reference line.
-     *
-     * @param string $text
-     * @param int    $indent
      */
-    private function writeLine($text, $indent = 0)
+    private function writeLine(string $text, int $indent = 0)
     {
         $indent = strlen($text) + $indent;
         $format = '%'.$indent.'s';
@@ -214,12 +205,7 @@ class YamlReferenceDumper
         }
     }
 
-    /**
-     * @param PrototypedArrayNode $node
-     *
-     * @return array
-     */
-    private function getPrototypeChildren(PrototypedArrayNode $node)
+    private function getPrototypeChildren(PrototypedArrayNode $node): array
     {
         $prototype = $node->getPrototype();
         $key = $node->getKeyAttribute();

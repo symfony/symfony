@@ -13,7 +13,7 @@ namespace Symfony\Component\ExpressionLanguage;
 
 class SyntaxError extends \LogicException
 {
-    public function __construct($message, $cursor = 0, $expression = '', $subject = null, array $proposals = null)
+    public function __construct(string $message, int $cursor = 0, string $expression = '', string $subject = null, array $proposals = null)
     {
         $message = sprintf('%s around position %d', $message, $cursor);
         if ($expression) {

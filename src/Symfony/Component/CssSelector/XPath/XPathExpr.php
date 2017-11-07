@@ -50,9 +50,6 @@ class XPathExpr
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getCondition(): string
     {
         return $this->condition;
@@ -77,9 +74,6 @@ class XPathExpr
 
     /**
      * Joins another XPathExpr with a combiner.
-     *
-     * @param string    $combiner
-     * @param XPathExpr $expr
      *
      * @return $this
      */

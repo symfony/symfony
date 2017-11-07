@@ -33,13 +33,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     private $escapeChar;
     private $keySeparator;
 
-    /**
-     * @param string $delimiter
-     * @param string $enclosure
-     * @param string $escapeChar
-     * @param string $keySeparator
-     */
-    public function __construct($delimiter = ',', $enclosure = '"', $escapeChar = '\\', $keySeparator = '.')
+    public function __construct(string $delimiter = ',', string $enclosure = '"', string $escapeChar = '\\', string $keySeparator = '.')
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
@@ -174,13 +168,8 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * Flattens an array and generates keys including the path.
-     *
-     * @param array  $array
-     * @param array  $result
-     * @param string $keySeparator
-     * @param string $parentKey
      */
-    private function flatten(array $array, array &$result, $keySeparator, $parentKey = '')
+    private function flatten(array $array, array &$result, string $keySeparator, string $parentKey = '')
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {

@@ -23,7 +23,7 @@ class JsonEncode implements EncoderInterface
     private $options;
     private $lastError = JSON_ERROR_NONE;
 
-    public function __construct($bitmask = 0)
+    public function __construct(int $bitmask = 0)
     {
         $this->options = $bitmask;
     }

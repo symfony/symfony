@@ -32,7 +32,7 @@ class DebugCommand extends Command
     private $twig;
     private $projectDir;
 
-    public function __construct(Environment $twig, $projectDir = null)
+    public function __construct(Environment $twig, string $projectDir = null)
     {
         parent::__construct();
 

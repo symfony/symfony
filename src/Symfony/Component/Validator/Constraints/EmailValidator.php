@@ -25,10 +25,7 @@ class EmailValidator extends ConstraintValidator
 {
     private $isStrict;
 
-    /**
-     * @param bool $strict
-     */
-    public function __construct($strict = false)
+    public function __construct(bool $strict = false)
     {
         $this->isStrict = $strict;
     }
@@ -111,24 +108,16 @@ class EmailValidator extends ConstraintValidator
 
     /**
      * Check DNS Records for MX type.
-     *
-     * @param string $host Host
-     *
-     * @return bool
      */
-    private function checkMX($host)
+    private function checkMX(string $host): bool
     {
         return '' !== $host && checkdnsrr($host, 'MX');
     }
 
     /**
      * Check if one of MX, A or AAAA DNS RR exists.
-     *
-     * @param string $host Host
-     *
-     * @return bool
      */
-    private function checkHost($host)
+    private function checkHost(string $host): bool
     {
         return '' !== $host && ($this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA')));
     }

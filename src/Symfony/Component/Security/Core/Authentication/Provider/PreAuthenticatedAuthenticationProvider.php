@@ -34,7 +34,7 @@ class PreAuthenticatedAuthenticationProvider implements AuthenticationProviderIn
     private $userChecker;
     private $providerKey;
 
-    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, $providerKey)
+    public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, string $providerKey)
     {
         $this->userProvider = $userProvider;
         $this->userChecker = $userChecker;

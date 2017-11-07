@@ -237,10 +237,8 @@ EOF;
 
     /**
      * Retrieves the currently set proxy dumper or instantiates one.
-     *
-     * @return ProxyDumper
      */
-    private function getProxyDumper()
+    private function getProxyDumper(): ProxyDumper
     {
         if (!$this->proxyDumper) {
             $this->proxyDumper = new NullDumper();
@@ -249,16 +247,7 @@ EOF;
         return $this->proxyDumper;
     }
 
-    /**
-     * Generates Service local temp variables.
-     *
-     * @param string     $cId
-     * @param Definition $definition
-     * @param array      $inlinedDefinitions
-     *
-     * @return string
-     */
-    private function addServiceLocalTempVariables($cId, Definition $definition, array $inlinedDefinitions)
+    private function addServiceLocalTempVariables(string $cId, Definition $definition, array $inlinedDefinitions): string
     {
         static $template = "        \$%s = %s;\n";
 
@@ -330,12 +319,7 @@ EOTXT
         }
     }
 
-    /**
-     * Generates the require_once statement for service includes.
-     *
-     * @return string
-     */
-    private function addServiceInclude(Definition $definition, array $inlinedDefinitions)
+    private function addServiceInclude(Definition $definition, array $inlinedDefinitions): string
     {
         $template = "        require_once %s;\n";
         $code = '';
@@ -360,15 +344,10 @@ EOTXT
     /**
      * Generates the inline definition of a service.
      *
-     * @param string $id
-     * @param array  $inlinedDefinitions
-     *
-     * @return string
-     *
      * @throws RuntimeException                  When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
      */
-    private function addServiceInlinedDefinitions($id, array $inlinedDefinitions)
+    private function addServiceInlinedDefinitions(string $id, array $inlinedDefinitions): string
     {
         $code = '';
         $variableMap = $this->definitionVariables;
@@ -422,18 +401,10 @@ EOTXT
     }
 
     /**
-     * Generates the service instance.
-     *
-     * @param string     $id
-     * @param Definition $definition
-     * @param bool       $isSimpleInstance
-     *
-     * @return string
-     *
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    private function addServiceInstance($id, Definition $definition, $isSimpleInstance)
+    private function addServiceInstance(string $id, Definition $definition, string $isSimpleInstance): string
     {
         $class = $this->dumpValue($definition->getClass());
 
@@ -466,15 +437,7 @@ EOTXT
         return $code;
     }
 
-    /**
-     * Checks if the definition is a simple instance.
-     *
-     * @param string     $id
-     * @param Definition $definition
-     *
-     * @return bool
-     */
-    private function isSimpleInstance($id, Definition $definition, array $inlinedDefinitions)
+    private function isSimpleInstance(string $id, Definition $definition, array $inlinedDefinitions): bool
     {
         foreach (array_merge(array($definition), $inlinedDefinitions) as $sDefinition) {
             if ($definition !== $sDefinition && !$this->hasReference($id, $sDefinition->getMethodCalls())) {
@@ -489,14 +452,7 @@ EOTXT
         return true;
     }
 
-    /**
-     * Checks if the definition is a trivial instance.
-     *
-     * @param Definition $definition
-     *
-     * @return bool
-     */
-    private function isTrivialInstance(Definition $definition)
+    private function isTrivialInstance(Definition $definition): bool
     {
         if ($definition->isSynthetic() || $definition->getFile() || $definition->getMethodCalls() || $definition->getProperties() || $definition->getConfigurator()) {
             return false;
@@ -533,15 +489,7 @@ EOTXT
         return true;
     }
 
-    /**
-     * Adds method calls to a service definition.
-     *
-     * @param Definition $definition
-     * @param string     $variableName
-     *
-     * @return string
-     */
-    private function addServiceMethodCalls(Definition $definition, $variableName = 'instance')
+    private function addServiceMethodCalls(Definition $definition, string $variableName = 'instance'): string
     {
         $calls = '';
         foreach ($definition->getMethodCalls() as $call) {
@@ -567,17 +515,9 @@ EOTXT
     }
 
     /**
-     * Generates the inline definition setup.
-     *
-     * @param string $id
-     * @param array  $inlinedDefinitions
-     * @param bool   $isSimpleInstance
-     *
-     * @return string
-     *
      * @throws ServiceCircularReferenceException when the container contains a circular reference
      */
-    private function addServiceInlinedDefinitionsSetup($id, array $inlinedDefinitions, $isSimpleInstance)
+    private function addServiceInlinedDefinitionsSetup(string $id, array $inlinedDefinitions, bool $isSimpleInstance): string
     {
         $this->referenceVariables[$id] = new Variable('instance');
 
@@ -612,15 +552,7 @@ EOTXT
         return $code;
     }
 
-    /**
-     * Adds configurator definition.
-     *
-     * @param Definition $definition
-     * @param string     $variableName
-     *
-     * @return string
-     */
-    private function addServiceConfigurator(Definition $definition, $variableName = 'instance')
+    private function addServiceConfigurator(Definition $definition, string $variableName = 'instance'): string
     {
         if (!$callable = $definition->getConfigurator()) {
             return '';
@@ -648,16 +580,7 @@ EOTXT
         return sprintf("        %s(\$%s);\n", $callable, $variableName);
     }
 
-    /**
-     * Adds a service.
-     *
-     * @param string     $id
-     * @param Definition $definition
-     * @param string     &$file
-     *
-     * @return string
-     */
-    private function addService($id, Definition $definition, &$file = null)
+    private function addService(string $id, Definition $definition, string &$file = null): string
     {
         $this->definitionVariables = new \SplObjectStorage();
         $this->referenceVariables = array();
@@ -757,12 +680,7 @@ EOF;
         return $code;
     }
 
-    /**
-     * Adds multiple services.
-     *
-     * @return string
-     */
-    private function addServices()
+    private function addServices(): string
     {
         $publicServices = $privateServices = '';
         $definitions = $this->container->getDefinitions();
@@ -841,15 +759,7 @@ EOF;
         return sprintf("        $return{$instantiation}new %s(%s);\n", $this->dumpLiteralClass($class), implode(', ', $arguments));
     }
 
-    /**
-     * Adds the class headers.
-     *
-     * @param string $class     Class name
-     * @param string $baseClass The name of the base class
-     *
-     * @return string
-     */
-    private function startClass($class, $baseClass)
+    private function startClass(string $class, string $baseClass): string
     {
         $namespaceLine = $this->namespace ? "\nnamespace {$this->namespace};\n" : '';
 
@@ -962,12 +872,7 @@ EOF;
         return $code;
     }
 
-    /**
-     * Adds the syntheticIds definition.
-     *
-     * @return string
-     */
-    private function addSyntheticIds()
+    private function addSyntheticIds(): string
     {
         $code = '';
         $definitions = $this->container->getDefinitions();
@@ -981,12 +886,7 @@ EOF;
         return $code ? "        \$this->syntheticIds = array(\n{$code}        );\n" : '';
     }
 
-    /**
-     * Adds the removedIds definition.
-     *
-     * @return string
-     */
-    private function addRemovedIds()
+    private function addRemovedIds(): string
     {
         $ids = $this->container->getRemovedIds();
         foreach ($this->container->getDefinitions() as $id => $definition) {
@@ -1020,12 +920,7 @@ EOF;
 EOF;
     }
 
-    /**
-     * Adds the methodMap property definition.
-     *
-     * @return string
-     */
-    private function addMethodMap()
+    private function addMethodMap(): string
     {
         $code = '';
         $definitions = $this->container->getDefinitions();
@@ -1039,12 +934,7 @@ EOF;
         return $code ? "        \$this->methodMap = array(\n{$code}        );\n" : '';
     }
 
-    /**
-     * Adds the fileMap property definition.
-     *
-     * @return string
-     */
-    private function addFileMap()
+    private function addFileMap(): string
     {
         $code = '';
         $definitions = $this->container->getDefinitions();
@@ -1058,12 +948,7 @@ EOF;
         return $code ? "        \$this->fileMap = array(\n{$code}        );\n" : '';
     }
 
-    /**
-     * Adds the aliases property definition.
-     *
-     * @return string
-     */
-    private function addAliases()
+    private function addAliases(): string
     {
         if (!$aliases = $this->container->getAliases()) {
             return "\n        \$this->aliases = array();\n";
@@ -1082,12 +967,7 @@ EOF;
         return $code."        );\n";
     }
 
-    /**
-     * Adds default parameters method.
-     *
-     * @return string
-     */
-    private function addDefaultParametersMethod()
+    private function addDefaultParametersMethod(): string
     {
         if (!$this->container->getParameterBag()->all()) {
             return '';
@@ -1206,17 +1086,9 @@ EOF;
     }
 
     /**
-     * Exports parameters.
-     *
-     * @param array  $parameters
-     * @param string $path
-     * @param int    $indent
-     *
-     * @return string
-     *
      * @throws InvalidArgumentException
      */
-    private function exportParameters(array $parameters, $path = '', $indent = 12)
+    private function exportParameters(array $parameters, string $path = '', int $indent = 12): string
     {
         $php = array();
         foreach ($parameters as $key => $value) {
@@ -1242,12 +1114,7 @@ EOF;
         return sprintf("array(\n%s\n%s)", implode("\n", $php), str_repeat(' ', $indent - 4));
     }
 
-    /**
-     * Ends the class definition.
-     *
-     * @return string
-     */
-    private function endClass()
+    private function endClass(): string
     {
         return <<<'EOF'
 }
@@ -1255,15 +1122,7 @@ EOF;
 EOF;
     }
 
-    /**
-     * Wraps the service conditionals.
-     *
-     * @param string $value
-     * @param string $code
-     *
-     * @return string
-     */
-    private function wrapServiceConditionals($value, $code)
+    private function wrapServiceConditionals($value, string $code): string
     {
         if (!$condition = $this->getServiceConditionals($value)) {
             return $code;
@@ -1275,14 +1134,7 @@ EOF;
         return sprintf("        if (%s) {\n%s        }\n", $condition, $code);
     }
 
-    /**
-     * Get the conditions to execute for conditional services.
-     *
-     * @param string $value
-     *
-     * @return null|string
-     */
-    private function getServiceConditionals($value)
+    private function getServiceConditionals($value): string
     {
         $conditions = array();
         foreach (ContainerBuilder::getInitializedConditionals($value) as $service) {
@@ -1306,10 +1158,7 @@ EOF;
         return implode(' && ', $conditions);
     }
 
-    /**
-     * Builds service calls from arguments.
-     */
-    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior, $isPreInstantiation)
+    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior, bool $isPreInstantiation)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -1331,12 +1180,7 @@ EOF;
         }
     }
 
-    /**
-     * Returns the inline definition.
-     *
-     * @return array
-     */
-    private function getInlinedDefinitions(Definition $definition)
+    private function getInlinedDefinitions(Definition $definition): array
     {
         if (false === $this->inlinedDefinitions->contains($definition)) {
             $definitions = array_merge(
@@ -1355,12 +1199,7 @@ EOF;
         return $this->inlinedDefinitions->offsetGet($definition);
     }
 
-    /**
-     * Gets the definition from arguments.
-     *
-     * @return array
-     */
-    private function getDefinitionsFromArguments(array $arguments)
+    private function getDefinitionsFromArguments(array $arguments): array
     {
         $definitions = array();
         foreach ($arguments as $argument) {
@@ -1378,17 +1217,7 @@ EOF;
         return $definitions;
     }
 
-    /**
-     * Checks if a service id has a reference.
-     *
-     * @param string $id
-     * @param array  $arguments
-     * @param bool   $deep
-     * @param array  $visited
-     *
-     * @return bool
-     */
-    private function hasReference($id, array $arguments, $deep = false, array &$visited = array())
+    private function hasReference(string $id, array $arguments, bool $deep = false, array &$visited = array()): bool
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -1433,16 +1262,9 @@ EOF;
     }
 
     /**
-     * Dumps values.
-     *
-     * @param mixed $value
-     * @param bool  $interpolate
-     *
-     * @return string
-     *
      * @throws RuntimeException
      */
-    private function dumpValue($value, $interpolate = true)
+    private function dumpValue($value, bool $interpolate = true): string
     {
         if (is_array($value)) {
             if ($value && $interpolate && false !== $param = array_search($value, $this->container->getParameterBag()->all(), true)) {
@@ -1594,13 +1416,9 @@ EOF;
     /**
      * Dumps a string to a literal (aka PHP Code) class value.
      *
-     * @param string $class
-     *
-     * @return string
-     *
      * @throws RuntimeException
      */
-    private function dumpLiteralClass($class)
+    private function dumpLiteralClass(string $class): string
     {
         if (false !== strpos($class, '$')) {
             return sprintf('${($_ = %s) && false ?: "_"}', $class);
@@ -1614,14 +1432,7 @@ EOF;
         return 0 === strpos($class, '\\') ? $class : '\\'.$class;
     }
 
-    /**
-     * Dumps a parameter.
-     *
-     * @param string $name
-     *
-     * @return string
-     */
-    private function dumpParameter($name)
+    private function dumpParameter(string $name): string
     {
         if ($this->container->isCompiled() && $this->container->hasParameter($name)) {
             $value = $this->container->getParameter($name);
@@ -1639,15 +1450,7 @@ EOF;
         return sprintf("\$this->getParameter('%s')", $name);
     }
 
-    /**
-     * Gets a service call.
-     *
-     * @param string    $id
-     * @param Reference $reference
-     *
-     * @return string
-     */
-    private function getServiceCall($id, Reference $reference = null)
+    private function getServiceCall(string $id, Reference $reference = null): string
     {
         while ($this->container->hasAlias($id)) {
             $id = (string) $this->container->getAlias($id);
@@ -1692,10 +1495,8 @@ EOF;
 
     /**
      * Initializes the method names map to avoid conflicts with the Container methods.
-     *
-     * @param string $class the container base class
      */
-    private function initializeMethodNamesMap($class)
+    private function initializeMethodNamesMap(string $class)
     {
         $this->serviceIdToMethodNameMap = array();
         $this->usedMethodNames = array();
@@ -1708,15 +1509,9 @@ EOF;
     }
 
     /**
-     * Convert a service id to a valid PHP method name.
-     *
-     * @param string $id
-     *
-     * @return string
-     *
      * @throws InvalidArgumentException
      */
-    private function generateMethodName($id)
+    private function generateMethodName(string $id): string
     {
         if (isset($this->serviceIdToMethodNameMap[$id])) {
             return $this->serviceIdToMethodNameMap[$id];
@@ -1739,12 +1534,7 @@ EOF;
         return $methodName;
     }
 
-    /**
-     * Returns the next name to use.
-     *
-     * @return string
-     */
-    private function getNextVariableName()
+    private function getNextVariableName(): string
     {
         $firstChars = self::FIRST_CHARS;
         $firstCharsLength = strlen($firstChars);

@@ -53,7 +53,7 @@ class Definition
      * @param string|null $class     The service class
      * @param array       $arguments An array of arguments to pass to the service constructor
      */
-    public function __construct($class = null, array $arguments = array())
+    public function __construct(string $class = null, array $arguments = array())
     {
         if (null !== $class) {
             $this->setClass($class);

@@ -19,13 +19,11 @@ trait AutoconfigureTrait
     /**
      * Sets whether or not instanceof conditionals should be prepended with a global set.
      *
-     * @param bool $autoconfigured
-     *
      * @return $this
      *
      * @throws InvalidArgumentException when a parent is already set
      */
-    final public function autoconfigure($autoconfigured = true)
+    final public function autoconfigure(bool $autoconfigured = true)
     {
         if ($autoconfigured && $this->definition instanceof ChildDefinition) {
             throw new InvalidArgumentException(sprintf('The service "%s" cannot have a "parent" and also have "autoconfigure". Try disabling autoconfiguration for the service.', $this->id));

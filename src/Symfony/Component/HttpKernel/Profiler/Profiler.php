@@ -36,14 +36,11 @@ class Profiler
     private $initiallyEnabled = true;
     private $enabled = true;
 
-    /**
-     * @param bool $enable  The initial enabled state
-     */
-    public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null, $enable = true)
+    public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null, bool $enable = true)
     {
         $this->storage = $storage;
         $this->logger = $logger;
-        $this->initiallyEnabled = $this->enabled = (bool) $enable;
+        $this->initiallyEnabled = $this->enabled = $enable;
     }
 
     /**

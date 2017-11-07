@@ -28,7 +28,7 @@ class MergeCollectionListener implements EventSubscriberInterface
      * @param bool $allowAdd    Whether values might be added to the collection
      * @param bool $allowDelete Whether values might be removed from the collection
      */
-    public function __construct($allowAdd = false, $allowDelete = false)
+    public function __construct(bool $allowAdd = false, bool $allowDelete = false)
     {
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;

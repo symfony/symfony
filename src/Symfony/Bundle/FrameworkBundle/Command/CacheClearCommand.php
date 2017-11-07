@@ -37,10 +37,6 @@ class CacheClearCommand extends Command
     private $cacheClearer;
     private $filesystem;
 
-    /**
-     * @param CacheClearerInterface $cacheClearer
-     * @param Filesystem|null       $filesystem
-     */
     public function __construct(CacheClearerInterface $cacheClearer, Filesystem $filesystem = null)
     {
         parent::__construct();
@@ -79,7 +75,7 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         $kernel = $this->getApplication()->getKernel();
-        $realCacheDir = isset($realCacheDir) ? $realCacheDir : $kernel->getContainer()->getParameter('kernel.cache_dir');
+        $realCacheDir = $kernel->getContainer()->getParameter('kernel.cache_dir');
         // the old cache dir name must not be longer than the real one to avoid exceeding
         // the maximum length of a directory or file path within it (esp. Windows MAX_PATH)
         $oldCacheDir = substr($realCacheDir, 0, -1).('~' === substr($realCacheDir, -1) ? '+' : '~');

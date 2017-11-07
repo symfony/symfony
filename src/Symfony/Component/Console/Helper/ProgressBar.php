@@ -272,8 +272,6 @@ final class ProgressBar
 
     /**
      * Sets whether to overwrite the progressbar, false for new line.
-     *
-     * @param bool $overwrite
      */
     public function setOverwrite(bool $overwrite)
     {
@@ -372,8 +370,6 @@ final class ProgressBar
 
     /**
      * Overwrites a previous message to the output.
-     *
-     * @param string $message The message
      */
     private function overwrite(string $message): void
     {

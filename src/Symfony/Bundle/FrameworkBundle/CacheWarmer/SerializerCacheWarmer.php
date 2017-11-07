@@ -35,7 +35,7 @@ class SerializerCacheWarmer extends AbstractPhpFileCacheWarmer
      * @param string                 $phpArrayFile The PHP file where metadata are cached
      * @param CacheItemPoolInterface $fallbackPool The pool where runtime-discovered metadata are cached
      */
-    public function __construct(array $loaders, $phpArrayFile, CacheItemPoolInterface $fallbackPool)
+    public function __construct(array $loaders, string $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {
         parent::__construct($phpArrayFile, $fallbackPool);
         $this->loaders = $loaders;

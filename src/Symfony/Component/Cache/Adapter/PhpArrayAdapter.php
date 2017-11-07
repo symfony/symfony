@@ -224,10 +224,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
         return $this->pool->commit();
     }
 
-    /**
-     * @return \Generator
-     */
-    private function generateItems(array $keys)
+    private function generateItems(array $keys): \Generator
     {
         $f = $this->createCacheItem;
         $fallbackKeys = array();

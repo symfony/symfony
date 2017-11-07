@@ -199,9 +199,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * Note that the order of the operations is important here, otherwise
      * operations such as {@link RequestStack::getParentRequest()} can lead to
      * weird results.
-     *
-     * @param Request $request
-     * @param int     $type
      */
     private function finishRequest(Request $request, int $type)
     {
@@ -214,13 +211,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @param \Exception $e       An \Exception instance
      * @param Request    $request A Request instance
-     * @param int        $type    The type of the request
-     *
-     * @return Response A Response instance
+     * @param int        $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @throws \Exception
      */
-    private function handleException(\Exception $e, Request $request, int $type)
+    private function handleException(\Exception $e, Request $request, int $type): Response
     {
         $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
         $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);

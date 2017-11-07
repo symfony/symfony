@@ -34,11 +34,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         \DateTime::class => true,
     );
 
-    /**
-     * @param string             $format
-     * @param \DateTimeZone|null $timezone
-     */
-    public function __construct($format = \DateTime::RFC3339, \DateTimeZone $timezone = null)
+    public function __construct(?string $format = \DateTime::RFC3339, \DateTimeZone $timezone = null)
     {
         $this->format = $format;
         $this->timezone = $timezone;

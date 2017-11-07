@@ -100,13 +100,8 @@ abstract class FileDumper implements DumperInterface
 
     /**
      * Gets the relative file path using the template.
-     *
-     * @param string $domain The domain
-     * @param string $locale The locale
-     *
-     * @return string The relative file path
      */
-    private function getRelativePath($domain, $locale)
+    private function getRelativePath(string $domain, string $locale): string
     {
         return strtr($this->relativePathTemplate, array(
             '%domain%' => $domain,

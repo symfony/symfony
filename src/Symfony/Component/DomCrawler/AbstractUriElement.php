@@ -36,11 +36,11 @@ abstract class AbstractUriElement
     /**
      * @param \DOMElement $node       A \DOMElement instance
      * @param string      $currentUri The URI of the page where the link is embedded (or the base href)
-     * @param string      $method     The method to use for the link (get by default)
+     * @param string      $method     The method to use for the link (GET by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
      */
-    public function __construct(\DOMElement $node, $currentUri, $method = 'GET')
+    public function __construct(\DOMElement $node, string $currentUri, ?string $method = 'GET')
     {
         if (!in_array(strtolower(substr($currentUri, 0, 4)), array('http', 'file'))) {
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
@@ -168,24 +168,16 @@ abstract class AbstractUriElement
 
     /**
      * Removes the query string and the anchor from the given uri.
-     *
-     * @param string $uri The uri to clean
-     *
-     * @return string
      */
-    private function cleanupUri($uri)
+    private function cleanupUri(string $uri): string
     {
         return $this->cleanupQuery($this->cleanupAnchor($uri));
     }
 
     /**
      * Remove the query string from the uri.
-     *
-     * @param string $uri
-     *
-     * @return string
      */
-    private function cleanupQuery($uri)
+    private function cleanupQuery(string $uri): string
     {
         if (false !== $pos = strpos($uri, '?')) {
             return substr($uri, 0, $pos);
@@ -196,12 +188,8 @@ abstract class AbstractUriElement
 
     /**
      * Remove the anchor from the uri.
-     *
-     * @param string $uri
-     *
-     * @return string
      */
-    private function cleanupAnchor($uri)
+    private function cleanupAnchor(string $uri): string
     {
         if (false !== $pos = strpos($uri, '#')) {
             return substr($uri, 0, $pos);

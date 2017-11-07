@@ -41,7 +41,7 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      */
     private $allowCustomResponseCode = false;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, \Exception $e)
+    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, \Exception $e)
     {
         parent::__construct($kernel, $request, $requestType);
 

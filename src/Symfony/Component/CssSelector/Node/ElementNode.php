@@ -30,7 +30,7 @@ class ElementNode extends AbstractNode
      * @param string|null $namespace
      * @param string|null $element
      */
-    public function __construct($namespace = null, $element = null)
+    public function __construct(string $namespace = null, string $element = null)
     {
         $this->namespace = $namespace;
         $this->element = $element;

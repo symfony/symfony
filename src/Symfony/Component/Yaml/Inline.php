@@ -257,13 +257,6 @@ class Inline
     /**
      * Parses a YAML scalar.
      *
-     * @param string   $scalar
-     * @param int      $flags
-     * @param string[] $delimiters
-     * @param int      &$i
-     * @param bool     $evaluate
-     * @param array    $references
-     *
      * @return mixed
      *
      * @throws ParseException When malformed inline YAML string is parsed
@@ -313,11 +306,6 @@ class Inline
     /**
      * Parses a YAML quoted scalar.
      *
-     * @param string $scalar
-     * @param int    &$i
-     *
-     * @return string
-     *
      * @throws ParseException When malformed inline YAML string is parsed
      */
     private static function parseQuotedScalar(string $scalar, int &$i): string
@@ -342,13 +330,6 @@ class Inline
 
     /**
      * Parses a YAML sequence.
-     *
-     * @param string $sequence
-     * @param int    $flags
-     * @param int    &$i
-     * @param array  $references
-     *
-     * @return array
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
@@ -411,11 +392,6 @@ class Inline
 
     /**
      * Parses a YAML mapping.
-     *
-     * @param string $mapping
-     * @param int    $flags
-     * @param int    &$i
-     * @param array  $references
      *
      * @return array|\stdClass
      *
@@ -524,10 +500,6 @@ class Inline
 
     /**
      * Evaluates scalars and replaces magic values.
-     *
-     * @param string $scalar
-     * @param int    $flags
-     * @param array  $references
      *
      * @return mixed The evaluated YAML string
      *
@@ -651,13 +623,6 @@ class Inline
         return (string) $scalar;
     }
 
-    /**
-     * @param string $value
-     * @param int    &$i
-     * @param int    $flags
-     *
-     * @return null|string
-     */
     private static function parseTag(string $value, int &$i, int $flags): ?string
     {
         if ('!' !== $value[$i]) {
@@ -690,11 +655,6 @@ class Inline
         throw new ParseException(sprintf('Tags support is not enabled. Enable the `Yaml::PARSE_CUSTOM_TAGS` flag to use "!%s".', $tag), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
     }
 
-    /**
-     * @param string $scalar
-     *
-     * @return string
-     */
     public static function evaluateBinaryScalar(string $scalar): string
     {
         $parsedBinaryData = self::parseScalar(preg_replace('/\s/', '', $scalar));

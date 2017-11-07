@@ -25,7 +25,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
     private $bag;
     private $resolveArrays;
 
-    public function __construct($resolveArrays = true)
+    public function __construct(bool $resolveArrays = true)
     {
         $this->resolveArrays = $resolveArrays;
     }

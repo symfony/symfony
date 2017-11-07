@@ -30,7 +30,7 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($resource)
+    public function __construct(string $resource)
     {
         $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
 

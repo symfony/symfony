@@ -84,7 +84,7 @@ abstract class Guess
      *
      * @throws InvalidArgumentException if the given value of confidence is unknown
      */
-    public function __construct($confidence)
+    public function __construct(int $confidence)
     {
         if (self::VERY_HIGH_CONFIDENCE !== $confidence && self::HIGH_CONFIDENCE !== $confidence &&
             self::MEDIUM_CONFIDENCE !== $confidence && self::LOW_CONFIDENCE !== $confidence) {

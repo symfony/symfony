@@ -37,11 +37,8 @@ class ProxyDumperTest extends TestCase
 
     /**
      * @dataProvider getProxyCandidates
-     *
-     * @param Definition $definition
-     * @param bool       $expected
      */
-    public function testIsProxyCandidate(Definition $definition, $expected)
+    public function testIsProxyCandidate(Definition $definition, bool $expected)
     {
         $this->assertSame($expected, $this->dumper->isProxyCandidate($definition));
     }

@@ -33,7 +33,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      * @param string $format      The date format
      * @param bool   $parseSigned Whether to parse as a signed interval
      */
-    public function __construct($format = 'P%yY%mM%dDT%hH%iM%sS', $parseSigned = false)
+    public function __construct(string $format = 'P%yY%mM%dDT%hH%iM%sS', bool $parseSigned = false)
     {
         $this->format = $format;
         $this->parseSigned = $parseSigned;

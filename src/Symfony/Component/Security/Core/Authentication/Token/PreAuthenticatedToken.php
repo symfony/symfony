@@ -27,7 +27,7 @@ class PreAuthenticatedToken extends AbstractToken
      * @param string          $providerKey The provider key
      * @param (Role|string)[] $roles       An array of roles
      */
-    public function __construct($user, $credentials, $providerKey, array $roles = array())
+    public function __construct($user, $credentials, string $providerKey, array $roles = array())
     {
         parent::__construct($roles);
 

@@ -993,10 +993,9 @@ class ProcessTest extends TestCase
     }
 
     /**
-     * @dataProvider provideWrongSignal
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
-    public function testWrongSignal($signal)
+    public function testWrongSignal()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('POSIX signals do not work on Windows');
@@ -1005,21 +1004,13 @@ class ProcessTest extends TestCase
         $process = $this->getProcessForCode('sleep(38);');
         $process->start();
         try {
-            $process->signal($signal);
+            $process->signal(-4);
             $this->fail('A RuntimeException must have been thrown');
         } catch (RuntimeException $e) {
             $process->stop(0);
         }
 
         throw $e;
-    }
-
-    public function provideWrongSignal()
-    {
-        return array(
-            array(-4),
-            array('Céphalopodes'),
-        );
     }
 
     public function testDisableOutputDisablesTheOutput()

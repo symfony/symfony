@@ -326,10 +326,8 @@ class RouteCollectionBuilder
 
     /**
      * Generates a route name based on details of this route.
-     *
-     * @return string
      */
-    private function generateRouteName(Route $route)
+    private function generateRouteName(Route $route): string
     {
         $methods = implode('_', $route->getMethods()).'_';
 

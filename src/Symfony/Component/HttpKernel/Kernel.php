@@ -825,7 +825,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $fs = new Filesystem();
 
         foreach ($content as $file => $code) {
-            $fs->dumpFile($dir.$file, $code, null);
+            $fs->dumpFile($dir.$file, $code);
             @chmod($dir.$file, 0666 & ~umask());
         }
 

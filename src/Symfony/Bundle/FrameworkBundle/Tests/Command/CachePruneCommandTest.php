@@ -97,9 +97,6 @@ class CachePruneCommandTest extends TestCase
     }
 
     /**
-     * @param KernelInterface     $kernel
-     * @param RewindableGenerator $generator
-     *
      * @return CommandTester
      */
     private function getCommandTester(KernelInterface $kernel, RewindableGenerator $generator)

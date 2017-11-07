@@ -171,6 +171,6 @@ class Stopwatch
      */
     public function reset()
     {
-        $this->sections = $this->activeSections = array('__root__' => new Section('__root__', $this->morePrecision));
+        $this->sections = $this->activeSections = array('__root__' => new Section(null, $this->morePrecision));
     }
 }

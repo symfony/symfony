@@ -178,7 +178,7 @@ EOF
 
         $loaderPaths = array();
         foreach ($loader->getNamespaces() as $namespace) {
-            $paths = array_map(function ($path) use ($namespace) {
+            $paths = array_map(function ($path) {
                 if (null !== $this->projectDir && 0 === strpos($path, $this->projectDir)) {
                     $path = ltrim(substr($path, strlen($this->projectDir)), DIRECTORY_SEPARATOR);
                 }

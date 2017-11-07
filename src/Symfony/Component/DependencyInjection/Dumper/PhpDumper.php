@@ -303,11 +303,6 @@ EOTXT;
         return $code;
     }
 
-    /**
-     * Generates code for the proxies.
-     *
-     * @return string
-     */
     private function generateProxyClasses()
     {
         $definitions = $this->container->getDefinitions();

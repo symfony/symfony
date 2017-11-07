@@ -207,8 +207,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
-     * @param array $data
-     *
      * @return string[]
      */
     private function extractHeaders(array $data)

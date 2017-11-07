@@ -75,9 +75,12 @@ class DeprecationErrorHandler
                     }
                 }
             }
-            $path = realpath($path) ?: $path;
+            $realPath = realpath($path);
+            if (false === $realPath && '-' !== $path && 'Standard input code' !== $path) {
+                return true;
+            }
             foreach ($vendors as $vendor) {
-                if (0 === strpos($path, $vendor) && false !== strpbrk(substr($path, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
+                if (0 === strpos($realPath, $vendor) && false !== strpbrk(substr($realPath, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
                     return true;
                 }
             }

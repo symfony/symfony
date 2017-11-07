@@ -135,7 +135,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         $mode = 0666;
         $umask = umask();
         $filesystem = new Filesystem();
-        $filesystem->dumpFile($this->file, $content, null);
+        $filesystem->dumpFile($this->file, $content);
         try {
             $filesystem->chmod($this->file, $mode, $umask);
         } catch (IOException $e) {
@@ -143,7 +143,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         }
 
         if (null !== $metadata) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), null);
+            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata));
             try {
                 $filesystem->chmod($this->getMetaFile(), $mode, $umask);
             } catch (IOException $e) {

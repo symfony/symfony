@@ -423,9 +423,9 @@ class PhpDumper extends Dumper
      *
      * @return bool
      */
-    private function isSimpleInstance($id, Definition $definition)
+    private function isSimpleInstance($id, Definition $definition, array $inlinedDefinitions)
     {
-        foreach (array_merge(array($definition), $this->getInlinedDefinitions($definition)) as $sDefinition) {
+        foreach (array_merge(array($definition), $inlinedDefinitions) as $sDefinition) {
             if ($definition !== $sDefinition && !$this->hasReference($id, $sDefinition->getMethodCalls())) {
                 continue;
             }

@@ -91,7 +91,7 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
             if ($loader instanceof XmlFileLoader || $loader instanceof YamlFileLoader) {
                 $supportedLoaders[] = $loader;
             } elseif ($loader instanceof LoaderChain) {
-                $supportedLoaders = array_merge($supportedLoaders, $this->extractSupportedLoaders($loader->getDelegatedLoaders()));
+                $supportedLoaders = array_merge($supportedLoaders, $this->extractSupportedLoaders($loader->getLoaders()));
             }
         }
 

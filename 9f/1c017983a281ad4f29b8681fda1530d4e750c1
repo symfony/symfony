@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-28T18:58:36Z
+
+Status: needs work
+
+To be rebase on top of #24723 #24724 #24725 #24726, and failure investigated.
+
+---------------------------------------------------------------------------
+
+by kaznovac at 2017-10-31T12:53:09Z
+
+good initiative, but the parameter documentation should be preserved IMHO
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-06T19:24:50Z
+
+Status: needs review (enjoy ;-))
+
+Docblocks are really different than actual type hints, their respective accuracies have nothing in common.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-11-07T11:46:44Z
+
+We should of course use them from the start for any new API added in 4.1+

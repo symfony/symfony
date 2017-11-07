@@ -27,9 +27,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class FilterControllerEvent extends KernelEvent
 {
-    /**
-     * The current controller.
-     */
     private $controller;
 
     public function __construct(HttpKernelInterface $kernel, $controller, Request $request, $requestType)

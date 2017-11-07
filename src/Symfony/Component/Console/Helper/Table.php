@@ -465,8 +465,6 @@ class Table
     /**
      * fill cells for a row that contains colspan > 1.
      *
-     * @param array|\Traversable $row
-     *
      * @return array
      */
     private function fillCells($row)

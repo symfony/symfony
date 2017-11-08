@@ -60,6 +60,24 @@ YAML;
         $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
     }
 
+    public function testCustomTags()
+    {
+        $yaml = <<<YAML
+foo: !my_tag {foo: bar}
+YAML;
+        $ret = $this->createCommandTester()->execute(array('filename' => $this->createFile($yaml), '--parse-tags' => true), array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false));
+        $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
+    }
+
+    public function testCustomTagsError()
+    {
+        $yaml = <<<YAML
+foo: !my_tag {foo: bar}
+YAML;
+        $ret = $this->createCommandTester()->execute(array('filename' => $this->createFile($yaml)), array('verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false));
+        $this->assertSame(1, $ret, 'lint:yaml exits with code 1 in case of error');
+    }
+
     /**
      * @expectedException \RuntimeException
      */

@@ -112,7 +112,7 @@ EOF
         });
 
         try {
-            $this->getParser()->parse($content, Yaml::PARSE_CONSTANT);
+            $this->getParser()->parse($content, Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS);
         } catch (ParseException $e) {
             return array('file' => $file, 'valid' => false, 'message' => $e->getMessage());
         } finally {

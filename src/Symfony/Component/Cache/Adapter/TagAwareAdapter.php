@@ -111,9 +111,8 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
                 $tags[$k] = $tag.static::TAGS_PREFIX;
             }
         }
-        $f = $this->invalidateTags;
 
-        return $f($this->tags, $tags);
+        return ($this->invalidateTags)($this->tags, $tags);
     }
 
     /**
@@ -252,14 +251,12 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
                 }
             }
 
-            $f = $this->getTagsByKey;
-            $tagsByKey = $f($items);
+            $tagsByKey = ($this->getTagsByKey)($items);
             $this->deferred = array();
             $tagVersions = $this->getTagVersions($tagsByKey);
-            $f = $this->createCacheItem;
 
             foreach ($tagsByKey as $key => $tags) {
-                $this->pool->saveDeferred($f(static::TAGS_PREFIX.$key, array_intersect_key($tagVersions, $tags), $items[$key]));
+                $this->pool->saveDeferred(($this->createCacheItem)(static::TAGS_PREFIX.$key, array_intersect_key($tagVersions, $tags), $items[$key]));
             }
         }
 
@@ -274,11 +271,10 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
     private function generateItems($items, array $tagKeys)
     {
         $bufferedItems = $itemTags = array();
-        $f = $this->setCacheItemTags;
 
         foreach ($items as $key => $item) {
             if (!$tagKeys) {
-                yield $key => $f($item, static::TAGS_PREFIX.$key, $itemTags);
+                yield $key => ($this->setCacheItemTags)($item, static::TAGS_PREFIX.$key, $itemTags);
                 continue;
             }
             if (!isset($tagKeys[$key])) {
@@ -303,7 +299,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
                 $tagVersions = $tagKeys = null;
 
                 foreach ($bufferedItems as $key => $item) {
-                    yield $key => $f($item, static::TAGS_PREFIX.$key, $itemTags);
+                    yield $key => ($this->setCacheItemTags)($item, static::TAGS_PREFIX.$key, $itemTags);
                 }
                 $bufferedItems = null;
             }

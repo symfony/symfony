@@ -70,9 +70,8 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
             $this->values[$key] = $value = null;
             $isHit = false;
         }
-        $f = $this->createCacheItem;
 
-        return $f($key, $value, $isHit);
+        return ($this->createCacheItem)($key, $value, $isHit);
     }
 
     /**

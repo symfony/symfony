@@ -41,9 +41,7 @@ class NullAdapter implements AdapterInterface
      */
     public function getItem($key)
     {
-        $f = $this->createCacheItem;
-
-        return $f($key);
+        return ($this->createCacheItem)($key);
     }
 
     /**
@@ -112,10 +110,8 @@ class NullAdapter implements AdapterInterface
 
     private function generateItems(array $keys)
     {
-        $f = $this->createCacheItem;
-
         foreach ($keys as $key) {
-            yield $key => $f($key);
+            yield $key => ($this->createCacheItem)($key);
         }
     }
 }

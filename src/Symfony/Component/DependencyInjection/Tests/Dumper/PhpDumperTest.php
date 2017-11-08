@@ -170,9 +170,10 @@ class PhpDumperTest extends TestCase
     public function testDumpAsFiles()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
+        $container->getDefinition('bar')->addTag('hot');
         $container->compile();
         $dumper = new PhpDumper($container);
-        $dump = print_r($dumper->dump(array('as_files' => true, 'file' => __DIR__)), true);
+        $dump = print_r($dumper->dump(array('as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot')), true);
         if ('\\' === DIRECTORY_SEPARATOR) {
             $dump = str_replace('\\\\Fixtures\\\\includes\\\\foo.php', '/Fixtures/includes/foo.php', $dump);
         }
@@ -796,6 +797,21 @@ class PhpDumperTest extends TestCase
         $foo = $container->get('foo');
 
         $this->assertSame($foo, $foo->bar->foobar->foo);
+    }
+
+    public function testHotPathOptimizations()
+    {
+        $container = include self::$fixturesPath.'/containers/container_inline_requires.php';
+        $container->setParameter('inline_requires', true);
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $dump = $dumper->dump(array('hot_path_tag' => 'container.hot_path', 'inline_class_loader_parameter' => 'inline_requires', 'file' => self::$fixturesPath.'/php/container_inline_requires.php'));
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $dump = str_replace("'\\\\includes\\\\HotPath\\\\", "'/includes/HotPath/", $dump);
+        }
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_inline_requires.php', $dump);
     }
 
     public function testDumpHandlesLiteralClassWithRootNamespace()

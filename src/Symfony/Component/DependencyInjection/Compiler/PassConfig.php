@@ -89,6 +89,7 @@ class PassConfig
             )),
             new DefinitionErrorExceptionPass(),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
+            new ResolveHotPathPass(),
         ));
     }
 

@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-11-08T17:06:11Z
+
+I like it.
+
+But i think the name `container.inline` is misleading. It can be confused with the service inlining (`$instance = new A(new B())`).
+
+IIUC, here it inlines the factory in the dumped container + it pre-load the PHP Class.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-08T17:08:14Z
+
+container.hot_path?
+ppl shouldn't really use that anyway, because propagation is enough most of the time
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-11-08T17:19:30Z
+
+> container.hot_path?
+
+Yes it's better. And like that the name of the tag will be the same as the CompilerPass ;)
+
+> ppl shouldn't really use that anyway, because propagation is enough most of the time
+
+It depends. We already use some inlining feature in Blackfire. It could be useful anyway.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-11-08T18:35:15Z
+
+Tests are missing, for both the compiler pass and the new dumper behavior
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-08T18:51:29Z
+
+Now with a new `container.dumper.inline_class_loader` parameter to *opt-in* this optimization, so that ppl doing strange things with their autoloader are still fine.
+
+@stof thanks, comments addressed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-08T18:53:41Z
+
+Just proposed to enable the parameter by default in https://github.com/symfony/recipes/pull/241
+
+---------------------------------------------------------------------------
+
+by beberlei at 2017-11-08T20:51:55Z
+
+I feel `container.inline` is a little misleading, it feels something along the lines of `container.require` or `container.preload` is more correct naming wise. Otherwise i love the idea :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-11-08T21:27:44Z
+
+So the `router` is loaded always even in CLI where it is not used?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-08T21:36:41Z
+
+The router *classes* are always loaded yes (not the objects). We don't care about the related CLI perf impact IMHO, it's negligible.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-11-08T22:02:57Z
+
+Can't we preload the CLI classes as well then to speed up the CLI? If the impact of preloading unused classes is negligible, this shouldn't hurt webrequest as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-08T22:06:11Z
+
+There's nothing to optimize for the CLI: the CLI is not called 700 times per second as the web is. Just forking the CLI process is an order of magnitude slower than these optimizations.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-11-08T22:07:41Z
+
+On my biggest monolith app I can also measure a slight performance benefit for one html page that I tested :+1:
+
+- prod, debug=false
+- `composer dump --classmap-authoritative && app/console cache:clear --env=prod --no-debug`
+- php 7.1, opcache enabled
+- `ab -n 10000 -c 1 "http://..."`
+
+your branch HEAD~1 (8cd2193a82171686f41fd073d2157de0293e3bb2): `41.112 ms`
+your commit (44fe030cb6f51fc77c2faed93f540640b837484e) with enabled feature: `40.289 ms`
+
+So for me its roughly 2% faster. Not quite as significant as in your benchmarks. Under which conditions did you benchmark @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-09T08:36:59Z
+
+Now with tests, PR ready for a last (hopefully) round of review.
+
+@dmaicher thanks for the confirmation! My test was on an annotated controller with a Twig-rendered Hello World, and using Blackfire to profile. Using `ab`, I'm more at 2% also.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-09T09:38:18Z
+
+(failures are false-positives)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-09T14:10:24Z
+
+Can we make fabbot happy? Avoiding false-positives in the future would be great.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-09T14:15:10Z
+
+green it is now :)

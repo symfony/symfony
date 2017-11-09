@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-11-06T15:17:56Z
+
+Note that this could break user space choice widgets which rely on `is valid` :/ But hey, this is BS4 only and they can still use errors|length. Still, better ideas welcome.

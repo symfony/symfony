@@ -818,6 +818,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             'file' => $cache->getPath(),
             'as_files' => true,
             'debug' => $this->debug,
+            'hot_path_tag' => !$this->loadClassCache ? 'container.hot_path' : null,
         ));
 
         $rootCode = array_pop($content);

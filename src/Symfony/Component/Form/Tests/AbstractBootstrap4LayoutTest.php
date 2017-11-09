@@ -164,7 +164,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
             [.=" [trans]Name[/trans]"]
             [@class="form-check-label required"]
             [
-                ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class"][@checked="checked"][@value="1"]
+                ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class form-check-input"][@checked="checked"][@value="1"]
             ]
     ]
 '
@@ -242,7 +242,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         ./label
             [.=" [trans]Name[/trans]"]
             [
-                ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class"][not(@checked)]
+                ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class form-check-input"][not(@checked)]
             ]
     ]
 '
@@ -262,7 +262,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         ./label
             [.=" [trans]Name[/trans]"]
             [
-                ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class"][@value="foo&bar"]
+                ./input[@type="checkbox"][@name="name"][@id="my&id"][@class="my&class form-check-input"][@value="foo&bar"]
             ]
     ]
 '
@@ -487,7 +487,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
                 ./label
                     [.=" [trans]Choice&B[/trans]"]
                     [
-                        ./input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)][@class="foo&bar"]
+                        ./input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)][@class="foo&bar form-check-input"]
                     ]
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
@@ -863,7 +863,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
                 ./label
                     [.=" [trans]Choice&B[/trans]"]
                     [
-                        ./input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)][@class="foo&bar"]
+                        ./input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)][@class="foo&bar form-check-input"]
                     ]
             ]
         /following-sibling::div
@@ -896,7 +896,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
                     [@id="my&id"]
                     [@type="radio"]
                     [@name="name"]
-                    [@class="my&class"]
+                    [@class="my&class form-check-input"]
                     [@checked="checked"]
                     [@value="1"]
             ]
@@ -920,7 +920,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
                     [@id="my&id"]
                     [@type="radio"]
                     [@name="name"]
-                    [@class="my&class"]
+                    [@class="my&class form-check-input"]
                     [not(@checked)]
             ]
     ]
@@ -945,7 +945,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
                     [@id="my&id"]
                     [@type="radio"]
                     [@name="name"]
-                    [@class="my&class"]
+                    [@class="my&class form-check-input"]
                     [@value="foo&bar"]
             ]
     ]

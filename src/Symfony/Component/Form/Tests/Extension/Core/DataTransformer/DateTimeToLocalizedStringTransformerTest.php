@@ -307,22 +307,6 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     }
 
     /**
-     * @expectedException \TypeError
-     */
-    public function testValidateDateFormatOption()
-    {
-        new DateTimeToLocalizedStringTransformer(null, null, 'foobar');
-    }
-
-    /**
-     * @expectedException \TypeError
-     */
-    public function testValidateTimeFormatOption()
-    {
-        new DateTimeToLocalizedStringTransformer(null, null, null, 'foobar');
-    }
-
-    /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformWithNonExistingDate()

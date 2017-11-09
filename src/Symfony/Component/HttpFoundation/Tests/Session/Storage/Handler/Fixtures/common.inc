@@ -38,14 +38,13 @@ ini_set('session.use_strict_mode', 1);
 ini_set('session.lazy_write', 1);
 ini_set('session.name', 'sid');
 ini_set('session.save_path', __DIR__);
-ini_set('session.cache_limiter', 'private_no_expire');
+ini_set('session.cache_limiter', '');
 
 header_remove('X-Powered-By');
 header('Content-Type: text/plain; charset=utf-8');
 
 register_shutdown_function(function () {
     echo "\n";
-    header_remove('Last-Modified');
     session_write_close();
     print_r(headers_list());
     echo "shutdown\n";

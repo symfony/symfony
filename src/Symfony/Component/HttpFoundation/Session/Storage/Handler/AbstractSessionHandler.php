@@ -32,6 +32,9 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
     public function open($savePath, $sessionName)
     {
         $this->sessionName = $sessionName;
+        if (!headers_sent() && !ini_get('session.cache_limiter')) {
+            header(sprintf('Cache-Control: max-age=%d, private, must-revalidate', 60 * (int) ini_get('session.cache_expire')));
+        }
 
         return true;
     }

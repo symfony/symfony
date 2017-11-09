@@ -28,11 +28,22 @@ class RegisterListenersPass implements CompilerPassInterface
     protected $listenerTag;
     protected $subscriberTag;
 
+    private $hotPathEvents = array();
+    private $hotPathTagName;
+
     public function __construct(string $dispatcherService = 'event_dispatcher', string $listenerTag = 'kernel.event_listener', string $subscriberTag = 'kernel.event_subscriber')
     {
         $this->dispatcherService = $dispatcherService;
         $this->listenerTag = $listenerTag;
         $this->subscriberTag = $subscriberTag;
+    }
+
+    public function setHotPathEvents(array $hotPathEvents, $tagName = 'container.hot_path')
+    {
+        $this->hotPathEvents = array_flip($hotPathEvents);
+        $this->hotPathTagName = $tagName;
+
+        return $this;
     }
 
     public function process(ContainerBuilder $container)
@@ -60,6 +71,10 @@ class RegisterListenersPass implements CompilerPassInterface
                 }
 
                 $definition->addMethodCall('addListener', array($event['event'], array(new ServiceClosureArgument(new Reference($id)), $event['method']), $priority));
+
+                if (isset($this->hotPathEvents[$event['event']])) {
+                    $container->getDefinition($id)->addTag($this->hotPathTagName);
+                }
             }
         }
 
@@ -86,6 +101,10 @@ class RegisterListenersPass implements CompilerPassInterface
             foreach ($extractingDispatcher->listeners as $args) {
                 $args[1] = array(new ServiceClosureArgument(new Reference($id)), $args[1]);
                 $definition->addMethodCall('addListener', $args);
+
+                if (isset($this->hotPathEvents[$args[0]])) {
+                    $container->getDefinition($id)->addTag('container.hot_path');
+                }
             }
             $extractingDispatcher->listeners = array();
         }

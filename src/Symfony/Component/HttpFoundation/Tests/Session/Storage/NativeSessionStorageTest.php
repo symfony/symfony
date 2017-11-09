@@ -150,7 +150,7 @@ class NativeSessionStorageTest extends TestCase
         $this->iniSet('session.cache_limiter', 'nocache');
 
         $storage = new NativeSessionStorage();
-        $this->assertEquals('private_no_expire', ini_get('session.cache_limiter'));
+        $this->assertEquals('', ini_get('session.cache_limiter'));
     }
 
     public function testExplicitSessionCacheLimiter()

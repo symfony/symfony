@@ -7,7 +7,9 @@
     <services>
         <defaults public="false" />
 
-        <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\EventDispatcher" public="true" />
+        <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\EventDispatcher" public="true">
+            <tag name="container.hot_path" />
+        </service>
         <service id="Symfony\Component\EventDispatcher\EventDispatcherInterface" alias="event_dispatcher" />
 
         <service id="http_kernel" class="Symfony\Component\HttpKernel\HttpKernel" public="true">
@@ -15,6 +17,7 @@
             <argument type="service" id="controller_resolver" />
             <argument type="service" id="request_stack" />
             <argument type="service" id="argument_resolver" />
+            <tag name="container.hot_path" />
         </service>
         <service id="Symfony\Component\HttpKernel\HttpKernelInterface" alias="http_kernel" />
 

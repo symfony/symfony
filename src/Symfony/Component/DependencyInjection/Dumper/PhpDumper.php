@@ -64,6 +64,9 @@ class PhpDumper extends Dumper
     private $usedMethodNames;
     private $namespace;
     private $asFiles;
+    private $hotPathTag;
+    private $inlineRequires;
+    private $inlinedRequires = array();
 
     /**
      * @var ProxyDumper
@@ -109,16 +112,21 @@ class PhpDumper extends Dumper
     public function dump(array $options = array())
     {
         $this->targetDirRegex = null;
+        $this->inlinedRequires = array();
         $options = array_merge(array(
             'class' => 'ProjectServiceContainer',
             'base_class' => 'Container',
             'namespace' => '',
             'as_files' => false,
             'debug' => true,
+            'hot_path_tag' => null,
+            'inline_class_loader_parameter' => 'container.dumper.inline_class_loader',
         ), $options);
 
         $this->namespace = $options['namespace'];
         $this->asFiles = $options['as_files'];
+        $this->hotPathTag = $options['hot_path_tag'];
+        $this->inlineRequires = $this->container->hasParameter($options['inline_class_loader_parameter']) && $this->container->getParameter($options['inline_class_loader_parameter']);
         $this->initializeMethodNamesMap($options['base_class']);
 
         $this->docStar = $options['debug'] ? '*' : '';
@@ -221,6 +229,7 @@ EOF;
         }
 
         $this->targetDirRegex = null;
+        $this->inlinedRequires = array();
 
         $unusedEnvs = array();
         foreach ($this->container->getEnvCounters() as $env => $use) {
@@ -253,9 +262,13 @@ EOF;
 
         array_unshift($inlinedDefinitions, $definition);
 
+        $collectLineage = $this->inlineRequires && !($this->hotPathTag && $definition->hasTag($this->hotPathTag));
         $isNonLazyShared = !$this->getProxyDumper()->isProxyCandidate($definition) && $definition->isShared();
-        $calls = $behavior = array();
+        $lineage = $calls = $behavior = array();
         foreach ($inlinedDefinitions as $iDefinition) {
+            if ($collectLineage && $class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()) {
+                $this->collectLineage($class, $lineage);
+            }
             $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior, $isNonLazyShared);
             $isPreInstantiation = $isNonLazyShared && $iDefinition !== $definition && !$this->hasReference($cId, $iDefinition->getMethodCalls(), true) && !$this->hasReference($cId, $iDefinition->getProperties(), true);
             $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior, $isPreInstantiation);
@@ -268,6 +281,13 @@ EOF;
         foreach ($calls as $id => $callCount) {
             if ('service_container' === $id || $id === $cId) {
                 continue;
+            }
+
+            if ($collectLineage && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE !== $behavior[$id] && $this->container->has($id)
+                && $this->isTrivialInstance($iDefinition = $this->container->findDefinition($id))
+                && $class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()
+            ) {
+                $this->collectLineage($class, $lineage);
             }
 
             if ($callCount > 1) {
@@ -297,7 +317,46 @@ EOTXT
             $code .= "\n";
         }
 
+        if ($lineage && $lineage = array_diff_key(array_flip($lineage), $this->inlinedRequires)) {
+            $code = "\n".$code;
+
+            foreach (array_reverse($lineage) as $file => $class) {
+                $code = sprintf("        require_once %s;\n", $file).$code;
+            }
+        }
+
         return $code;
+    }
+
+    private function collectLineage($class, array &$lineage)
+    {
+        if (isset($lineage[$class])) {
+            return;
+        }
+        if (!$r = $this->container->getReflectionClass($class)) {
+            return;
+        }
+        if ($this->container instanceof $class) {
+            return;
+        }
+        $file = $r->getFileName();
+        if (!$file || $this->doExport($file) === $exportedFile = $this->export($file)) {
+            return;
+        }
+
+        if ($parent = $r->getParentClass()) {
+            $this->collectLineage($parent->name, $lineage);
+        }
+
+        foreach ($r->getInterfaces() as $parent) {
+            $this->collectLineage($parent->name, $lineage);
+        }
+
+        foreach ($r->getTraits() as $parent) {
+            $this->collectLineage($parent->name, $lineage);
+        }
+
+        $lineage[$class] = substr($exportedFile, 1, -1);
     }
 
     private function generateProxyClasses()
@@ -473,10 +532,15 @@ EOTXT
                     if (!$v || ($v instanceof Reference && 'service_container' === (string) $v)) {
                         continue;
                     }
+                    if ($v instanceof Reference && $this->container->has($id = (string) $v) && $this->container->findDefinition($id)->isSynthetic()) {
+                        continue;
+                    }
                     if (!is_scalar($v) || $this->dumpValue($v) !== $this->dumpValue($v, false)) {
                         return false;
                     }
                 }
+            } elseif ($arg instanceof Reference && $this->container->has($id = (string) $arg) && $this->container->findDefinition($id)->isSynthetic()) {
+                continue;
             } elseif (!is_scalar($arg) || $this->dumpValue($arg) !== $this->dumpValue($arg, false)) {
                 return false;
             }
@@ -625,7 +689,7 @@ EOTXT
             $lazyInitialization = '';
         }
 
-        $asFile = $this->asFiles && $definition->isShared();
+        $asFile = $this->asFiles && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag));
         $methodName = $this->generateMethodName($id);
         if ($asFile) {
             $file = $methodName.'.php';
@@ -686,7 +750,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if ($definition->isSynthetic() || ($this->asFiles && $definition->isShared())) {
+            if ($definition->isSynthetic() || ($this->asFiles && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag)))) {
                 continue;
             }
             if ($definition->isPublic()) {
@@ -704,7 +768,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && $definition->isShared()) {
+            if (!$definition->isSynthetic() && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag))) {
                 $code = $this->addService($id, $definition, $file);
                 yield $file => $code;
             }
@@ -810,6 +874,7 @@ EOF;
         $code .= $this->addMethodMap();
         $code .= $this->asFiles ? $this->addFileMap() : '';
         $code .= $this->addAliases();
+        $code .= $this->addInlineRequires();
         $code .= <<<EOF
     }
 
@@ -926,7 +991,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && $definition->isPublic() && (!$this->asFiles || !$definition->isShared())) {
+            if (!$definition->isSynthetic() && $definition->isPublic() && (!$this->asFiles || !$definition->isShared() || ($this->hotPathTag && $definition->hasTag($this->hotPathTag)))) {
                 $code .= '            '.$this->export($id).' => '.$this->export($this->generateMethodName($id)).",\n";
             }
         }
@@ -940,7 +1005,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && $definition->isPublic() && $definition->isShared()) {
+            if (!$definition->isSynthetic() && $definition->isPublic() && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag))) {
                 $code .= sprintf("            %s => __DIR__.'/%s.php',\n", $this->export($id), $this->generateMethodName($id));
             }
         }
@@ -965,6 +1030,38 @@ EOF;
         }
 
         return $code."        );\n";
+    }
+
+    private function addInlineRequires() :string
+    {
+        if (!$this->hotPathTag || !$this->inlineRequires) {
+            return '';
+        }
+
+        $lineage = array();
+
+        foreach ($this->container->findTaggedServiceIds($this->hotPathTag) as $id => $tags) {
+            $definition = $this->container->getDefinition($id);
+            $inlinedDefinitions = $this->getInlinedDefinitions($definition);
+            array_unshift($inlinedDefinitions, $definition);
+
+            foreach ($inlinedDefinitions as $iDefinition) {
+                if ($class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()) {
+                    $this->collectLineage($class, $lineage);
+                }
+            }
+        }
+
+        $code = "\n";
+
+        foreach ($lineage as $file) {
+            if (!isset($this->inlinedRequires[$file])) {
+                $this->inlinedRequires[$file] = true;
+                $code .= sprintf("        require_once %s;\n", $file);
+            }
+        }
+
+        return "\n" === $code ? '' : $code;
     }
 
     private function addDefaultParametersMethod(): string
@@ -1167,7 +1264,7 @@ EOF;
                 $id = (string) $argument;
 
                 if (!isset($calls[$id])) {
-                    $calls[$id] = (int) $isPreInstantiation;
+                    $calls[$id] = (int) ($isPreInstantiation && $this->container->has($id) && !$this->container->findDefinition($id)->isSynthetic());
                 }
                 if (!isset($behavior[$id])) {
                     $behavior[$id] = $argument->getInvalidBehavior();
@@ -1460,9 +1557,7 @@ EOF;
             return '$this';
         }
 
-        if ($this->container->hasDefinition($id)) {
-            $definition = $this->container->getDefinition($id);
-
+        if ($this->container->hasDefinition($id) && ($definition = $this->container->getDefinition($id)) && !$definition->isSynthetic()) {
             if (null !== $reference && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $reference->getInvalidBehavior()) {
                 $code = 'null';
             } elseif ($this->isTrivialInstance($definition)) {
@@ -1470,7 +1565,7 @@ EOF;
                 if ($definition->isShared()) {
                     $code = sprintf('$this->%s[\'%s\'] = %s', $definition->isPublic() ? 'services' : 'privates', $id, $code);
                 }
-            } elseif ($this->asFiles && $definition->isShared()) {
+            } elseif ($this->asFiles && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag))) {
                 $code = sprintf("\$this->load(__DIR__.'/%s.php')", $this->generateMethodName($id));
             } else {
                 $code = sprintf('$this->%s()', $this->generateMethodName($id));

@@ -141,6 +141,18 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
+    public function testHotPathEvents()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', SubscriberService::class)->addTag('kernel.event_subscriber', array());
+        $container->register('event_dispatcher', 'stdClass');
+
+        (new RegisterListenersPass())->setHotPathEvents(array('event'))->process($container);
+
+        $this->assertTrue($container->getDefinition('foo')->hasTag('container.hot_path'));
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage You have requested a non-existent parameter "subscriber.class"

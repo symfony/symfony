@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-11-09T13:03:22Z
+
+FYI it seems like your git user is not recognized by github, you probably need to register a new email address on github from the output of `git config --global user.email`. See https://help.github.com/articles/why-are-my-commits-linked-to-the-wrong-user/#commits-are-not-linked-to-any-user
+
+---------------------------------------------------------------------------
+
+by SerkanYildiz at 2017-11-09T13:14:16Z
+
+True. It is already fixed in 3.4 :)
+Btw, thanks letting me know about git config for email, will set up that correctly.

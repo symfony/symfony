@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-09T17:21:50Z
+
+(now investigating the failure)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-09T19:36:02Z
+
+PR ready.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-11-10T07:08:39Z
+
+Same issue affects the Lock component, and could be patched in the same way. I will open a PR when this one will be merged to reuse the RedisProxy. (thanks FWBundle has a dependency on Cache)
+
+Diff is to take into account and allow the new class  `RedisProxy` in `Symfony\Component\Lock\Store\RedisStore` and in `Symfony\Component\Lock\Store\StoreFactory` and add the `array('lazy' => true)` in the `FrameworkExtension`

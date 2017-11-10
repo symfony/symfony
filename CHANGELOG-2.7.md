@@ -7,6 +7,37 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.36 (2017-11-10)
+
+ * bug #24888 [FrameworkBundle] Specifically inject the debug dispatcher in the collector (ogizanagi)
+ * bug #24909 [Intl] Update ICU data to 60.1 (jakzal)
+ * bug #24906 [Bridge/ProxyManager] Remove direct reference to value holder property (nicolas-grekas)
+ * bug #24900 [Validator] Fix Costa Rica IBAN format (Bozhidar Hristov)
+ * bug #24904 [Validator] Add Belarus IBAN format (Bozhidar Hristov)
+ * bug #24531 [HttpFoundation] Fix forward-compat of NativeSessionStorage with PHP 7.2 (sroze)
+ * bug #24814 [Intl] Make intl-data tests pass and save language aliases again (jakzal)
+ * bug #24764 [HttpFoundation] add Early Hints to Reponse to fix test (Simperfit)
+ * bug #24605 [FrameworkBundle] Do not load property_access.xml if the component isn't installed (ogizanagi)
+ * bug #24606 [HttpFoundation] Fix FileBag issue with associative arrays (enumag)
+ * bug #24660 Escape trailing \ in QuestionHelper autocompletion (kamazee)
+ * bug #24644 [Security] Fixed auth provider authenticate() cannot return void (glye)
+ * bug #24626 streamed response should return $this (DQNEO)
+ * bug #24589 Username and password in basic auth are allowed to contain '.' (Richard Quadling)
+ * bug #24566 Fixed unsetting from loosely equal keys OrderedHashMap (maryo)
+ * bug #24570 [Debug] Fix same vendor detection in class loader (Jean-Beru)
+ * bug #24563 [Serializer] ObjectNormalizer: throw if PropertyAccess isn't installed (dunglas)
+ * bug #24579 pdo session fix (mxp100)
+ * bug #24536 [Security] Reject remember-me token if UserCheckerInterface::checkPostAuth() fails (kbond)
+ * bug #24519 [Validator] [Twig] added magic method __isset()  to File Constraint class (loru88)
+ * bug #24532 [DI] Fix possible incorrect php-code when dumped strings contains newlines (Strate)
+ * bug #24502 [HttpFoundation] never match invalid IP addresses (xabbuh)
+ * bug #24460 [Form] fix parsing invalid floating point numbers (xabbuh)
+ * bug #24490 [HttpFoundation] Combine Cache-Control headers (c960657)
+ * bug #23711 Fix support for PHP 7.2 (Simperfit, nicolas-grekas)
+ * bug #24494 [HttpFoundation] Add missing session.lazy_write config option (nicolas-grekas)
+ * bug #24434 [Form] Use for=ID on radio/checkbox label. (Nyholm)
+ * bug #24455 [Console] Escape command usage (sroze)
+
 * 2.7.35 (2017-10-05)
 
  * bug #24448 [Session] fix MongoDb session handler to gc all expired sessions (Tobion)

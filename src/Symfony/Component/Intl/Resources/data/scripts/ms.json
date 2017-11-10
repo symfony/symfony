@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "Arab": "Arab",
         "Armn": "Armenia",
@@ -16,7 +16,7 @@
         "Grek": "Greek",
         "Gujr": "Gujarat",
         "Guru": "Gurmukhi",
-        "Hanb": "Hanb",
+        "Hanb": "Han dengan Bopomofo",
         "Hang": "Hangul",
         "Hani": "Han",
         "Hans": "Ringkas",

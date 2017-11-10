@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.67",
     "Names": {
         "aa": "afar",
         "ab": "abhaasi",
@@ -158,7 +158,7 @@
         "eu": "baski",
         "ewo": "ewondo",
         "ext": "extremadura",
-        "fa": "farsi",
+        "fa": "persia",
         "fan": "fang",
         "fat": "fanti",
         "ff": "fulani",
@@ -171,7 +171,7 @@
         "fr": "ranska",
         "fr_CA": "kanadanranska",
         "fr_CH": "sveitsinranska",
-        "frc": "cajun",
+        "frc": "cajunranska",
         "frm": "keskiranska",
         "fro": "muinaisranska",
         "frp": "arpitaani",
@@ -318,6 +318,7 @@
         "ln": "lingala",
         "lo": "lao",
         "lol": "mongo",
+        "lou": "louisianankreoli",
         "loz": "lozi",
         "lrc": "pohjoisluri",
         "lt": "liettua",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "AC": "Wyspa Wniebowstąpienia",
         "AD": "Andora",
@@ -10,7 +10,7 @@
         "AL": "Albania",
         "AM": "Armenia",
         "AO": "Angola",
-        "AQ": "Antarktyka",
+        "AQ": "Antarktyda",
         "AR": "Argentyna",
         "AS": "Samoa Amerykańskie",
         "AT": "Austria",
@@ -72,6 +72,7 @@
         "ER": "Erytrea",
         "ES": "Hiszpania",
         "ET": "Etiopia",
+        "EZ": "strefa euro",
         "FI": "Finlandia",
         "FJ": "Fidżi",
         "FK": "Falklandy",

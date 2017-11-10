@@ -57,7 +57,7 @@ class IbanValidator extends ConstraintValidator
         'CH' => 'CH\d{2}\d{5}[\dA-Z]{12}', // Switzerland
         'CI' => 'CI\d{2}[A-Z]{1}\d{23}', // Ivory Coast
         'CM' => 'CM\d{2}\d{23}', // Cameron
-        'CR' => 'CR\d{2}\d{3}\d{14}', // Costa Rica
+        'CR' => 'CR\d{2}0\d{3}\d{14}', // Costa Rica
         'CV' => 'CV\d{2}\d{21}', // Cape Verde
         'CY' => 'CY\d{2}\d{3}\d{5}[\dA-Z]{16}', // Cyprus
         'CZ' => 'CZ\d{2}\d{20}', // Czech Republic

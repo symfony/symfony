@@ -707,7 +707,7 @@ class ErrorHandler
         }
         if (!($throw || $this->scopedErrors & $type)) {
             for ($i = 0; isset($lightTrace[$i]); ++$i) {
-                unset($lightTrace[$i]['args']);
+                unset($lightTrace[$i]['args'], $lightTrace[$i]['object']);
             }
         }
 

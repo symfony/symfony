@@ -68,6 +68,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('BE62 5100 0754 7061'), //Belgium
             array('BA39 1290 0794 0102 8494'), //Bosnia and Herzegovina
             array('BG80 BNBG 9661 1020 3456 78'), //Bulgaria
+            array('BY 13 NBRB 3600 900000002Z00AB00'), //Belarus
             array('HR12 1001 0051 8630 0016 0'), //Croatia
             array('CY17 0020 0128 0000 0012 0052 7600'), //Cyprus
             array('CZ65 0800 0000 1920 0014 5399'), //Czech Republic
@@ -127,6 +128,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('BR1800000000141455123924100C2'), // Brazil
             array('VG96VPVG0000012345678901'), //British Virgin Islands
             array('BF1030134020015400945000643'), //Burkina Faso
+            array('BY22NB23324232T78YR7823HR32U'), //Belarus
             array('BI43201011067444'), //Burundi
             array('CM2110003001000500000605306'), //Cameroon
             array('CV64000300004547069110176'), //Cape Verde
@@ -183,6 +185,10 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('BA39 1290 0794 0102 8494 4'), //Bosnia and Herzegovina
             array('BG80 BNBG 9661 1020 3456 7'), //Bulgaria
             array('BG80 B2BG 9661 1020 3456 78'), //Bulgaria
+            array('BY 13 NBRB 3600 900000002Z00AB001'), //Belarus
+            array('BY 13 NBRB 3600 900000002Z00AB0'), //Belarus
+            array('BYRO NBRB 3600 900000002Z00AB0'), //Belarus
+            array('BY 13 3600 NBRB 900000002Z00AB05'), //Belarus
             array('HR12 1001 0051 8630 0016 01'), //Croatia
             array('CY17 0020 0128 0000 0012 0052 7600 1'), //Cyprus
             array('CZ65 0800 0000 1920 0014 5399 1'), //Czech Republic
@@ -293,6 +299,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('BE62 5100 0754 7062'), //Belgium
             array('BA39 1290 0794 0102 8495'), //Bosnia and Herzegovina
             array('BG80 BNBG 9661 1020 3456 79'), //Bulgaria
+            array('BY90 NBRB 3600 900000002Z00AB00'), //Belarus
             array('HR12 1001 0051 8630 0016 1'), //Croatia
             array('CY17 0020 0128 0000 0012 0052 7601'), //Cyprus
             array('CZ65 0800 0000 1920 0014 5398'), //Czech Republic

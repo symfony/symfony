@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "ADP": [
             "ADP",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "Čilės pesas"
+        ],
+        "CNH": [
+            "CNH",
+            "Kinijos Užsienio juanis"
         ],
         "CNX": [
             "CNX",

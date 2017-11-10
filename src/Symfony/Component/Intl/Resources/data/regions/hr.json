@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.1",
     "Names": {
         "AC": "Otok Ascension",
         "AD": "Andora",
@@ -72,6 +72,7 @@
         "ER": "Eritreja",
         "ES": "Španjolska",
         "ET": "Etiopija",
+        "EZ": "eurozona",
         "FI": "Finska",
         "FJ": "Fidži",
         "FK": "Falklandski otoci",
@@ -182,7 +183,7 @@
         "PH": "Filipini",
         "PK": "Pakistan",
         "PL": "Poljska",
-        "PM": "Saint-Pierre-et-Miquelon",
+        "PM": "Sveti Petar i Mikelon",
         "PN": "Otoci Pitcairn",
         "PR": "Portoriko",
         "PS": "Palestinsko Područje",

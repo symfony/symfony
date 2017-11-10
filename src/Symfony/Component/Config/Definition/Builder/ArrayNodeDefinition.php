@@ -424,7 +424,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 $node->setKeyAttribute($this->key, $this->removeKeyItem);
             }
 
-            if (true === $this->atLeastOne || false === $this->allowEmptyValue) {
+            if (false === $this->allowEmptyValue) {
+                @trigger_error(sprintf('Using %s::cannotBeEmpty() at path "%s" has no effect, consider requiresAtLeastOneElement() instead. In 4.0 both methods will behave the same.', __CLASS__, $node->getPath()), E_USER_DEPRECATED);
+            }
+
+            if (true === $this->atLeastOne) {
                 $node->setMinNumberOfElements(1);
             }
 
@@ -486,9 +490,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         }
 
         if (false === $this->allowEmptyValue) {
-            throw new InvalidDefinitionException(
-                sprintf('->cannotBeEmpty() is not applicable to concrete nodes at path "%s"', $path)
-            );
+            @trigger_error(sprintf('->cannotBeEmpty() is not applicable to concrete nodes at path "%s". In 4.0 it will throw an exception.', $path), E_USER_DEPRECATED);
         }
 
         if (true === $this->atLeastOne) {

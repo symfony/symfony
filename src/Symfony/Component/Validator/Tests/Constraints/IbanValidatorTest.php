@@ -133,8 +133,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('CV64000300004547069110176'), //Cape Verde
             array('FR7630007000110009970004942'), //Central African Republic
             array('CG5230011000202151234567890'), //Congo
-            array('CR0515202001026284066'), //Costa Rica
-            array('CR05015202001026284066'), //Costa Rica with zero
+            array('CR05015202001026284066'), //Costa Rica
             array('DO28BAGR00000001212453611324'), //Dominican Republic
             array('GT82TRAJ01020000001210029690'), //Guatemala
             array('IR580540105180021273113007'), //Iran
@@ -185,7 +184,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('BA39 1290 0794 0102 8494 4'), //Bosnia and Herzegovina
             array('BG80 BNBG 9661 1020 3456 7'), //Bulgaria
             array('BG80 B2BG 9661 1020 3456 78'), //Bulgaria
-            array('BY 13 NBRB 3600 900000002Z00AB002'), //Bulgaria
+            array('BY 13 NBRB 3600 900000002Z00AB002'), //Belarus
             array('HR12 1001 0051 8630 0016 01'), //Croatia
             array('CY17 0020 0128 0000 0012 0052 7600 1'), //Cyprus
             array('CZ65 0800 0000 1920 0014 5399 1'), //Czech Republic

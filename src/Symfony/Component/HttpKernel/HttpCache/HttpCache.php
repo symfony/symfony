@@ -687,11 +687,11 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private function waitForLock(Request $request): bool
     {
         $wait = 0;
-        while ($this->store->isLocked($request) && $wait < 5000000) {
+        while ($this->store->isLocked($request) && $wait < 100) {
             usleep(50000);
-            $wait += 50000;
+            $wait++;
         }
 
-        return $wait < 5000000;
+        return $wait < 100;
     }
 }

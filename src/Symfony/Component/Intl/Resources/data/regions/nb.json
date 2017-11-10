@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -72,6 +72,7 @@
         "ER": "Eritrea",
         "ES": "Spania",
         "ET": "Etiopia",
+        "EZ": "eurosonen",
         "FI": "Finland",
         "FJ": "Fiji",
         "FK": "Falklandsøyene",
@@ -182,7 +183,7 @@
         "PH": "Filippinene",
         "PK": "Pakistan",
         "PL": "Polen",
-        "PM": "St. Pierre og Miquelon",
+        "PM": "Saint-Pierre-et-Miquelon",
         "PN": "Pitcairn",
         "PR": "Puerto Rico",
         "PS": "Det palestinske området",

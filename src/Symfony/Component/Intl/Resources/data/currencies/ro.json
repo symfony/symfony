@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.60",
+    "Version": "2.1.37.5",
     "Names": {
         "ADP": [
             "ADP",
@@ -172,6 +172,10 @@
         "CLP": [
             "CLP",
             "peso chilian"
+        ],
+        "CNH": [
+            "CNH",
+            "yuan chinezesc (offshore)"
         ],
         "CNY": [
             "CNY",

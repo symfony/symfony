@@ -1547,7 +1547,7 @@ class FrameworkExtension extends Extension
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
                             $connectionDefinition->setFactory(array(AbstractAdapter::class, 'createConnection'));
-                            $connectionDefinition->setArguments(array($storeDsn));
+                            $connectionDefinition->setArguments(array($storeDsn, array('lazy' => true)));
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }
 

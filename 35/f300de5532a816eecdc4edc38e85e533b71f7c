@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-09T08:40:37Z
+
+Since the tag parsing feature is opt-in it may be worth it to make at an opt-in feature of the lint command too.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-11-09T08:53:35Z
+
+I did initially add a new option to the command to enable the flag, but wasn't sure if that would count as a new feature then instead of a bug fix?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-11-09T10:38:45Z
+
+Seems like a feature yes, although it should have been added at time the constant has been introduced.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-11-09T20:25:34Z
+
+Linting the yaml files is part of our build process, so all our builds keeps failing because of this. So if this can only go in as a new feature in 4.1, then we won't be able to lint yaml files until May next year and after upgrading to Symfony 4 (or we must duplicate the logic in our application) unless this can be enabled by default without the additional option, but that might cause some false-positives if someone hasn't enabled custom tags

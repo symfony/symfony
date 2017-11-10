@@ -302,7 +302,7 @@ class Request
      * @param array  $cookies    The request cookies ($_COOKIE)
      * @param array  $files      The request files ($_FILES)
      * @param array  $server     The server parameters ($_SERVER)
-     * @param string $content    The raw body data
+     * @param string|null $content    The raw body data
      *
      * @return static
      */

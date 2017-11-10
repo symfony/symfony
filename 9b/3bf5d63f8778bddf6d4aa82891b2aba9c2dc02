@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-10T09:37:32Z
+
+Do we have any idea about how significant this change can be? (performance-wise)
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-11-10T10:49:16Z
+
+I'm not really seeing a performance difference (sadly). Used 3.4.0-BETA3 as reference vs your commit.
+
+#### Before your patch
+![image](https://user-images.githubusercontent.com/1754678/32654402-6aa43128-c60b-11e7-9cc1-59f656804d0c.png)
+
+![image](https://user-images.githubusercontent.com/1754678/32655139-b0fd1792-c60c-11e7-8b0d-d60ff1b17e04.png)
+
+#### After your patch
+![image](https://user-images.githubusercontent.com/1754678/32654415-76df0bd4-c60b-11e7-907c-3864c9d25ef9.png)
+
+![image](https://user-images.githubusercontent.com/1754678/32654692-c4dae2cc-c60b-11e7-952e-3442ee9be9fc.png)
+
+Either that was not what was causing it, or there's something wrong on my end, but I did double check the results.

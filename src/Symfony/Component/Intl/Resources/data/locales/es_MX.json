@@ -1,10 +1,5 @@
 {
     "Names": {
-        "bs_BA": "bosnio (Bosnia y Herzegovina)",
-        "bs_Cyrl_BA": "bosnio (cirílico, Bosnia y Herzegovina)",
-        "bs_Latn_BA": "bosnio (latino, Bosnia y Herzegovina)",
-        "en_UM": "inglés (Islas Ultramarinas Menores de Estados Unidos)",
-        "hr_BA": "croata (Bosnia y Herzegovina)",
         "pa": "punyabí",
         "pa_Arab": "punyabí (árabe)",
         "pa_Arab_PK": "punyabí (árabe, Pakistán)",
@@ -14,9 +9,7 @@
         "pa_PK": "punyabí (Pakistán)",
         "rn": "kiroundi",
         "rn_BI": "kiroundi (Burundi)",
-        "sh_BA": "serbocroata (Bosnia y Herzegovina)",
-        "sr_BA": "serbio (Bosnia y Herzegovina)",
-        "sr_Cyrl_BA": "serbio (cirílico, Bosnia y Herzegovina)",
-        "sr_Latn_BA": "serbio (latino, Bosnia y Herzegovina)"
+        "wo": "wolof",
+        "wo_SN": "wolof (Senegal)"
     }
 }

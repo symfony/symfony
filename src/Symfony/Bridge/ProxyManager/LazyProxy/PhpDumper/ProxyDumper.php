@@ -95,7 +95,11 @@ EOF;
      */
     public function getProxyCode(Definition $definition)
     {
-        return $this->classGenerator->generate($this->generateProxyClass($definition));
+        return preg_replace(
+            '/(\$this->initializer[0-9a-f]++) && \1->__invoke\(\$this->(valueHolder[0-9a-f]++), (.*?), \1\);/',
+            '$1 && ($1->__invoke(\$$2, $3, $1) || 1) && $this->$2 = \$$2;',
+            $this->classGenerator->generate($this->generateProxyClass($definition))
+        );
     }
 
     /**

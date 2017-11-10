@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "Arab": "arābu",
         "Armi": "aramiešu",
@@ -23,8 +23,8 @@
         "Grek": "grieķu",
         "Gujr": "gudžaratu",
         "Guru": "pandžabu",
-        "Hanb": "ķīniešu hanb",
-        "Hang": "hangila",
+        "Hanb": "haņu ar bopomofo",
+        "Hang": "hangils",
         "Hani": "ķīniešu",
         "Hans": "vienkāršotā",
         "Hant": "tradicionālā",
@@ -65,7 +65,7 @@
         "Taml": "tamilu",
         "Telu": "telugu",
         "Tglg": "tagalu",
-        "Thaa": "taana",
+        "Thaa": "tāna",
         "Thai": "taju",
         "Tibt": "tibetiešu",
         "Xpeo": "senperiešu",

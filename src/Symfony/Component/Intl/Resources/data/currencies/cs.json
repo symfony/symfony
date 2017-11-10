@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.11",
     "Names": {
         "ADP": [
             "ADP",
@@ -123,15 +123,15 @@
         ],
         "BGL": [
             "BGL",
-            "BGL"
+            "bulharský tvrdý leva"
         ],
         "BGM": [
             "BGM",
-            "BGM"
+            "bulharský socialistický leva"
         ],
         "BGN": [
             "BGN",
-            "bulharský lev"
+            "bulharský leva"
         ],
         "BGO": [
             "BGO",
@@ -260,6 +260,14 @@
         "CLP": [
             "CLP",
             "chilské peso"
+        ],
+        "CNH": [
+            "CNH",
+            "čínský jüan (offshore)"
+        ],
+        "CNX": [
+            "CNX",
+            "čínský dolar ČLB"
         ],
         "CNY": [
             "CN¥",

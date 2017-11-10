@@ -1,13 +1,33 @@
 {
-    "Version": "2.1.31.74",
+    "Version": "2.1.37.22",
     "Names": {
         "JPY": [
             "¥",
             "yen"
         ],
+        "MYR": [
+            "MYR",
+            "ringit"
+        ],
+        "THB": [
+            "THB",
+            "bat"
+        ],
         "USD": [
             "$",
             "dólar estadounidense"
+        ],
+        "UZS": [
+            "UZS",
+            "sum"
+        ],
+        "XAF": [
+            "XAF",
+            "franco CFA de África central"
+        ],
+        "XOF": [
+            "XOF",
+            "franco CFA de África Occidental"
         ]
     }
 }

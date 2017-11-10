@@ -133,6 +133,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('FR7630007000110009970004942'), //Central African Republic
             array('CG5230011000202151234567890'), //Congo
             array('CR0515202001026284066'), //Costa Rica
+            array('CR05015202001026284066'), //Costa Rica with zero
             array('DO28BAGR00000001212453611324'), //Dominican Republic
             array('GT82TRAJ01020000001210029690'), //Guatemala
             array('IR580540105180021273113007'), //Iran

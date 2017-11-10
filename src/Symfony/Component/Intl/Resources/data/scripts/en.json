@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.44",
     "Names": {
         "Adlm": "Adlam",
         "Afak": "Afaka",
@@ -42,6 +42,7 @@
         "Geok": "Georgian Khutsuri",
         "Geor": "Georgian",
         "Glag": "Glagolitic",
+        "Gonm": "Masaram Gondi",
         "Goth": "Gothic",
         "Gran": "Grantha",
         "Grek": "Greek",
@@ -140,6 +141,7 @@
         "Sind": "Khudawadi",
         "Sinh": "Sinhala",
         "Sora": "Sora Sompeng",
+        "Soyo": "Soyombo",
         "Sund": "Sundanese",
         "Sylo": "Syloti Nagri",
         "Syrc": "Syriac",
@@ -169,6 +171,7 @@
         "Xpeo": "Old Persian",
         "Xsux": "Sumero-Akkadian Cuneiform",
         "Yiii": "Yi",
+        "Zanb": "Zanabazar Square",
         "Zinh": "Inherited",
         "Zmth": "Mathematical Notation",
         "Zsye": "Emoji",

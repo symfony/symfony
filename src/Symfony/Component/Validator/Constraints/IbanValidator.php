@@ -50,6 +50,7 @@ class IbanValidator extends ConstraintValidator
         'BG' => 'BG\d{2}[A-Z]{4}\d{4}\d{2}[\dA-Z]{8}', // Bulgaria
         'BH' => 'BH\d{2}[A-Z]{4}[\dA-Z]{14}', // Bahrain
         'BI' => 'BI\d{2}\d{12}', // Burundi
+        'BY' => 'BY\d{2}[\dA-Z]{4}\d{4}[\dA-Z]{16}', // Belarus - https://bank.codes/iban/structure/belarus/
         'BJ' => 'BJ\d{2}[A-Z]{1}\d{23}', // Benin
         'BL' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // Saint Barthelemy
         'BR' => 'BR\d{2}\d{8}\d{5}\d{10}[A-Z][\dA-Z]', // Brazil

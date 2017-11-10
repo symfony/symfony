@@ -296,12 +296,12 @@ class Request
      * The information contained in the URI always take precedence
      * over the other information (server and parameters).
      *
-     * @param string $uri        The URI
-     * @param string $method     The HTTP method
-     * @param array  $parameters The query (GET) or request (POST) parameters
-     * @param array  $cookies    The request cookies ($_COOKIE)
-     * @param array  $files      The request files ($_FILES)
-     * @param array  $server     The server parameters ($_SERVER)
+     * @param string      $uri        The URI
+     * @param string      $method     The HTTP method
+     * @param array       $parameters The query (GET) or request (POST) parameters
+     * @param array       $cookies    The request cookies ($_COOKIE)
+     * @param array       $files      The request files ($_FILES)
+     * @param array       $server     The server parameters ($_SERVER)
      * @param string|null $content    The raw body data
      *
      * @return static
@@ -1748,7 +1748,7 @@ class Request
 
         // Does the baseUrl have anything in common with the request_uri?
         $requestUri = $this->getRequestUri();
-        if ($requestUri !== '' && $requestUri[0] !== '/') {
+        if ('' !== $requestUri && '/' !== $requestUri[0]) {
             $requestUri = '/'.$requestUri;
         }
 
@@ -1824,7 +1824,7 @@ class Request
         if (false !== $pos = strpos($requestUri, '?')) {
             $requestUri = substr($requestUri, 0, $pos);
         }
-        if ($requestUri !== '' && $requestUri[0] !== '/') {
+        if ('' !== $requestUri && '/' !== $requestUri[0]) {
             $requestUri = '/'.$requestUri;
         }
 

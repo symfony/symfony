@@ -13,6 +13,7 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\PropertyAccess\Mapping\Factory\BlackHoleMetadataFactory;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 
@@ -61,6 +62,14 @@ class PropertyAccessorBuilderTest extends TestCase
         $cacheItemPool = new ArrayAdapter();
         $this->builder->setCacheItemPool($cacheItemPool);
         $this->assertEquals($cacheItemPool, $this->builder->getCacheItemPool());
+        $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
+    }
+
+    public function testUseMetadataFactory()
+    {
+        $metadataFactory = new BlackHoleMetadataFactory();
+        $this->builder->setMetadataFactory($metadataFactory);
+        $this->assertEquals($metadataFactory, $this->builder->getMetadataFactory());
         $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
     }
 }

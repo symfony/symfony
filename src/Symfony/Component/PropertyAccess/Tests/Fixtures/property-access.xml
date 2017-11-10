@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+
+<property-access xmlns="http://symfony.com/schema/dic/property-access-mapping"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://symfony.com/schema/dic/property-access-mapping http://symfony.com/schema/dic/property-access-mapping/property-access-mapping-1.0.xsd">
+
+    <class name="Symfony\Component\PropertyAccess\Tests\Fixtures\Dummy">
+        <property name="foo" getter="getter1" setter="setter1" adder="adder1" remover="remover1" />
+        <property name="bar" getter="getter2" />
+    </class>
+
+</property-access>

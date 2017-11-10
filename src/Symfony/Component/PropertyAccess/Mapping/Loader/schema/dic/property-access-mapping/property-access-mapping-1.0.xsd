@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+
+<xsd:schema xmlns="http://symfony.com/schema/dic/property-access-mapping"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://symfony.com/schema/dic/property-access-mapping"
+            elementFormDefault="qualified">
+
+    <xsd:annotation>
+        <xsd:documentation><![CDATA[
+      Symfony Property Access Mapping Schema, version 1.0
+      Authors: Luis Ramón López
+
+      A property access mapping connects attributes with custom access methods.
+    ]]></xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:element name="property-access" type="property-access" />
+
+    <xsd:complexType name="property-access">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+        The root element of the property access mapping definition.
+      ]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="class" type="class" />
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="class">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+        Contains property access overrides for a single class.
+
+        Nested elements must be class properties.
+      ]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="property">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+        Contains override values for attributes. The name of the attribute should be given in the "name" option.
+      ]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="getter" type="xsd:string" use="optional" />
+        <xsd:attribute name="setter" type="xsd:string" use="optional" />
+        <xsd:attribute name="adder" type="xsd:string" use="optional" />
+        <xsd:attribute name="remover" type="xsd:string" use="optional" />
+    </xsd:complexType>
+
+</xsd:schema>

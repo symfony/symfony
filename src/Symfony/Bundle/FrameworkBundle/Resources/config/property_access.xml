@@ -7,10 +7,21 @@
     <services>
         <defaults public="false" />
 
+        <!-- Loader -->
+        <service id="property_access.mapping.chain_loader" class="Symfony\Component\PropertyAccess\Mapping\Loader\LoaderChain">
+            <argument type="collection" />
+        </service>
+
+        <!-- Class Metadata Factory -->
+        <service id="property_access.mapping.class_metadata_factory" class="Symfony\Component\PropertyAccess\Mapping\Factory\LazyLoadingMetadataFactory">
+            <argument type="service" id="property_access.mapping.chain_loader" />
+        </service>
+
         <service id="property_accessor" class="Symfony\Component\PropertyAccess\PropertyAccessor">
             <argument /> <!-- magicCall, set by the extension -->
             <argument /> <!-- throwExceptionOnInvalidIndex, set by the extension -->
             <argument type="service" id="cache.property_access" on-invalid="ignore" />
+            <argument type="service" id="property_access.mapping.class_metadata_factory" on-invalid="ignore" />
         </service>
         <service id="Symfony\Component\PropertyAccess\PropertyAccessorInterface" alias="property_accessor" />
     </services>

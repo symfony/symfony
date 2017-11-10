@@ -18,13 +18,18 @@
     "require": {
         "php": "^5.5.9|>=7.0.8",
         "symfony/polyfill-php70": "~1.0",
-        "symfony/inflector": "~3.1|~4.0"
+        "symfony/inflector": "~3.4|~4.0"
     },
     "require-dev": {
-        "symfony/cache": "~3.1|~4.0"
+        "doctrine/annotations": "~1.2",
+        "symfony/cache": "~3.4",
+        "symfony/config": "~3.4",
+        "symfony/yaml": "~3.4"
     },
     "suggest": {
-        "psr/cache-implementation": "To cache access methods."
+        "psr/cache-implementation": "To cache access methods.",
+        "doctrine/annotations": "To define custom accessors using annotations.",
+        "symfony/yaml": "To define custom accessors using YAML config files."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\PropertyAccess\\": "" },

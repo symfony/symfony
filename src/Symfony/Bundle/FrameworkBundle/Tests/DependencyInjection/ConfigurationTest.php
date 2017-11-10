@@ -282,6 +282,10 @@ class ConfigurationTest extends TestCase
             'property_access' => array(
                 'magic_call' => false,
                 'throw_exception_on_invalid_index' => false,
+                'enable_annotations' => false,
+                'mapping' => array(
+                    'paths' => array(),
+                ),
             ),
             'property_info' => array(
                 'enabled' => false,

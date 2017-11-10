@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.37.8",
     "Names": {
         "BN": "Brunei",
         "BW": "Botswana",
@@ -7,6 +7,7 @@
         "CV": "Kapverden",
         "GB": "Grossbritannien",
         "SB": "Salomon-Inseln",
+        "TL": "Osttimor",
         "ZW": "Zimbabwe"
     }
 }

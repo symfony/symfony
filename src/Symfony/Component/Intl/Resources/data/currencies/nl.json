@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.1",
     "Names": {
         "ADP": [
             "ADP",
@@ -187,7 +187,7 @@
         ],
         "BRN": [
             "BRN",
-            "Braziliaanse cruzado novo"
+            "Braziliaanse nieuwe cruzado (1989–1990)"
         ],
         "BRR": [
             "BRR",
@@ -261,13 +261,17 @@
             "CLP",
             "Chileense peso"
         ],
+        "CNH": [
+            "CNH",
+            "Chinese renminbi (offshore)"
+        ],
         "CNX": [
             "CNX",
             "dollar van de Chinese Volksbank"
         ],
         "CNY": [
             "CN¥",
-            "Chinese renminbi"
+            "Chinese Yuan"
         ],
         "COP": [
             "COP",

@@ -1,9 +1,10 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.37.22",
     "Names": {
         "BA": "Bosnia y Herzegovina",
         "TA": "Tristán de Acuña",
         "TL": "Timor-Leste",
-        "UM": "Islas menores alejadas de EE. UU."
+        "UM": "Islas menores alejadas de EE. UU.",
+        "VI": "Islas Vírgenes de EE. UU."
     }
 }

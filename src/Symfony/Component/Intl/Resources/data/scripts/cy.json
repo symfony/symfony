@@ -1,9 +1,9 @@
 {
-    "Version": "2.1.31.86",
+    "Version": "2.1.37.17",
     "Names": {
         "Arab": "Arabaidd",
         "Armn": "Armenaidd",
-        "Beng": "Bengalaidd",
+        "Beng": "Bangla",
         "Bopo": "Bopomofo",
         "Brai": "Braille",
         "Cyrl": "Cyrilig",
@@ -13,7 +13,7 @@
         "Grek": "Groegaidd",
         "Gujr": "Gwjarataidd",
         "Guru": "Gwrmwci",
-        "Hanb": "Hanb",
+        "Hanb": "Han gyda Bopomofo",
         "Hang": "Hangul",
         "Hani": "Han",
         "Hans": "Symledig",

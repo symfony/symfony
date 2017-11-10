@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.60",
+    "Version": "2.1.37.5",
     "Names": {
         "Arab": "arabă",
         "Armn": "armeană",
@@ -32,7 +32,7 @@
         "Hant": "tradițională",
         "Hebr": "ebraică",
         "Hira": "hiragana",
-        "Hrkt": "katakana sau hiragana",
+        "Hrkt": "silabică japoneză",
         "Hung": "maghiară veche",
         "Inds": "indus",
         "Ital": "italică veche",

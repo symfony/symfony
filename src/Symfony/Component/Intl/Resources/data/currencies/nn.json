@@ -1,13 +1,13 @@
 {
-    "Version": "2.1.31.86",
+    "Version": "2.1.37.5",
     "Names": {
         "ADP": [
             "ADP",
-            "andorransk peseta"
+            "andorranske peseta"
         ],
         "AED": [
             "AED",
-            "UAE dirham"
+            "emiratarabiske dirham"
         ],
         "AFA": [
             "AFA",
@@ -15,95 +15,95 @@
         ],
         "AFN": [
             "AFN",
-            "afghani"
+            "afghanske afghani"
         ],
         "ALL": [
             "ALL",
-            "albansk lek"
+            "albanske lek"
         ],
         "AMD": [
             "AMD",
-            "armensk dram"
+            "armenske dram"
         ],
         "ANG": [
             "ANG",
-            "nederlansk antillegylden"
+            "nederlandske antillegylden"
         ],
         "AOA": [
             "AOA",
-            "angolsk kwanza"
+            "angolanske kwanza"
         ],
         "AOK": [
             "AOK",
-            "angolsk kwanza (1977–1990)"
+            "angolske kwanza (1977–1990)"
         ],
         "AON": [
             "AON",
-            "angolsk ny kwanza (1990–2000)"
+            "angolske nye kwanza (1990–2000)"
         ],
         "AOR": [
             "AOR",
-            "angolsk kwanza reajustado (1995–1999)"
+            "angolske kwanza reajustado (1995–1999)"
         ],
         "ARA": [
             "ARA",
-            "argentisk austral"
+            "argentiske austral"
         ],
         "ARP": [
             "ARP",
-            "argentinsk peso (1983–1985)"
+            "argentinske peso (1983–1985)"
         ],
         "ARS": [
             "ARS",
-            "argentinsk peso"
+            "argentinske pesos"
         ],
         "ATS": [
             "ATS",
-            "austerriksk schilling"
+            "austerrikske schilling"
         ],
         "AUD": [
-            "A$",
-            "australsk dollar"
+            "AUD",
+            "australske dollar"
         ],
         "AWG": [
             "AWG",
-            "arubisk gylden"
+            "arubiske floriner"
         ],
         "AZM": [
             "AZM",
-            "aserbaijansk manat"
+            "aserbaijanske manat"
         ],
         "AZN": [
             "AZN",
-            "aserbajdsjansk manat"
+            "aserbajdsjanske manat"
         ],
         "BAD": [
             "BAD",
-            "bosnisk-hercegovinsk dinar"
+            "bosnisk-hercegovinske dinarar"
         ],
         "BAM": [
             "BAM",
-            "bosnisk-hercegovinsk mark (konvertibel)"
+            "bosnisk-hercegovinske konvertible mark"
         ],
         "BBD": [
             "BBD",
-            "barbadisk dollar"
+            "barbadiske dollar"
         ],
         "BDT": [
             "BDT",
-            "bangladeshisk taka"
+            "bangladeshiske taka"
         ],
         "BEC": [
             "BEC",
-            "belgisk franc (konvertibel)"
+            "belgiske franc (konvertibel)"
         ],
         "BEF": [
             "BEF",
-            "belgisk franc"
+            "belgiske franc"
         ],
         "BEL": [
             "BEL",
-            "belgisk franc (finansiell)"
+            "belgiske franc (finansiell)"
         ],
         "BGL": [
             "BGL",
@@ -111,35 +111,35 @@
         ],
         "BGN": [
             "BGN",
-            "bulgarsk ny lev"
+            "bulgarske lev"
         ],
         "BHD": [
             "BHD",
-            "bahrainsk dinar"
+            "bahrainske dinarar"
         ],
         "BIF": [
             "BIF",
-            "burundisk franc"
+            "burundiske franc"
         ],
         "BMD": [
             "BMD",
-            "bermudisk dollar"
+            "bermudiske dollar"
         ],
         "BND": [
             "BND",
-            "bruneisk dollar"
+            "bruneiske dollar"
         ],
         "BOB": [
             "BOB",
-            "boliviano"
+            "bolivianske boliviano"
         ],
         "BOP": [
             "BOP",
-            "bolivisk peso"
+            "boliviske peso"
         ],
         "BOV": [
             "BOV",
-            "bolivisk mvdol"
+            "boliviske mvdol"
         ],
         "BRB": [
             "BRB",
@@ -147,31 +147,31 @@
         ],
         "BRC": [
             "BRC",
-            "brasiliansk cruzado"
+            "brasilianske cruzado"
         ],
         "BRE": [
             "BRE",
-            "brasiliansk cruzeiro (1990–1993)"
+            "brasilianske cruzeiro (1990–1993)"
         ],
         "BRL": [
-            "R$",
-            "brasiliansk real"
+            "BRL",
+            "brasilianske real"
         ],
         "BRN": [
             "BRN",
-            "brasiliansk cruzado novo"
+            "brasilianske cruzado novo"
         ],
         "BRR": [
             "BRR",
-            "brasiliansk cruzeiro"
+            "brasilianske cruzeiro"
         ],
         "BSD": [
             "BSD",
-            "bahamisk dollar"
+            "bahamanske dollar"
         ],
         "BTN": [
             "BTN",
-            "bhutansk ngultrum"
+            "bhutanske ngultrum"
         ],
         "BUK": [
             "BUK",
@@ -179,31 +179,31 @@
         ],
         "BWP": [
             "BWP",
-            "botswansk pula"
+            "botswanske pula"
         ],
         "BYB": [
             "BYB",
-            "kviterussisk ny rubel (1994–1999)"
+            "kviterussiske nye rublar (1994–1999)"
         ],
         "BYN": [
             "BYN",
-            "kviterussisk rubel"
+            "kviterussiske rublar"
         ],
         "BYR": [
             "BYR",
-            "kviterussisk rubel (2000–2016)"
+            "kviterussiske rublar (2000–2016)"
         ],
         "BZD": [
             "BZD",
-            "belizisk dollar"
+            "beliziske dollar"
         ],
         "CAD": [
-            "CA$",
-            "kanadisk dollar"
+            "CAD",
+            "kanadiske dollar"
         ],
         "CDF": [
             "CDF",
-            "kongolesisk franc"
+            "kongolesiske franc"
         ],
         "CHE": [
             "CHE",
@@ -211,7 +211,7 @@
         ],
         "CHF": [
             "CHF",
-            "sveitsisk franc"
+            "sveitsiske franc"
         ],
         "CHW": [
             "CHW",
@@ -219,19 +219,19 @@
         ],
         "CLF": [
             "CLF",
-            "chilensk unidades de fomento"
+            "chilenske unidades de fomento"
         ],
         "CLP": [
             "CLP",
-            "chilensk peso"
+            "chilenske pesos"
         ],
         "CNY": [
-            "CN¥",
-            "kinesisk yuan renminbi"
+            "CNY",
+            "kinesiske yuan"
         ],
         "COP": [
             "COP",
-            "colombiansk peso"
+            "kolombianske pesos"
         ],
         "COU": [
             "COU",
@@ -239,91 +239,95 @@
         ],
         "CRC": [
             "CRC",
-            "costaricansk colon"
+            "kostarikanske colón"
         ],
         "CSD": [
             "CSD",
-            "gammal serbisk dinar"
+            "gamle serbiske dinarer"
         ],
         "CSK": [
             "CSK",
-            "tsjekkoslovakisk koruna (hard)"
+            "tsjekkoslovakiske koruna (hard)"
+        ],
+        "CUC": [
+            "CUC",
+            "kubanske konvertible pesos"
         ],
         "CUP": [
             "CUP",
-            "kubansk peso"
+            "kubanske pesos"
         ],
         "CVE": [
             "CVE",
-            "kappverdisk escudo"
+            "kappverdiske escudo"
         ],
         "CYP": [
             "CYP",
-            "kypriotisk pund"
+            "kypriotiske pund"
         ],
         "CZK": [
             "CZK",
-            "tsjekkisk koruna"
+            "tsjekkiske koruna"
         ],
         "DDM": [
             "DDM",
-            "austtysk mark"
+            "austtyske mark"
         ],
         "DEM": [
             "DEM",
-            "tysk mark"
+            "tyske mark"
         ],
         "DJF": [
             "DJF",
-            "djiboutisk franc"
+            "djiboutiske franc"
         ],
         "DKK": [
             "DKK",
-            "dansk krone"
+            "danske kroner"
         ],
         "DOP": [
             "DOP",
-            "dominikansk peso"
+            "dominikanske pesos"
         ],
         "DZD": [
             "DZD",
-            "algerisk dinar"
+            "algeriske dinarar"
         ],
         "ECS": [
             "ECS",
-            "ecuadoriansk sucre"
+            "ecuadorianske sucre"
         ],
         "ECV": [
             "ECV",
-            "ecuadoriansk unidad de valor constante (UVC)"
+            "ecuadorianske unidad de valor constante (UVC)"
         ],
         "EEK": [
             "EEK",
-            "estisk kroon"
+            "estiske kroon"
         ],
         "EGP": [
             "EGP",
-            "egyptisk pund"
+            "egyptiske pund"
         ],
         "ERN": [
             "ERN",
-            "eritreisk nakfa"
+            "eritreiske nakfa"
         ],
         "ESA": [
             "ESA",
-            "spansk peseta (A–konto)"
+            "spanske peseta (A–konto)"
         ],
         "ESB": [
             "ESB",
-            "spansk peseta (konvertibel konto)"
+            "spanske peseta (konvertibel konto)"
         ],
         "ESP": [
             "ESP",
-            "spansk peseta"
+            "spanske peseta"
         ],
         "ETB": [
             "ETB",
-            "etiopisk birr"
+            "etiopiske birr"
         ],
         "EUR": [
             "€",
@@ -331,71 +335,71 @@
         ],
         "FIM": [
             "FIM",
-            "finsk mark"
+            "finske mark"
         ],
         "FJD": [
             "FJD",
-            "fijiansk dollar"
+            "fijianske dollar"
         ],
         "FKP": [
             "FKP",
-            "Falkland-pund"
+            "falklandspund"
         ],
         "FRF": [
             "FRF",
-            "fransk franc"
+            "franske franc"
         ],
         "GBP": [
-            "£",
-            "britisk pund"
+            "GBP",
+            "britiske pund"
         ],
         "GEK": [
             "GEK",
-            "georgisk kupon larit"
+            "georgiske kupon larit"
         ],
         "GEL": [
             "GEL",
-            "georgisk lari"
+            "georgiske lari"
         ],
         "GHC": [
             "GHC",
-            "ghanesisk cedi (1979–2007)"
+            "ghanesiske cedi (1979–2007)"
         ],
         "GHS": [
             "GHS",
-            "ghanesisk cedi"
+            "ghanesiske cedi"
         ],
         "GIP": [
             "GIP",
-            "gibraltarsk pund"
+            "gibraltarske pund"
         ],
         "GMD": [
             "GMD",
-            "gambisk dalasi"
+            "gambiske dalasi"
         ],
         "GNF": [
             "GNF",
-            "guineansk franc"
+            "guineanske franc"
         ],
         "GNS": [
             "GNS",
-            "guineansk syli"
+            "guineanske syli"
         ],
         "GQE": [
             "GQE",
-            "ekvatorialguineansk ekwele guineana"
+            "ekvatorialguineanske ekwele guineana"
         ],
         "GRD": [
             "GRD",
-            "gresk drakme"
+            "greske drakme"
         ],
         "GTQ": [
             "GTQ",
-            "guatemalansk quetzal"
+            "guatemalanske quetzal"
         ],
         "GWE": [
             "GWE",
-            "portugisisk guinea escudo"
+            "portugisiske guinea escudo"
         ],
         "GWP": [
             "GWP",
@@ -403,591 +407,599 @@
         ],
         "GYD": [
             "GYD",
-            "guyansk dollar"
+            "guyanske dollar"
         ],
         "HKD": [
-            "HK$",
+            "HKD",
             "Hongkong-dollar"
         ],
         "HNL": [
             "HNL",
-            "honduransk lempira"
+            "honduranske lempira"
         ],
         "HRD": [
             "HRD",
-            "kroatisk dinar"
+            "kroatiske dinar"
         ],
         "HRK": [
             "HRK",
-            "kroatisk kuna"
+            "kroatiske kuna"
         ],
         "HTG": [
             "HTG",
-            "haitisk gourde"
+            "haitiske gourde"
         ],
         "HUF": [
             "HUF",
-            "ungarsk forint"
+            "ungarske forintar"
         ],
         "IDR": [
             "IDR",
-            "indonesisk rupi"
+            "indonesiske rupiar"
         ],
         "IEP": [
             "IEP",
-            "irsk pund"
+            "irske pund"
         ],
         "ILP": [
             "ILP",
-            "israelsk pund"
+            "israelske pund"
         ],
         "ILS": [
-            "₪",
-            "israelsk ny shekel"
+            "ILS",
+            "israelske nye sheklar"
         ],
         "INR": [
-            "₹",
-            "indisk rupi"
+            "INR",
+            "indiske rupiar"
         ],
         "IQD": [
             "IQD",
-            "iraksk dinar"
+            "irakiske dinarar"
         ],
         "IRR": [
             "IRR",
-            "iransk rial"
+            "iranske rial"
         ],
         "ISK": [
             "ISK",
-            "islandsk krone"
+            "islandske kroner"
         ],
         "ITL": [
             "ITL",
-            "italiensk lire"
+            "italienske lire"
         ],
         "JMD": [
             "JMD",
-            "jamaikansk dollar"
+            "jamaikanske dollar"
         ],
         "JOD": [
             "JOD",
-            "jordansk dinar"
+            "jordanske dinarar"
         ],
         "JPY": [
-            "JP¥",
-            "japansk yen"
+            "JPY",
+            "japanske yen"
         ],
         "KES": [
             "KES",
-            "kenyansk shilling"
+            "kenyanske shilling"
         ],
         "KGS": [
             "KGS",
-            "kirgisisk som"
+            "kirgisiske som"
         ],
         "KHR": [
             "KHR",
-            "kambodsjansk riel"
+            "kambodsjanske riel"
         ],
         "KMF": [
             "KMF",
-            "komorisk franc"
+            "komoriske franc"
         ],
         "KPW": [
             "KPW",
-            "nordkoreansk won"
+            "nordkoreanske won"
         ],
         "KRW": [
-            "₩",
-            "sørkoreansk won"
+            "KRW",
+            "sørkoreanske won"
         ],
         "KWD": [
             "KWD",
-            "kuwaitisk dinar"
+            "kuwaitiske dinarar"
         ],
         "KYD": [
             "KYD",
-            "caymansk dollar"
+            "caymanske dollar"
         ],
         "KZT": [
             "KZT",
-            "kasakhstansk tenge"
+            "kasakhstanske tenge"
         ],
         "LAK": [
             "LAK",
-            "laotisk kip"
+            "laotiske kip"
         ],
         "LBP": [
             "LBP",
-            "libanesisk pund"
+            "libanesiske pund"
         ],
         "LKR": [
             "LKR",
-            "srilankisk rupi"
+            "srilankiske rupiar"
         ],
         "LRD": [
             "LRD",
-            "liberisk dollar"
+            "liberiske dollar"
         ],
         "LSL": [
             "LSL",
-            "lesothisk loti"
+            "lesothiske loti"
         ],
         "LTL": [
             "LTL",
-            "litauisk lita"
+            "litauiske lita"
         ],
         "LTT": [
             "LTT",
-            "litauisk talona"
+            "litauiske talona"
         ],
         "LUC": [
             "LUC",
-            "luxemburgsk konvertibel franc"
+            "luxemburgske konvertibel franc"
         ],
         "LUF": [
             "LUF",
-            "luxemburgsk franc"
+            "luxemburgske franc"
         ],
         "LUL": [
             "LUL",
-            "luxemburgsk finansiell franc"
+            "luxemburgske finansielle franc"
         ],
         "LVL": [
             "LVL",
-            "latvisk lat"
+            "latviske lat"
         ],
         "LVR": [
             "LVR",
-            "latvisk rubel"
+            "latviske rublar"
         ],
         "LYD": [
             "LYD",
-            "libysk dinar"
+            "libyske dinarar"
         ],
         "MAD": [
             "MAD",
-            "marokkansk dirham"
+            "marokkanske dirham"
         ],
         "MAF": [
             "MAF",
-            "marokkansk franc"
+            "marokkanske franc"
         ],
         "MDL": [
             "MDL",
-            "moldovsk leu"
+            "moldovske leuar"
         ],
         "MGA": [
             "MGA",
-            "madagassisk ariary"
+            "madagassiske ariary"
         ],
         "MGF": [
             "MGF",
-            "madagassisk franc"
+            "madagassiske franc"
         ],
         "MKD": [
             "MKD",
-            "makedonsk denar"
+            "makedonske denarar"
         ],
         "MLF": [
             "MLF",
-            "malisk franc"
+            "maliske franc"
         ],
         "MMK": [
             "MMK",
-            "myanmarsk kyat"
+            "myanmarske kyat"
         ],
         "MNT": [
             "MNT",
-            "mongolsk tugrik"
+            "mongolske tugrik"
         ],
         "MOP": [
             "MOP",
-            "makaosk pataca"
+            "makaoiske pataca"
         ],
         "MRO": [
             "MRO",
-            "mauritansk ouguiya"
+            "mauritanske ouguiya"
         ],
         "MTL": [
             "MTL",
-            "maltesisk lira"
+            "maltesiske lira"
         ],
         "MTP": [
             "MTP",
-            "maltesisk pund"
+            "maltesiske pund"
         ],
         "MUR": [
             "MUR",
-            "mauritansk rupi"
+            "mauritanske rupiar"
         ],
         "MVR": [
             "MVR",
-            "maldivisk rufiyaa"
+            "maldiviske rufiyaa"
         ],
         "MWK": [
             "MWK",
-            "malawisk kwacha"
+            "malawiske kwacha"
         ],
         "MXN": [
-            "MX$",
-            "meksikansk peso"
+            "MXN",
+            "meksikanske pesos"
         ],
         "MXP": [
             "MXP",
-            "meksikansk sølvpeso (1861–1992)"
+            "meksikanske sølvpeso (1861–1992)"
         ],
         "MXV": [
             "MXV",
-            "meksikansk unidad de inversion (UDI)"
+            "meksikanske unidad de inversion (UDI)"
         ],
         "MYR": [
             "MYR",
-            "malaysisk ringgit"
+            "malaysiske ringgit"
         ],
         "MZE": [
             "MZE",
-            "mosambikisk escudo"
+            "mosambikiske escudo"
         ],
         "MZM": [
             "MZM",
-            "gammal mosambikisk metical"
+            "gamle mosambikiske metical"
         ],
         "MZN": [
             "MZN",
-            "mosambikisk metical"
+            "mosambikiske metical"
         ],
         "NAD": [
             "NAD",
-            "namibisk dollar"
+            "namibiske dollar"
         ],
         "NGN": [
             "NGN",
-            "nigeriansk naira"
+            "nigerianske naira"
         ],
         "NIC": [
             "NIC",
-            "nicaraguansk cordoba"
+            "nicaraguanske cordoba"
         ],
         "NIO": [
             "NIO",
-            "nicaraguansk cordoba oro"
+            "nicaraguanske córdoba"
         ],
         "NLG": [
             "NLG",
-            "nederlandsk gylden"
+            "nederlandske gylden"
         ],
         "NOK": [
             "kr",
-            "norsk krone"
+            "norske kroner"
         ],
         "NPR": [
             "NPR",
-            "nepalsk rupi"
+            "nepalske rupiar"
         ],
         "NZD": [
-            "NZ$",
-            "new zealandsk dollar"
+            "NZD",
+            "nyzealandske dollar"
         ],
         "OMR": [
             "OMR",
-            "omansk rial"
+            "omanske rial"
         ],
         "PAB": [
             "PAB",
-            "panamansk balboa"
+            "panamanske balboa"
         ],
         "PEI": [
             "PEI",
-            "peruansk inti"
+            "peruanske inti"
         ],
         "PEN": [
             "PEN",
-            "peruansk sol"
+            "peruanske sol"
         ],
         "PES": [
             "PES",
-            "peruansk sol (1863–1965)"
+            "peruanske sol (1863–1965)"
         ],
         "PGK": [
             "PGK",
-            "papuansk kina"
+            "papuanske kina"
         ],
         "PHP": [
             "PHP",
-            "filippinsk peso"
+            "filippinske pesos"
         ],
         "PKR": [
             "PKR",
-            "pakistansk rupi"
+            "pakistanske rupiar"
         ],
         "PLN": [
             "PLN",
-            "polsk zloty"
+            "polske zloty"
         ],
         "PLZ": [
             "PLZ",
-            "polsk zloty (1950–1995)"
+            "polske zloty (1950–1995)"
         ],
         "PTE": [
             "PTE",
-            "portugisisk escudo"
+            "portugisiske escudo"
         ],
         "PYG": [
             "PYG",
-            "paraguayansk guarani"
+            "paraguayanske guaraní"
         ],
         "QAR": [
             "QAR",
-            "qatarsk rial"
+            "qatarske rial"
         ],
         "RHD": [
             "RHD",
-            "rhodesisk dollar"
+            "rhodesiske dollar"
         ],
         "ROL": [
             "ROL",
-            "gammal rumensk leu"
+            "gamle rumenske leu"
         ],
         "RON": [
             "RON",
-            "rumensk leu"
+            "rumenske leuar"
         ],
         "RSD": [
             "RSD",
-            "serbisk dinar"
+            "serbiske dinarar"
         ],
         "RUB": [
             "RUB",
-            "russisk rubel"
+            "russiske rublar"
         ],
         "RUR": [
             "RUR",
-            "russisk rubel (1991–1998)"
+            "russiske rublar (1991–1998)"
         ],
         "RWF": [
             "RWF",
-            "rwandisk franc"
+            "rwandiske franc"
         ],
         "SAR": [
             "SAR",
-            "saudiarabisk rial"
+            "saudiarabiske rial"
         ],
         "SBD": [
             "SBD",
-            "salomonsk dollar"
+            "salomonske dollar"
         ],
         "SCR": [
             "SCR",
-            "seychellisk rupi"
+            "seychelliske rupiar"
         ],
         "SDD": [
             "SDD",
-            "gammal sudanesisk dinar"
+            "gamle sudanske dinarer"
         ],
         "SDG": [
             "SDG",
-            "sudansk pund"
+            "sudanske pund"
         ],
         "SDP": [
             "SDP",
-            "gammalt sudanesisk pund"
+            "gamle sudanske pund"
         ],
         "SEK": [
             "SEK",
-            "svensk krone"
+            "svenske kroner"
         ],
         "SGD": [
             "SGD",
-            "singaporsk dollar"
+            "singaporske dollar"
         ],
         "SHP": [
             "SHP",
-            "sankthelensk pund"
+            "sankthelenske pund"
         ],
         "SIT": [
             "SIT",
-            "slovensk tolar"
+            "slovenske tolar"
         ],
         "SKK": [
             "SKK",
-            "slovakisk koruna"
+            "slovakiske koruna"
         ],
         "SLL": [
             "SLL",
-            "sierraleonsk leone"
+            "sierraleonske leone"
         ],
         "SOS": [
             "SOS",
-            "somalisk shilling"
+            "somaliske shilling"
         ],
         "SRD": [
             "SRD",
-            "surinamsk dollar"
+            "surinamske dollar"
         ],
         "SRG": [
             "SRG",
-            "surinamsk gylden"
+            "surinamske gylden"
+        ],
+        "SSP": [
+            "SSP",
+            "sørsudanske pund"
         ],
         "STD": [
             "STD",
-            "Sao Tome og Principe-dobra"
+            "saotomesiske dobra"
         ],
         "SUR": [
             "SUR",
-            "sovjetisk rubel"
+            "sovjetiske rublar"
         ],
         "SVC": [
             "SVC",
-            "salvadoransk colon"
+            "salvadoranske colon"
         ],
         "SYP": [
             "SYP",
-            "syrisk pund"
+            "syriske pund"
         ],
         "SZL": [
             "SZL",
-            "swazilandsk lilangeni"
+            "swazilandske lilangeni"
         ],
         "THB": [
             "THB",
-            "thailandsk baht"
+            "thailandske baht"
         ],
         "TJR": [
             "TJR",
-            "tadsjikisk rubel"
+            "tadsjikiske rublar"
         ],
         "TJS": [
             "TJS",
-            "tadsjikisk somoni"
+            "tadsjikiske somoni"
         ],
         "TMM": [
             "TMM",
-            "turkmensk manat"
+            "turkmenske manat (1993–2009)"
+        ],
+        "TMT": [
+            "TMT",
+            "turkmenske manat"
         ],
         "TND": [
             "TND",
-            "tunisisk dinar"
+            "tunisiske dinarar"
         ],
         "TOP": [
             "TOP",
-            "tongansk paʻanga"
+            "tonganske paʻanga"
         ],
         "TPE": [
             "TPE",
-            "timoresisk escudo"
+            "timoresiske escudo"
         ],
         "TRL": [
             "TRL",
-            "gammal tyrkiske lire"
+            "gamle tyrkiske lire"
         ],
         "TRY": [
             "TRY",
-            "tyrkisk lire"
+            "tyrkiske lire"
         ],
         "TTD": [
             "TTD",
-            "trinidadisk dollar"
+            "trinidadiske dollar"
         ],
         "TWD": [
-            "NT$",
-            "taiwansk ny dollar"
+            "TWD",
+            "nye taiwanske dollar"
         ],
         "TZS": [
             "TZS",
-            "tanzaniansk shilling"
+            "tanzanianske shilling"
         ],
         "UAH": [
             "UAH",
-            "ukrainsk hryvnia"
+            "ukrainske hryvnia"
         ],
         "UAK": [
             "UAK",
-            "ukrainsk karbovanetz"
+            "ukrainske karbovanetz"
         ],
         "UGS": [
             "UGS",
-            "ugandisk shilling (1966–1987)"
+            "ugandiske shilling (1966–1987)"
         ],
         "UGX": [
             "UGX",
-            "ugandisk shilling"
+            "ugandiske shilling"
         ],
         "USD": [
-            "US$",
-            "amerikansk dollar"
+            "USD",
+            "amerikanske dollar"
         ],
         "USN": [
             "USN",
-            "amerikansk dollar (neste dag)"
+            "amerikanske dollar (neste dag)"
         ],
         "USS": [
             "USS",
-            "amerikansk dollar (same dag)"
+            "amerikanske dollar (same dag)"
         ],
         "UYI": [
             "UYI",
-            "uruguayansk peso en unidades indexadas"
+            "uruguayanske peso en unidades indexadas"
         ],
         "UYP": [
             "UYP",
-            "uruguayansk peso (1975–1993)"
+            "uruguayanske peso (1975–1993)"
         ],
         "UYU": [
             "UYU",
-            "uruguayansk peso"
+            "uruguayanske pesos"
         ],
         "UZS": [
             "UZS",
-            "usbekisk sum"
+            "usbekiske sum"
         ],
         "VEB": [
             "VEB",
-            "venezuelansk bolivar (1871–2008)"
+            "venezuelanske bolivar (1871–2008)"
         ],
         "VEF": [
             "VEF",
-            "venezuelansk bolivar"
+            "venezuelanske bolivar"
         ],
         "VND": [
-            "₫",
-            "vietnamesisk dong"
+            "VND",
+            "vietnamesiske dong"
         ],
         "VUV": [
             "VUV",
-            "vanuatuisk vatu"
+            "vanuatuiske vatu"
         ],
         "WST": [
             "WST",
-            "vestsamoisk tala"
+            "samoanske tala"
         ],
         "XAF": [
-            "FCFA",
-            "CFA franc BEAC"
+            "XAF",
+            "sentralafrikanske CFA-franc"
         ],
         "XCD": [
-            "EC$",
-            "austkaribisk dollar"
+            "XCD",
+            "austkaribiske dollar"
         ],
         "XEU": [
             "XEU",
-            "europeisk valutaeining"
+            "europeiske valutaeiningar"
         ],
         "XFO": [
             "XFO",
-            "fransk gullfranc"
+            "franske gullfranc"
         ],
         "XFU": [
             "XFU",
-            "fransk UIC-franc"
+            "franske UIC-franc"
         ],
         "XOF": [
             "CFA",
-            "CFA franc BCEAO"
+            "vestafrikanske CFA-franc"
         ],
         "XPF": [
-            "CFPF",
-            "CFP franc"
+            "XPF",
+            "CFP-franc"
         ],
         "XRE": [
             "XRE",
@@ -995,39 +1007,39 @@
         ],
         "YDD": [
             "YDD",
-            "jemenittisk dinar"
+            "jemenittiske dinarar"
         ],
         "YER": [
             "YER",
-            "jemenittisk rial"
+            "jemenittiske rial"
         ],
         "YUD": [
             "YUD",
-            "jugoslavisk dinar (hard)"
+            "jugoslaviske dinarar (hard)"
         ],
         "YUM": [
             "YUM",
-            "jugoslavisk noviy-dinar"
+            "jugoslaviske noviy-dinarar"
         ],
         "YUN": [
             "YUN",
-            "jugoslavisk konvertibel dinar"
+            "jugoslaviske konvertibel dinarar"
         ],
         "ZAL": [
             "ZAL",
-            "sørafrikansk rand (finansiell)"
+            "sørafrikanske rand (finansiell)"
         ],
         "ZAR": [
             "ZAR",
-            "sørafrikansk rand"
+            "sørafrikanske rand"
         ],
         "ZMK": [
             "ZMK",
-            "zambisk kwacha (1968–2012)"
+            "zambiske kwacha (1968–2012)"
         ],
         "ZMW": [
             "ZMW",
-            "zambisk kwacha"
+            "zambiske kwacha"
         ],
         "ZRN": [
             "ZRN",

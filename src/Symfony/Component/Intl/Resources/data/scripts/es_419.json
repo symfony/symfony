@@ -1,8 +1,10 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.37.22",
     "Names": {
+        "Hanb": "han con bopomofo",
         "Hrkt": "katakana o hiragana",
         "Laoo": "lao",
-        "Latn": "latín"
+        "Latn": "latín",
+        "Mlym": "malayalam"
     }
 }

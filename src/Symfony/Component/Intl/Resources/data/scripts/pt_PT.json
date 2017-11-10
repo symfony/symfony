@@ -1,11 +1,12 @@
 {
-    "Version": "2.1.31.86",
+    "Version": "2.1.37.6",
     "Names": {
         "Armn": "arménio",
         "Egyd": "egípcio demótico",
         "Egyh": "egípcio hierático",
-        "Gujr": "guzerate",
+        "Hanb": "han com bopomofo",
         "Inds": "indus",
+        "Orya": "odia",
         "Sylo": "siloti nagri",
         "Tale": "tai le",
         "Telu": "telugu",

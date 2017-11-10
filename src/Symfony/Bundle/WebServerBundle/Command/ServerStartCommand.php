@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Runs a local web server in a background process.
@@ -131,6 +132,10 @@ EOF
         if ('prod' === $env) {
             $io->error('Running this server in production environment is NOT recommended!');
         }
+
+        // replace event dispatcher with an empty one to prevent console.terminate from firing
+        // as container could have changed between start and stop
+        $this->getApplication()->setDispatcher(new EventDispatcher());
 
         try {
             $server = new WebServer();

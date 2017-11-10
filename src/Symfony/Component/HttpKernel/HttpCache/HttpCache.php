@@ -36,6 +36,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private $traces = array();
 
     /**
+     * Constructor
+     *
      * The available options are:
      *
      *   * debug:                 If true, the traces are added as a HTTP header to ease debugging
@@ -702,11 +704,11 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private function waitForLock(Request $request)
     {
         $wait = 0;
-        while ($this->store->isLocked($request) && $wait < 5000000) {
+        while ($this->store->isLocked($request) && $wait < 100) {
             usleep(50000);
-            $wait += 50000;
+            ++$wait;
         }
 
-        return $wait < 5000000;
+        return $wait < 100;
     }
 }

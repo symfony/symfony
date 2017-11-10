@@ -409,21 +409,24 @@ class ErrorHandler
             $errorAsException = self::$toStringException;
             self::$toStringException = null;
         } elseif (!$throw && !($type & $level)) {
-            if (isset(self::$silencedErrorCache[$message])) {
-                $lightTrace = null;
-                $errorAsException = self::$silencedErrorCache[$message];
-                ++$errorAsException->count;
-            } else {
+            if (!isset(self::$silencedErrorCache[$id = $file.':'.$line])) {
                 $lightTrace = $this->tracedErrors & $type ? $this->cleanTrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3), $type, $file, $line, false) : array();
                 $errorAsException = new SilencedErrorContext($type, $file, $line, $lightTrace);
+            } elseif (isset(self::$silencedErrorCache[$id][$message])) {
+                $lightTrace = null;
+                $errorAsException = self::$silencedErrorCache[$id][$message];
+                ++$errorAsException->count;
+            } else {
+                $errorAsException = null;
             }
 
             if (100 < ++self::$silencedErrorCount) {
                 self::$silencedErrorCache = $lightTrace = array();
                 self::$silencedErrorCount = 1;
             }
-            self::$silencedErrorCache[$message] = $errorAsException;
-
+            if ($errorAsException) {
+                self::$silencedErrorCache[$id][$message] = $errorAsException;
+            }
             if (null === $lightTrace) {
                 return;
             }
@@ -494,13 +497,13 @@ class ErrorHandler
                 $this->loggers[$type][0],
                 ($type & $level) ? $this->loggers[$type][1] : LogLevel::DEBUG,
                 $logMessage,
-                array('exception' => $errorAsException),
+                $errorAsException ? array('exception' => $errorAsException) : array(),
             );
         } else {
             try {
                 $this->isRecursive = true;
                 $level = ($type & $level) ? $this->loggers[$type][1] : LogLevel::DEBUG;
-                $this->loggers[$type][0]->log($level, $logMessage, array('exception' => $errorAsException));
+                $this->loggers[$type][0]->log($level, $logMessage, $errorAsException ? array('exception' => $errorAsException) : array());
             } finally {
                 $this->isRecursive = false;
             }

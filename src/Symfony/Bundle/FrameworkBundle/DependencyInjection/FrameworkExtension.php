@@ -1291,6 +1291,11 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $projectDir = $container->getParameter('kernel.project_dir');
+        if ($container->fileExists($dir = $projectDir.'/config/validator', '/^$/')) {
+            $this->registerMappingFilesFromDir($dir, $fileRecorder);
+        }
+
         $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
     }
 

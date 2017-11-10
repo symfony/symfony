@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-11-06T04:46:46Z
+
+I just see this issue https://github.com/symfony/symfony/issues/21187 related to the same proposal by @chalasr:
+> Shouldn't we try to detect those configuration files in `%kernel.root_dir%/Resources/config/serialization` as well?
+
+I hope it makes more sense now for Symfony 4 structure.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-06T06:21:11Z
+
+Not sure the `Resources` directory still makes sense for this with Flex. Ideally, if Symfony has adopted the root [`res/` directory](https://github.com/symfony/symfony-standard/pull/1034#issuecomment-281750583), I'd put it there in a `res/serializer` directory, next to templates, translations, validation mapping & other resources used by the application.
+But for now, I put it in `config/serializer`. Not `src/Resources/config/serializer`. Actually my kernel isn't even at `src/` root. IMHO `%kernel.root_dir%` should be avoided as much as possible now.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-06T10:28:02Z
+
+AFAIK `res/` did not happen yet so I'd go for `config/serializer`, that would make sense to me.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-11-06T14:09:04Z
+
+Changed to `%kernel.project_dir%/config/serializer/` by now :+1:
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-11-07T13:10:36Z
+
+@dunglas great! see https://github.com/symfony/symfony/pull/24856 for the Validator component.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-11-07T14:04:43Z
+
+Rebased to 3.4 (same opinion of @nicolas-grekas here https://github.com/symfony/symfony/pull/24856#issuecomment-342484310)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-11-09T08:35:20Z
+
+So, we are moving from `config/serialization/`  to `config/serializer/` (same for validation/validator in https://github.com/symfony/symfony/pull/24856)?
+No strong opinion on that, slightly prefer `serializer` as it reflects the package name.
+Shouldn't the new name be supported for other paths (e.g. `Resources/config/serializer` for bundles)?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-10T18:50:32Z
+
+I don't think we need to support the new name for the old paths.

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-10-19T18:03:56Z
+
+Small side note, the case where mine triggered, wasn't working with `requiresAtLeastOneElement()`, I've already tried that. I'll check tomorrow what it was used on (ping me in case I forget).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-19T18:15:57Z
+
+@iltar from your issue;
+
+>  ->requiresAtLeastOneElement() is not applicable to concrete nodes
+
+Im not actually sure this relates to the PR of mine :thinking: it should be _->cannotBeEmpty is not.._ then.  So curious about the breakage you experiencing :)
+
+Still :+1: for this path.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-10-19T19:23:46Z
+
+@ro0NL No, that error is not related to the original issue, but your deprecation is saying `use requiresAtLeastOneElement() instead`, which will also error for me, so it might not be the right description
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-25T18:04:04Z
+
+Updated deprecation message. @iltar OK for you?
+
+I still find your issue confusing; the title refers to cannotBeEmpty(), yet the body mentions requiresAtLeastOneElement. Im assuming cannotBeEmpty() indeed raises this issue in 3.4
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-10-25T20:05:04Z
+
+Yes, that message sounds good! 👍
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-10T10:46:49Z
+
+ping @symfony/deciders

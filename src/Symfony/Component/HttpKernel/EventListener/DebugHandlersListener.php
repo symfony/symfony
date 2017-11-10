@@ -86,7 +86,7 @@ class DebugHandlersListener implements EventSubscriberInterface
                         $handler->screamAt($levels);
                     }
                     if ($this->scope) {
-                        $handler->scopeAt($this->levels);
+                        $handler->scopeAt($levels & ~E_USER_DEPRECATED & ~E_DEPRECATED);
                     } else {
                         $handler->scopeAt(0, true);
                     }

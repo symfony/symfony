@@ -1021,6 +1021,11 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $projectDir = $container->getParameter('kernel.project_dir');
+        if ($container->fileExists($dir = $projectDir.'/config/validator', '/^$/')) {
+            $this->registerMappingFilesFromDir($dir, $fileRecorder);
+        }
+
         $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
     }
 
@@ -1188,6 +1193,11 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $projectDir = $container->getParameter('kernel.project_dir');
+        if ($container->fileExists($dir = $projectDir.'/config/serializer', '/^$/')) {
+            $this->registerMappingFilesFromDir($dir, $fileRecorder);
+        }
+
         $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
 
         $chainLoader->replaceArgument(0, $serializerLoaders);
@@ -1253,7 +1263,7 @@ class FrameworkExtension extends Extension
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
                             $connectionDefinition->setFactory(array(AbstractAdapter::class, 'createConnection'));
-                            $connectionDefinition->setArguments(array($storeDsn));
+                            $connectionDefinition->setArguments(array($storeDsn, array('lazy' => true)));
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }
 

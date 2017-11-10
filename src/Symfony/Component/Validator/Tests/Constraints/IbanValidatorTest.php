@@ -63,6 +63,9 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             array('BE62 5100 0754 7061'), //Belgium
             array('BA39 1290 0794 0102 8494'), //Bosnia and Herzegovina
             array('BG80 BNBG 9661 1020 3456 78'), //Bulgaria
+            array('BY 13 NBRB 3600 900000002Z00AB00'), //Belarus
+            array('BY13 NBRB 3600 900000002Z00AB00'), //Belarus
+            array('BY22NB23324232T78YR7823HR32U'), //Belarus
             array('HR12 1001 0051 8630 0016 0'), //Croatia
             array('CY17 0020 0128 0000 0012 0052 7600'), //Cyprus
             array('CZ65 0800 0000 1920 0014 5399'), //Czech Republic
@@ -127,7 +130,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             array('CV64000300004547069110176'), //Cape Verde
             array('FR7630007000110009970004942'), //Central African Republic
             array('CG5230011000202151234567890'), //Congo
-            array('CR0515202001026284066'), //Costa Rica
+            array('CR05015202001026284066'), //Costa Rica
             array('DO28BAGR00000001212453611324'), //Dominican Republic
             array('GT82TRAJ01020000001210029690'), //Guatemala
             array('IR580540105180021273113007'), //Iran
@@ -178,6 +181,10 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             array('BA39 1290 0794 0102 8494 4'), //Bosnia and Herzegovina
             array('BG80 BNBG 9661 1020 3456 7'), //Bulgaria
             array('BG80 B2BG 9661 1020 3456 78'), //Bulgaria
+            array('BY 13 NBRB 3600 900000002Z00AB001'), //Belarus
+            array('BY 13 NBRB 3600 900000002Z00AB0'), //Belarus
+            array('BYRO NBRB 3600 900000002Z00AB0'), //Belarus
+            array('BY 13 3600 NBRB 900000002Z00AB05'), //Belarus
             array('HR12 1001 0051 8630 0016 01'), //Croatia
             array('CY17 0020 0128 0000 0012 0052 7600 1'), //Cyprus
             array('CZ65 0800 0000 1920 0014 5399 1'), //Czech Republic
@@ -241,6 +248,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             array('FR76300070001100099700049421'), //Central African Republic
             array('CG52300110002021512345678901'), //Congo
             array('CR05152020010262840661'), //Costa Rica
+            array('CR0515202001026284066'), //Costa Rica
             array('DO28BAGR000000012124536113241'), //Dominican Republic
             array('GT82TRAJ010200000012100296901'), //Guatemala
             array('IR5805401051800212731130071'), //Iran
@@ -288,6 +296,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             array('BE62 5100 0754 7062'), //Belgium
             array('BA39 1290 0794 0102 8495'), //Bosnia and Herzegovina
             array('BG80 BNBG 9661 1020 3456 79'), //Bulgaria
+            array('BY90 NBRB 3600 900000002Z00AB00'), //Belarus
             array('HR12 1001 0051 8630 0016 1'), //Croatia
             array('CY17 0020 0128 0000 0012 0052 7601'), //Cyprus
             array('CZ65 0800 0000 1920 0014 5398'), //Czech Republic
@@ -350,7 +359,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
             array('CV64000300004547069110177'), //Cape Verde
             array('FR7630007000110009970004943'), //Central African Republic
             array('CG5230011000202151234567891'), //Congo
-            array('CR0515202001026284067'), //Costa Rica
+            array('CR96042332432534543564'), //Costa Rica
             array('DO28BAGR00000001212453611325'), //Dominican Republic
             array('GT82TRAJ01020000001210029691'), //Guatemala
             array('IR580540105180021273113008'), //Iran

@@ -536,9 +536,13 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testValidation()
     {
         $container = $this->createContainerFromFile('full');
+        $projectDir = $container->getParameter('kernel.project_dir');
 
         $ref = new \ReflectionClass('Symfony\Component\Form\Form');
-        $xmlMappings = array(dirname($ref->getFileName()).'/Resources/config/validation.xml');
+        $xmlMappings = array(
+            dirname($ref->getFileName()).'/Resources/config/validation.xml',
+            strtr($projectDir.'/config/validator/foo.xml', '/', DIRECTORY_SEPARATOR),
+        );
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
@@ -626,7 +630,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array(new Reference('validator.mapping.cache.symfony')), $calls[7][1]);
 
         $xmlMappings = $calls[3][1][0];
-        $this->assertCount(2, $xmlMappings);
+        $this->assertCount(3, $xmlMappings);
         try {
             // Testing symfony/symfony
             $this->assertStringEndsWith('Component'.DIRECTORY_SEPARATOR.'Form/Resources/config/validation.xml', $xmlMappings[0]);
@@ -652,7 +656,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
         $xmlMappings = $calls[3][1][0];
-        $this->assertCount(2, $xmlMappings);
+        $this->assertCount(3, $xmlMappings);
 
         try {
             // Testing symfony/symfony
@@ -694,7 +698,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
         $this->assertSame('addXmlMappings', $calls[3][0]);
-        $this->assertCount(2, $calls[3][1][0]);
+        $this->assertCount(3, $calls[3][1][0]);
 
         $this->assertSame('addYamlMappings', $calls[4][0]);
         $this->assertCount(3, $calls[4][1][0]);
@@ -742,7 +746,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $argument = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
 
-        $this->assertCount(1, $argument);
+        $this->assertCount(2, $argument);
         $this->assertEquals('Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader', $argument[0]->getClass());
         $this->assertNull($container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1));
         $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.normalizer.object')->getArgument(1));
@@ -839,11 +843,13 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testSerializerMapping()
     {
         $container = $this->createContainerFromFile('serializer_mapping', array('kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle'))));
+        $projectDir = $container->getParameter('kernel.project_dir');
         $configDir = __DIR__.'/Fixtures/TestBundle/Resources/config';
         $expectedLoaders = array(
             new Definition(AnnotationLoader::class, array(new Reference('annotation_reader'))),
             new Definition(XmlFileLoader::class, array($configDir.'/serialization.xml')),
             new Definition(YamlFileLoader::class, array($configDir.'/serialization.yml')),
+            new Definition(YamlFileLoader::class, array($projectDir.'/config/serializer/foo.yml')),
             new Definition(XmlFileLoader::class, array($configDir.'/serializer_mapping/files/foo.xml')),
             new Definition(YamlFileLoader::class, array($configDir.'/serializer_mapping/files/foo.yml')),
             new Definition(YamlFileLoader::class, array($configDir.'/serializer_mapping/serialization.yml')),
@@ -851,11 +857,19 @@ abstract class FrameworkExtensionTest extends TestCase
         );
 
         foreach ($expectedLoaders as $definition) {
+            if (is_file($arg = $definition->getArgument(0))) {
+                $definition->replaceArgument(0, strtr($arg, '/', DIRECTORY_SEPARATOR));
+            }
             $definition->setPublic(false);
         }
 
         $loaders = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
-        $this->assertEquals(sort($expectedLoaders), sort($loaders));
+        foreach ($loaders as $loader) {
+            if (is_file($arg = $loader->getArgument(0))) {
+                $loader->replaceArgument(0, strtr($arg, '/', DIRECTORY_SEPARATOR));
+            }
+        }
+        $this->assertEquals($expectedLoaders, $loaders);
     }
 
     public function testAssetHelperWhenAssetsAreEnabled()

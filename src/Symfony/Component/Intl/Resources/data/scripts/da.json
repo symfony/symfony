@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "Afak": "afaka",
         "Arab": "arabisk",
@@ -14,7 +14,7 @@
         "Blis": "blissymboler",
         "Bopo": "bopomofo",
         "Brah": "bramisk",
-        "Brai": "brailleskrift",
+        "Brai": "punktskrift",
         "Bugi": "buginesisk",
         "Buhd": "buhid",
         "Cakm": "cakm",

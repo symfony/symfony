@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "AC": "Debesbraukšanas sala",
         "AD": "Andora",
@@ -72,6 +72,7 @@
         "ER": "Eritreja",
         "ES": "Spānija",
         "ET": "Etiopija",
+        "EZ": "Eirozona",
         "FI": "Somija",
         "FJ": "Fidži",
         "FK": "Folklenda salas",

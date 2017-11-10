@@ -12,6 +12,11 @@ EventDispatcher
 
  * The `TraceableEventDispatcherInterface` has been deprecated and will be removed in 5.0.
 
+FrameworkBundle
+---------------
+
+ * A `RouterInterface` that does not implement the `WarmableInterface` is deprecated and will not be supported in Symfony 5.0.
+
 HttpFoundation
 --------------
 

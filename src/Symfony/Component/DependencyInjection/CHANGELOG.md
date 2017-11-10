@@ -1,6 +1,72 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * Relying on service auto-registration while autowiring is not supported anymore.
+   Explicitly inject your dependencies or create services whose ids are
+   their fully-qualified class name.
+
+   Before:
+
+   ```php
+   namespace App\Controller;
+
+   use App\Mailer;
+
+   class DefaultController
+   {
+       public function __construct(Mailer $mailer) {
+           // ...
+       }
+
+       // ...
+   }
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+   ```
+
+   After:
+
+   ```php
+   // same PHP code
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+
+       # or
+       # App\Controller\DefaultController:
+       #     arguments: { $mailer: "@App\Mailer" }
+
+       App\Mailer:
+           autowire: true
+    ```
+ * removed autowiring services based on the types they implement
+ * added a third `$methodName` argument to the `getProxyFactoryCode()` method
+   of the `DumperInterface`
+ * removed support for autowiring types
+ * removed `Container::isFrozen`
+ * removed support for dumping an ucompiled container in `PhpDumper`
+ * removed support for generating a dumped `Container` without populating the method map
+ * removed support for case insensitive service identifiers
+ * removed the `DefinitionDecorator` class, replaced by `ChildDefinition`
+ * removed the `AutowireServiceResource` class and related `AutowirePass::createResourceForClass()` method
+ * removed `LoggingFormatter`, `Compiler::getLoggingFormatter()` and `addLogMessage()` class and methods, use the `ContainerBuilder::log()` method instead
+ * removed `FactoryReturnTypePass`
+ * removed `ContainerBuilder::addClassResource()`, use the `addObjectResource()` or the `getReflectionClass()` method instead.
+ * removed support for top-level anonymous services
+ * removed silent behavior for unused attributes and elements
+ * removed support for setting and accessing private services in `Container`
+ * removed support for setting pre-defined services in `Container`
+ * removed support for case insensitivity of parameter names
+ * removed `AutowireExceptionPass` and `AutowirePass::getAutowiringExceptions()`, use `Definition::addError()` and the `DefinitionErrorExceptionPass` instead
+
 3.4.0
 -----
 

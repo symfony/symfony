@@ -48,22 +48,6 @@ class RouterDebugCommandTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand::__construct() expects an instance of "Symfony\Component\Routing\RouterInterface" as first argument since version 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.
-     */
-    public function testLegacyDebugCommand()
-    {
-        $application = new Application($this->getKernel());
-        $application->add(new RouterDebugCommand());
-
-        $tester = new CommandTester($application->find('debug:router'));
-
-        $tester->execute(array());
-
-        $this->assertRegExp('/foo\s+ANY\s+ANY\s+ANY\s+\\/foo/', $tester->getDisplay());
-    }
-
-    /**
      * @return CommandTester
      */
     private function createCommandTester()

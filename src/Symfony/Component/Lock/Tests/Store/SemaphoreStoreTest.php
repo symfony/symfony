@@ -27,10 +27,6 @@ class SemaphoreStoreTest extends AbstractStoreTest
      */
     protected function getStore()
     {
-        if (\PHP_VERSION_ID < 50601) {
-            $this->markTestSkipped('Non blocking semaphore are supported by PHP version greater or equals than 5.6.1');
-        }
-
         return new SemaphoreStore();
     }
 }

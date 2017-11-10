@@ -143,30 +143,6 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testUrlRedirectDefaultPortParameters()
-    {
-        $host = 'www.example.com';
-        $baseUrl = '/base';
-        $path = '/redirect-path';
-        $httpPort = 1080;
-        $httpsPort = 1443;
-
-        $expectedUrl = "https://$host:$httpsPort$baseUrl$path";
-        $request = $this->createRequestObject('http', $host, $httpPort, $baseUrl);
-        $controller = $this->createLegacyRedirectController(null, $httpsPort);
-        $returnValue = $controller->urlRedirectAction($request, $path, false, 'https');
-        $this->assertRedirectUrl($returnValue, $expectedUrl);
-
-        $expectedUrl = "http://$host:$httpPort$baseUrl$path";
-        $request = $this->createRequestObject('https', $host, $httpPort, $baseUrl);
-        $controller = $this->createLegacyRedirectController($httpPort);
-        $returnValue = $controller->urlRedirectAction($request, $path, false, 'http');
-        $this->assertRedirectUrl($returnValue, $expectedUrl);
-    }
-
     public function urlRedirectProvider()
     {
         return array(
@@ -274,44 +250,6 @@ class RedirectControllerTest extends TestCase
     private function createRedirectController($httpPort = null, $httpsPort = null)
     {
         return new RedirectController(null, $httpPort, $httpsPort);
-    }
-
-    /**
-     * @deprecated
-     */
-    private function createLegacyRedirectController($httpPort = null, $httpsPort = null)
-    {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-
-        if (null !== $httpPort) {
-            $container
-                ->expects($this->once())
-                ->method('hasParameter')
-                ->with($this->equalTo('request_listener.http_port'))
-                ->will($this->returnValue(true));
-            $container
-                ->expects($this->once())
-                ->method('getParameter')
-                ->with($this->equalTo('request_listener.http_port'))
-                ->will($this->returnValue($httpPort));
-        }
-        if (null !== $httpsPort) {
-            $container
-                ->expects($this->once())
-                ->method('hasParameter')
-                ->with($this->equalTo('request_listener.https_port'))
-                ->will($this->returnValue(true));
-            $container
-                ->expects($this->once())
-                ->method('getParameter')
-                ->with($this->equalTo('request_listener.https_port'))
-                ->will($this->returnValue($httpsPort));
-        }
-
-        $controller = new RedirectController();
-        $controller->setContainer($container);
-
-        return $controller;
     }
 
     public function assertRedirectUrl(Response $returnResponse, $expectedUrl)

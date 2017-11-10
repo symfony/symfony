@@ -78,7 +78,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     private $scale;
 
-    public function __construct($scale = null, $grouping = false, $roundingMode = self::ROUND_HALF_UP)
+    public function __construct(int $scale = null, ?bool $grouping = false, ?int $roundingMode = self::ROUND_HALF_UP)
     {
         if (null === $grouping) {
             $grouping = false;

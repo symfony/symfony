@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed the `WebProfilerExtension::dumpValue()` method
+ * removed the `getTemplates()` method of the `TemplateManager` class in favor of the ``getNames()`` method
+ * removed the `web_profiler.position` config option and the
+   `web_profiler.debug_toolbar.position` container parameter
+
 3.4.0
 -----
 

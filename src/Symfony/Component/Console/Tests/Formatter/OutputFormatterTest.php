@@ -196,17 +196,6 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     * @dataProvider provideInlineStyleTagsWithUnknownOptions
-     * @expectedDeprecation Unknown style options are deprecated since version 3.2 and will be removed in 4.0. Exception "Invalid option specified: "%s". Expected one of (bold, underscore, blink, reverse, conceal)".
-     */
-    public function testInlineStyleOptionsUnknownAreDeprecated($tag, $option)
-    {
-        $formatter = new OutputFormatter(true);
-        $formatter->format($tag);
-    }
-
     public function provideInlineStyleTagsWithUnknownOptions()
     {
         return array(

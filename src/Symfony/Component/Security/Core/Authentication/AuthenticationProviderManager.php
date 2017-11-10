@@ -40,14 +40,14 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($providers, $eraseCredentials = true)
+    public function __construct(iterable $providers, bool $eraseCredentials = true)
     {
         if (!$providers) {
             throw new \InvalidArgumentException('You must at least add one authentication provider.');
         }
 
         $this->providers = $providers;
-        $this->eraseCredentials = (bool) $eraseCredentials;
+        $this->eraseCredentials = $eraseCredentials;
     }
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)

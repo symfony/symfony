@@ -187,12 +187,9 @@ class DoctrineExtensionTest extends TestCase
     }
 
     /**
-     * @param string $class
-     * @param array  $config
-     *
      * @dataProvider providerBasicDrivers
      */
-    public function testLoadBasicCacheDriver($class, array $config, array $expectedCalls = array())
+    public function testLoadBasicCacheDriver(string $class, array $config, array $expectedCalls = array())
     {
         $container = $this->createContainer();
         $cacheName = 'metadata_cache';

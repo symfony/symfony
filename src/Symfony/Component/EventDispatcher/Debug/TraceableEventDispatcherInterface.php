@@ -15,8 +15,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @method reset() Resets the trace.
  */
 interface TraceableEventDispatcherInterface extends EventDispatcherInterface
 {
@@ -33,4 +31,9 @@ interface TraceableEventDispatcherInterface extends EventDispatcherInterface
      * @return array An array of not called listeners
      */
     public function getNotCalledListeners();
+
+    /**
+     * Resets the trace.
+     */
+    public function reset();
 }

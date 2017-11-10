@@ -6,3 +6,4 @@ services:
         # set explicitly on child
         autowire: true
         tags: [from_defaults]
+        public: true

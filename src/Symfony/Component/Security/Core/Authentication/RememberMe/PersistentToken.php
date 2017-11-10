@@ -24,16 +24,7 @@ final class PersistentToken implements PersistentTokenInterface
     private $tokenValue;
     private $lastUsed;
 
-    /**
-     * @param string    $class
-     * @param string    $username
-     * @param string    $series
-     * @param string    $tokenValue
-     * @param \DateTime $lastUsed
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($class, $username, $series, $tokenValue, \DateTime $lastUsed)
+    public function __construct(string $class, string $username, string $series, string $tokenValue, \DateTime $lastUsed)
     {
         if (empty($class)) {
             throw new \InvalidArgumentException('$class must not be empty.');

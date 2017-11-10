@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -63,46 +62,6 @@ class QuestionHelper extends Helper
         };
 
         return $this->validateAttempts($interviewer, $output, $question);
-    }
-
-    /**
-     * Sets the input stream to read from when interacting with the user.
-     *
-     * This is mainly useful for testing purpose.
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Use
-     *             StreamableInputInterface::setStream() instead.
-     *
-     * @param resource $stream The input stream
-     *
-     * @throws InvalidArgumentException In case the stream is not a resource
-     */
-    public function setInputStream($stream)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use %s::setStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
-
-        if (!is_resource($stream)) {
-            throw new InvalidArgumentException('Input stream must be a valid resource.');
-        }
-
-        $this->inputStream = $stream;
-    }
-
-    /**
-     * Returns the helper's input stream.
-     *
-     * @deprecated since version 3.2, to be removed in 4.0. Use
-     *             StreamableInputInterface::getStream() instead.
-     *
-     * @return resource
-     */
-    public function getInputStream()
-    {
-        if (0 === func_num_args() || func_get_arg(0)) {
-            @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use %s::getStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
-        }
-
-        return $this->inputStream;
     }
 
     /**
@@ -211,10 +170,8 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output
      * @param Question        $question
      * @param resource        $inputStream
-     *
-     * @return string
      */
-    private function autocomplete(OutputInterface $output, Question $question, $inputStream)
+    private function autocomplete(OutputInterface $output, Question $question, $inputStream): string
     {
         $autocomplete = $question->getAutocompleterValues();
         $ret = '';
@@ -330,11 +287,9 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output      An Output instance
      * @param resource        $inputStream The handler resource
      *
-     * @return string The answer
-     *
      * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
-    private function getHiddenResponse(OutputInterface $output, $inputStream)
+    private function getHiddenResponse(OutputInterface $output, $inputStream): string
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
@@ -445,10 +400,8 @@ class QuestionHelper extends Helper
 
     /**
      * Returns whether Stty is available or not.
-     *
-     * @return bool
      */
-    private function hasSttyAvailable()
+    private function hasSttyAvailable(): bool
     {
         if (null !== self::$stty) {
             return self::$stty;

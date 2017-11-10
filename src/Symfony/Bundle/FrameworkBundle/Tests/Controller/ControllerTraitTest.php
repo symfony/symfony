@@ -378,7 +378,7 @@ abstract class ControllerTraitTest extends TestCase
     public function testAddFlash()
     {
         $flashBag = new FlashBag();
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->disableOriginalConstructor()->getMock();
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->getMock();
         $session->expects($this->once())->method('getFlashBag')->willReturn($flashBag);
 
         $container = new Container();

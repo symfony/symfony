@@ -37,7 +37,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      * @param string                              $file             The absolute cache path
      * @param iterable|ResourceCheckerInterface[] $resourceCheckers The ResourceCheckers to use for the freshness check
      */
-    public function __construct($file, $resourceCheckers = array())
+    public function __construct(string $file, iterable $resourceCheckers = array())
     {
         $this->file = $file;
         $this->resourceCheckers = $resourceCheckers;

@@ -11,20 +11,15 @@ init:
     - SET COMPOSER_NO_INTERACTION=1
     - SET SYMFONY_DEPRECATIONS_HELPER=strict
     - SET ANSICON=121x90 (121x90)
-    - SET SYMFONY_PHPUNIT_VERSION=4.8
     - REG ADD "HKEY_CURRENT_USER\Software\Microsoft\Command Processor" /v DelayedExpansion /t REG_DWORD /d 1 /f
 
 install:
     - mkdir c:\php && cd c:\php
-    - appveyor DownloadFile https://raw.githubusercontent.com/symfony/binary-utils/master/cacert.pem
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-5.5.9-nts-Win32-VC11-x86.zip
-    - 7z x php-5.5.9-nts-Win32-VC11-x86.zip -y >nul
     - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php-7.1.3-Win32-VC14-x86.zip
+    - 7z x php-7.1.3-Win32-VC14-x86.zip -y >nul
     - cd ext
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-4.0.10-5.5-nts-vc11-x86.zip
-    - 7z x php_apcu-4.0.10-5.5-nts-vc11-x86.zip -y >nul
-    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_memcache-3.0.8-5.5-nts-vc11-x86.zip
-    - 7z x php_memcache-3.0.8-5.5-nts-vc11-x86.zip -y >nul
+    - appveyor DownloadFile https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.8-7.1-ts-vc14-x86.zip
+    - 7z x php_apcu-5.1.8-7.1-ts-vc14-x86.zip -y >nul
     - cd ..
     - copy /Y php.ini-development php.ini-min
     - echo serialize_precision=14 >> php.ini-min
@@ -37,13 +32,11 @@ install:
     - echo extension=php_openssl.dll >> php.ini-max
     - echo extension=php_apcu.dll >> php.ini-max
     - echo apc.enable_cli=1 >> php.ini-max
-    - echo extension=php_memcache.dll >> php.ini-max
     - echo extension=php_intl.dll >> php.ini-max
     - echo extension=php_mbstring.dll >> php.ini-max
     - echo extension=php_fileinfo.dll >> php.ini-max
     - echo extension=php_pdo_sqlite.dll >> php.ini-max
     - echo extension=php_curl.dll >> php.ini-max
-    - echo curl.cainfo=c:\php\cacert.pem >> php.ini-max
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
     - IF NOT EXIST composer.phar (appveyor DownloadFile https://getcomposer.org/download/1.3.0/composer.phar)
@@ -56,12 +49,8 @@ install:
 
 test_script:
     - SET X=0
-    - cd c:\php && 7z x php-7.1.3-Win32-VC14-x86.zip -y >nul && copy /Y php.ini-min php.ini
-    - cd c:\projects\symfony
-    - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
-    - cd c:\php && 7z x php-5.5.9-nts-Win32-VC11-x86.zip -y >nul && copy /Y php.ini-min php.ini
-    - cd c:\projects\symfony
     - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
+    - copy /Y c:\php\php.ini-min c:\php\php.ini
     - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
     - copy /Y c:\php\php.ini-max c:\php\php.ini
     - php phpunit src\Symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!

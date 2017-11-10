@@ -17,13 +17,9 @@ class Alias
     private $public;
     private $private;
 
-    /**
-     * @param string $id     Alias identifier
-     * @param bool   $public If this alias is public
-     */
-    public function __construct($id, $public = true)
+    public function __construct(string $id, bool $public = true)
     {
-        $this->id = (string) $id;
+        $this->id = $id;
         $this->public = $public;
         $this->private = 2 > func_num_args();
     }

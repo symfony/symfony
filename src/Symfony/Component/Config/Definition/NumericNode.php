@@ -23,7 +23,7 @@ class NumericNode extends ScalarNode
     protected $min;
     protected $max;
 
-    public function __construct($name, NodeInterface $parent = null, $min = null, $max = null)
+    public function __construct(?string $name, NodeInterface $parent = null, $min = null, $max = null)
     {
         parent::__construct($name, $parent);
         $this->min = $min;

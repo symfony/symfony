@@ -65,29 +65,6 @@ class RegistryTest extends TestCase
         $this->assertSame('workflow1', $w1->getName());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetWithSuccessLegacyStrategy()
-    {
-        $registry = new Registry();
-
-        $registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), Subject1::class);
-        $registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), Subject2::class);
-
-        $workflow = $registry->get(new Subject1());
-        $this->assertInstanceOf(Workflow::class, $workflow);
-        $this->assertSame('workflow1', $workflow->getName());
-
-        $workflow = $registry->get(new Subject1(), 'workflow1');
-        $this->assertInstanceOf(Workflow::class, $workflow);
-        $this->assertSame('workflow1', $workflow->getName());
-
-        $workflow = $registry->get(new Subject2(), 'workflow2');
-        $this->assertInstanceOf(Workflow::class, $workflow);
-        $this->assertSame('workflow2', $workflow->getName());
-    }
-
     private function createSupportStrategy($supportedClassName)
     {
         $strategy = $this->getMockBuilder(SupportStrategyInterface::class)->getMock();

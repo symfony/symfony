@@ -44,8 +44,6 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
@@ -116,37 +114,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('web.xml');
         $loader->load('services.xml');
-
-        $container->getDefinition('kernel.class_cache.cache_warmer')->setPrivate(true);
-        $container->getDefinition('uri_signer')->setPrivate(true);
-        $container->getDefinition('config_cache_factory')->setPrivate(true);
-        $container->getDefinition('response_listener')->setPrivate(true);
-        $container->getDefinition('file_locator')->setPrivate(true);
-        $container->getDefinition('streamed_response_listener')->setPrivate(true);
-        $container->getDefinition('locale_listener')->setPrivate(true);
-        $container->getDefinition('validate_request_listener')->setPrivate(true);
-
-        // forward compatibility with Symfony 4.0 where the ContainerAwareEventDispatcher class is removed
-        if (!class_exists(ContainerAwareEventDispatcher::class)) {
-            $definition = $container->getDefinition('event_dispatcher');
-            $definition->setClass(EventDispatcher::class);
-            $definition->setArguments(array());
-        }
-
-        if (\PHP_VERSION_ID < 70000) {
-            $definition = $container->getDefinition('kernel.class_cache.cache_warmer');
-            $definition->addTag('kernel.cache_warmer');
-            // Ignore deprecation for PHP versions below 7.0
-            $definition->setDeprecated(false);
-        }
-
         $loader->load('fragment_renderer.xml');
-
-        $container->getDefinition('fragment.handler')->setPrivate(true);
-        $container->getDefinition('fragment.renderer.inline')->setPrivate(true);
-        $container->getDefinition('fragment.renderer.hinclude')->setPrivate(true);
-        $container->getDefinition('fragment.renderer.esi')->setPrivate(true);
-        $container->getDefinition('fragment.renderer.ssi')->setPrivate(true);
 
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
@@ -161,15 +129,6 @@ class FrameworkExtension extends Extension
 
         // Load Cache configuration first as it is used by other components
         $loader->load('cache.xml');
-
-        $container->getDefinition('cache.adapter.system')->setPrivate(true);
-        $container->getDefinition('cache.adapter.apcu')->setPrivate(true);
-        $container->getDefinition('cache.adapter.doctrine')->setPrivate(true);
-        $container->getDefinition('cache.adapter.filesystem')->setPrivate(true);
-        $container->getDefinition('cache.adapter.psr6')->setPrivate(true);
-        $container->getDefinition('cache.adapter.redis')->setPrivate(true);
-        $container->getDefinition('cache.adapter.memcached')->setPrivate(true);
-        $container->getDefinition('cache.default_clearer')->setPrivate(true);
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -200,9 +159,6 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('kernel.http_method_override', $config['http_method_override']);
         $container->setParameter('kernel.trusted_hosts', $config['trusted_hosts']);
-        if ($config['trusted_proxies']) {
-            $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
-        }
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
         if (!$container->hasParameter('debug.file_link_format')) {
@@ -223,10 +179,6 @@ class FrameworkExtension extends Extension
 
         if (!empty($config['test'])) {
             $loader->load('test.xml');
-
-            $container->getDefinition('test.client.history')->setPrivate(true);
-            $container->getDefinition('test.client.cookiejar')->setPrivate(true);
-            $container->getDefinition('test.session.listener')->setPrivate(true);
         }
 
         if ($this->isConfigEnabled($container, $config['session'])) {
@@ -367,47 +319,6 @@ class FrameworkExtension extends Extension
             // remove tagged iterator argument for resource checkers
             $container->getDefinition('config_cache_factory')->setArguments(array());
         }
-
-        if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
-                'Symfony\\Component\\Config\\ConfigCache',
-                'Symfony\\Component\\Config\\FileLocator',
-
-                'Symfony\\Component\\Debug\\ErrorHandler',
-
-                'Symfony\\Component\\DependencyInjection\\ContainerAwareInterface',
-                'Symfony\\Component\\DependencyInjection\\Container',
-
-                'Symfony\\Component\\EventDispatcher\\Event',
-                'Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher',
-
-                'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
-                'Symfony\\Component\\HttpKernel\\EventListener\\RouterListener',
-                'Symfony\\Component\\HttpKernel\\Bundle\\Bundle',
-                'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
-                'Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolver',
-                'Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadata',
-                'Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadataFactory',
-                'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
-                'Symfony\\Component\\HttpKernel\\Event\\FilterControllerEvent',
-                'Symfony\\Component\\HttpKernel\\Event\\FilterResponseEvent',
-                'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
-                'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
-                'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
-                'Symfony\\Component\\HttpKernel\\HttpKernel',
-                'Symfony\\Component\\HttpKernel\\KernelEvents',
-                'Symfony\\Component\\HttpKernel\\Config\\FileLocator',
-
-                'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
-                'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
-
-                // Cannot be included because annotations will parse the big compiled class file
-                // 'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
-
-                // cannot be included as commands are discovered based on the path to this class via Reflection
-                // 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
-            ));
-        }
     }
 
     /**
@@ -422,27 +333,12 @@ class FrameworkExtension extends Extension
     {
         $loader->load('form.xml');
 
-        $container->getDefinition('form.resolved_type_factory')->setPrivate(true);
-        $container->getDefinition('form.registry')->setPrivate(true);
-        $container->getDefinition('form.type_guesser.validator')->setPrivate(true);
-        $container->getDefinition('form.type.form')->setPrivate(true);
-        $container->getDefinition('form.type.choice')->setPrivate(true);
-        $container->getDefinition('form.type_extension.form.http_foundation')->setPrivate(true);
-        $container->getDefinition('form.type_extension.form.validator')->setPrivate(true);
-        $container->getDefinition('form.type_extension.repeated.validator')->setPrivate(true);
-        $container->getDefinition('form.type_extension.submit.validator')->setPrivate(true);
-        $container->getDefinition('form.type_extension.upload.validator')->setPrivate(true);
-        $container->getDefinition('deprecated.form.registry')->setPrivate(true);
-
         if (null === $config['form']['csrf_protection']['enabled']) {
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
         }
 
         if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
             $loader->load('form_csrf.xml');
-
-            $container->getDefinition('form.type_extension.csrf')->setPrivate(true);
-            $container->getDefinition('deprecated.form.registry.csrf')->setPrivate(true);
 
             $container->setParameter('form.type_extension.csrf.enabled', true);
             $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
@@ -464,9 +360,6 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('esi.xml');
-
-        $container->getDefinition('esi')->setPrivate(true);
-        $container->getDefinition('esi_listener')->setPrivate(true);
     }
 
     private function registerSsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
@@ -478,9 +371,6 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('ssi.xml');
-
-        $container->getDefinition('ssi')->setPrivate(true);
-        $container->getDefinition('ssi_listener')->setPrivate(true);
     }
 
     private function registerFragmentsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
@@ -508,16 +398,8 @@ class FrameworkExtension extends Extension
         $loader->load('collectors.xml');
         $loader->load('cache_debug.xml');
 
-        $container->getDefinition('data_collector.request')->setPrivate(true);
-        $container->getDefinition('data_collector.router')->setPrivate(true);
-        $container->getDefinition('profiler_listener')->setPrivate(true);
-
         if ($this->formConfigEnabled) {
             $loader->load('form_debug.xml');
-
-            $container->getDefinition('form.resolved_type_factory')->setPrivate(true);
-            $container->getDefinition('data_collector.form.extractor')->setPrivate(true);
-            $container->getDefinition('data_collector.form')->setPrivate(true);
         }
 
         if ($this->validatorConfigEnabled) {
@@ -526,8 +408,6 @@ class FrameworkExtension extends Extension
 
         if ($this->translationConfigEnabled) {
             $loader->load('translation_debug.xml');
-
-            $container->getDefinition('data_collector.translation')->setPrivate(true);
 
             $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
         }
@@ -542,27 +422,6 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('profiler.storage.dsn', $config['dsn']);
-
-        if ($this->isConfigEnabled($container, $config['matcher'])) {
-            if (isset($config['matcher']['service'])) {
-                $container->setAlias('profiler.request_matcher', $config['matcher']['service'])->setPrivate(true);
-            } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path']) || isset($config['matcher']['ips'])) {
-                $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
-                $definition->setPublic(false);
-
-                if (isset($config['matcher']['ip'])) {
-                    $definition->addMethodCall('matchIp', array($config['matcher']['ip']));
-                }
-
-                if (isset($config['matcher']['ips'])) {
-                    $definition->addMethodCall('matchIps', array($config['matcher']['ips']));
-                }
-
-                if (isset($config['matcher']['path'])) {
-                    $definition->addMethodCall('matchPath', array($config['matcher']['path']));
-                }
-            }
-        }
 
         $container->getDefinition('profiler')
             ->addArgument($config['collect'])
@@ -583,17 +442,9 @@ class FrameworkExtension extends Extension
 
         $loader->load('workflow.xml');
 
-        $container->getDefinition('workflow.marking_store.multiple_state')->setPrivate(true);
-        $container->getDefinition('workflow.marking_store.single_state')->setPrivate(true);
-        $container->getDefinition('workflow.registry')->setPrivate(true);
-
         $registryDefinition = $container->getDefinition('workflow.registry');
 
         foreach ($config['workflows'] as $name => $workflow) {
-            if (!array_key_exists('type', $workflow)) {
-                $workflow['type'] = 'workflow';
-                @trigger_error(sprintf('The "type" option of the "framework.workflows.%s" configuration entry must be defined since Symfony 3.3. The default value will be "state_machine" in Symfony 4.0.', $name), E_USER_DEPRECATED);
-            }
             $type = $workflow['type'];
 
             $transitions = array();
@@ -711,8 +562,6 @@ class FrameworkExtension extends Extension
     {
         $loader->load('debug_prod.xml');
 
-        $container->getDefinition('debug.debug_handlers_listener')->setPrivate(true);
-
         if (class_exists(Stopwatch::class)) {
             $container->register('debug.stopwatch', Stopwatch::class)
                 ->addArgument(true)
@@ -729,9 +578,6 @@ class FrameworkExtension extends Extension
 
         if ($debug && class_exists(Stopwatch::class)) {
             $loader->load('debug.xml');
-            $container->getDefinition('debug.event_dispatcher')->setPrivate(true);
-            $container->getDefinition('debug.controller_resolver')->setPrivate(true);
-            $container->getDefinition('debug.argument_resolver')->setPrivate(true);
         }
 
         $definition = $container->findDefinition('debug.debug_handlers_listener');
@@ -765,8 +611,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('routing.xml');
 
-        $container->getDefinition('router_listener')->setPrivate(true);
-
         $container->setParameter('router.resource', $config['resource']);
         $container->setParameter('router.cache_class_prefix', $container->getParameter('kernel.container_class'));
         $router = $container->findDefinition('router.default');
@@ -779,16 +623,6 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('request_listener.http_port', $config['http_port']);
         $container->setParameter('request_listener.https_port', $config['https_port']);
-
-        if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
-                'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-                'Symfony\\Component\\Routing\\RequestContext',
-                'Symfony\\Component\\Routing\\Router',
-                'Symfony\\Bundle\\FrameworkBundle\\Routing\\RedirectableUrlMatcher',
-                $container->findDefinition('router.default')->getClass(),
-            ));
-        }
 
         if ($this->annotationsConfigEnabled) {
             $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
@@ -818,16 +652,10 @@ class FrameworkExtension extends Extension
     {
         $loader->load('session.xml');
 
-        $container->getDefinition('session.storage.native')->setPrivate(true);
-        $container->getDefinition('session.storage.php_bridge')->setPrivate(true);
-        $container->getDefinition('session_listener')->setPrivate(true);
-        $container->getDefinition('session.save_listener')->setPrivate(true);
-        $container->getAlias('session.storage.filesystem')->setPrivate(true);
-
         // session storage
         $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
         $options = array();
-        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode') as $key) {
+        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
@@ -846,24 +674,6 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('session.save_path', $config['save_path']);
 
-        if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
-                'Symfony\\Component\\HttpKernel\\EventListener\\SessionListener',
-                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\NativeSessionStorage',
-                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\PhpBridgeSessionStorage',
-                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler',
-                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\AbstractProxy',
-                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\SessionHandlerProxy',
-                $container->getDefinition('session')->getClass(),
-            ));
-
-            if ($container->hasDefinition($config['storage_id'])) {
-                $this->addClassesToCompile(array(
-                    $container->findDefinition('session.storage')->getClass(),
-                ));
-            }
-        }
-
         $container->setParameter('session.metadata.update_threshold', $config['metadata_update_threshold']);
     }
 
@@ -871,8 +681,6 @@ class FrameworkExtension extends Extension
     {
         if ($config['formats']) {
             $loader->load('request.xml');
-
-            $container->getDefinition('request.add_request_formats_listener')->setPrivate(true);
 
             $container
                 ->getDefinition('request.add_request_formats_listener')
@@ -884,9 +692,6 @@ class FrameworkExtension extends Extension
     private function registerTemplatingConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('templating.xml');
-
-        $container->getDefinition('templating.name_parser')->setPrivate(true);
-        $container->getDefinition('templating.filename_parser')->setPrivate(true);
 
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
@@ -923,15 +728,6 @@ class FrameworkExtension extends Extension
             $container->setDefinition('templating.loader', $loaderCache);
         }
 
-        if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
-                'Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables',
-                'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateReference',
-                'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateNameParser',
-                $container->findDefinition('templating.locator')->getClass(),
-            ));
-        }
-
         $container->setParameter('templating.engines', $config['engines']);
         $engines = array_map(function ($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
 
@@ -954,18 +750,6 @@ class FrameworkExtension extends Extension
         if (in_array('php', $config['engines'], true)) {
             $loader->load('templating_php.xml');
 
-            $container->getDefinition('templating.helper.slots')->setPrivate(true);
-            $container->getDefinition('templating.helper.request')->setPrivate(true);
-            $container->getDefinition('templating.helper.session')->setPrivate(true);
-            $container->getDefinition('templating.helper.router')->setPrivate(true);
-            $container->getDefinition('templating.helper.assets')->setPrivate(true);
-            $container->getDefinition('templating.helper.actions')->setPrivate(true);
-            $container->getDefinition('templating.helper.code')->setPrivate(true);
-            $container->getDefinition('templating.helper.translator')->setPrivate(true);
-            $container->getDefinition('templating.helper.form')->setPrivate(true);
-            $container->getDefinition('templating.helper.stopwatch')->setPrivate(true);
-            $container->getDefinition('templating.globals')->setPrivate(true);
-
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 
             if ($container->getParameter('kernel.debug') && class_exists(Stopwatch::class)) {
@@ -973,14 +757,6 @@ class FrameworkExtension extends Extension
 
                 $container->setDefinition('templating.engine.php', $container->findDefinition('debug.templating.engine.php'));
                 $container->setAlias('debug.templating.engine.php', 'templating.engine.php')->setPrivate(true);
-            }
-
-            if (\PHP_VERSION_ID < 70000) {
-                $this->addClassesToCompile(array(
-                    'Symfony\\Component\\Templating\\Storage\\FileStorage',
-                    'Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine',
-                    'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
-                ));
             }
 
             if ($container->has('assets.packages')) {
@@ -998,12 +774,6 @@ class FrameworkExtension extends Extension
     private function registerAssetsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('assets.xml');
-
-        $container->getDefinition('assets.packages')->setPrivate(true);
-        $container->getDefinition('assets.context')->setPrivate(true);
-        $container->getDefinition('assets.path_package')->setPrivate(true);
-        $container->getDefinition('assets.url_package')->setPrivate(true);
-        $container->getDefinition('assets.static_version_strategy')->setPrivate(true);
 
         $defaultVersion = null;
 
@@ -1095,35 +865,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('translation.xml');
 
-        $container->getDefinition('translator.default')->setPrivate(true);
-        $container->getDefinition('translation.loader.php')->setPrivate(true);
-        $container->getDefinition('translation.loader.yml')->setPrivate(true);
-        $container->getDefinition('translation.loader.xliff')->setPrivate(true);
-        $container->getDefinition('translation.loader.po')->setPrivate(true);
-        $container->getDefinition('translation.loader.mo')->setPrivate(true);
-        $container->getDefinition('translation.loader.qt')->setPrivate(true);
-        $container->getDefinition('translation.loader.csv')->setPrivate(true);
-        $container->getDefinition('translation.loader.res')->setPrivate(true);
-        $container->getDefinition('translation.loader.dat')->setPrivate(true);
-        $container->getDefinition('translation.loader.ini')->setPrivate(true);
-        $container->getDefinition('translation.loader.json')->setPrivate(true);
-        $container->getDefinition('translation.dumper.php')->setPrivate(true);
-        $container->getDefinition('translation.dumper.xliff')->setPrivate(true);
-        $container->getDefinition('translation.dumper.po')->setPrivate(true);
-        $container->getDefinition('translation.dumper.mo')->setPrivate(true);
-        $container->getDefinition('translation.dumper.yml')->setPrivate(true);
-        $container->getDefinition('translation.dumper.qt')->setPrivate(true);
-        $container->getDefinition('translation.dumper.csv')->setPrivate(true);
-        $container->getDefinition('translation.dumper.ini')->setPrivate(true);
-        $container->getDefinition('translation.dumper.json')->setPrivate(true);
-        $container->getDefinition('translation.dumper.res')->setPrivate(true);
-        $container->getDefinition('translation.extractor.php')->setPrivate(true);
-        $container->getDefinition('translator_listener')->setPrivate(true);
-        $container->getDefinition('translation.loader')->setPrivate(true);
-        $container->getDefinition('translation.reader')->setPrivate(true);
-        $container->getDefinition('translation.extractor')->setPrivate(true);
-        $container->getDefinition('translation.writer')->setPrivate(true);
-
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default')->setPublic(true);
         $container->setAlias('translator.formatter', new Alias($config['formatter'], false));
@@ -1213,10 +954,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('validator.xml');
 
-        $container->getDefinition('validator.builder')->setPrivate(true);
-        $container->getDefinition('validator.expression')->setPrivate(true);
-        $container->getDefinition('validator.email')->setPrivate(true);
-
         $validatorBuilder = $container->getDefinition('validator.builder');
 
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
@@ -1249,14 +986,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (isset($config['cache']) && $config['cache']) {
-            $container->setParameter(
-                'validator.mapping.cache.prefix',
-                'validator_'.$this->getKernelRootHash($container)
-            );
-
-            $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
-        } elseif (!$container->getParameter('kernel.debug')) {
+        if (!$container->getParameter('kernel.debug')) {
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference('validator.mapping.cache.symfony')));
         }
     }
@@ -1330,8 +1060,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('annotations.xml');
 
-        $container->getAlias('annotation_reader')->setPrivate(true);
-
         if ('none' !== $config['cache']) {
             if (!class_exists('Doctrine\Common\Cache\CacheProvider')) {
                 throw new LogicException('Annotations cannot be enabled as the Doctrine Cache library is not installed.');
@@ -1345,13 +1073,6 @@ class FrameworkExtension extends Extension
                 // Enable warmer only if PHP array is used for cache
                 $definition = $container->findDefinition('annotations.cache_warmer');
                 $definition->addTag('kernel.cache_warmer');
-
-                if (\PHP_VERSION_ID < 70000) {
-                    $this->addClassesToCompile(array(
-                        'Symfony\Component\Cache\Adapter\PhpArrayAdapter',
-                        'Symfony\Component\Cache\DoctrineProvider',
-                    ));
-                }
             } elseif ('file' === $config['cache']) {
                 $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
 
@@ -1387,8 +1108,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('property_access.xml');
 
-        $container->getDefinition('property_accessor')->setPrivate(true);
-
         $container
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $config['magic_call'])
@@ -1421,8 +1140,6 @@ class FrameworkExtension extends Extension
         if (!class_exists(DateIntervalNormalizer::class)) {
             $container->removeDefinition('serializer.normalizer.dateinterval');
         }
-
-        $container->getDefinition('serializer.mapping.cache.symfony')->setPrivate(true);
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
@@ -1476,16 +1193,7 @@ class FrameworkExtension extends Extension
         $chainLoader->replaceArgument(0, $serializerLoaders);
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
 
-        if (isset($config['cache']) && $config['cache']) {
-            $container->setParameter(
-                'serializer.mapping.cache.prefix',
-                'serializer_'.$this->getKernelRootHash($container)
-            );
-
-            $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
-                1, new Reference($config['cache'])
-            );
-        } elseif (!$container->getParameter('kernel.debug')) {
+        if (!$container->getParameter('kernel.debug')) {
             $cacheMetadataFactory = new Definition(
                 CacheClassMetadataFactory::class,
                 array(
@@ -1511,8 +1219,6 @@ class FrameworkExtension extends Extension
     private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('property_info.xml');
-
-        $container->getDefinition('property_info')->setPrivate(true);
 
         if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
@@ -1647,14 +1353,6 @@ class FrameworkExtension extends Extension
                 $propertyAccessDefinition->setClass(ArrayAdapter::class);
                 $propertyAccessDefinition->setArguments(array(0, false));
             }
-        }
-
-        if (\PHP_VERSION_ID < 70000) {
-            $this->addClassesToCompile(array(
-                'Symfony\Component\Cache\Adapter\ApcuAdapter',
-                'Symfony\Component\Cache\Adapter\FilesystemAdapter',
-                'Symfony\Component\Cache\CacheItem',
-            ));
         }
     }
 

@@ -34,7 +34,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, $providerKey, array $roles)
+    public function __construct(UserInterface $user, string $providerKey, array $roles)
     {
         parent::__construct($roles);
 

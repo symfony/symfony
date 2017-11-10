@@ -15,8 +15,6 @@ namespace Symfony\Component\HttpKernel\Log;
  * DebugLoggerInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @method clear() Removes all log records.
  */
 interface DebugLoggerInterface
 {
@@ -37,4 +35,9 @@ interface DebugLoggerInterface
      * @return int The number of errors
      */
     public function countErrors();
+
+    /**
+     * Removes all log records.
+     */
+    public function clear();
 }

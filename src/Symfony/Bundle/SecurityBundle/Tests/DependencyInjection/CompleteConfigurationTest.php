@@ -37,20 +37,6 @@ abstract class CompleteConfigurationTest extends TestCase
         ), $container->getParameter('security.role_hierarchy.roles'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
-     */
-    public function testRolesHierarchyWithAcl()
-    {
-        $container = $this->getContainer('container1_with_acl');
-        $this->assertEquals(array(
-            'ROLE_ADMIN' => array('ROLE_USER'),
-            'ROLE_SUPER_ADMIN' => array('ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'),
-            'ROLE_REMOTE' => array('ROLE_USER', 'ROLE_ADMIN'),
-        ), $container->getParameter('security.role_hierarchy.roles'));
-    }
-
     public function testUserProviders()
     {
         $container = $this->getContainer('container1');
@@ -178,134 +164,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.authentication.listener.remote_user.secure',
                 'security.authentication.listener.form.secure',
                 'security.authentication.listener.basic.secure',
-                'security.authentication.listener.rememberme.secure',
-                'security.authentication.listener.anonymous.secure',
-                'security.authentication.switchuser_listener.secure',
-                'security.access_listener',
-            ),
-            array(
-                'security.channel_listener',
-                'security.context_listener.0',
-                'security.authentication.listener.basic.host',
-                'security.authentication.listener.anonymous.host',
-                'security.access_listener',
-            ),
-            array(
-                'security.channel_listener',
-                'security.context_listener.1',
-                'security.authentication.listener.basic.with_user_checker',
-                'security.authentication.listener.anonymous.with_user_checker',
-                'security.access_listener',
-            ),
-        ), $listeners);
-
-        $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testFirewallsWithDigest()
-    {
-        $container = $this->getContainer('container1_with_digest');
-        $arguments = $container->getDefinition('security.firewall.map')->getArguments();
-        $listeners = array();
-        $configs = array();
-        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
-            $contextDef = $container->getDefinition($contextId);
-            $arguments = $contextDef->getArguments();
-            $listeners[] = array_map('strval', $arguments['index_0']->getValues());
-
-            $configDef = $container->getDefinition((string) $arguments['index_2']);
-            $configs[] = array_values($configDef->getArguments());
-        }
-
-        // the IDs of the services are case sensitive or insensitive depending on
-        // the Symfony version. Transform them to lowercase to simplify tests.
-        $configs[0][2] = strtolower($configs[0][2]);
-        $configs[2][2] = strtolower($configs[2][2]);
-
-        $this->assertEquals(array(
-            array(
-                'simple',
-                'security.user_checker',
-                'security.request_matcher.6tndozi',
-                false,
-            ),
-            array(
-                'secure',
-                'security.user_checker',
-                null,
-                true,
-                true,
-                'security.user.provider.concrete.default',
-                null,
-                'security.authentication.form_entry_point.secure',
-                null,
-                null,
-                array(
-                    'logout',
-                    'switch_user',
-                    'x509',
-                    'remote_user',
-                    'form_login',
-                    'http_basic',
-                    'http_digest',
-                    'remember_me',
-                    'anonymous',
-                ),
-                array(
-                    'parameter' => '_switch_user',
-                    'role' => 'ROLE_ALLOWED_TO_SWITCH',
-                    'stateless' => true,
-                ),
-            ),
-            array(
-                'host',
-                'security.user_checker',
-                'security.request_matcher.and0kk1',
-                true,
-                false,
-                'security.user.provider.concrete.default',
-                'host',
-                'security.authentication.basic_entry_point.host',
-                null,
-                null,
-                array(
-                    'http_basic',
-                    'anonymous',
-                ),
-                null,
-            ),
-            array(
-                'with_user_checker',
-                'app.user_checker',
-                null,
-                true,
-                false,
-                'security.user.provider.concrete.default',
-                'with_user_checker',
-                'security.authentication.basic_entry_point.with_user_checker',
-                null,
-                null,
-                array(
-                    'http_basic',
-                    'anonymous',
-                ),
-                null,
-            ),
-        ), $configs);
-
-        $this->assertEquals(array(
-            array(),
-            array(
-                'security.channel_listener',
-                'security.logout_listener.secure',
-                'security.authentication.listener.x509.secure',
-                'security.authentication.listener.remote_user.secure',
-                'security.authentication.listener.form.secure',
-                'security.authentication.listener.basic.secure',
-                'security.authentication.listener.digest.secure',
                 'security.authentication.listener.rememberme.secure',
                 'security.authentication.listener.anonymous.secure',
                 'security.authentication.switchuser_listener.secure',
@@ -464,30 +322,6 @@ abstract class CompleteConfigurationTest extends TestCase
             'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
             'arguments' => array(),
         ))), $this->getContainer('argon2i_encoder')->getDefinition('security.encoder_factory.generic')->getArguments());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
-     */
-    public function testAcl()
-    {
-        $container = $this->getContainer('container1_with_acl');
-
-        $this->assertTrue($container->hasDefinition('security.acl.dbal.provider'));
-        $this->assertEquals('security.acl.dbal.provider', (string) $container->getAlias('security.acl.provider'));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
-     */
-    public function testCustomAclProvider()
-    {
-        $container = $this->getContainer('custom_acl_provider');
-
-        $this->assertFalse($container->hasDefinition('security.acl.dbal.provider'));
-        $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
     }
 
     public function testRememberMeThrowExceptionsDefault()

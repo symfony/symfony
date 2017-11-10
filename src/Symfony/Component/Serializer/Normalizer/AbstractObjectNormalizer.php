@@ -225,18 +225,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Validates the submitted data and denormalizes it.
      *
-     * @param string      $currentClass
-     * @param string      $attribute
      * @param mixed       $data
-     * @param string|null $format
-     * @param array       $context
      *
      * @return mixed
      *
      * @throws NotNormalizableValueException
      * @throws LogicException
      */
-    private function validateAndDenormalize($currentClass, $attribute, $data, $format, array $context)
+    private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context)
     {
         if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
             return $data;
@@ -298,13 +294,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Sets an attribute and apply the name converter if necessary.
      *
-     * @param array  $data
-     * @param string $attribute
      * @param mixed  $attributeValue
-     *
-     * @return array
      */
-    private function updateData(array $data, $attribute, $attributeValue)
+    private function updateData(array $data, string $attribute, $attributeValue): array
     {
         if ($this->nameConverter) {
             $attribute = $this->nameConverter->normalize($attribute);
@@ -319,13 +311,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * Is the max depth reached for the given attribute?
      *
      * @param AttributeMetadataInterface[] $attributesMetadata
-     * @param string                       $class
-     * @param string                       $attribute
-     * @param array                        $context
-     *
-     * @return bool
      */
-    private function isMaxDepthReached(array $attributesMetadata, $class, $attribute, array &$context)
+    private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
     {
         if (
             !isset($context[static::ENABLE_MAX_DEPTH]) ||
@@ -354,12 +341,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Gets the cache key to use.
      *
-     * @param string|null $format
-     * @param array       $context
-     *
      * @return bool|string
      */
-    private function getCacheKey($format, array $context)
+    private function getCacheKey(?string $format, array $context)
     {
         try {
             return md5($format.serialize($context));

@@ -21,7 +21,7 @@ class DumpNode extends Node
 {
     private $varPrefix;
 
-    public function __construct($varPrefix, Node $values = null, $lineno, $tag = null)
+    public function __construct($varPrefix, Node $values = null, int $lineno, string $tag = null)
     {
         $nodes = array();
         if (null !== $values) {

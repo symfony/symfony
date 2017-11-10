@@ -35,54 +35,34 @@ class Token
     private $value;
     private $position;
 
-    /**
-     * @param int    $type
-     * @param string $value
-     * @param int    $position
-     */
-    public function __construct($type, $value, $position)
+    public function __construct(?string $type, ?string $value, ?int $position)
     {
         $this->type = $type;
         $this->value = $value;
         $this->position = $position;
     }
 
-    /**
-     * @return int
-     */
-    public function getType()
+    public function getType(): ?int
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    /**
-     * @return int
-     */
-    public function getPosition()
+    public function getPosition(): ?int
     {
         return $this->position;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFileEnd()
+    public function isFileEnd(): bool
     {
         return self::TYPE_FILE_END === $this->type;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDelimiter(array $values = array())
+    public function isDelimiter(array $values = array()): bool
     {
         if (self::TYPE_DELIMITER !== $this->type) {
             return false;
@@ -95,50 +75,32 @@ class Token
         return in_array($this->value, $values);
     }
 
-    /**
-     * @return bool
-     */
-    public function isWhitespace()
+    public function isWhitespace(): bool
     {
         return self::TYPE_WHITESPACE === $this->type;
     }
 
-    /**
-     * @return bool
-     */
-    public function isIdentifier()
+    public function isIdentifier(): bool
     {
         return self::TYPE_IDENTIFIER === $this->type;
     }
 
-    /**
-     * @return bool
-     */
-    public function isHash()
+    public function isHash(): bool
     {
         return self::TYPE_HASH === $this->type;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNumber()
+    public function isNumber(): bool
     {
         return self::TYPE_NUMBER === $this->type;
     }
 
-    /**
-     * @return bool
-     */
-    public function isString()
+    public function isString(): bool
     {
         return self::TYPE_STRING === $this->type;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->value) {
             return sprintf('<%s "%s" at %s>', $this->type, $this->value, $this->position);

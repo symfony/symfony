@@ -37,11 +37,8 @@ class ProxyDumperTest extends TestCase
 
     /**
      * @dataProvider getProxyCandidates
-     *
-     * @param Definition $definition
-     * @param bool       $expected
      */
-    public function testIsProxyCandidate(Definition $definition, $expected)
+    public function testIsProxyCandidate(Definition $definition, bool $expected)
     {
         $this->assertSame($expected, $this->dumper->isProxyCandidate($definition));
     }
@@ -76,20 +73,14 @@ class ProxyDumperTest extends TestCase
     }
 
     /**
-     * @group legacy
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Missing factory code to construct the service "foo".
      */
-    public function testLegacyGetProxyFactoryCode()
+    public function testGetProxyFactoryCodeWithoutCustomMethod()
     {
         $definition = new Definition(__CLASS__);
-
         $definition->setLazy(true);
-
-        $code = $this->dumper->getProxyFactoryCode($definition, 'foo');
-
-        $this->assertStringMatchesFormat(
-            '%A$wrappedInstance = $this->getFooService(false);%w$proxy->setProxyInitializer(null);%A',
-            $code
-        );
+        $this->dumper->getProxyFactoryCode($definition, 'foo');
     }
 
     /**

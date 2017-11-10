@@ -13,7 +13,7 @@ namespace Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper;
 
 use ProxyManager\Generator\ClassGenerator;
 use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 
@@ -30,10 +30,7 @@ class ProxyDumper implements DumperInterface
     private $proxyGenerator;
     private $classGenerator;
 
-    /**
-     * @param string $salt
-     */
-    public function __construct($salt = '')
+    public function __construct(string $salt = '')
     {
         $this->salt = $salt;
         $this->proxyGenerator = new LazyLoadingValueHolderGenerator();
@@ -56,16 +53,13 @@ class ProxyDumper implements DumperInterface
         $instantiation = 'return';
 
         if ($definition->isShared()) {
-            $instantiation .= " \$this->services['$id'] =";
+            $instantiation .= sprintf(' $this->%s[\'%s\'] =', $definition->isPublic() || !method_exists(ContainerBuilder::class, 'addClassResource') ? 'services' : 'privates', $id);
         }
 
         if (null === $factoryCode) {
-            @trigger_error(sprintf('The "%s()" method expects a third argument defining the code to execute to construct your service since version 3.4, providing it will be required in 4.0.', __METHOD__), E_USER_DEPRECATED);
-            $factoryCode = '$this->get'.Container::camelize($id).'Service(false)';
-        } elseif (false === strpos($factoryCode, '(')) {
-            @trigger_error(sprintf('The "%s()" method expects its third argument to define the code to execute to construct your service since version 3.4, providing it will be required in 4.0.', __METHOD__), E_USER_DEPRECATED);
-            $factoryCode = "\$this->$factoryCode(false)";
+            throw new \InvalidArgumentException(sprintf('Missing factory code to construct the service "%s".', $id));
         }
+
         $proxyClass = $this->getProxyClassName($definition);
 
         $hasStaticConstructor = $this->generateProxyClass($definition)->hasMethod('staticProxyConstructor');

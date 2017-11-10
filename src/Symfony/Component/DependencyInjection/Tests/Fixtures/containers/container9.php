@@ -161,6 +161,13 @@ $container
     ->setPublic(true)
 ;
 $container
+    ->register('BAR', 'stdClass')
+    ->setProperty('bar', new Reference('bar'))
+    ->setPublic(true)
+;
+$container->register('bar2', 'stdClass')->setPublic(true);
+$container->register('BAR2', 'stdClass')->setPublic(true);
+$container
     ->register('tagged_iterator_foo', 'Bar')
     ->addTag('foo')
     ->setPublic(false)

@@ -60,11 +60,9 @@ trait RouteTrait
     /**
      * Sets the condition.
      *
-     * @param string $condition
-     *
      * @return $this
      */
-    final public function condition($condition)
+    final public function condition(string $condition)
     {
         $this->route->setCondition($condition);
 
@@ -74,11 +72,9 @@ trait RouteTrait
     /**
      * Sets the pattern for the host.
      *
-     * @param string $pattern
-     *
      * @return $this
      */
-    final public function host($pattern)
+    final public function host(string $pattern)
     {
         $this->route->setHost($pattern);
 

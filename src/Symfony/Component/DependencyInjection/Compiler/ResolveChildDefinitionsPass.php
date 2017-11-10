@@ -89,9 +89,6 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
-        if ($parentDef->getAutowiringTypes(false)) {
-            $def->setAutowiringTypes($parentDef->getAutowiringTypes(false));
-        }
         if ($parentDef->isDeprecated()) {
             $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
         }
@@ -166,11 +163,6 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
         }
 
-        // merge autowiring types
-        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
-            $def->addAutowiringType($autowiringType);
-        }
-
         // these attributes are always taken from the child
         $def->setAbstract($definition->isAbstract());
         $def->setTags($definition->getTags());
@@ -181,5 +173,3 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         return $def;
     }
 }
-
-class_alias(ResolveChildDefinitionsPass::class, ResolveDefinitionTemplatesPass::class);

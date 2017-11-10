@@ -76,14 +76,14 @@
 
         <service id="Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand">
             <argument type="service" id="translator" />
-            <argument type="service" id="translation.loader" />
+            <argument type="service" id="translation.reader" />
             <argument type="service" id="translation.extractor" />
             <tag name="console.command" command="debug:translation" />
         </service>
 
         <service id="Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand">
             <argument type="service" id="translation.writer" />
-            <argument type="service" id="translation.loader" />
+            <argument type="service" id="translation.reader" />
             <argument type="service" id="translation.extractor" />
             <argument>%kernel.default_locale%</argument>
             <tag name="console.command" command="translation:update" />

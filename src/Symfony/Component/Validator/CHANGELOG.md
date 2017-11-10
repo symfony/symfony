@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * Setting the `strict` option of the `Choice` constraint to anything but `true`
+   is not supported anymore.
+ * removed the `DateTimeValidator::PATTERN` constant
+ * removed the `AbstractConstraintValidatorTest` class
+ * removed support for setting the `checkDNS` option of the `Url` constraint to `true`
+
 3.4.0
 -----
 

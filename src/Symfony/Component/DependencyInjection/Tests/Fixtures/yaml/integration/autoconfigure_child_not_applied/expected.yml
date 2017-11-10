@@ -8,3 +8,4 @@ services:
         # set on the parent, not the child
         #calls:
         #    - [enableSummer, [true]]
+        public: true

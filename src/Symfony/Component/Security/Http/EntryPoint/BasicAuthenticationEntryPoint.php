@@ -24,7 +24,7 @@ class BasicAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
     private $realmName;
 
-    public function __construct($realmName)
+    public function __construct(string $realmName)
     {
         $this->realmName = $realmName;
     }

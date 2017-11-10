@@ -34,7 +34,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
      * @param string                 $phpArrayFile     The PHP file where annotations are cached
      * @param CacheItemPoolInterface $fallbackPool     The pool where runtime-discovered annotations are cached
      */
-    public function __construct(Reader $annotationReader, $phpArrayFile, CacheItemPoolInterface $fallbackPool, $excludeRegexp = null)
+    public function __construct(Reader $annotationReader, string $phpArrayFile, CacheItemPoolInterface $fallbackPool, string $excludeRegexp = null)
     {
         parent::__construct($phpArrayFile, $fallbackPool);
         $this->annotationReader = $annotationReader;

@@ -34,9 +34,9 @@ class WindowsPipes extends AbstractPipes
     );
     private $haveReadSupport;
 
-    public function __construct($input, $haveReadSupport)
+    public function __construct($input, bool $haveReadSupport)
     {
-        $this->haveReadSupport = (bool) $haveReadSupport;
+        $this->haveReadSupport = $haveReadSupport;
 
         if ($this->haveReadSupport) {
             // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.

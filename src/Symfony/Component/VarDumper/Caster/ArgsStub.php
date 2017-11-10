@@ -22,7 +22,7 @@ class ArgsStub extends EnumStub
 {
     private static $parameters = array();
 
-    public function __construct(array $args, $function, $class)
+    public function __construct(array $args, string $function, ?string $class)
     {
         list($variadic, $params) = self::getParameters($function, $class);
 
@@ -68,7 +68,7 @@ class ArgsStub extends EnumStub
             if ($v->isPassedByReference()) {
                 $k = '&'.$k;
             }
-            if (method_exists($v, 'isVariadic') && $v->isVariadic()) {
+            if ($v->isVariadic()) {
                 $variadic .= $k;
             } else {
                 $params[] = $k;

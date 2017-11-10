@@ -33,7 +33,7 @@ class CacheLoader extends Loader
      * @param LoaderInterface $loader A Loader instance
      * @param string          $dir    The directory where to store the cache files
      */
-    public function __construct(LoaderInterface $loader, $dir)
+    public function __construct(LoaderInterface $loader, string $dir)
     {
         $this->loader = $loader;
         $this->dir = $dir;

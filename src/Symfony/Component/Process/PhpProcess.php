@@ -29,9 +29,8 @@ class PhpProcess extends Process
      * @param string|null $cwd     The working directory or null to use the working dir of the current PHP process
      * @param array|null  $env     The environment variables or null to use the same environment as the current PHP process
      * @param int         $timeout The timeout in seconds
-     * @param array       $options An array of options for proc_open
      */
-    public function __construct($script, $cwd = null, array $env = null, $timeout = 60, array $options = null)
+    public function __construct(string $script, string $cwd = null, array $env = null, int $timeout = 60)
     {
         $executableFinder = new PhpExecutableFinder();
         if (false === $php = $executableFinder->find(false)) {
@@ -46,11 +45,8 @@ class PhpProcess extends Process
             $php[] = $file;
             $script = null;
         }
-        if (null !== $options) {
-            @trigger_error(sprintf('The $options parameter of the %s constructor is deprecated since version 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
-        }
 
-        parent::__construct($php, $cwd, $env, $script, $timeout, $options);
+        parent::__construct($php, $cwd, $env, $script, $timeout);
     }
 
     /**
@@ -64,12 +60,11 @@ class PhpProcess extends Process
     /**
      * {@inheritdoc}
      */
-    public function start(callable $callback = null/*, array $env = array()*/)
+    public function start(callable $callback = null, array $env = array())
     {
         if (null === $this->getCommandLine()) {
             throw new RuntimeException('Unable to find the PHP executable.');
         }
-        $env = 1 < func_num_args() ? func_get_arg(1) : null;
 
         parent::start($callback, $env);
     }

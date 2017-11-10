@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,33 +24,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @final since version 3.4
  */
-class RedirectController implements ContainerAwareInterface
+class RedirectController
 {
-    /**
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    protected $container;
-
     private $router;
     private $httpPort;
     private $httpsPort;
 
-    public function __construct(UrlGeneratorInterface $router = null, $httpPort = null, $httpsPort = null)
+    public function __construct(UrlGeneratorInterface $router = null, int $httpPort = null, int $httpsPort = null)
     {
         $this->router = $router;
         $this->httpPort = $httpPort;
         $this->httpsPort = $httpsPort;
-    }
-
-    /**
-     * @deprecated since version 3.4, to be removed in 4.0 alongside with the ContainerAwareInterface type.
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.4 and will be removed in 4.0. Inject an UrlGeneratorInterface using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->container = $container;
-        $this->router = $container->get('router');
     }
 
     /**
@@ -69,11 +51,9 @@ class RedirectController implements ContainerAwareInterface
      * @param bool       $permanent        Whether the redirection is permanent
      * @param bool|array $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
      *
-     * @return Response A Response instance
-     *
      * @throws HttpException In case the route name is empty
      */
-    public function redirectAction(Request $request, $route, $permanent = false, $ignoreAttributes = false)
+    public function redirectAction(Request $request, string $route, bool $permanent = false, $ignoreAttributes = false): Response
     {
         if ('' == $route) {
             throw new HttpException($permanent ? 410 : 404);
@@ -104,14 +84,12 @@ class RedirectController implements ContainerAwareInterface
      * @param string      $path      The absolute path or URL to redirect to
      * @param bool        $permanent Whether the redirect is permanent or not
      * @param string|null $scheme    The URL scheme (null to keep the current one)
-     * @param int|null    $httpPort  The HTTP port (null to keep the current one for the same scheme or the configured port in the container)
-     * @param int|null    $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
-     *
-     * @return Response A Response instance
+     * @param int|null    $httpPort  The HTTP port (null to keep the current one for the same scheme or the default configured port)
+     * @param int|null    $httpsPort The HTTPS port (null to keep the current one for the same scheme or the default configured port)
      *
      * @throws HttpException In case the path is empty
      */
-    public function urlRedirectAction(Request $request, $path, $permanent = false, $scheme = null, $httpPort = null, $httpsPort = null)
+    public function urlRedirectAction(Request $request, string $path, bool $permanent = false, string $scheme = null, int $httpPort = null, int $httpsPort = null): Response
     {
         if ('' == $path) {
             throw new HttpException($permanent ? 410 : 404);
@@ -142,9 +120,6 @@ class RedirectController implements ContainerAwareInterface
             if (null === $httpPort) {
                 if ('http' === $request->getScheme()) {
                     $httpPort = $request->getPort();
-                } elseif ($this->container && $this->container->hasParameter('request_listener.http_port')) {
-                    @trigger_error(sprintf('Passing the http port as a container parameter is deprecated since Symfony 3.4 and won\'t be possible in 4.0. Pass it to the constructor of the "%s" class instead.', __CLASS__), E_USER_DEPRECATED);
-                    $httpPort = $this->container->getParameter('request_listener.http_port');
                 } else {
                     $httpPort = $this->httpPort;
                 }
@@ -157,9 +132,6 @@ class RedirectController implements ContainerAwareInterface
             if (null === $httpsPort) {
                 if ('https' === $request->getScheme()) {
                     $httpsPort = $request->getPort();
-                } elseif ($this->container && $this->container->hasParameter('request_listener.https_port')) {
-                    @trigger_error(sprintf('Passing the https port as a container parameter is deprecated since Symfony 3.4 and won\'t be possible in 4.0. Pass it to the constructor of the "%s" class instead.', __CLASS__), E_USER_DEPRECATED);
-                    $httpsPort = $this->container->getParameter('request_listener.https_port');
                 } else {
                     $httpsPort = $this->httpsPort;
                 }

@@ -30,7 +30,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
      * @param string                 $phpArrayFile The PHP file where metadata are cached
      * @param CacheItemPoolInterface $fallbackPool The pool where runtime-discovered metadata are cached
      */
-    public function __construct($phpArrayFile, CacheItemPoolInterface $fallbackPool)
+    public function __construct(string $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {
         $this->phpArrayFile = $phpArrayFile;
         if (!$fallbackPool instanceof AdapterInterface) {

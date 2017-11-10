@@ -48,7 +48,6 @@ class CliDumperTest extends TestCase
         $intMax = PHP_INT_MAX;
         $res = (int) $var['res'];
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 array:24 [
@@ -76,9 +75,9 @@ array:24 [
     +foo: "foo"
     +"bar": "bar"
   }
-  "closure" => Closure {{$r}
+  "closure" => Closure {#%d
     class: "Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest"
-    this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {{$r} …}
+    this: Symfony\Component\VarDumper\Tests\Dumper\CliDumperTest {#%d …}
     parameters: {
       \$a: {}
       &\$b: {
@@ -290,10 +289,6 @@ EOTXT
 
     public function testClosedResource()
     {
-        if (defined('HHVM_VERSION') && HHVM_VERSION_ID < 30600) {
-            $this->markTestSkipped();
-        }
-
         $var = fopen(__FILE__, 'r');
         fclose($var);
 
@@ -384,11 +379,10 @@ EOTXT
         $dumper->dump($data, $out);
         $out = stream_get_contents($out, -1, 0);
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
 stream resource {@{$ref}
-  ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
+  ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {#%d
     #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: {
       %sTwig.php:2 {
@@ -429,10 +423,9 @@ EOTXT
         $data = $cloner->cloneVar($var);
         $out = $dumper->dump($data, true);
 
-        $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
-{{$r}
+{#%d
   +"foo": &1 "foo"
   +"bar": &1 "foo"
 }
@@ -446,7 +439,6 @@ EOTXT
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
-     * @requires PHP 5.6
      */
     public function testSpecialVars56()
     {
@@ -477,7 +469,7 @@ EOTXT
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testGlobalsNoExt()
+    public function testGlobals()
     {
         $var = $this->getSpecialVars();
         unset($var[0]);
@@ -491,10 +483,6 @@ EOTXT
         $dumper->setColors(false);
         $cloner = new VarCloner();
 
-        $refl = new \ReflectionProperty($cloner, 'useExt');
-        $refl->setAccessible(true);
-        $refl->setValue($cloner, false);
-
         $data = $cloner->cloneVar($var);
         $dumper->dump($data);
 
@@ -507,47 +495,6 @@ array:2 [
     ]
   ]
   2 => &1 array:1 [&1]
-]
-
-EOTXT
-            ,
-            $out
-        );
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function testBuggyRefs()
-    {
-        if (\PHP_VERSION_ID >= 50600) {
-            $this->markTestSkipped('PHP 5.6 fixed refs counting');
-        }
-
-        $var = $this->getSpecialVars();
-        $var = $var[0];
-
-        $dumper = new CliDumper();
-        $dumper->setColors(false);
-        $cloner = new VarCloner();
-
-        $data = $cloner->cloneVar($var)->withMaxDepth(3);
-        $out = '';
-        $dumper->dump($data, function ($line, $depth) use (&$out) {
-            if ($depth >= 0) {
-                $out .= str_repeat('  ', $depth).$line."\n";
-            }
-        });
-
-        $this->assertSame(
-            <<<'EOTXT'
-array:1 [
-  0 => array:1 [
-    0 => array:1 [
-      0 => array:1 [ …1]
-    ]
-  ]
 ]
 
 EOTXT

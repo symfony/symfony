@@ -13,7 +13,6 @@ namespace Symfony\Component\Debug;
 
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
@@ -97,8 +96,6 @@ class ErrorHandler
     private $bootstrappingLogger;
 
     private static $reservedMemory;
-    private static $stackedErrors = array();
-    private static $stackedErrorLevels = array();
     private static $toStringException = null;
     private static $silencedErrorCache = array();
     private static $silencedErrorCount = 0;
@@ -382,25 +379,14 @@ class ErrorHandler
 
         if (4 < $numArgs = func_num_args()) {
             $context = $scope ? (func_get_arg(4) ?: array()) : array();
-            $backtrace = 5 < $numArgs ? func_get_arg(5) : null; // defined on HHVM
         } else {
             $context = array();
-            $backtrace = null;
         }
 
         if (isset($context['GLOBALS']) && $scope) {
             $e = $context;                  // Whatever the signature of the method,
             unset($e['GLOBALS'], $context); // $context is always a reference in 5.3
             $context = $e;
-        }
-
-        if (null !== $backtrace && $type & E_ERROR) {
-            // E_ERROR fatal errors are triggered on HHVM when
-            // hhvm.error_handling.call_user_handler_on_fatals=1
-            // which is the way to get their backtrace.
-            $this->handleFatalError(compact('type', 'message', 'file', 'line', 'backtrace'));
-
-            return true;
         }
 
         $logMessage = $this->levels[$type].': '.$message;
@@ -431,19 +417,16 @@ class ErrorHandler
                 return;
             }
         } else {
-            if ($scope) {
-                $errorAsException = new ContextErrorException($logMessage, 0, $type, $file, $line, $context);
-            } else {
-                $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);
-            }
+            $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);
 
             // Clean the trace by removing function arguments and the first frames added by the error handler itself.
             if ($throw || $this->tracedErrors & $type) {
-                $backtrace = $backtrace ?: $errorAsException->getTrace();
+                $backtrace = $errorAsException->getTrace();
                 $lightTrace = $this->cleanTrace($backtrace, $type, $file, $line, $throw);
                 $this->traceReflector->setValue($errorAsException, $lightTrace);
             } else {
                 $this->traceReflector->setValue($errorAsException, array());
+                $backtrace = array();
             }
         }
 
@@ -457,32 +440,25 @@ class ErrorHandler
                         && ('trigger_error' === $backtrace[$i - 1]['function'] || 'user_error' === $backtrace[$i - 1]['function'])
                     ) {
                         // Here, we know trigger_error() has been called from __toString().
-                        // HHVM is fine with throwing from __toString() but PHP triggers a fatal error instead.
+                        // PHP triggers a fatal error when throwing from __toString().
                         // A small convention allows working around the limitation:
                         // given a caught $e exception in __toString(), quitting the method with
                         // `return trigger_error($e, E_USER_ERROR);` allows this error handler
                         // to make $e get through the __toString() barrier.
 
                         foreach ($context as $e) {
-                            if (($e instanceof \Exception || $e instanceof \Throwable) && $e->__toString() === $message) {
-                                if (1 === $i) {
-                                    // On HHVM
-                                    $errorAsException = $e;
-                                    break;
-                                }
+                            if ($e instanceof \Throwable && $e->__toString() === $message) {
                                 self::$toStringException = $e;
 
                                 return true;
                             }
                         }
 
-                        if (1 < $i) {
-                            // On PHP (not on HHVM), display the original error message instead of the default one.
-                            $this->handleException($errorAsException);
+                        // Display the original error message instead of the default one.
+                        $this->handleException($errorAsException);
 
-                            // Stop the process by giving back the error to the native handler.
-                            return false;
-                        }
+                        // Stop the process by giving back the error to the native handler.
+                        return false;
                     }
                 }
             }
@@ -551,7 +527,6 @@ class ErrorHandler
         if ($this->loggedErrors & $type) {
             try {
                 $this->loggers[$type][0]->log($this->loggers[$type][1], $message, array('exception' => $exception));
-            } catch (\Exception $handlerException) {
             } catch (\Throwable $handlerException) {
             }
         }
@@ -568,7 +543,6 @@ class ErrorHandler
         }
         try {
             call_user_func($this->exceptionHandler, $exception);
-        } catch (\Exception $handlerException) {
         } catch (\Throwable $handlerException) {
         }
         if (isset($handlerException)) {
@@ -604,16 +578,6 @@ class ErrorHandler
             $error = error_get_last();
         }
 
-        try {
-            while (self::$stackedErrorLevels) {
-                static::unstackErrors();
-            }
-        } catch (\Exception $exception) {
-            // Handled below
-        } catch (\Throwable $exception) {
-            // Handled below
-        }
-
         if ($error && $error['type'] &= E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR) {
             // Let's not throw anymore but keep logging
             $handler->throwAt(0, true);
@@ -624,10 +588,12 @@ class ErrorHandler
             } else {
                 $exception = new FatalErrorException($handler->levels[$error['type']].': '.$error['message'], 0, $error['type'], $error['file'], $error['line'], 2, true, $trace);
             }
+        } else {
+            $exception = null;
         }
 
         try {
-            if (isset($exception)) {
+            if (null !== $exception) {
                 self::$exitCode = 255;
                 $handler->handleException($exception, $error);
             }
@@ -638,55 +604,6 @@ class ErrorHandler
         if ($exit && self::$exitCode) {
             $exitCode = self::$exitCode;
             register_shutdown_function('register_shutdown_function', function () use ($exitCode) { exit($exitCode); });
-        }
-    }
-
-    /**
-     * Configures the error handler for delayed handling.
-     * Ensures also that non-catchable fatal errors are never silenced.
-     *
-     * As shown by http://bugs.php.net/42098 and http://bugs.php.net/60724
-     * PHP has a compile stage where it behaves unusually. To workaround it,
-     * we plug an error handler that only stacks errors for later.
-     *
-     * The most important feature of this is to prevent
-     * autoloading until unstackErrors() is called.
-     *
-     * @deprecated since version 3.4, to be removed in 4.0.
-     */
-    public static function stackErrors()
-    {
-        @trigger_error('Support for stacking errors is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
-
-        self::$stackedErrorLevels[] = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
-    }
-
-    /**
-     * Unstacks stacked errors and forwards to the logger.
-     *
-     * @deprecated since version 3.4, to be removed in 4.0.
-     */
-    public static function unstackErrors()
-    {
-        @trigger_error('Support for unstacking errors is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
-
-        $level = array_pop(self::$stackedErrorLevels);
-
-        if (null !== $level) {
-            $errorReportingLevel = error_reporting($level);
-            if ($errorReportingLevel !== ($level | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR)) {
-                // If the user changed the error level, do not overwrite it
-                error_reporting($errorReportingLevel);
-            }
-        }
-
-        if (empty(self::$stackedErrorLevels)) {
-            $errors = self::$stackedErrors;
-            self::$stackedErrors = array();
-
-            foreach ($errors as $error) {
-                $error[0]->log($error[1], $error[2], $error[3]);
-            }
         }
     }
 

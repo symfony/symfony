@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+* removed the symfony_debug extension
+* removed `ContextErrorException`
+
 3.4.0
 -----
 

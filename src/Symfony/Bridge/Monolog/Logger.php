@@ -50,7 +50,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface
      */
     public function clear()
     {
-        if (($logger = $this->getDebugLogger()) && method_exists($logger, 'clear')) {
+        if ($logger = $this->getDebugLogger()) {
             $logger->clear();
         }
     }

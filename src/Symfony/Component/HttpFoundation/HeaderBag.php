@@ -46,7 +46,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         $max = max(array_map('strlen', array_keys($headers))) + 1;
         $content = '';
         foreach ($headers as $name => $values) {
-            $name = implode('-', array_map('ucfirst', explode('-', $name)));
+            $name = ucwords($name, '-');
             foreach ($values as $value) {
                 $content .= sprintf("%-{$max}s %s\r\n", $name.':', $value);
             }

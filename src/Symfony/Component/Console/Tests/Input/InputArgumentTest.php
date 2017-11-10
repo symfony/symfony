@@ -38,26 +38,12 @@ class InputArgumentTest extends TestCase
     }
 
     /**
-     * @dataProvider provideInvalidModes
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Argument mode "-1" is not valid.
      */
-    public function testInvalidModes($mode)
+    public function testInvalidModes()
     {
-        if (method_exists($this, 'expectException')) {
-            $this->expectException('InvalidArgumentException');
-            $this->expectExceptionMessage(sprintf('Argument mode "%s" is not valid.', $mode));
-        } else {
-            $this->setExpectedException('InvalidArgumentException', sprintf('Argument mode "%s" is not valid.', $mode));
-        }
-
-        new InputArgument('foo', $mode);
-    }
-
-    public function provideInvalidModes()
-    {
-        return array(
-            array('ANOTHER_ONE'),
-            array(-1),
-        );
+        new InputArgument('foo', '-1');
     }
 
     public function testIsArray()

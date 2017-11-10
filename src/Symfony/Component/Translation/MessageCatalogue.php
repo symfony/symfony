@@ -30,7 +30,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      * @param string $locale   The locale
      * @param array  $messages An array of messages classified by domain
      */
-    public function __construct($locale, array $messages = array())
+    public function __construct(?string $locale, array $messages = array())
     {
         $this->locale = $locale;
         $this->messages = $messages;

@@ -24,7 +24,7 @@ class ResourceCheckerConfigCacheFactory implements ConfigCacheFactoryInterface
     /**
      * @param iterable|ResourceCheckerInterface[] $resourceCheckers
      */
-    public function __construct($resourceCheckers = array())
+    public function __construct(iterable $resourceCheckers = array())
     {
         $this->resourceCheckers = $resourceCheckers;
     }

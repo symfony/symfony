@@ -37,16 +37,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     private $unresolvedChildren = array();
 
-    /**
-     * Creates a new form builder.
-     *
-     * @param string                   $name
-     * @param string                   $dataClass
-     * @param EventDispatcherInterface $dispatcher
-     * @param FormFactoryInterface     $factory
-     * @param array                    $options
-     */
-    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = array())
+    public function __construct(?string $name, ?string $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = array())
     {
         parent::__construct($name, $dataClass, $dispatcher, $options);
 
@@ -245,12 +236,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * Converts an unresolved child into a {@link FormBuilder} instance.
-     *
-     * @param string $name The name of the unresolved child
-     *
-     * @return self The created instance
      */
-    private function resolveChild($name)
+    private function resolveChild(string $name): self
     {
         $info = $this->unresolvedChildren[$name];
         $child = $this->create($name, $info['type'], $info['options']);

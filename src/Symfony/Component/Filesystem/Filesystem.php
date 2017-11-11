@@ -90,7 +90,7 @@ class Filesystem
      */
     public function mkdir($dirs, $mode = 0777)
     {
-        foreach ($this->toIterator($dirs) as $dir) {
+        foreach ($this->toIterable($dirs) as $dir) {
             if (is_dir($dir)) {
                 continue;
             }
@@ -119,7 +119,7 @@ class Filesystem
     {
         $maxPathLength = PHP_MAXPATHLEN - 2;
 
-        foreach ($this->toIterator($files) as $file) {
+        foreach ($this->toIterable($files) as $file) {
             if (strlen($file) > $maxPathLength) {
                 throw new IOException(sprintf('Could not check if file exist because path length exceeds %d characters.', $maxPathLength), 0, null, $file);
             }
@@ -143,7 +143,7 @@ class Filesystem
      */
     public function touch($files, $time = null, $atime = null)
     {
-        foreach ($this->toIterator($files) as $file) {
+        foreach ($this->toIterable($files) as $file) {
             $touch = $time ? @touch($file, $time, $atime) : @touch($file);
             if (true !== $touch) {
                 throw new IOException(sprintf('Failed to touch "%s".', $file), 0, null, $file);
@@ -199,7 +199,7 @@ class Filesystem
      */
     public function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
-        foreach ($this->toIterator($files) as $file) {
+        foreach ($this->toIterable($files) as $file) {
             if (true !== @chmod($file, $mode & ~$umask)) {
                 throw new IOException(sprintf('Failed to chmod file "%s".', $file), 0, null, $file);
             }
@@ -220,7 +220,7 @@ class Filesystem
      */
     public function chown($files, $user, $recursive = false)
     {
-        foreach ($this->toIterator($files) as $file) {
+        foreach ($this->toIterable($files) as $file) {
             if ($recursive && is_dir($file) && !is_link($file)) {
                 $this->chown(new \FilesystemIterator($file), $user, true);
             }
@@ -247,7 +247,7 @@ class Filesystem
      */
     public function chgrp($files, $group, $recursive = false)
     {
-        foreach ($this->toIterator($files) as $file) {
+        foreach ($this->toIterable($files) as $file) {
             if ($recursive && is_dir($file) && !is_link($file)) {
                 $this->chgrp(new \FilesystemIterator($file), $group, true);
             }
@@ -369,7 +369,7 @@ class Filesystem
             throw new FileNotFoundException(sprintf('Origin file "%s" is not a file', $originFile));
         }
 
-        foreach ($this->toIterator($targetFiles) as $targetFile) {
+        foreach ($this->toIterable($targetFiles) as $targetFile) {
             if (is_file($targetFile)) {
                 if (fileinode($originFile) === fileinode($targetFile)) {
                     continue;
@@ -722,15 +722,11 @@ class Filesystem
     /**
      * @param mixed $files
      *
-     * @return \Traversable
+     * @return array|\Traversable
      */
-    private function toIterator($files)
+    private function toIterable($files)
     {
-        if (!$files instanceof \Traversable) {
-            $files = new \ArrayObject(is_array($files) ? $files : array($files));
-        }
-
-        return $files;
+        return is_array($files) || $files instanceof \Traversable ? $files : array($files);
     }
 
     /**

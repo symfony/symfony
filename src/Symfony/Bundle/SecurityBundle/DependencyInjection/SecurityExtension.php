@@ -280,7 +280,7 @@ class SecurityExtension extends Extension
             }
 
             if (!isset($firewall['logout_on_user_change']) || !$firewall['logout_on_user_change']) {
-                @trigger_error('Setting "logout_on_user_change" to false is deprecated as of 3.4 and will always be true in 4.0. Set it to true in your firewall configuration.', E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not setting "logout_on_user_change" to true on firewall "%s" is deprecated as of 3.4, it will always be true in 4.0.', $name), E_USER_DEPRECATED);
             }
 
             $contextListenerDefinition->addMethodCall('setLogoutOnUserChange', array($firewall['logout_on_user_change']));

@@ -16,16 +16,9 @@ namespace Symfony\Component\Workflow;
  */
 class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAccess
 {
-    /**
-     * @var TransitionBlocker[]
-     */
+    /** @var TransitionBlocker[] */
     private $blockers = array();
 
-    /**
-     * Creates a new transition blocker list.
-     *
-     * @param TransitionBlocker[] $blockers The transition blockers to add to the list
-     */
     public function __construct(array $blockers = array())
     {
         foreach ($blockers as $blocker) {
@@ -33,54 +26,12 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
         }
     }
 
-    /**
-     * Converts the blocker into a string for debugging purposes.
-     *
-     * @return string The blocker as string
-     */
-    public function __toString()
-    {
-        $string = '';
-
-        foreach ($this->blockers as $blocker) {
-            $string .= $blocker."\n";
-        }
-
-        return $string;
-    }
-
-    /**
-     * Adds a transition blocker to this list.
-     *
-     * @param TransitionBlocker $blocker
-     */
     public function add(TransitionBlocker $blocker): void
     {
         $this->blockers[] = $blocker;
     }
 
-    /**
-     * Merges an existing blocker list into this list.
-     *
-     * @param TransitionBlockerList $otherList
-     */
-    public function addAll(self $otherList): void
-    {
-        foreach ($otherList as $blocker) {
-            $this->blockers[] = $blocker;
-        }
-    }
-
-    /**
-     * Returns the blocker at a given offset.
-     *
-     * @param int $offset The offset of the blocker
-     *
-     * @return TransitionBlocker The blocker
-     *
-     * @throws \OutOfBoundsException if the offset does not exist
-     */
-    public function get($offset): TransitionBlocker
+    public function get(int $offset): TransitionBlocker
     {
         if (!isset($this->blockers[$offset])) {
             throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $offset));
@@ -89,35 +40,17 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
         return $this->blockers[$offset];
     }
 
-    /**
-     * Returns whether the given offset exists.
-     *
-     * @param int $offset The blocker offset
-     *
-     * @return bool Whether the offset exists
-     */
-    public function has($offset): bool
+    public function has(int $offset): bool
     {
         return isset($this->blockers[$offset]);
     }
 
-    /**
-     * Sets a blocker at a given offset.
-     *
-     * @param int               $offset  The blocker offset
-     * @param TransitionBlocker $blocker The blocker
-     */
-    public function set($offset, TransitionBlocker $blocker): void
+    public function set(int $offset, TransitionBlocker $blocker): void
     {
         $this->blockers[$offset] = $blocker;
     }
 
-    /**
-     * Removes a blocker at a given offset.
-     *
-     * @param int $offset The offset to remove
-     */
-    public function remove($offset): void
+    public function remove(int$offset): void
     {
         unset($this->blockers[$offset]);
     }
@@ -132,34 +65,22 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
         return new \ArrayIterator($this->blockers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function count()
+    public function count(): int
     {
         return count($this->blockers);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
+    public function offsetGet($offset): TransitionBlocker
     {
         return $this->get($offset);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $blocker)
+    public function offsetSet($offset, $blocker): void
     {
         if (null === $offset) {
             $this->add($blocker);
@@ -168,21 +89,11 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->remove($offset);
     }
 
-    /**
-     * Creates iterator for blockers with specific code.
-     *
-     * @param string $code The code to find
-     *
-     * @return TransitionBlocker|null the first blocker with the code
-     */
     public function findByCode(string $code): ?TransitionBlocker
     {
         foreach ($this as $transitionBlocker) {

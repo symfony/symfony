@@ -4,7 +4,8 @@ CHANGELOG
 4.1.0
 -----
 
-* Added TransitionBlockers as a way to convey why exactly transitions can't be made (#24501).
+* Added TransitionBlockers as a way to pass around reasons why exactly transitions 
+  can't be made.
 
 4.0.0
 -----

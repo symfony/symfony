@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\TransitionBlockerList;
  * Thrown by Workflow when a transition is applied on a subject that is
  * not possible to be made.
  */
-class SubjectTransitionException extends LogicException
+class BlockedTransitionException extends LogicException
 {
     private $transitionBlockerList;
 

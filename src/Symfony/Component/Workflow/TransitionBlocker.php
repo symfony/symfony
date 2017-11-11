@@ -16,27 +16,25 @@ namespace Symfony\Component\Workflow;
  */
 class TransitionBlocker
 {
-    const REASON_CODE_TRANSITION_NOT_DEFINED = 'com.symfony.www.workflow.transition_blocker.not_defined';
-    const REASON_CODE_TRANSITION_NOT_APPLICABLE = 'com.symfony.www.workflow.transition_blocker.not_applicable';
-    const REASON_CODE_TRANSITION_UNKNOWN = 'com.symfony.www.workflow.transition_blocker.unknown';
+    const REASON_TRANSITION_NOT_DEFINED = '80f2a8e9-ee53-408a-9dd8-cce09e031db8';
+    const REASON_TRANSITION_NOT_APPLICABLE = '19beefc8-6b1e-4716-9d07-a39bd6d16e34';
+    const REASON_TRANSITION_UNKNOWN = 'e8b5bbb9-5913-4b98-bfa6-65dbd228a82a';
 
     private $message;
     private $code;
-    private $parameters;
 
     /**
-     * Creates a new transition blocker.
-     *
-     * @param string      $message    The blocker message
-     * @param string|null $code       The error code of the blocker
-     * @param array       $parameters The parameters that may be useful to pass
-     *                                around with the blocker
+     * @var array This is useful if you would like to pass around the condition values, that
+     *            blocked the transition. E.g. for a condition "distance must be larger than
+     *            5 miles", you might want to pass around the value of 5.
      */
-    public function __construct($message, $code = null, array $parameters = array())
+    private $parameters;
+
+    public function __construct(string $message, string $code, array $parameters = array())
     {
         $this->message = $message;
-        $this->parameters = $parameters;
         $this->code = $code;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -48,12 +46,11 @@ class TransitionBlocker
      *
      * @return static
      */
-    public static function createNotDefined(string $transitionName, string $workflowName)
+    public static function createNotDefined(string $transitionName, string $workflowName): self
     {
-        return new static(
-            sprintf('Transition "%s" is not defined in workflow "%s".', $transitionName, $workflowName),
-            self::REASON_CODE_TRANSITION_NOT_DEFINED
-        );
+        $message = sprintf('Transition "%s" is not defined in workflow "%s".', $transitionName, $workflowName);
+
+        return new static($message, self::REASON_TRANSITION_NOT_DEFINED);
     }
 
     /**
@@ -64,12 +61,11 @@ class TransitionBlocker
      *
      * @return static
      */
-    public static function createNotApplicable(string $transitionName)
+    public static function createNotApplicable(string $transitionName): self
     {
-        return new static(
-            sprintf('Transition "%s" cannot be made, because the subject is not in the required place.', $transitionName),
-            self::REASON_CODE_TRANSITION_NOT_APPLICABLE
-        );
+        $message = sprintf('Transition "%s" cannot be made, because the subject is not in the required place.', $transitionName);
+
+        return new static($message, self::REASON_TRANSITION_NOT_APPLICABLE);
     }
 
     /**
@@ -82,58 +78,23 @@ class TransitionBlocker
      *
      * @return static
      */
-    public static function createUnknownReason(string $transitionName)
+    public static function createUnknownReason(string $transitionName): self
     {
-        return new static(
-            sprintf('Transition "%s" cannot be made, because of unknown reason.', $transitionName),
-            self::REASON_CODE_TRANSITION_UNKNOWN
-        );
+        $message = sprintf('Transition "%s" cannot be made, because of unknown reason.', $transitionName);
+
+        return new static($message, self::REASON_TRANSITION_UNKNOWN);
     }
 
-    /**
-     * Converts the blocker into a string for debugging purposes.
-     *
-     * @return string The blocker as string
-     */
-    public function __toString()
-    {
-        $code = $this->code;
-
-        if (!empty($code)) {
-            $code = ' (code '.$code.')';
-        }
-
-        return $this->getMessage().$code;
-    }
-
-    /**
-     * Returns the blocker message.
-     *
-     * @return string
-     */
     public function getMessage(): string
     {
         return $this->message;
     }
 
-    /**
-     * Returns a machine-digestible error code for the blocker.
-     *
-     * @return string|null The error code
-     */
-    public function getCode(): ?string
+    public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * Returns the parameters that you might want to pass around with the blocker.
-     *
-     * This is useful if you would like to include the blocker conditions in your
-     * error messages.
-     *
-     * @return array
-     */
     public function getParameters(): array
     {
         return $this->parameters;

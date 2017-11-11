@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
-use Symfony\Component\Workflow\Exception\SubjectTransitionException;
+use Symfony\Component\Workflow\Exception\BlockedTransitionException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
@@ -436,7 +436,7 @@ class WorkflowTest extends TestCase
             $dispatcher->addListener('workflow.guard', $guard);
         }
 
-        $transitionBlockerList = $workflow->whyCannot($subject, 't1');
+        $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't1');
 
         $this->assertCount(3, $transitionBlockerList);
 
@@ -459,11 +459,11 @@ class WorkflowTest extends TestCase
         $subject->marking = null;
         $workflow = new Workflow($definition);
 
-        $transitionBlockerList = $workflow->whyCannot($subject, 'undefined_transition_name');
+        $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 'undefined_transition_name');
 
         $this->assertCount(1, $transitionBlockerList);
         $this->assertEquals(
-            TransitionBlocker::REASON_CODE_TRANSITION_NOT_DEFINED,
+            TransitionBlocker::REASON_TRANSITION_NOT_DEFINED,
             $transitionBlockerList[0]->getCode()
         );
     }
@@ -475,11 +475,11 @@ class WorkflowTest extends TestCase
         $subject->marking = null;
         $workflow = new Workflow($definition);
 
-        $transitionBlockerList = $workflow->whyCannot($subject, 't2');
+        $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't2');
 
         $this->assertCount(1, $transitionBlockerList);
         $this->assertEquals(
-            TransitionBlocker::REASON_CODE_TRANSITION_NOT_APPLICABLE,
+            TransitionBlocker::REASON_TRANSITION_NOT_APPLICABLE,
             $transitionBlockerList[0]->getCode()
         );
     }
@@ -498,7 +498,7 @@ class WorkflowTest extends TestCase
 
         try {
             $workflow->apply($subject, 't1');
-        } catch (SubjectTransitionException $exception) {
+        } catch (BlockedTransitionException $exception) {
             $this->assertNotNull(
                 $exception->getTransitionBlockerList()->findByCode('blocker_1'),
                 'Workflow failed to convey it could not transition subject because of expected blocker'

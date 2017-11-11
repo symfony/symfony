@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-11-07T15:16:17Z
+
+Having this in 3.4/4.0 could be awesome but I guess it doesn't qualify, right?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-11-10T16:01:34Z
+
+Any opinion on this? I'd like to finish it :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-10T18:47:19Z
+
+It does qualify. LGTM.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-10T18:55:40Z
+
+Wouldn't it be "better" to move them to `config/translations`? Like for serialization and validation configs?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-11-11T02:17:21Z
+
+Great! ready :)

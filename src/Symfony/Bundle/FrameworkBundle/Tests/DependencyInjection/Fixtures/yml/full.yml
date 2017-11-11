@@ -42,6 +42,7 @@ framework:
     translator:
         enabled:  true
         fallback: fr
+        default_path: '%kernel.root_dir%/config/translations'
         paths: ['%kernel.root_dir%/Fixtures/translations']
     validation:
         enabled: true

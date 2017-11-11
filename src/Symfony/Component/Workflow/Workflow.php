@@ -378,7 +378,7 @@ class Workflow
         $transitions = array();
 
         /** @var TransitionBlockerList[] $transitionBlockerLists */
-        $transitionBlockerLists = [];
+        $transitionBlockerLists = array();
 
         foreach ($eligibleTransitions as $transition) {
             $transitionBlockerLists[]

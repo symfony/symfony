@@ -50,7 +50,7 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
         $this->blockers[$offset] = $blocker;
     }
 
-    public function remove(int$offset): void
+    public function remove(int $offset): void
     {
         unset($this->blockers[$offset]);
     }

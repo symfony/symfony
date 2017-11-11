@@ -31,7 +31,6 @@ class DebugClassLoader
     private static $final = array();
     private static $finalMethods = array();
     private static $deprecated = array();
-    private static $deprecatedMethods = array();
     private static $internal = array();
     private static $internalMethods = array();
     private static $php7Reserved = array('int', 'float', 'bool', 'string', 'true', 'false', 'null');
@@ -204,12 +203,11 @@ class DebugClassLoader
                 }
             }
 
-            // Inherit @final and @deprecated annotations for methods
+            // Inherit @final and @internal annotations for methods
             self::$finalMethods[$name] = array();
-            self::$deprecatedMethods[$name] = array();
             self::$internalMethods[$name] = array();
             foreach ($parentAndTraits as $use) {
-                foreach (array('finalMethods', 'deprecatedMethods', 'internalMethods') as $property) {
+                foreach (array('finalMethods', 'internalMethods') as $property) {
                     if (isset(self::${$property}[$use])) {
                         self::${$property}[$name] = array_merge(self::${$property}[$name], self::${$property}[$use]);
                     }
@@ -233,12 +231,6 @@ class DebugClassLoader
                 }
 
                 foreach ($parentAndTraits as $use) {
-                    if (isset(self::$deprecatedMethods[$use][$method->name])) {
-                        list($declaringClass, $message) = self::$deprecatedMethods[$use][$method->name];
-                        if (strncmp($ns, $declaringClass, $len)) {
-                            @trigger_error(sprintf('The "%s::%s()" method is deprecated%s. You should not extend it from "%s".', $declaringClass, $method->name, $message, $name), E_USER_DEPRECATED);
-                        }
-                    }
                     if (isset(self::$internalMethods[$use][$method->name])) {
                         list($declaringClass, $message) = self::$internalMethods[$use][$method->name];
                         if (strncmp($ns, $declaringClass, $len)) {
@@ -252,7 +244,7 @@ class DebugClassLoader
                     continue;
                 }
 
-                foreach (array('final', 'deprecated', 'internal') as $annotation) {
+                foreach (array('final', 'internal') as $annotation) {
                     if (false !== strpos($doc, '@'.$annotation) && preg_match('#\n\s+\* @'.$annotation.'(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$)#s', $doc, $notice)) {
                         $message = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
                         self::${$annotation.'Methods'}[$name][$method->name] = array($name, $message);

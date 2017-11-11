@@ -72,7 +72,7 @@ class AddSecurityVotersPassTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Using a "security.voter" tag on a class without implementing the "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" is deprecated as of 3.4 and will be removed in 4.0. Implement the interface instead.
+     * @expectedDeprecation Using a "security.voter" tag on a class without implementing the "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" is deprecated as of 3.4 and will throw an exception in 4.0. Implement the interface instead.
      */
     public function testVoterMissingInterface()
     {

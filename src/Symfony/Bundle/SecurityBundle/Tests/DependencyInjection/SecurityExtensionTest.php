@@ -125,7 +125,7 @@ class SecurityExtensionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Setting logout_on_user_change to false is deprecated as of 3.4 and will always be true in 4.0. Set logout_on_user_change to true in your firewall configuration.
+     * @expectedDeprecation Setting "logout_on_user_change" to false is deprecated as of 3.4 and will always be true in 4.0. Set it to true in your firewall configuration.
      */
     public function testDeprecationForUserLogout()
     {

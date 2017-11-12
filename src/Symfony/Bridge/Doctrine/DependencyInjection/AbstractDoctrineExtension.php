@@ -167,7 +167,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
-     * @param ContainerBuilder $container     A ContainerBuilder instance
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
     protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container): void
     {
@@ -295,7 +295,6 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param string           $objectManagerName The object manager name
      * @param array            $cacheDriver       The cache driver mapping
      * @param ContainerBuilder $container         The ContainerBuilder instance
-     *
      *
      * @throws \InvalidArgumentException
      */

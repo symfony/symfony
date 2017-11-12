@@ -7,6 +7,30 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.0-BETA4 (2017-11-12)
+
+ * bug #24874 [TwigBridge] Fixed the .form-check-input class in the bs4 templates (vudaltsov)
+ * bug #24929 [Console] Fix traversable autocomplete values (ro0NL)
+ * feature #24860 [FrameworkBundle] Add default translations path option and convention (yceruto)
+ * bug #24921 [Debug] Remove false-positive deprecation from DebugClassLoader (nicolas-grekas)
+ * bug #24856 [FrameworkBundle] Add default mapping path for validator component in bundle-less app (yceruto)
+ * bug #24833 [FrameworkBundle] Add default mapping path for serializer component in bundle-less app (yceruto)
+ * bug #24908 [WebServerBundle] Prevent console.terminate from being fired when server:start finishes (kbond)
+ * bug #24888 [FrameworkBundle] Specifically inject the debug dispatcher in the collector (ogizanagi)
+ * bug #24909 [Intl] Update ICU data to 60.1 (jakzal)
+ * bug #24870 [YAML] Allow to parse custom tags when linting yaml files (pierredup)
+ * bug #24910 [HttpKernel][Debug] Remove noise from stack frames of deprecations (nicolas-grekas)
+ * bug #24906 [Bridge/ProxyManager] Remove direct reference to value holder property (nicolas-grekas)
+ * feature #24887 [Cache][Lock] Add RedisProxy for lazy Redis connections (nicolas-grekas)
+ * bug #24633 [Config] Fix cannotBeEmpty() (ro0NL)
+ * bug #24900 [Validator] Fix Costa Rica IBAN format (Bozhidar Hristov)
+ * bug #24904 [Validator] Add Belarus IBAN format (Bozhidar Hristov)
+ * bug #24837 [TwigBridge] [Bootstrap 4] Fix validation error design for expanded choiceType (ostrolucky)
+ * bug #24878 [HttpFoundation] Prevent PHP from sending Last-Modified on session start (nicolas-grekas)
+ * bug #24881 [WebserverBundle] fixed the bug that caused that the webserver would … (Serkan Yildiz)
+ * bug #24850 [DI] Fix cannot bind env var (ogizanagi)
+ * bug #24851 [TwigBridge] Fix BC break due required twig environment (ro0NL)
+
 * 3.4.0-BETA3 (2017-11-05)
 
  * bug #24531 [HttpFoundation] Fix forward-compat of NativeSessionStorage with PHP 7.2 (sroze)

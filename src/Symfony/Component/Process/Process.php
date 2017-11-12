@@ -402,7 +402,7 @@ class Process implements \IteratorAggregate
      *
      * @return int|null The process id if running, null otherwise
      */
-    public function getPid() 
+    public function getPid()
     {
         return $this->isRunning() ? $this->processInformation['pid'] : null;
     }

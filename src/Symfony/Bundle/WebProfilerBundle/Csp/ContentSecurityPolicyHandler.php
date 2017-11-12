@@ -38,8 +38,6 @@ class ContentSecurityPolicyHandler
      *  - The request - In case HTML content is fetched via AJAX and inserted in DOM, it must use the same nonce as origin
      *  - The response -  A call to getNonces() has already been done previously. Same nonce are returned
      *  - They are otherwise randomly generated
-     *
-     * @return array
      */
     public function getNonces(Request $request, Response $response): array
     {
@@ -113,8 +111,6 @@ class ContentSecurityPolicyHandler
 
     /**
      * Updates Content-Security-Policy headers in a response.
-     *
-     * @return array
      */
     private function updateCspHeaders(Response $response, array $nonces = array()): array
     {
@@ -161,8 +157,6 @@ class ContentSecurityPolicyHandler
 
     /**
      * Generates a valid Content-Security-Policy nonce.
-     *
-     * @return string
      */
     private function generateNonce(): string
     {
@@ -211,8 +205,6 @@ class ContentSecurityPolicyHandler
      *
      * @param array  $directivesSet The directive set
      * @param string $type          The name of the directive to check
-     *
-     * @return bool
      */
     private function authorizesInline(array $directivesSet, string $type): bool
     {

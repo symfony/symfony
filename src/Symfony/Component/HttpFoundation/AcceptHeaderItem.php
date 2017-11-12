@@ -33,10 +33,6 @@ class AcceptHeaderItem
 
     /**
      * Builds an AcceptHeaderInstance instance from a string.
-     *
-     * @param string $itemValue
-     *
-     * @return self
      */
     public static function fromString(string $itemValue): self
     {
@@ -62,8 +58,6 @@ class AcceptHeaderItem
 
     /**
      * Returns header  value's string representation.
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -80,7 +74,6 @@ class AcceptHeaderItem
     /**
      * Set the item value.
      *
-     * @param string $value
      *
      * @return $this
      */
@@ -93,8 +86,6 @@ class AcceptHeaderItem
 
     /**
      * Returns the item value.
-     *
-     * @return string
      */
     public function getValue(): string
     {
@@ -104,7 +95,6 @@ class AcceptHeaderItem
     /**
      * Set the item quality.
      *
-     * @param float $quality
      *
      * @return $this
      */
@@ -117,8 +107,6 @@ class AcceptHeaderItem
 
     /**
      * Returns the item quality.
-     *
-     * @return float
      */
     public function getQuality(): float
     {
@@ -128,7 +116,6 @@ class AcceptHeaderItem
     /**
      * Set the item index.
      *
-     * @param int $index
      *
      * @return $this
      */
@@ -141,8 +128,6 @@ class AcceptHeaderItem
 
     /**
      * Returns the item index.
-     *
-     * @return int
      */
     public function getIndex(): int
     {
@@ -151,10 +136,6 @@ class AcceptHeaderItem
 
     /**
      * Tests if an attribute exists.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
     public function hasAttribute(string $name): bool
     {
@@ -164,7 +145,6 @@ class AcceptHeaderItem
     /**
      * Returns an attribute by its name.
      *
-     * @param string $name
      * @param mixed  $default
      *
      * @return mixed
@@ -176,8 +156,6 @@ class AcceptHeaderItem
 
     /**
      * Returns all attributes.
-     *
-     * @return array
      */
     public function getAttributes(): array
     {
@@ -187,8 +165,6 @@ class AcceptHeaderItem
     /**
      * Set an attribute.
      *
-     * @param string $name
-     * @param string $value
      *
      * @return $this
      */

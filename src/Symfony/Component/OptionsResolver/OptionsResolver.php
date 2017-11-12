@@ -869,11 +869,8 @@ class OptionsResolver implements Options
     }
 
     /**
-     * @param string $type
      * @param mixed  $value
      * @param array  &$invalidTypes
-     *
-     * @return bool
      */
     private function verifyTypes(string $type, $value, array &$invalidTypes): bool
     {

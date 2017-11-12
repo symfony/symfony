@@ -54,8 +54,6 @@ abstract class AbstractCollatorTest extends TestCase
     }
 
     /**
-     * @param string $locale
-     *
      * @return \Collator
      */
     abstract protected function getCollator(string $locale): \Collator;

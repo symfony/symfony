@@ -35,7 +35,6 @@ class Inline
     private static $constantSupport = false;
 
     /**
-     * @param int         $flags
      * @param int|null    $parsedLineNumber
      * @param string|null $parsedFilename
      */

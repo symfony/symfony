@@ -35,7 +35,6 @@ class TableStyle
     /**
      * Sets padding character, used for cell padding.
      *
-     * @param string $paddingChar
      *
      * @return $this
      */
@@ -52,8 +51,6 @@ class TableStyle
 
     /**
      * Gets padding character, used for cell padding.
-     *
-     * @return string
      */
     public function getPaddingChar(): string
     {
@@ -63,7 +60,6 @@ class TableStyle
     /**
      * Sets horizontal border character.
      *
-     * @param string $horizontalBorderChar
      *
      * @return $this
      */
@@ -76,8 +72,6 @@ class TableStyle
 
     /**
      * Gets horizontal border character.
-     *
-     * @return string
      */
     public function getHorizontalBorderChar(): string
     {
@@ -87,7 +81,6 @@ class TableStyle
     /**
      * Sets vertical border character.
      *
-     * @param string $verticalBorderChar
      *
      * @return $this
      */
@@ -100,8 +93,6 @@ class TableStyle
 
     /**
      * Gets vertical border character.
-     *
-     * @return string
      */
     public function getVerticalBorderChar(): string
     {
@@ -111,7 +102,6 @@ class TableStyle
     /**
      * Sets crossing character.
      *
-     * @param string $crossingChar
      *
      * @return $this
      */
@@ -135,7 +125,6 @@ class TableStyle
     /**
      * Sets header cell format.
      *
-     * @param string $cellHeaderFormat
      *
      * @return $this
      */
@@ -148,8 +137,6 @@ class TableStyle
 
     /**
      * Gets header cell format.
-     *
-     * @return string
      */
     public function getCellHeaderFormat(): string
     {
@@ -159,7 +146,6 @@ class TableStyle
     /**
      * Sets row cell format.
      *
-     * @param string $cellRowFormat
      *
      * @return $this
      */
@@ -172,8 +158,6 @@ class TableStyle
 
     /**
      * Gets row cell format.
-     *
-     * @return string
      */
     public function getCellRowFormat(): string
     {
@@ -183,7 +167,6 @@ class TableStyle
     /**
      * Sets row cell content format.
      *
-     * @param string $cellRowContentFormat
      *
      * @return $this
      */
@@ -196,8 +179,6 @@ class TableStyle
 
     /**
      * Gets row cell content format.
-     *
-     * @return string
      */
     public function getCellRowContentFormat(): string
     {
@@ -207,7 +188,6 @@ class TableStyle
     /**
      * Sets table border format.
      *
-     * @param string $borderFormat
      *
      * @return $this
      */
@@ -220,8 +200,6 @@ class TableStyle
 
     /**
      * Gets table border format.
-     *
-     * @return string
      */
     public function getBorderFormat(): string
     {
@@ -248,8 +226,6 @@ class TableStyle
 
     /**
      * Gets cell padding type.
-     *
-     * @return int
      */
     public function getPadType(): int
     {

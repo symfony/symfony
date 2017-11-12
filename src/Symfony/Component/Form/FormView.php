@@ -88,9 +88,6 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isMethodRendered(): bool
     {
         return $this->methodRendered;

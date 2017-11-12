@@ -44,9 +44,6 @@ class HelperTest extends TestCase
 
     /**
      * @dataProvider formatTimeProvider
-     *
-     * @param int    $secs
-     * @param string $expectedFormat
      */
     public function testFormatTime(int $secs, string $expectedFormat): void
     {

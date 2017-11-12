@@ -66,9 +66,6 @@ class ConfigDebugCommandTest extends WebTestCase
         $this->assertContains('Unable to find configuration for "test.foo"', $tester->getDisplay());
     }
 
-    /**
-     * @return CommandTester
-     */
     private function createCommandTester(): CommandTester
     {
         $command = $this->application->find('debug:config');

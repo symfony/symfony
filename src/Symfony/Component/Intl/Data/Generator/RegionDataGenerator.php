@@ -126,9 +126,6 @@ class RegionDataGenerator extends AbstractDataGenerator
         );
     }
 
-    /**
-     * @return array
-     */
     protected function generateRegionNames(ArrayAccessibleResourceBundle $localeBundle): array
     {
         $unfilteredRegionNames = iterator_to_array($localeBundle['Countries']);

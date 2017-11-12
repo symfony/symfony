@@ -63,7 +63,6 @@ abstract class AbstractLoader implements LoaderInterface
      *                        {@link addNamespaceAlias()}.
      * @param mixed  $options The constraint options
      *
-     * @return Constraint
      *
      * @throws MappingException If the namespace prefix is undefined
      */

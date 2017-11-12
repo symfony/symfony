@@ -83,7 +83,6 @@ class TokenStream
     /**
      * Returns next token.
      *
-     * @return Token
      *
      * @throws InternalErrorException If there is no more token
      */
@@ -105,8 +104,6 @@ class TokenStream
 
     /**
      * Returns peeked token.
-     *
-     * @return Token
      */
     public function getPeek(): Token
     {

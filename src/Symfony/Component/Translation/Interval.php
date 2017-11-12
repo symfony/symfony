@@ -41,7 +41,6 @@ class Interval
      * @param int    $number   A number
      * @param string $interval An interval
      *
-     * @return bool
      *
      * @throws InvalidArgumentException
      */

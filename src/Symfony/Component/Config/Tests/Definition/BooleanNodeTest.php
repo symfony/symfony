@@ -27,8 +27,6 @@ class BooleanNodeTest extends TestCase
 
     /**
      * @dataProvider getValidValues
-     *
-     * @param bool $value
      */
     public function testValidNonEmptyValues(bool $value): void
     {

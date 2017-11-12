@@ -30,8 +30,6 @@ class DebugFormatterHelper extends Helper
      * @param string $id      The id of the formatting session
      * @param string $message The message to display
      * @param string $prefix  The prefix to use
-     *
-     * @return string
      */
     public function start(string $id, string $message, string $prefix = 'RUN'): string
     {
@@ -48,8 +46,6 @@ class DebugFormatterHelper extends Helper
      * @param bool   $error       Whether to consider the buffer as error
      * @param string $prefix      The prefix for output
      * @param string $errorPrefix The prefix for error output
-     *
-     * @return string
      */
     public function progress(string $id, string $buffer, bool $error = false, string $prefix = 'OUT', string $errorPrefix = 'ERR'): string
     {
@@ -89,8 +85,6 @@ class DebugFormatterHelper extends Helper
      * @param string $message    The message to display
      * @param bool   $successful Whether to consider the result as success
      * @param string $prefix     The prefix for the end output
-     *
-     * @return string
      */
     public function stop(string $id, string $message, bool $successful, string $prefix = 'RES'): string
     {
@@ -109,8 +103,6 @@ class DebugFormatterHelper extends Helper
 
     /**
      * @param string $id The id of the formatting session
-     *
-     * @return string
      */
     private function getBorder(string $id): string
     {

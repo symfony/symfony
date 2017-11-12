@@ -318,8 +318,6 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * Gets the MetadataBag.
-     *
-     * @return MetadataBag
      */
     public function getMetadataBag(): MetadataBag
     {

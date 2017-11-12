@@ -124,8 +124,6 @@ class ApplicationTester
      * Gets the output written to STDERR by the application.
      *
      * @param bool $normalize Whether to normalize end of lines to \n or not
-     *
-     * @return string
      */
     public function getErrorOutput(bool $normalize = false): string
     {

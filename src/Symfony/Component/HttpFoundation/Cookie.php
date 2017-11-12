@@ -34,8 +34,6 @@ class Cookie
     /**
      * Creates cookie from raw header string.
      *
-     * @param string $cookie
-     * @param bool   $decode
      *
      * @return static
      */
@@ -179,8 +177,6 @@ class Cookie
 
     /**
      * Gets the name of the cookie.
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -209,8 +205,6 @@ class Cookie
 
     /**
      * Gets the time the cookie expires.
-     *
-     * @return int
      */
     public function getExpiresTime(): int
     {
@@ -219,8 +213,6 @@ class Cookie
 
     /**
      * Gets the max-age attribute.
-     *
-     * @return int
      */
     public function getMaxAge(): int
     {
@@ -229,8 +221,6 @@ class Cookie
 
     /**
      * Gets the path on the server in which the cookie will be available on.
-     *
-     * @return string
      */
     public function getPath(): string
     {
@@ -239,8 +229,6 @@ class Cookie
 
     /**
      * Checks whether the cookie should only be transmitted over a secure HTTPS connection from the client.
-     *
-     * @return bool
      */
     public function isSecure(): bool
     {
@@ -249,8 +237,6 @@ class Cookie
 
     /**
      * Checks whether the cookie will be made accessible only through the HTTP protocol.
-     *
-     * @return bool
      */
     public function isHttpOnly(): bool
     {
@@ -259,8 +245,6 @@ class Cookie
 
     /**
      * Whether this cookie is about to be cleared.
-     *
-     * @return bool
      */
     public function isCleared(): bool
     {
@@ -269,8 +253,6 @@ class Cookie
 
     /**
      * Checks if the cookie value should be sent with no url encoding.
-     *
-     * @return bool
      */
     public function isRaw(): bool
     {

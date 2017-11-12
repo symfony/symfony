@@ -153,8 +153,6 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * This method is identical to {@link \Symfony\Component\HttpFoundation\FileBag::fixPhpFilesArray}
      * and should be kept as such in order to port fixes quickly and easily.
-     *
-     * @return array
      */
     private static function fixPhpFilesArray($data): array
     {

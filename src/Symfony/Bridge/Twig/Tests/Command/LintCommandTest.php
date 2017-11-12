@@ -68,9 +68,6 @@ class LintCommandTest extends TestCase
         $this->assertRegExp('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
-    /**
-     * @return CommandTester
-     */
     private function createCommandTester(): CommandTester
     {
         $command = new LintCommand(new Environment(new FilesystemLoader()));

@@ -189,7 +189,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * Gets filename to store data, associated to the token.
      *
-     * @param string $token
      *
      * @return string The profile filename
      */

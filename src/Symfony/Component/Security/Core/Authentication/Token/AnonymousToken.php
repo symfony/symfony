@@ -46,8 +46,6 @@ class AnonymousToken extends AbstractToken
 
     /**
      * Returns the secret.
-     *
-     * @return string
      */
     public function getSecret(): string
     {

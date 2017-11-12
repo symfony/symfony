@@ -35,8 +35,6 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
 
     /**
      * Returns whether this guesser is supported on the current OS/PHP setup.
-     *
-     * @return bool
      */
     public static function isSupported(): bool
     {

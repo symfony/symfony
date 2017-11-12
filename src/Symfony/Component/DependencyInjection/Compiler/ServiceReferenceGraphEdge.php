@@ -47,8 +47,6 @@ class ServiceReferenceGraphEdge
 
     /**
      * Returns the source node.
-     *
-     * @return ServiceReferenceGraphNode
      */
     public function getSourceNode(): ServiceReferenceGraphNode
     {
@@ -57,8 +55,6 @@ class ServiceReferenceGraphEdge
 
     /**
      * Returns the destination node.
-     *
-     * @return ServiceReferenceGraphNode
      */
     public function getDestNode(): ServiceReferenceGraphNode
     {
@@ -67,8 +63,6 @@ class ServiceReferenceGraphEdge
 
     /**
      * Returns true if the edge is lazy, meaning it's a dependency not requiring direct instantiation.
-     *
-     * @return bool
      */
     public function isLazy(): bool
     {
@@ -77,8 +71,6 @@ class ServiceReferenceGraphEdge
 
     /**
      * Returns true if the edge is weak, meaning it shouldn't prevent removing the target service.
-     *
-     * @return bool
      */
     public function isWeak(): bool
     {

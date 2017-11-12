@@ -45,25 +45,11 @@ class RoutingExtension extends AbstractExtension
         );
     }
 
-    /**
-     * @param string $name
-     * @param array  $parameters
-     * @param bool   $relative
-     *
-     * @return string
-     */
     public function getPath(string $name, array $parameters = array(), bool $relative = false): string
     {
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
-    /**
-     * @param string $name
-     * @param array  $parameters
-     * @param bool   $schemeRelative
-     *
-     * @return string
-     */
     public function getUrl(string $name, array $parameters = array(), bool $schemeRelative = false): string
     {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);

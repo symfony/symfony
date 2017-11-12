@@ -95,7 +95,6 @@ class UrlPackage extends Package
     /**
      * Returns the base URL for a path.
      *
-     * @param string $path
      *
      * @return string The base URL
      */
@@ -114,7 +113,6 @@ class UrlPackage extends Package
      * Override this method to change the default distribution strategy.
      * This method should always return the same base URL index for a given path.
      *
-     * @param string $path
      *
      * @return int The base URL index for the given path
      */

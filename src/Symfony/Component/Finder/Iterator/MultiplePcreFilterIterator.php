@@ -47,8 +47,6 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
      * apply a different behavior.
      *
      * @param string $string The string to be matched against filters
-     *
-     * @return bool
      */
     protected function isAccepted(string $string): bool
     {
@@ -77,7 +75,6 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
     /**
      * Checks whether the string is a regex.
      *
-     * @param string $str
      *
      * @return bool Whether the given string is a regex
      */

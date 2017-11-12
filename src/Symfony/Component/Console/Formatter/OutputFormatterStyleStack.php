@@ -50,7 +50,6 @@ class OutputFormatterStyleStack
     /**
      * Pops a style from the stack.
      *
-     * @return OutputFormatterStyleInterface
      *
      * @throws InvalidArgumentException When style tags incorrectly nested
      */
@@ -77,8 +76,6 @@ class OutputFormatterStyleStack
 
     /**
      * Computes current style with stacks top codes.
-     *
-     * @return OutputFormatterStyle
      */
     public function getCurrent(): OutputFormatterStyle
     {
@@ -99,9 +96,6 @@ class OutputFormatterStyleStack
         return $this;
     }
 
-    /**
-     * @return OutputFormatterStyleInterface
-     */
     public function getEmptyStyle(): OutputFormatterStyleInterface
     {
         return $this->emptyStyle;

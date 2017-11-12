@@ -78,8 +78,6 @@ class FileLocator implements FileLocatorInterface
      * Returns whether the file path is an absolute path.
      *
      * @param string $file A file path
-     *
-     * @return bool
      */
     private function isAbsolutePath(string $file): bool
     {

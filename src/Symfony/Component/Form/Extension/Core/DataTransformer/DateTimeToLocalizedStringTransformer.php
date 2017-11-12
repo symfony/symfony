@@ -181,8 +181,6 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Checks if the pattern contains only a date.
-     *
-     * @return bool
      */
     protected function isPatternDateOnly(): bool
     {

@@ -45,8 +45,6 @@ class UniqueEntity extends Constraint
 
     /**
      * The validator must be defined as a service with this name.
-     *
-     * @return string
      */
     public function validatedBy(): string
     {

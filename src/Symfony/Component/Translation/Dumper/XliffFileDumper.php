@@ -188,10 +188,7 @@ class XliffFileDumper extends FileDumper
     }
 
     /**
-     * @param string     $key
      * @param array|null $metadata
-     *
-     * @return bool
      */
     private function hasMetadataArrayInfo(string $key, ?array $metadata = null): bool
     {

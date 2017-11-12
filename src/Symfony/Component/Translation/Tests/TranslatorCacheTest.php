@@ -279,9 +279,6 @@ class TranslatorCacheTest extends TestCase
         return array(array(true), array(false));
     }
 
-    /**
-     * @return LoaderInterface
-     */
     private function createFailingLoader(): LoaderInterface
     {
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();

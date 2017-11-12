@@ -31,8 +31,6 @@ class MethodNotAllowedException extends \RuntimeException implements ExceptionIn
 
     /**
      * Gets the allowed HTTP methods.
-     *
-     * @return array
      */
     public function getAllowedMethods(): array
     {

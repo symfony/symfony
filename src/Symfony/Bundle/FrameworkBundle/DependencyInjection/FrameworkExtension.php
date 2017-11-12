@@ -1368,8 +1368,6 @@ class FrameworkExtension extends Extension
 
     /**
      * Gets a hash of the kernel root directory.
-     *
-     * @return string
      */
     private function getKernelRootHash(ContainerBuilder $container): string
     {

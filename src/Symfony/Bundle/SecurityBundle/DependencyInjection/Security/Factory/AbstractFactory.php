@@ -118,8 +118,6 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *             abstract="true" />
      *
      * In the above case, this method would return "my.listener.id".
-     *
-     * @return string
      */
     abstract protected function getListenerId(): string;
 
@@ -127,10 +125,6 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * Subclasses may create an entry point of their as they see fit. The
      * default implementation does not change the default entry point.
      *
-     * @param ContainerBuilder $container
-     * @param string           $id
-     * @param array            $config
-     * @param string           $defaultEntryPointId
      *
      * @return string the entry point id
      */

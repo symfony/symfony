@@ -43,10 +43,6 @@ class AcceptHeader
 
     /**
      * Builds an AcceptHeader instance from a string.
-     *
-     * @param string $headerValue
-     *
-     * @return self
      */
     public static function fromString(string $headerValue): self
     {
@@ -62,8 +58,6 @@ class AcceptHeader
 
     /**
      * Returns header value's string representation.
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -72,10 +66,6 @@ class AcceptHeader
 
     /**
      * Tests if header has given value.
-     *
-     * @param string $value
-     *
-     * @return bool
      */
     public function has(string $value): bool
     {
@@ -85,7 +75,6 @@ class AcceptHeader
     /**
      * Returns given value's item, if exists.
      *
-     * @param string $value
      *
      * @return AcceptHeaderItem|null
      */
@@ -121,10 +110,6 @@ class AcceptHeader
 
     /**
      * Filters items on their value using given regex.
-     *
-     * @param string $pattern
-     *
-     * @return self
      */
     public function filter(string $pattern): self
     {

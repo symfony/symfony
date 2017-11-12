@@ -45,8 +45,6 @@ class RequestHelper extends Helper
 
     /**
      * Returns the locale.
-     *
-     * @return string
      */
     public function getLocale(): string
     {

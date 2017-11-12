@@ -64,7 +64,6 @@ abstract class IteratorTestCase extends TestCase
     /**
      * Same as IteratorTestCase::assertIterator with foreach usage.
      *
-     * @param array        $expected
      * @param \Traversable $iterator
      */
     protected function assertIteratorInForeach(array $expected, \Traversable $iterator): void
@@ -84,7 +83,6 @@ abstract class IteratorTestCase extends TestCase
     /**
      * Same as IteratorTestCase::assertOrderedIterator with foreach usage.
      *
-     * @param array        $expected
      * @param \Traversable $iterator
      */
     protected function assertOrderedIteratorInForeach(array $expected, \Traversable $iterator): void

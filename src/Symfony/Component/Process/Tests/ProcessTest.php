@@ -1491,14 +1491,10 @@ EOTXT;
     }
 
     /**
-     * @param string      $commandline
      * @param null|string $cwd
      * @param null|array  $env
      * @param null|string $input
-     * @param int         $timeout
      * @param array       $options
-     *
-     * @return Process
      */
     private function getProcess(string $commandline, ?string $cwd = null, array $env = null, ?string $input = null, int $timeout = 60): Process
     {
@@ -1512,9 +1508,6 @@ EOTXT;
         return self::$process = $process;
     }
 
-    /**
-     * @return Process
-     */
     private function getProcessForCode($code, $cwd = null, array $env = null, $input = null, $timeout = 60): Process
     {
         return $this->getProcess(array(self::$phpBin, '-r', $code), $cwd, $env, $input, $timeout);

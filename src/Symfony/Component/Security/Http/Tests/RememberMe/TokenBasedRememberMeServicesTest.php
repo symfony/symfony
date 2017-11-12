@@ -108,8 +108,6 @@ class TokenBasedRememberMeServicesTest extends TestCase
 
     /**
      * @dataProvider provideUsernamesForAutoLogin
-     *
-     * @param string $username
      */
     public function testAutoLogin(string $username): void
     {

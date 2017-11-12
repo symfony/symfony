@@ -101,9 +101,6 @@ abstract class AbstractDoctrineExtension extends Extension
      * Register the alias for this mapping driver.
      *
      * Aliases can be used in the Query languages of all the Doctrine object managers to simplify writing tasks.
-     *
-     * @param array  $mappingConfig
-     * @param string $mappingName
      */
     protected function setMappingDriverAlias(array $mappingConfig, string $mappingName): void
     {
@@ -117,7 +114,6 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register the mapping driver configuration for later use with the object managers metadata driver chain.
      *
-     * @param string $mappingName
      *
      * @throws \InvalidArgumentException
      */
@@ -171,7 +167,6 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
-     * @param array            $objectManager
      * @param ContainerBuilder $container     A ContainerBuilder instance
      */
     protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container): void
@@ -224,7 +219,6 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Assertion if the specified mapping information is valid.
      *
-     * @param string $objectManagerName
      *
      * @throws \InvalidArgumentException
      */
@@ -286,7 +280,6 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array            $objectManager A configured object manager
      * @param ContainerBuilder $container     A ContainerBuilder instance
-     * @param string           $cacheName
      *
      * @throws \InvalidArgumentException in case of unknown driver type
      */
@@ -303,7 +296,6 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param array            $cacheDriver       The cache driver mapping
      * @param ContainerBuilder $container         The ContainerBuilder instance
      *
-     * @return string
      *
      * @throws \InvalidArgumentException
      */
@@ -423,10 +415,6 @@ abstract class AbstractDoctrineExtension extends Extension
      * Prefixes the relative dependency injection container path with the object manager prefix.
      *
      * @example $name is 'entity_manager' then the result would be 'doctrine.orm.entity_manager'
-     *
-     * @param string $name
-     *
-     * @return string
      */
     abstract protected function getObjectManagerElementName(string $name): string;
 
@@ -434,22 +422,16 @@ abstract class AbstractDoctrineExtension extends Extension
      * Noun that describes the mapped objects such as Entity or Document.
      *
      * Will be used for autodetection of persistent objects directory.
-     *
-     * @return string
      */
     abstract protected function getMappingObjectDefaultName(): string;
 
     /**
      * Relative path from the bundle root to the directory where mapping files reside.
-     *
-     * @return string
      */
     abstract protected function getMappingResourceConfigDirectory(): string;
 
     /**
      * Extension used by the mapping files.
-     *
-     * @return string
      */
     abstract protected function getMappingResourceExtension(): string;
 

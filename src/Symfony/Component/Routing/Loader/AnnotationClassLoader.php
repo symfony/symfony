@@ -191,8 +191,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
      *
      * @param \ReflectionClass  $class
      * @param \ReflectionMethod $method
-     *
-     * @return string
      */
     protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
     {

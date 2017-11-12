@@ -137,7 +137,6 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param string $name
      *
      * @throws BadMethodCallException
      */
@@ -149,7 +148,6 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      *
-     * @param string $name
      *
      * @return bool Always returns false
      */
@@ -163,7 +161,6 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * This method should not be invoked.
      *
-     * @param string $name
      *
      * @throws BadMethodCallException
      */

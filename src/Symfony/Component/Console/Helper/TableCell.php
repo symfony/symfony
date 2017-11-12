@@ -38,8 +38,6 @@ class TableCell
 
     /**
      * Returns the cell value.
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -48,8 +46,6 @@ class TableCell
 
     /**
      * Gets number of colspan.
-     *
-     * @return int
      */
     public function getColspan(): int
     {
@@ -58,8 +54,6 @@ class TableCell
 
     /**
      * Gets number of rowspan.
-     *
-     * @return int
      */
     public function getRowspan(): int
     {

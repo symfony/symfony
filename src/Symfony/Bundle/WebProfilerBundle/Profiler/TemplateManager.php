@@ -42,7 +42,6 @@ class TemplateManager
     /**
      * Gets the template name for a given panel.
      *
-     * @param string $panel
      *
      * @return mixed
      *
@@ -62,7 +61,6 @@ class TemplateManager
     /**
      * Gets template names of templates that are present in the viewed profile.
      *
-     * @return array
      *
      * @throws \UnexpectedValueException
      */

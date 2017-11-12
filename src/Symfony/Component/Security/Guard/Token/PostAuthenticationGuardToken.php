@@ -63,8 +63,6 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
 
     /**
      * Returns the provider (firewall) key.
-     *
-     * @return string
      */
     public function getProviderKey(): string
     {

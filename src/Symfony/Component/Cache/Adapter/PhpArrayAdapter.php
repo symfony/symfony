@@ -60,8 +60,6 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
      *
      * @param string                 $file         The PHP file were values are cached
      * @param CacheItemPoolInterface $fallbackPool Fallback when opcache is disabled
-     *
-     * @return CacheItemPoolInterface
      */
     public static function create(string $file, CacheItemPoolInterface $fallbackPool): CacheItemPoolInterface
     {

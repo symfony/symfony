@@ -124,9 +124,6 @@ EOF;
         return $filename;
     }
 
-    /**
-     * @return CommandTester
-     */
     private function createCommandTester($application = null): CommandTester
     {
         if (!$application) {

@@ -32,9 +32,6 @@ class ConsoleLoggerTest extends TestCase
      */
     protected $output;
 
-    /**
-     * @return LoggerInterface
-     */
     public function getLogger(): LoggerInterface
     {
         $this->output = new DummyOutput(OutputInterface::VERBOSITY_VERBOSE);

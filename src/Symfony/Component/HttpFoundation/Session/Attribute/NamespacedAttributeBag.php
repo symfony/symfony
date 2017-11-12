@@ -96,8 +96,6 @@ class NamespacedAttributeBag extends AttributeBag
      *
      * @param string $name         Key name
      * @param bool   $writeContext Write context, default false
-     *
-     * @return array
      */
     protected function &resolveAttributePath(string $name, bool $writeContext = false): array
     {
@@ -137,10 +135,6 @@ class NamespacedAttributeBag extends AttributeBag
      * Resolves the key from the name.
      *
      * This is the last part in a dot separated string.
-     *
-     * @param string $name
-     *
-     * @return string
      */
     protected function resolveKey(string $name): string
     {

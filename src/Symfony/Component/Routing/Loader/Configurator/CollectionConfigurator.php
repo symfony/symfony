@@ -50,8 +50,6 @@ class CollectionConfigurator
 
     /**
      * Creates a sub-collection.
-     *
-     * @return self
      */
     final public function collection($name = ''): self
     {

@@ -108,10 +108,6 @@ class NodeBuilder implements NodeParentInterface
 
     /**
      * Creates a child EnumNode.
-     *
-     * @param string $name
-     *
-     * @return EnumNodeDefinition
      */
     public function enumNode(string $name): EnumNodeDefinition
     {

@@ -34,17 +34,11 @@ class SwitchUserEvent extends Event
         $this->token = $token;
     }
 
-    /**
-     * @return Request
-     */
     public function getRequest(): Request
     {
         return $this->request;
     }
 
-    /**
-     * @return UserInterface
-     */
     public function getTargetUser(): UserInterface
     {
         return $this->targetUser;

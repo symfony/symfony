@@ -720,9 +720,6 @@ abstract class AbstractDataProviderTest extends TestCase
         return self::$rootLocales;
     }
 
-    /**
-     * @return BundleEntryReader
-     */
     protected function createEntryReader(): BundleEntryReader
     {
         $entryReader = new BundleEntryReader($this->createBundleReader());
@@ -731,8 +728,5 @@ abstract class AbstractDataProviderTest extends TestCase
         return $entryReader;
     }
 
-    /**
-     * @return BundleReaderInterface
-     */
     abstract protected function createBundleReader(): BundleReaderInterface;
 }

@@ -33,8 +33,6 @@ class TokenStream
 
     /**
      * Returns a string representation of the token stream.
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -73,8 +71,6 @@ class TokenStream
 
     /**
      * Checks if end of stream was reached.
-     *
-     * @return bool
      */
     public function isEOF(): bool
     {
@@ -83,8 +79,6 @@ class TokenStream
 
     /**
      * @internal
-     *
-     * @return string
      */
     public function getExpression(): string
     {

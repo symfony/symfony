@@ -51,8 +51,6 @@ class Client extends BaseClient
 
     /**
      * Returns the kernel.
-     *
-     * @return KernelInterface
      */
     public function getKernel(): KernelInterface
     {

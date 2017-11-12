@@ -54,8 +54,6 @@ final class Security
      *
      * @param mixed $attributes
      * @param mixed $subject
-     *
-     * @return bool
      */
     public function isGranted($attributes, $subject = null): bool
     {

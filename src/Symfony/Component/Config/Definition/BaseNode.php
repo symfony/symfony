@@ -302,7 +302,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return $value The normalized array value
      */
-    protected function preNormalize($value): $value
+    protected function preNormalize($value)
     {
         return $value;
     }

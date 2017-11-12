@@ -98,8 +98,6 @@ class Stopwatch
      *
      * @param string $name     The event name
      * @param string $category The event category
-     *
-     * @return StopwatchEvent
      */
     public function start(string $name, string $category = null): StopwatchEvent
     {
@@ -110,8 +108,6 @@ class Stopwatch
      * Checks if the event was started.
      *
      * @param string $name The event name
-     *
-     * @return bool
      */
     public function isStarted(string $name): bool
     {
@@ -122,8 +118,6 @@ class Stopwatch
      * Stops an event.
      *
      * @param string $name The event name
-     *
-     * @return StopwatchEvent
      */
     public function stop(string $name): StopwatchEvent
     {
@@ -134,8 +128,6 @@ class Stopwatch
      * Stops then restarts an event.
      *
      * @param string $name The event name
-     *
-     * @return StopwatchEvent
      */
     public function lap(string $name): StopwatchEvent
     {
@@ -146,8 +138,6 @@ class Stopwatch
      * Returns a specific event by name.
      *
      * @param string $name The event name
-     *
-     * @return StopwatchEvent
      */
     public function getEvent(string $name): StopwatchEvent
     {

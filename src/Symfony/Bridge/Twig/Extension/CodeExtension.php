@@ -82,8 +82,6 @@ class CodeExtension extends AbstractExtension
      * Formats an array as a string.
      *
      * @param array $args The argument array
-     *
-     * @return string
      */
     public function formatArgs(array $args): string
     {
@@ -115,8 +113,6 @@ class CodeExtension extends AbstractExtension
      * Formats an array as a string.
      *
      * @param array $args The argument array
-     *
-     * @return string
      */
     public function formatArgsAsText(array $args): string
     {
@@ -165,8 +161,6 @@ class CodeExtension extends AbstractExtension
      * @param string $file An absolute file path
      * @param int    $line The line number
      * @param string $text Use this text for the link rather than the file path
-     *
-     * @return string
      */
     public function formatFile(string $file, int $line, string $text = null): string
     {

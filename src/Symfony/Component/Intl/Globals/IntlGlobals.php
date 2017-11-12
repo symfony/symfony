@@ -58,8 +58,6 @@ abstract class IntlGlobals
      * Returns whether the error code indicates a failure.
      *
      * @param int $errorCode The error code returned by IntlGlobals::getErrorCode()
-     *
-     * @return bool
      */
     public static function isFailure(int $errorCode): bool
     {
@@ -71,8 +69,6 @@ abstract class IntlGlobals
      * Returns the error code of the last operation.
      *
      * Returns IntlGlobals::U_ZERO_ERROR if no error occurred.
-     *
-     * @return int
      */
     public static function getErrorCode(): int
     {
@@ -83,8 +79,6 @@ abstract class IntlGlobals
      * Returns the error message of the last operation.
      *
      * Returns "U_ZERO_ERROR" if no error occurred.
-     *
-     * @return string
      */
     public static function getErrorMessage(): string
     {
@@ -95,8 +89,6 @@ abstract class IntlGlobals
      * Returns the symbolic name for a given error code.
      *
      * @param int $code The error code returned by IntlGlobals::getErrorCode()
-     *
-     * @return string
      */
     public static function getErrorName(int $code): string
     {

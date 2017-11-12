@@ -27,8 +27,6 @@ class Entry
 
     /**
      * Returns the entry's DN.
-     *
-     * @return string
      */
     public function getDn(): string
     {
@@ -39,8 +37,6 @@ class Entry
      * Returns whether an attribute exists.
      *
      * @param $name string The name of the attribute
-     *
-     * @return bool
      */
     public function hasAttribute($name): bool
     {
@@ -64,8 +60,6 @@ class Entry
 
     /**
      * Returns the complete list of attributes.
-     *
-     * @return array
      */
     public function getAttributes(): array
     {
@@ -74,8 +68,6 @@ class Entry
 
     /**
      * Sets a value for the given attribute.
-     *
-     * @param string $name
      */
     public function setAttribute(string $name, array $value): void
     {
@@ -84,8 +76,6 @@ class Entry
 
     /**
      * Removes a given attribute.
-     *
-     * @param string $name
      */
     public function removeAttribute(string $name): void
     {

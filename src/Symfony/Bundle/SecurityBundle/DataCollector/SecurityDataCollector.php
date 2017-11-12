@@ -287,8 +287,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Get the full security token class as Data object.
-     *
-     * @return Data
      */
     public function getToken(): Data
     {
@@ -317,8 +315,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Returns the strategy configured for the security voters.
-     *
-     * @return string
      */
     public function getVoterStrategy(): string
     {
@@ -327,8 +323,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Returns the log of the security decisions made by the access decision manager.
-     *
-     * @return array
      */
     public function getAccessDecisionLog(): array
     {
@@ -337,8 +331,6 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Returns the configuration of the current firewall context.
-     *
-     * @return array
      */
     public function getFirewall(): array
     {

@@ -110,7 +110,6 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
     /**
      * Logs for missing translations.
      *
-     * @param string      $id
      * @param string|null $domain
      * @param string|null $locale
      */

@@ -56,8 +56,6 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
      * Finds the correct authenticator for the token and calls it.
      *
      * @param GuardTokenInterface $token
-     *
-     * @return TokenInterface
      */
     public function authenticate(TokenInterface $token): TokenInterface
     {

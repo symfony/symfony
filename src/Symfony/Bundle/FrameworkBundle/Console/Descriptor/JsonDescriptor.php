@@ -188,9 +188,6 @@ class JsonDescriptor extends Descriptor
         $this->write(json_encode($data, $flags | JSON_PRETTY_PRINT)."\n");
     }
 
-    /**
-     * @return array
-     */
     protected function getRouteData(Route $route): array
     {
         return array(

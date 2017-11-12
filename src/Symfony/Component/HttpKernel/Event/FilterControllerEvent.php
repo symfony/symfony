@@ -38,8 +38,6 @@ class FilterControllerEvent extends KernelEvent
 
     /**
      * Returns the current controller.
-     *
-     * @return callable
      */
     public function getController(): callable
     {

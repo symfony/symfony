@@ -27,8 +27,6 @@ class Scope
 
     /**
      * Opens a new child scope.
-     *
-     * @return self
      */
     public function enter(): self
     {
@@ -50,7 +48,6 @@ class Scope
     /**
      * Stores data into current scope.
      *
-     * @param string $key
      * @param mixed  $value
      *
      * @return $this
@@ -70,10 +67,6 @@ class Scope
 
     /**
      * Tests if a data is visible from current scope.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
     public function has(string $key): bool
     {
@@ -91,7 +84,6 @@ class Scope
     /**
      * Returns data visible from current scope.
      *
-     * @param string $key
      * @param mixed  $default
      *
      * @return mixed

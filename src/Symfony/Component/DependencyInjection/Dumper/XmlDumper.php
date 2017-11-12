@@ -90,8 +90,6 @@ class XmlDumper extends Dumper
     /**
      * Adds a service.
      *
-     * @param Definition  $definition
-     * @param string      $id
      * @param \DOMElement $parent
      */
     private function addService(Definition $definition, string $id, \DOMElement $parent): void
@@ -214,7 +212,6 @@ class XmlDumper extends Dumper
     /**
      * Adds a service alias.
      *
-     * @param string      $alias
      * @param \DOMElement $parent
      */
     private function addServiceAlias(string $alias, Alias $id, \DOMElement $parent): void
@@ -253,9 +250,7 @@ class XmlDumper extends Dumper
     /**
      * Converts parameters.
      *
-     * @param string      $type
      * @param \DOMElement $parent
-     * @param string      $keyAttribute
      */
     private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key'): void
     {
@@ -309,8 +304,6 @@ class XmlDumper extends Dumper
 
     /**
      * Escapes arguments.
-     *
-     * @return array
      */
     private function escape(array $arguments): array
     {
@@ -333,7 +326,6 @@ class XmlDumper extends Dumper
      *
      * @param mixed $value Value to convert
      *
-     * @return string
      *
      * @throws RuntimeException When trying to dump object or resource
      */

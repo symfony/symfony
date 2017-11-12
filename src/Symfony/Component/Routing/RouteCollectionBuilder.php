@@ -52,7 +52,6 @@ class RouteCollectionBuilder
      * @param string|null $prefix
      * @param string      $type
      *
-     * @return self
      *
      * @throws FileLoaderLoadException
      */
@@ -90,8 +89,6 @@ class RouteCollectionBuilder
      * @param string      $path       The route path
      * @param string      $controller The route's controller
      * @param string|null $name       The name to give this route
-     *
-     * @return Route
      */
     public function add(string $path, string $controller, ?string $name = null): Route
     {
@@ -104,8 +101,6 @@ class RouteCollectionBuilder
 
     /**
      * Returns a RouteCollectionBuilder that can be configured and then added with mount().
-     *
-     * @return self
      */
     public function createBuilder(): self
     {
@@ -114,8 +109,6 @@ class RouteCollectionBuilder
 
     /**
      * Add a RouteCollectionBuilder.
-     *
-     * @param string                 $prefix
      */
     public function mount(string $prefix, RouteCollectionBuilder $builder): void
     {
@@ -145,7 +138,6 @@ class RouteCollectionBuilder
     /**
      * Sets the host on all embedded routes (unless already set).
      *
-     * @param string $pattern
      *
      * @return $this
      */
@@ -159,7 +151,6 @@ class RouteCollectionBuilder
     /**
      * Sets a condition on all embedded routes (unless already set).
      *
-     * @param string $condition
      *
      * @return $this
      */
@@ -174,7 +165,6 @@ class RouteCollectionBuilder
      * Sets a default value that will be added to all embedded routes (unless that
      * default value is already set).
      *
-     * @param string $key
      * @param mixed  $value
      *
      * @return $this
@@ -190,7 +180,6 @@ class RouteCollectionBuilder
      * Sets a requirement that will be added to all embedded routes (unless that
      * requirement is already set).
      *
-     * @param string $key
      * @param mixed  $regex
      *
      * @return $this
@@ -206,7 +195,6 @@ class RouteCollectionBuilder
      * Sets an option that will be added to all embedded routes (unless that
      * option is already set).
      *
-     * @param string $key
      * @param mixed  $value
      *
      * @return $this
@@ -261,8 +249,6 @@ class RouteCollectionBuilder
 
     /**
      * Creates the final RouteCollection and returns it.
-     *
-     * @return RouteCollection
      */
     public function build(): RouteCollection
     {

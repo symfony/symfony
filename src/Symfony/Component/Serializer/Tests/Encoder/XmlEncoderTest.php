@@ -677,9 +677,6 @@ XML;
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
     }
 
-    /**
-     * @return XmlEncoder
-     */
     private function createXmlEncoderWithDateTimeNormalizer(): XmlEncoder
     {
         $encoder = new XmlEncoder();
@@ -711,9 +708,6 @@ XML;
         return $mock;
     }
 
-    /**
-     * @return string
-     */
     private function createXmlWithDateTime(): string
     {
         return sprintf('<?xml version="1.0"?>
@@ -721,9 +715,6 @@ XML;
 ', $this->exampleDateTimeString);
     }
 
-    /**
-     * @return string
-     */
     private function createXmlWithDateTimeField(): string
     {
         return sprintf('<?xml version="1.0"?>

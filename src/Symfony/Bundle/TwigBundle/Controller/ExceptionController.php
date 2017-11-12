@@ -47,7 +47,6 @@ class ExceptionController
      * the exception page (when true). If it is not present, the "debug" value passed into the constructor will
      * be used.
      *
-     * @return Response
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
@@ -70,11 +69,6 @@ class ExceptionController
         ), 200, array('Content-Type' => $request->getMimeType($request->getRequestFormat()) ?: 'text/html'));
     }
 
-    /**
-     * @param int $startObLevel
-     *
-     * @return string
-     */
     protected function getAndCleanOutputBuffering(int $startObLevel): string
     {
         if (ob_get_level() <= $startObLevel) {
@@ -87,11 +81,7 @@ class ExceptionController
     }
 
     /**
-     * @param string $format
      * @param int    $code          An HTTP response status code
-     * @param bool   $showException
-     *
-     * @return string
      */
     protected function findTemplate(Request $request, string $format, int $code, bool $showException): string
     {

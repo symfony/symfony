@@ -57,8 +57,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Returns a builder to add children nodes.
-     *
-     * @return NodeBuilder
      */
     public function children(): NodeBuilder
     {
@@ -69,65 +67,42 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * Sets a prototype for child nodes.
      *
      * @param string $type The type of node
-     *
-     * @return NodeDefinition
      */
     public function prototype(string $type): NodeDefinition
     {
         return $this->prototype = $this->getNodeBuilder()->node(null, $type)->setParent($this);
     }
 
-    /**
-     * @return VariableNodeDefinition
-     */
     public function variablePrototype(): VariableNodeDefinition
     {
         return $this->prototype('variable');
     }
 
-    /**
-     * @return ScalarNodeDefinition
-     */
     public function scalarPrototype(): ScalarNodeDefinition
     {
         return $this->prototype('scalar');
     }
 
-    /**
-     * @return BooleanNodeDefinition
-     */
     public function booleanPrototype(): BooleanNodeDefinition
     {
         return $this->prototype('boolean');
     }
 
-    /**
-     * @return IntegerNodeDefinition
-     */
     public function integerPrototype(): IntegerNodeDefinition
     {
         return $this->prototype('integer');
     }
 
-    /**
-     * @return FloatNodeDefinition
-     */
     public function floatPrototype(): FloatNodeDefinition
     {
         return $this->prototype('float');
     }
 
-    /**
-     * @return ArrayNodeDefinition
-     */
     public function arrayPrototype(): ArrayNodeDefinition
     {
         return $this->prototype('array');
     }
 
-    /**
-     * @return EnumNodeDefinition
-     */
     public function enumPrototype(): EnumNodeDefinition
     {
         return $this->prototype('enum');
@@ -247,7 +222,6 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets whether the node can be unset.
      *
-     * @param bool $allow
      *
      * @return $this
      */

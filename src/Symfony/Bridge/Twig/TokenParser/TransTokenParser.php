@@ -30,7 +30,6 @@ class TransTokenParser extends AbstractTokenParser
     /**
      * Parses a token and returns a node.
      *
-     * @return Node
      *
      * @throws SyntaxError
      */

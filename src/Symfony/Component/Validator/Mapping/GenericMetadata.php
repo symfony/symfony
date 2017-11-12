@@ -176,8 +176,6 @@ class GenericMetadata implements MetadataInterface
 
     /**
      * Returns whether this element has any constraints.
-     *
-     * @return bool
      */
     public function hasConstraints(): bool
     {

@@ -30,7 +30,6 @@ class MergeBuilder
     /**
      * Sets whether the node can be unset.
      *
-     * @param bool $allow
      *
      * @return $this
      */

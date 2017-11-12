@@ -52,17 +52,11 @@ class Package implements PackageInterface
         return $this->versionStrategy->applyVersion($path);
     }
 
-    /**
-     * @return ContextInterface
-     */
     protected function getContext(): ContextInterface
     {
         return $this->context;
     }
 
-    /**
-     * @return VersionStrategyInterface
-     */
     protected function getVersionStrategy(): VersionStrategyInterface
     {
         return $this->versionStrategy;

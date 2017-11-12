@@ -26,9 +26,6 @@ class AccessDeniedException extends \RuntimeException
         parent::__construct($message, 403, $previous);
     }
 
-    /**
-     * @return array
-     */
     public function getAttributes(): array
     {
         return $this->attributes;

@@ -83,9 +83,6 @@ class ProxyDumperTest extends TestCase
         $this->dumper->getProxyFactoryCode($definition, 'foo');
     }
 
-    /**
-     * @return array
-     */
     public function getProxyCandidates(): array
     {
         $definitions = array(

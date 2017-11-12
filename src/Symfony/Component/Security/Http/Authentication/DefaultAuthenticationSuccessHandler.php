@@ -73,8 +73,6 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 
     /**
      * Get the provider key.
-     *
-     * @return string
      */
     public function getProviderKey(): string
     {
@@ -83,8 +81,6 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 
     /**
      * Set the provider key.
-     *
-     * @param string $providerKey
      */
     public function setProviderKey(string $providerKey): void
     {
@@ -93,8 +89,6 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
 
     /**
      * Builds the target URL according to the defined options.
-     *
-     * @return string
      */
     protected function determineTargetUrl(Request $request): string
     {

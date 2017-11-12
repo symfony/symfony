@@ -381,11 +381,6 @@ class ResolvedFormTypeTest extends TestCase
         return $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
     }
 
-    /**
-     * @param string $name
-     *
-     * @return FormBuilder
-     */
     protected function getBuilder(string $name = 'name', array $options = array()): FormBuilder
     {
         return new FormBuilder($name, null, $this->dispatcher, $this->factory, $options);

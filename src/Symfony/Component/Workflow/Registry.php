@@ -22,9 +22,6 @@ class Registry
 {
     private $workflows = array();
 
-    /**
-     * @param SupportStrategyInterface $supportStrategy
-     */
     public function add(Workflow $workflow, SupportStrategyInterface $supportStrategy): void
     {
         if (!$supportStrategy instanceof SupportStrategyInterface) {
@@ -37,8 +34,6 @@ class Registry
     /**
      * @param object      $subject
      * @param string|null $workflowName
-     *
-     * @return Workflow
      */
     public function get($subject, $workflowName = null): Workflow
     {

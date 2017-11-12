@@ -250,8 +250,6 @@ class FullTransformer
     /**
      * Normalize a preg_replace match array, removing the numeric keys and returning an associative array
      * with the value and pattern values for the matched Transformer.
-     *
-     * @return array
      */
     protected function normalizeArray(array $data): array
     {
@@ -327,8 +325,6 @@ class FullTransformer
     /**
      * Add sensible default values for missing items in the extracted date/time options array. The values
      * are base in the beginning of the Unix era.
-     *
-     * @return array
      */
     private function getDefaultValueForOptions(array $options): array
     {

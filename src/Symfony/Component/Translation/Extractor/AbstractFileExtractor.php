@@ -22,8 +22,6 @@ abstract class AbstractFileExtractor
 {
     /**
      * @param string|array $resource Files, a file or a directory
-     *
-     * @return array
      */
     protected function extractFiles($resource): array
     {
@@ -49,10 +47,6 @@ abstract class AbstractFileExtractor
     }
 
     /**
-     * @param string $file
-     *
-     * @return bool
-     *
      * @throws InvalidArgumentException
      */
     protected function isFile(string $file): bool
@@ -64,11 +58,6 @@ abstract class AbstractFileExtractor
         return true;
     }
 
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
     abstract protected function canBeExtracted(string $file): bool;
 
     /**

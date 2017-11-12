@@ -41,8 +41,6 @@ class KernelEvent extends Event
 
     /**
      * Returns the kernel in which this event was thrown.
-     *
-     * @return HttpKernelInterface
      */
     public function getKernel(): HttpKernelInterface
     {
@@ -51,8 +49,6 @@ class KernelEvent extends Event
 
     /**
      * Returns the request the kernel is currently processing.
-     *
-     * @return Request
      */
     public function getRequest(): Request
     {

@@ -38,8 +38,6 @@ abstract class FileLoader extends Loader
 
     /**
      * Sets the current directory.
-     *
-     * @param string $dir
      */
     public function setCurrentDir(string $dir): void
     {
@@ -48,8 +46,6 @@ abstract class FileLoader extends Loader
 
     /**
      * Returns the file locator used by this loader.
-     *
-     * @return FileLocatorInterface
      */
     public function getLocator(): FileLocatorInterface
     {

@@ -69,8 +69,6 @@ abstract class Client
 
     /**
      * Returns whether client automatically follows redirects or not.
-     *
-     * @return bool
      */
     public function isFollowingRedirects(): bool
     {
@@ -79,8 +77,6 @@ abstract class Client
 
     /**
      * Sets the maximum number of requests that crawler can follow.
-     *
-     * @param int $maxRedirects
      */
     public function setMaxRedirects(int $maxRedirects): void
     {
@@ -90,8 +86,6 @@ abstract class Client
 
     /**
      * Returns the maximum number of requests that crawler can follow.
-     *
-     * @return int
      */
     public function getMaxRedirects(): int
     {
@@ -232,8 +226,6 @@ abstract class Client
 
     /**
      * Clicks on a given link.
-     *
-     * @return Crawler
      */
     public function click(Link $link): Crawler
     {
@@ -249,8 +241,6 @@ abstract class Client
      *
      * @param Form  $form   A Form instance
      * @param array $values An array of form field values
-     *
-     * @return Crawler
      */
     public function submit(Form $form, array $values = array()): Crawler
     {
@@ -269,8 +259,6 @@ abstract class Client
      * @param array  $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
      * @param string $content       The raw body data
      * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
-     *
-     * @return Crawler
      */
     public function request(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true): Crawler
     {
@@ -438,8 +426,6 @@ abstract class Client
 
     /**
      * Goes back in the browser history.
-     *
-     * @return Crawler
      */
     public function back(): Crawler
     {
@@ -452,8 +438,6 @@ abstract class Client
 
     /**
      * Goes forward in the browser history.
-     *
-     * @return Crawler
      */
     public function forward(): Crawler
     {
@@ -466,8 +450,6 @@ abstract class Client
 
     /**
      * Reloads the current browser.
-     *
-     * @return Crawler
      */
     public function reload(): Crawler
     {
@@ -477,7 +459,6 @@ abstract class Client
     /**
      * Follow redirects?
      *
-     * @return Crawler
      *
      * @throws \LogicException If request was not a redirect
      */
@@ -587,8 +568,6 @@ abstract class Client
      *
      * @param Request $request       A Request instance
      * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
-     *
-     * @return Crawler
      */
     protected function requestFromRequest(Request $request, bool $changeHistory = true): Crawler
     {

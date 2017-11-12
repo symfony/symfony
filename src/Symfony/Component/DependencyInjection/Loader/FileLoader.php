@@ -65,8 +65,6 @@ abstract class FileLoader extends BaseFileLoader
 
     /**
      * Registers a definition in the container with its instanceof-conditionals.
-     *
-     * @param string     $id
      */
     protected function setDefinition(string $id, Definition $definition): void
     {

@@ -31,8 +31,6 @@ class AuthenticationUtils
     }
 
     /**
-     * @param bool $clearSession
-     *
      * @return AuthenticationException|null
      */
     public function getLastAuthenticationError(bool $clearSession = true): ?AuthenticationException
@@ -54,9 +52,6 @@ class AuthenticationUtils
         return $authenticationException;
     }
 
-    /**
-     * @return string
-     */
     public function getLastUsername(): string
     {
         $request = $this->getRequest();

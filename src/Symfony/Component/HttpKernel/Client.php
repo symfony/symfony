@@ -76,8 +76,6 @@ class Client extends BaseClient
 
     /**
      * Returns the script to execute when the request must be insulated.
-     *
-     * @return string
      */
     protected function getScript($request): string
     {

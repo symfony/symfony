@@ -175,10 +175,6 @@ abstract class Input implements InputInterface, StreamableInputInterface
 
     /**
      * Escapes a token through escapeshellarg if it contains unsafe chars.
-     *
-     * @param string $token
-     *
-     * @return string
      */
     public function escapeToken(string $token): string
     {

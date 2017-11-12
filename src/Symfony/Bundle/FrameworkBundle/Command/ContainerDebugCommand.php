@@ -177,7 +177,6 @@ EOF
     /**
      * Loads the ContainerBuilder from the cache.
      *
-     * @return ContainerBuilder
      *
      * @throws \LogicException
      */

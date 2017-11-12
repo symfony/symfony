@@ -45,11 +45,6 @@ class EntityType extends DoctrineType
 
     /**
      * Return the default loader object.
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $class
-     *
-     * @return ORMQueryBuilderLoader
      */
     public function getLoader(ObjectManager $manager, QueryBuilder $queryBuilder, string $class): ORMQueryBuilderLoader
     {
@@ -68,9 +63,7 @@ class EntityType extends DoctrineType
      * We consider two query builders with an equal SQL string and
      * equal parameters to be equal.
      *
-     * @param QueryBuilder $queryBuilder
      *
-     * @return array
      *
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.

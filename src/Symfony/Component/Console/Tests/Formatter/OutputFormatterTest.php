@@ -157,7 +157,6 @@ class OutputFormatterTest extends TestCase
     }
 
     /**
-     * @param string      $tag
      * @param string|null $expected
      * @param string|null $input
      *

@@ -1018,8 +1018,6 @@ class Application
      *
      * @param string $commandName     The Command name
      * @param bool   $isSingleCommand Set to true if there is only one command in this application
-     *
-     * @return self
      */
     public function setDefaultCommand(string $commandName, bool $isSingleCommand = false): self
     {

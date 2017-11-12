@@ -216,8 +216,6 @@ abstract class Constraint
 
     /**
      * Adds the given group if this constraint is in the Default group.
-     *
-     * @param string $group
      */
     public function addImplicitGroupName(string $group): void
     {
@@ -244,7 +242,6 @@ abstract class Constraint
      *
      * Override this method if you want to define required options.
      *
-     * @return array
      *
      * @see __construct()
      */
@@ -259,8 +256,6 @@ abstract class Constraint
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
      * behaviour.
-     *
-     * @return string
      */
     public function validatedBy(): string
     {

@@ -75,9 +75,6 @@ class TranslationUpdateCommandTest extends TestCase
         $this->fs->remove($this->translationDir);
     }
 
-    /**
-     * @return CommandTester
-     */
     private function createCommandTester($extractedMessages = array(), $loadedMessages = array(), HttpKernel\KernelInterface $kernel = null): CommandTester
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')

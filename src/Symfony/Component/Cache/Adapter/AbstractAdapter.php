@@ -77,13 +77,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     }
 
     /**
-     * @param string               $namespace
-     * @param int                  $defaultLifetime
-     * @param string               $version
-     * @param string               $directory
      * @param LoggerInterface|null $logger
-     *
-     * @return AdapterInterface
      */
     public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, LoggerInterface $logger = null): AdapterInterface
     {

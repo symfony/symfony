@@ -42,8 +42,6 @@ class Question
 
     /**
      * Returns the question.
-     *
-     * @return string
      */
     public function getQuestion(): string
     {
@@ -62,8 +60,6 @@ class Question
 
     /**
      * Returns whether the user response must be hidden.
-     *
-     * @return bool
      */
     public function isHidden(): bool
     {
@@ -73,7 +69,6 @@ class Question
     /**
      * Sets whether the user response must be hidden or not.
      *
-     * @param bool $hidden
      *
      * @return $this
      *
@@ -92,8 +87,6 @@ class Question
 
     /**
      * In case the response can not be hidden, whether to fallback on non-hidden question or not.
-     *
-     * @return bool
      */
     public function isHiddenFallback(): bool
     {
@@ -103,7 +96,6 @@ class Question
     /**
      * Sets whether to fallback on non-hidden question if the response can not be hidden.
      *
-     * @param bool $fallback
      *
      * @return $this
      */
@@ -233,8 +225,6 @@ class Question
      * Gets the normalizer for the response.
      *
      * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
-     *
-     * @return callable
      */
     public function getNormalizer(): callable
     {

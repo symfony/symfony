@@ -121,8 +121,6 @@ abstract class FormField
 
     /**
      * Check if the current field is disabled.
-     *
-     * @return bool
      */
     public function isDisabled(): bool
     {

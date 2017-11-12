@@ -37,8 +37,6 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Sets the minimum number of elements that a prototype based node must
      * contain. By default this is zero, meaning no elements.
-     *
-     * @param int $number
      */
     public function setMinNumberOfElements(int $number): void
     {
@@ -88,7 +86,6 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Sets the default value of this node.
      *
-     * @param string $value
      *
      * @throws \InvalidArgumentException if the default value is not an array
      */
@@ -103,8 +100,6 @@ class PrototypedArrayNode extends ArrayNode
 
     /**
      * Checks if the node has a default value.
-     *
-     * @return bool
      */
     public function hasDefaultValue(): bool
     {

@@ -195,8 +195,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * Gets a HTTP kernel from the container.
-     *
-     * @return HttpKernel
      */
     protected function getHttpKernel(): HttpKernel
     {
@@ -432,8 +430,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * Gets the container's base class.
      *
      * All names except Container must be fully qualified.
-     *
-     * @return string
      */
     protected function getContainerBaseClass(): string
     {
@@ -616,8 +612,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     /**
      * Gets a new ContainerBuilder instance used to build the service container.
-     *
-     * @return ContainerBuilder
      */
     protected function getContainerBuilder(): ContainerBuilder
     {

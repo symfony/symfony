@@ -134,8 +134,6 @@ class CommandTester
      *
      * @param array $inputs An array of strings representing each input
      *                      passed to the command input stream
-     *
-     * @return CommandTester
      */
     public function setInputs(array $inputs): CommandTester
     {

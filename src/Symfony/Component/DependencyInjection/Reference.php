@@ -37,8 +37,6 @@ class Reference
 
     /**
      * Returns the behavior to be used when the service does not exist.
-     *
-     * @return int
      */
     public function getInvalidBehavior(): int
     {

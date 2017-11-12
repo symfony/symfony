@@ -33,9 +33,6 @@ class RoutingConfigurator
         $this->file = $file;
     }
 
-    /**
-     * @return ImportConfigurator
-     */
     final public function import($resource, $type = null, $ignoreErrors = false): ImportConfigurator
     {
         $this->loader->setCurrentDir(dirname($this->path));
@@ -44,9 +41,6 @@ class RoutingConfigurator
         return new ImportConfigurator($this->collection, $subCollection);
     }
 
-    /**
-     * @return CollectionConfigurator
-     */
     final public function collection($name = ''): CollectionConfigurator
     {
         return new CollectionConfigurator($this->collection, $name);

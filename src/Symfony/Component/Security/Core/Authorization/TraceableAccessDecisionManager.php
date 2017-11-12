@@ -60,9 +60,6 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         return $result;
     }
 
-    /**
-     * @return string
-     */
     public function getStrategy(): string
     {
         // The $strategy property is misleading because it stores the name of its
@@ -79,9 +76,6 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         return $this->voters;
     }
 
-    /**
-     * @return array
-     */
     public function getDecisionLog(): array
     {
         return $this->decisionLog;

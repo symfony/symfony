@@ -720,8 +720,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     /**
      * Gets removed service or alias ids.
-     *
-     * @return array
      */
     public function getRemovedIds(): array
     {
@@ -753,7 +751,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string       $alias The alias to create
      * @param string|Alias $id    The service to alias
      *
-     * @return Alias
      *
      * @throws InvalidArgumentException if the id is not a string or an Alias
      * @throws InvalidArgumentException if the alias is for itself
@@ -1158,8 +1155,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *     }
      * }
      *
-     * @param string $name
-     * @param bool   $throwOnAbstract
      *
      * @return array An array of tags with the tagged service as key, holding a list of attribute arrays
      */
@@ -1221,8 +1216,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Returns a ChildDefinition that will be used for autoconfiguring the interface/class.
      *
      * @param string $interface The class or interface to match
-     *
-     * @return ChildDefinition
      */
     public function registerForAutoconfiguration(string $interface): ChildDefinition
     {
@@ -1383,8 +1376,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * Computes a reasonably unique hash of a value.
      *
      * @param mixed $value A serializable value
-     *
-     * @return string
      */
     public static function hash($value): string
     {

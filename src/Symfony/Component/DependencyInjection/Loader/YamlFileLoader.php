@@ -301,7 +301,6 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses a definition.
      *
-     * @param string       $id
      * @param array|string $service
      * @param string       $file
      *
@@ -589,7 +588,6 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a YAML file.
      *
-     * @param string $file
      *
      * @return array The file content
      *
@@ -628,7 +626,6 @@ class YamlFileLoader extends FileLoader
      * @param mixed  $content
      * @param string $file
      *
-     * @return array
      *
      * @throws InvalidArgumentException When service file is not valid
      */

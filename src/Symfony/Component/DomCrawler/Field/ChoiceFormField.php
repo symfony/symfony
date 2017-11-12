@@ -54,8 +54,6 @@ class ChoiceFormField extends FormField
 
     /**
      * Check if the current selected option is disabled.
-     *
-     * @return bool
      */
     public function isDisabled(): bool
     {
@@ -269,11 +267,6 @@ class ChoiceFormField extends FormField
 
     /**
      * Checks whether given value is in the existing options.
-     *
-     * @param string $optionValue
-     * @param array  $options
-     *
-     * @return bool
      */
     public function containsOption(string $optionValue, array $options): bool
     {
@@ -292,8 +285,6 @@ class ChoiceFormField extends FormField
 
     /**
      * Returns list of available field options.
-     *
-     * @return array
      */
     public function availableOptionValues(): array
     {
@@ -308,8 +299,6 @@ class ChoiceFormField extends FormField
 
     /**
      * Disables the internal validation of the field.
-     *
-     * @return self
      */
     public function disableValidation(): self
     {

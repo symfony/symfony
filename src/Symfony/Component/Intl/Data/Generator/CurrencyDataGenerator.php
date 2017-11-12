@@ -147,9 +147,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         return $data;
     }
 
-    /**
-     * @return array
-     */
     private function generateSymbolNamePairs(ArrayAccessibleResourceBundle $rootBundle): array
     {
         $symbolNamePairs = iterator_to_array($rootBundle['Currencies']);

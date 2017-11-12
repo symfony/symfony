@@ -51,8 +51,6 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
 
     /**
      * Defines an instanceof-conditional to be applied to following service definitions.
-     *
-     * @return InstanceofConfigurator
      */
     final public function instanceof(string $fqcn): InstanceofConfigurator
     {

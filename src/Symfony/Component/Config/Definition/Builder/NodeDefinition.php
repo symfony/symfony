@@ -81,7 +81,6 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets an attribute on the node.
      *
-     * @param string $key
      * @param mixed  $value
      *
      * @return $this
@@ -107,8 +106,6 @@ abstract class NodeDefinition implements NodeParentInterface
      * Creates the node.
      *
      * @param bool $forceRootNode Whether to force this node as the root node
-     *
-     * @return NodeInterface
      */
     public function getNode(bool $forceRootNode = false): NodeInterface
     {
@@ -248,8 +245,6 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets an expression to run before the normalization.
-     *
-     * @return ExprBuilder
      */
     public function beforeNormalization(): ExprBuilder
     {
@@ -274,8 +269,6 @@ abstract class NodeDefinition implements NodeParentInterface
      * The expression receives the value of the node and must return it. It can
      * modify it.
      * An exception should be thrown when the node is not valid.
-     *
-     * @return ExprBuilder
      */
     public function validate(): ExprBuilder
     {
@@ -298,8 +291,6 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Gets the builder for validation rules.
-     *
-     * @return ValidationBuilder
      */
     protected function validation(): ValidationBuilder
     {
@@ -312,8 +303,6 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Gets the builder for merging rules.
-     *
-     * @return MergeBuilder
      */
     protected function merge(): MergeBuilder
     {
@@ -326,8 +315,6 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Gets the builder for normalization rules.
-     *
-     * @return NormalizationBuilder
      */
     protected function normalization(): NormalizationBuilder
     {

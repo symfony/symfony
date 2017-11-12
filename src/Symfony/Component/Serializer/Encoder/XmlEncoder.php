@@ -171,8 +171,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Returns the root node name.
-     *
-     * @return string
      */
     public function getRootNodeName(): string
     {

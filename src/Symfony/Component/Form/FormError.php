@@ -58,8 +58,6 @@ class FormError implements \Serializable
 
     /**
      * Returns the error message.
-     *
-     * @return string
      */
     public function getMessage(): string
     {
@@ -68,8 +66,6 @@ class FormError implements \Serializable
 
     /**
      * Returns the error message template.
-     *
-     * @return string
      */
     public function getMessageTemplate(): string
     {
@@ -78,8 +74,6 @@ class FormError implements \Serializable
 
     /**
      * Returns the parameters to be inserted in the message template.
-     *
-     * @return array
      */
     public function getMessageParameters(): array
     {

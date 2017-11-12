@@ -119,8 +119,6 @@ class AutowirePass extends AbstractRecursivePass
 
     /**
      * @param \ReflectionClass $reflectionClass
-     *
-     * @return array
      */
     private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls): array
     {

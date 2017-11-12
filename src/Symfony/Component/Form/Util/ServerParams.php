@@ -27,8 +27,6 @@ class ServerParams
 
     /**
      * Returns true if the POST max size has been exceeded in the request.
-     *
-     * @return bool
      */
     public function hasPostMaxSizeBeenExceeded(): bool
     {
@@ -75,8 +73,6 @@ class ServerParams
 
     /**
      * Returns the normalized "post_max_size" ini setting.
-     *
-     * @return string
      */
     public function getNormalizedIniPostMaxSize(): string
     {

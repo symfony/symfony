@@ -216,8 +216,6 @@ class Store implements StoreInterface
 
     /**
      * Returns content digest for $response.
-     *
-     * @return string
      */
     protected function generateContentDigest(Response $response): string
     {
@@ -361,8 +359,6 @@ class Store implements StoreInterface
      *
      * @param string $key  The store key
      * @param string $data The data to store
-     *
-     * @return bool
      */
     private function save(string $key, string $data): bool
     {
@@ -466,8 +462,6 @@ class Store implements StoreInterface
      *
      * @param array  $headers An array of HTTP headers for the Response
      * @param string $body    The Response body
-     *
-     * @return Response
      */
     private function restoreResponse(array $headers, string $body = null): Response
     {

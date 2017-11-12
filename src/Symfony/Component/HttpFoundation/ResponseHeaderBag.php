@@ -179,10 +179,6 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Removes a cookie from the array, but does not unset it in the browser.
-     *
-     * @param string $name
-     * @param string $path
-     * @param string $domain
      */
     public function removeCookie(string $name, string $path = '/', string $domain = null): void
     {
@@ -208,9 +204,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * Returns an array with all cookies.
      *
-     * @param string $format
      *
-     * @return array
      *
      * @throws \InvalidArgumentException When the $format is invalid
      */
@@ -238,12 +232,6 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Clears a cookie in the browser.
-     *
-     * @param string $name
-     * @param string $path
-     * @param string $domain
-     * @param bool   $secure
-     * @param bool   $httpOnly
      */
     public function clearCookie(string $name, string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true): void
     {
@@ -304,8 +292,6 @@ class ResponseHeaderBag extends HeaderBag
      *
      * This considers several other headers and calculates or modifies the
      * cache-control header to a sensible, conservative value.
-     *
-     * @return string
      */
     protected function computeCacheControlValue(): string
     {

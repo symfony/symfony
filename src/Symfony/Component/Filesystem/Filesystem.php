@@ -298,7 +298,6 @@ class Filesystem
      *
      * @param string $filename Path to the file
      *
-     * @return bool
      *
      * @throws IOException When windows path is longer than 258 characters
      */
@@ -385,8 +384,6 @@ class Filesystem
     }
 
     /**
-     * @param string $origin
-     * @param string $target
      * @param string $linkType Name of the link type, typically 'symbolic' or 'hard'
      */
     private function linkException(string $origin, string $target, string $linkType): void
@@ -600,8 +597,6 @@ class Filesystem
      * Returns whether the file path is an absolute path.
      *
      * @param string $file A file path
-     *
-     * @return bool
      */
     public function isAbsolutePath(string $file): bool
     {

@@ -85,7 +85,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param string                   $name
      * @param string|FormTypeInterface $type
      *
      * @throws BadMethodCallException
@@ -100,7 +99,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param string $name
      *
      * @throws BadMethodCallException
      */
@@ -114,7 +112,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param string $name
      *
      * @throws BadMethodCallException
      */
@@ -126,7 +123,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @param string $name
      *
      * @return bool Always returns false
      */
@@ -160,9 +156,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param string   $eventName
      * @param callable $listener
-     * @param int      $priority
      *
      * @throws BadMethodCallException
      */
@@ -188,7 +182,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool                     $forcePrepend
      *
      * @throws BadMethodCallException
      */
@@ -214,7 +207,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool                     $forceAppend
      *
      * @throws BadMethodCallException
      */
@@ -300,7 +292,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool $errorBubbling
      *
      * @throws BadMethodCallException
      */
@@ -314,7 +305,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool $required
      *
      * @throws BadMethodCallException
      */
@@ -342,7 +332,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool $mapped
      *
      * @throws BadMethodCallException
      */
@@ -356,7 +345,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool $byReference
      *
      * @throws BadMethodCallException
      */
@@ -370,7 +358,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool $compound
      *
      * @throws BadMethodCallException
      */
@@ -410,7 +397,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool $locked
      *
      * @throws BadMethodCallException
      */
@@ -434,7 +420,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @param string $action
      *
      * @throws BadMethodCallException
      */
@@ -446,7 +431,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @param string $method
      *
      * @throws BadMethodCallException
      */
@@ -468,7 +452,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @param bool $initialize
      *
      * @return $this
      *
@@ -486,7 +469,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
     /**
      * Unsupported method.
      *
-     * @param bool $inheritData
      *
      * @throws BadMethodCallException
      */
@@ -497,8 +479,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Builds and returns the button configuration.
-     *
-     * @return FormConfigInterface
      */
     public function getFormConfig(): FormConfigInterface
     {

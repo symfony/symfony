@@ -27,8 +27,6 @@ class IntegerNodeTest extends TestCase
 
     /**
      * @dataProvider getValidValues
-     *
-     * @param int $value
      */
     public function testValidNonEmptyValues(int $value): void
     {

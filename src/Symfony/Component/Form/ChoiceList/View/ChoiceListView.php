@@ -41,8 +41,6 @@ class ChoiceListView
      * Returns whether a placeholder is in the choices.
      *
      * A placeholder must be the first child element, not be in a group and have an empty value.
-     *
-     * @return bool
      */
     public function hasPlaceholder(): bool
     {

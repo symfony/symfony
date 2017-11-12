@@ -127,8 +127,6 @@ class Command
      *
      * Override this to check for x or y and return false if the command can not
      * run properly under the current conditions.
-     *
-     * @return bool
      */
     public function isEnabled(): bool
     {
@@ -604,8 +602,6 @@ class Command
 
     /**
      * Returns alternative usages of the command.
-     *
-     * @return array
      */
     public function getUsages(): array
     {

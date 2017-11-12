@@ -36,9 +36,6 @@ class DefinitionBuilder
         $this->addTransitions($transitions);
     }
 
-    /**
-     * @return Definition
-     */
     public function build(): Definition
     {
         return new Definition($this->places, $this->transitions, $this->initialPlace);
@@ -59,8 +56,6 @@ class DefinitionBuilder
     }
 
     /**
-     * @param string $place
-     *
      * @return $this
      */
     public function setInitialPlace(string $place)
@@ -71,8 +66,6 @@ class DefinitionBuilder
     }
 
     /**
-     * @param string $place
-     *
      * @return $this
      */
     public function addPlace(string $place)

@@ -360,9 +360,6 @@ class MarkdownDescriptor extends Descriptor
         throw new \InvalidArgumentException('Callable is not describable.');
     }
 
-    /**
-     * @return string
-     */
     private function formatRouterConfig(array $array): string
     {
         if (!$array) {

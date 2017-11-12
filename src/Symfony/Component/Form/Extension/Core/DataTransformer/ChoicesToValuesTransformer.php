@@ -28,8 +28,6 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     }
 
     /**
-     * @return array
-     *
      * @throws TransformationFailedException if the given value is not an array
      */
     public function transform($array): array
@@ -46,8 +44,6 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     }
 
     /**
-     * @return array
-     *
      * @throws TransformationFailedException if the given value is not an array
      *                                       or if no matching choice could be
      *                                       found for some given value

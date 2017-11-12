@@ -56,8 +56,6 @@ class JsonEncode implements EncoderInterface
 
     /**
      * Merge default json encode options with context.
-     *
-     * @return array
      */
     private function resolveContext(array $context = array()): array
     {

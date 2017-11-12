@@ -27,9 +27,6 @@ class JsonRegionDataProviderTest extends AbstractRegionDataProviderTest
         return Intl::getDataDirectory();
     }
 
-    /**
-     * @return BundleReaderInterface
-     */
     protected function createBundleReader(): BundleReaderInterface
     {
         return new JsonBundleReader();

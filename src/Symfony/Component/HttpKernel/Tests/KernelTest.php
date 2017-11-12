@@ -565,8 +565,6 @@ EOF;
 
     /**
      * Returns a mock for the BundleInterface.
-     *
-     * @return BundleInterface
      */
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null): BundleInterface
     {
@@ -608,8 +606,6 @@ EOF;
      *
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
-     *
-     * @return Kernel
      */
     protected function getKernel(array $methods = array(), array $bundles = array()): Kernel
     {

@@ -205,8 +205,6 @@ class Definition
 
     /**
      * Gets the properties to define when creating the service.
-     *
-     * @return array
      */
     public function getProperties(): array
     {
@@ -216,7 +214,6 @@ class Definition
     /**
      * Sets a specific property.
      *
-     * @param string $name
      * @param mixed  $value
      *
      * @return $this
@@ -372,8 +369,6 @@ class Definition
      * Check if the current definition has a given method to call after service initialization.
      *
      * @param string $method The method name to search for
-     *
-     * @return bool
      */
     public function hasMethodCall(string $method): bool
     {
@@ -423,7 +418,6 @@ class Definition
     /**
      * Sets whether or not instanceof conditionals should be prepended with a global set.
      *
-     * @param bool $autoconfigured
      *
      * @return $this
      */
@@ -436,9 +430,6 @@ class Definition
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isAutoconfigured(): bool
     {
         return $this->autoconfigured;
@@ -495,10 +486,6 @@ class Definition
 
     /**
      * Whether this definition has a tag with the given name.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
     public function hasTag(string $name): bool
     {
@@ -575,8 +562,6 @@ class Definition
 
     /**
      * Whether this service is shared.
-     *
-     * @return bool
      */
     public function isShared(): bool
     {
@@ -586,7 +571,6 @@ class Definition
     /**
      * Sets the visibility of this service.
      *
-     * @param bool $boolean
      *
      * @return $this
      */
@@ -602,8 +586,6 @@ class Definition
 
     /**
      * Whether this service is public facing.
-     *
-     * @return bool
      */
     public function isPublic(): bool
     {
@@ -618,7 +600,6 @@ class Definition
      * but triggers a deprecation notice when accessed from the container,
      * so that the service can be made really private in 4.0.
      *
-     * @param bool $boolean
      *
      * @return $this
      */
@@ -631,8 +612,6 @@ class Definition
 
     /**
      * Whether this service is private.
-     *
-     * @return bool
      */
     public function isPrivate(): bool
     {
@@ -642,7 +621,6 @@ class Definition
     /**
      * Sets the lazy flag of this service.
      *
-     * @param bool $lazy
      *
      * @return $this
      */
@@ -657,8 +635,6 @@ class Definition
 
     /**
      * Whether this service is lazy.
-     *
-     * @return bool
      */
     public function isLazy(): bool
     {
@@ -669,7 +645,6 @@ class Definition
      * Sets whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
-     * @param bool $boolean
      *
      * @return $this
      */
@@ -683,8 +658,6 @@ class Definition
     /**
      * Whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
-     *
-     * @return bool
      */
     public function isSynthetic(): bool
     {
@@ -695,7 +668,6 @@ class Definition
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
      *
-     * @param bool $boolean
      *
      * @return $this
      */
@@ -709,8 +681,6 @@ class Definition
     /**
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
-     *
-     * @return bool
      */
     public function isAbstract(): bool
     {
@@ -721,7 +691,6 @@ class Definition
      * Whether this definition is deprecated, that means it should not be called
      * anymore.
      *
-     * @param bool   $status
      * @param string $template Template message to use if the definition is deprecated
      *
      * @return $this
@@ -752,8 +721,6 @@ class Definition
     /**
      * Whether this definition is deprecated, that means it should not be called
      * anymore.
-     *
-     * @return bool
      */
     public function isDeprecated(): bool
     {
@@ -764,8 +731,6 @@ class Definition
      * Message to use if this definition is deprecated.
      *
      * @param string $id Service id relying on this definition
-     *
-     * @return string
      */
     public function getDeprecationMessage(string $id): string
     {
@@ -804,8 +769,6 @@ class Definition
 
     /**
      * Is the definition autowired?
-     *
-     * @return bool
      */
     public function isAutowired(): bool
     {
@@ -815,7 +778,6 @@ class Definition
     /**
      * Enables/disables autowiring.
      *
-     * @param bool $autowired
      *
      * @return $this
      */
@@ -830,8 +792,6 @@ class Definition
 
     /**
      * Gets bindings.
-     *
-     * @return array
      */
     public function getBindings(): array
     {
@@ -863,8 +823,6 @@ class Definition
 
     /**
      * Add an error that occurred when building this Definition.
-     *
-     * @param string $error
      */
     public function addError(string $error): void
     {
@@ -873,8 +831,6 @@ class Definition
 
     /**
      * Returns any errors that occurred while building this Definition.
-     *
-     * @return array
      */
     public function getErrors(): array
     {

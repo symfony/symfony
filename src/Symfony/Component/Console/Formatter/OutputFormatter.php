@@ -175,9 +175,6 @@ class OutputFormatter implements OutputFormatterInterface
         return str_replace('\\<', '<', $output);
     }
 
-    /**
-     * @return OutputFormatterStyleStack
-     */
     public function getStyleStack(): OutputFormatterStyleStack
     {
         return $this->styleStack;

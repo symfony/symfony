@@ -116,9 +116,6 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->assertNoViolation();
     }
 
-    /**
-     * @return array
-     */
     public function provideAllValidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
@@ -191,14 +188,8 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->validator->validate(5, $constraint);
     }
 
-    /**
-     * @return array
-     */
     abstract public function provideValidComparisons(): array;
 
-    /**
-     * @return array
-     */
     abstract public function provideValidComparisonsToPropertyPath(): array;
 
     /**
@@ -231,9 +222,6 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
             ->assertRaised();
     }
 
-    /**
-     * @return array
-     */
     public function provideAllInvalidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
@@ -247,15 +235,10 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         return $comparisons;
     }
 
-    /**
-     * @return array
-     */
     abstract public function provideInvalidComparisons(): array;
 
     /**
      * @param array|null $options Options for the constraint
-     *
-     * @return Constraint
      */
     abstract protected function createConstraint(array $options = null): Constraint;
 

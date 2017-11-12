@@ -79,9 +79,6 @@ final class Key
         return null === $this->expiringTime ? null : $this->expiringTime - microtime(true);
     }
 
-    /**
-     * @return bool
-     */
     public function isExpired(): bool
     {
         return null !== $this->expiringTime && $this->expiringTime <= microtime(true);

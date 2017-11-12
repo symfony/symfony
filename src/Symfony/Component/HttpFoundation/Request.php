@@ -714,8 +714,6 @@ class Request
     /**
      * Whether the request contains a Session which was started in one of the
      * previous requests.
-     *
-     * @return bool
      */
     public function hasPreviousSession(): bool
     {
@@ -794,8 +792,6 @@ class Request
 
     /**
      * Returns current script name.
-     *
-     * @return string
      */
     public function getScriptName(): string
     {
@@ -867,8 +863,6 @@ class Request
 
     /**
      * Gets the request's scheme.
-     *
-     * @return string
      */
     public function getScheme(): string
     {
@@ -949,8 +943,6 @@ class Request
      * Returns the HTTP host being requested.
      *
      * The port name will be appended to the host if it's non-standard.
-     *
-     * @return string
      */
     public function getHttpHost(): string
     {
@@ -1096,8 +1088,6 @@ class Request
      * when trusted proxies were set via "setTrustedProxies()".
      *
      * The "X-Forwarded-Proto" header must contain the protocol: "https" or "http".
-     *
-     * @return bool
      */
     public function isSecure(): bool
     {
@@ -1118,7 +1108,6 @@ class Request
      *
      * The "X-Forwarded-Host" header must contain the client host name.
      *
-     * @return string
      *
      * @throws SuspiciousOperationException when the host name is invalid or not trusted
      */
@@ -1176,8 +1165,6 @@ class Request
 
     /**
      * Sets the request method.
-     *
-     * @param string $method
      */
     public function setMethod(string $method): void
     {
@@ -1348,8 +1335,6 @@ class Request
 
     /**
      * Sets the default locale.
-     *
-     * @param string $locale
      */
     public function setDefaultLocale(string $locale): void
     {
@@ -1362,8 +1347,6 @@ class Request
 
     /**
      * Get the default locale.
-     *
-     * @return string
      */
     public function getDefaultLocale(): string
     {
@@ -1372,8 +1355,6 @@ class Request
 
     /**
      * Sets the locale.
-     *
-     * @param string $locale
      */
     public function setLocale(string $locale): void
     {
@@ -1382,8 +1363,6 @@ class Request
 
     /**
      * Get the locale.
-     *
-     * @return string
      */
     public function getLocale(): string
     {
@@ -1394,8 +1373,6 @@ class Request
      * Checks if the request method is of specified type.
      *
      * @param string $method Uppercase request method (GET, POST etc)
-     *
-     * @return bool
      */
     public function isMethod(string $method): bool
     {
@@ -1408,8 +1385,6 @@ class Request
      * @see https://tools.ietf.org/html/rfc7231#section-4.2.1
      *
      * @param bool $andCacheable Adds the additional condition that the method should be cacheable. True by default.
-     *
-     * @return bool
      */
     public function isMethodSafe(/* $andCacheable = true */): bool
     {
@@ -1423,8 +1398,6 @@ class Request
 
     /**
      * Checks whether or not the method is idempotent.
-     *
-     * @return bool
      */
     public function isMethodIdempotent(): bool
     {
@@ -1435,8 +1408,6 @@ class Request
      * Checks whether the method is cacheable or not.
      *
      * @see https://tools.ietf.org/html/rfc7231#section-4.2.3
-     *
-     * @return bool
      */
     public function isMethodCacheable(): bool
     {
@@ -1451,8 +1422,6 @@ class Request
      * server might be different. This returns the former (from the "Via" header)
      * if the proxy is trusted (see "setTrustedProxies()"), otherwise it returns
      * the latter (from the "SERVER_PROTOCOL" server parameter).
-     *
-     * @return string
      */
     public function getProtocolVersion(): string
     {
@@ -1524,9 +1493,6 @@ class Request
         return preg_split('/\s*,\s*/', $this->headers->get('if_none_match'), null, PREG_SPLIT_NO_EMPTY);
     }
 
-    /**
-     * @return bool
-     */
     public function isNoCache(): bool
     {
         return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
@@ -1716,8 +1682,6 @@ class Request
 
     /**
      * Prepares the base URL.
-     *
-     * @return string
      */
     protected function prepareBaseUrl(): string
     {
@@ -1873,8 +1837,7 @@ class Request
         }
     }
 
-    /*
-     * Returns the prefix as encoded in the string when the string starts with
+         * Returns the prefix as encoded in the string when the string starts with
      * the given prefix, false otherwise.
      *
      * @return string|false The prefix as it is encoded in $string, or false

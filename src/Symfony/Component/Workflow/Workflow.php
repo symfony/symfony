@@ -189,17 +189,11 @@ class Workflow
         return $this->name;
     }
 
-    /**
-     * @return Definition
-     */
     public function getDefinition(): Definition
     {
         return $this->definition;
     }
 
-    /**
-     * @return MarkingStoreInterface
-     */
     public function getMarkingStore(): MarkingStoreInterface
     {
         return $this->markingStore;

@@ -31,8 +31,6 @@ class ExecutableFinder
 
     /**
      * Adds new possible suffix to check for executable.
-     *
-     * @param string $suffix
      */
     public function addSuffix(string $suffix): void
     {

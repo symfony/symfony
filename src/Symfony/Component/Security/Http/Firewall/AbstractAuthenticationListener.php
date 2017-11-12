@@ -151,8 +151,6 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * The default implementation only processes requests to a specific path,
      * but a subclass could change this to only authenticate requests where a
      * certain parameters is present.
-     *
-     * @return bool
      */
     protected function requiresAuthentication(Request $request): bool
     {

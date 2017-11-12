@@ -90,38 +90,25 @@ abstract class AbstractDataGenerator
     }
 
     /**
-     * @param string        $sourceDir
-     *
      * @return string[]
      */
     abstract protected function scanLocales(LocaleScanner $scanner, string $sourceDir);
 
-    /**
-     * @param string        $sourceDir
-     * @param string        $tempDir
-     */
     abstract protected function compileTemporaryBundles(GenrbCompiler $compiler, string $sourceDir, string $tempDir): void;
 
     abstract protected function preGenerate(): void;
 
     /**
-     * @param string                $tempDir
-     * @param string                $displayLocale
-     *
      * @return array|null
      */
     abstract protected function generateDataForLocale(BundleReaderInterface $reader, string $tempDir, string $displayLocale): ?array;
 
     /**
-     * @param string                $tempDir
-     *
      * @return array|null
      */
     abstract protected function generateDataForRoot(BundleReaderInterface $reader, string $tempDir): ?array;
 
     /**
-     * @param string                $tempDir
-     *
      * @return array|null
      */
     abstract protected function generateDataForMeta(BundleReaderInterface $reader, string $tempDir): ?array;

@@ -80,8 +80,6 @@ class CliDumper extends AbstractDumper
 
     /**
      * Enables/disables colored output.
-     *
-     * @param bool $colors
      */
     public function setColors(bool $colors): void
     {
@@ -90,8 +88,6 @@ class CliDumper extends AbstractDumper
 
     /**
      * Sets the maximum number of characters per line for dumped strings.
-     *
-     * @param int $maxStringWidth
      */
     public function setMaxStringWidth(int $maxStringWidth): void
     {

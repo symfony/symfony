@@ -506,7 +506,6 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * By default, scanning unreadable directories content throws an AccessDeniedException.
      *
-     * @param bool $ignore
      *
      * @return $this
      */
@@ -608,8 +607,6 @@ class Finder implements \IteratorAggregate, \Countable
 
     /**
      * Check if the any results were found.
-     *
-     * @return bool
      */
     public function hasResults(): bool
     {
@@ -622,8 +619,6 @@ class Finder implements \IteratorAggregate, \Countable
 
     /**
      * Counts all the results collected by the iterators.
-     *
-     * @return int
      */
     public function count(): int
     {

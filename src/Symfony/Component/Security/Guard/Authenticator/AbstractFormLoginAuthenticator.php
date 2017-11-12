@@ -30,15 +30,11 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
 
     /**
      * Return the URL to the login page.
-     *
-     * @return string
      */
     abstract protected function getLoginUrl(): string;
 
     /**
      * Override to change what happens after a bad username/password is submitted.
-     *
-     * @return RedirectResponse
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): RedirectResponse
     {
@@ -59,8 +55,6 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
     /**
      * Override to control what happens when the user hits a secure page
      * but isn't logged in yet.
-     *
-     * @return RedirectResponse
      */
     public function start(Request $request, AuthenticationException $authException = null): RedirectResponse
     {

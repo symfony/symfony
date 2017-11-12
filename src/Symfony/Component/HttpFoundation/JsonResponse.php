@@ -115,7 +115,6 @@ class JsonResponse extends Response
     /**
      * Sets a raw string containing a JSON document to be sent.
      *
-     * @param string $json
      *
      * @return $this
      *
@@ -157,8 +156,6 @@ class JsonResponse extends Response
 
     /**
      * Returns options used while encoding data to JSON.
-     *
-     * @return int
      */
     public function getEncodingOptions(): int
     {
@@ -168,7 +165,6 @@ class JsonResponse extends Response
     /**
      * Sets options used while encoding data to JSON.
      *
-     * @param int $encodingOptions
      *
      * @return $this
      */

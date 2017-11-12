@@ -160,7 +160,6 @@ class IntlDateFormatter
      *                         One of the calendar constants
      * @param string $pattern  Optional pattern to use when formatting
      *
-     * @return self
      *
      * @see http://www.php.net/manual/en/intldateformatter.create.php
      * @see http://userguide.icu-project.org/formatparse/datetime
@@ -580,7 +579,6 @@ class IntlDateFormatter
      * Create and returns a DateTime object with the specified timestamp and with the
      * current time zone.
      *
-     * @param int $timestamp
      *
      * @return \DateTime
      */
@@ -595,8 +593,6 @@ class IntlDateFormatter
 
     /**
      * Returns a pattern string based in the datetype and timetype values.
-     *
-     * @return string
      */
     protected function getDefaultPattern(): string
     {

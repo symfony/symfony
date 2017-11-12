@@ -62,8 +62,6 @@ class ChainLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      * @param int                        $time     The last modification time of the cached template (timestamp)
-     *
-     * @return bool
      */
     public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {

@@ -188,7 +188,6 @@ class Route implements \Serializable
     /**
      * Checks if a scheme requirement has been set.
      *
-     * @param string $scheme
      *
      * @return bool true if the scheme requirement exists, otherwise false
      */

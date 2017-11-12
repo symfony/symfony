@@ -75,8 +75,6 @@ class Comparator
      * Tests against the target.
      *
      * @param mixed $test A test value
-     *
-     * @return bool
      */
     public function test($test): bool
     {

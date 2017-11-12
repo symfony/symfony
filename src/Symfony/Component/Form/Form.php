@@ -925,8 +925,6 @@ class Form implements \IteratorAggregate, FormInterface
      * Returns whether a child with the given name exists (implements the \ArrayAccess interface).
      *
      * @param string $name The name of the child
-     *
-     * @return bool
      */
     public function offsetExists(string $name): bool
     {

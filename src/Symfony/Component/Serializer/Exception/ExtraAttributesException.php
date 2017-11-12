@@ -31,8 +31,6 @@ class ExtraAttributesException extends RuntimeException
 
     /**
      * Get the extra attributes that are not allowed.
-     *
-     * @return array
      */
     public function getExtraAttributes(): array
     {

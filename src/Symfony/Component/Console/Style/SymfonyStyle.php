@@ -278,9 +278,6 @@ class SymfonyStyle extends OutputStyle
         return $progressBar;
     }
 
-    /**
-     * @return string
-     */
     public function askQuestion(Question $question): string
     {
         if ($this->input->isInteractive()) {
@@ -330,8 +327,6 @@ class SymfonyStyle extends OutputStyle
 
     /**
      * Returns a new instance which makes use of stderr if available.
-     *
-     * @return self
      */
     public function getErrorStyle(): self
     {

@@ -50,9 +50,6 @@ class ApplicationDescription
         $this->showHidden = $showHidden;
     }
 
-    /**
-     * @return array
-     */
     public function getNamespaces(): array
     {
         if (null === $this->namespaces) {
@@ -75,10 +72,6 @@ class ApplicationDescription
     }
 
     /**
-     * @param string $name
-     *
-     * @return Command
-     *
      * @throws CommandNotFoundException
      */
     public function getCommand(string $name): Command

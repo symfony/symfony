@@ -51,8 +51,6 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      * the VarDumper component.
      *
      * @param mixed $var
-     *
-     * @return Data
      */
     protected function cloneVar($var): Data
     {

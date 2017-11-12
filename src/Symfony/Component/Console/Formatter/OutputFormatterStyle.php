@@ -187,8 +187,6 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * Applies the style to a given text.
      *
      * @param string $text The text to style
-     *
-     * @return string
      */
     public function apply(string $text): string
     {

@@ -20,8 +20,6 @@ class BufferedOutput extends Output
 
     /**
      * Empties buffer and returns its content.
-     *
-     * @return string
      */
     public function fetch(): string
     {

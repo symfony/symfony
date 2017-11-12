@@ -73,9 +73,6 @@ EOL
         $this->assertContains('[ERROR] The "path" option is only available for the "yaml" format.', $tester->getDisplay());
     }
 
-    /**
-     * @return CommandTester
-     */
     private function createCommandTester(): CommandTester
     {
         $command = $this->application->find('config:dump-reference');

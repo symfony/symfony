@@ -799,7 +799,6 @@ abstract class AbstractNumberFormatterTest extends TestCase
     }
 
     /**
-     * @param string $locale
      * @param null   $style
      * @param null   $pattern
      *
@@ -807,20 +806,9 @@ abstract class AbstractNumberFormatterTest extends TestCase
      */
     abstract protected function getNumberFormatter(string $locale = 'en', $style = null, $pattern = null): \NumberFormatter;
 
-    /**
-     * @return string
-     */
     abstract protected function getIntlErrorMessage(): string;
 
-    /**
-     * @return int
-     */
     abstract protected function getIntlErrorCode(): int;
 
-    /**
-     * @param int $errorCode
-     *
-     * @return bool
-     */
     abstract protected function isIntlFailure(int $errorCode): bool;
 }

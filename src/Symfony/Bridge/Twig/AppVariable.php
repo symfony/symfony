@@ -151,8 +151,6 @@ class AppVariable
      *  * getFlashes() returns all the flash messages
      *  * getFlashes('notice') returns a simple array with flash messages of that type
      *  * getFlashes(array('notice', 'error')) returns a nested array of type => messages.
-     *
-     * @return array
      */
     public function getFlashes($types = null): array
     {

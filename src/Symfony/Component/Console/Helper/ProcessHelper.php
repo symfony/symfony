@@ -106,8 +106,6 @@ class ProcessHelper extends Helper
      * @param OutputInterface $output   An OutputInterface interface
      * @param Process         $process  The Process
      * @param callable|null   $callback A PHP callable
-     *
-     * @return callable
      */
     public function wrapCallback(OutputInterface $output, Process $process, callable $callback = null): callable
     {

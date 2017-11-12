@@ -314,11 +314,6 @@ class SymfonyTestsListenerTrait
         $this->gatheredDeprecations[] = $msg;
     }
 
-    /**
-     * @param TestCase $test
-     *
-     * @return bool
-     */
     private function willBeIsolated(TestCase $test): bool
     {
         if ($test->isInIsolation()) {

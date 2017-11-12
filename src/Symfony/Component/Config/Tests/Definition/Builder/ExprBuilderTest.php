@@ -207,8 +207,6 @@ class ExprBuilderTest extends TestCase
 
     /**
      * Create a test treebuilder with a variable node, and init the validation.
-     *
-     * @return TreeBuilder
      */
     protected function getTestBuilder(): TreeBuilder
     {

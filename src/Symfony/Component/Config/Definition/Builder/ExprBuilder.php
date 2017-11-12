@@ -90,8 +90,6 @@ class ExprBuilder
 
     /**
      * Tests if the value is empty.
-     *
-     * @return ExprBuilder
      */
     public function ifEmpty(): ExprBuilder
     {
@@ -178,7 +176,6 @@ class ExprBuilder
      *
      * if you want to add the value of the node in your message just use a %s placeholder.
      *
-     * @param string $message
      *
      * @return $this
      *
@@ -228,8 +225,6 @@ class ExprBuilder
      * Builds the expressions.
      *
      * @param ExprBuilder[] $expressions An array of ExprBuilder instances to build
-     *
-     * @return array
      */
     public static function buildExpressions(array $expressions): array
     {

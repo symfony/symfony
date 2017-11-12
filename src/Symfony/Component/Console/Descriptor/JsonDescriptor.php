@@ -100,9 +100,6 @@ class JsonDescriptor extends Descriptor
         $this->write(json_encode($data, isset($options['json_encoding']) ? $options['json_encoding'] : 0));
     }
 
-    /**
-     * @return array
-     */
     private function getInputArgumentData(InputArgument $argument): array
     {
         return array(
@@ -114,9 +111,6 @@ class JsonDescriptor extends Descriptor
         );
     }
 
-    /**
-     * @return array
-     */
     private function getInputOptionData(InputOption $option): array
     {
         return array(
@@ -130,9 +124,6 @@ class JsonDescriptor extends Descriptor
         );
     }
 
-    /**
-     * @return array
-     */
     private function getInputDefinitionData(InputDefinition $definition): array
     {
         $inputArguments = array();
@@ -148,9 +139,6 @@ class JsonDescriptor extends Descriptor
         return array('arguments' => $inputArguments, 'options' => $inputOptions);
     }
 
-    /**
-     * @return array
-     */
     private function getCommandData(Command $command): array
     {
         $command->getSynopsis();

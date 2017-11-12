@@ -26,8 +26,6 @@ class Alias
 
     /**
      * Checks if this DI Alias should be public or not.
-     *
-     * @return bool
      */
     public function isPublic(): bool
     {
@@ -57,7 +55,6 @@ class Alias
      * but triggers a deprecation notice when accessed from the container,
      * so that the alias can be made really private in 4.0.
      *
-     * @param bool $boolean
      *
      * @return $this
      */
@@ -70,8 +67,6 @@ class Alias
 
     /**
      * Whether this alias is private.
-     *
-     * @return bool
      */
     public function isPrivate(): bool
     {

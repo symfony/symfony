@@ -44,7 +44,6 @@ class TreeBuilder implements NodeParentInterface
     /**
      * Builds the tree.
      *
-     * @return NodeInterface
      *
      * @throws \RuntimeException
      */

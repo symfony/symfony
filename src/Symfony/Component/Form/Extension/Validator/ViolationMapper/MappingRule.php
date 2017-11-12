@@ -30,9 +30,6 @@ class MappingRule
         $this->targetPath = $targetPath;
     }
 
-    /**
-     * @return FormInterface
-     */
     public function getOrigin(): FormInterface
     {
         return $this->origin;
@@ -72,8 +69,6 @@ class MappingRule
     }
 
     /**
-     * @return FormInterface
-     *
      * @throws ErrorMappingException
      */
     public function getTarget(): FormInterface

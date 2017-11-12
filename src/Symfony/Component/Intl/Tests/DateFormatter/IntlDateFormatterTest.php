@@ -214,8 +214,6 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
      * Also in intl, format like 'ss E' for '10 2' (2nd day of year
      * + 10 seconds) are added, then we have 86,400 seconds (24h * 60min * 60s)
      * + 10 seconds
-     *
-     * @return array
      */
     private function notImplemented(array $dataSets): array
     {

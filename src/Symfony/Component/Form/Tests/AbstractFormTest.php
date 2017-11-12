@@ -52,20 +52,12 @@ abstract class AbstractFormTest extends TestCase
      */
     abstract protected function createForm(): \Symfony\Component\Form\FormInterface;
 
-    /**
-     * @param string                   $name
-     * @param string                   $dataClass
-     *
-     * @return FormBuilder
-     */
     protected function getBuilder(string $name = 'name', EventDispatcherInterface $dispatcher = null, string $dataClass = null, array $options = array()): FormBuilder
     {
         return new FormBuilder($name, $dataClass, $dispatcher ?: $this->dispatcher, $this->factory, $options);
     }
 
     /**
-     * @param string $name
-     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function getMockForm(string $name = 'name'): \PHPUnit_Framework_MockObject_MockObject

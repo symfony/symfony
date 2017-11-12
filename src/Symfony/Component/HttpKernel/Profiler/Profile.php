@@ -78,8 +78,6 @@ class Profile
 
     /**
      * Returns the parent profile.
-     *
-     * @return self
      */
     public function getParent(): self
     {
@@ -108,8 +106,6 @@ class Profile
 
     /**
      * Sets the IP.
-     *
-     * @param string $ip
      */
     public function setIp(string $ip): void
     {
@@ -168,17 +164,11 @@ class Profile
         $this->time = $time;
     }
 
-    /**
-     * @param int $statusCode
-     */
     public function setStatusCode(int $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
 
-    /**
-     * @return int
-     */
     public function getStatusCode(): int
     {
         return $this->statusCode;
@@ -269,8 +259,6 @@ class Profile
      * Returns true if a Collector for the given name exists.
      *
      * @param string $name A collector name
-     *
-     * @return bool
      */
     public function hasCollector(string $name): bool
     {

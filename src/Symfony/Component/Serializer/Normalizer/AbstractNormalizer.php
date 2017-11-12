@@ -85,8 +85,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Set circular reference limit.
      *
      * @param int $circularReferenceLimit Limit of iterations for the same object
-     *
-     * @return self
      */
     public function setCircularReferenceLimit(int $circularReferenceLimit): self
     {
@@ -99,8 +97,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Set circular reference handler.
      *
      * @param callable $circularReferenceHandler
-     *
-     * @return self
      */
     public function setCircularReferenceHandler(callable $circularReferenceHandler): self
     {
@@ -114,7 +110,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @param callable[] $callbacks Help normalize the result
      *
-     * @return self
      *
      * @throws InvalidArgumentException if a non-callable callback is set
      */
@@ -135,8 +130,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
     /**
      * Set ignored attributes for normalization and denormalization.
-     *
-     * @return self
      */
     public function setIgnoredAttributes(array $ignoredAttributes): self
     {
@@ -151,7 +144,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @param object $object
      * @param array  $context
      *
-     * @return bool
      *
      * @throws CircularReferenceException
      */
@@ -237,8 +229,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @param object|string $classOrObject
      * @param string        $attribute
      * @param string|null   $format
-     *
-     * @return bool
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array()): bool
     {
@@ -263,8 +253,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * the denormalization process.
      *
      * @param object|array $data
-     *
-     * @return array
      */
     protected function prepareForDenormalization($data): array
     {
@@ -275,7 +263,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Returns the method to use to construct an object. This method must be either
      * the object constructor or static.
      *
-     * @param string           $class
      * @param \ReflectionClass $reflectionClass
      * @param array|bool       $allowedAttributes
      *
@@ -294,7 +281,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * is removed from the context before being returned to avoid side effects
      * when recursively normalizing an object graph.
      *
-     * @param string           $class
      * @param \ReflectionClass $reflectionClass
      * @param array|bool       $allowedAttributes
      * @param string|null      $format
@@ -371,10 +357,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     }
 
     /**
-     * @param string $attribute
-     *
-     * @return array
-     *
      * @internal
      */
     protected function createChildContext(array $parentContext, string $attribute): array

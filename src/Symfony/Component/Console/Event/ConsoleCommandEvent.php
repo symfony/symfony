@@ -30,8 +30,6 @@ class ConsoleCommandEvent extends ConsoleEvent
 
     /**
      * Disables the command, so it won't be run.
-     *
-     * @return bool
      */
     public function disableCommand(): bool
     {
@@ -40,8 +38,6 @@ class ConsoleCommandEvent extends ConsoleEvent
 
     /**
      * Enables the command.
-     *
-     * @return bool
      */
     public function enableCommand(): bool
     {
@@ -50,8 +46,6 @@ class ConsoleCommandEvent extends ConsoleEvent
 
     /**
      * Returns true if the command is runnable, false otherwise.
-     *
-     * @return bool
      */
     public function commandShouldRun(): bool
     {

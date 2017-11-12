@@ -91,9 +91,6 @@ abstract class Descriptor implements DescriptorInterface
 
     /**
      * Writes content to output.
-     *
-     * @param string $content
-     * @param bool   $decorated
      */
     protected function write(string $content, bool $decorated = false): void
     {
@@ -173,8 +170,6 @@ abstract class Descriptor implements DescriptorInterface
      * Formats a value as string.
      *
      * @param mixed $value
-     *
-     * @return string
      */
     protected function formatValue($value): string
     {
@@ -193,8 +188,6 @@ abstract class Descriptor implements DescriptorInterface
      * Formats a parameter.
      *
      * @param mixed $value
-     *
-     * @return string
      */
     protected function formatParameter($value): string
     {
@@ -212,8 +205,6 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param string $serviceId
-     *
      * @return mixed
      */
     protected function resolveServiceDefinition(ContainerBuilder $builder, string $serviceId)
@@ -231,11 +222,6 @@ abstract class Descriptor implements DescriptorInterface
         return $builder->get($serviceId);
     }
 
-    /**
-     * @param bool $showPrivate
-     *
-     * @return array
-     */
     protected function findDefinitionsByTag(ContainerBuilder $builder, bool $showPrivate): array
     {
         $definitions = array();

@@ -98,8 +98,6 @@ class ArrayInput extends Input
 
     /**
      * Returns a stringified representation of the args passed to the command.
-     *
-     * @return string
      */
     public function __toString(): string
     {

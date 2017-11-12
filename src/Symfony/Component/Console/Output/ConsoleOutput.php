@@ -94,8 +94,6 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Returns true if current environment supports writing console output to
      * STDOUT.
-     *
-     * @return bool
      */
     protected function hasStdoutSupport(): bool
     {
@@ -105,8 +103,6 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Returns true if current environment supports writing console output to
      * STDERR.
-     *
-     * @return bool
      */
     protected function hasStderrSupport(): bool
     {
@@ -116,8 +112,6 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Checks if current executing environment is IBM iSeries (OS400), which
      * doesn't properly convert character-encodings between ASCII to EBCDIC.
-     *
-     * @return bool
      */
     private function isRunningOS400(): bool
     {

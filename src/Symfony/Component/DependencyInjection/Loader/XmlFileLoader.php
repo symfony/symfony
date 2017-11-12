@@ -87,7 +87,6 @@ class XmlFileLoader extends FileLoader
      * Parses parameters.
      *
      * @param \DOMDocument $xml
-     * @param string       $file
      */
     private function parseParameters(\DOMDocument $xml, string $file): void
     {
@@ -100,7 +99,6 @@ class XmlFileLoader extends FileLoader
      * Parses imports.
      *
      * @param \DOMDocument $xml
-     * @param string       $file
      */
     private function parseImports(\DOMDocument $xml, string $file): void
     {
@@ -122,7 +120,6 @@ class XmlFileLoader extends FileLoader
      * Parses multiple definitions.
      *
      * @param \DOMDocument $xml
-     * @param string       $file
      */
     private function parseDefinitions(\DOMDocument $xml, string $file, $defaults): void
     {
@@ -155,8 +152,6 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Get service defaults.
-     *
-     * @return array
      */
     private function getServiceDefaults(\DOMDocument $xml, $file): array
     {
@@ -194,7 +189,6 @@ class XmlFileLoader extends FileLoader
      * Parses an individual Definition.
      *
      * @param \DOMElement $service
-     * @param string      $file
      *
      * @return Definition|null
      */
@@ -390,8 +384,6 @@ class XmlFileLoader extends FileLoader
      * Processes anonymous services.
      *
      * @param \DOMDocument $xml
-     * @param string       $file
-     * @param array        $defaults
      */
     private function processAnonymousServices(\DOMDocument $xml, string $file, array $defaults): void
     {
@@ -441,9 +433,6 @@ class XmlFileLoader extends FileLoader
      * Returns arguments as valid php types.
      *
      * @param \DOMElement $node
-     * @param string      $name
-     * @param string      $file
-     * @param bool        $lowercase
      *
      * @return mixed
      */
@@ -525,8 +514,6 @@ class XmlFileLoader extends FileLoader
      *
      * @param \DOMNode $node
      * @param mixed    $name
-     *
-     * @return array
      */
     private function getChildren(\DOMNode $node, $name): array
     {
@@ -545,7 +532,6 @@ class XmlFileLoader extends FileLoader
      *
      * @param \DOMDocument $dom
      *
-     * @return bool
      *
      * @throws RuntimeException When extension references a non-existent XSD file
      */
@@ -618,7 +604,6 @@ EOF
      * Validates an alias.
      *
      * @param \DOMElement $alias
-     * @param string      $file
      */
     private function validateAlias(\DOMElement $alias, string $file): void
     {
@@ -639,7 +624,6 @@ EOF
      * Validates an extension.
      *
      * @param \DOMDocument $dom
-     * @param string       $file
      *
      * @throws InvalidArgumentException When no extension is found corresponding to a tag
      */

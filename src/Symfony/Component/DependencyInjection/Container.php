@@ -76,8 +76,6 @@ class Container implements ResettableContainerInterface
 
     /**
      * Returns true if the container is compiled.
-     *
-     * @return bool
      */
     public function isCompiled(): bool
     {
@@ -304,8 +302,6 @@ class Container implements ResettableContainerInterface
 
     /**
      * Gets service ids that existed at compile time.
-     *
-     * @return array
      */
     public function getRemovedIds(): array
     {

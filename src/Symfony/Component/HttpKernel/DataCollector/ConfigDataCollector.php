@@ -149,8 +149,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Returns the minor Symfony version used (without patch numbers of extra
      * suffix like "RC", "beta", etc.).
-     *
-     * @return string
      */
     public function getSymfonyMinorVersion(): string
     {
@@ -160,8 +158,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Returns the human redable date when this Symfony version ends its
      * maintenance period.
-     *
-     * @return string
      */
     public function getSymfonyEom(): string
     {
@@ -171,8 +167,6 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Returns the human redable date when this Symfony version reaches its
      * "end of life" and won't receive bugs or security fixes.
-     *
-     * @return string
      */
     public function getSymfonyEol(): string
     {
@@ -207,17 +201,11 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['php_architecture'];
     }
 
-    /**
-     * @return string
-     */
     public function getPhpIntlLocale(): string
     {
         return $this->data['php_intl_locale'];
     }
 
-    /**
-     * @return string
-     */
     public function getPhpTimezone(): string
     {
         return $this->data['php_timezone'];

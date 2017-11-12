@@ -67,7 +67,6 @@ class ExpressionFunction
      * @param string      $phpFunctionName        The PHP function name
      * @param string|null $expressionFunctionName The expression function name (default: same than the PHP function name)
      *
-     * @return self
      *
      * @throws \InvalidArgumentException if given PHP function name does not exist
      * @throws \InvalidArgumentException if given PHP function name is in namespace

@@ -195,9 +195,6 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->assertSame(0, $violationsCount = count($this->context->getViolations()), sprintf('0 violation expected. Got %u.', $violationsCount));
     }
 
-    /**
-     * @return ConstraintViolationAssertion
-     */
     protected function buildViolation($message): ConstraintViolationAssertion
     {
         return new ConstraintViolationAssertion($this->context, $message, $this->constraint);

@@ -79,7 +79,6 @@ class ContainerAwareEventManager extends EventManager
     /**
      * Checks whether an event has any registered listeners.
      *
-     * @param string $event
      *
      * @return bool TRUE if the specified event has any listeners, FALSE otherwise
      */

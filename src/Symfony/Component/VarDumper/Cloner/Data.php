@@ -373,7 +373,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Dumps children of hash structures.
      *
-     * @param DumperInterface $dumper
      * @param Cursor          $parentCursor The cursor of the parent hash
      * @param array           &$refs        A map of all references discovered while dumping
      * @param array           $children     The children to dump

@@ -55,8 +55,6 @@ class PluralizationRulesTest extends TestCase
      * This array should contain all currently known langcodes.
      *
      * As it is impossible to have this ever complete we should try as hard as possible to have it almost complete.
-     *
-     * @return array
      */
     public function successLangcodes(): array
     {
@@ -93,7 +91,6 @@ class PluralizationRulesTest extends TestCase
      *
      * @param string $nplural       Plural expected
      * @param array  $matrix        Containing langcodes and their plural index values
-     * @param bool   $expectSuccess
      */
     protected function validateMatrix(string $nplural, array $matrix, bool $expectSuccess = true): void
     {

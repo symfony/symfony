@@ -56,9 +56,6 @@ class SingleStateMarkingStore implements MarkingStoreInterface
         $this->propertyAccessor->setValue($subject, $this->property, key($marking->getPlaces()));
     }
 
-    /**
-     * @return string
-     */
     public function getProperty(): string
     {
         return $this->property;

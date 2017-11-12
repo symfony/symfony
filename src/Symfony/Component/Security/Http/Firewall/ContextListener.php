@@ -64,8 +64,6 @@ class ContextListener implements ListenerInterface
 
     /**
      * Enables deauthentication during refreshUser when the user has changed.
-     *
-     * @param bool $logoutOnUserChange
      */
     public function setLogoutOnUserChange(bool $logoutOnUserChange): void
     {

@@ -78,7 +78,6 @@ class Locale
      *
      * @param string $langtag      The language tag to check
      * @param string $locale       The language range to check against
-     * @param bool   $canonicalize
      *
      * @return string The corresponding locale code
      *

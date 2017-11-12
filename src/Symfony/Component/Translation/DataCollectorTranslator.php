@@ -109,9 +109,6 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         return call_user_func_array(array($this->translator, $method), $args);
     }
 
-    /**
-     * @return array
-     */
     public function getCollectedMessages(): array
     {
         return $this->messages;
@@ -120,8 +117,6 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * @param string|null $locale
      * @param string|null $domain
-     * @param string      $id
-     * @param string      $translation
      * @param array|null  $parameters
      * @param int|null    $number
      */

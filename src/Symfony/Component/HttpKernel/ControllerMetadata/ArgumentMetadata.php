@@ -37,8 +37,6 @@ class ArgumentMetadata
 
     /**
      * Returns the name as given in PHP, $foo would yield "foo".
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -49,8 +47,6 @@ class ArgumentMetadata
      * Returns the type of the argument.
      *
      * The type is the PHP class in 5.5+ and additionally the basic type in PHP 7.0+.
-     *
-     * @return string
      */
     public function getType(): string
     {
@@ -59,8 +55,6 @@ class ArgumentMetadata
 
     /**
      * Returns whether the argument is defined as "...$variadic".
-     *
-     * @return bool
      */
     public function isVariadic(): bool
     {
@@ -71,8 +65,6 @@ class ArgumentMetadata
      * Returns whether the argument has a default value.
      *
      * Implies whether an argument is optional.
-     *
-     * @return bool
      */
     public function hasDefaultValue(): bool
     {
@@ -81,8 +73,6 @@ class ArgumentMetadata
 
     /**
      * Returns whether the argument accepts null values.
-     *
-     * @return bool
      */
     public function isNullable(): bool
     {

@@ -270,8 +270,6 @@ abstract class DoctrineType extends AbstractType
      *
      * @param mixed  $queryBuilder
      * @param string $class
-     *
-     * @return EntityLoaderInterface
      */
     abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class): EntityLoaderInterface;
 

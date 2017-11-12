@@ -410,11 +410,6 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * Guesses how to read the property value.
-     *
-     * @param string $class
-     * @param string $property
-     *
-     * @return array
      */
     private function getReadAccessInfo(string $class, string $property): array
     {
@@ -781,12 +776,8 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Creates the APCu adapter if applicable.
      *
-     * @param string               $namespace
-     * @param int                  $defaultLifetime
-     * @param string               $version
      * @param LoggerInterface|null $logger
      *
-     * @return AdapterInterface
      *
      * @throws RuntimeException When the Cache Component isn't available
      */

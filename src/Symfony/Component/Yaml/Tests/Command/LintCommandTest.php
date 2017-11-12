@@ -103,9 +103,6 @@ YAML;
         return $filename;
     }
 
-    /**
-     * @return CommandTester
-     */
     protected function createCommandTester(): CommandTester
     {
         $application = new Application();

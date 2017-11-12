@@ -46,8 +46,6 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
 
     /**
      * Set a query string to use in order to find a DN for the username.
-     *
-     * @param string $queryString
      */
     public function setQueryString(string $queryString): void
     {

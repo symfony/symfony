@@ -113,9 +113,6 @@ class TranslationDefaultDomainNodeVisitor extends AbstractNodeVisitor
         return -10;
     }
 
-    /**
-     * @return bool
-     */
     private function isNamedArguments($arguments): bool
     {
         foreach ($arguments as $name => $node) {

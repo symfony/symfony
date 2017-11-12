@@ -41,9 +41,6 @@ class RouterMatchCommandTest extends TestCase
         $this->assertContains('None of the routes match the path "/test"', $tester->getDisplay());
     }
 
-    /**
-     * @return CommandTester
-     */
     private function createCommandTester(): CommandTester
     {
         $application = new Application($this->getKernel());

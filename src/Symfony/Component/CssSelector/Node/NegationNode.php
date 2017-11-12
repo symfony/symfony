@@ -32,17 +32,11 @@ class NegationNode extends AbstractNode
         $this->subSelector = $subSelector;
     }
 
-    /**
-     * @return NodeInterface
-     */
     public function getSelector(): NodeInterface
     {
         return $this->selector;
     }
 
-    /**
-     * @return NodeInterface
-     */
     public function getSubSelector(): NodeInterface
     {
         return $this->subSelector;

@@ -100,9 +100,6 @@ class TwigExtractorTest extends TestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function resourcesWithSyntaxErrorsProvider(): array
     {
         return array(
@@ -134,9 +131,6 @@ class TwigExtractorTest extends TestCase
         $this->assertEquals('Hi!', $catalogue->get('Hi!', 'messages'));
     }
 
-    /**
-     * @return array
-     */
     public function resourceProvider(): array
     {
         $directory = __DIR__.'/../Fixtures/extractor/';

@@ -55,8 +55,6 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
 
     /**
      * Returns the singleton instance.
-     *
-     * @return self
      */
     public static function getInstance(): self
     {

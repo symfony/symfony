@@ -29,8 +29,6 @@ class FormEvent extends Event
 
     /**
      * Returns the form at the source of the event.
-     *
-     * @return FormInterface
      */
     public function getForm(): FormInterface
     {

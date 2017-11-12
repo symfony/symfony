@@ -97,8 +97,6 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
 
     /**
      * Returns the name of the member.
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -125,8 +123,6 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      * Returns whether this member is public.
      *
      * @param object|string $objectOrClassName The object or the class name
-     *
-     * @return bool
      */
     public function isPublic($objectOrClassName): bool
     {
@@ -137,8 +133,6 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      * Returns whether this member is protected.
      *
      * @param object|string $objectOrClassName The object or the class name
-     *
-     * @return bool
      */
     public function isProtected($objectOrClassName): bool
     {
@@ -149,8 +143,6 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      * Returns whether this member is private.
      *
      * @param object|string $objectOrClassName The object or the class name
-     *
-     * @return bool
      */
     public function isPrivate($objectOrClassName): bool
     {

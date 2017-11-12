@@ -380,7 +380,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     }
 
     /**
-     * @param string $name
      * @param mixed  $value
      */
     public function addGlobal(string $name, $value): void
@@ -390,8 +389,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
 
     /**
      * Returns the assigned globals.
-     *
-     * @return array
      */
     public function getGlobals(): array
     {

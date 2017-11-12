@@ -56,8 +56,6 @@ class Token
      *
      * @param array|int   $type  The type to test
      * @param string|null $value The token value
-     *
-     * @return bool
      */
     public function test($type, $value = null): bool
     {

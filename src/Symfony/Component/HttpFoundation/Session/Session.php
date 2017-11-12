@@ -223,8 +223,6 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
 
     /**
      * Gets the flashbag interface.
-     *
-     * @return FlashBagInterface
      */
     public function getFlashBag(): FlashBagInterface
     {
@@ -235,8 +233,6 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      * Gets the attributebag interface.
      *
      * Note that this method was added to help with IDE autocompletion.
-     *
-     * @return AttributeBagInterface
      */
     private function getAttributeBag(): AttributeBagInterface
     {

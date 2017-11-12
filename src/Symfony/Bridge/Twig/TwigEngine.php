@@ -111,7 +111,6 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
      * @param string|TemplateReferenceInterface|Template $name A template name or an instance of
      *                                                         TemplateReferenceInterface or Template
      *
-     * @return Template
      *
      * @throws \InvalidArgumentException if the template does not exist
      */

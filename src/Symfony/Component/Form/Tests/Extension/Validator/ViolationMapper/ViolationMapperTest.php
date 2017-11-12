@@ -96,17 +96,11 @@ class ViolationMapperTest extends TestCase
         return $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
     }
 
-    /**
-     * @return ConstraintViolation
-     */
     protected function getConstraintViolation($propertyPath): ConstraintViolation
     {
         return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, $propertyPath, null);
     }
 
-    /**
-     * @return FormError
-     */
     protected function getFormError(ConstraintViolationInterface $violation, FormInterface $form): FormError
     {
         $error = new FormError($this->message, $this->messageTemplate, $this->params, null, $violation);

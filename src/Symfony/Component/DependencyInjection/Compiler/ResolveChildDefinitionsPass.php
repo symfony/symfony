@@ -48,7 +48,6 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
     /**
      * Resolves the definition.
      *
-     * @return Definition
      *
      * @throws RuntimeException When the definition is invalid
      */

@@ -63,17 +63,11 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         }, 0);
     }
 
-    /**
-     * @return Data
-     */
     public function getCalls(): Data
     {
         return $this->data['calls'];
     }
 
-    /**
-     * @return int
-     */
     public function getViolationsCount(): int
     {
         return $this->data['violations_count'];

@@ -146,8 +146,6 @@ abstract class Bundle implements BundleInterface
 
     /**
      * Returns the bundle's container extension class.
-     *
-     * @return string
      */
     protected function getContainerExtensionClass(): string
     {

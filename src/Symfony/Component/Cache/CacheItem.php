@@ -133,8 +133,6 @@ final class CacheItem implements CacheItemInterface
 
     /**
      * Returns the list of tags bound to the value coming from the pool storage if any.
-     *
-     * @return array
      */
     public function getPreviousTags(): array
     {
@@ -146,7 +144,6 @@ final class CacheItem implements CacheItemInterface
      *
      * @param string $key The key to validate
      *
-     * @return string
      *
      * @throws InvalidArgumentException When $key is not valid
      */

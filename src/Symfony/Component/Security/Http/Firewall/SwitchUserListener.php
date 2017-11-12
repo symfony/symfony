@@ -106,7 +106,6 @@ class SwitchUserListener implements ListenerInterface
      * Attempts to switch to another user.
      *
      * @param Request $request  A Request instance
-     * @param string  $username
      *
      * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
      *

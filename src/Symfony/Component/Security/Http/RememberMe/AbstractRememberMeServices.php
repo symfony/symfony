@@ -68,17 +68,12 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Returns the parameter that is used for checking whether remember-me
      * services have been requested.
-     *
-     * @return string
      */
     public function getRememberMeParameter(): string
     {
         return $this->options['remember_me_parameter'];
     }
 
-    /**
-     * @return string
-     */
     public function getSecret(): string
     {
         return $this->secret;
@@ -205,8 +200,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Subclasses should validate the cookie and do any additional processing
      * that is required. This is called from autoLogin().
-     *
-     * @return UserInterface
      */
     abstract protected function processAutoLoginCookie(array $cookieParts, Request $request): UserInterface;
 
@@ -234,10 +227,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
 
     /**
      * Decodes the raw cookie value.
-     *
-     * @param string $rawCookie
-     *
-     * @return array
      */
     protected function decodeCookie(string $rawCookie): array
     {
@@ -247,7 +236,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Encodes the cookie parts.
      *
-     * @return string
      *
      * @throws \InvalidArgumentException When $cookieParts contain the cookie delimiter. Extending class should either remove or escape it.
      */
@@ -276,8 +264,6 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
 
     /**
      * Checks whether remember-me capabilities were requested.
-     *
-     * @return bool
      */
     protected function isRememberMeRequested(Request $request): bool
     {

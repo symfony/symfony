@@ -48,8 +48,6 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      *
      * @param mixed  $data   Data to normalize
      * @param string $format The format being (de-)serialized from or into
-     *
-     * @return bool
      */
     public function supportsNormalization($data, $format = null): bool
     {
@@ -62,8 +60,6 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      * @param mixed  $data   Data to denormalize from
      * @param string $type   The class to which the data should be denormalized
      * @param string $format The format being deserialized from
-     *
-     * @return bool
      */
     public function supportsDenormalization($data, $type, $format = null): bool
     {

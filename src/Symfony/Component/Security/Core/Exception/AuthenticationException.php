@@ -25,8 +25,6 @@ class AuthenticationException extends \RuntimeException implements \Serializable
 
     /**
      * Get the token.
-     *
-     * @return TokenInterface
      */
     public function getToken(): TokenInterface
     {
@@ -62,8 +60,6 @@ class AuthenticationException extends \RuntimeException implements \Serializable
 
     /**
      * Message key to be used by the translation component.
-     *
-     * @return string
      */
     public function getMessageKey(): string
     {
@@ -72,8 +68,6 @@ class AuthenticationException extends \RuntimeException implements \Serializable
 
     /**
      * Message data to be used by the translation component.
-     *
-     * @return array
      */
     public function getMessageData(): array
     {

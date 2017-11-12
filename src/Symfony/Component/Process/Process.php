@@ -210,7 +210,6 @@ class Process implements \IteratorAggregate
      * @param callable|null $callback
      * @param array         $env      An array of additional env vars to set when running the process
      *
-     * @return self
      *
      * @throws ProcessFailedException if the process didn't terminate successfully
      *
@@ -467,8 +466,6 @@ class Process implements \IteratorAggregate
 
     /**
      * Returns true in case the output is disabled, false otherwise.
-     *
-     * @return bool
      */
     public function isOutputDisabled(): bool
     {
@@ -696,7 +693,6 @@ class Process implements \IteratorAggregate
      *
      * It always returns false on Windows.
      *
-     * @return bool
      *
      * @throws LogicException In case the process is not terminated
      */
@@ -712,7 +708,6 @@ class Process implements \IteratorAggregate
      *
      * It is only meaningful if hasBeenSignaled() returns true.
      *
-     * @return int
      *
      * @throws RuntimeException In case --enable-sigchild is activated
      * @throws LogicException   In case the process is not terminated
@@ -733,7 +728,6 @@ class Process implements \IteratorAggregate
      *
      * It always returns false on Windows.
      *
-     * @return bool
      *
      * @throws LogicException In case the process is not terminated
      */
@@ -749,7 +743,6 @@ class Process implements \IteratorAggregate
      *
      * It is only meaningful if hasBeenStopped() returns true.
      *
-     * @return int
      *
      * @throws LogicException In case the process is not terminated
      */
@@ -1005,10 +998,6 @@ class Process implements \IteratorAggregate
 
     /**
      * Sets PTY mode.
-     *
-     * @param bool $bool
-     *
-     * @return self
      */
     public function setPty(bool $bool): self
     {
@@ -1019,8 +1008,6 @@ class Process implements \IteratorAggregate
 
     /**
      * Returns PTY state.
-     *
-     * @return bool
      */
     public function isPty(): bool
     {
@@ -1129,7 +1116,6 @@ class Process implements \IteratorAggregate
     /**
      * Sets whether environment variables will be inherited or not.
      *
-     * @param bool $inheritEnv
      *
      * @return self The current Process instance
      */
@@ -1171,8 +1157,6 @@ class Process implements \IteratorAggregate
 
     /**
      * Returns whether PTY is supported on the current operating system.
-     *
-     * @return bool
      */
     public static function isPtySupported(): bool
     {
@@ -1268,8 +1252,6 @@ class Process implements \IteratorAggregate
 
     /**
      * Returns whether PHP has been compiled with the '--enable-sigchild' option or not.
-     *
-     * @return bool
      */
     protected function isSigchildEnabled(): bool
     {

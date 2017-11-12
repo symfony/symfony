@@ -51,8 +51,6 @@ class TranslationWriter implements TranslationWriterInterface
 
     /**
      * Obtains the list of supported formats.
-     *
-     * @return array
      */
     public function getFormats(): array
     {

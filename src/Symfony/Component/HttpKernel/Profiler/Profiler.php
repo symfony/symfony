@@ -87,8 +87,6 @@ class Profiler
 
     /**
      * Saves a Profile.
-     *
-     * @return bool
      */
     public function saveProfile(Profile $profile): bool
     {
@@ -211,8 +209,6 @@ class Profiler
      * Returns true if a Collector for the given name exists.
      *
      * @param string $name A collector name
-     *
-     * @return bool
      */
     public function has(string $name): bool
     {

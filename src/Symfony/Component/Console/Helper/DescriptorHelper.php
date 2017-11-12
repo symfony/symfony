@@ -70,7 +70,6 @@ class DescriptorHelper extends Helper
     /**
      * Registers a descriptor.
      *
-     * @param string $format
      *
      * @return $this
      */

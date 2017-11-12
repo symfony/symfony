@@ -45,8 +45,6 @@ class ChoiceQuestion extends Question
 
     /**
      * Returns available choices.
-     *
-     * @return array
      */
     public function getChoices(): array
     {
@@ -58,7 +56,6 @@ class ChoiceQuestion extends Question
      *
      * When multiselect is set to true, multiple choices can be answered.
      *
-     * @param bool $multiselect
      *
      * @return $this
      */
@@ -72,8 +69,6 @@ class ChoiceQuestion extends Question
 
     /**
      * Returns whether the choices are multiselect.
-     *
-     * @return bool
      */
     public function isMultiselect(): bool
     {
@@ -82,8 +77,6 @@ class ChoiceQuestion extends Question
 
     /**
      * Gets the prompt for choices.
-     *
-     * @return string
      */
     public function getPrompt(): string
     {
@@ -93,7 +86,6 @@ class ChoiceQuestion extends Question
     /**
      * Sets the prompt for choices.
      *
-     * @param string $prompt
      *
      * @return $this
      */
@@ -109,7 +101,6 @@ class ChoiceQuestion extends Question
      *
      * The error message has a string placeholder (%s) for the invalid value.
      *
-     * @param string $errorMessage
      *
      * @return $this
      */

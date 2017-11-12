@@ -43,8 +43,6 @@ class PhpArrayCache implements CacheInterface, PruneableInterface, ResettableInt
      * This adapter takes advantage of how PHP stores arrays in its latest versions.
      *
      * @param string $file The PHP file were values are cached
-     *
-     * @return CacheInterface
      */
     public static function create(string $file, CacheInterface $fallbackPool): CacheInterface
     {

@@ -37,8 +37,6 @@ class FilterResponseEvent extends KernelEvent
 
     /**
      * Returns the current response object.
-     *
-     * @return Response
      */
     public function getResponse(): Response
     {

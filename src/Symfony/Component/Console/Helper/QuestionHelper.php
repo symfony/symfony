@@ -167,7 +167,7 @@ class QuestionHelper extends Helper
     /**
      * Autocompletes a question.
      *
-     * @param resource        $inputStream
+     * @param resource $inputStream
      */
     private function autocomplete(OutputInterface $output, Question $question, $inputStream): string
     {

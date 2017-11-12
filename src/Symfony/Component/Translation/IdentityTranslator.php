@@ -32,7 +32,7 @@ class IdentityTranslator implements TranslatorInterface
     /**
      * {@inheritdoc}
      */
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
         $this->locale = $locale;
     }

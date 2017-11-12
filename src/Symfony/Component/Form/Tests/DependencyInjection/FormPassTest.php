@@ -28,7 +28,7 @@ use Symfony\Component\Form\FormRegistryInterface;
  */
 class FormPassTest extends TestCase
 {
-    public function testDoNothingIfFormExtensionNotLoaded()
+    public function testDoNothingIfFormExtensionNotLoaded(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -37,7 +37,7 @@ class FormPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('form.extension'));
     }
 
-    public function testDoNothingIfDebugCommandNotLoaded()
+    public function testDoNothingIfDebugCommandNotLoaded(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -46,7 +46,7 @@ class FormPassTest extends TestCase
         $this->assertFalse($container->hasDefinition(DebugCommand::class));
     }
 
-    public function testAddTaggedTypes()
+    public function testAddTaggedTypes(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -67,7 +67,7 @@ class FormPassTest extends TestCase
         );
     }
 
-    public function testAddTaggedTypesToDebugCommand()
+    public function testAddTaggedTypesToDebugCommand(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -92,7 +92,7 @@ class FormPassTest extends TestCase
     /**
      * @dataProvider addTaggedTypeExtensionsDataProvider
      */
-    public function testAddTaggedTypeExtensions(array $extensions, array $expectedRegisteredExtensions)
+    public function testAddTaggedTypeExtensions(array $extensions, array $expectedRegisteredExtensions): void
     {
         $container = $this->createContainerBuilder();
 
@@ -157,7 +157,7 @@ class FormPassTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage extended-type attribute, none was configured for the "my.type_extension" service
      */
-    public function testAddTaggedFormTypeExtensionWithoutExtendedTypeAttribute()
+    public function testAddTaggedFormTypeExtensionWithoutExtendedTypeAttribute(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -169,7 +169,7 @@ class FormPassTest extends TestCase
         $container->compile();
     }
 
-    public function testAddTaggedGuessers()
+    public function testAddTaggedGuessers(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -198,7 +198,7 @@ class FormPassTest extends TestCase
     /**
      * @dataProvider privateTaggedServicesProvider
      */
-    public function testPrivateTaggedServices($id, $tagName, callable $assertion, array $tagAttributes = array())
+    public function testPrivateTaggedServices($id, $tagName, callable $assertion, array $tagAttributes = array()): void
     {
         $formPass = new FormPass();
         $container = new ContainerBuilder();
@@ -216,7 +216,7 @@ class FormPassTest extends TestCase
             array(
                 'my.type',
                 'form.type',
-                function (ContainerBuilder $container) {
+                function (ContainerBuilder $container): void {
                     $formTypes = $container->getDefinition('form.extension')->getArgument(0);
 
                     $this->assertInstanceOf(Reference::class, $formTypes);
@@ -233,7 +233,7 @@ class FormPassTest extends TestCase
             array(
                 'my.type_extension',
                 'form.type_extension',
-                function (ContainerBuilder $container) {
+                function (ContainerBuilder $container): void {
                     $this->assertEquals(
                         array('Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument(array(new Reference('my.type_extension')))),
                         $container->getDefinition('form.extension')->getArgument(1)
@@ -241,7 +241,7 @@ class FormPassTest extends TestCase
                 },
                 array('extended_type' => 'Symfony\Component\Form\Extension\Core\Type\FormType'),
             ),
-            array('my.guesser', 'form.type_guesser', function (ContainerBuilder $container) {
+            array('my.guesser', 'form.type_guesser', function (ContainerBuilder $container): void {
                 $this->assertEquals(new IteratorArgument(array(new Reference('my.guesser'))), $container->getDefinition('form.extension')->getArgument(2));
             }),
         );

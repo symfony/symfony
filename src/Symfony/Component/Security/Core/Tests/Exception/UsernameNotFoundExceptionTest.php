@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class UsernameNotFoundExceptionTest extends TestCase
 {
-    public function testGetMessageData()
+    public function testGetMessageData(): void
     {
         $exception = new UsernameNotFoundException('Username could not be found.');
         $this->assertEquals(array('{{ username }}' => null), $exception->getMessageData());

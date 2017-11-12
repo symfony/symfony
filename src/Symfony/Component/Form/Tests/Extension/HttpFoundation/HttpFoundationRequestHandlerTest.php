@@ -24,7 +24,7 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testRequestShouldNotBeNull()
+    public function testRequestShouldNotBeNull(): void
     {
         $this->requestHandler->handleRequest($this->getMockForm('name', 'GET'));
     }
@@ -32,12 +32,12 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testRequestShouldBeInstanceOfRequest()
+    public function testRequestShouldBeInstanceOfRequest(): void
     {
         $this->requestHandler->handleRequest($this->getMockForm('name', 'GET'), new \stdClass());
     }
 
-    protected function setRequestData($method, $data, $files = array())
+    protected function setRequestData($method, $data, $files = array()): void
     {
         $this->request = Request::create('http://localhost', $method, $data, array(), $files);
     }

@@ -159,7 +159,7 @@ class ErrorHandler
      * @param array|int       $levels  An array map of E_* to LogLevel::* or an integer bit field of E_* constants
      * @param bool            $replace Whether to replace or not any existing logger
      */
-    public function setDefaultLogger(LoggerInterface $logger, $levels = E_ALL, $replace = false)
+    public function setDefaultLogger(LoggerInterface $logger, $levels = E_ALL, $replace = false): void
     {
         $loggers = array();
 
@@ -332,7 +332,7 @@ class ErrorHandler
     /**
      * Re-registers as a PHP error handler if levels changed.
      */
-    private function reRegister($prev)
+    private function reRegister($prev): void
     {
         if ($prev !== $this->thrownErrors | $this->loggedErrors) {
             $handler = set_error_handler('var_dump');
@@ -489,7 +489,7 @@ class ErrorHandler
      *
      * @internal
      */
-    public function handleException($exception, array $error = null)
+    public function handleException($exception, array $error = null): void
     {
         if (null === $error) {
             self::$exitCode = 255;
@@ -551,7 +551,7 @@ class ErrorHandler
      *
      * @internal
      */
-    public static function handleFatalError(array $error = null)
+    public static function handleFatalError(array $error = null): void
     {
         if (null === self::$reservedMemory) {
             return;
@@ -596,7 +596,7 @@ class ErrorHandler
 
         if ($exit && self::$exitCode) {
             $exitCode = self::$exitCode;
-            register_shutdown_function('register_shutdown_function', function () use ($exitCode) { exit($exitCode); });
+            register_shutdown_function('register_shutdown_function', function () use ($exitCode): void { exit($exitCode); });
         }
     }
 

@@ -111,7 +111,7 @@ class ExpressionLanguage
      *
      * @see ExpressionFunction
      */
-    public function register($name, callable $compiler, callable $evaluator)
+    public function register($name, callable $compiler, callable $evaluator): void
     {
         if (null !== $this->parser) {
             throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
@@ -120,19 +120,19 @@ class ExpressionLanguage
         $this->functions[$name] = array('compiler' => $compiler, 'evaluator' => $evaluator);
     }
 
-    public function addFunction(ExpressionFunction $function)
+    public function addFunction(ExpressionFunction $function): void
     {
         $this->register($function->getName(), $function->getCompiler(), $function->getEvaluator());
     }
 
-    public function registerProvider(ExpressionFunctionProviderInterface $provider)
+    public function registerProvider(ExpressionFunctionProviderInterface $provider): void
     {
         foreach ($provider->getFunctions() as $function) {
             $this->addFunction($function);
         }
     }
 
-    protected function registerFunctions()
+    protected function registerFunctions(): void
     {
         $this->addFunction(ExpressionFunction::fromPhp('constant'));
     }

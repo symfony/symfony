@@ -20,7 +20,7 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider getDebugModes
      */
-    public function testConfigTree($options, $results)
+    public function testConfigTree($options, $results): void
     {
         $processor = new Processor();
         $configuration = new Configuration();

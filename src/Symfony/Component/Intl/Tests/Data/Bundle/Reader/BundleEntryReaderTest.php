@@ -61,13 +61,13 @@ class BundleEntryReaderTest extends TestCase
         'Foo' => 'Bar',
     );
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->readerImpl = $this->getMockBuilder('Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface')->getMock();
         $this->reader = new BundleEntryReader($this->readerImpl);
     }
 
-    public function testForwardCallToRead()
+    public function testForwardCallToRead(): void
     {
         $this->readerImpl->expects($this->once())
             ->method('read')
@@ -77,7 +77,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame(self::$data, $this->reader->read(self::RES_DIR, 'root'));
     }
 
-    public function testReadEntireDataFileIfNoIndicesGiven()
+    public function testReadEntireDataFileIfNoIndicesGiven(): void
     {
         $this->readerImpl->expects($this->at(0))
             ->method('read')
@@ -92,7 +92,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame(self::$mergedData, $this->reader->readEntry(self::RES_DIR, 'en', array()));
     }
 
-    public function testReadExistingEntry()
+    public function testReadExistingEntry(): void
     {
         $this->readerImpl->expects($this->once())
             ->method('read')
@@ -105,7 +105,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
-    public function testReadNonExistingEntry()
+    public function testReadNonExistingEntry(): void
     {
         $this->readerImpl->expects($this->once())
             ->method('read')
@@ -115,7 +115,7 @@ class BundleEntryReaderTest extends TestCase
         $this->reader->readEntry(self::RES_DIR, 'root', array('Entries', 'NonExisting'));
     }
 
-    public function testFallbackIfEntryDoesNotExist()
+    public function testFallbackIfEntryDoesNotExist(): void
     {
         $this->readerImpl->expects($this->at(0))
             ->method('read')
@@ -133,7 +133,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
-    public function testDontFallbackIfEntryDoesNotExistAndFallbackDisabled()
+    public function testDontFallbackIfEntryDoesNotExistAndFallbackDisabled(): void
     {
         $this->readerImpl->expects($this->once())
             ->method('read')
@@ -143,7 +143,7 @@ class BundleEntryReaderTest extends TestCase
         $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Entries', 'Bam'), false);
     }
 
-    public function testFallbackIfLocaleDoesNotExist()
+    public function testFallbackIfLocaleDoesNotExist(): void
     {
         $this->readerImpl->expects($this->at(0))
             ->method('read')
@@ -161,7 +161,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
-    public function testDontFallbackIfLocaleDoesNotExistAndFallbackDisabled()
+    public function testDontFallbackIfLocaleDoesNotExistAndFallbackDisabled(): void
     {
         $this->readerImpl->expects($this->once())
             ->method('read')
@@ -187,7 +187,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @dataProvider provideMergeableValues
      */
-    public function testMergeDataWithFallbackData($childData, $parentData, $result)
+    public function testMergeDataWithFallbackData($childData, $parentData, $result): void
     {
         if (null === $childData || is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
@@ -212,7 +212,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @dataProvider provideMergeableValues
      */
-    public function testDontMergeDataIfFallbackDisabled($childData, $parentData, $result)
+    public function testDontMergeDataIfFallbackDisabled($childData, $parentData, $result): void
     {
         $this->readerImpl->expects($this->once())
             ->method('read')
@@ -225,7 +225,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @dataProvider provideMergeableValues
      */
-    public function testMergeExistingEntryWithExistingFallbackEntry($childData, $parentData, $result)
+    public function testMergeExistingEntryWithExistingFallbackEntry($childData, $parentData, $result): void
     {
         if (null === $childData || is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
@@ -250,7 +250,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @dataProvider provideMergeableValues
      */
-    public function testMergeNonExistingEntryWithExistingFallbackEntry($childData, $parentData, $result)
+    public function testMergeNonExistingEntryWithExistingFallbackEntry($childData, $parentData, $result): void
     {
         $this->readerImpl->expects($this->at(0))
             ->method('read')
@@ -268,7 +268,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @dataProvider provideMergeableValues
      */
-    public function testMergeExistingEntryWithNonExistingFallbackEntry($childData, $parentData, $result)
+    public function testMergeExistingEntryWithNonExistingFallbackEntry($childData, $parentData, $result): void
     {
         if (null === $childData || is_array($childData)) {
             $this->readerImpl->expects($this->at(0))
@@ -293,7 +293,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
-    public function testFailIfEntryFoundNeitherInParentNorChild()
+    public function testFailIfEntryFoundNeitherInParentNorChild(): void
     {
         $this->readerImpl->expects($this->at(0))
             ->method('read')
@@ -311,7 +311,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @dataProvider provideMergeableValues
      */
-    public function testMergeTraversables($childData, $parentData, $result)
+    public function testMergeTraversables($childData, $parentData, $result): void
     {
         $parentData = is_array($parentData) ? new \ArrayObject($parentData) : $parentData;
         $childData = is_array($childData) ? new \ArrayObject($childData) : $childData;
@@ -339,7 +339,7 @@ class BundleEntryReaderTest extends TestCase
     /**
      * @dataProvider provideMergeableValues
      */
-    public function testFollowLocaleAliases($childData, $parentData, $result)
+    public function testFollowLocaleAliases($childData, $parentData, $result): void
     {
         $this->reader->setLocaleAliases(array('mo' => 'ro_MD'));
 

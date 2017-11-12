@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslato
 
 class LoggingTranslatorPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->getMock();
@@ -80,7 +80,7 @@ class LoggingTranslatorPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testThatCompilerPassIsIgnoredIfThereIsNotLoggerDefinition()
+    public function testThatCompilerPassIsIgnoredIfThereIsNotLoggerDefinition(): void
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->getMock();
         $container->expects($this->once())
@@ -91,7 +91,7 @@ class LoggingTranslatorPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testThatCompilerPassIsIgnoredIfThereIsNotTranslatorDefinition()
+    public function testThatCompilerPassIsIgnoredIfThereIsNotTranslatorDefinition(): void
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->getMock();
         $container->expects($this->at(0))

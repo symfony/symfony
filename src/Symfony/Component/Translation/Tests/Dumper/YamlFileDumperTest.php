@@ -17,7 +17,7 @@ use Symfony\Component\Translation\Dumper\YamlFileDumper;
 
 class YamlFileDumperTest extends TestCase
 {
-    public function testTreeFormatCatalogue()
+    public function testTreeFormatCatalogue(): void
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(
@@ -31,7 +31,7 @@ class YamlFileDumperTest extends TestCase
         $this->assertStringEqualsFile(__DIR__.'/../fixtures/messages.yml', $dumper->formatCatalogue($catalogue, 'messages', array('as_tree' => true, 'inline' => 999)));
     }
 
-    public function testLinearFormatCatalogue()
+    public function testLinearFormatCatalogue(): void
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(

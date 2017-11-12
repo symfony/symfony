@@ -25,7 +25,7 @@ class AddExpressionLanguageProvidersPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         // routing
         if ($container->has('router')) {

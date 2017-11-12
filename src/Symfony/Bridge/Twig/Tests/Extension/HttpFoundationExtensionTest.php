@@ -22,7 +22,7 @@ class HttpFoundationExtensionTest extends TestCase
     /**
      * @dataProvider getGenerateAbsoluteUrlData()
      */
-    public function testGenerateAbsoluteUrl($expected, $path, $pathinfo)
+    public function testGenerateAbsoluteUrl($expected, $path, $pathinfo): void
     {
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
@@ -57,7 +57,7 @@ class HttpFoundationExtensionTest extends TestCase
     /**
      * @dataProvider getGenerateAbsoluteUrlRequestContextData
      */
-    public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected): void
     {
         if (!class_exists('Symfony\Component\Routing\RequestContext')) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
@@ -72,7 +72,7 @@ class HttpFoundationExtensionTest extends TestCase
     /**
      * @dataProvider getGenerateAbsoluteUrlRequestContextData
      */
-    public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path)
+    public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path): void
     {
         if (!class_exists('Symfony\Component\Routing\RequestContext')) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
@@ -97,7 +97,7 @@ class HttpFoundationExtensionTest extends TestCase
         );
     }
 
-    public function testGenerateAbsoluteUrlWithScriptFileName()
+    public function testGenerateAbsoluteUrlWithScriptFileName(): void
     {
         $request = Request::create('http://localhost/app/web/app_dev.php');
         $request->server->set('SCRIPT_FILENAME', '/var/www/app/web/app_dev.php');
@@ -115,7 +115,7 @@ class HttpFoundationExtensionTest extends TestCase
     /**
      * @dataProvider getGenerateRelativePathData()
      */
-    public function testGenerateRelativePath($expected, $path, $pathinfo)
+    public function testGenerateRelativePath($expected, $path, $pathinfo): void
     {
         if (!method_exists('Symfony\Component\HttpFoundation\Request', 'getRelativeUriForPath')) {
             $this->markTestSkipped('Your version of Symfony HttpFoundation is too old.');

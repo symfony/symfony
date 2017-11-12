@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class DataTest extends TestCase
 {
-    public function testBasicData()
+    public function testBasicData(): void
     {
         $values = array(1 => 123, 4.5, 'abc', null, false);
         $data = $this->cloneVar($values);
@@ -45,7 +45,7 @@ class DataTest extends TestCase
         $this->assertSame($values, $clonedValues);
     }
 
-    public function testObject()
+    public function testObject(): void
     {
         $data = $this->cloneVar(new \Exception('foo'));
 
@@ -60,7 +60,7 @@ class DataTest extends TestCase
         $this->assertStringMatchesFormat('Exception (count=%d)', (string) $data);
     }
 
-    public function testArray()
+    public function testArray(): void
     {
         $values = array(array(), array(123));
         $data = $this->cloneVar($values);
@@ -81,7 +81,7 @@ class DataTest extends TestCase
         $this->assertSame($values[1], $children[1]->getValue(true));
     }
 
-    public function testStub()
+    public function testStub(): void
     {
         $data = $this->cloneVar(array(new ClassStub('stdClass')));
         $data = $data[0];
@@ -91,7 +91,7 @@ class DataTest extends TestCase
         $this->assertSame('stdClass', (string) $data);
     }
 
-    public function testHardRefs()
+    public function testHardRefs(): void
     {
         $values = array(array());
         $values[1] = &$values[0];

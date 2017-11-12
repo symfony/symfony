@@ -39,7 +39,7 @@ class Inline
      * @param int|null    $parsedLineNumber
      * @param string|null $parsedFilename
      */
-    public static function initialize($flags, $parsedLineNumber = null, $parsedFilename = null)
+    public static function initialize($flags, $parsedLineNumber = null, $parsedFilename = null): void
     {
         self::$exceptionOnInvalidType = (bool) (Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE & $flags);
         self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);

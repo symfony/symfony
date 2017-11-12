@@ -42,7 +42,7 @@ class ScriptDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function compileTemporaryBundles(GenrbCompiler $compiler, $sourceDir, $tempDir)
+    protected function compileTemporaryBundles(GenrbCompiler $compiler, $sourceDir, $tempDir): void
     {
         $compiler->compile($sourceDir.'/lang', $tempDir);
     }
@@ -50,7 +50,7 @@ class ScriptDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function preGenerate()
+    protected function preGenerate(): void
     {
         $this->scriptCodes = array();
     }
@@ -78,7 +78,7 @@ class ScriptDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForRoot(BundleReaderInterface $reader, $tempDir)
+    protected function generateDataForRoot(BundleReaderInterface $reader, $tempDir): void
     {
     }
 

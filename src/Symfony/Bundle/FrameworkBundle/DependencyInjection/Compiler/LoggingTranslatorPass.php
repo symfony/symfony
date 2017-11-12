@@ -22,7 +22,7 @@ use Symfony\Component\Translation\TranslatorBagInterface;
  */
 class LoggingTranslatorPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasAlias('logger') || !$container->hasAlias('translator')) {
             return;

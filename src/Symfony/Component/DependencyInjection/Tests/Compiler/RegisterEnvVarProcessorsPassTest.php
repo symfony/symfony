@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 
 class RegisterEnvVarProcessorsPassTest extends TestCase
 {
-    public function testSimpleProcessor()
+    public function testSimpleProcessor(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', SimpleProcessor::class)->addTag('container.env_var_processor');
@@ -44,7 +44,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
         $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());
     }
 
-    public function testNoProcessor()
+    public function testNoProcessor(): void
     {
         $container = new ContainerBuilder();
 
@@ -57,7 +57,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid type "foo" returned by "Symfony\Component\DependencyInjection\Tests\Compiler\BadProcessor::getProvidedTypes()", expected one of "array", "bool", "float", "int", "string".
      */
-    public function testBadProcessor()
+    public function testBadProcessor(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', BadProcessor::class)->addTag('container.env_var_processor');

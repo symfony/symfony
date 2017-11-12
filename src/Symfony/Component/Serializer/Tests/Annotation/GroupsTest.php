@@ -22,7 +22,7 @@ class GroupsTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
      */
-    public function testEmptyGroupsParameter()
+    public function testEmptyGroupsParameter(): void
     {
         new Groups(array('value' => array()));
     }
@@ -30,7 +30,7 @@ class GroupsTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
      */
-    public function testNotAnArrayGroupsParameter()
+    public function testNotAnArrayGroupsParameter(): void
     {
         new Groups(array('value' => 12));
     }
@@ -38,12 +38,12 @@ class GroupsTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
      */
-    public function testInvalidGroupsParameter()
+    public function testInvalidGroupsParameter(): void
     {
         new Groups(array('value' => array('a', 1, new \stdClass())));
     }
 
-    public function testGroupsParameters()
+    public function testGroupsParameters(): void
     {
         $validData = array('a', 'b');
 
@@ -51,7 +51,7 @@ class GroupsTest extends TestCase
         $this->assertEquals($validData, $groups->getGroups());
     }
 
-    public function testSingleGroup()
+    public function testSingleGroup(): void
     {
         $groups = new Groups(array('value' => 'a'));
         $this->assertEquals(array('a'), $groups->getGroups());

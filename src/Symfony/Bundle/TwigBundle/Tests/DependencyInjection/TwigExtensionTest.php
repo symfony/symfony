@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class TwigExtensionTest extends TestCase
 {
-    public function testLoadEmptyConfiguration()
+    public function testLoadEmptyConfiguration(): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -46,7 +46,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadFullConfiguration($format)
+    public function testLoadFullConfiguration($format): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -91,7 +91,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadCustomTemplateEscapingGuesserConfiguration($format)
+    public function testLoadCustomTemplateEscapingGuesserConfiguration($format): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -105,7 +105,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadDefaultTemplateEscapingGuesserConfiguration($format)
+    public function testLoadDefaultTemplateEscapingGuesserConfiguration($format): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -119,7 +119,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testLoadCustomDateFormats($fileFormat)
+    public function testLoadCustomDateFormats($fileFormat): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -136,7 +136,7 @@ class TwigExtensionTest extends TestCase
         $this->assertSame('.', $environmentConfigurator->getArgument(5));
     }
 
-    public function testGlobalsWithDifferentTypesAndValues()
+    public function testGlobalsWithDifferentTypesAndValues(): void
     {
         $globals = array(
             'array' => array(),
@@ -166,7 +166,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider getFormats
      */
-    public function testTwigLoaderPaths($format)
+    public function testTwigLoaderPaths($format): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -209,7 +209,7 @@ class TwigExtensionTest extends TestCase
     /**
      * @dataProvider stopwatchExtensionAvailabilityProvider
      */
-    public function testStopwatchExtensionAvailability($debug, $stopwatchEnabled, $expected)
+    public function testStopwatchExtensionAvailability($debug, $stopwatchEnabled, $expected): void
     {
         $container = $this->createContainer();
         $container->setParameter('kernel.debug', $debug);
@@ -237,7 +237,7 @@ class TwigExtensionTest extends TestCase
         );
     }
 
-    public function testRuntimeLoader()
+    public function testRuntimeLoader(): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -283,14 +283,14 @@ class TwigExtensionTest extends TestCase
         return $container;
     }
 
-    private function compileContainer(ContainerBuilder $container)
+    private function compileContainer(ContainerBuilder $container): void
     {
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();
     }
 
-    private function loadFromFile(ContainerBuilder $container, $file, $format)
+    private function loadFromFile(ContainerBuilder $container, $file, $format): void
     {
         $locator = new FileLocator(__DIR__.'/Fixtures/'.$format);
 

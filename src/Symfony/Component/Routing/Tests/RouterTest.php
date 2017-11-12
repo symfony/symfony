@@ -21,13 +21,13 @@ class RouterTest extends TestCase
 
     private $loader = null;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $this->router = new Router($this->loader, 'routing.yml');
     }
 
-    public function testSetOptionsWithSupportedOptions()
+    public function testSetOptionsWithSupportedOptions(): void
     {
         $this->router->setOptions(array(
             'cache_dir' => './cache',
@@ -44,7 +44,7 @@ class RouterTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The Router does not support the following options: "option_foo", "option_bar"
      */
-    public function testSetOptionsWithUnsupportedOptions()
+    public function testSetOptionsWithUnsupportedOptions(): void
     {
         $this->router->setOptions(array(
             'cache_dir' => './cache',
@@ -54,7 +54,7 @@ class RouterTest extends TestCase
         ));
     }
 
-    public function testSetOptionWithSupportedOption()
+    public function testSetOptionWithSupportedOption(): void
     {
         $this->router->setOption('cache_dir', './cache');
 
@@ -65,7 +65,7 @@ class RouterTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The Router does not support the "option_foo" option
      */
-    public function testSetOptionWithUnsupportedOption()
+    public function testSetOptionWithUnsupportedOption(): void
     {
         $this->router->setOption('option_foo', true);
     }
@@ -74,12 +74,12 @@ class RouterTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The Router does not support the "option_foo" option
      */
-    public function testGetOptionWithUnsupportedOption()
+    public function testGetOptionWithUnsupportedOption(): void
     {
         $this->router->getOption('option_foo', true);
     }
 
-    public function testThatRouteCollectionIsLoaded()
+    public function testThatRouteCollectionIsLoaded(): void
     {
         $this->router->setOption('resource_type', 'ResourceType');
 
@@ -95,7 +95,7 @@ class RouterTest extends TestCase
     /**
      * @dataProvider provideMatcherOptionsPreventingCaching
      */
-    public function testMatcherIsCreatedIfCacheIsNotConfigured($option)
+    public function testMatcherIsCreatedIfCacheIsNotConfigured($option): void
     {
         $this->router->setOption($option, null);
 
@@ -117,7 +117,7 @@ class RouterTest extends TestCase
     /**
      * @dataProvider provideGeneratorOptionsPreventingCaching
      */
-    public function testGeneratorIsCreatedIfCacheIsNotConfigured($option)
+    public function testGeneratorIsCreatedIfCacheIsNotConfigured($option): void
     {
         $this->router->setOption($option, null);
 
@@ -136,7 +136,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testMatchRequestWithUrlMatcherInterface()
+    public function testMatchRequestWithUrlMatcherInterface(): void
     {
         $matcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')->getMock();
         $matcher->expects($this->once())->method('match');
@@ -148,7 +148,7 @@ class RouterTest extends TestCase
         $this->router->matchRequest(Request::create('/'));
     }
 
-    public function testMatchRequestWithRequestMatcherInterface()
+    public function testMatchRequestWithRequestMatcherInterface(): void
     {
         $matcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
         $matcher->expects($this->once())->method('matchRequest');

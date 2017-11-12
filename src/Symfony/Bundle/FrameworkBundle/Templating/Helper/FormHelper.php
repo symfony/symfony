@@ -47,7 +47,7 @@ class FormHelper extends Helper
      * @param string|array $themes           A theme or an array of theme
      * @param bool         $useDefaultThemes If true, will use default themes defined in the renderer
      */
-    public function setTheme(FormView $view, $themes, $useDefaultThemes = true)
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true): void
     {
         $this->renderer->setTheme($view, $themes, $useDefaultThemes);
     }

@@ -24,7 +24,7 @@ class CheckCircularReferencesPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
@@ -36,7 +36,7 @@ class CheckCircularReferencesPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public function testProcessWithAliases()
+    public function testProcessWithAliases(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
@@ -49,7 +49,7 @@ class CheckCircularReferencesPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public function testProcessWithFactory()
+    public function testProcessWithFactory(): void
     {
         $container = new ContainerBuilder();
 
@@ -67,7 +67,7 @@ class CheckCircularReferencesPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public function testProcessDetectsIndirectCircularReference()
+    public function testProcessDetectsIndirectCircularReference(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
@@ -80,7 +80,7 @@ class CheckCircularReferencesPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public function testProcessDetectsIndirectCircularReferenceWithFactory()
+    public function testProcessDetectsIndirectCircularReferenceWithFactory(): void
     {
         $container = new ContainerBuilder();
 
@@ -98,7 +98,7 @@ class CheckCircularReferencesPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public function testDeepCircularReference()
+    public function testDeepCircularReference(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
@@ -108,7 +108,7 @@ class CheckCircularReferencesPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessIgnoresMethodCalls()
+    public function testProcessIgnoresMethodCalls(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
@@ -119,7 +119,7 @@ class CheckCircularReferencesPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessIgnoresLazyServices()
+    public function testProcessIgnoresLazyServices(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->setLazy(true)->addArgument(new Reference('b'));
@@ -131,7 +131,7 @@ class CheckCircularReferencesPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessIgnoresIteratorArguments()
+    public function testProcessIgnoresIteratorArguments(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
@@ -143,7 +143,7 @@ class CheckCircularReferencesPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $compiler = new Compiler();
         $passConfig = $compiler->getPassConfig();

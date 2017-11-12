@@ -51,7 +51,7 @@ class Event
      * further event listener will be triggered once any trigger calls
      * stopPropagation().
      */
-    public function stopPropagation()
+    public function stopPropagation(): void
     {
         $this->propagationStopped = true;
     }

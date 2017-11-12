@@ -18,7 +18,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     protected $dateTime;
     protected $dateTimeWithoutSeconds;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,13 +26,13 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
         $this->dateTimeWithoutSeconds = new \DateTime('2010-02-03 04:05:00 UTC');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dateTime = null;
         $this->dateTimeWithoutSeconds = null;
     }
 
-    public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false)
+    public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false): void
     {
         if ($expected instanceof \DateTime && $actual instanceof \DateTime) {
             $expected = $expected->format('c');
@@ -72,7 +72,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     /**
      * @dataProvider transformProvider
      */
-    public function testTransform($fromTz, $toTz, $from, $to)
+    public function testTransform($fromTz, $toTz, $from, $to): void
     {
         $transformer = new DateTimeToRfc3339Transformer($fromTz, $toTz);
 
@@ -82,7 +82,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     /**
      * @dataProvider transformProvider
      */
-    public function testTransformDateTimeImmutable($fromTz, $toTz, $from, $to)
+    public function testTransformDateTimeImmutable($fromTz, $toTz, $from, $to): void
     {
         $transformer = new DateTimeToRfc3339Transformer($fromTz, $toTz);
 
@@ -92,7 +92,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testTransformRequiresValidDateTime()
+    public function testTransformRequiresValidDateTime(): void
     {
         $transformer = new DateTimeToRfc3339Transformer();
         $transformer->transform('2010-01-01');
@@ -101,7 +101,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     /**
      * @dataProvider reverseTransformProvider
      */
-    public function testReverseTransform($toTz, $fromTz, $to, $from)
+    public function testReverseTransform($toTz, $fromTz, $to, $from): void
     {
         $transformer = new DateTimeToRfc3339Transformer($toTz, $fromTz);
 
@@ -115,7 +115,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformRequiresString()
+    public function testReverseTransformRequiresString(): void
     {
         $transformer = new DateTimeToRfc3339Transformer();
         $transformer->reverseTransform(12345);
@@ -124,7 +124,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformWithNonExistingDate()
+    public function testReverseTransformWithNonExistingDate(): void
     {
         $transformer = new DateTimeToRfc3339Transformer('UTC', 'UTC');
 
@@ -134,7 +134,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformExpectsValidDateString()
+    public function testReverseTransformExpectsValidDateString(): void
     {
         $transformer = new DateTimeToRfc3339Transformer('UTC', 'UTC');
 

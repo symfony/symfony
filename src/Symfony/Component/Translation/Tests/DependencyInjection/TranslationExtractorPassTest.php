@@ -17,7 +17,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
 
 class TranslationExtractorPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->disableOriginalConstructor()->getMock();
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->disableOriginalConstructor()->getMock();
@@ -48,7 +48,7 @@ class TranslationExtractorPassTest extends TestCase
         $translationDumperPass->process($container);
     }
 
-    public function testProcessNoDefinitionFound()
+    public function testProcessNoDefinitionFound(): void
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->disableOriginalConstructor()->getMock();
 
@@ -68,7 +68,7 @@ class TranslationExtractorPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage The alias for the tag "translation.extractor" of service "foo.id" must be set.
      */
-    public function testProcessMissingAlias()
+    public function testProcessMissingAlias(): void
     {
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->disableOriginalConstructor()->getMock();
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->disableOriginalConstructor()->getMock();

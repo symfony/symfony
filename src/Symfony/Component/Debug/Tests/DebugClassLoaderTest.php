@@ -23,7 +23,7 @@ class DebugClassLoaderTest extends TestCase
 
     private $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->errorReporting = error_reporting(E_ALL);
         $this->loader = new ClassLoader();
@@ -31,14 +31,14 @@ class DebugClassLoaderTest extends TestCase
         DebugClassLoader::enable();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         DebugClassLoader::disable();
         spl_autoload_unregister(array($this->loader, 'loadClass'));
         error_reporting($this->errorReporting);
     }
 
-    public function testIdempotence()
+    public function testIdempotence(): void
     {
         DebugClassLoader::enable();
 
@@ -62,7 +62,7 @@ class DebugClassLoaderTest extends TestCase
      * @expectedException \Exception
      * @expectedExceptionMessage boo
      */
-    public function testThrowingClass()
+    public function testThrowingClass(): void
     {
         try {
             class_exists(__NAMESPACE__.'\Fixtures\Throwing');
@@ -78,7 +78,7 @@ class DebugClassLoaderTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testNameCaseMismatch()
+    public function testNameCaseMismatch(): void
     {
         class_exists(__NAMESPACE__.'\TestingCaseMismatch', true);
     }
@@ -87,7 +87,7 @@ class DebugClassLoaderTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Case mismatch between class and real file names
      */
-    public function testFileCaseMismatch()
+    public function testFileCaseMismatch(): void
     {
         if (!file_exists(__DIR__.'/Fixtures/CaseMismatch.php')) {
             $this->markTestSkipped('Can only be run on case insensitive filesystems');
@@ -99,22 +99,22 @@ class DebugClassLoaderTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testPsr4CaseMismatch()
+    public function testPsr4CaseMismatch(): void
     {
         class_exists(__NAMESPACE__.'\Fixtures\Psr4CaseMismatch', true);
     }
 
-    public function testNotPsr0()
+    public function testNotPsr0(): void
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0', true));
     }
 
-    public function testNotPsr0Bis()
+    public function testNotPsr0Bis(): void
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0bis', true));
     }
 
-    public function testClassAlias()
+    public function testClassAlias(): void
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\ClassAlias', true));
     }
@@ -122,7 +122,7 @@ class DebugClassLoaderTest extends TestCase
     /**
      * @dataProvider provideDeprecatedSuper
      */
-    public function testDeprecatedSuper($class, $super, $type)
+    public function testDeprecatedSuper($class, $super, $type): void
     {
         set_error_handler(function () { return false; });
         $e = error_reporting(0);
@@ -152,7 +152,7 @@ class DebugClassLoaderTest extends TestCase
         );
     }
 
-    public function testInterfaceExtendsDeprecatedInterface()
+    public function testInterfaceExtendsDeprecatedInterface(): void
     {
         set_error_handler(function () { return false; });
         $e = error_reporting(0);
@@ -174,7 +174,7 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
-    public function testDeprecatedSuperInSameNamespace()
+    public function testDeprecatedSuperInSameNamespace(): void
     {
         set_error_handler(function () { return false; });
         $e = error_reporting(0);
@@ -196,7 +196,7 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
-    public function testExtendedFinalClass()
+    public function testExtendedFinalClass(): void
     {
         set_error_handler(function () { return false; });
         $e = error_reporting(0);
@@ -218,7 +218,7 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
-    public function testExtendedFinalMethod()
+    public function testExtendedFinalMethod(): void
     {
         set_error_handler(function () { return false; });
         $e = error_reporting(0);
@@ -240,7 +240,7 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
-    public function testExtendedDeprecatedMethod()
+    public function testExtendedDeprecatedMethod(): void
     {
         set_error_handler(function () { return false; });
         $e = error_reporting(0);
@@ -262,10 +262,10 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
-    public function testInternalsUse()
+    public function testInternalsUse(): void
     {
         $deprecations = array();
-        set_error_handler(function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(E_USER_DEPRECATED);
 
         class_exists('Test\\'.__NAMESPACE__.'\\ExtendsInternals', true);
@@ -284,7 +284,7 @@ class DebugClassLoaderTest extends TestCase
 
 class ClassLoader
 {
-    public function loadClass($class)
+    public function loadClass($class): void
     {
     }
 

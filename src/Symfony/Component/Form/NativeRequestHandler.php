@@ -45,7 +45,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handleRequest(FormInterface $form, $request = null)
+    public function handleRequest(FormInterface $form, $request = null): void
     {
         if (null !== $request) {
             throw new UnexpectedTypeException($request, 'null');

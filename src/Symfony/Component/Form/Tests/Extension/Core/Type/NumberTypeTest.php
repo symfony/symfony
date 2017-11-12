@@ -17,7 +17,7 @@ class NumberTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\NumberType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class NumberTypeTest extends BaseTypeTest
         \Locale::setDefault('de_DE');
     }
 
-    public function testDefaultFormatting()
+    public function testDefaultFormatting(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->setData('12345.67890');
@@ -35,7 +35,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,679', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithGrouping()
+    public function testDefaultFormattingWithGrouping(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array('grouping' => true));
         $form->setData('12345.67890');
@@ -43,7 +43,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12.345,679', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithScale()
+    public function testDefaultFormattingWithScale(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array('scale' => 2));
         $form->setData('12345.67890');
@@ -51,7 +51,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithRounding()
+    public function testDefaultFormattingWithRounding(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array('scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP));
         $form->setData('12345.54321');
@@ -59,7 +59,7 @@ class NumberTypeTest extends BaseTypeTest
         $this->assertSame('12346', $form->createView()->vars['value']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }

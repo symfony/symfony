@@ -34,7 +34,7 @@ class OutputFormatterStyleStack
     /**
      * Resets stack (ie. empty internal arrays).
      */
-    public function reset()
+    public function reset(): void
     {
         $this->styles = array();
     }
@@ -42,7 +42,7 @@ class OutputFormatterStyleStack
     /**
      * Pushes a style in the stack.
      */
-    public function push(OutputFormatterStyleInterface $style)
+    public function push(OutputFormatterStyleInterface $style): void
     {
         $this->styles[] = $style;
     }

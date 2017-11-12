@@ -25,7 +25,7 @@ class RegisterListenersPassTest extends TestCase
      *
      * @expectedException \InvalidArgumentException
      */
-    public function testEventSubscriberWithoutInterface()
+    public function testEventSubscriberWithoutInterface(): void
     {
         // one service, not implementing any interface
         $services = array(
@@ -55,7 +55,7 @@ class RegisterListenersPassTest extends TestCase
         $registerListenersPass->process($builder);
     }
 
-    public function testValidEventSubscriber()
+    public function testValidEventSubscriber(): void
     {
         $services = array(
             'my_event_subscriber' => array(0 => array()),
@@ -92,7 +92,7 @@ class RegisterListenersPassTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The service "foo" tagged "kernel.event_listener" must not be abstract.
      */
-    public function testAbstractEventListener()
+    public function testAbstractEventListener(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_listener', array());
@@ -106,7 +106,7 @@ class RegisterListenersPassTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The service "foo" tagged "kernel.event_subscriber" must not be abstract.
      */
-    public function testAbstractEventSubscriber()
+    public function testAbstractEventSubscriber(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_subscriber', array());
@@ -116,7 +116,7 @@ class RegisterListenersPassTest extends TestCase
         $registerListenersPass->process($container);
     }
 
-    public function testEventSubscriberResolvableClassName()
+    public function testEventSubscriberResolvableClassName(): void
     {
         $container = new ContainerBuilder();
 
@@ -141,7 +141,7 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
-    public function testHotPathEvents()
+    public function testHotPathEvents(): void
     {
         $container = new ContainerBuilder();
 
@@ -157,7 +157,7 @@ class RegisterListenersPassTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage You have requested a non-existent parameter "subscriber.class"
      */
-    public function testEventSubscriberUnresolvableClassName()
+    public function testEventSubscriberUnresolvableClassName(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', '%subscriber.class%')->addTag('kernel.event_subscriber', array());

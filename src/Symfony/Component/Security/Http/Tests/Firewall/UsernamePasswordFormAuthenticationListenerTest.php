@@ -22,7 +22,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
     /**
      * @dataProvider getUsernameForLength
      */
-    public function testHandleWhenUsernameLength($username, $ok)
+    public function testHandleWhenUsernameLength($username, $ok): void
     {
         $request = Request::create('/login_check', 'POST', array('_username' => $username));
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());

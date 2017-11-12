@@ -23,7 +23,7 @@ class BooleanNode extends ScalarNode
     /**
      * {@inheritdoc}
      */
-    protected function validateType($value)
+    protected function validateType($value): void
     {
         if (!is_bool($value)) {
             $ex = new InvalidTypeException(sprintf(

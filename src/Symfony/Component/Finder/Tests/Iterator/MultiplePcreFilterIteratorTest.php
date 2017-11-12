@@ -19,7 +19,7 @@ class MultiplePcreFilterIteratorTest extends TestCase
     /**
      * @dataProvider getIsRegexFixtures
      */
-    public function testIsRegex($string, $isRegex, $message)
+    public function testIsRegex($string, $isRegex, $message): void
     {
         $testIterator = new TestMultiplePcreFilterIterator();
         $this->assertEquals($isRegex, $testIterator->isRegex($string), $message);
@@ -54,7 +54,7 @@ class TestMultiplePcreFilterIterator extends MultiplePcreFilterIterator
     {
     }
 
-    public function accept()
+    public function accept(): void
     {
         throw new \BadFunctionCallException('Not implemented');
     }
@@ -64,7 +64,7 @@ class TestMultiplePcreFilterIterator extends MultiplePcreFilterIterator
         return parent::isRegex($str);
     }
 
-    public function toRegex($str)
+    public function toRegex($str): void
     {
         throw new \BadFunctionCallException('Not implemented');
     }

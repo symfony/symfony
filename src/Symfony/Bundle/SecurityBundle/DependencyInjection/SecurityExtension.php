@@ -52,7 +52,7 @@ class SecurityExtension extends Extension
         }
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         if (!array_filter($configs)) {
             return;
@@ -116,7 +116,7 @@ class SecurityExtension extends Extension
             ->addTag('security.voter');
     }
 
-    private function createRoleHierarchy(array $config, ContainerBuilder $container)
+    private function createRoleHierarchy(array $config, ContainerBuilder $container): void
     {
         if (!isset($config['role_hierarchy']) || 0 === count($config['role_hierarchy'])) {
             $container->removeDefinition('security.access.role_hierarchy_voter');
@@ -128,7 +128,7 @@ class SecurityExtension extends Extension
         $container->removeDefinition('security.access.simple_role_voter');
     }
 
-    private function createAuthorization($config, ContainerBuilder $container)
+    private function createAuthorization($config, ContainerBuilder $container): void
     {
         if (!$config['access_control']) {
             return;
@@ -153,7 +153,7 @@ class SecurityExtension extends Extension
         }
     }
 
-    private function createFirewalls($config, ContainerBuilder $container)
+    private function createFirewalls($config, ContainerBuilder $container): void
     {
         if (!isset($config['firewalls'])) {
             return;
@@ -454,7 +454,7 @@ class SecurityExtension extends Extension
         return array($listeners, $defaultEntryPoint);
     }
 
-    private function createEncoders($encoders, ContainerBuilder $container)
+    private function createEncoders($encoders, ContainerBuilder $container): void
     {
         $encoderMap = array();
         foreach ($encoders as $class => $encoder) {
@@ -655,12 +655,12 @@ class SecurityExtension extends Extension
         return $this->requestMatchers[$id] = new Reference($id);
     }
 
-    public function addSecurityListenerFactory(SecurityFactoryInterface $factory)
+    public function addSecurityListenerFactory(SecurityFactoryInterface $factory): void
     {
         $this->factories[$factory->getPosition()][] = $factory;
     }
 
-    public function addUserProviderFactory(UserProviderFactoryInterface $factory)
+    public function addUserProviderFactory(UserProviderFactoryInterface $factory): void
     {
         $this->userProviderFactories[] = $factory;
     }

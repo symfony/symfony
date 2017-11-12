@@ -17,13 +17,13 @@ use Symfony\Component\CssSelector\Node\NodeInterface;
 abstract class AbstractNodeTest extends TestCase
 {
     /** @dataProvider getToStringConversionTestData */
-    public function testToStringConversion(NodeInterface $node, $representation)
+    public function testToStringConversion(NodeInterface $node, $representation): void
     {
         $this->assertEquals($representation, (string) $node);
     }
 
     /** @dataProvider getSpecificityValueTestData */
-    public function testSpecificityValue(NodeInterface $node, $value)
+    public function testSpecificityValue(NodeInterface $node, $value): void
     {
         $this->assertEquals($value, $node->getSpecificity()->getValue());
     }

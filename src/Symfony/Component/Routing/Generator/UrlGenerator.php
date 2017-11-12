@@ -75,7 +75,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     /**
      * {@inheritdoc}
      */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->context = $context;
     }
@@ -91,7 +91,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     /**
      * {@inheritdoc}
      */
-    public function setStrictRequirements($enabled)
+    public function setStrictRequirements($enabled): void
     {
         $this->strictRequirements = null === $enabled ? null : (bool) $enabled;
     }

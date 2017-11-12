@@ -45,7 +45,7 @@ class CallbackChoiceLoaderTest extends TestCase
      */
     private static $lazyChoiceList;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$loader = new CallbackChoiceLoader(function () {
             return self::$choices;
@@ -61,19 +61,19 @@ class CallbackChoiceLoaderTest extends TestCase
         self::$lazyChoiceList = new LazyChoiceList(self::$loader, self::$value);
     }
 
-    public function testLoadChoiceList()
+    public function testLoadChoiceList(): void
     {
         $this->assertInstanceOf('\Symfony\Component\Form\ChoiceList\ChoiceListInterface', self::$loader->loadChoiceList(self::$value));
     }
 
-    public function testLoadChoiceListOnlyOnce()
+    public function testLoadChoiceListOnlyOnce(): void
     {
         $loadedChoiceList = self::$loader->loadChoiceList(self::$value);
 
         $this->assertSame($loadedChoiceList, self::$loader->loadChoiceList(self::$value));
     }
 
-    public function testLoadChoicesForValuesLoadsChoiceListOnFirstCall()
+    public function testLoadChoicesForValuesLoadsChoiceListOnFirstCall(): void
     {
         $this->assertSame(
             self::$loader->loadChoicesForValues(self::$choiceValues, self::$value),
@@ -82,7 +82,7 @@ class CallbackChoiceLoaderTest extends TestCase
         );
     }
 
-    public function testLoadValuesForChoicesLoadsChoiceListOnFirstCall()
+    public function testLoadValuesForChoicesLoadsChoiceListOnFirstCall(): void
     {
         $this->assertSame(
             self::$loader->loadValuesForChoices(self::$choices, self::$value),
@@ -91,7 +91,7 @@ class CallbackChoiceLoaderTest extends TestCase
         );
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         self::$loader = null;
         self::$value = null;

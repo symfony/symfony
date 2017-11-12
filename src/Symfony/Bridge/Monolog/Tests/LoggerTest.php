@@ -18,7 +18,7 @@ use Symfony\Bridge\Monolog\Logger;
 
 class LoggerTest extends TestCase
 {
-    public function testGetLogsWithoutDebugProcessor()
+    public function testGetLogsWithoutDebugProcessor(): void
     {
         $handler = new TestHandler();
         $logger = new Logger(__METHOD__, array($handler));
@@ -27,7 +27,7 @@ class LoggerTest extends TestCase
         $this->assertSame(array(), $logger->getLogs());
     }
 
-    public function testCountErrorsWithoutDebugProcessor()
+    public function testCountErrorsWithoutDebugProcessor(): void
     {
         $handler = new TestHandler();
         $logger = new Logger(__METHOD__, array($handler));
@@ -36,7 +36,7 @@ class LoggerTest extends TestCase
         $this->assertSame(0, $logger->countErrors());
     }
 
-    public function testGetLogsWithDebugProcessor()
+    public function testGetLogsWithDebugProcessor(): void
     {
         $handler = new TestHandler();
         $processor = new DebugProcessor();
@@ -46,7 +46,7 @@ class LoggerTest extends TestCase
         $this->assertSame(1, count($logger->getLogs()));
     }
 
-    public function testCountErrorsWithDebugProcessor()
+    public function testCountErrorsWithDebugProcessor(): void
     {
         $handler = new TestHandler();
         $processor = new DebugProcessor();
@@ -65,7 +65,7 @@ class LoggerTest extends TestCase
         $this->assertSame(4, $logger->countErrors());
     }
 
-    public function testGetLogsWithDebugProcessor2()
+    public function testGetLogsWithDebugProcessor2(): void
     {
         $handler = new TestHandler();
         $logger = new Logger('test', array($handler));
@@ -79,7 +79,7 @@ class LoggerTest extends TestCase
         $this->assertEquals(Logger::INFO, $record['priority']);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $handler = new TestHandler();
         $logger = new Logger('test', array($handler));

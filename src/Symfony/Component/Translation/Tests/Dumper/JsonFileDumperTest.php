@@ -17,7 +17,7 @@ use Symfony\Component\Translation\Dumper\JsonFileDumper;
 
 class JsonFileDumperTest extends TestCase
 {
-    public function testFormatCatalogue()
+    public function testFormatCatalogue(): void
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar'));
@@ -27,7 +27,7 @@ class JsonFileDumperTest extends TestCase
         $this->assertStringEqualsFile(__DIR__.'/../fixtures/resources.json', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 
-    public function testDumpWithCustomEncoding()
+    public function testDumpWithCustomEncoding(): void
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => '"bar"'));

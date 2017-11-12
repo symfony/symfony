@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class JsonLoginTest extends WebTestCase
 {
-    public function testDefaultJsonLoginSuccess()
+    public function testDefaultJsonLoginSuccess(): void
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'config.yml'));
         $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "foo"}}');
@@ -29,7 +29,7 @@ class JsonLoginTest extends WebTestCase
         $this->assertSame(array('message' => 'Welcome @dunglas!'), json_decode($response->getContent(), true));
     }
 
-    public function testDefaultJsonLoginFailure()
+    public function testDefaultJsonLoginFailure(): void
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'config.yml'));
         $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "bad"}}');
@@ -40,7 +40,7 @@ class JsonLoginTest extends WebTestCase
         $this->assertSame(array('error' => 'Invalid credentials.'), json_decode($response->getContent(), true));
     }
 
-    public function testCustomJsonLoginSuccess()
+    public function testCustomJsonLoginSuccess(): void
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'custom_handlers.yml'));
         $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "foo"}}');
@@ -51,7 +51,7 @@ class JsonLoginTest extends WebTestCase
         $this->assertSame(array('message' => 'Good game @dunglas!'), json_decode($response->getContent(), true));
     }
 
-    public function testCustomJsonLoginFailure()
+    public function testCustomJsonLoginFailure(): void
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'custom_handlers.yml'));
         $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "password": "bad"}}');
@@ -62,7 +62,7 @@ class JsonLoginTest extends WebTestCase
         $this->assertSame(array('message' => 'Something went wrong'), json_decode($response->getContent(), true));
     }
 
-    public function testDefaultJsonLoginBadRequest()
+    public function testDefaultJsonLoginBadRequest(): void
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'config.yml'));
         $client->request('POST', '/chk', array(), array(), array('CONTENT_TYPE' => 'application/json'), 'Not a json content');

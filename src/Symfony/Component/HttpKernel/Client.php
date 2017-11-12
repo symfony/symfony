@@ -53,7 +53,7 @@ class Client extends BaseClient
      *
      * @param bool $catchExceptions Whether to catch exceptions
      */
-    public function catchExceptions($catchExceptions)
+    public function catchExceptions($catchExceptions): void
     {
         $this->catchExceptions = $catchExceptions;
     }

@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class TimedPhpEngineTest extends TestCase
 {
-    public function testThatRenderLogsTime()
+    public function testThatRenderLogsTime(): void
     {
         $container = $this->getContainer();
         $templateNameParser = $this->getTemplateNameParser();

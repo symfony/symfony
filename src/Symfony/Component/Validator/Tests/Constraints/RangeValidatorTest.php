@@ -23,7 +23,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         return new RangeValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Range(array('min' => 10, 'max' => 20)));
 
@@ -67,7 +67,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getTenToTwenty
      */
-    public function testValidValuesMin($value)
+    public function testValidValuesMin($value): void
     {
         $constraint = new Range(array('min' => 10));
         $this->validator->validate($value, $constraint);
@@ -78,7 +78,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getTenToTwenty
      */
-    public function testValidValuesMax($value)
+    public function testValidValuesMax($value): void
     {
         $constraint = new Range(array('max' => 20));
         $this->validator->validate($value, $constraint);
@@ -89,7 +89,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getTenToTwenty
      */
-    public function testValidValuesMinMax($value)
+    public function testValidValuesMinMax($value): void
     {
         $constraint = new Range(array('min' => 10, 'max' => 20));
         $this->validator->validate($value, $constraint);
@@ -100,7 +100,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getLessThanTen
      */
-    public function testInvalidValuesMin($value, $formattedValue)
+    public function testInvalidValuesMin($value, $formattedValue): void
     {
         $constraint = new Range(array(
             'min' => 10,
@@ -119,7 +119,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getMoreThanTwenty
      */
-    public function testInvalidValuesMax($value, $formattedValue)
+    public function testInvalidValuesMax($value, $formattedValue): void
     {
         $constraint = new Range(array(
             'max' => 20,
@@ -138,7 +138,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getMoreThanTwenty
      */
-    public function testInvalidValuesCombinedMax($value, $formattedValue)
+    public function testInvalidValuesCombinedMax($value, $formattedValue): void
     {
         $constraint = new Range(array(
             'min' => 10,
@@ -159,7 +159,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getLessThanTen
      */
-    public function testInvalidValuesCombinedMin($value, $formattedValue)
+    public function testInvalidValuesCombinedMin($value, $formattedValue): void
     {
         $constraint = new Range(array(
             'min' => 10,
@@ -239,7 +239,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getTenthToTwentiethMarch2014
      */
-    public function testValidDatesMin($value)
+    public function testValidDatesMin($value): void
     {
         $constraint = new Range(array('min' => 'March 10, 2014'));
         $this->validator->validate($value, $constraint);
@@ -250,7 +250,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getTenthToTwentiethMarch2014
      */
-    public function testValidDatesMax($value)
+    public function testValidDatesMax($value): void
     {
         $constraint = new Range(array('max' => 'March 20, 2014'));
         $this->validator->validate($value, $constraint);
@@ -261,7 +261,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getTenthToTwentiethMarch2014
      */
-    public function testValidDatesMinMax($value)
+    public function testValidDatesMinMax($value): void
     {
         $constraint = new Range(array('min' => 'March 10, 2014', 'max' => 'March 20, 2014'));
         $this->validator->validate($value, $constraint);
@@ -272,7 +272,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getSoonerThanTenthMarch2014
      */
-    public function testInvalidDatesMin($value, $dateTimeAsString)
+    public function testInvalidDatesMin($value, $dateTimeAsString): void
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
@@ -295,7 +295,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getLaterThanTwentiethMarch2014
      */
-    public function testInvalidDatesMax($value, $dateTimeAsString)
+    public function testInvalidDatesMax($value, $dateTimeAsString): void
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
@@ -318,7 +318,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getLaterThanTwentiethMarch2014
      */
-    public function testInvalidDatesCombinedMax($value, $dateTimeAsString)
+    public function testInvalidDatesCombinedMax($value, $dateTimeAsString): void
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
@@ -343,7 +343,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getSoonerThanTenthMarch2014
      */
-    public function testInvalidDatesCombinedMin($value, $dateTimeAsString)
+    public function testInvalidDatesCombinedMin($value, $dateTimeAsString): void
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
@@ -376,7 +376,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function testNonNumeric()
+    public function testNonNumeric(): void
     {
         $this->validator->validate('abcd', new Range(array(
             'min' => 10,

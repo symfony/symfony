@@ -20,7 +20,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 
 class ConfigurationTest extends TestCase
 {
-    public function testDefaultConfig()
+    public function testDefaultConfig(): void
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), array(array('secret' => 's3cr3t')));
@@ -31,7 +31,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    public function testDoNoDuplicateDefaultFormResources()
+    public function testDoNoDuplicateDefaultFormResources(): void
     {
         $input = array('templating' => array(
             'form' => array('resources' => array('FrameworkBundle:Form')),
@@ -44,7 +44,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(array('FrameworkBundle:Form'), $config['templating']['form']['resources']);
     }
 
-    public function testAssetsCanBeEnabled()
+    public function testAssetsCanBeEnabled(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -67,7 +67,7 @@ class ConfigurationTest extends TestCase
     /**
      * @dataProvider provideInvalidAssetConfigurationTests
      */
-    public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
+    public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage): void
     {
         if (method_exists($this, 'expectException')) {
             $this->expectException(InvalidConfigurationException::class);

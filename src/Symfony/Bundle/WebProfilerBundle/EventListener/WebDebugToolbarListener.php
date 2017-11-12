@@ -58,7 +58,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         return self::DISABLED !== $this->mode;
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         $response = $event->getResponse();
         $request = $event->getRequest();
@@ -113,7 +113,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     /**
      * Injects the web debug toolbar into the given Response.
      */
-    protected function injectToolbar(Response $response, Request $request, array $nonces)
+    protected function injectToolbar(Response $response, Request $request, array $nonces): void
     {
         $content = $response->getContent();
         $pos = strripos($content, '</body>');

@@ -18,14 +18,14 @@ use Symfony\Component\Console\Output\Output;
 
 class ConsoleOutputTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $output = new ConsoleOutput(Output::VERBOSITY_QUIET, true);
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
         $this->assertSame($output->getFormatter(), $output->getErrorOutput()->getFormatter(), '__construct() takes a formatter or null as the third argument');
     }
 
-    public function testSetFormatter()
+    public function testSetFormatter(): void
     {
         $output = new ConsoleOutput();
         $outputFormatter = new OutputFormatter();
@@ -33,7 +33,7 @@ class ConsoleOutputTest extends TestCase
         $this->assertSame($outputFormatter, $output->getFormatter());
     }
 
-    public function testSetVerbosity()
+    public function testSetVerbosity(): void
     {
         $output = new ConsoleOutput();
         $output->setVerbosity(Output::VERBOSITY_VERBOSE);

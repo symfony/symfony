@@ -86,13 +86,13 @@ class SymfonyTestsListenerTrait
         }
     }
 
-    public function globalListenerDisabled()
+    public function globalListenerDisabled(): void
     {
         self::$globallyEnabled = false;
         $this->state = -1;
     }
 
-    public function startTestSuite($suite)
+    public function startTestSuite($suite): void
     {
         if (class_exists('PHPUnit_Util_Blacklist', false)) {
             $Test = 'PHPUnit_Util_Test';
@@ -153,7 +153,7 @@ class SymfonyTestsListenerTrait
         }
     }
 
-    public function addSkippedTest($test, \Exception $e, $time)
+    public function addSkippedTest($test, \Exception $e, $time): void
     {
         if (0 < $this->state) {
             if ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase) {
@@ -168,7 +168,7 @@ class SymfonyTestsListenerTrait
         }
     }
 
-    public function startTest($test)
+    public function startTest($test): void
     {
         if (-2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
             if (null !== $test->getTestResultObject()) {
@@ -218,14 +218,14 @@ class SymfonyTestsListenerTrait
         }
     }
 
-    public function addWarning($test, $e, $time)
+    public function addWarning($test, $e, $time): void
     {
         if ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase) {
             $this->testsWithWarnings[$test->getName()] = true;
         }
     }
 
-    public function endTest($test, $time)
+    public function endTest($test, $time): void
     {
         if (class_exists('PHPUnit_Util_Blacklist', false)) {
             $Test = 'PHPUnit_Util_Test';

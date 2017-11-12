@@ -28,7 +28,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
         $this->warmers = $warmers;
     }
 
-    public function enableOptionalWarmers()
+    public function enableOptionalWarmers(): void
     {
         $this->optionalsEnabled = true;
     }
@@ -38,7 +38,7 @@ class CacheWarmerAggregate implements CacheWarmerInterface
      *
      * @param string $cacheDir The cache directory
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): void
     {
         foreach ($this->warmers as $warmer) {
             if (!$this->optionalsEnabled && $warmer->isOptional()) {

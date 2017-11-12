@@ -280,7 +280,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
+    public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null): void
     {
         throw new MethodNotImplementedException(__METHOD__);
     }

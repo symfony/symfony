@@ -18,14 +18,14 @@ class LocaleTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LocaleType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
     }
 
-    public function testLocalesAreSelectable()
+    public function testLocalesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -35,7 +35,7 @@ class LocaleTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('zh_Hant_MO', 'zh_Hant_MO', 'Chinese (Traditional, Macau SAR China)'), $choices, '', false, false);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }

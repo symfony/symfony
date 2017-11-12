@@ -33,7 +33,7 @@ class AuthenticationException extends \RuntimeException implements \Serializable
         return $this->token;
     }
 
-    public function setToken(TokenInterface $token)
+    public function setToken(TokenInterface $token): void
     {
         $this->token = $token;
     }
@@ -49,7 +49,7 @@ class AuthenticationException extends \RuntimeException implements \Serializable
         ));
     }
 
-    public function unserialize($str)
+    public function unserialize($str): void
     {
         list(
             $this->token,

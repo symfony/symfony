@@ -90,7 +90,7 @@ class ApplicationDescription
         return isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
     }
 
-    private function inspectApplication()
+    private function inspectApplication(): void
     {
         $this->commands = array();
         $this->namespaces = array();

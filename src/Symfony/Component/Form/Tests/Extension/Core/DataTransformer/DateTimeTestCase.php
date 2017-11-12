@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class DateTimeTestCase extends TestCase
 {
-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual): void
     {
         self::assertEquals($expected->format('U'), $actual->format('U'));
     }

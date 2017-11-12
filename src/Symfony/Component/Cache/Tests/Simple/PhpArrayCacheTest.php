@@ -49,12 +49,12 @@ class PhpArrayCacheTest extends CacheTestCase
 
     protected static $file;
 
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         self::$file = sys_get_temp_dir().'/symfony-cache/php-array-adapter-test.php';
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
             FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
@@ -66,7 +66,7 @@ class PhpArrayCacheTest extends CacheTestCase
         return new PhpArrayCacheWrapper(self::$file, new NullCache());
     }
 
-    public function testStore()
+    public function testStore(): void
     {
         $arrayWithRefs = array();
         $arrayWithRefs[0] = 123;
@@ -93,7 +93,7 @@ class PhpArrayCacheTest extends CacheTestCase
         }
     }
 
-    public function testStoredFile()
+    public function testStoredFile(): void
     {
         $expected = array(
             'integer' => 42,
@@ -116,7 +116,7 @@ class PhpArrayCacheWrapper extends PhpArrayCache
 {
     public function set($key, $value, $ttl = null)
     {
-        call_user_func(\Closure::bind(function () use ($key, $value) {
+        call_user_func(\Closure::bind(function () use ($key, $value): void {
             $this->values[$key] = $value;
             $this->warmUp($this->values);
             $this->values = eval(substr(file_get_contents($this->file), 6));
@@ -130,7 +130,7 @@ class PhpArrayCacheWrapper extends PhpArrayCache
         if (!is_array($values) && !$values instanceof \Traversable) {
             return parent::setMultiple($values, $ttl);
         }
-        call_user_func(\Closure::bind(function () use ($values) {
+        call_user_func(\Closure::bind(function () use ($values): void {
             foreach ($values as $key => $value) {
                 $this->values[$key] = $value;
             }

@@ -23,20 +23,20 @@ class CustomNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new CustomNormalizer();
         $this->normalizer->setSerializer(new Serializer());
     }
 
-    public function testInterface()
+    public function testInterface(): void
     {
         $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $this->normalizer);
         $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $this->normalizer);
         $this->assertInstanceOf('Symfony\Component\Serializer\SerializerAwareInterface', $this->normalizer);
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $obj = new ScalarDummy();
         $obj->foo = 'foo';
@@ -45,7 +45,7 @@ class CustomNormalizerTest extends TestCase
         $this->assertEquals('xml', $this->normalizer->normalize($obj, 'xml'));
     }
 
-    public function testDeserialize()
+    public function testDeserialize(): void
     {
         $obj = $this->normalizer->denormalize('foo', get_class(new ScalarDummy()), 'xml');
         $this->assertEquals('foo', $obj->xmlFoo);
@@ -56,7 +56,7 @@ class CustomNormalizerTest extends TestCase
         $this->assertNull($obj->xmlFoo);
     }
 
-    public function testDenormalizeWithObjectToPopulateUsesProvidedObject()
+    public function testDenormalizeWithObjectToPopulateUsesProvidedObject(): void
     {
         $expected = new ScalarDummy();
         $obj = $this->normalizer->denormalize('foo', ScalarDummy::class, 'json', array(
@@ -68,13 +68,13 @@ class CustomNormalizerTest extends TestCase
         $this->assertNull($obj->xmlFoo);
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new ScalarDummy()));
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization(array(), 'Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy'));
         $this->assertFalse($this->normalizer->supportsDenormalization(array(), 'stdClass'));

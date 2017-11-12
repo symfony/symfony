@@ -18,7 +18,7 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 class ValidatorCacheWarmerTest extends TestCase
 {
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
@@ -51,7 +51,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author', $values);
     }
 
-    public function testWarmUpWithAnnotations()
+    public function testWarmUpWithAnnotations(): void
     {
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/categories.yml');
@@ -84,7 +84,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.SubCategory', $values);
     }
 
-    public function testWarmUpWithoutLoader()
+    public function testWarmUpWithoutLoader(): void
     {
         $validatorBuilder = new ValidatorBuilder();
 

@@ -110,7 +110,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Advances the iterator to the next position.
      */
-    public function next()
+    public function next(): void
     {
         next($this->errors);
     }
@@ -141,7 +141,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * This method detects if errors have been added to the form since the
      * construction of the iterator.
      */
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->errors);
     }
@@ -181,7 +181,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @throws BadMethodCallException
      */
-    public function offsetSet($position, $value)
+    public function offsetSet($position, $value): void
     {
         throw new BadMethodCallException('The iterator doesn\'t support modification of elements.');
     }
@@ -191,7 +191,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @throws BadMethodCallException
      */
-    public function offsetUnset($position)
+    public function offsetUnset($position): void
     {
         throw new BadMethodCallException('The iterator doesn\'t support modification of elements.');
     }
@@ -244,7 +244,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @throws OutOfBoundsException If the position is invalid
      */
-    public function seek($position)
+    public function seek($position): void
     {
         if (!isset($this->errors[$position])) {
             throw new OutOfBoundsException('The offset '.$position.' does not exist.');

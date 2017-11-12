@@ -26,7 +26,7 @@ trait ApcuTrait
         return function_exists('apcu_fetch') && ini_get('apc.enabled');
     }
 
-    private function init($namespace, $defaultLifetime, $version)
+    private function init($namespace, $defaultLifetime, $version): void
     {
         if (!static::isSupported()) {
             throw new CacheException('APCu is not enabled');

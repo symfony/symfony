@@ -958,7 +958,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @see self::add()
      */
-    public function offsetSet($name, $child)
+    public function offsetSet($name, $child): void
     {
         $this->add($child);
     }
@@ -970,7 +970,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @throws AlreadySubmittedException if the form has already been submitted
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         $this->remove($name);
     }

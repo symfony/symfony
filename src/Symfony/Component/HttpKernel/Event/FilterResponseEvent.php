@@ -48,7 +48,7 @@ class FilterResponseEvent extends KernelEvent
     /**
      * Sets a new response object.
      */
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): void
     {
         $this->response = $response;
     }

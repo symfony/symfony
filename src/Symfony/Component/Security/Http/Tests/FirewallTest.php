@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Firewall;
 
 class FirewallTest extends TestCase
 {
-    public function testOnKernelRequestRegistersExceptionListener()
+    public function testOnKernelRequestRegistersExceptionListener(): void
     {
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
 
@@ -46,7 +46,7 @@ class FirewallTest extends TestCase
         $firewall->onKernelRequest($event);
     }
 
-    public function testOnKernelRequestStopsWhenThereIsAResponse()
+    public function testOnKernelRequestStopsWhenThereIsAResponse(): void
     {
         $response = new Response();
 
@@ -88,7 +88,7 @@ class FirewallTest extends TestCase
         $firewall->onKernelRequest($event);
     }
 
-    public function testOnKernelRequestWithSubRequest()
+    public function testOnKernelRequestWithSubRequest(): void
     {
         $map = $this->getMockBuilder('Symfony\Component\Security\Http\FirewallMapInterface')->getMock();
         $map

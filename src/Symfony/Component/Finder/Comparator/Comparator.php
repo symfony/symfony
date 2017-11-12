@@ -36,7 +36,7 @@ class Comparator
      *
      * @param string $target The target value
      */
-    public function setTarget($target)
+    public function setTarget($target): void
     {
         $this->target = $target;
     }
@@ -58,7 +58,7 @@ class Comparator
      *
      * @throws \InvalidArgumentException
      */
-    public function setOperator($operator)
+    public function setOperator($operator): void
     {
         if (!$operator) {
             $operator = '==';

@@ -24,7 +24,7 @@ class History
     /**
      * Clears the history.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->stack = array();
         $this->position = -1;
@@ -33,7 +33,7 @@ class History
     /**
      * Adds a Request to the history.
      */
-    public function add(Request $request)
+    public function add(Request $request): void
     {
         $this->stack = array_slice($this->stack, 0, $this->position + 1);
         $this->stack[] = clone $request;

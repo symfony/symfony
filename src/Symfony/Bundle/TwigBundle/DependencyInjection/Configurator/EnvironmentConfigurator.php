@@ -40,7 +40,7 @@ class EnvironmentConfigurator
         $this->thousandsSeparator = $thousandsSeparator;
     }
 
-    public function configure(Environment $environment)
+    public function configure(Environment $environment): void
     {
         $environment->getExtension('Twig\Extension\CoreExtension')->setDateFormat($this->dateFormat, $this->intervalFormat);
 

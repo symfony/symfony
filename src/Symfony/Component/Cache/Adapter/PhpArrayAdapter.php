@@ -263,7 +263,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
      *
      * @internal
      */
-    public static function throwOnRequiredClass($class)
+    public static function throwOnRequiredClass($class): void
     {
         $e = new \ReflectionException("Class $class does not exist");
         $trace = $e->getTrace();

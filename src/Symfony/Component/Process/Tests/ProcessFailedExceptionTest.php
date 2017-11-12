@@ -22,7 +22,7 @@ class ProcessFailedExceptionTest extends TestCase
     /**
      * tests ProcessFailedException throws exception if the process was successful.
      */
-    public function testProcessFailedExceptionThrowsException()
+    public function testProcessFailedExceptionThrowsException(): void
     {
         $process = $this->getMockBuilder('Symfony\Component\Process\Process')->setMethods(array('isSuccessful'))->setConstructorArgs(array('php'))->getMock();
         $process->expects($this->once())
@@ -43,7 +43,7 @@ class ProcessFailedExceptionTest extends TestCase
      * tests ProcessFailedException uses information from process output
      * to generate exception message.
      */
-    public function testProcessFailedExceptionPopulatesInformationFromProcessOutput()
+    public function testProcessFailedExceptionPopulatesInformationFromProcessOutput(): void
     {
         $cmd = 'php';
         $exitCode = 1;
@@ -93,7 +93,7 @@ class ProcessFailedExceptionTest extends TestCase
      * Tests that ProcessFailedException does not extract information from
      * process output if it was previously disabled.
      */
-    public function testDisabledOutputInFailedExceptionDoesNotPopulateOutput()
+    public function testDisabledOutputInFailedExceptionDoesNotPopulateOutput(): void
     {
         $cmd = 'php';
         $exitCode = 1;

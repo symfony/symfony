@@ -17,7 +17,7 @@ use Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper\PhpDumperTest;
 
 class ManagerRegistryTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!class_exists('PHPUnit_Framework_TestCase')) {
             self::markTestSkipped('proxy-manager-bridge is not yet compatible with namespaced phpunit versions.');
@@ -26,7 +26,7 @@ class ManagerRegistryTest extends TestCase
         $test->testDumpContainerWithProxyServiceWillShareProxies();
     }
 
-    public function testResetService()
+    public function testResetService(): void
     {
         $container = new \LazyServiceProjectServiceContainer();
 
@@ -46,7 +46,7 @@ class ManagerRegistryTest extends TestCase
 
 class TestManagerRegistry extends ManagerRegistry
 {
-    public function setTestContainer($container)
+    public function setTestContainer($container): void
     {
         $this->container = $container;
     }

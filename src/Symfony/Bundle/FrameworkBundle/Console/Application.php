@@ -134,7 +134,7 @@ class Application extends BaseApplication
         return parent::add($command);
     }
 
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         if ($this->commandsRegistered) {
             return;
@@ -178,7 +178,7 @@ class Application extends BaseApplication
         }
     }
 
-    private function renderRegistrationErrors(InputInterface $input, OutputInterface $output)
+    private function renderRegistrationErrors(InputInterface $input, OutputInterface $output): void
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();

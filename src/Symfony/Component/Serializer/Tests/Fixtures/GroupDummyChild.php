@@ -26,7 +26,7 @@ class GroupDummyChild extends GroupDummy
     /**
      * @param mixed $baz
      */
-    public function setBaz($baz)
+    public function setBaz($baz): void
     {
         $this->baz = $baz;
     }

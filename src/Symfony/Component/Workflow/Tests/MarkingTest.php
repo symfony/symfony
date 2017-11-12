@@ -7,7 +7,7 @@ use Symfony\Component\Workflow\Marking;
 
 class MarkingTest extends TestCase
 {
-    public function testMarking()
+    public function testMarking(): void
     {
         $marking = new Marking(array('a' => 1));
 

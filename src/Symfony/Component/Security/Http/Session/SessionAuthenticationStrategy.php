@@ -40,7 +40,7 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
     /**
      * {@inheritdoc}
      */
-    public function onAuthentication(Request $request, TokenInterface $token)
+    public function onAuthentication(Request $request, TokenInterface $token): void
     {
         switch ($this->strategy) {
             case self::NONE:

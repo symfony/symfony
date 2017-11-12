@@ -32,7 +32,7 @@ class Ssi extends AbstractSurrogate
     /**
      * {@inheritdoc}
      */
-    public function addSurrogateControl(Response $response)
+    public function addSurrogateControl(Response $response): void
     {
         if (false !== strpos($response->getContent(), '<!--#include')) {
             $response->headers->set('Surrogate-Control', 'content="SSI/1.0"');

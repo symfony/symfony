@@ -39,7 +39,7 @@ class GetResponseEvent extends KernelEvent
     /**
      * Sets a response and stops event propagation.
      */
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): void
     {
         $this->response = $response;
 

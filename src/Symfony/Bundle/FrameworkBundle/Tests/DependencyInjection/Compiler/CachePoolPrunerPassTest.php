@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CachePoolPrunerPassTest extends TestCase
 {
-    public function testCompilerPassReplacesCommandArgument()
+    public function testCompilerPassReplacesCommandArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register(CachePoolPruneCommand::class)->addArgument(array());
@@ -42,7 +42,7 @@ class CachePoolPrunerPassTest extends TestCase
         $this->assertEquals($expected, $argument->getValues());
     }
 
-    public function testCompilePassIsIgnoredIfCommandDoesNotExist()
+    public function testCompilePassIsIgnoredIfCommandDoesNotExist(): void
     {
         $container = $this
             ->getMockBuilder(ContainerBuilder::class)
@@ -71,7 +71,7 @@ class CachePoolPrunerPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Class "Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\NotFound" used for service "pool.not-found" cannot be found.
      */
-    public function testCompilerPassThrowsOnInvalidDefinitionClass()
+    public function testCompilerPassThrowsOnInvalidDefinitionClass(): void
     {
         $container = new ContainerBuilder();
         $container->register(CachePoolPruneCommand::class)->addArgument(array());

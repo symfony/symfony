@@ -40,7 +40,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectArrayIfMultipleIsTrue()
+    public function testExpectArrayIfMultipleIsTrue(): void
     {
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar'),
@@ -50,7 +50,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('asdf', $constraint);
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(
             null,
@@ -67,7 +67,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testChoicesOrCallbackExpected()
+    public function testChoicesOrCallbackExpected(): void
     {
         $this->validator->validate('foobar', new Choice());
     }
@@ -75,12 +75,12 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testValidCallbackExpected()
+    public function testValidCallbackExpected(): void
     {
         $this->validator->validate('foobar', new Choice(array('callback' => 'abcd')));
     }
 
-    public function testValidChoiceArray()
+    public function testValidChoiceArray(): void
     {
         $constraint = new Choice(array('choices' => array('foo', 'bar')));
 
@@ -89,7 +89,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidChoiceCallbackFunction()
+    public function testValidChoiceCallbackFunction(): void
     {
         $constraint = new Choice(array('callback' => __NAMESPACE__.'\choice_callback'));
 
@@ -98,7 +98,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidChoiceCallbackClosure()
+    public function testValidChoiceCallbackClosure(): void
     {
         $constraint = new Choice(
             array(
@@ -113,7 +113,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidChoiceCallbackStaticMethod()
+    public function testValidChoiceCallbackStaticMethod(): void
     {
         $constraint = new Choice(array('callback' => array(__CLASS__, 'staticCallback')));
 
@@ -122,7 +122,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidChoiceCallbackContextMethod()
+    public function testValidChoiceCallbackContextMethod(): void
     {
         // search $this for "staticCallback"
         $this->setObject($this);
@@ -134,7 +134,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidChoiceCallbackContextObjectMethod()
+    public function testValidChoiceCallbackContextObjectMethod(): void
     {
         // search $this for "objectMethodCallback"
         $this->setObject($this);
@@ -146,7 +146,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testMultipleChoices()
+    public function testMultipleChoices(): void
     {
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar', 'baz'),
@@ -158,7 +158,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidChoice()
+    public function testInvalidChoice(): void
     {
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar'),
@@ -173,7 +173,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidChoiceEmptyChoices()
+    public function testInvalidChoiceEmptyChoices(): void
     {
         $constraint = new Choice(array(
             // May happen when the choices are provided dynamically, e.g. from
@@ -190,7 +190,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidChoiceMultiple()
+    public function testInvalidChoiceMultiple(): void
     {
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar'),
@@ -207,7 +207,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testTooFewChoices()
+    public function testTooFewChoices(): void
     {
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar', 'moo', 'maa'),
@@ -230,7 +230,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testTooManyChoices()
+    public function testTooManyChoices(): void
     {
         $constraint = new Choice(array(
             'choices' => array('foo', 'bar', 'moo', 'maa'),
@@ -253,7 +253,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testStrictAllowsExactValue()
+    public function testStrictAllowsExactValue(): void
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2),
@@ -264,7 +264,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testStrictDisallowsDifferentType()
+    public function testStrictDisallowsDifferentType(): void
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2),
@@ -279,7 +279,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testStrictWithMultipleChoices()
+    public function testStrictWithMultipleChoices(): void
     {
         $constraint = new Choice(array(
             'choices' => array(1, 2, 3),

@@ -41,7 +41,7 @@ class ContainerConfigurator extends AbstractConfigurator
         $this->file = $file;
     }
 
-    final public function extension(string $namespace, array $config)
+    final public function extension(string $namespace, array $config): void
     {
         if (!$this->container->hasExtension($namespace)) {
             $extensions = array_filter(array_map(function ($ext) { return $ext->getAlias(); }, $this->container->getExtensions()));
@@ -57,7 +57,7 @@ class ContainerConfigurator extends AbstractConfigurator
         $this->container->loadFromExtension($namespace, static::processValue($config));
     }
 
-    final public function import(string $resource, string $type = null, bool $ignoreErrors = false)
+    final public function import(string $resource, string $type = null, bool $ignoreErrors = false): void
     {
         $this->loader->setCurrentDir(dirname($this->path));
         $this->loader->import($resource, $type, $ignoreErrors, $this->file);

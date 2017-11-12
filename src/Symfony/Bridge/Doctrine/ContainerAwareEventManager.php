@@ -96,7 +96,7 @@ class ContainerAwareEventManager extends EventManager
      *
      * @throws \RuntimeException
      */
-    public function addEventListener($events, $listener)
+    public function addEventListener($events, $listener): void
     {
         if (is_string($listener)) {
             if ($this->initialized) {
@@ -122,7 +122,7 @@ class ContainerAwareEventManager extends EventManager
      * @param string|array  $events
      * @param object|string $listener
      */
-    public function removeEventListener($events, $listener)
+    public function removeEventListener($events, $listener): void
     {
         if (is_string($listener)) {
             $hash = '_service_'.$listener;

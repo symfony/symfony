@@ -20,14 +20,14 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  */
 abstract class BaseValidatorExtensionTest extends TypeTestCase
 {
-    public function testValidationGroupNullByDefault()
+    public function testValidationGroupNullByDefault(): void
     {
         $form = $this->createForm();
 
         $this->assertNull($form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsTransformedToArray()
+    public function testValidationGroupsTransformedToArray(): void
     {
         $form = $this->createForm(array(
             'validation_groups' => 'group',
@@ -36,7 +36,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
         $this->assertEquals(array('group'), $form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToArray()
+    public function testValidationGroupsCanBeSetToArray(): void
     {
         $form = $this->createForm(array(
             'validation_groups' => array('group1', 'group2'),
@@ -45,7 +45,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
         $this->assertEquals(array('group1', 'group2'), $form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToFalse()
+    public function testValidationGroupsCanBeSetToFalse(): void
     {
         $form = $this->createForm(array(
             'validation_groups' => false,
@@ -54,7 +54,7 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
         $this->assertEquals(array(), $form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToCallback()
+    public function testValidationGroupsCanBeSetToCallback(): void
     {
         $form = $this->createForm(array(
             'validation_groups' => array($this, 'testValidationGroupsCanBeSetToCallback'),
@@ -63,16 +63,16 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
         $this->assertInternalType('callable', $form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToClosure()
+    public function testValidationGroupsCanBeSetToClosure(): void
     {
         $form = $this->createForm(array(
-            'validation_groups' => function (FormInterface $form) { },
+            'validation_groups' => function (FormInterface $form): void { },
         ));
 
         $this->assertInternalType('callable', $form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToGroupSequence()
+    public function testValidationGroupsCanBeSetToGroupSequence(): void
     {
         $form = $this->createForm(array(
             'validation_groups' => new GroupSequence(array('group1', 'group2')),

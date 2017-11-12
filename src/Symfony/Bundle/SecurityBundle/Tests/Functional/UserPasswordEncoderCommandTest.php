@@ -30,7 +30,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
     /** @var CommandTester */
     private $passwordEncoderCommandTester;
 
-    public function testEncodePasswordEmptySalt()
+    public function testEncodePasswordEmptySalt(): void
     {
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
@@ -43,7 +43,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertEquals($expected, $this->passwordEncoderCommandTester->getDisplay());
     }
 
-    public function testEncodeNoPasswordNoInteraction()
+    public function testEncodeNoPasswordNoInteraction(): void
     {
         $statusCode = $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
@@ -53,7 +53,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertEquals($statusCode, 1);
     }
 
-    public function testEncodePasswordBcrypt()
+    public function testEncodePasswordBcrypt(): void
     {
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
@@ -70,7 +70,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertTrue($encoder->isPasswordValid($hash, 'password', null));
     }
 
-    public function testEncodePasswordArgon2i()
+    public function testEncodePasswordArgon2i(): void
     {
         if (!Argon2iPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Argon2i algorithm not available.');
@@ -91,7 +91,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertTrue($encoder->isPasswordValid($hash, 'password', null));
     }
 
-    public function testEncodePasswordPbkdf2()
+    public function testEncodePasswordPbkdf2(): void
     {
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
@@ -110,7 +110,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertTrue($encoder->isPasswordValid($hash, 'password', $salt));
     }
 
-    public function testEncodePasswordOutput()
+    public function testEncodePasswordOutput(): void
     {
         $this->passwordEncoderCommandTester->execute(
             array(
@@ -124,7 +124,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordEmptySaltOutput()
+    public function testEncodePasswordEmptySaltOutput(): void
     {
         $this->passwordEncoderCommandTester->execute(
             array(
@@ -140,7 +140,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordBcryptOutput()
+    public function testEncodePasswordBcryptOutput(): void
     {
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
@@ -151,7 +151,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordArgon2iOutput()
+    public function testEncodePasswordArgon2iOutput(): void
     {
         if (!Argon2iPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Argon2i algorithm not available.');
@@ -167,7 +167,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordNoConfigForGivenUserClass()
+    public function testEncodePasswordNoConfigForGivenUserClass(): void
     {
         if (method_exists($this, 'expectException')) {
             $this->expectException('\RuntimeException');
@@ -183,7 +183,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         ), array('interactive' => false));
     }
 
-    public function testEncodePasswordAsksNonProvidedUserClass()
+    public function testEncodePasswordAsksNonProvidedUserClass(): void
     {
         $this->passwordEncoderCommandTester->setInputs(array('Custom\Class\Pbkdf2\User', "\n"));
         $this->passwordEncoderCommandTester->execute(array(
@@ -201,7 +201,7 @@ EOTXT
         , $this->passwordEncoderCommandTester->getDisplay(true));
     }
 
-    public function testNonInteractiveEncodePasswordUsesFirstUserClass()
+    public function testNonInteractiveEncodePasswordUsesFirstUserClass(): void
     {
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
@@ -215,7 +215,7 @@ EOTXT
      * @expectedException \RuntimeException
      * @expectedExceptionMessage There are no configured encoders for the "security" extension.
      */
-    public function testThrowsExceptionOnNoConfiguredEncoders()
+    public function testThrowsExceptionOnNoConfiguredEncoders(): void
     {
         $application = new ConsoleApplication();
         $application->add(new UserPasswordEncoderCommand($this->getMockBuilder(EncoderFactoryInterface::class)->getMock(), array()));
@@ -229,7 +229,7 @@ EOTXT
         ), array('interactive' => false));
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         putenv('COLUMNS='.(119 + strlen(PHP_EOL)));
         $kernel = $this->createKernel(array('test_case' => 'PasswordEncode'));
@@ -242,12 +242,12 @@ EOTXT
         $this->passwordEncoderCommandTester = new CommandTester($passwordEncoderCommand);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->passwordEncoderCommandTester = null;
     }
 
-    private function setupArgon2i()
+    private function setupArgon2i(): void
     {
         putenv('COLUMNS='.(119 + strlen(PHP_EOL)));
         $kernel = $this->createKernel(array('test_case' => 'PasswordEncode', 'root_config' => 'argon2i'));

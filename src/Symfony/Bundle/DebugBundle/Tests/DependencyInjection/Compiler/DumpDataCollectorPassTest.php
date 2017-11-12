@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DumpDataCollectorPassTest extends TestCase
 {
-    public function testProcessWithoutFileLinkFormatParameter()
+    public function testProcessWithoutFileLinkFormatParameter(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
@@ -33,7 +33,7 @@ class DumpDataCollectorPassTest extends TestCase
         $this->assertNull($definition->getArgument(1));
     }
 
-    public function testProcessWithToolbarEnabled()
+    public function testProcessWithToolbarEnabled(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
@@ -48,7 +48,7 @@ class DumpDataCollectorPassTest extends TestCase
         $this->assertSame($requestStack, $definition->getArgument(3));
     }
 
-    public function testProcessWithToolbarDisabled()
+    public function testProcessWithToolbarDisabled(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
@@ -62,7 +62,7 @@ class DumpDataCollectorPassTest extends TestCase
         $this->assertNull($definition->getArgument(3));
     }
 
-    public function testProcessWithoutToolbar()
+    public function testProcessWithoutToolbar(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());

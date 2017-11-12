@@ -37,14 +37,14 @@ class DumperTest extends TestCase
         ),
     );
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parser = new Parser();
         $this->dumper = new Dumper();
         $this->path = __DIR__.'/Fixtures';
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->parser = null;
         $this->dumper = null;
@@ -52,7 +52,7 @@ class DumperTest extends TestCase
         $this->array = null;
     }
 
-    public function testIndentationInConstructor()
+    public function testIndentationInConstructor(): void
     {
         $dumper = new Dumper(7);
         $expected = <<<'EOF'
@@ -77,7 +77,7 @@ EOF;
         $this->assertEquals($expected, $dumper->dump($this->array, 4, 0));
     }
 
-    public function testSpecifications()
+    public function testSpecifications(): void
     {
         $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));
         foreach ($files as $file) {
@@ -102,7 +102,7 @@ EOF;
         }
     }
 
-    public function testInlineLevel()
+    public function testInlineLevel(): void
     {
         $expected = <<<'EOF'
 { '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
@@ -177,14 +177,14 @@ EOF;
         $this->assertEquals($expected, $this->dumper->dump($this->array, 10), '->dump() takes an inline level argument');
     }
 
-    public function testObjectSupportEnabled()
+    public function testObjectSupportEnabled(): void
     {
         $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_OBJECT);
 
         $this->assertEquals('{ foo: !php/object \'O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}\', bar: 1 }', $dump, '->dump() is able to dump objects');
     }
 
-    public function testObjectSupportDisabledButNoExceptions()
+    public function testObjectSupportDisabledButNoExceptions(): void
     {
         $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1));
 
@@ -194,7 +194,7 @@ EOF;
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\DumpException
      */
-    public function testObjectSupportDisabledWithExceptions()
+    public function testObjectSupportDisabledWithExceptions(): void
     {
         $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
     }
@@ -202,7 +202,7 @@ EOF;
     /**
      * @dataProvider getEscapeSequences
      */
-    public function testEscapedEscapeSequencesInQuotedScalar($input, $expected)
+    public function testEscapedEscapeSequencesInQuotedScalar($input, $expected): void
     {
         $this->assertEquals($expected, $this->dumper->dump($input));
     }
@@ -232,7 +232,7 @@ EOF;
         );
     }
 
-    public function testBinaryDataIsDumpedBase64Encoded()
+    public function testBinaryDataIsDumpedBase64Encoded(): void
     {
         $binaryData = file_get_contents(__DIR__.'/Fixtures/arrow.gif');
         $expected = '{ data: !!binary '.base64_encode($binaryData).' }';
@@ -240,7 +240,7 @@ EOF;
         $this->assertSame($expected, $this->dumper->dump(array('data' => $binaryData)));
     }
 
-    public function testNonUtf8DataIsDumpedBase64Encoded()
+    public function testNonUtf8DataIsDumpedBase64Encoded(): void
     {
         // "für" (ISO-8859-1 encoded)
         $this->assertSame('!!binary ZsM/cg==', $this->dumper->dump("f\xc3\x3fr"));
@@ -249,7 +249,7 @@ EOF;
     /**
      * @dataProvider objectAsMapProvider
      */
-    public function testDumpObjectAsMap($object, $expected)
+    public function testDumpObjectAsMap($object, $expected): void
     {
         $yaml = $this->dumper->dump($object, 0, 0, Yaml::DUMP_OBJECT_AS_MAP);
 
@@ -285,7 +285,7 @@ EOF;
         return $tests;
     }
 
-    public function testDumpingArrayObjectInstancesRespectsInlineLevel()
+    public function testDumpingArrayObjectInstancesRespectsInlineLevel(): void
     {
         $deep = new \ArrayObject(array('deep1' => 'd', 'deep2' => 'e'));
         $inner = new \ArrayObject(array('inner1' => 'b', 'inner2' => 'c', 'inner3' => $deep));
@@ -304,7 +304,7 @@ YAML;
         $this->assertSame($expected, $yaml);
     }
 
-    public function testDumpingArrayObjectInstancesWithNumericKeysInlined()
+    public function testDumpingArrayObjectInstancesWithNumericKeysInlined(): void
     {
         $deep = new \ArrayObject(array('d', 'e'));
         $inner = new \ArrayObject(array('b', 'c', $deep));
@@ -317,7 +317,7 @@ YAML;
         $this->assertSame($expected, $yaml);
     }
 
-    public function testDumpingArrayObjectInstancesWithNumericKeysRespectsInlineLevel()
+    public function testDumpingArrayObjectInstancesWithNumericKeysRespectsInlineLevel(): void
     {
         $deep = new \ArrayObject(array('d', 'e'));
         $inner = new \ArrayObject(array('b', 'c', $deep));
@@ -334,17 +334,17 @@ YAML;
         $this->assertEquals($expected, $yaml);
     }
 
-    public function testDumpEmptyArrayObjectInstanceAsMap()
+    public function testDumpEmptyArrayObjectInstanceAsMap(): void
     {
         $this->assertSame('{  }', $this->dumper->dump(new \ArrayObject(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
     }
 
-    public function testDumpEmptyStdClassInstanceAsMap()
+    public function testDumpEmptyStdClassInstanceAsMap(): void
     {
         $this->assertSame('{  }', $this->dumper->dump(new \stdClass(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
     }
 
-    public function testDumpingStdClassInstancesRespectsInlineLevel()
+    public function testDumpingStdClassInstancesRespectsInlineLevel(): void
     {
         $deep = new \stdClass();
         $deep->deep1 = 'd';
@@ -372,7 +372,7 @@ YAML;
         $this->assertSame($expected, $yaml);
     }
 
-    public function testDumpMultiLineStringAsScalarBlock()
+    public function testDumpMultiLineStringAsScalarBlock(): void
     {
         $data = array(
             'data' => array(
@@ -391,7 +391,7 @@ YAML;
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The indentation must be greater than zero
      */
-    public function testZeroIndentationThrowsException()
+    public function testZeroIndentationThrowsException(): void
     {
         new Dumper(0);
     }
@@ -400,7 +400,7 @@ YAML;
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The indentation must be greater than zero
      */
-    public function testNegativeIndentationThrowsException()
+    public function testNegativeIndentationThrowsException(): void
     {
         new Dumper(-4);
     }

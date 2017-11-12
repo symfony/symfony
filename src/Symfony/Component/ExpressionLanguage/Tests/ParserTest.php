@@ -22,7 +22,7 @@ class ParserTest extends TestCase
      * @expectedException        \Symfony\Component\ExpressionLanguage\SyntaxError
      * @expectedExceptionMessage Variable "foo" is not valid around position 1 for expression `foo`.
      */
-    public function testParseWithInvalidName()
+    public function testParseWithInvalidName(): void
     {
         $lexer = new Lexer();
         $parser = new Parser(array());
@@ -33,7 +33,7 @@ class ParserTest extends TestCase
      * @expectedException        \Symfony\Component\ExpressionLanguage\SyntaxError
      * @expectedExceptionMessage Variable "foo" is not valid around position 1 for expression `foo`.
      */
-    public function testParseWithZeroInNames()
+    public function testParseWithZeroInNames(): void
     {
         $lexer = new Lexer();
         $parser = new Parser(array());
@@ -43,7 +43,7 @@ class ParserTest extends TestCase
     /**
      * @dataProvider getParseData
      */
-    public function testParse($node, $expression, $names = array())
+    public function testParse($node, $expression, $names = array()): void
     {
         $lexer = new Lexer();
         $parser = new Parser(array());
@@ -167,7 +167,7 @@ class ParserTest extends TestCase
      * @dataProvider getInvalidPostfixData
      * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
      */
-    public function testParseWithInvalidPostfixData($expr, $names = array())
+    public function testParseWithInvalidPostfixData($expr, $names = array()): void
     {
         $lexer = new Lexer();
         $parser = new Parser(array());
@@ -200,7 +200,7 @@ class ParserTest extends TestCase
      * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
      * @expectedExceptionMessage Did you mean "baz"?
      */
-    public function testNameProposal()
+    public function testNameProposal(): void
     {
         $lexer = new Lexer();
         $parser = new Parser(array());

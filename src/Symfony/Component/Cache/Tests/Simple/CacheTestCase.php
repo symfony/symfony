@@ -17,7 +17,7 @@ use Symfony\Component\Cache\PruneableInterface;
 
 abstract class CacheTestCase extends SimpleCacheTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ abstract class CacheTestCase extends SimpleCacheTest
         return array_merge(parent::validKeys(), array(array("a\0b")));
     }
 
-    public function testDefaultLifeTime()
+    public function testDefaultLifeTime(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -48,7 +48,7 @@ abstract class CacheTestCase extends SimpleCacheTest
         $this->assertNull($cache->get('key.dlt'));
     }
 
-    public function testNotUnserializable()
+    public function testNotUnserializable(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -67,7 +67,7 @@ abstract class CacheTestCase extends SimpleCacheTest
         $this->assertNull($value);
     }
 
-    public function testPrune()
+    public function testPrune(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -130,7 +130,7 @@ class NotUnserializable implements \Serializable
         return serialize(123);
     }
 
-    public function unserialize($ser)
+    public function unserialize($ser): void
     {
         throw new \Exception(__CLASS__);
     }

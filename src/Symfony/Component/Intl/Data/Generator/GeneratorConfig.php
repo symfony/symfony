@@ -42,7 +42,7 @@ class GeneratorConfig
      * @param string                $targetDir The output directory
      * @param BundleWriterInterface $writer    The writer instance
      */
-    public function addBundleWriter($targetDir, BundleWriterInterface $writer)
+    public function addBundleWriter($targetDir, BundleWriterInterface $writer): void
     {
         $this->bundleWriters[$targetDir] = $writer;
     }

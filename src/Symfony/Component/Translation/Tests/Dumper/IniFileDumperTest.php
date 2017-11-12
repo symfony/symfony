@@ -17,7 +17,7 @@ use Symfony\Component\Translation\Dumper\IniFileDumper;
 
 class IniFileDumperTest extends TestCase
 {
-    public function testFormatCatalogue()
+    public function testFormatCatalogue(): void
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar'));

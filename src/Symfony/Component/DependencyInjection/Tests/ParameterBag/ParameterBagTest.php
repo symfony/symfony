@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class ParameterBagTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $bag = new ParameterBag($parameters = array(
             'foo' => 'foo',
@@ -28,7 +28,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $bag = new ParameterBag($parameters = array(
             'foo' => 'foo',
@@ -38,7 +38,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(array(), $bag->all(), '->clear() removes all parameters');
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $bag = new ParameterBag(array(
             'foo' => 'foo',
@@ -48,7 +48,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(array('bar' => 'bar'), $bag->all(), '->remove() removes a parameter');
     }
 
-    public function testGetSet()
+    public function testGetSet(): void
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
         $bag->set('bar', 'foo');
@@ -69,7 +69,7 @@ class ParameterBagTest extends TestCase
     /**
      * @dataProvider provideGetThrowParameterNotFoundExceptionData
      */
-    public function testGetThrowParameterNotFoundException($parameterKey, $exceptionMessage)
+    public function testGetThrowParameterNotFoundException($parameterKey, $exceptionMessage): void
     {
         $bag = new ParameterBag(array(
             'foo' => 'foo',
@@ -99,14 +99,14 @@ class ParameterBagTest extends TestCase
         );
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
         $this->assertTrue($bag->has('foo'), '->has() returns true if a parameter is defined');
         $this->assertFalse($bag->has('bar'), '->has() returns false if a parameter is not defined');
     }
 
-    public function testMixedCase()
+    public function testMixedCase(): void
     {
         $bag = new ParameterBag(array(
             'foo' => 'foo',
@@ -122,7 +122,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('baz1', $bag->get('Foo'));
     }
 
-    public function testResolveValue()
+    public function testResolveValue(): void
     {
         $bag = new ParameterBag(array());
         $this->assertEquals('foo', $bag->resolveValue('foo'), '->resolveValue() returns its argument unmodified if no placeholders are found');
@@ -189,7 +189,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('foo.bar:1337', $bag->resolveValue('%host%:%port%'));
     }
 
-    public function testResolveIndicatesWhyAParameterIsNeeded()
+    public function testResolveIndicatesWhyAParameterIsNeeded(): void
     {
         $bag = new ParameterBag(array('foo' => '%bar%'));
 
@@ -208,7 +208,7 @@ class ParameterBagTest extends TestCase
         }
     }
 
-    public function testResolveUnescapesValue()
+    public function testResolveUnescapesValue(): void
     {
         $bag = new ParameterBag(array(
             'foo' => array('bar' => array('ding' => 'I\'m a bar %%foo %%bar')),
@@ -221,7 +221,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(array('bar' => array('ding' => 'I\'m a bar %foo %bar')), $bag->get('foo'), '->resolveValue() supports % escaping by doubling it');
     }
 
-    public function testEscapeValue()
+    public function testEscapeValue(): void
     {
         $bag = new ParameterBag();
 
@@ -237,7 +237,7 @@ class ParameterBagTest extends TestCase
     /**
      * @dataProvider stringsWithSpacesProvider
      */
-    public function testResolveStringWithSpacesReturnsString($expected, $test, $description)
+    public function testResolveStringWithSpacesReturnsString($expected, $test, $description): void
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
 

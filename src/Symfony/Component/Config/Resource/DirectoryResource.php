@@ -109,7 +109,7 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
         return serialize(array($this->resource, $this->pattern));
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->resource, $this->pattern) = unserialize($serialized);
     }

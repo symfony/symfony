@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class SecurityUserValueResolverTest extends TestCase
 {
-    public function testResolveNoToken()
+    public function testResolveNoToken(): void
     {
         $tokenStorage = new TokenStorage();
         $resolver = new SecurityUserValueResolver($tokenStorage);
@@ -32,7 +32,7 @@ class SecurityUserValueResolverTest extends TestCase
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
-    public function testResolveNoUser()
+    public function testResolveNoUser(): void
     {
         $mock = $this->getMockBuilder(UserInterface::class)->getMock();
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();
@@ -45,7 +45,7 @@ class SecurityUserValueResolverTest extends TestCase
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
-    public function testResolveWrongType()
+    public function testResolveWrongType(): void
     {
         $tokenStorage = new TokenStorage();
         $resolver = new SecurityUserValueResolver($tokenStorage);
@@ -54,7 +54,7 @@ class SecurityUserValueResolverTest extends TestCase
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $user = $this->getMockBuilder(UserInterface::class)->getMock();
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();
@@ -69,7 +69,7 @@ class SecurityUserValueResolverTest extends TestCase
         $this->assertSame(array($user), iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));
     }
 
-    public function testIntegration()
+    public function testIntegration(): void
     {
         $user = $this->getMockBuilder(UserInterface::class)->getMock();
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();
@@ -78,17 +78,17 @@ class SecurityUserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $argumentResolver = new ArgumentResolver(null, array(new SecurityUserValueResolver($tokenStorage)));
-        $this->assertSame(array($user), $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user) {}));
+        $this->assertSame(array($user), $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user): void {}));
     }
 
-    public function testIntegrationNoUser()
+    public function testIntegrationNoUser(): void
     {
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
         $argumentResolver = new ArgumentResolver(null, array(new SecurityUserValueResolver($tokenStorage), new DefaultValueResolver()));
-        $this->assertSame(array(null), $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user = null) {}));
+        $this->assertSame(array(null), $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user = null): void {}));
     }
 }
 

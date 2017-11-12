@@ -16,7 +16,7 @@ use Symfony\Component\Finder\Comparator\Comparator;
 
 class ComparatorTest extends TestCase
 {
-    public function testGetSetOperator()
+    public function testGetSetOperator(): void
     {
         $comparator = new Comparator();
         try {
@@ -31,7 +31,7 @@ class ComparatorTest extends TestCase
         $this->assertEquals('>', $comparator->getOperator(), '->getOperator() returns the current operator');
     }
 
-    public function testGetSetTarget()
+    public function testGetSetTarget(): void
     {
         $comparator = new Comparator();
         $comparator->setTarget(8);
@@ -41,7 +41,7 @@ class ComparatorTest extends TestCase
     /**
      * @dataProvider getTestData
      */
-    public function testTest($operator, $target, $match, $noMatch)
+    public function testTest($operator, $target, $match, $noMatch): void
     {
         $c = new Comparator();
         $c->setOperator($operator);

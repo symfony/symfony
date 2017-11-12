@@ -19,17 +19,17 @@ class StreamOutputTest extends TestCase
 {
     protected $stream;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->stream = fopen('php://memory', 'a', false);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->stream = null;
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $output = new StreamOutput($this->stream, Output::VERBOSITY_QUIET, true);
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
@@ -40,18 +40,18 @@ class StreamOutputTest extends TestCase
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage The StreamOutput class needs a stream as its first argument.
      */
-    public function testStreamIsRequired()
+    public function testStreamIsRequired(): void
     {
         new StreamOutput('foo');
     }
 
-    public function testGetStream()
+    public function testGetStream(): void
     {
         $output = new StreamOutput($this->stream);
         $this->assertEquals($this->stream, $output->getStream(), '->getStream() returns the current stream');
     }
 
-    public function testDoWrite()
+    public function testDoWrite(): void
     {
         $output = new StreamOutput($this->stream);
         $output->writeln('foo');

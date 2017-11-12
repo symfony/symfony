@@ -20,7 +20,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
-    public function testProcessDetectsSyntheticNonPublicDefinitions()
+    public function testProcessDetectsSyntheticNonPublicDefinitions(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(true)->setPublic(false);
@@ -31,7 +31,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
-    public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
+    public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(false)->setAbstract(false);
@@ -39,7 +39,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('a', 'class');
@@ -52,7 +52,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testValidTags()
+    public function testValidTags(): void
     {
         $container = new ContainerBuilder();
         $container->register('a', 'class')->addTag('foo', array('bar' => 'baz'));
@@ -68,7 +68,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
-    public function testInvalidTags()
+    public function testInvalidTags(): void
     {
         $container = new ContainerBuilder();
         $container->register('a', 'class')->addTag('foo', array('bar' => array('baz' => 'baz')));
@@ -79,7 +79,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
      */
-    public function testDynamicServiceName()
+    public function testDynamicServiceName(): void
     {
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
@@ -91,7 +91,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
      */
-    public function testDynamicAliasName()
+    public function testDynamicAliasName(): void
     {
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
@@ -100,7 +100,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->process($container);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new CheckDefinitionValidityPass();
         $pass->process($container);

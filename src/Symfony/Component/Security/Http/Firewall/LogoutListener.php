@@ -57,7 +57,7 @@ class LogoutListener implements ListenerInterface
         $this->handlers = array();
     }
 
-    public function addHandler(LogoutHandlerInterface $handler)
+    public function addHandler(LogoutHandlerInterface $handler): void
     {
         $this->handlers[] = $handler;
     }
@@ -71,7 +71,7 @@ class LogoutListener implements ListenerInterface
      * @throws LogoutException   if the CSRF token is invalid
      * @throws \RuntimeException if the LogoutSuccessHandlerInterface instance does not return a response
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 

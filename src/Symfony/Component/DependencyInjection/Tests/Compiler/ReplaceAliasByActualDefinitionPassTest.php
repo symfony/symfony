@@ -21,7 +21,7 @@ require_once __DIR__.'/../Fixtures/includes/foo.php';
 
 class ReplaceAliasByActualDefinitionPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -56,14 +56,14 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testProcessWithInvalidAlias()
+    public function testProcessWithInvalidAlias(): void
     {
         $container = new ContainerBuilder();
         $container->setAlias('a_alias', 'a');
         $this->process($container);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new ReplaceAliasByActualDefinitionPass();
         $pass->process($container);

@@ -32,7 +32,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $removeExtraKeys = true;
     protected $normalizeKeys = true;
 
-    public function setNormalizeKeys($normalizeKeys)
+    public function setNormalizeKeys($normalizeKeys): void
     {
         $this->normalizeKeys = (bool) $normalizeKeys;
     }
@@ -84,7 +84,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param array $remappings An array of the form array(array(string, string))
      */
-    public function setXmlRemappings(array $remappings)
+    public function setXmlRemappings(array $remappings): void
     {
         $this->xmlRemappings = $remappings;
     }
@@ -105,7 +105,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $boolean
      */
-    public function setAddIfNotSet($boolean)
+    public function setAddIfNotSet($boolean): void
     {
         $this->addIfNotSet = (bool) $boolean;
     }
@@ -115,7 +115,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $allow
      */
-    public function setAllowFalse($allow)
+    public function setAllowFalse($allow): void
     {
         $this->allowFalse = (bool) $allow;
     }
@@ -125,7 +125,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $allow
      */
-    public function setAllowNewKeys($allow)
+    public function setAllowNewKeys($allow): void
     {
         $this->allowNewKeys = (bool) $allow;
     }
@@ -135,7 +135,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $boolean
      */
-    public function setPerformDeepMerging($boolean)
+    public function setPerformDeepMerging($boolean): void
     {
         $this->performDeepMerging = (bool) $boolean;
     }
@@ -146,7 +146,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @param bool $boolean To allow extra keys
      * @param bool $remove  To remove extra keys
      */
-    public function setIgnoreExtraKeys($boolean, $remove = true)
+    public function setIgnoreExtraKeys($boolean, $remove = true): void
     {
         $this->ignoreExtraKeys = (bool) $boolean;
         $this->removeExtraKeys = $this->ignoreExtraKeys && $remove;
@@ -157,7 +157,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param string $name The node's name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -201,7 +201,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @throws \InvalidArgumentException when the child node has no name
      * @throws \InvalidArgumentException when the child node's name is not unique
      */
-    public function addChild(NodeInterface $node)
+    public function addChild(NodeInterface $node): void
     {
         $name = $node->getName();
         if (!strlen($name)) {
@@ -269,7 +269,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @throws InvalidTypeException
      */
-    protected function validateType($value)
+    protected function validateType($value): void
     {
         if (!is_array($value) && (!$this->allowFalse || false !== $value)) {
             $ex = new InvalidTypeException(sprintf(

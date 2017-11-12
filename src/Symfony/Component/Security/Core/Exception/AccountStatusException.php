@@ -34,7 +34,7 @@ abstract class AccountStatusException extends AuthenticationException
         return $this->user;
     }
 
-    public function setUser(UserInterface $user)
+    public function setUser(UserInterface $user): void
     {
         $this->user = $user;
     }
@@ -53,7 +53,7 @@ abstract class AccountStatusException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function unserialize($str)
+    public function unserialize($str): void
     {
         list($this->user, $parentData) = unserialize($str);
 

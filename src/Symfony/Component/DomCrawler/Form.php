@@ -173,7 +173,7 @@ class Form extends Link implements \ArrayAccess
 
                 array_walk_recursive(
                     $expandedValue,
-                    function (&$value, $key) {
+                    function (&$value, $key): void {
                         if (ctype_digit($value) && ('size' === $key || 'error' === $key)) {
                             $value = (int) $value;
                         }
@@ -267,7 +267,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      */
-    public function remove($name)
+    public function remove($name): void
     {
         $this->fields->remove($name);
     }
@@ -289,7 +289,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets a named field.
      */
-    public function set(FormField $field)
+    public function set(FormField $field): void
     {
         $this->fields->add($field);
     }
@@ -338,7 +338,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         $this->fields->set($name, $value);
     }
@@ -348,7 +348,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         $this->fields->remove($name);
     }
@@ -376,7 +376,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
-    protected function setNode(\DOMElement $node)
+    protected function setNode(\DOMElement $node): void
     {
         $this->button = $node;
         if ('button' === $node->nodeName || ('input' === $node->nodeName && in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
@@ -411,7 +411,7 @@ class Form extends Link implements \ArrayAccess
      * the form node or the entire document depending on whether we need
      * to find non-descendant elements through HTML5 'form' attribute.
      */
-    private function initialize()
+    private function initialize(): void
     {
         $this->fields = new FormFieldRegistry();
 
@@ -461,7 +461,7 @@ class Form extends Link implements \ArrayAccess
         }
     }
 
-    private function addField(\DOMElement $node)
+    private function addField(\DOMElement $node): void
     {
         if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {
             return;

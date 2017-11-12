@@ -23,7 +23,7 @@ use Symfony\Component\Ldap\LdapInterface;
  */
 class AdapterTest extends LdapTestCase
 {
-    public function testLdapEscape()
+    public function testLdapEscape(): void
     {
         $ldap = new Adapter();
 
@@ -33,7 +33,7 @@ class AdapterTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapQuery()
+    public function testLdapQuery(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
 
@@ -53,7 +53,7 @@ class AdapterTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapQueryIterator()
+    public function testLdapQueryIterator(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
 
@@ -71,7 +71,7 @@ class AdapterTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapQueryWithoutBind()
+    public function testLdapQueryWithoutBind(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
@@ -79,7 +79,7 @@ class AdapterTest extends LdapTestCase
         $query->execute();
     }
 
-    public function testLdapQueryScopeBase()
+    public function testLdapQueryScopeBase(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
 
@@ -95,7 +95,7 @@ class AdapterTest extends LdapTestCase
         $this->assertEquals(array('Fabien Potencier'), $entry->getAttribute('cn'));
     }
 
-    public function testLdapQueryScopeOneLevel()
+    public function testLdapQueryScopeOneLevel(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
 

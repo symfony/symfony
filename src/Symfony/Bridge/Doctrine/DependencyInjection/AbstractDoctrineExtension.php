@@ -40,7 +40,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @throws \InvalidArgumentException
      */
-    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
+    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container): void
     {
         if ($objectManager['auto_mapping']) {
             // automatically register bundle mappings
@@ -105,7 +105,7 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param array  $mappingConfig
      * @param string $mappingName
      */
-    protected function setMappingDriverAlias($mappingConfig, $mappingName)
+    protected function setMappingDriverAlias($mappingConfig, $mappingName): void
     {
         if (isset($mappingConfig['alias'])) {
             $this->aliasMap[$mappingConfig['alias']] = $mappingConfig['prefix'];
@@ -121,7 +121,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @throws \InvalidArgumentException
      */
-    protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
+    protected function setMappingDriverConfig(array $mappingConfig, $mappingName): void
     {
         $mappingDirectory = $mappingConfig['dir'];
         if (!is_dir($mappingDirectory)) {
@@ -174,7 +174,7 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param array            $objectManager
      * @param ContainerBuilder $container     A ContainerBuilder instance
      */
-    protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
+    protected function registerMappingDrivers($objectManager, ContainerBuilder $container): void
     {
         // configure metadata driver for each bundle based on the type of mapping files found
         if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'))) {
@@ -228,7 +228,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @throws \InvalidArgumentException
      */
-    protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
+    protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName): void
     {
         if (!$mappingConfig['type'] || !$mappingConfig['dir'] || !$mappingConfig['prefix']) {
             throw new \InvalidArgumentException(sprintf('Mapping definitions for Doctrine manager "%s" require at least the "type", "dir" and "prefix" options.', $objectManagerName));
@@ -290,7 +290,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @throws \InvalidArgumentException in case of unknown driver type
      */
-    protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
+    protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName): void
     {
         $this->loadCacheDriver($cacheName, $objectManager['name'], $objectManager[$cacheName.'_driver'], $container);
     }

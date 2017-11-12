@@ -69,7 +69,7 @@ class FileExistenceResource implements SelfCheckingResourceInterface, \Serializa
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->resource, $this->exists) = unserialize($serialized);
     }

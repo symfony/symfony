@@ -16,13 +16,13 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 
 class PredisAdapterTest extends AbstractRedisAdapterTest
 {
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         parent::setupBeforeClass();
         self::$redis = new \Predis\Client(array('host' => getenv('REDIS_HOST')));
     }
 
-    public function testCreateConnection()
+    public function testCreateConnection(): void
     {
         $redisHost = getenv('REDIS_HOST');
 

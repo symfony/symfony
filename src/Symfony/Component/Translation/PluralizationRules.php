@@ -192,7 +192,7 @@ class PluralizationRules
      * @param callable $rule   A PHP callable
      * @param string   $locale The locale
      */
-    public static function set(callable $rule, $locale)
+    public static function set(callable $rule, $locale): void
     {
         if ('pt_BR' === $locale) {
             // temporary set a locale for brazilian

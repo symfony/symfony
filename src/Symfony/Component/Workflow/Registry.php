@@ -25,7 +25,7 @@ class Registry
     /**
      * @param SupportStrategyInterface $supportStrategy
      */
-    public function add(Workflow $workflow, $supportStrategy)
+    public function add(Workflow $workflow, $supportStrategy): void
     {
         if (!$supportStrategy instanceof SupportStrategyInterface) {
             throw new \InvalidArgumentException('The "supportStrategy" is not an instance of SupportStrategyInterface.');

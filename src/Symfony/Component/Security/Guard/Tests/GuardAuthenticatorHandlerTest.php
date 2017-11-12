@@ -28,7 +28,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
     private $request;
     private $guardAuthenticator;
 
-    public function testAuthenticateWithToken()
+    public function testAuthenticateWithToken(): void
     {
         $this->tokenStorage->expects($this->once())
             ->method('setToken')
@@ -46,7 +46,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $handler->authenticateWithToken($this->token, $this->request);
     }
 
-    public function testHandleAuthenticationSuccess()
+    public function testHandleAuthenticationSuccess(): void
     {
         $providerKey = 'my_handleable_firewall';
         $response = new Response('Guard all the things!');
@@ -60,7 +60,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->assertSame($response, $actualResponse);
     }
 
-    public function testHandleAuthenticationFailure()
+    public function testHandleAuthenticationFailure(): void
     {
         // setToken() not called - getToken() will return null, so there's nothing to clear
         $this->tokenStorage->expects($this->never())
@@ -82,7 +82,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
     /**
      * @dataProvider getTokenClearingTests
      */
-    public function testHandleAuthenticationClearsToken($tokenClass, $tokenProviderKey, $actualProviderKey, $shouldTokenBeCleared)
+    public function testHandleAuthenticationClearsToken($tokenClass, $tokenProviderKey, $actualProviderKey, $shouldTokenBeCleared): void
     {
         $token = $this->getMockBuilder($tokenClass)
             ->disableOriginalConstructor()
@@ -123,7 +123,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         return $tests;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
@@ -132,7 +132,7 @@ class GuardAuthenticatorHandlerTest extends TestCase
         $this->guardAuthenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->tokenStorage = null;
         $this->dispatcher = null;

@@ -33,7 +33,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         $this->data = array(
             'called_listeners' => array(),
@@ -41,7 +41,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
         );
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = array();
 
@@ -50,7 +50,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
         }
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
             $this->setCalledListeners($this->dispatcher->getCalledListeners());
@@ -66,7 +66,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @see TraceableEventDispatcherInterface
      */
-    public function setCalledListeners(array $listeners)
+    public function setCalledListeners(array $listeners): void
     {
         $this->data['called_listeners'] = $listeners;
     }
@@ -90,7 +90,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @see TraceableEventDispatcherInterface
      */
-    public function setNotCalledListeners(array $listeners)
+    public function setNotCalledListeners(array $listeners): void
     {
         $this->data['not_called_listeners'] = $listeners;
     }

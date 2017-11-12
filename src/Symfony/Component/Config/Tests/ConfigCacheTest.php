@@ -19,12 +19,12 @@ class ConfigCacheTest extends TestCase
 {
     private $cacheFile = null;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $files = array($this->cacheFile, $this->cacheFile.'.meta');
 
@@ -38,7 +38,7 @@ class ConfigCacheTest extends TestCase
     /**
      * @dataProvider debugModes
      */
-    public function testCacheIsNotValidIfNothingHasBeenCached($debug)
+    public function testCacheIsNotValidIfNothingHasBeenCached($debug): void
     {
         unlink($this->cacheFile); // remove tempnam() side effect
         $cache = new ConfigCache($this->cacheFile, $debug);
@@ -46,7 +46,7 @@ class ConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testIsAlwaysFreshInProduction()
+    public function testIsAlwaysFreshInProduction(): void
     {
         $staleResource = new ResourceStub();
         $staleResource->setFresh(false);
@@ -60,14 +60,14 @@ class ConfigCacheTest extends TestCase
     /**
      * @dataProvider debugModes
      */
-    public function testIsFreshWhenNoResourceProvided($debug)
+    public function testIsFreshWhenNoResourceProvided($debug): void
     {
         $cache = new ConfigCache($this->cacheFile, $debug);
         $cache->write('', array());
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testFreshResourceInDebug()
+    public function testFreshResourceInDebug(): void
     {
         $freshResource = new ResourceStub();
         $freshResource->setFresh(true);
@@ -78,7 +78,7 @@ class ConfigCacheTest extends TestCase
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testStaleResourceInDebug()
+    public function testStaleResourceInDebug(): void
     {
         $staleResource = new ResourceStub();
         $staleResource->setFresh(false);

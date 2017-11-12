@@ -35,7 +35,7 @@ class CoverageListenerTrait
         $this->warnings = array();
     }
 
-    public function startTest($test)
+    public function startTest($test): void
     {
         if (!$test instanceof TestCase) {
             return;

@@ -28,7 +28,7 @@ class DoctrineExtractorTest extends TestCase
      */
     private $extractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'), true);
         $entityManager = EntityManager::create(array('driver' => 'pdo_sqlite'), $config);
@@ -41,7 +41,7 @@ class DoctrineExtractorTest extends TestCase
         $this->extractor = new DoctrineExtractor($entityManager->getMetadataFactory());
     }
 
-    public function testGetProperties()
+    public function testGetProperties(): void
     {
         $this->assertEquals(
              array(
@@ -66,7 +66,7 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    public function testGetPropertiesWithEmbedded()
+    public function testGetPropertiesWithEmbedded(): void
     {
         if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
             $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
@@ -84,12 +84,12 @@ class DoctrineExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, array $type = null)
+    public function testExtract($property, array $type = null): void
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures\DoctrineDummy', $property, array()));
     }
 
-    public function testExtractWithEmbedded()
+    public function testExtractWithEmbedded(): void
     {
         if (!class_exists('Doctrine\ORM\Mapping\Embedded')) {
             $this->markTestSkipped('@Embedded is not available in Doctrine ORM lower than 2.5.');
@@ -147,12 +147,12 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    public function testGetPropertiesCatchException()
+    public function testGetPropertiesCatchException(): void
     {
         $this->assertNull($this->extractor->getProperties('Not\Exist'));
     }
 
-    public function testGetTypesCatchException()
+    public function testGetTypesCatchException(): void
     {
         $this->assertNull($this->extractor->getTypes('Not\Exist', 'baz'));
     }

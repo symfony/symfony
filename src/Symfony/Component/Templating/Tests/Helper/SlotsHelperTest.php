@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Helper\SlotsHelper;
 
 class SlotsHelperTest extends TestCase
 {
-    public function testHasGetSet()
+    public function testHasGetSet(): void
     {
         $helper = new SlotsHelper();
         $helper->set('foo', 'bar');
@@ -27,7 +27,7 @@ class SlotsHelperTest extends TestCase
         $this->assertFalse($helper->has('bar'), '->has() returns false if the slot does not exist');
     }
 
-    public function testOutput()
+    public function testOutput(): void
     {
         $helper = new SlotsHelper();
         $helper->set('foo', 'bar');
@@ -50,7 +50,7 @@ class SlotsHelperTest extends TestCase
         $this->assertFalse($ret, '->output() returns false if the slot does not exist');
     }
 
-    public function testStartStop()
+    public function testStartStop(): void
     {
         $helper = new SlotsHelper();
         $helper->start('bar');

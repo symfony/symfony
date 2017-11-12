@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 
 class LoggerDataCollectorTest extends TestCase
 {
-    public function testCollectWithUnexpectedFormat()
+    public function testCollectWithUnexpectedFormat(): void
     {
         $logger = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
@@ -44,7 +44,7 @@ class LoggerDataCollectorTest extends TestCase
     /**
      * @dataProvider getCollectTestData
      */
-    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null)
+    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null): void
     {
         $logger = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
@@ -76,7 +76,7 @@ class LoggerDataCollectorTest extends TestCase
         }
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $logger = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')

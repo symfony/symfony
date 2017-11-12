@@ -66,7 +66,7 @@ class NamespacedAttributeBag extends AttributeBag
     /**
      * {@inheritdoc}
      */
-    public function set($name, $value)
+    public function set($name, $value): void
     {
         $attributes = &$this->resolveAttributePath($name, true);
         $name = $this->resolveKey($name);

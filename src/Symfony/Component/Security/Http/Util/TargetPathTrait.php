@@ -27,7 +27,7 @@ trait TargetPathTrait
      * @param string           $providerKey The name of your firewall
      * @param string           $uri         The URI to set as the target path
      */
-    private function saveTargetPath(SessionInterface $session, $providerKey, $uri)
+    private function saveTargetPath(SessionInterface $session, $providerKey, $uri): void
     {
         $session->set('_security.'.$providerKey.'.target_path', $uri);
     }
@@ -51,7 +51,7 @@ trait TargetPathTrait
      * @param SessionInterface $session
      * @param string           $providerKey The name of your firewall
      */
-    private function removeTargetPath(SessionInterface $session, $providerKey)
+    private function removeTargetPath(SessionInterface $session, $providerKey): void
     {
         $session->remove('_security.'.$providerKey.'.target_path');
     }

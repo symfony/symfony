@@ -54,7 +54,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscribe
      *
      * @param string $cacheDir The cache directory
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): void
     {
         if (null === $this->finder) {
             return;

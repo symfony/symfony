@@ -100,7 +100,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Boots the current kernel.
      */
-    public function boot()
+    public function boot(): void
     {
         if (true === $this->booted) {
             if (!$this->requestStackSize && $this->resetServices) {
@@ -135,7 +135,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function reboot($warmupDir)
+    public function reboot($warmupDir): void
     {
         $this->shutdown();
         $this->warmupDir = $warmupDir;
@@ -145,7 +145,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function terminate(Request $request, Response $response)
+    public function terminate(Request $request, Response $response): void
     {
         if (false === $this->booted) {
             return;
@@ -159,7 +159,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * {@inheritdoc}
      */
-    public function shutdown()
+    public function shutdown(): void
     {
         if (false === $this->booted) {
             return;
@@ -354,7 +354,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * @internal
      */
-    public function setAnnotatedClassCache(array $annotatedClasses)
+    public function setAnnotatedClassCache(array $annotatedClasses): void
     {
         file_put_contents(($this->warmupDir ?: $this->getCacheDir()).'/annotations.map', sprintf('<?php return %s;', var_export($annotatedClasses, true)));
     }
@@ -396,7 +396,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @throws \LogicException if two bundles share a common name
      */
-    protected function initializeBundles()
+    protected function initializeBundles(): void
     {
         // init bundles
         $this->bundles = array();
@@ -414,7 +414,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * Use this method to register compiler passes and manipulate the container during the building process.
      */
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
     }
 
@@ -446,7 +446,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * The cached version of the service container is used when fresh, otherwise the
      * container is built.
      */
-    protected function initializeContainer()
+    protected function initializeContainer(): void
     {
         $class = $this->getContainerClass();
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
@@ -590,7 +590,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     /**
      * Prepares the ContainerBuilder before it is compiled.
      */
-    protected function prepareContainer(ContainerBuilder $container)
+    protected function prepareContainer(ContainerBuilder $container): void
     {
         $extensions = array();
         foreach ($this->bundles as $bundle) {
@@ -642,7 +642,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * @param string           $class     The name of the class to generate
      * @param string           $baseClass The name of the container's base class
      */
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass): void
     {
         // cache the container
         $dumper = new PhpDumper($container);
@@ -759,7 +759,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         return serialize(array($this->environment, $this->debug));
     }
 
-    public function unserialize($data)
+    public function unserialize($data): void
     {
         list($environment, $debug) = unserialize($data, array('allowed_classes' => false));
 

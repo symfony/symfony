@@ -16,7 +16,7 @@ use Symfony\Component\Config\Resource\GlobResource;
 
 class GlobResourceTest extends TestCase
 {
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $dir = dirname(__DIR__).'/Fixtures';
         @rmdir($dir.'/TmpGlob');
@@ -25,7 +25,7 @@ class GlobResourceTest extends TestCase
         touch($dir.'/Resource/.hiddenFile');
     }
 
-    public function testIterator()
+    public function testIterator(): void
     {
         $dir = dirname(__DIR__).DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, '/Resource', true);
@@ -47,7 +47,7 @@ class GlobResourceTest extends TestCase
         $this->assertSame($dir, $resource->getPrefix());
     }
 
-    public function testIsFreshNonRecursiveDetectsNewFile()
+    public function testIsFreshNonRecursiveDetectsNewFile(): void
     {
         $dir = dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', false);
@@ -67,7 +67,7 @@ class GlobResourceTest extends TestCase
         $this->assertTrue($resource->isFresh(0));
     }
 
-    public function testIsFreshNonRecursiveDetectsRemovedFile()
+    public function testIsFreshNonRecursiveDetectsRemovedFile(): void
     {
         $dir = dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', false);
@@ -83,7 +83,7 @@ class GlobResourceTest extends TestCase
         $this->assertFalse($resource->isFresh(0));
     }
 
-    public function testIsFreshRecursiveDetectsRemovedFile()
+    public function testIsFreshRecursiveDetectsRemovedFile(): void
     {
         $dir = dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', true);
@@ -101,7 +101,7 @@ class GlobResourceTest extends TestCase
         $this->assertTrue($resource->isFresh(0));
     }
 
-    public function testIsFreshRecursiveDetectsNewFile()
+    public function testIsFreshRecursiveDetectsNewFile(): void
     {
         $dir = dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', true);

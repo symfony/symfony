@@ -30,7 +30,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function setDefaultValue($value)
+    public function setDefaultValue($value): void
     {
         $this->defaultValueSet = true;
         $this->defaultValue = $value;
@@ -59,7 +59,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $boolean True if this entity will accept empty values
      */
-    public function setAllowEmptyValue($boolean)
+    public function setAllowEmptyValue($boolean): void
     {
         $this->allowEmptyValue = (bool) $boolean;
     }
@@ -67,7 +67,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -75,7 +75,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     /**
      * {@inheritdoc}
      */
-    protected function validateType($value)
+    protected function validateType($value): void
     {
     }
 

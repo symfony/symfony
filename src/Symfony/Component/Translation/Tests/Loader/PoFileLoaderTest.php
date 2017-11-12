@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class PoFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/resources.po';
@@ -28,7 +28,7 @@ class PoFileLoaderTest extends TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
-    public function testLoadPlurals()
+    public function testLoadPlurals(): void
     {
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/plurals.po';
@@ -39,7 +39,7 @@ class PoFileLoaderTest extends TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
-    public function testLoadDoesNothingIfEmpty()
+    public function testLoadDoesNothingIfEmpty(): void
     {
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/empty.po';
@@ -53,14 +53,14 @@ class PoFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.po';
         $loader->load($resource, 'en', 'domain1');
     }
 
-    public function testLoadEmptyTranslation()
+    public function testLoadEmptyTranslation(): void
     {
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/empty-translation.po';
@@ -71,7 +71,7 @@ class PoFileLoaderTest extends TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
-    public function testEscapedId()
+    public function testEscapedId(): void
     {
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/escaped-id.po';
@@ -82,7 +82,7 @@ class PoFileLoaderTest extends TestCase
         $this->assertEquals('escaped "bar"', $messages['escaped "foo"']);
     }
 
-    public function testEscapedIdPlurals()
+    public function testEscapedIdPlurals(): void
     {
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/escaped-id-plurals.po';
@@ -95,7 +95,7 @@ class PoFileLoaderTest extends TestCase
         $this->assertEquals('escaped "bar"|escaped "bars"', $messages['escaped "foos"']);
     }
 
-    public function testSkipFuzzyTranslations()
+    public function testSkipFuzzyTranslations(): void
     {
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../fixtures/fuzzy-translations.po';

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 abstract class ResponseTestCase extends TestCase
 {
-    public function testNoCacheControlHeaderOnAttachmentUsingHTTPSAndMSIE()
+    public function testNoCacheControlHeaderOnAttachmentUsingHTTPSAndMSIE(): void
     {
         // Check for HTTPS and IE 8
         $request = new Request();

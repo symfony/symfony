@@ -20,7 +20,7 @@ class NormalizationTest extends TestCase
     /**
      * @dataProvider getEncoderTests
      */
-    public function testNormalizeEncoders($denormalized)
+    public function testNormalizeEncoders($denormalized): void
     {
         $tb = new TreeBuilder();
         $tree = $tb
@@ -95,7 +95,7 @@ class NormalizationTest extends TestCase
     /**
      * @dataProvider getAnonymousKeysTests
      */
-    public function testAnonymousKeysArray($denormalized)
+    public function testAnonymousKeysArray($denormalized): void
     {
         $tb = new TreeBuilder();
         $tree = $tb
@@ -141,7 +141,7 @@ class NormalizationTest extends TestCase
     /**
      * @dataProvider getNumericKeysTests
      */
-    public function testNumericKeysAsAttributes($denormalized)
+    public function testNumericKeysAsAttributes($denormalized): void
     {
         $normalized = array(
             'thing' => array(42 => array('foo', 'bar'), 1337 => array('baz', 'qux')),
@@ -173,7 +173,7 @@ class NormalizationTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage The attribute "id" must be set for path "root.thing".
      */
-    public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
+    public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet(): void
     {
         $denormalized = array(
             'thing' => array(
@@ -184,7 +184,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, array());
     }
 
-    public function testAssociativeArrayPreserveKeys()
+    public function testAssociativeArrayPreserveKeys(): void
     {
         $tb = new TreeBuilder();
         $tree = $tb
@@ -203,7 +203,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $data, $data);
     }
 
-    public static function assertNormalized(NodeInterface $tree, $denormalized, $normalized)
+    public static function assertNormalized(NodeInterface $tree, $denormalized, $normalized): void
     {
         self::assertSame($normalized, $tree->normalize($denormalized));
     }

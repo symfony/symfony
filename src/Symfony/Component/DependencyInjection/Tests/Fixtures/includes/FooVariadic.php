@@ -10,7 +10,7 @@ class FooVariadic
     {
     }
 
-    public function bar(...$arguments)
+    public function bar(...$arguments): void
     {
     }
 }

@@ -42,7 +42,7 @@ class LocaleTest extends TestCase
     /**
      * @dataProvider provideGetFallbackTests
      */
-    public function testGetFallback($expected, $locale)
+    public function testGetFallback($expected, $locale): void
     {
         $this->assertSame($expected, Locale::getFallback($locale));
     }

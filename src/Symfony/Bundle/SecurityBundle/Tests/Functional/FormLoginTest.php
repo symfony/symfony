@@ -16,7 +16,7 @@ class FormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFormLogin($config)
+    public function testFormLogin($config): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
 
@@ -35,7 +35,7 @@ class FormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFormLogout($config)
+    public function testFormLogout($config): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
 
@@ -68,7 +68,7 @@ class FormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFormLoginWithCustomTargetPath($config)
+    public function testFormLoginWithCustomTargetPath($config): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
 
@@ -88,7 +88,7 @@ class FormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFormLoginRedirectsToProtectedResourceAfterLogin($config)
+    public function testFormLoginRedirectsToProtectedResourceAfterLogin($config): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
 

@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Helper\Helper;
 
 class HelperTest extends TestCase
 {
-    public function testGetSetCharset()
+    public function testGetSetCharset(): void
     {
         $helper = new ProjectTemplateHelper();
         $helper->setCharset('ISO-8859-1');

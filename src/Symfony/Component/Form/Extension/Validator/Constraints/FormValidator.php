@@ -26,7 +26,7 @@ class FormValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($form, Constraint $constraint)
+    public function validate($form, Constraint $constraint): void
     {
         if (!$constraint instanceof Form) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Form');

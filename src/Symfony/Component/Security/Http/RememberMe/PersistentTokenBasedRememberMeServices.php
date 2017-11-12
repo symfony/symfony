@@ -32,7 +32,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     /** @var TokenProviderInterface */
     private $tokenProvider;
 
-    public function setTokenProvider(TokenProviderInterface $tokenProvider)
+    public function setTokenProvider(TokenProviderInterface $tokenProvider): void
     {
         $this->tokenProvider = $tokenProvider;
     }
@@ -40,7 +40,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     /**
      * {@inheritdoc}
      */
-    protected function cancelCookie(Request $request)
+    protected function cancelCookie(Request $request): void
     {
         // Delete cookie on the client
         parent::cancelCookie($request);
@@ -94,7 +94,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     /**
      * {@inheritdoc}
      */
-    protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
+    protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token): void
     {
         $series = base64_encode(random_bytes(64));
         $tokenValue = base64_encode(random_bytes(64));

@@ -42,7 +42,7 @@ class LocaleListener implements EventSubscriberInterface
         $this->router = $router;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         $request->setDefaultLocale($this->defaultLocale);
@@ -51,21 +51,21 @@ class LocaleListener implements EventSubscriberInterface
         $this->setRouterContext($request);
     }
 
-    public function onKernelFinishRequest(FinishRequestEvent $event)
+    public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
         if (null !== $parentRequest = $this->requestStack->getParentRequest()) {
             $this->setRouterContext($parentRequest);
         }
     }
 
-    private function setLocale(Request $request)
+    private function setLocale(Request $request): void
     {
         if ($locale = $request->attributes->get('_locale')) {
             $request->setLocale($locale);
         }
     }
 
-    private function setRouterContext(Request $request)
+    private function setRouterContext(Request $request): void
     {
         if (null !== $this->router) {
             $this->router->getContext()->setParameter('_locale', $request->getLocale());

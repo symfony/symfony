@@ -31,7 +31,7 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 class FlattenExceptionTest extends TestCase
 {
-    public function testStatusCode()
+    public function testStatusCode(): void
     {
         $flattened = FlattenException::create(new \RuntimeException(), 403);
         $this->assertEquals('403', $flattened->getStatusCode());
@@ -87,7 +87,7 @@ class FlattenExceptionTest extends TestCase
         }
     }
 
-    public function testHeadersForHttpException()
+    public function testHeadersForHttpException(): void
     {
         $flattened = FlattenException::create(new MethodNotAllowedHttpException(array('POST')));
         $this->assertEquals(array('Allow' => 'POST'), $flattened->getHeaders());
@@ -111,7 +111,7 @@ class FlattenExceptionTest extends TestCase
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testFlattenHttpException(\Exception $exception, $statusCode)
+    public function testFlattenHttpException(\Exception $exception, $statusCode): void
     {
         $flattened = FlattenException::create($exception);
         $flattened2 = FlattenException::create($exception);
@@ -126,7 +126,7 @@ class FlattenExceptionTest extends TestCase
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testPrevious(\Exception $exception, $statusCode)
+    public function testPrevious(\Exception $exception, $statusCode): void
     {
         $flattened = FlattenException::create($exception);
         $flattened2 = FlattenException::create($exception);
@@ -138,7 +138,7 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(array($flattened2), $flattened->getAllPrevious());
     }
 
-    public function testPreviousError()
+    public function testPreviousError(): void
     {
         $exception = new \Exception('test', 123, new \ParseError('Oh noes!', 42));
 
@@ -152,7 +152,7 @@ class FlattenExceptionTest extends TestCase
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testLine(\Exception $exception)
+    public function testLine(\Exception $exception): void
     {
         $flattened = FlattenException::create($exception);
         $this->assertSame($exception->getLine(), $flattened->getLine());
@@ -161,7 +161,7 @@ class FlattenExceptionTest extends TestCase
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testFile(\Exception $exception)
+    public function testFile(\Exception $exception): void
     {
         $flattened = FlattenException::create($exception);
         $this->assertSame($exception->getFile(), $flattened->getFile());
@@ -170,7 +170,7 @@ class FlattenExceptionTest extends TestCase
     /**
      * @dataProvider flattenDataProvider
      */
-    public function testToArray(\Exception $exception, $statusCode)
+    public function testToArray(\Exception $exception, $statusCode): void
     {
         $flattened = FlattenException::create($exception);
         $flattened->setTrace(array(), 'foo.php', 123);
@@ -194,7 +194,7 @@ class FlattenExceptionTest extends TestCase
         );
     }
 
-    public function testArguments()
+    public function testArguments(): void
     {
         $dh = opendir(__DIR__);
         $fh = tmpfile();
@@ -207,7 +207,7 @@ class FlattenExceptionTest extends TestCase
             $incomplete,
             $dh,
             $fh,
-            function () {},
+            function (): void {},
             array(1, 2),
             array('foo' => 123),
             null,
@@ -256,7 +256,7 @@ class FlattenExceptionTest extends TestCase
         $this->assertTrue(is_nan($array[$i++][1]));
     }
 
-    public function testRecursionInArguments()
+    public function testRecursionInArguments(): void
     {
         $a = array('foo', array(2, &$a));
         $exception = $this->createException($a);
@@ -266,7 +266,7 @@ class FlattenExceptionTest extends TestCase
         $this->assertContains('*DEEP NESTED ARRAY*', serialize($trace));
     }
 
-    public function testTooBigArray()
+    public function testTooBigArray(): void
     {
         $a = array();
         for ($i = 0; $i < 20; ++$i) {

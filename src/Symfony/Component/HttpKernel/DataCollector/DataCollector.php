@@ -39,7 +39,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
         return serialize($this->data);
     }
 
-    public function unserialize($data)
+    public function unserialize($data): void
     {
         $this->data = unserialize($data);
     }

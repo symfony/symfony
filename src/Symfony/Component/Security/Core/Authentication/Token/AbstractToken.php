@@ -85,7 +85,7 @@ abstract class AbstractToken implements TokenInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function setUser($user)
+    public function setUser($user): void
     {
         if (!($user instanceof UserInterface || (is_object($user) && method_exists($user, '__toString')) || is_string($user))) {
             throw new \InvalidArgumentException('$user must be an instanceof UserInterface, an object implementing a __toString method, or a primitive string.');
@@ -123,7 +123,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * {@inheritdoc}
      */
-    public function setAuthenticated($authenticated)
+    public function setAuthenticated($authenticated): void
     {
         $this->authenticated = (bool) $authenticated;
     }
@@ -131,7 +131,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         if ($this->getUser() instanceof UserInterface) {
             $this->getUser()->eraseCredentials();
@@ -156,7 +156,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->user, $this->authenticated, $this->roles, $this->attributes) = unserialize($serialized);
     }
@@ -176,7 +176,7 @@ abstract class AbstractToken implements TokenInterface
      *
      * @param array $attributes The token attributes
      */
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): void
     {
         $this->attributes = $attributes;
     }
@@ -217,7 +217,7 @@ abstract class AbstractToken implements TokenInterface
      * @param string $name  The attribute name
      * @param mixed  $value The attribute value
      */
-    public function setAttribute($name, $value)
+    public function setAttribute($name, $value): void
     {
         $this->attributes[$name] = $value;
     }

@@ -63,7 +63,7 @@ abstract class AbstractSurrogate implements SurrogateInterface
     /**
      * {@inheritdoc}
      */
-    public function addSurrogateCapability(Request $request)
+    public function addSurrogateCapability(Request $request): void
     {
         $current = $request->headers->get('Surrogate-Capability');
         $new = sprintf('symfony="%s/1.0"', strtoupper($this->getName()));
@@ -114,7 +114,7 @@ abstract class AbstractSurrogate implements SurrogateInterface
     /**
      * Remove the Surrogate from the Surrogate-Control header.
      */
-    protected function removeFromControl(Response $response)
+    protected function removeFromControl(Response $response): void
     {
         if (!$response->headers->has('Surrogate-Control')) {
             return;

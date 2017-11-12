@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ExceptionDataCollectorTest extends TestCase
 {
-    public function testCollect()
+    public function testCollect(): void
     {
         $e = new \Exception('foo', 500);
         $c = new ExceptionDataCollector();
@@ -38,7 +38,7 @@ class ExceptionDataCollectorTest extends TestCase
         $this->assertSame($trace, $c->getTrace());
     }
 
-    public function testCollectWithoutException()
+    public function testCollectWithoutException(): void
     {
         $c = new ExceptionDataCollector();
         $c->collect(new Request(), new Response());
@@ -46,7 +46,7 @@ class ExceptionDataCollectorTest extends TestCase
         $this->assertFalse($c->hasException());
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $c = new ExceptionDataCollector();
 

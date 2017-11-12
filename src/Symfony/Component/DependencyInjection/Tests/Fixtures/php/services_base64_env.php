@@ -29,13 +29,13 @@ class Symfony_DI_PhpDumper_Test_Base64Parameters extends Container
         $this->aliases = array();
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->privates = array();
         parent::reset();
     }
 
-    public function compile()
+    public function compile(): void
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
@@ -74,7 +74,7 @@ class Symfony_DI_PhpDumper_Test_Base64Parameters extends Container
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter($name, $value)
+    public function setParameter($name, $value): void
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }

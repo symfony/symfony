@@ -133,7 +133,7 @@ class ConsoleFormatter implements FormatterInterface
     /**
      * @internal
      */
-    public function echoLine($line, $depth, $indentPad)
+    public function echoLine($line, $depth, $indentPad): void
     {
         if (-1 !== $depth) {
             fwrite($this->outputBuffer, $line);

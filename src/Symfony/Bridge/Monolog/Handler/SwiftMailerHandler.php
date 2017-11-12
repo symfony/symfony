@@ -26,7 +26,7 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
 
     protected $instantFlush = false;
 
-    public function setTransport(\Swift_Transport $transport)
+    public function setTransport(\Swift_Transport $transport): void
     {
         $this->transport = $transport;
     }
@@ -34,7 +34,7 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
     /**
      * After the kernel has been terminated we will always flush messages.
      */
-    public function onKernelTerminate(PostResponseEvent $event)
+    public function onKernelTerminate(PostResponseEvent $event): void
     {
         $this->instantFlush = true;
     }
@@ -42,7 +42,7 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
     /**
      * After the CLI application has been terminated we will always flush messages.
      */
-    public function onCliTerminate(ConsoleTerminateEvent $event)
+    public function onCliTerminate(ConsoleTerminateEvent $event): void
     {
         $this->instantFlush = true;
     }
@@ -50,7 +50,7 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
     /**
      * {@inheritdoc}
      */
-    protected function send($content, array $records)
+    protected function send($content, array $records): void
     {
         parent::send($content, $records);
 
@@ -62,7 +62,7 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
     /**
      * Flushes the mail queue if a memory spool is used.
      */
-    private function flushMemorySpool()
+    private function flushMemorySpool(): void
     {
         $mailerTransport = $this->mailer->getTransport();
         if (!$mailerTransport instanceof \Swift_Transport_SpoolTransport) {

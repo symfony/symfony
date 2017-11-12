@@ -19,7 +19,7 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 
 class CacheWarmingTest extends TestCase
 {
-    public function testCacheIsProperlyWarmedWhenTemplatingIsAvailable()
+    public function testCacheIsProperlyWarmedWhenTemplatingIsAvailable(): void
     {
         $kernel = new CacheWarmingKernel(true);
         $kernel->boot();
@@ -31,7 +31,7 @@ class CacheWarmingTest extends TestCase
         $this->assertFileExists($kernel->getCacheDir().'/twig');
     }
 
-    public function testCacheIsProperlyWarmedWhenTemplatingIsDisabled()
+    public function testCacheIsProperlyWarmedWhenTemplatingIsDisabled(): void
     {
         $kernel = new CacheWarmingKernel(false);
         $kernel->boot();
@@ -43,17 +43,17 @@ class CacheWarmingTest extends TestCase
         $this->assertFileExists($kernel->getCacheDir().'/twig');
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deleteTempDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteTempDir();
     }
 
-    private function deleteTempDir()
+    private function deleteTempDir(): void
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/CacheWarmingKernel')) {
             return;
@@ -85,9 +85,9 @@ class CacheWarmingKernel extends Kernel
         return array(new FrameworkBundle(), new TwigBundle());
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(function ($container) {
+        $loader->load(function ($container): void {
             $container->loadFromExtension('framework', array(
                 'secret' => '$ecret',
                 'form' => array('enabled' => false),
@@ -95,7 +95,7 @@ class CacheWarmingKernel extends Kernel
         });
 
         if ($this->withTemplating) {
-            $loader->load(function ($container) {
+            $loader->load(function ($container): void {
                 $container->loadFromExtension('framework', array(
                     'secret' => '$ecret',
                     'templating' => array('engines' => array('twig')),

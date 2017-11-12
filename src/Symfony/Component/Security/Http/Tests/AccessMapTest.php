@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\AccessMap;
 
 class AccessMapTest extends TestCase
 {
-    public function testReturnsFirstMatchedPattern()
+    public function testReturnsFirstMatchedPattern(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $requestMatcher1 = $this->getRequestMatcher($request, false);
@@ -29,7 +29,7 @@ class AccessMapTest extends TestCase
         $this->assertSame(array(array('ROLE_USER'), 'https'), $map->getPatterns($request));
     }
 
-    public function testReturnsEmptyPatternIfNoneMatched()
+    public function testReturnsEmptyPatternIfNoneMatched(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $requestMatcher = $this->getRequestMatcher($request, false);

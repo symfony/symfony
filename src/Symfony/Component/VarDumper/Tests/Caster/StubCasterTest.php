@@ -24,7 +24,7 @@ class StubCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testArgsStubWithDefaults($foo = 234, $bar = 456)
+    public function testArgsStubWithDefaults($foo = 234, $bar = 456): void
     {
         $args = array(new ArgsStub(array(123), __FUNCTION__, __CLASS__));
 
@@ -39,7 +39,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testArgsStubWithExtraArgs($foo = 234)
+    public function testArgsStubWithExtraArgs($foo = 234): void
     {
         $args = array(new ArgsStub(array(123, 456), __FUNCTION__, __CLASS__));
 
@@ -57,7 +57,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testArgsStubNoParamWithExtraArgs()
+    public function testArgsStubNoParamWithExtraArgs(): void
     {
         $args = array(new ArgsStub(array(123), __FUNCTION__, __CLASS__));
 
@@ -72,7 +72,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testArgsStubWithClosure()
+    public function testArgsStubWithClosure(): void
     {
         $args = array(new ArgsStub(array(123), '{closure}', null));
 
@@ -87,7 +87,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testLinkStub()
+    public function testLinkStub(): void
     {
         $var = array(new LinkStub(__CLASS__, 0, __FILE__));
 
@@ -108,7 +108,7 @@ EODUMP;
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    public function testClassStub()
+    public function testClassStub(): void
     {
         $var = array(new ClassStub('hello', array(FooInterface::class, 'foo')));
 
@@ -128,7 +128,7 @@ EODUMP;
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    public function testClassStubWithNotExistingClass()
+    public function testClassStubWithNotExistingClass(): void
     {
         $var = array(new ClassStub(NotExisting::class));
 
@@ -149,7 +149,7 @@ EODUMP;
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    public function testClassStubWithNotExistingMethod()
+    public function testClassStubWithNotExistingMethod(): void
     {
         $var = array(new ClassStub('hello', array(FooInterface::class, 'missing')));
 

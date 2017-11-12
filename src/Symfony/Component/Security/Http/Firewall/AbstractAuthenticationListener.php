@@ -97,7 +97,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     /**
      * Sets the RememberMeServices implementation to use.
      */
-    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
+    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices): void
     {
         $this->rememberMeServices = $rememberMeServices;
     }
@@ -108,7 +108,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @throws \RuntimeException
      * @throws SessionUnavailableException
      */
-    final public function handle(GetResponseEvent $event)
+    final public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 

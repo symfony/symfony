@@ -52,7 +52,7 @@ class FormEvent extends Event
      *
      * @param mixed $data
      */
-    public function setData($data)
+    public function setData($data): void
     {
         $this->data = $data;
     }

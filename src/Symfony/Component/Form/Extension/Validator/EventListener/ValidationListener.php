@@ -46,7 +46,7 @@ class ValidationListener implements EventSubscriberInterface
      *
      * @param FormEvent $event The event object
      */
-    public function validateForm(FormEvent $event)
+    public function validateForm(FormEvent $event): void
     {
         $form = $event->getForm();
 

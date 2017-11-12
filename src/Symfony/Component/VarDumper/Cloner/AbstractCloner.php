@@ -160,7 +160,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @param callable[] $casters A map of casters
      */
-    public function addCasters(array $casters)
+    public function addCasters(array $casters): void
     {
         foreach ($casters as $type => $callback) {
             $this->casters[strtolower($type)][] = is_string($callback) && false !== strpos($callback, '::') ? explode('::', $callback, 2) : $callback;
@@ -172,7 +172,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @param int $maxItems
      */
-    public function setMaxItems($maxItems)
+    public function setMaxItems($maxItems): void
     {
         $this->maxItems = (int) $maxItems;
     }
@@ -182,7 +182,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @param int $maxString
      */
-    public function setMaxString($maxString)
+    public function setMaxString($maxString): void
     {
         $this->maxString = (int) $maxString;
     }
@@ -193,7 +193,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @param int $minDepth
      */
-    public function setMinDepth($minDepth)
+    public function setMinDepth($minDepth): void
     {
         $this->minDepth = (int) $minDepth;
     }

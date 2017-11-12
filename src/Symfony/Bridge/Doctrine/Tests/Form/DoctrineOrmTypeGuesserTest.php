@@ -22,7 +22,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
     /**
      * @dataProvider requiredProvider
      */
-    public function testRequiredGuesser($classMetadata, $expected)
+    public function testRequiredGuesser($classMetadata, $expected): void
     {
         $this->assertEquals($expected, $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
     }

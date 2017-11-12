@@ -17,7 +17,7 @@ class TimezoneTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TimezoneType';
 
-    public function testTimezonesAreSelectable()
+    public function testTimezonesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -29,12 +29,12 @@ class TimezoneTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('America/New_York', 'America/New_York', 'New York'), $choices['America'], '', false, false);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testDateTimeZoneInput()
+    public function testDateTimeZoneInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, new \DateTimeZone('America/New_York'), array('input' => 'datetimezone'));
 
@@ -53,7 +53,7 @@ class TimezoneTypeTest extends BaseTypeTest
         $this->assertEquals(array(new \DateTimeZone('Europe/Amsterdam'), new \DateTimeZone('Europe/Paris')), $form->getData());
     }
 
-    public function testFilterByRegions()
+    public function testFilterByRegions(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE, null, array('regions' => \DateTimeZone::EUROPE))
             ->createView()->vars['choices'];

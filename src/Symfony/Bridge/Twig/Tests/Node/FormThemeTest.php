@@ -27,7 +27,7 @@ class FormThemeTest extends TestCase
 {
     use RuntimeLoaderProvider;
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $form = new NameExpression('form', 0);
         $resources = new Node(array(
@@ -42,7 +42,7 @@ class FormThemeTest extends TestCase
         $this->assertFalse($node->getAttribute('only'));
     }
 
-    public function testCompile()
+    public function testCompile(): void
     {
         $form = new NameExpression('form', 0);
         $resources = new ArrayExpression(array(

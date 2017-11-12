@@ -47,7 +47,7 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function setTheme(FormView $view, $themes, $useDefaultThemes = true)
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true): void
     {
         $this->engine->setTheme($view, $themes, $useDefaultThemes);
     }

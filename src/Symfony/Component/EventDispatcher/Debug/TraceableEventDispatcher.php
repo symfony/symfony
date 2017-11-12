@@ -45,7 +45,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function addListener($eventName, $listener, $priority = 0)
+    public function addListener($eventName, $listener, $priority = 0): void
     {
         $this->dispatcher->addListener($eventName, $listener, $priority);
     }
@@ -53,7 +53,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber)
+    public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         $this->dispatcher->addSubscriber($subscriber);
     }
@@ -207,7 +207,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         return $notCalled;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->called = array();
     }
@@ -231,7 +231,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      * @param string $eventName The event name
      * @param Event  $event     The event
      */
-    protected function preDispatch($eventName, Event $event)
+    protected function preDispatch($eventName, Event $event): void
     {
     }
 
@@ -241,11 +241,11 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      * @param string $eventName The event name
      * @param Event  $event     The event
      */
-    protected function postDispatch($eventName, Event $event)
+    protected function postDispatch($eventName, Event $event): void
     {
     }
 
-    private function preProcess($eventName)
+    private function preProcess($eventName): void
     {
         foreach ($this->dispatcher->getListeners($eventName) as $listener) {
             $priority = $this->getListenerPriority($eventName, $listener);
@@ -256,7 +256,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         }
     }
 
-    private function postProcess($eventName)
+    private function postProcess($eventName): void
     {
         unset($this->wrappedListeners[$eventName]);
         $skipped = false;

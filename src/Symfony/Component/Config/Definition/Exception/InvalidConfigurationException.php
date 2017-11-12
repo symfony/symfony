@@ -22,7 +22,7 @@ class InvalidConfigurationException extends Exception
     private $path;
     private $containsHints = false;
 
-    public function setPath($path)
+    public function setPath($path): void
     {
         $this->path = $path;
     }
@@ -37,7 +37,7 @@ class InvalidConfigurationException extends Exception
      *
      * @param string $hint
      */
-    public function addHint($hint)
+    public function addHint($hint): void
     {
         if (!$this->containsHints) {
             $this->message .= "\nHint: ".$hint;

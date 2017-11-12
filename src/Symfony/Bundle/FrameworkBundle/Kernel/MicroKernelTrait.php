@@ -59,9 +59,9 @@ trait MicroKernelTrait
     /**
      * {@inheritdoc}
      */
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(function (ContainerBuilder $container) use ($loader) {
+        $loader->load(function (ContainerBuilder $container) use ($loader): void {
             $container->loadFromExtension('framework', array(
                 'router' => array(
                     'resource' => 'kernel:loadRoutes',

@@ -19,7 +19,7 @@ use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 
 class RoutingResolverPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('routing.resolver', LoaderResolver::class);

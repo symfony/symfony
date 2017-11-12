@@ -19,7 +19,7 @@ class AcceptHeaderItemTest extends TestCase
     /**
      * @dataProvider provideFromStringData
      */
-    public function testFromString($string, $value, array $attributes)
+    public function testFromString($string, $value, array $attributes): void
     {
         $item = AcceptHeaderItem::fromString($string);
         $this->assertEquals($value, $item->getValue());
@@ -51,7 +51,7 @@ class AcceptHeaderItemTest extends TestCase
     /**
      * @dataProvider provideToStringData
      */
-    public function testToString($value, array $attributes, $string)
+    public function testToString($value, array $attributes, $string): void
     {
         $item = new AcceptHeaderItem($value, $attributes);
         $this->assertEquals($string, (string) $item);
@@ -71,7 +71,7 @@ class AcceptHeaderItemTest extends TestCase
         );
     }
 
-    public function testValue()
+    public function testValue(): void
     {
         $item = new AcceptHeaderItem('value', array());
         $this->assertEquals('value', $item->getValue());
@@ -83,7 +83,7 @@ class AcceptHeaderItemTest extends TestCase
         $this->assertEquals('1', $item->getValue());
     }
 
-    public function testQuality()
+    public function testQuality(): void
     {
         $item = new AcceptHeaderItem('value', array());
         $this->assertEquals(1.0, $item->getQuality());
@@ -96,7 +96,7 @@ class AcceptHeaderItemTest extends TestCase
         $this->assertFalse($item->hasAttribute('q'));
     }
 
-    public function testAttribute()
+    public function testAttribute(): void
     {
         $item = new AcceptHeaderItem('value', array());
         $this->assertEquals(array(), $item->getAttributes());

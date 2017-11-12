@@ -21,13 +21,13 @@ class JsonEncoderTest extends TestCase
     private $encoder;
     private $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encoder = new JsonEncoder();
         $this->serializer = new Serializer(array(new CustomNormalizer()), array('json' => new JsonEncoder()));
     }
 
-    public function testEncodeScalar()
+    public function testEncodeScalar(): void
     {
         $obj = new \stdClass();
         $obj->foo = 'foo';
@@ -37,7 +37,7 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->encode($obj, 'json'));
     }
 
-    public function testComplexObject()
+    public function testComplexObject(): void
     {
         $obj = $this->getObject();
 
@@ -46,7 +46,7 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->encode($obj, 'json'));
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $context = array('json_encode_options' => JSON_NUMERIC_CHECK);
 

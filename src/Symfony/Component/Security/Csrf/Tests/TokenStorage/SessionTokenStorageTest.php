@@ -31,7 +31,7 @@ class SessionTokenStorageTest extends TestCase
      */
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')
             ->disableOriginalConstructor()
@@ -39,7 +39,7 @@ class SessionTokenStorageTest extends TestCase
         $this->storage = new SessionTokenStorage($this->session, self::SESSION_NAMESPACE);
     }
 
-    public function testStoreTokenInClosedSession()
+    public function testStoreTokenInClosedSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -55,7 +55,7 @@ class SessionTokenStorageTest extends TestCase
         $this->storage->setToken('token_id', 'TOKEN');
     }
 
-    public function testStoreTokenInActiveSession()
+    public function testStoreTokenInActiveSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -71,7 +71,7 @@ class SessionTokenStorageTest extends TestCase
         $this->storage->setToken('token_id', 'TOKEN');
     }
 
-    public function testCheckTokenInClosedSession()
+    public function testCheckTokenInClosedSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -88,7 +88,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertSame('RESULT', $this->storage->hasToken('token_id'));
     }
 
-    public function testCheckTokenInActiveSession()
+    public function testCheckTokenInActiveSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -105,7 +105,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertSame('RESULT', $this->storage->hasToken('token_id'));
     }
 
-    public function testGetExistingTokenFromClosedSession()
+    public function testGetExistingTokenFromClosedSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -127,7 +127,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertSame('RESULT', $this->storage->getToken('token_id'));
     }
 
-    public function testGetExistingTokenFromActiveSession()
+    public function testGetExistingTokenFromActiveSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -152,7 +152,7 @@ class SessionTokenStorageTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException
      */
-    public function testGetNonExistingTokenFromClosedSession()
+    public function testGetNonExistingTokenFromClosedSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -172,7 +172,7 @@ class SessionTokenStorageTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException
      */
-    public function testGetNonExistingTokenFromActiveSession()
+    public function testGetNonExistingTokenFromActiveSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -189,7 +189,7 @@ class SessionTokenStorageTest extends TestCase
         $this->storage->getToken('token_id');
     }
 
-    public function testRemoveNonExistingTokenFromClosedSession()
+    public function testRemoveNonExistingTokenFromClosedSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -206,7 +206,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertNull($this->storage->removeToken('token_id'));
     }
 
-    public function testRemoveNonExistingTokenFromActiveSession()
+    public function testRemoveNonExistingTokenFromActiveSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -223,7 +223,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertNull($this->storage->removeToken('token_id'));
     }
 
-    public function testRemoveExistingTokenFromClosedSession()
+    public function testRemoveExistingTokenFromClosedSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')
@@ -240,7 +240,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertSame('TOKEN', $this->storage->removeToken('token_id'));
     }
 
-    public function testRemoveExistingTokenFromActiveSession()
+    public function testRemoveExistingTokenFromActiveSession(): void
     {
         $this->session->expects($this->any())
             ->method('isStarted')

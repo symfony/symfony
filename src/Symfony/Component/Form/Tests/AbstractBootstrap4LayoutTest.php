@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormError;
  */
 abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 {
-    public function testLabelOnForm()
+    public function testLabelOnForm(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType');
         $view = $form->createView();
@@ -35,7 +35,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testLabelDoesNotRenderFieldAttributes()
+    public function testLabelDoesNotRenderFieldAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, array(
@@ -52,7 +52,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testLabelWithCustomAttributesPassedDirectly()
+    public function testLabelWithCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, array(
@@ -69,7 +69,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), 'Custom label', array(
@@ -87,7 +87,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
             'label' => 'Custom label',
@@ -107,7 +107,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testLegendOnExpandedType()
+    public function testLegendOnExpandedType(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
             'label' => 'Custom label',
@@ -126,7 +126,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testErrors()
+    public function testErrors(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $form->addError(new FormError('[trans]Error 1[/trans]'));
@@ -152,7 +152,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testCheckedCheckbox()
+    public function testCheckedCheckbox(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', true);
 
@@ -171,7 +171,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceAttributesWithMainAttributes()
+    public function testSingleChoiceAttributesWithMainAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -194,7 +194,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleExpandedChoiceAttributesWithMainAttributes()
+    public function testSingleExpandedChoiceAttributesWithMainAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -231,7 +231,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testUncheckedCheckbox()
+    public function testUncheckedCheckbox(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', false);
 
@@ -249,7 +249,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testCheckboxWithValue()
+    public function testCheckboxWithValue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', false, array(
             'value' => 'foo&bar',
@@ -269,7 +269,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceExpanded()
+    public function testSingleChoiceExpanded(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -304,7 +304,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceExpandedWithLabelsAsFalse()
+    public function testSingleChoiceExpandedWithLabelsAsFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -338,7 +338,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceExpandedWithLabelsSetByCallable()
+    public function testSingleChoiceExpandedWithLabelsSetByCallable(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
@@ -388,7 +388,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceExpandedWithLabelsSetFalseByCallable()
+    public function testSingleChoiceExpandedWithLabelsSetFalseByCallable(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -424,7 +424,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceExpandedWithoutTranslation()
+    public function testSingleChoiceExpandedWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -460,7 +460,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceExpandedAttributes()
+    public function testSingleChoiceExpandedAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -496,7 +496,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceExpandedWithPlaceholder()
+    public function testSingleChoiceExpandedWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -542,7 +542,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
+    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -589,7 +589,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testSingleChoiceExpandedWithBooleanValue()
+    public function testSingleChoiceExpandedWithBooleanValue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', true, array(
             'choices' => array('Choice&A' => '1', 'Choice&B' => '0'),
@@ -624,7 +624,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testMultipleChoiceExpanded()
+    public function testMultipleChoiceExpanded(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a', '&c'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
@@ -669,7 +669,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testMultipleChoiceExpandedWithLabelsAsFalse()
+    public function testMultipleChoiceExpandedWithLabelsAsFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -703,7 +703,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testMultipleChoiceExpandedWithLabelsSetByCallable()
+    public function testMultipleChoiceExpandedWithLabelsSetByCallable(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
@@ -753,7 +753,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testMultipleChoiceExpandedWithLabelsSetFalseByCallable()
+    public function testMultipleChoiceExpandedWithLabelsSetFalseByCallable(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b'),
@@ -789,7 +789,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testMultipleChoiceExpandedWithoutTranslation()
+    public function testMultipleChoiceExpandedWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a', '&c'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
@@ -835,7 +835,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testMultipleChoiceExpandedAttributes()
+    public function testMultipleChoiceExpandedAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array('&a', '&c'), array(
             'choices' => array('Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'),
@@ -881,7 +881,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testCheckedRadio()
+    public function testCheckedRadio(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', true);
 
@@ -905,7 +905,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testUncheckedRadio()
+    public function testUncheckedRadio(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', false);
 
@@ -928,7 +928,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testRadioWithValue()
+    public function testRadioWithValue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', false, array(
             'value' => 'foo&bar',
@@ -953,7 +953,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
-    public function testButtonAttributeNameRepeatedIfTrue()
+    public function testButtonAttributeNameRepeatedIfTrue(): void
     {
         $form = $this->factory->createNamed('button', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, array(
             'attr' => array('foo' => true),
@@ -965,7 +965,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $this->assertSame('<button type="button" id="button" name="button" foo="foo" class="btn-secondary btn">[trans]Button[/trans]</button>', $html);
     }
 
-    public function testFile()
+    public function testFile(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\FileType');
 

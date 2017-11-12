@@ -54,7 +54,7 @@ class Terminal
         return self::$height ?: 50;
     }
 
-    private static function initDimensions()
+    private static function initDimensions(): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim(getenv('ANSICON')), $matches)) {

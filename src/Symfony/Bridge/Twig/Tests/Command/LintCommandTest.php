@@ -23,7 +23,7 @@ class LintCommandTest extends TestCase
 {
     private $files;
 
-    public function testLintCorrectFile()
+    public function testLintCorrectFile(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('{{ foo }}');
@@ -34,7 +34,7 @@ class LintCommandTest extends TestCase
         $this->assertContains('OK in', trim($tester->getDisplay()));
     }
 
-    public function testLintIncorrectFile()
+    public function testLintIncorrectFile(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('{{ foo');
@@ -48,7 +48,7 @@ class LintCommandTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testLintFileNotReadable()
+    public function testLintFileNotReadable(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
@@ -57,7 +57,7 @@ class LintCommandTest extends TestCase
         $ret = $tester->execute(array('filename' => array($filename)), array('decorated' => false));
     }
 
-    public function testLintFileCompileTimeException()
+    public function testLintFileCompileTimeException(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile("{{ 2|number_format(2, decimal_point='.', ',') }}");
@@ -95,12 +95,12 @@ class LintCommandTest extends TestCase
         return $filename;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->files = array();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

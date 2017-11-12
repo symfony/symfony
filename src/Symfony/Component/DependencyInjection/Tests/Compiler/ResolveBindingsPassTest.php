@@ -25,7 +25,7 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class ResolveBindingsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -50,7 +50,7 @@ class ResolveBindingsPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Unused binding "$quz" in service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy".
      */
-    public function testUnusedBinding()
+    public function testUnusedBinding(): void
     {
         $container = new ContainerBuilder();
 
@@ -61,7 +61,7 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testTypedReferenceSupport()
+    public function testTypedReferenceSupport(): void
     {
         $container = new ContainerBuilder();
 
@@ -83,7 +83,7 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals(array(new Reference('foo')), $container->getDefinition('def2')->getArguments());
     }
 
-    public function testScalarSetter()
+    public function testScalarSetter(): void
     {
         $container = new ContainerBuilder();
 

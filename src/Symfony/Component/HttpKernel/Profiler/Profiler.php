@@ -46,7 +46,7 @@ class Profiler
     /**
      * Disables the profiler.
      */
-    public function disable()
+    public function disable(): void
     {
         $this->enabled = false;
     }
@@ -54,7 +54,7 @@ class Profiler
     /**
      * Enables the profiler.
      */
-    public function enable()
+    public function enable(): void
     {
         $this->enabled = true;
     }
@@ -109,7 +109,7 @@ class Profiler
     /**
      * Purges all data from the storage.
      */
-    public function purge()
+    public function purge(): void
     {
         $this->storage->purge();
     }
@@ -168,7 +168,7 @@ class Profiler
         return $profile;
     }
 
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->collectors as $collector) {
             $collector->reset();
@@ -191,7 +191,7 @@ class Profiler
      *
      * @param DataCollectorInterface[] $collectors An array of collectors
      */
-    public function set(array $collectors = array())
+    public function set(array $collectors = array()): void
     {
         $this->collectors = array();
         foreach ($collectors as $collector) {
@@ -202,7 +202,7 @@ class Profiler
     /**
      * Adds a Collector.
      */
-    public function add(DataCollectorInterface $collector)
+    public function add(DataCollectorInterface $collector): void
     {
         $this->collectors[$collector->getName()] = $collector;
     }

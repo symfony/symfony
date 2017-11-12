@@ -122,7 +122,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @throws \InvalidArgumentException When unsupported option is provided
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = array(
             'cache_dir' => null,
@@ -162,7 +162,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function setOption($key, $value)
+    public function setOption($key, $value): void
     {
         if (!array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
@@ -204,7 +204,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->context = $context;
 
@@ -227,7 +227,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * Sets the ConfigCache factory to use.
      */
-    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
+    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory): void
     {
         $this->configCacheFactory = $configCacheFactory;
     }
@@ -285,7 +285,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['matcher_cache_class'].'.php',
-            function (ConfigCacheInterface $cache) {
+            function (ConfigCacheInterface $cache): void {
                 $dumper = $this->getMatcherDumperInstance();
                 if (method_exists($dumper, 'addExpressionLanguageProvider')) {
                     foreach ($this->expressionLanguageProviders as $provider) {
@@ -322,7 +322,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
         } else {
             $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['generator_cache_class'].'.php',
-                function (ConfigCacheInterface $cache) {
+                function (ConfigCacheInterface $cache): void {
                     $dumper = $this->getGeneratorDumperInstance();
 
                     $options = array(
@@ -346,7 +346,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         return $this->generator;
     }
 
-    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
     {
         $this->expressionLanguageProviders[] = $provider;
     }

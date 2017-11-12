@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\UriSigner;
 
 class UriSignerTest extends TestCase
 {
-    public function testSign()
+    public function testSign(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -24,7 +24,7 @@ class UriSignerTest extends TestCase
         $this->assertContains('&_hash=', $signer->sign('http://example.com/foo?foo=bar'));
     }
 
-    public function testCheck()
+    public function testCheck(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -39,7 +39,7 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->sign('http://example.com/foo?foo=bar&bar=foo') === $signer->sign('http://example.com/foo?bar=foo&foo=bar'));
     }
 
-    public function testCheckWithDifferentArgSeparator()
+    public function testCheckWithDifferentArgSeparator(): void
     {
         $this->iniSet('arg_separator.output', '&amp;');
         $signer = new UriSigner('foobar');
@@ -51,7 +51,7 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
     }
 
-    public function testCheckWithDifferentParameter()
+    public function testCheckWithDifferentParameter(): void
     {
         $signer = new UriSigner('foobar', 'qux');
 

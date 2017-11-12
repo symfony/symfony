@@ -21,7 +21,7 @@ class AuthenticatedVoterTest extends TestCase
     /**
      * @dataProvider getVoteTests
      */
-    public function testVote($authenticated, $attributes, $expected)
+    public function testVote($authenticated, $attributes, $expected): void
     {
         $voter = new AuthenticatedVoter($this->getResolver());
 

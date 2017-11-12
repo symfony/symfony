@@ -26,7 +26,7 @@ class KernelForTest extends Kernel
         return array();
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
 

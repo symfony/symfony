@@ -137,7 +137,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array()): void
     {
         $setter = 'set'.ucfirst($attribute);
         $key = get_class($object).':'.$setter;

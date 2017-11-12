@@ -15,7 +15,7 @@ use Symfony\Bundle\TwigBundle\TemplateIterator;
 
 class TemplateIteratorTest extends TestCase
 {
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
         $bundle->expects($this->any())->method('getName')->will($this->returnValue('BarBundle'));

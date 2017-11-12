@@ -24,7 +24,7 @@ class ProfilerTest extends TestCase
     private $tmp;
     private $storage;
 
-    public function testCollect()
+    public function testCollect(): void
     {
         $request = new Request();
         $request->query->set('foo', 'bar');
@@ -41,7 +41,7 @@ class ProfilerTest extends TestCase
         $this->assertSame('bar', $profile->getCollector('request')->getRequestQuery()->all()['foo']->getValue());
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $collector = $this->getMockBuilder(DataCollectorInterface::class)
             ->setMethods(['collect', 'getName', 'reset'])
@@ -54,35 +54,35 @@ class ProfilerTest extends TestCase
         $profiler->reset();
     }
 
-    public function testFindWorksWithDates()
+    public function testFindWorksWithDates(): void
     {
         $profiler = new Profiler($this->storage);
 
         $this->assertCount(0, $profiler->find(null, null, null, null, '7th April 2014', '9th April 2014'));
     }
 
-    public function testFindWorksWithTimestamps()
+    public function testFindWorksWithTimestamps(): void
     {
         $profiler = new Profiler($this->storage);
 
         $this->assertCount(0, $profiler->find(null, null, null, null, '1396828800', '1397001600'));
     }
 
-    public function testFindWorksWithInvalidDates()
+    public function testFindWorksWithInvalidDates(): void
     {
         $profiler = new Profiler($this->storage);
 
         $this->assertCount(0, $profiler->find(null, null, null, null, 'some string', ''));
     }
 
-    public function testFindWorksWithStatusCode()
+    public function testFindWorksWithStatusCode(): void
     {
         $profiler = new Profiler($this->storage);
 
         $this->assertCount(0, $profiler->find(null, null, null, null, null, null, '204'));
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
         if (file_exists($this->tmp)) {
@@ -93,7 +93,7 @@ class ProfilerTest extends TestCase
         $this->storage->purge();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (null !== $this->storage) {
             $this->storage->purge();

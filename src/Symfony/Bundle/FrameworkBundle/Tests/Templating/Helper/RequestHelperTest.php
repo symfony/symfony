@@ -20,7 +20,7 @@ class RequestHelperTest extends TestCase
 {
     protected $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
         $request = new Request();
@@ -28,7 +28,7 @@ class RequestHelperTest extends TestCase
         $this->requestStack->push($request);
     }
 
-    public function testGetParameter()
+    public function testGetParameter(): void
     {
         $helper = new RequestHelper($this->requestStack);
 
@@ -38,14 +38,14 @@ class RequestHelperTest extends TestCase
         $this->assertNull($helper->getParameter('foo'));
     }
 
-    public function testGetLocale()
+    public function testGetLocale(): void
     {
         $helper = new RequestHelper($this->requestStack);
 
         $this->assertEquals('en', $helper->getLocale());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $helper = new RequestHelper($this->requestStack);
 

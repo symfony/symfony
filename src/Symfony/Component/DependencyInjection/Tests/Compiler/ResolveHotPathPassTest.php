@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveHotPathPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 

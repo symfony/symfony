@@ -42,7 +42,7 @@ class LocaleDataGenerator
         $this->regionDataProvider = $regionDataProvider;
     }
 
-    public function generateData(GeneratorConfig $config)
+    public function generateData(GeneratorConfig $config): void
     {
         $filesystem = new Filesystem();
         $localeScanner = new LocaleScanner();

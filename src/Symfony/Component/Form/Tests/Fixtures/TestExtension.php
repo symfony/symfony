@@ -29,7 +29,7 @@ class TestExtension implements FormExtensionInterface
         $this->guesser = $guesser;
     }
 
-    public function addType(FormTypeInterface $type)
+    public function addType(FormTypeInterface $type): void
     {
         $this->types[get_class($type)] = $type;
     }
@@ -44,7 +44,7 @@ class TestExtension implements FormExtensionInterface
         return isset($this->types[$name]);
     }
 
-    public function addTypeExtension(FormTypeExtensionInterface $extension)
+    public function addTypeExtension(FormTypeExtensionInterface $extension): void
     {
         $type = $extension->getExtendedType();
 

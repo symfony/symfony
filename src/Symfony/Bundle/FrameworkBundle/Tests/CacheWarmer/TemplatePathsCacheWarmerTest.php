@@ -35,7 +35,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
 
     private $tmpDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->templateFinder = $this
             ->getMockBuilder(TemplateFinderInterface::class)
@@ -56,12 +56,12 @@ class TemplatePathsCacheWarmerTest extends TestCase
         $this->filesystem->mkdir($this->tmpDir);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->filesystem->remove($this->tmpDir);
     }
 
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');
 
@@ -82,7 +82,7 @@ class TemplatePathsCacheWarmerTest extends TestCase
         $this->assertFileEquals(__DIR__.'/../Fixtures/TemplatePathsCache/templates.php', $this->tmpDir.'/templates.php');
     }
 
-    public function testWarmUpEmpty()
+    public function testWarmUpEmpty(): void
     {
         $this->templateFinder
             ->expects($this->once())

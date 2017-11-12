@@ -17,7 +17,7 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class ParsedExpressionTest extends TestCase
 {
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $expression = new ParsedExpression('25', new ConstantNode('25'));
 

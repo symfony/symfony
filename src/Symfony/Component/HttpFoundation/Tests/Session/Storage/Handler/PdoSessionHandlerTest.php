@@ -22,7 +22,7 @@ class PdoSessionHandlerTest extends TestCase
 {
     private $dbFile;
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         // make sure the temporary database file is deleted when it has been created (even when a test fails)
         if ($this->dbFile) {
@@ -51,7 +51,7 @@ class PdoSessionHandlerTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testWrongPdoErrMode()
+    public function testWrongPdoErrMode(): void
     {
         $pdo = $this->getMemorySqlitePdo();
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
@@ -62,7 +62,7 @@ class PdoSessionHandlerTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testInexistentTable()
+    public function testInexistentTable(): void
     {
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), array('db_table' => 'inexistent_table'));
         $storage->open('', 'sid');
@@ -74,13 +74,13 @@ class PdoSessionHandlerTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testCreateTableTwice()
+    public function testCreateTableTwice(): void
     {
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->createTable();
     }
 
-    public function testWithLazyDsnConnection()
+    public function testWithLazyDsnConnection(): void
     {
         $dsn = $this->getPersistentSqliteDsn();
 
@@ -98,7 +98,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('data', $data, 'Written value can be read back correctly');
     }
 
-    public function testWithLazySavePathConnection()
+    public function testWithLazySavePathConnection(): void
     {
         $dsn = $this->getPersistentSqliteDsn();
 
@@ -117,7 +117,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('data', $data, 'Written value can be read back correctly');
     }
 
-    public function testReadWriteReadWithNullByte()
+    public function testReadWriteReadWithNullByte(): void
     {
         $sessionData = 'da'."\0".'ta';
 
@@ -134,7 +134,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame($sessionData, $readData, 'Written value can be read back correctly');
     }
 
-    public function testReadConvertsStreamToString()
+    public function testReadConvertsStreamToString(): void
     {
         $pdo = new MockPdo('pgsql');
         $pdo->prepareResult = $this->getMockBuilder('PDOStatement')->getMock();
@@ -151,7 +151,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame($content, $result);
     }
 
-    public function testReadLockedConvertsStreamToString()
+    public function testReadLockedConvertsStreamToString(): void
     {
         if (ini_get('session.use_strict_mode')) {
             $this->markTestSkipped('Strict mode needs no locking for new sessions.');
@@ -175,7 +175,7 @@ class PdoSessionHandlerTest extends TestCase
             }));
 
         $insertStmt->expects($this->once())->method('execute')
-            ->will($this->returnCallback(function () use (&$exception) {
+            ->will($this->returnCallback(function () use (&$exception): void {
                 throw $exception = new \PDOException('', '23');
             }));
 
@@ -185,7 +185,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame($content, $result);
     }
 
-    public function testReadingRequiresExactlySameId()
+    public function testReadingRequiresExactlySameId(): void
     {
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->open('', 'sid');
@@ -210,7 +210,7 @@ class PdoSessionHandlerTest extends TestCase
     /**
      * Simulates session_regenerate_id(true) which will require an INSERT or UPDATE (replace).
      */
-    public function testWriteDifferentSessionIdThanRead()
+    public function testWriteDifferentSessionIdThanRead(): void
     {
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->open('', 'sid');
@@ -226,7 +226,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('data_of_new_session_id', $data, 'Data of regenerated session id is available');
     }
 
-    public function testWrongUsageStillWorks()
+    public function testWrongUsageStillWorks(): void
     {
         // wrong method sequence that should no happen, but still works
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
@@ -242,7 +242,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('other_data', $otherData);
     }
 
-    public function testSessionDestroy()
+    public function testSessionDestroy(): void
     {
         $pdo = $this->getMemorySqlitePdo();
         $storage = new PdoSessionHandler($pdo);
@@ -268,7 +268,7 @@ class PdoSessionHandlerTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testSessionGC()
+    public function testSessionGC(): void
     {
         $previousLifeTime = ini_set('session.gc_maxlifetime', 1000);
         $pdo = $this->getMemorySqlitePdo();
@@ -297,7 +297,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertEquals(1, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'Expired session is pruned');
     }
 
-    public function testGetConnection()
+    public function testGetConnection(): void
     {
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
 
@@ -307,7 +307,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertInstanceOf('\PDO', $method->invoke($storage));
     }
 
-    public function testGetConnectionConnectsIfNeeded()
+    public function testGetConnectionConnectsIfNeeded(): void
     {
         $storage = new PdoSessionHandler('sqlite::memory:');
 
@@ -359,11 +359,11 @@ class MockPdo extends \PDO
             : $this->prepareResult;
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
     }
 
-    public function rollBack()
+    public function rollBack(): void
     {
     }
 }

@@ -6,7 +6,7 @@ class ResettableService
 {
     public static $counter = 0;
 
-    public function reset()
+    public function reset(): void
     {
         ++self::$counter;
     }

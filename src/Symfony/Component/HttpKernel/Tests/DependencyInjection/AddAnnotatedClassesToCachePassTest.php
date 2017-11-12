@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\AddAnnotatedClassesToCacheP
 
 class AddAnnotatedClassesToCachePassTest extends TestCase
 {
-    public function testExpandClasses()
+    public function testExpandClasses(): void
     {
         $r = new \ReflectionClass(AddAnnotatedClassesToCachePass::class);
         $pass = $r->newInstanceWithoutConstructor();

@@ -34,7 +34,7 @@ class TextBundleWriterTest extends TestCase
      */
     private $filesystem;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->writer = new TextBundleWriter();
         $this->directory = sys_get_temp_dir().'/TextBundleWriterTest/'.mt_rand(1000, 9999);
@@ -43,12 +43,12 @@ class TextBundleWriterTest extends TestCase
         $this->filesystem->mkdir($this->directory);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->filesystem->remove($this->directory);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $this->writer->write($this->directory, 'en', array(
             'Entry1' => array(
@@ -69,7 +69,7 @@ class TextBundleWriterTest extends TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
     }
 
-    public function testWriteTraversable()
+    public function testWriteTraversable(): void
     {
         $this->writer->write($this->directory, 'en', new \ArrayIterator(array(
             'Entry1' => new \ArrayIterator(array(
@@ -90,7 +90,7 @@ class TextBundleWriterTest extends TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
     }
 
-    public function testWriteNoFallback()
+    public function testWriteNoFallback(): void
     {
         $data = array(
             'Entry' => 'Value',
@@ -101,7 +101,7 @@ class TextBundleWriterTest extends TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en_nofallback.txt', $this->directory.'/en_nofallback.txt');
     }
 
-    public function testEscapeKeysIfNecessary()
+    public function testEscapeKeysIfNecessary(): void
     {
         $this->writer->write($this->directory, 'escaped', array(
             // Keys with colons must be escaped, otherwise the part after the

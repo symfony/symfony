@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class FormAuthenticationEntryPointTest extends TestCase
 {
-    public function testStart()
+    public function testStart(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
         $response = new Response();
@@ -37,7 +37,7 @@ class FormAuthenticationEntryPointTest extends TestCase
         $this->assertEquals($response, $entryPoint->start($request));
     }
 
-    public function testStartWithUseForward()
+    public function testStartWithUseForward(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
         $subRequest = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();

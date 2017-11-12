@@ -50,7 +50,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     /**
      * Sets a custom children builder.
      */
-    public function setBuilder(NodeBuilder $builder)
+    public function setBuilder(NodeBuilder $builder): void
     {
         $this->nodeBuilder = $builder;
     }
@@ -475,7 +475,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @throws InvalidDefinitionException
      */
-    protected function validateConcreteNode(ArrayNode $node)
+    protected function validateConcreteNode(ArrayNode $node): void
     {
         $path = $node->getPath();
 
@@ -513,7 +513,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      *
      * @throws InvalidDefinitionException
      */
-    protected function validatePrototypeNode(PrototypedArrayNode $node)
+    protected function validatePrototypeNode(PrototypedArrayNode $node): void
     {
         $path = $node->getPath();
 

@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  */
 class TokenProcessorTest extends TestCase
 {
-    public function testProcessor()
+    public function testProcessor(): void
     {
         $token = new UsernamePasswordToken('user', 'password', 'provider', array('ROLE_USER'));
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();

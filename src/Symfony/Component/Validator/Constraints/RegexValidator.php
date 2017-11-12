@@ -26,7 +26,7 @@ class RegexValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof Regex) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Regex');

@@ -19,7 +19,7 @@ class ImageTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testConstructorWithANonImgTag()
+    public function testConstructorWithANonImgTag(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><div><div></html>');
@@ -30,7 +30,7 @@ class ImageTest extends TestCase
     /**
      * @dataProvider getGetUriTests
      */
-    public function testGetUri($url, $currentUri, $expected)
+    public function testGetUri($url, $currentUri, $expected): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(sprintf('<html><img alt="foo" src="%s" /></html>', $url));

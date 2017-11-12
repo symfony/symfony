@@ -33,7 +33,7 @@ class GuardAuthenticationListenerTest extends TestCase
     private $request;
     private $rememberMeServices;
 
-    public function testHandleSuccess()
+    public function testHandleSuccess(): void
     {
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticateToken = $this->getMockBuilder(TokenInterface::class)->getMock();
@@ -88,7 +88,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener->handle($this->event);
     }
 
-    public function testHandleSuccessStopsAfterResponseIsSet()
+    public function testHandleSuccessStopsAfterResponseIsSet(): void
     {
         $authenticator1 = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticator2 = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
@@ -122,7 +122,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener->handle($this->event);
     }
 
-    public function testHandleSuccessWithRememberMe()
+    public function testHandleSuccessWithRememberMe(): void
     {
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $authenticateToken = $this->getMockBuilder(TokenInterface::class)->getMock();
@@ -170,7 +170,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener->handle($this->event);
     }
 
-    public function testHandleCatchesAuthenticationException()
+    public function testHandleCatchesAuthenticationException(): void
     {
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $providerKey = 'my_firewall2';
@@ -206,7 +206,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener->handle($this->event);
     }
 
-    public function testSupportsReturnFalseSkipAuth()
+    public function testSupportsReturnFalseSkipAuth(): void
     {
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $providerKey = 'my_firewall4';
@@ -235,7 +235,7 @@ class GuardAuthenticationListenerTest extends TestCase
     /**
      * @expectedException \UnexpectedValueException
      */
-    public function testReturnNullFromGetCredentials()
+    public function testReturnNullFromGetCredentials(): void
     {
         $authenticator = $this->getMockBuilder(AuthenticatorInterface::class)->getMock();
         $providerKey = 'my_firewall4';
@@ -262,7 +262,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $listener->handle($this->event);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager')
             ->disableOriginalConstructor()
@@ -287,7 +287,7 @@ class GuardAuthenticationListenerTest extends TestCase
         $this->rememberMeServices = $this->getMockBuilder('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface')->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->authenticationManager = null;
         $this->guardAuthenticatorHandler = null;

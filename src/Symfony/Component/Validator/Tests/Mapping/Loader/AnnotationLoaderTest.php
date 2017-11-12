@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
 class AnnotationLoaderTest extends TestCase
 {
-    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    public function testLoadClassMetadataReturnsTrueIfSuccessful(): void
     {
         $reader = new AnnotationReader();
         $loader = new AnnotationLoader($reader);
@@ -36,7 +36,7 @@ class AnnotationLoaderTest extends TestCase
         $this->assertTrue($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
+    public function testLoadClassMetadataReturnsFalseIfNotSuccessful(): void
     {
         $loader = new AnnotationLoader(new AnnotationReader());
         $metadata = new ClassMetadata('\stdClass');
@@ -44,7 +44,7 @@ class AnnotationLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadata()
+    public function testLoadClassMetadata(): void
     {
         $loader = new AnnotationLoader(new AnnotationReader());
         $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
@@ -84,7 +84,7 @@ class AnnotationLoaderTest extends TestCase
     /**
      * Test MetaData merge with parent annotation.
      */
-    public function testLoadParentClassMetadata()
+    public function testLoadParentClassMetadata(): void
     {
         $loader = new AnnotationLoader(new AnnotationReader());
 
@@ -102,7 +102,7 @@ class AnnotationLoaderTest extends TestCase
     /**
      * Test MetaData merge with parent annotation.
      */
-    public function testLoadClassMetadataAndMerge()
+    public function testLoadClassMetadataAndMerge(): void
     {
         $loader = new AnnotationLoader(new AnnotationReader());
 
@@ -153,7 +153,7 @@ class AnnotationLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function testLoadGroupSequenceProviderAnnotation()
+    public function testLoadGroupSequenceProviderAnnotation(): void
     {
         $loader = new AnnotationLoader(new AnnotationReader());
 

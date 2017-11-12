@@ -28,7 +28,7 @@ final class DoctrineCache implements CacheInterface
         $this->cache = $cache;
     }
 
-    public function setCache(Cache $cache)
+    public function setCache(Cache $cache): void
     {
         $this->cache = $cache;
     }
@@ -52,7 +52,7 @@ final class DoctrineCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function write(ClassMetadata $metadata)
+    public function write(ClassMetadata $metadata): void
     {
         $this->cache->save($metadata->getClassName(), $metadata);
     }

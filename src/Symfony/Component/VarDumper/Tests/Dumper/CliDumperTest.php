@@ -25,7 +25,7 @@ class CliDumperTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testGet()
+    public function testGet(): void
     {
         require __DIR__.'/../Fixtures/dumb-var.php';
 
@@ -112,7 +112,7 @@ EOTXT
     /**
      * @dataProvider provideDumpWithCommaFlagTests
      */
-    public function testDumpWithCommaFlag($expected, $flags)
+    public function testDumpWithCommaFlag($expected, $flags): void
     {
         $dumper = new CliDumper(null, null, $flags);
         $dumper->setColors(false);
@@ -129,7 +129,7 @@ EOTXT
         $this->assertSame($expected, $dump);
     }
 
-    public function testDumpWithCommaFlagsAndExceptionCodeExcerpt()
+    public function testDumpWithCommaFlagsAndExceptionCodeExcerpt(): void
     {
         $dumper = new CliDumper(null, null, CliDumper::DUMP_TRAILING_COMMA);
         $dumper->setColors(false);
@@ -203,7 +203,7 @@ EOTXT;
     /**
      * @requires extension xml
      */
-    public function testXmlResource()
+    public function testXmlResource(): void
     {
         $var = xml_parser_create();
 
@@ -221,7 +221,7 @@ EOTXT
         );
     }
 
-    public function testJsonCast()
+    public function testJsonCast(): void
     {
         $var = (array) json_decode('{"0":{},"1":null}');
         foreach ($var as &$v) {
@@ -258,7 +258,7 @@ EOTXT
         }
     }
 
-    public function testObjectCast()
+    public function testObjectCast(): void
     {
         $var = (object) array(1 => 1);
         $var->{1} = 2;
@@ -287,7 +287,7 @@ EOTXT
         }
     }
 
-    public function testClosedResource()
+    public function testClosedResource(): void
     {
         $var = fopen(__FILE__, 'r');
         fclose($var);
@@ -312,7 +312,7 @@ EOTXT
         );
     }
 
-    public function testFlags()
+    public function testFlags(): void
     {
         putenv('DUMP_LIGHT_ARRAY=1');
         putenv('DUMP_STRING_LENGTH=1');
@@ -347,7 +347,7 @@ EOTXT
     /**
      * @requires function Twig\Template::getSourceContext
      */
-    public function testThrowingCaster()
+    public function testThrowingCaster(): void
     {
         $out = fopen('php://memory', 'r+b');
 
@@ -411,7 +411,7 @@ EOTXT
         );
     }
 
-    public function testRefsInProperties()
+    public function testRefsInProperties(): void
     {
         $var = (object) array('foo' => 'foo');
         $var->bar = &$var->foo;
@@ -440,7 +440,7 @@ EOTXT
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testSpecialVars56()
+    public function testSpecialVars56(): void
     {
         $var = $this->getSpecialVars();
 
@@ -469,13 +469,13 @@ EOTXT
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testGlobals()
+    public function testGlobals(): void
     {
         $var = $this->getSpecialVars();
         unset($var[0]);
         $out = '';
 
-        $dumper = new CliDumper(function ($line, $depth) use (&$out) {
+        $dumper = new CliDumper(function ($line, $depth) use (&$out): void {
             if ($depth >= 0) {
                 $out .= str_repeat('  ', $depth).$line."\n";
             }
@@ -503,7 +503,7 @@ EOTXT
         );
     }
 
-    public function testIncompleteClass()
+    public function testIncompleteClass(): void
     {
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', null);
         $var = unserialize('O:8:"Foo\Buzz":0:{}');

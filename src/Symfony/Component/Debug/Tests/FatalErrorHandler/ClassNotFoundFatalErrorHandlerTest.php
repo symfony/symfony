@@ -19,7 +19,7 @@ use Composer\Autoload\ClassLoader as ComposerClassLoader;
 
 class ClassNotFoundFatalErrorHandlerTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         foreach (spl_autoload_functions() as $function) {
             if (!is_array($function)) {
@@ -41,7 +41,7 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
     /**
      * @dataProvider provideClassNotFoundData
      */
-    public function testHandleClassNotFound($error, $translatedMessage, $autoloader = null)
+    public function testHandleClassNotFound($error, $translatedMessage, $autoloader = null): void
     {
         if ($autoloader) {
             // Unregister all autoloaders to ensure the custom provided
@@ -148,12 +148,12 @@ class ClassNotFoundFatalErrorHandlerTest extends TestCase
                     'message' => 'Class \'Foo\\Bar\\UndefinedFunctionException\' not found',
                 ),
                 "Attempted to load class \"UndefinedFunctionException\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
-                function ($className) { /* do nothing here */ },
+                function ($className): void { /* do nothing here */ },
             ),
         );
     }
 
-    public function testCannotRedeclareClass()
+    public function testCannotRedeclareClass(): void
     {
         if (!file_exists(__DIR__.'/../FIXTURES2/REQUIREDTWICE.PHP')) {
             $this->markTestSkipped('Can only be run on case insensitive filesystems');

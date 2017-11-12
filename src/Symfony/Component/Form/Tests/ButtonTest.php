@@ -24,7 +24,7 @@ class ButtonTest extends TestCase
 
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
@@ -33,7 +33,7 @@ class ButtonTest extends TestCase
     /**
      * @dataProvider getDisabledStates
      */
-    public function testDisabledIfParentIsDisabled($parentDisabled, $buttonDisabled, $result)
+    public function testDisabledIfParentIsDisabled($parentDisabled, $buttonDisabled, $result): void
     {
         $form = $this->getFormBuilder('form')
             ->setDisabled($parentDisabled)

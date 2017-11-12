@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 class SessionAuthenticationStrategyTest extends TestCase
 {
-    public function testSessionIsNotChanged()
+    public function testSessionIsNotChanged(): void
     {
         $request = $this->getRequest();
         $request->expects($this->never())->method('getSession');
@@ -29,7 +29,7 @@ class SessionAuthenticationStrategyTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Invalid session authentication strategy "foo"
      */
-    public function testUnsupportedStrategy()
+    public function testUnsupportedStrategy(): void
     {
         $request = $this->getRequest();
         $request->expects($this->never())->method('getSession');
@@ -38,7 +38,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($request, $this->getToken());
     }
 
-    public function testSessionIsMigrated()
+    public function testSessionIsMigrated(): void
     {
         $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
         $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
@@ -47,7 +47,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($this->getRequest($session), $this->getToken());
     }
 
-    public function testSessionIsInvalidated()
+    public function testSessionIsInvalidated(): void
     {
         $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
         $session->expects($this->once())->method('invalidate');

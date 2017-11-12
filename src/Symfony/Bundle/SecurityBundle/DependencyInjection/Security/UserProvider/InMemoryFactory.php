@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class InMemoryFactory implements UserProviderFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config)
+    public function create(ContainerBuilder $container, $id, $config): void
     {
         $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
 
@@ -45,7 +45,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
         return 'memory';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->fixXmlConfig('user')

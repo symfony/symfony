@@ -29,7 +29,7 @@ class ValidateWorkflowsPass implements CompilerPassInterface
         $this->definitionTag = $definitionTag;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $taggedServices = $container->findTaggedServiceIds($this->definitionTag, true);
         foreach ($taggedServices as $id => $tags) {

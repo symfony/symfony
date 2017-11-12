@@ -52,7 +52,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         if (is_object($value)) {
             $value = spl_object_hash($value);
         } elseif (is_array($value)) {
-            array_walk_recursive($value, function (&$v) {
+            array_walk_recursive($value, function (&$v): void {
                 if (is_object($v)) {
                     $v = spl_object_hash($v);
                 }
@@ -70,7 +70,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      *
      * @internal
      */
-    private static function flatten(array $array, &$output)
+    private static function flatten(array $array, &$output): void
     {
         if (null === $output) {
             $output = array();

@@ -16,7 +16,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 
 class FirewallConfigTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $listeners = array('logout', 'remember_me', 'anonymous');
         $options = array(

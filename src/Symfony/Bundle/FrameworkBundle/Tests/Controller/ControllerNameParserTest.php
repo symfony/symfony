@@ -20,7 +20,7 @@ class ControllerNameParserTest extends TestCase
 {
     protected $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new ClassLoader();
         $this->loader->add('TestBundle', __DIR__.'/../Fixtures');
@@ -28,13 +28,13 @@ class ControllerNameParserTest extends TestCase
         $this->loader->register();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->loader->unregister();
         $this->loader = null;
     }
 
-    public function testParse()
+    public function testParse(): void
     {
         $parser = $this->createParser();
 
@@ -52,7 +52,7 @@ class ControllerNameParserTest extends TestCase
         }
     }
 
-    public function testBuild()
+    public function testBuild(): void
     {
         $parser = $this->createParser();
 
@@ -84,7 +84,7 @@ class ControllerNameParserTest extends TestCase
     /**
      * @dataProvider getMissingControllersTest
      */
-    public function testMissingControllers($name)
+    public function testMissingControllers($name): void
     {
         $parser = $this->createParser();
 
@@ -114,7 +114,7 @@ class ControllerNameParserTest extends TestCase
     /**
      * @dataProvider getInvalidBundleNameTests
      */
-    public function testInvalidBundleName($bundleName, $suggestedBundleName)
+    public function testInvalidBundleName($bundleName, $suggestedBundleName): void
     {
         $parser = $this->createParser();
 

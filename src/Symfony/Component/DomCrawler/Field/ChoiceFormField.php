@@ -77,7 +77,7 @@ class ChoiceFormField extends FormField
      *
      * @param string $value The value of the field
      */
-    public function select($value)
+    public function select($value): void
     {
         $this->setValue($value);
     }
@@ -87,7 +87,7 @@ class ChoiceFormField extends FormField
      *
      * @throws \LogicException When the type provided is not correct
      */
-    public function tick()
+    public function tick(): void
     {
         if ('checkbox' !== $this->type) {
             throw new \LogicException(sprintf('You cannot tick "%s" as it is not a checkbox (%s).', $this->name, $this->type));
@@ -101,7 +101,7 @@ class ChoiceFormField extends FormField
      *
      * @throws \LogicException When the type provided is not correct
      */
-    public function untick()
+    public function untick(): void
     {
         if ('checkbox' !== $this->type) {
             throw new \LogicException(sprintf('You cannot tick "%s" as it is not a checkbox (%s).', $this->name, $this->type));
@@ -117,7 +117,7 @@ class ChoiceFormField extends FormField
      *
      * @throws \InvalidArgumentException When value type provided is not correct
      */
-    public function setValue($value)
+    public function setValue($value): void
     {
         if ('checkbox' === $this->type && false === $value) {
             // uncheck
@@ -161,7 +161,7 @@ class ChoiceFormField extends FormField
      *
      * @internal
      */
-    public function addChoice(\DOMElement $node)
+    public function addChoice(\DOMElement $node): void
     {
         if (!$this->multiple && 'radio' !== $this->type) {
             throw new \LogicException(sprintf('Unable to add a choice for "%s" as it is not multiple or is not a radio button.', $this->name));
@@ -200,7 +200,7 @@ class ChoiceFormField extends FormField
      *
      * @throws \LogicException When node type is incorrect
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         if ('input' !== $this->node->nodeName && 'select' !== $this->node->nodeName) {
             throw new \LogicException(sprintf('A ChoiceFormField can only be created from an input or select tag (%s given).', $this->node->nodeName));

@@ -33,7 +33,7 @@ class LocaleType extends AbstractType implements ChoiceLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(array(
             'choice_loader' => $this,

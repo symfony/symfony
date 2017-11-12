@@ -16,7 +16,7 @@ use Symfony\Component\Config\Loader\Loader;
 
 class LoaderTest extends TestCase
 {
-    public function testGetSetResolver()
+    public function testGetSetResolver(): void
     {
         $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
 
@@ -26,7 +26,7 @@ class LoaderTest extends TestCase
         $this->assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $resolvedLoader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
 
@@ -46,7 +46,7 @@ class LoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Config\Exception\FileLoaderLoadException
      */
-    public function testResolveWhenResolverCannotFindLoader()
+    public function testResolveWhenResolverCannotFindLoader(): void
     {
         $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
         $resolver->expects($this->once())
@@ -60,7 +60,7 @@ class LoaderTest extends TestCase
         $loader->resolve('FOOBAR');
     }
 
-    public function testImport()
+    public function testImport(): void
     {
         $resolvedLoader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $resolvedLoader->expects($this->once())
@@ -80,7 +80,7 @@ class LoaderTest extends TestCase
         $this->assertEquals('yes', $loader->import('foo'));
     }
 
-    public function testImportWithType()
+    public function testImportWithType(): void
     {
         $resolvedLoader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $resolvedLoader->expects($this->once())
@@ -103,7 +103,7 @@ class LoaderTest extends TestCase
 
 class ProjectLoader1 extends Loader
 {
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): void
     {
     }
 
@@ -112,7 +112,7 @@ class ProjectLoader1 extends Loader
         return is_string($resource) && 'foo' === pathinfo($resource, PATHINFO_EXTENSION);
     }
 
-    public function getType()
+    public function getType(): void
     {
     }
 }

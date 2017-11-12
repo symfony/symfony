@@ -43,7 +43,7 @@ class HelperSet implements \IteratorAggregate
      * @param HelperInterface $helper The helper instance
      * @param string          $alias  An alias
      */
-    public function set(HelperInterface $helper, $alias = null)
+    public function set(HelperInterface $helper, $alias = null): void
     {
         $this->helpers[$helper->getName()] = $helper;
         if (null !== $alias) {
@@ -83,7 +83,7 @@ class HelperSet implements \IteratorAggregate
         return $this->helpers[$name];
     }
 
-    public function setCommand(Command $command = null)
+    public function setCommand(Command $command = null): void
     {
         $this->command = $command;
     }

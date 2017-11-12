@@ -66,7 +66,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * {@inheritdoc}
      */
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
         $this->translator->setLocale($locale);
     }
@@ -125,7 +125,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      * @param array|null  $parameters
      * @param int|null    $number
      */
-    private function collectMessage($locale, $domain, $id, $translation, $parameters = array(), $number = null)
+    private function collectMessage($locale, $domain, $id, $translation, $parameters = array(), $number = null): void
     {
         if (null === $domain) {
             $domain = 'messages';

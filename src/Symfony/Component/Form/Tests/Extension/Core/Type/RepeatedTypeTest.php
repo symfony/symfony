@@ -22,7 +22,7 @@ class RepeatedTypeTest extends BaseTypeTest
      */
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class RepeatedTypeTest extends BaseTypeTest
         ));
     }
 
-    public function testSetData()
+    public function testSetData(): void
     {
         $this->form->setData('foobar');
 
@@ -39,7 +39,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertSame('foobar', $this->form['second']->getData());
     }
 
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'type' => TextTypeTest::TESTED_TYPE,
@@ -52,7 +52,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertTrue($form['second']->isRequired());
     }
 
-    public function testSetOptionsPerChild()
+    public function testSetOptionsPerChild(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             // the global required value cannot be overridden
@@ -67,7 +67,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertTrue($form['second']->isRequired());
     }
 
-    public function testSetRequired()
+    public function testSetRequired(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => false,
@@ -81,7 +81,7 @@ class RepeatedTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testSetInvalidOptions()
+    public function testSetInvalidOptions(): void
     {
         $this->factory->create(static::TESTED_TYPE, null, array(
             'type' => TextTypeTest::TESTED_TYPE,
@@ -92,7 +92,7 @@ class RepeatedTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testSetInvalidFirstOptions()
+    public function testSetInvalidFirstOptions(): void
     {
         $this->factory->create(static::TESTED_TYPE, null, array(
             'type' => TextTypeTest::TESTED_TYPE,
@@ -103,7 +103,7 @@ class RepeatedTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testSetInvalidSecondOptions()
+    public function testSetInvalidSecondOptions(): void
     {
         $this->factory->create(static::TESTED_TYPE, null, array(
             'type' => TextTypeTest::TESTED_TYPE,
@@ -111,7 +111,7 @@ class RepeatedTypeTest extends BaseTypeTest
         ));
     }
 
-    public function testSetErrorBubblingToTrue()
+    public function testSetErrorBubblingToTrue(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'error_bubbling' => true,
@@ -122,7 +122,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertTrue($form['second']->getConfig()->getOption('error_bubbling'));
     }
 
-    public function testSetErrorBubblingToFalse()
+    public function testSetErrorBubblingToFalse(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'error_bubbling' => false,
@@ -133,7 +133,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertFalse($form['second']->getConfig()->getOption('error_bubbling'));
     }
 
-    public function testSetErrorBubblingIndividually()
+    public function testSetErrorBubblingIndividually(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'error_bubbling' => true,
@@ -146,7 +146,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertTrue($form['second']->getConfig()->getOption('error_bubbling'));
     }
 
-    public function testSetOptionsPerChildAndOverwrite()
+    public function testSetOptionsPerChildAndOverwrite(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'type' => TextTypeTest::TESTED_TYPE,
@@ -160,7 +160,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertTrue($form['second']->isRequired());
     }
 
-    public function testSubmitUnequal()
+    public function testSubmitUnequal(): void
     {
         $input = array('first' => 'foo', 'second' => 'bar');
 
@@ -173,7 +173,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertNull($this->form->getData());
     }
 
-    public function testSubmitEqual()
+    public function testSubmitEqual(): void
     {
         $input = array('first' => 'foo', 'second' => 'foo');
 
@@ -186,7 +186,7 @@ class RepeatedTypeTest extends BaseTypeTest
         $this->assertSame('foo', $this->form->getData());
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, array('first' => null, 'second' => null));
     }

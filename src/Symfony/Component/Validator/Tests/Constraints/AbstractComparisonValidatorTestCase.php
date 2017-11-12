@@ -84,7 +84,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      * @expectedExceptionMessage requires either the "value" or "propertyPath" option to be set.
      */
-    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
+    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options): void
     {
         $this->createConstraint($options);
     }
@@ -93,7 +93,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      * @expectedExceptionMessage requires only one of the "value" or "propertyPath" options to be set, not both.
      */
-    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
+    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath(): void
     {
         $this->createConstraint((array(
             'value' => 'value',
@@ -107,7 +107,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
      * @param mixed $dirtyValue
      * @param mixed $comparisonValue
      */
-    public function testValidComparisonToValue($dirtyValue, $comparisonValue)
+    public function testValidComparisonToValue($dirtyValue, $comparisonValue): void
     {
         $constraint = $this->createConstraint(array('value' => $comparisonValue));
 
@@ -135,7 +135,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     /**
      * @dataProvider provideValidComparisonsToPropertyPath
      */
-    public function testValidComparisonToPropertyPath($comparedValue)
+    public function testValidComparisonToPropertyPath($comparedValue): void
     {
         $constraint = $this->createConstraint(array('propertyPath' => 'value'));
 
@@ -151,7 +151,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     /**
      * @dataProvider provideValidComparisonsToPropertyPath
      */
-    public function testValidComparisonToPropertyPathOnArray($comparedValue)
+    public function testValidComparisonToPropertyPathOnArray($comparedValue): void
     {
         $constraint = $this->createConstraint(array('propertyPath' => '[root][value]'));
 
@@ -162,7 +162,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->assertNoViolation();
     }
 
-    public function testNoViolationOnNullObjectWithPropertyPath()
+    public function testNoViolationOnNullObjectWithPropertyPath(): void
     {
         $constraint = $this->createConstraint(array('propertyPath' => 'propertyPath'));
 
@@ -173,7 +173,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->assertNoViolation();
     }
 
-    public function testInvalidValuePath()
+    public function testInvalidValuePath(): void
     {
         $constraint = $this->createConstraint(array('propertyPath' => 'foo'));
 
@@ -210,7 +210,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
      * @param mixed  $comparedValueString
      * @param string $comparedValueType
      */
-    public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType)
+    public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType): void
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded

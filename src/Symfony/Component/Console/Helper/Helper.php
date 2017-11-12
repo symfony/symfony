@@ -25,7 +25,7 @@ abstract class Helper implements HelperInterface
     /**
      * {@inheritdoc}
      */
-    public function setHelperSet(HelperSet $helperSet = null)
+    public function setHelperSet(HelperSet $helperSet = null): void
     {
         $this->helperSet = $helperSet;
     }

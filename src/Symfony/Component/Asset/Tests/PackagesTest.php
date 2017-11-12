@@ -18,7 +18,7 @@ use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class PackagesTest extends TestCase
 {
-    public function testGetterSetters()
+    public function testGetterSetters(): void
     {
         $packages = new Packages();
         $packages->setDefaultPackage($default = $this->getMockBuilder('Symfony\Component\Asset\PackageInterface')->getMock());
@@ -33,7 +33,7 @@ class PackagesTest extends TestCase
         $this->assertEquals($a, $packages->getPackage('a'));
     }
 
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $packages = new Packages(
             new Package(new StaticVersionStrategy('default')),
@@ -44,7 +44,7 @@ class PackagesTest extends TestCase
         $this->assertEquals('a', $packages->getVersion('/foo', 'a'));
     }
 
-    public function testGetUrl()
+    public function testGetUrl(): void
     {
         $packages = new Packages(
             new Package(new StaticVersionStrategy('default')),
@@ -58,7 +58,7 @@ class PackagesTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Asset\Exception\LogicException
      */
-    public function testNoDefaultPackage()
+    public function testNoDefaultPackage(): void
     {
         $packages = new Packages();
         $packages->getPackage();
@@ -67,7 +67,7 @@ class PackagesTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Asset\Exception\InvalidArgumentException
      */
-    public function testUndefinedPackage()
+    public function testUndefinedPackage(): void
     {
         $packages = new Packages();
         $packages->getPackage('a');

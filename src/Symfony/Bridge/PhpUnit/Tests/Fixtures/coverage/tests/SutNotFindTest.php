@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class SutNotFoundTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $this->assertTrue(true);
     }

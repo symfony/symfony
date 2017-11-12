@@ -20,7 +20,7 @@ use Twig\Loader\ArrayLoader;
 
 class ExceptionControllerTest extends TestCase
 {
-    public function testShowActionCanBeForcedToShowErrorPage()
+    public function testShowActionCanBeForcedToShowErrorPage(): void
     {
         $twig = $this->createTwigEnv(array('@Twig/Exception/error404.html.twig' => '<html>not found</html>'));
 
@@ -35,7 +35,7 @@ class ExceptionControllerTest extends TestCase
         $this->assertEquals('<html>not found</html>', $response->getContent());
     }
 
-    public function testFallbackToHtmlIfNoTemplateForRequestedFormat()
+    public function testFallbackToHtmlIfNoTemplateForRequestedFormat(): void
     {
         $twig = $this->createTwigEnv(array('@Twig/Exception/error.html.twig' => '<html></html>'));
 
@@ -48,7 +48,7 @@ class ExceptionControllerTest extends TestCase
         $this->assertEquals('html', $request->getRequestFormat());
     }
 
-    public function testFallbackToHtmlWithFullExceptionIfNoTemplateForRequestedFormatAndExceptionsShouldBeShown()
+    public function testFallbackToHtmlWithFullExceptionIfNoTemplateForRequestedFormatAndExceptionsShouldBeShown(): void
     {
         $twig = $this->createTwigEnv(array('@Twig/Exception/exception_full.html.twig' => '<html></html>'));
 
@@ -62,7 +62,7 @@ class ExceptionControllerTest extends TestCase
         $this->assertEquals('html', $request->getRequestFormat());
     }
 
-    public function testResponseHasRequestedMimeType()
+    public function testResponseHasRequestedMimeType(): void
     {
         $twig = $this->createTwigEnv(array('@Twig/Exception/error.json.twig' => '{}'));
 

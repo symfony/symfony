@@ -19,7 +19,7 @@ class SizeRangeFilterIteratorTest extends RealIteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($size, $expected)
+    public function testAccept($size, $expected): void
     {
         $inner = new InnerSizeIterator(self::$files);
 

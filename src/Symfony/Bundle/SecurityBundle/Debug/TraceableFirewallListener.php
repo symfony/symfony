@@ -28,7 +28,7 @@ final class TraceableFirewallListener extends FirewallListener
         return $this->wrappedListeners;
     }
 
-    protected function handleRequest(GetResponseEvent $event, $listeners)
+    protected function handleRequest(GetResponseEvent $event, $listeners): void
     {
         foreach ($listeners as $listener) {
             $wrappedListener = new WrappedListener($listener);

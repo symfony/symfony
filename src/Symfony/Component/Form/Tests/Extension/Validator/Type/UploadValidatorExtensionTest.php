@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\Options;
 
 class UploadValidatorExtensionTest extends TypeTestCase
 {
-    public function testPostMaxSizeTranslation()
+    public function testPostMaxSizeTranslation(): void
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
 

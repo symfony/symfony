@@ -16,7 +16,7 @@ function headers_sent()
     return false;
 }
 
-function header($str, $replace = true, $status = null)
+function header($str, $replace = true, $status = null): void
 {
     Tests\testHeader($str, $replace, $status);
 }

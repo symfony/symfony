@@ -25,7 +25,7 @@ class FormThemeNode extends Node
         parent::__construct(array('form' => $form, 'resources' => $resources), array('only' => $only), $lineno, $tag);
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler
             ->addDebugInfo($this)

@@ -23,40 +23,40 @@ class PropertyAccessorBuilderTest extends TestCase
      */
     protected $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new PropertyAccessorBuilder();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->builder = null;
     }
 
-    public function testEnableMagicCall()
+    public function testEnableMagicCall(): void
     {
         $this->assertSame($this->builder, $this->builder->enableMagicCall());
     }
 
-    public function testDisableMagicCall()
+    public function testDisableMagicCall(): void
     {
         $this->assertSame($this->builder, $this->builder->disableMagicCall());
     }
 
-    public function testIsMagicCallEnable()
+    public function testIsMagicCallEnable(): void
     {
         $this->assertFalse($this->builder->isMagicCallEnabled());
         $this->assertTrue($this->builder->enableMagicCall()->isMagicCallEnabled());
         $this->assertFalse($this->builder->disableMagicCall()->isMagicCallEnabled());
     }
 
-    public function testGetPropertyAccessor()
+    public function testGetPropertyAccessor(): void
     {
         $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
         $this->assertInstanceOf(PropertyAccessor::class, $this->builder->enableMagicCall()->getPropertyAccessor());
     }
 
-    public function testUseCache()
+    public function testUseCache(): void
     {
         $cacheItemPool = new ArrayAdapter();
         $this->builder->setCacheItemPool($cacheItemPool);

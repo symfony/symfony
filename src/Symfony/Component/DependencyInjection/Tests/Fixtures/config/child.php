@@ -4,7 +4,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use App\BarService;
 
-return function (ContainerConfigurator $c) {
+return function (ContainerConfigurator $c): void {
     $c->services()
         ->set('bar', 'Class1')
         ->set(BarService::class)

@@ -90,7 +90,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Removes all the nodes.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->nodes = array();
         $this->document = null;
@@ -106,7 +106,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @throws \InvalidArgumentException when node is not the expected type
      */
-    public function add($node)
+    public function add($node): void
     {
         if ($node instanceof \DOMNodeList) {
             $this->addNodeList($node);
@@ -131,7 +131,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * @param string      $content A string to parse as HTML/XML
      * @param null|string $type    The content type of the string
      */
-    public function addContent($content, $type = null)
+    public function addContent($content, $type = null): void
     {
         if (empty($type)) {
             $type = 0 === strpos($content, '<?xml') ? 'application/xml' : 'text/html';
@@ -181,7 +181,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * @param string $content The HTML content
      * @param string $charset The charset
      */
-    public function addHtmlContent($content, $charset = 'UTF-8')
+    public function addHtmlContent($content, $charset = 'UTF-8'): void
     {
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
@@ -189,7 +189,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $dom = new \DOMDocument('1.0', $charset);
         $dom->validateOnParse = true;
 
-        set_error_handler(function () { throw new \Exception(); });
+        set_error_handler(function (): void { throw new \Exception(); });
 
         try {
             // Convert charset to HTML-entities to work around bugs in DOMDocument::loadHTML()
@@ -239,7 +239,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *                        LIBXML_PARSEHUGE is dangerous, see
      *                        http://symfony.com/blog/security-release-symfony-2-0-17-released
      */
-    public function addXmlContent($content, $charset = 'UTF-8', $options = LIBXML_NONET)
+    public function addXmlContent($content, $charset = 'UTF-8', $options = LIBXML_NONET): void
     {
         // remove the default namespace if it's the only namespace to make XPath expressions simpler
         if (!preg_match('/xmlns:/', $content)) {
@@ -269,7 +269,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param \DOMDocument $dom A \DOMDocument instance
      */
-    public function addDocument(\DOMDocument $dom)
+    public function addDocument(\DOMDocument $dom): void
     {
         if ($dom->documentElement) {
             $this->addNode($dom->documentElement);
@@ -281,7 +281,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param \DOMNodeList $nodes A \DOMNodeList instance
      */
-    public function addNodeList(\DOMNodeList $nodes)
+    public function addNodeList(\DOMNodeList $nodes): void
     {
         foreach ($nodes as $node) {
             if ($node instanceof \DOMNode) {
@@ -295,7 +295,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param \DOMNode[] $nodes An array of \DOMNode instances
      */
-    public function addNodes(array $nodes)
+    public function addNodes(array $nodes): void
     {
         foreach ($nodes as $node) {
             $this->add($node);
@@ -307,7 +307,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param \DOMNode $node A \DOMNode instance
      */
-    public function addNode(\DOMNode $node)
+    public function addNode(\DOMNode $node): void
     {
         if ($node instanceof \DOMDocument) {
             $node = $node->documentElement;
@@ -869,7 +869,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param string $prefix
      */
-    public function setDefaultNamespacePrefix($prefix)
+    public function setDefaultNamespacePrefix($prefix): void
     {
         $this->defaultNamespacePrefix = $prefix;
     }
@@ -878,7 +878,7 @@ class Crawler implements \Countable, \IteratorAggregate
      * @param string $prefix
      * @param string $namespace
      */
-    public function registerNamespace($prefix, $namespace)
+    public function registerNamespace($prefix, $namespace): void
     {
         $this->namespaces[$prefix] = $namespace;
     }

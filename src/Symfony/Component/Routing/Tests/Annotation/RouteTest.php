@@ -19,7 +19,7 @@ class RouteTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      */
-    public function testInvalidRouteParameter()
+    public function testInvalidRouteParameter(): void
     {
         $route = new Route(array('foo' => 'bar'));
     }
@@ -27,7 +27,7 @@ class RouteTest extends TestCase
     /**
      * @dataProvider getValidParameters
      */
-    public function testRouteParameters($parameter, $value, $getter)
+    public function testRouteParameters($parameter, $value, $getter): void
     {
         $route = new Route(array($parameter => $value));
         $this->assertEquals($route->$getter(), $value);

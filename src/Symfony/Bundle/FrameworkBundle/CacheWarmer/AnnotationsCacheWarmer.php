@@ -77,7 +77,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
         return true;
     }
 
-    private function readAllComponents(Reader $reader, $class)
+    private function readAllComponents(Reader $reader, $class): void
     {
         $reflectionClass = new \ReflectionClass($class);
         $reader->getClassAnnotations($reflectionClass);

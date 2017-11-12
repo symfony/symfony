@@ -64,7 +64,7 @@ class ConsoleLoggerTest extends TestCase
     /**
      * @dataProvider provideOutputMappingParams
      */
-    public function testOutputMapping($logLevel, $outputVerbosity, $isOutput, $addVerbosityLevelMap = array())
+    public function testOutputMapping($logLevel, $outputVerbosity, $isOutput, $addVerbosityLevelMap = array()): void
     {
         $out = new BufferedOutput($outputVerbosity);
         $logger = new ConsoleLogger($out, $addVerbosityLevelMap);
@@ -93,7 +93,7 @@ class ConsoleLoggerTest extends TestCase
         );
     }
 
-    public function testHasErrored()
+    public function testHasErrored(): void
     {
         $logger = new ConsoleLogger(new BufferedOutput());
 
@@ -106,7 +106,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertTrue($logger->hasErrored());
     }
 
-    public function testImplements()
+    public function testImplements(): void
     {
         $this->assertInstanceOf('Psr\Log\LoggerInterface', $this->getLogger());
     }
@@ -114,7 +114,7 @@ class ConsoleLoggerTest extends TestCase
     /**
      * @dataProvider provideLevelsAndMessages
      */
-    public function testLogsAtAllLevels($level, $message)
+    public function testLogsAtAllLevels($level, $message): void
     {
         $logger = $this->getLogger();
         $logger->{$level}($message, array('user' => 'Bob'));
@@ -144,13 +144,13 @@ class ConsoleLoggerTest extends TestCase
     /**
      * @expectedException \Psr\Log\InvalidArgumentException
      */
-    public function testThrowsOnInvalidLevel()
+    public function testThrowsOnInvalidLevel(): void
     {
         $logger = $this->getLogger();
         $logger->log('invalid level', 'Foo');
     }
 
-    public function testContextReplacement()
+    public function testContextReplacement(): void
     {
         $logger = $this->getLogger();
         $logger->info('{Message {nothing} {user} {foo.bar} a}', array('user' => 'Bob', 'foo.bar' => 'Bar'));
@@ -159,7 +159,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertEquals($expected, $this->getLogs());
     }
 
-    public function testObjectCastToString()
+    public function testObjectCastToString(): void
     {
         if (method_exists($this, 'createPartialMock')) {
             $dummy = $this->createPartialMock('Symfony\Component\Console\Tests\Logger\DummyTest', array('__toString'));
@@ -174,7 +174,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertEquals($expected, $this->getLogs());
     }
 
-    public function testContextCanContainAnything()
+    public function testContextCanContainAnything(): void
     {
         $context = array(
             'bool' => true,
@@ -193,7 +193,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertEquals($expected, $this->getLogs());
     }
 
-    public function testContextExceptionKeyCanBeExceptionOrOtherValues()
+    public function testContextExceptionKeyCanBeExceptionOrOtherValues(): void
     {
         $logger = $this->getLogger();
         $logger->warning('Random message', array('exception' => 'oops'));
@@ -209,7 +209,7 @@ class ConsoleLoggerTest extends TestCase
 
 class DummyTest
 {
-    public function __toString()
+    public function __toString(): void
     {
     }
 }

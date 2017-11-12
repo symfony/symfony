@@ -69,7 +69,7 @@ class CompiledRoute implements \Serializable
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $data = unserialize($serialized, array('allowed_classes' => false));
 

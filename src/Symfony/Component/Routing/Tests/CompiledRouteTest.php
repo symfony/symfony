@@ -16,7 +16,7 @@ use Symfony\Component\Routing\CompiledRoute;
 
 class CompiledRouteTest extends TestCase
 {
-    public function testAccessors()
+    public function testAccessors(): void
     {
         $compiled = new CompiledRoute('prefix', 'regex', array('tokens'), array(), null, array(), array(), array('variables'));
         $this->assertEquals('prefix', $compiled->getStaticPrefix(), '__construct() takes a static prefix as its second argument');

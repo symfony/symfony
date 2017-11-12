@@ -23,13 +23,13 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class ClassMetadataFactoryTest extends TestCase
 {
-    public function testInterface()
+    public function testInterface(): void
     {
         $classMetadata = new ClassMetadataFactory(new LoaderChain(array()));
         $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface', $classMetadata);
     }
 
-    public function testGetMetadataFor()
+    public function testGetMetadataFor(): void
     {
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $classMetadata = $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
@@ -37,7 +37,7 @@ class ClassMetadataFactoryTest extends TestCase
         $this->assertEquals(TestClassMetadataFactory::createClassMetadata(true, true), $classMetadata);
     }
 
-    public function testHasMetadataFor()
+    public function testHasMetadataFor(): void
     {
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $this->assertTrue($factory->hasMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy'));

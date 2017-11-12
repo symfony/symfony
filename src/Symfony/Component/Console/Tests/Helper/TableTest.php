@@ -22,12 +22,12 @@ class TableTest extends TestCase
 {
     protected $stream;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->stream = fopen('php://memory', 'r+');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         fclose($this->stream);
         $this->stream = null;
@@ -36,7 +36,7 @@ class TableTest extends TestCase
     /**
      * @dataProvider renderProvider
      */
-    public function testRender($headers, $rows, $style, $expected, $decorated = false)
+    public function testRender($headers, $rows, $style, $expected, $decorated = false): void
     {
         $table = new Table($output = $this->getOutputStream($decorated));
         $table
@@ -52,7 +52,7 @@ class TableTest extends TestCase
     /**
      * @dataProvider renderProvider
      */
-    public function testRenderAddRows($headers, $rows, $style, $expected, $decorated = false)
+    public function testRenderAddRows($headers, $rows, $style, $expected, $decorated = false): void
     {
         $table = new Table($output = $this->getOutputStream($decorated));
         $table
@@ -68,7 +68,7 @@ class TableTest extends TestCase
     /**
      * @dataProvider renderProvider
      */
-    public function testRenderAddRowsOneByOne($headers, $rows, $style, $expected, $decorated = false)
+    public function testRenderAddRowsOneByOne($headers, $rows, $style, $expected, $decorated = false): void
     {
         $table = new Table($output = $this->getOutputStream($decorated));
         $table
@@ -547,7 +547,7 @@ TABLE
         );
     }
 
-    public function testRenderMultiByte()
+    public function testRenderMultiByte(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -570,7 +570,7 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testTableCellWithNumericIntValue()
+    public function testTableCellWithNumericIntValue(): void
     {
         $table = new Table($output = $this->getOutputStream());
 
@@ -588,7 +588,7 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testTableCellWithNumericFloatValue()
+    public function testTableCellWithNumericFloatValue(): void
     {
         $table = new Table($output = $this->getOutputStream());
 
@@ -606,7 +606,7 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testStyle()
+    public function testStyle(): void
     {
         $style = new TableStyle();
         $style
@@ -636,7 +636,7 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testRowSeparator()
+    public function testRowSeparator(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -669,7 +669,7 @@ TABLE;
         $this->assertEquals($table, $table->addRow(new TableSeparator()), 'fluent interface on addRow() with a single TableSeparator() works');
     }
 
-    public function testRenderMultiCalls()
+    public function testRenderMultiCalls(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table->setRows(array(
@@ -696,7 +696,7 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testColumnStyle()
+    public function testColumnStyle(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -726,7 +726,7 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testColumnWith()
+    public function testColumnWith(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -758,7 +758,7 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testColumnWiths()
+    public function testColumnWiths(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -793,7 +793,7 @@ TABLE;
      * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Style "absent" is not defined.
      */
-    public function testIsNotDefinedStyleException()
+    public function testIsNotDefinedStyleException(): void
     {
         $table = new Table($this->getOutputStream());
         $table->setStyle('absent');
@@ -803,7 +803,7 @@ TABLE;
      * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Style "absent" is not defined.
      */
-    public function testGetStyleDefinition()
+    public function testGetStyleDefinition(): void
     {
         Table::getStyleDefinition('absent');
     }

@@ -16,14 +16,14 @@ use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
 class MessageDigestPasswordEncoderTest extends TestCase
 {
-    public function testIsPasswordValid()
+    public function testIsPasswordValid(): void
     {
         $encoder = new MessageDigestPasswordEncoder('sha256', false, 1);
 
         $this->assertTrue($encoder->isPasswordValid(hash('sha256', 'password'), 'password', ''));
     }
 
-    public function testEncodePassword()
+    public function testEncodePassword(): void
     {
         $encoder = new MessageDigestPasswordEncoder('sha256', false, 1);
         $this->assertSame(hash('sha256', 'password'), $encoder->encodePassword('password', ''));
@@ -38,7 +38,7 @@ class MessageDigestPasswordEncoderTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testEncodePasswordAlgorithmDoesNotExist()
+    public function testEncodePasswordAlgorithmDoesNotExist(): void
     {
         $encoder = new MessageDigestPasswordEncoder('foobar');
         $encoder->encodePassword('password', '');
@@ -47,14 +47,14 @@ class MessageDigestPasswordEncoderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testEncodePasswordLength()
+    public function testEncodePasswordLength(): void
     {
         $encoder = new MessageDigestPasswordEncoder();
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');
     }
 
-    public function testCheckPasswordLength()
+    public function testCheckPasswordLength(): void
     {
         $encoder = new MessageDigestPasswordEncoder();
 

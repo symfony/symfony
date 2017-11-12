@@ -60,7 +60,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
         return $this->options;
     }
 
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = array_merge($this->defaultOptions, $options);
     }

@@ -23,14 +23,14 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         return new CountryValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Country());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Country());
 
@@ -40,7 +40,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Country());
     }
@@ -48,7 +48,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidCountries
      */
-    public function testValidCountries($country)
+    public function testValidCountries($country): void
     {
         $this->validator->validate($country, new Country());
 
@@ -67,7 +67,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidCountries
      */
-    public function testInvalidCountries($country)
+    public function testInvalidCountries($country): void
     {
         $constraint = new Country(array(
             'message' => 'myMessage',
@@ -89,7 +89,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function testValidateUsingCountrySpecificLocale()
+    public function testValidateUsingCountrySpecificLocale(): void
     {
         // in order to test with "en_GB"
         IntlTestHelper::requireFullIntl($this, false);

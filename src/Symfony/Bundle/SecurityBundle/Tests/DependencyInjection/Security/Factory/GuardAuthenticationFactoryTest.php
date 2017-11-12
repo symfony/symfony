@@ -23,7 +23,7 @@ class GuardAuthenticationFactoryTest extends TestCase
     /**
      * @dataProvider getValidConfigurationTests
      */
-    public function testAddValidConfiguration(array $inputConfig, array $expectedConfig)
+    public function testAddValidConfiguration(array $inputConfig, array $expectedConfig): void
     {
         $factory = new GuardAuthenticationFactory();
         $nodeDefinition = new ArrayNodeDefinition('guard');
@@ -40,7 +40,7 @@ class GuardAuthenticationFactoryTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @dataProvider getInvalidConfigurationTests
      */
-    public function testAddInvalidConfiguration(array $inputConfig)
+    public function testAddInvalidConfiguration(array $inputConfig): void
     {
         $factory = new GuardAuthenticationFactory();
         $nodeDefinition = new ArrayNodeDefinition('guard');
@@ -96,7 +96,7 @@ class GuardAuthenticationFactoryTest extends TestCase
         return $tests;
     }
 
-    public function testBasicCreate()
+    public function testBasicCreate(): void
     {
         // simple configuration
         $config = array(
@@ -119,7 +119,7 @@ class GuardAuthenticationFactoryTest extends TestCase
         $this->assertEquals(array(new Reference('authenticator123')), $listenerDefinition->getArgument(3)->getValues());
     }
 
-    public function testExistingDefaultEntryPointUsed()
+    public function testExistingDefaultEntryPointUsed(): void
     {
         // any existing default entry point is used
         $config = array(
@@ -133,7 +133,7 @@ class GuardAuthenticationFactoryTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testCannotOverrideDefaultEntryPoint()
+    public function testCannotOverrideDefaultEntryPoint(): void
     {
         // any existing default entry point is used
         $config = array(
@@ -146,7 +146,7 @@ class GuardAuthenticationFactoryTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testMultipleAuthenticatorsRequiresEntryPoint()
+    public function testMultipleAuthenticatorsRequiresEntryPoint(): void
     {
         // any existing default entry point is used
         $config = array(
@@ -156,7 +156,7 @@ class GuardAuthenticationFactoryTest extends TestCase
         $this->executeCreate($config, null);
     }
 
-    public function testCreateWithEntryPoint()
+    public function testCreateWithEntryPoint(): void
     {
         // any existing default entry point is used
         $config = array(

@@ -51,7 +51,7 @@ class FlockStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $this->lock($key, false);
     }
@@ -59,12 +59,12 @@ class FlockStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         $this->lock($key, true);
     }
 
-    private function lock(Key $key, $blocking)
+    private function lock(Key $key, $blocking): void
     {
         // The lock is maybe already acquired.
         if ($key->hasState(__CLASS__)) {
@@ -78,7 +78,7 @@ class FlockStore implements StoreInterface
         );
 
         // Silence error reporting
-        set_error_handler(function () {
+        set_error_handler(function (): void {
         });
         if (!$handle = fopen($fileName, 'r')) {
             if ($handle = fopen($fileName, 'x')) {
@@ -108,7 +108,7 @@ class FlockStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, $ttl): void
     {
         // do nothing, the flock locks forever.
     }
@@ -116,7 +116,7 @@ class FlockStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         // The lock is maybe not acquired.
         if (!$key->hasState(__CLASS__)) {

@@ -21,7 +21,7 @@ class RoleVoterTest extends TestCase
     /**
      * @dataProvider getVoteTests
      */
-    public function testVote($roles, $attributes, $expected)
+    public function testVote($roles, $attributes, $expected): void
     {
         $voter = new RoleVoter();
 

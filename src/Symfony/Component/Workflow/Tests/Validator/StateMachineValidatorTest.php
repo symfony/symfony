@@ -13,7 +13,7 @@ class StateMachineValidatorTest extends TestCase
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
      * @expectedExceptionMessage A transition from a place/state must have an unique name.
      */
-    public function testWithMultipleTransitionWithSameNameShareInput()
+    public function testWithMultipleTransitionWithSameNameShareInput(): void
     {
         $places = array('a', 'b', 'c');
         $transitions[] = new Transition('t1', 'a', 'b');
@@ -39,7 +39,7 @@ class StateMachineValidatorTest extends TestCase
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
      * @expectedExceptionMessage A transition in StateMachine can only have one output.
      */
-    public function testWithMultipleTos()
+    public function testWithMultipleTos(): void
     {
         $places = array('a', 'b', 'c');
         $transitions[] = new Transition('t1', 'a', array('b', 'c'));
@@ -64,7 +64,7 @@ class StateMachineValidatorTest extends TestCase
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
      * @expectedExceptionMessage A transition in StateMachine can only have one input.
      */
-    public function testWithMultipleFroms()
+    public function testWithMultipleFroms(): void
     {
         $places = array('a', 'b', 'c');
         $transitions[] = new Transition('t1', array('a', 'b'), 'c');
@@ -85,7 +85,7 @@ class StateMachineValidatorTest extends TestCase
         //           +----+
     }
 
-    public function testValid()
+    public function testValid(): void
     {
         $places = array('a', 'b', 'c');
         $transitions[] = new Transition('t1', 'a', 'b');

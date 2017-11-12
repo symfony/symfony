@@ -22,13 +22,13 @@ class ExtensionCompilerPassTest extends TestCase
     private $container;
     private $pass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->getMock();
         $this->pass = new ExtensionCompilerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $extension1 = $this->createExtensionMock(true);
         $extension1->expects($this->once())->method('process');

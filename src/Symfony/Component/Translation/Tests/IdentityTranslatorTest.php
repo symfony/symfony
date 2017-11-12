@@ -20,7 +20,7 @@ class IdentityTranslatorTest extends TestCase
     /**
      * @dataProvider getTransTests
      */
-    public function testTrans($expected, $id, $parameters)
+    public function testTrans($expected, $id, $parameters): void
     {
         $translator = new IdentityTranslator();
 
@@ -30,7 +30,7 @@ class IdentityTranslatorTest extends TestCase
     /**
      * @dataProvider getTransChoiceTests
      */
-    public function testTransChoiceWithExplicitLocale($expected, $id, $number, $parameters)
+    public function testTransChoiceWithExplicitLocale($expected, $id, $number, $parameters): void
     {
         $translator = new IdentityTranslator();
         $translator->setLocale('en');
@@ -41,7 +41,7 @@ class IdentityTranslatorTest extends TestCase
     /**
      * @dataProvider getTransChoiceTests
      */
-    public function testTransChoiceWithDefaultLocale($expected, $id, $number, $parameters)
+    public function testTransChoiceWithDefaultLocale($expected, $id, $number, $parameters): void
     {
         \Locale::setDefault('en');
 
@@ -50,7 +50,7 @@ class IdentityTranslatorTest extends TestCase
         $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters));
     }
 
-    public function testGetSetLocale()
+    public function testGetSetLocale(): void
     {
         $translator = new IdentityTranslator();
         $translator->setLocale('en');
@@ -58,7 +58,7 @@ class IdentityTranslatorTest extends TestCase
         $this->assertEquals('en', $translator->getLocale());
     }
 
-    public function testGetLocaleReturnsDefaultLocaleIfNotSet()
+    public function testGetLocaleReturnsDefaultLocaleIfNotSet(): void
     {
         // in order to test with "pt_BR"
         IntlTestHelper::requireFullIntl($this, false);

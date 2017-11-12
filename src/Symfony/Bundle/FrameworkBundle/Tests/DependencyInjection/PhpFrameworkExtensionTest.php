@@ -17,7 +17,7 @@ use Symfony\Component\Config\FileLocator;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
+    protected function loadFromFile(ContainerBuilder $container, $file): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
         $loader->load($file.'.php');
@@ -26,9 +26,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
     /**
      * @expectedException \LogicException
      */
-    public function testAssetsCannotHavePathAndUrl()
+    public function testAssetsCannotHavePathAndUrl(): void
     {
-        $this->createContainerFromClosure(function ($container) {
+        $this->createContainerFromClosure(function ($container): void {
             $container->loadFromExtension('framework', array(
                 'assets' => array(
                     'base_urls' => 'http://cdn.example.com',
@@ -41,9 +41,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
     /**
      * @expectedException \LogicException
      */
-    public function testAssetPackageCannotHavePathAndUrl()
+    public function testAssetPackageCannotHavePathAndUrl(): void
     {
-        $this->createContainerFromClosure(function ($container) {
+        $this->createContainerFromClosure(function ($container): void {
             $container->loadFromExtension('framework', array(
                 'assets' => array(
                     'packages' => array(

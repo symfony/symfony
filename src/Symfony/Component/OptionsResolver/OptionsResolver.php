@@ -932,7 +932,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException
      */
-    public function offsetSet($option, $value)
+    public function offsetSet($option, $value): void
     {
         throw new AccessException('Setting options via array access is not supported. Use setDefault() instead.');
     }
@@ -942,7 +942,7 @@ class OptionsResolver implements Options
      *
      * @throws AccessException
      */
-    public function offsetUnset($option)
+    public function offsetUnset($option): void
     {
         throw new AccessException('Removing options via array access is not supported. Use remove() instead.');
     }

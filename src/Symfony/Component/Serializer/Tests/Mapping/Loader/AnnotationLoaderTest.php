@@ -27,24 +27,24 @@ class AnnotationLoaderTest extends TestCase
      */
     private $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new AnnotationLoader(new AnnotationReader());
     }
 
-    public function testInterface()
+    public function testInterface(): void
     {
         $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\Loader\LoaderInterface', $this->loader);
     }
 
-    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    public function testLoadClassMetadataReturnsTrueIfSuccessful(): void
     {
         $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
 
         $this->assertTrue($this->loader->loadClassMetadata($classMetadata));
     }
 
-    public function testLoadGroups()
+    public function testLoadGroups(): void
     {
         $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
         $this->loader->loadClassMetadata($classMetadata);
@@ -52,7 +52,7 @@ class AnnotationLoaderTest extends TestCase
         $this->assertEquals(TestClassMetadataFactory::createClassMetadata(), $classMetadata);
     }
 
-    public function testLoadMaxDepth()
+    public function testLoadMaxDepth(): void
     {
         $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy');
         $this->loader->loadClassMetadata($classMetadata);
@@ -62,7 +62,7 @@ class AnnotationLoaderTest extends TestCase
         $this->assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
     }
 
-    public function testLoadClassMetadataAndMerge()
+    public function testLoadClassMetadataAndMerge(): void
     {
         $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
         $parentClassMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummyParent');

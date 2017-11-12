@@ -16,7 +16,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
  */
 class SerializerTest extends WebTestCase
 {
-    public function testDeserializeArrayOfObject()
+    public function testDeserializeArrayOfObject(): void
     {
         static::bootKernel(array('test_case' => 'Serializer'));
         $container = static::$kernel->getContainer();

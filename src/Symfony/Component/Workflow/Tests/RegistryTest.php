@@ -14,7 +14,7 @@ class RegistryTest extends TestCase
 {
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new Registry();
 
@@ -23,12 +23,12 @@ class RegistryTest extends TestCase
         $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->createSupportStrategy(Subject2::class));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->registry = null;
     }
 
-    public function testGetWithSuccess()
+    public function testGetWithSuccess(): void
     {
         $workflow = $this->registry->get(new Subject1());
         $this->assertInstanceOf(Workflow::class, $workflow);
@@ -47,7 +47,7 @@ class RegistryTest extends TestCase
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
      * @expectedExceptionMessage At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.
      */
-    public function testGetWithMultipleMatch()
+    public function testGetWithMultipleMatch(): void
     {
         $w1 = $this->registry->get(new Subject2());
         $this->assertInstanceOf(Workflow::class, $w1);
@@ -58,7 +58,7 @@ class RegistryTest extends TestCase
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
      * @expectedExceptionMessage Unable to find a workflow for class "stdClass".
      */
-    public function testGetWithNoMatch()
+    public function testGetWithNoMatch(): void
     {
         $w1 = $this->registry->get(new \stdClass());
         $this->assertInstanceOf(Workflow::class, $w1);

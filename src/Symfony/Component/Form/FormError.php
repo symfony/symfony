@@ -115,7 +115,7 @@ class FormError implements \Serializable
      *
      * @throws BadMethodCallException If the method is called more than once
      */
-    public function setOrigin(FormInterface $origin)
+    public function setOrigin(FormInterface $origin): void
     {
         if (null !== $this->origin) {
             throw new BadMethodCallException('setOrigin() must only be called once.');
@@ -155,7 +155,7 @@ class FormError implements \Serializable
      *
      * @param string $serialized The serialized error
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized, array('allowed_classes' => false));
     }

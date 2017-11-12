@@ -26,12 +26,12 @@ class ArgumentMetadataFactoryTest extends TestCase
      */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = new ArgumentMetadataFactory();
     }
 
-    public function testSignature1()
+    public function testSignature1(): void
     {
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature1'));
 
@@ -42,7 +42,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         ), $arguments);
     }
 
-    public function testSignature2()
+    public function testSignature2(): void
     {
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature2'));
 
@@ -53,7 +53,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         ), $arguments);
     }
 
-    public function testSignature3()
+    public function testSignature3(): void
     {
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature3'));
 
@@ -63,7 +63,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         ), $arguments);
     }
 
-    public function testSignature4()
+    public function testSignature4(): void
     {
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature4'));
 
@@ -74,7 +74,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         ), $arguments);
     }
 
-    public function testSignature5()
+    public function testSignature5(): void
     {
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature5'));
 
@@ -84,7 +84,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         ), $arguments);
     }
 
-    public function testVariadicSignature()
+    public function testVariadicSignature(): void
     {
         $arguments = $this->factory->createArgumentMetadata(array(new VariadicController(), 'action'));
 
@@ -94,7 +94,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         ), $arguments);
     }
 
-    public function testBasicTypesSignature()
+    public function testBasicTypesSignature(): void
     {
         $arguments = $this->factory->createArgumentMetadata(array(new BasicTypesController(), 'action'));
 
@@ -105,7 +105,7 @@ class ArgumentMetadataFactoryTest extends TestCase
         ), $arguments);
     }
 
-    public function testNullableTypesSignature()
+    public function testNullableTypesSignature(): void
     {
         $arguments = $this->factory->createArgumentMetadata(array(new NullableController(), 'action'));
 
@@ -117,23 +117,23 @@ class ArgumentMetadataFactoryTest extends TestCase
         ), $arguments);
     }
 
-    private function signature1(ArgumentMetadataFactoryTest $foo, array $bar, callable $baz)
+    private function signature1(ArgumentMetadataFactoryTest $foo, array $bar, callable $baz): void
     {
     }
 
-    private function signature2(ArgumentMetadataFactoryTest $foo = null, FakeClassThatDoesNotExist $bar = null, ImportedAndFake $baz = null)
+    private function signature2(ArgumentMetadataFactoryTest $foo = null, FakeClassThatDoesNotExist $bar = null, ImportedAndFake $baz = null): void
     {
     }
 
-    private function signature3(FakeClassThatDoesNotExist $bar, ImportedAndFake $baz)
+    private function signature3(FakeClassThatDoesNotExist $bar, ImportedAndFake $baz): void
     {
     }
 
-    private function signature4($foo = 'default', $bar = 500, $baz = array())
+    private function signature4($foo = 'default', $bar = 500, $baz = array()): void
     {
     }
 
-    private function signature5(array $foo = null, $bar)
+    private function signature5(array $foo = null, $bar): void
     {
     }
 }

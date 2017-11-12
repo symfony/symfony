@@ -18,17 +18,17 @@ class CacheWarmerTest extends TestCase
 {
     protected static $cacheFile;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$cacheFile = tempnam(sys_get_temp_dir(), 'sf2_cache_warmer_dir');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         @unlink(self::$cacheFile);
     }
 
-    public function testWriteCacheFileCreatesTheFile()
+    public function testWriteCacheFileCreatesTheFile(): void
     {
         $warmer = new TestCacheWarmer(self::$cacheFile);
         $warmer->warmUp(dirname(self::$cacheFile));
@@ -39,7 +39,7 @@ class CacheWarmerTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testWriteNonWritableCacheFileThrowsARuntimeException()
+    public function testWriteNonWritableCacheFileThrowsARuntimeException(): void
     {
         $nonWritableFile = '/this/file/is/very/probably/not/writable';
         $warmer = new TestCacheWarmer($nonWritableFile);
@@ -56,7 +56,7 @@ class TestCacheWarmer extends CacheWarmer
         $this->file = $file;
     }
 
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): void
     {
         $this->writeCacheFile($this->file, 'content');
     }

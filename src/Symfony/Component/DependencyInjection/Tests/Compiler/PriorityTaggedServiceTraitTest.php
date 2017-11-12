@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class PriorityTaggedServiceTraitTest extends TestCase
 {
-    public function testThatCacheWarmersAreProcessedInPriorityOrder()
+    public function testThatCacheWarmersAreProcessedInPriorityOrder(): void
     {
         $services = array(
             'my_service1' => array('my_custom_tag' => array('priority' => 100)),

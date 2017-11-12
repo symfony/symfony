@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
  */
 class NullDumperTest extends TestCase
 {
-    public function testNullDumper()
+    public function testNullDumper(): void
     {
         $dumper = new NullDumper();
         $definition = new Definition('stdClass');

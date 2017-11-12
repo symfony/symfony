@@ -66,7 +66,7 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function setStyles(array $styles)
+    public function setStyles(array $styles): void
     {
         $this->headerIsDumped = false;
         $this->styles = $styles + $this->styles;
@@ -77,7 +77,7 @@ class HtmlDumper extends CliDumper
      *
      * @param array $displayOptions A map of display options to customize the behavior
      */
-    public function setDisplayOptions(array $displayOptions)
+    public function setDisplayOptions(array $displayOptions): void
     {
         $this->headerIsDumped = false;
         $this->displayOptions = $displayOptions + $this->displayOptions;
@@ -88,7 +88,7 @@ class HtmlDumper extends CliDumper
      *
      * @param string $header An HTML string
      */
-    public function setDumpHeader($header)
+    public function setDumpHeader($header): void
     {
         $this->dumpHeader = $header;
     }
@@ -99,7 +99,7 @@ class HtmlDumper extends CliDumper
      * @param string $prefix The prepended HTML string
      * @param string $suffix The appended HTML string
      */
-    public function setDumpBoundaries($prefix, $suffix)
+    public function setDumpBoundaries($prefix, $suffix): void
     {
         $this->dumpPrefix = $prefix;
         $this->dumpSuffix = $suffix;
@@ -732,7 +732,7 @@ EOHTML
     /**
      * {@inheritdoc}
      */
-    public function enterHash(Cursor $cursor, $type, $class, $hasChild)
+    public function enterHash(Cursor $cursor, $type, $class, $hasChild): void
     {
         parent::enterHash($cursor, $type, $class, false);
 
@@ -762,7 +762,7 @@ EOHTML
     /**
      * {@inheritdoc}
      */
-    public function leaveHash(Cursor $cursor, $type, $class, $hasChild, $cut)
+    public function leaveHash(Cursor $cursor, $type, $class, $hasChild, $cut): void
     {
         $this->dumpEllipsis($cursor, $hasChild, $cut);
         if ($hasChild) {
@@ -851,7 +851,7 @@ EOHTML
     /**
      * {@inheritdoc}
      */
-    protected function dumpLine($depth, $endOfValue = false)
+    protected function dumpLine($depth, $endOfValue = false): void
     {
         if (-1 === $this->lastDepth) {
             $this->line = sprintf($this->dumpPrefix, $this->dumpId, $this->indentPad).$this->line;

@@ -56,7 +56,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'validator.initializer',
     );
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $tags = array_unique(array_merge($container->findTags(), $this->whitelist));
 

@@ -21,7 +21,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
-    public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
+    public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed(): void
     {
         $node = new ArrayNode('root');
         $node->normalize(false);
@@ -31,7 +31,7 @@ class ArrayNodeTest extends TestCase
      * @expectedException        \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Unrecognized option "foo" under "root"
      */
-    public function testExceptionThrownOnUnrecognizedChild()
+    public function testExceptionThrownOnUnrecognizedChild(): void
     {
         $node = new ArrayNode('root');
         $node->normalize(array('foo' => 'bar'));
@@ -52,7 +52,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider ignoreAndRemoveMatrixProvider
      */
-    public function testIgnoreAndRemoveBehaviors($ignore, $remove, $expected, $message = '')
+    public function testIgnoreAndRemoveBehaviors($ignore, $remove, $expected, $message = ''): void
     {
         if ($expected instanceof \Exception) {
             if (method_exists($this, 'expectException')) {
@@ -71,7 +71,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider getPreNormalizationTests
      */
-    public function testPreNormalize($denormalized, $normalized)
+    public function testPreNormalize($denormalized, $normalized): void
     {
         $node = new ArrayNode('foo');
 
@@ -106,7 +106,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider getZeroNamedNodeExamplesData
      */
-    public function testNodeNameCanBeZero($denormalized, $normalized)
+    public function testNodeNameCanBeZero($denormalized, $normalized): void
     {
         $zeroNode = new ArrayNode(0);
         $zeroNode->addChild(new ScalarNode('name'));
@@ -154,7 +154,7 @@ class ArrayNodeTest extends TestCase
     /**
      * @dataProvider getPreNormalizedNormalizedOrderedData
      */
-    public function testChildrenOrderIsMaintainedOnNormalizeValue($prenormalized, $normalized)
+    public function testChildrenOrderIsMaintainedOnNormalizeValue($prenormalized, $normalized): void
     {
         $scalar1 = new ScalarNode('1');
         $scalar2 = new ScalarNode('2');
@@ -184,7 +184,7 @@ class ArrayNodeTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Child nodes must be named.
      */
-    public function testAddChildEmptyName()
+    public function testAddChildEmptyName(): void
     {
         $node = new ArrayNode('root');
 
@@ -196,7 +196,7 @@ class ArrayNodeTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage A child node named "foo" already exists.
      */
-    public function testAddChildNameAlreadyExists()
+    public function testAddChildNameAlreadyExists(): void
     {
         $node = new ArrayNode('root');
 
@@ -211,13 +211,13 @@ class ArrayNodeTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage The node at path "foo" has no default value.
      */
-    public function testGetDefaultValueWithoutDefaultValue()
+    public function testGetDefaultValueWithoutDefaultValue(): void
     {
         $node = new ArrayNode('foo');
         $node->getDefaultValue();
     }
 
-    public function testSetDeprecated()
+    public function testSetDeprecated(): void
     {
         $childNode = new ArrayNode('foo');
         $childNode->setDeprecated('"%node%" is deprecated');

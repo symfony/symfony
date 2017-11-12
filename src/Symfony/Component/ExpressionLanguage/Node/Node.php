@@ -57,7 +57,7 @@ class Node
         return implode("\n", $repr);
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         foreach ($this->nodes as $node) {
             $node->compile($compiler);
@@ -74,7 +74,7 @@ class Node
         return $results;
     }
 
-    public function toArray()
+    public function toArray(): void
     {
         throw new \BadMethodCallException(sprintf('Dumping a "%s" instance is not supported yet.', get_class($this)));
     }

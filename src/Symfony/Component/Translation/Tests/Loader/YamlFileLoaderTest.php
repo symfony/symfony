@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class YamlFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../fixtures/resources.yml';
@@ -28,7 +28,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
-    public function testLoadDoesNothingIfEmpty()
+    public function testLoadDoesNothingIfEmpty(): void
     {
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../fixtures/empty.yml';
@@ -42,7 +42,7 @@ class YamlFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.yml';
@@ -52,7 +52,7 @@ class YamlFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
-    public function testLoadThrowsAnExceptionIfFileNotLocal()
+    public function testLoadThrowsAnExceptionIfFileNotLocal(): void
     {
         $loader = new YamlFileLoader();
         $resource = 'http://example.com/resources.yml';
@@ -62,7 +62,7 @@ class YamlFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
-    public function testLoadThrowsAnExceptionIfNotAnArray()
+    public function testLoadThrowsAnExceptionIfNotAnArray(): void
     {
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../fixtures/non-valid.yml';

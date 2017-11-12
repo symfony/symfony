@@ -59,7 +59,7 @@ class XmlDumper extends Dumper
         return $this->container->resolveEnvPlaceholders($xml);
     }
 
-    private function addParameters(\DOMElement $parent)
+    private function addParameters(\DOMElement $parent): void
     {
         $data = $this->container->getParameterBag()->all();
         if (!$data) {
@@ -75,7 +75,7 @@ class XmlDumper extends Dumper
         $this->convertParameters($data, 'parameter', $parameters);
     }
 
-    private function addMethodCalls(array $methodcalls, \DOMElement $parent)
+    private function addMethodCalls(array $methodcalls, \DOMElement $parent): void
     {
         foreach ($methodcalls as $methodcall) {
             $call = $this->document->createElement('call');
@@ -94,7 +94,7 @@ class XmlDumper extends Dumper
      * @param string      $id
      * @param \DOMElement $parent
      */
-    private function addService($definition, $id, \DOMElement $parent)
+    private function addService($definition, $id, \DOMElement $parent): void
     {
         $service = $this->document->createElement('service');
         if (null !== $id) {
@@ -217,7 +217,7 @@ class XmlDumper extends Dumper
      * @param string      $alias
      * @param \DOMElement $parent
      */
-    private function addServiceAlias($alias, Alias $id, \DOMElement $parent)
+    private function addServiceAlias($alias, Alias $id, \DOMElement $parent): void
     {
         $service = $this->document->createElement('service');
         $service->setAttribute('id', $alias);
@@ -228,7 +228,7 @@ class XmlDumper extends Dumper
         $parent->appendChild($service);
     }
 
-    private function addServices(\DOMElement $parent)
+    private function addServices(\DOMElement $parent): void
     {
         $definitions = $this->container->getDefinitions();
         if (!$definitions) {
@@ -257,7 +257,7 @@ class XmlDumper extends Dumper
      * @param \DOMElement $parent
      * @param string      $keyAttribute
      */
-    private function convertParameters(array $parameters, $type, \DOMElement $parent, $keyAttribute = 'key')
+    private function convertParameters(array $parameters, $type, \DOMElement $parent, $keyAttribute = 'key'): void
     {
         $withKeys = array_keys($parameters) !== range(0, count($parameters) - 1);
         foreach ($parameters as $key => $value) {

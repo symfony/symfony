@@ -19,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddExpressionLan
 
 class AddExpressionLanguageProvidersPassTest extends TestCase
 {
-    public function testProcessForRouter()
+    public function testProcessForRouter(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
@@ -38,7 +38,7 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $this->assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
     }
 
-    public function testProcessForRouterAlias()
+    public function testProcessForRouterAlias(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
@@ -58,7 +58,7 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $this->assertEquals(new Reference('some_routing_provider'), $calls[0][1][0]);
     }
 
-    public function testProcessForSecurity()
+    public function testProcessForSecurity(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
@@ -77,7 +77,7 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
     }
 
-    public function testProcessForSecurityAlias()
+    public function testProcessForSecurityAlias(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());

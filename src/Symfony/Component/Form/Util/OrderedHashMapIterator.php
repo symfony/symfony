@@ -100,7 +100,7 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         ++$this->cursor;
 
@@ -138,7 +138,7 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->cursor = 0;
 

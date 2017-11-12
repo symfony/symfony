@@ -124,7 +124,7 @@ class ArrayInput extends Input
     /**
      * {@inheritdoc}
      */
-    protected function parse()
+    protected function parse(): void
     {
         foreach ($this->parameters as $key => $value) {
             if ('--' === $key) {
@@ -148,7 +148,7 @@ class ArrayInput extends Input
      *
      * @throws InvalidOptionException When option given doesn't exist
      */
-    private function addShortOption($shortcut, $value)
+    private function addShortOption($shortcut, $value): void
     {
         if (!$this->definition->hasShortcut($shortcut)) {
             throw new InvalidOptionException(sprintf('The "-%s" option does not exist.', $shortcut));
@@ -166,7 +166,7 @@ class ArrayInput extends Input
      * @throws InvalidOptionException When option given doesn't exist
      * @throws InvalidOptionException When a required value is missing
      */
-    private function addLongOption($name, $value)
+    private function addLongOption($name, $value): void
     {
         if (!$this->definition->hasOption($name)) {
             throw new InvalidOptionException(sprintf('The "--%s" option does not exist.', $name));
@@ -195,7 +195,7 @@ class ArrayInput extends Input
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    private function addArgument($name, $value)
+    private function addArgument($name, $value): void
     {
         if (!$this->definition->hasArgument($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));

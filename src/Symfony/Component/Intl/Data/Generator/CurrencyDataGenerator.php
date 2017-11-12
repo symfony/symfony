@@ -76,7 +76,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function compileTemporaryBundles(GenrbCompiler $compiler, $sourceDir, $tempDir)
+    protected function compileTemporaryBundles(GenrbCompiler $compiler, $sourceDir, $tempDir): void
     {
         $compiler->compile($sourceDir.'/curr', $tempDir);
         $compiler->compile($sourceDir.'/misc/currencyNumericCodes.txt', $tempDir);
@@ -85,7 +85,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function preGenerate()
+    protected function preGenerate(): void
     {
         $this->currencyCodes = array();
     }

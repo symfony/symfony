@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class PhpFileLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new PhpFileLoader($this->getMockBuilder('Symfony\Component\Config\FileLocator')->getMock());
 
@@ -31,7 +31,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertFalse($loader->supports('foo.php', 'foo'), '->supports() checks the resource type if specified');
     }
 
-    public function testLoadWithRoute()
+    public function testLoadWithRoute(): void
     {
         $loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('validpattern.php');
@@ -50,7 +50,7 @@ class PhpFileLoaderTest extends TestCase
         }
     }
 
-    public function testLoadWithImport()
+    public function testLoadWithImport(): void
     {
         $loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('validresource.php');
@@ -69,7 +69,7 @@ class PhpFileLoaderTest extends TestCase
         }
     }
 
-    public function testThatDefiningVariableInConfigFileHasNoSideEffects()
+    public function testThatDefiningVariableInConfigFileHasNoSideEffects(): void
     {
         $locator = new FileLocator(array(__DIR__.'/../Fixtures'));
         $loader = new PhpFileLoader($locator);
@@ -84,7 +84,7 @@ class PhpFileLoaderTest extends TestCase
         );
     }
 
-    public function testRoutingConfigurator()
+    public function testRoutingConfigurator(): void
     {
         $locator = new FileLocator(array(__DIR__.'/../Fixtures'));
         $loader = new PhpFileLoader($locator);

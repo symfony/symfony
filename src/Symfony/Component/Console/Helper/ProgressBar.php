@@ -147,7 +147,7 @@ final class ProgressBar
      * @param string $message The text to associate with the placeholder
      * @param string $name    The name of the placeholder
      */
-    public function setMessage(string $message, string $name = 'message')
+    public function setMessage(string $message, string $name = 'message'): void
     {
         $this->messages[$name] = $message;
     }
@@ -182,7 +182,7 @@ final class ProgressBar
         return $this->percent;
     }
 
-    public function setBarWidth(int $size)
+    public function setBarWidth(int $size): void
     {
         $this->barWidth = max(1, $size);
     }
@@ -192,7 +192,7 @@ final class ProgressBar
         return $this->barWidth;
     }
 
-    public function setBarCharacter(string $char)
+    public function setBarCharacter(string $char): void
     {
         $this->barChar = $char;
     }
@@ -206,7 +206,7 @@ final class ProgressBar
         return $this->barChar;
     }
 
-    public function setEmptyBarCharacter(string $char)
+    public function setEmptyBarCharacter(string $char): void
     {
         $this->emptyBarChar = $char;
     }
@@ -216,7 +216,7 @@ final class ProgressBar
         return $this->emptyBarChar;
     }
 
-    public function setProgressCharacter(string $char)
+    public function setProgressCharacter(string $char): void
     {
         $this->progressChar = $char;
     }
@@ -226,7 +226,7 @@ final class ProgressBar
         return $this->progressChar;
     }
 
-    public function setFormat(string $format)
+    public function setFormat(string $format): void
     {
         $this->format = null;
         $this->internalFormat = $format;
@@ -237,7 +237,7 @@ final class ProgressBar
      *
      * @param int|float $freq The frequency in steps
      */
-    public function setRedrawFrequency(int $freq)
+    public function setRedrawFrequency(int $freq): void
     {
         $this->redrawFreq = max($freq, 1);
     }
@@ -247,7 +247,7 @@ final class ProgressBar
      *
      * @param int|null $max Number of steps to complete the bar (0 if indeterminate), null to leave unchanged
      */
-    public function start(int $max = null)
+    public function start(int $max = null): void
     {
         $this->startTime = time();
         $this->step = 0;
@@ -265,7 +265,7 @@ final class ProgressBar
      *
      * @param int $step Number of steps to advance
      */
-    public function advance(int $step = 1)
+    public function advance(int $step = 1): void
     {
         $this->setProgress($this->step + $step);
     }
@@ -273,12 +273,12 @@ final class ProgressBar
     /**
      * Sets whether to overwrite the progressbar, false for new line.
      */
-    public function setOverwrite(bool $overwrite)
+    public function setOverwrite(bool $overwrite): void
     {
         $this->overwrite = $overwrite;
     }
 
-    public function setProgress(int $step)
+    public function setProgress(int $step): void
     {
         if ($this->max && $step > $this->max) {
             $this->max = $step;
@@ -348,7 +348,7 @@ final class ProgressBar
         $this->overwrite('');
     }
 
-    private function setRealFormat(string $format)
+    private function setRealFormat(string $format): void
     {
         // try to use the _nomax variant if available
         if (!$this->max && null !== self::getFormatDefinition($format.'_nomax')) {
@@ -362,7 +362,7 @@ final class ProgressBar
         $this->formatLineCount = substr_count($this->format, "\n");
     }
 
-    private function setMaxSteps(int $max)
+    private function setMaxSteps(int $max): void
     {
         $this->max = max(0, $max);
         $this->stepWidth = $this->max ? Helper::strlen((string) $this->max) : 4;

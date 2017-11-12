@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 
 class AuthenticationTrustResolverTest extends TestCase
 {
-    public function testIsAnonymous()
+    public function testIsAnonymous(): void
     {
         $resolver = $this->getResolver();
 
@@ -26,7 +26,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isAnonymous($this->getAnonymousToken()));
     }
 
-    public function testIsRememberMe()
+    public function testIsRememberMe(): void
     {
         $resolver = $this->getResolver();
 
@@ -36,7 +36,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
     }
 
-    public function testisFullFledged()
+    public function testisFullFledged(): void
     {
         $resolver = $this->getResolver();
 

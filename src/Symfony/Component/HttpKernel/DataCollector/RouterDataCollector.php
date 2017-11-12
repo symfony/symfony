@@ -36,7 +36,7 @@ class RouterDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         if ($response instanceof RedirectResponse) {
             $this->data['redirect'] = true;
@@ -50,7 +50,7 @@ class RouterDataCollector extends DataCollector
         unset($this->controllers[$request]);
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->controllers = new \SplObjectStorage();
 
@@ -69,7 +69,7 @@ class RouterDataCollector extends DataCollector
     /**
      * Remembers the controller associated to each request.
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event): void
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }

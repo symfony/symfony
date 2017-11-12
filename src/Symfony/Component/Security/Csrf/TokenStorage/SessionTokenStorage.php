@@ -60,7 +60,7 @@ class SessionTokenStorage implements TokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function setToken($tokenId, $token)
+    public function setToken($tokenId, $token): void
     {
         if (!$this->session->isStarted()) {
             $this->session->start();

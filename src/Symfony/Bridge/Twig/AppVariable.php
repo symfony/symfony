@@ -29,22 +29,22 @@ class AppVariable
     private $environment;
     private $debug;
 
-    public function setTokenStorage(TokenStorageInterface $tokenStorage)
+    public function setTokenStorage(TokenStorageInterface $tokenStorage): void
     {
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function setRequestStack(RequestStack $requestStack)
+    public function setRequestStack(RequestStack $requestStack): void
     {
         $this->requestStack = $requestStack;
     }
 
-    public function setEnvironment($environment)
+    public function setEnvironment($environment): void
     {
         $this->environment = $environment;
     }
 
-    public function setDebug($debug)
+    public function setDebug($debug): void
     {
         $this->debug = (bool) $debug;
     }

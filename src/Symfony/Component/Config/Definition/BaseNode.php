@@ -46,7 +46,7 @@ abstract class BaseNode implements NodeInterface
         $this->parent = $parent;
     }
 
-    public function setAttribute($key, $value)
+    public function setAttribute($key, $value): void
     {
         $this->attributes[$key] = $value;
     }
@@ -66,12 +66,12 @@ abstract class BaseNode implements NodeInterface
         return $this->attributes;
     }
 
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): void
     {
         $this->attributes = $attributes;
     }
 
-    public function removeAttribute($key)
+    public function removeAttribute($key): void
     {
         unset($this->attributes[$key]);
     }
@@ -81,7 +81,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param string $info
      */
-    public function setInfo($info)
+    public function setInfo($info): void
     {
         $this->setAttribute('info', $info);
     }
@@ -101,7 +101,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param string|array $example
      */
-    public function setExample($example)
+    public function setExample($example): void
     {
         $this->setAttribute('example', $example);
     }
@@ -122,7 +122,7 @@ abstract class BaseNode implements NodeInterface
      * @param mixed $originalValue
      * @param mixed $equivalentValue
      */
-    public function addEquivalentValue($originalValue, $equivalentValue)
+    public function addEquivalentValue($originalValue, $equivalentValue): void
     {
         $this->equivalentValues[] = array($originalValue, $equivalentValue);
     }
@@ -132,7 +132,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param bool $boolean Required node
      */
-    public function setRequired($boolean)
+    public function setRequired($boolean): void
     {
         $this->required = (bool) $boolean;
     }
@@ -145,7 +145,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param string|null $message Deprecated message
      */
-    public function setDeprecated($message)
+    public function setDeprecated($message): void
     {
         $this->deprecationMessage = $message;
     }
@@ -155,7 +155,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param bool $allow
      */
-    public function setAllowOverwrite($allow)
+    public function setAllowOverwrite($allow): void
     {
         $this->allowOverwrite = (bool) $allow;
     }
@@ -165,7 +165,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param \Closure[] $closures An array of Closures used for normalization
      */
-    public function setNormalizationClosures(array $closures)
+    public function setNormalizationClosures(array $closures): void
     {
         $this->normalizationClosures = $closures;
     }
@@ -175,7 +175,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param \Closure[] $closures An array of Closures used for final validation
      */
-    public function setFinalValidationClosures(array $closures)
+    public function setFinalValidationClosures(array $closures): void
     {
         $this->finalValidationClosures = $closures;
     }

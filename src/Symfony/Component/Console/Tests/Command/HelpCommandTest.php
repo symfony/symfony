@@ -19,7 +19,7 @@ use Symfony\Component\Console\Application;
 
 class HelpCommandTest extends TestCase
 {
-    public function testExecuteForCommandAlias()
+    public function testExecuteForCommandAlias(): void
     {
         $command = new HelpCommand();
         $command->setApplication(new Application());
@@ -30,7 +30,7 @@ class HelpCommandTest extends TestCase
         $this->assertContains('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command alias');
     }
 
-    public function testExecuteForCommand()
+    public function testExecuteForCommand(): void
     {
         $command = new HelpCommand();
         $commandTester = new CommandTester($command);
@@ -41,7 +41,7 @@ class HelpCommandTest extends TestCase
         $this->assertContains('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
     }
 
-    public function testExecuteForCommandWithXmlOption()
+    public function testExecuteForCommandWithXmlOption(): void
     {
         $command = new HelpCommand();
         $commandTester = new CommandTester($command);
@@ -50,7 +50,7 @@ class HelpCommandTest extends TestCase
         $this->assertContains('<command', $commandTester->getDisplay(), '->execute() returns an XML help text if --xml is passed');
     }
 
-    public function testExecuteForApplicationCommand()
+    public function testExecuteForApplicationCommand(): void
     {
         $application = new Application();
         $commandTester = new CommandTester($application->get('help'));
@@ -60,7 +60,7 @@ class HelpCommandTest extends TestCase
         $this->assertContains('raw', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
     }
 
-    public function testExecuteForApplicationCommandWithXmlOption()
+    public function testExecuteForApplicationCommandWithXmlOption(): void
     {
         $application = new Application();
         $commandTester = new CommandTester($application->get('help'));

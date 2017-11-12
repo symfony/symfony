@@ -86,14 +86,14 @@ class Collection implements CollectionInterface
         return isset($this->entries[$offset]) ? $this->entries[$offset] : null;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->toArray();
 
         $this->entries[$offset] = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->toArray();
 
@@ -125,7 +125,7 @@ class Collection implements CollectionInterface
                 'count' => null,
                 'dn' => null,
             ));
-        array_walk($attributes, function (&$value) {
+        array_walk($attributes, function (&$value): void {
             unset($value['count']);
         });
 

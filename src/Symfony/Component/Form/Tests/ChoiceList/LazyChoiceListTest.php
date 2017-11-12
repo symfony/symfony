@@ -36,15 +36,15 @@ class LazyChoiceListTest extends TestCase
 
     private $value;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loadedList = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
         $this->loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
-        $this->value = function () {};
+        $this->value = function (): void {};
         $this->list = new LazyChoiceList($this->loader, $this->value);
     }
 
-    public function testGetChoiceLoadersLoadsLoadedListOnFirstCall()
+    public function testGetChoiceLoadersLoadsLoadedListOnFirstCall(): void
     {
         $this->loader->expects($this->exactly(2))
             ->method('loadChoiceList')
@@ -60,7 +60,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame('RESULT', $this->list->getChoices());
     }
 
-    public function testGetValuesLoadsLoadedListOnFirstCall()
+    public function testGetValuesLoadsLoadedListOnFirstCall(): void
     {
         $this->loader->expects($this->exactly(2))
             ->method('loadChoiceList')
@@ -76,7 +76,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame('RESULT', $this->list->getValues());
     }
 
-    public function testGetStructuredValuesLoadsLoadedListOnFirstCall()
+    public function testGetStructuredValuesLoadsLoadedListOnFirstCall(): void
     {
         $this->loader->expects($this->exactly(2))
             ->method('loadChoiceList')
@@ -92,7 +92,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame('RESULT', $this->list->getStructuredValues());
     }
 
-    public function testGetOriginalKeysLoadsLoadedListOnFirstCall()
+    public function testGetOriginalKeysLoadsLoadedListOnFirstCall(): void
     {
         $this->loader->expects($this->exactly(2))
             ->method('loadChoiceList')
@@ -108,7 +108,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame('RESULT', $this->list->getOriginalKeys());
     }
 
-    public function testGetChoicesForValuesForwardsCallIfListNotLoaded()
+    public function testGetChoicesForValuesForwardsCallIfListNotLoaded(): void
     {
         $this->loader->expects($this->exactly(2))
             ->method('loadChoicesForValues')
@@ -119,7 +119,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame('RESULT', $this->list->getChoicesForValues(array('a', 'b')));
     }
 
-    public function testGetChoicesForValuesUsesLoadedList()
+    public function testGetChoicesForValuesUsesLoadedList(): void
     {
         $this->loader->expects($this->exactly(1))
             ->method('loadChoiceList')
@@ -138,7 +138,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame('RESULT', $this->list->getChoicesForValues(array('a', 'b')));
     }
 
-    public function testGetValuesForChoicesUsesLoadedList()
+    public function testGetValuesForChoicesUsesLoadedList(): void
     {
         $this->loader->expects($this->exactly(1))
             ->method('loadChoiceList')

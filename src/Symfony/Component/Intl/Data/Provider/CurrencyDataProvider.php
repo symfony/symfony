@@ -88,7 +88,7 @@ class CurrencyDataProvider
 
         $index = static::INDEX_NAME;
 
-        array_walk($names, function (&$value) use ($index) {
+        array_walk($names, function (&$value) use ($index): void {
             $value = $value[$index];
         });
 

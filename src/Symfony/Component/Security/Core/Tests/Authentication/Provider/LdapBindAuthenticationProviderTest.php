@@ -32,7 +32,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
      * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
      * @expectedExceptionMessage The presented password must not be empty.
      */
-    public function testEmptyPasswordShouldThrowAnException()
+    public function testEmptyPasswordShouldThrowAnException(): void
     {
         $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
@@ -49,7 +49,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
      * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
      * @expectedExceptionMessage The presented password is invalid.
      */
-    public function testBindFailureShouldThrowAnException()
+    public function testBindFailureShouldThrowAnException(): void
     {
         $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
@@ -67,7 +67,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
     }
 
-    public function testRetrieveUser()
+    public function testRetrieveUser(): void
     {
         $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
         $userProvider
@@ -86,7 +86,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
         $reflection->invoke($provider, 'foo', new UsernamePasswordToken('foo', 'bar', 'key'));
     }
 
-    public function testQueryForDn()
+    public function testQueryForDn(): void
     {
         $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
 
@@ -126,7 +126,7 @@ class LdapBindAuthenticationProviderTest extends TestCase
      * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
      * @expectedExceptionMessage The presented username is invalid.
      */
-    public function testEmptyQueryResultShouldThrowAnException()
+    public function testEmptyQueryResultShouldThrowAnException(): void
     {
         $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
 

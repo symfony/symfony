@@ -53,7 +53,7 @@ class ValidationListenerTest extends TestCase
 
     private $params;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
@@ -92,7 +92,7 @@ class ValidationListenerTest extends TestCase
     }
 
     // More specific mapping tests can be found in ViolationMapperTest
-    public function testMapViolation()
+    public function testMapViolation(): void
     {
         $violation = $this->getConstraintViolation();
         $form = $this->getForm('street');
@@ -108,7 +108,7 @@ class ValidationListenerTest extends TestCase
         $this->listener->validateForm(new FormEvent($form, null));
     }
 
-    public function testMapViolationAllowsNonSyncIfInvalid()
+    public function testMapViolationAllowsNonSyncIfInvalid(): void
     {
         $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR);
         $form = $this->getForm('street');
@@ -125,7 +125,7 @@ class ValidationListenerTest extends TestCase
         $this->listener->validateForm(new FormEvent($form, null));
     }
 
-    public function testValidateIgnoresNonRoot()
+    public function testValidateIgnoresNonRoot(): void
     {
         $form = $this->getMockForm();
         $form->expects($this->once())
@@ -141,7 +141,7 @@ class ValidationListenerTest extends TestCase
         $this->listener->validateForm(new FormEvent($form, null));
     }
 
-    public function testValidateWithEmptyViolationList()
+    public function testValidateWithEmptyViolationList(): void
     {
         $form = $this->getMockForm();
         $form->expects($this->once())
@@ -160,7 +160,7 @@ class ValidationListenerTest extends TestCase
         $this->listener->validateForm(new FormEvent($form, null));
     }
 
-    public function testValidatorInterface()
+    public function testValidatorInterface(): void
     {
         $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
 

@@ -122,7 +122,7 @@ abstract class Composite extends Constraint
      *
      * @param string $group
      */
-    public function addImplicitGroupName($group)
+    public function addImplicitGroupName($group): void
     {
         parent::addImplicitGroupName($group);
 
@@ -149,7 +149,7 @@ abstract class Composite extends Constraint
      *
      * @see Collection::initializeNestedConstraints()
      */
-    protected function initializeNestedConstraints()
+    protected function initializeNestedConstraints(): void
     {
     }
 }

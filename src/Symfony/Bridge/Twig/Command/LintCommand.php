@@ -42,7 +42,7 @@ class LintCommand extends Command
         $this->twig = $twig;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Lints a template and outputs encountered errors')
@@ -172,7 +172,7 @@ EOF
     {
         $errors = 0;
 
-        array_walk($filesInfo, function (&$v) use (&$errors) {
+        array_walk($filesInfo, function (&$v) use (&$errors): void {
             $v['file'] = (string) $v['file'];
             unset($v['template']);
             if (!$v['valid']) {
@@ -187,7 +187,7 @@ EOF
         return min($errors, 1);
     }
 
-    private function renderException(OutputInterface $output, $template, Error $exception, $file = null)
+    private function renderException(OutputInterface $output, $template, Error $exception, $file = null): void
     {
         $line = $exception->getTemplateLine();
 

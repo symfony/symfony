@@ -61,7 +61,7 @@ class FormRegistryTest extends TestCase
      */
     private $extension2;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resolvedTypeFactory = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeFactory')->getMock();
         $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
@@ -74,7 +74,7 @@ class FormRegistryTest extends TestCase
         ), $this->resolvedTypeFactory);
     }
 
-    public function testGetTypeFromExtension()
+    public function testGetTypeFromExtension(): void
     {
         $type = new FooType();
         $resolvedType = new ResolvedFormType($type);
@@ -89,7 +89,7 @@ class FormRegistryTest extends TestCase
         $this->assertSame($resolvedType, $this->registry->getType(get_class($type)));
     }
 
-    public function testLoadUnregisteredType()
+    public function testLoadUnregisteredType(): void
     {
         $type = new FooType();
         $resolvedType = new ResolvedFormType($type);
@@ -105,7 +105,7 @@ class FormRegistryTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
-    public function testFailIfUnregisteredTypeNoClass()
+    public function testFailIfUnregisteredTypeNoClass(): void
     {
         $this->registry->getType('Symfony\Blubb');
     }
@@ -113,12 +113,12 @@ class FormRegistryTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
-    public function testFailIfUnregisteredTypeNoFormType()
+    public function testFailIfUnregisteredTypeNoFormType(): void
     {
         $this->registry->getType('stdClass');
     }
 
-    public function testGetTypeWithTypeExtensions()
+    public function testGetTypeWithTypeExtensions(): void
     {
         $type = new FooType();
         $ext1 = new FooTypeBarExtension();
@@ -137,7 +137,7 @@ class FormRegistryTest extends TestCase
         $this->assertSame($resolvedType, $this->registry->getType(get_class($type)));
     }
 
-    public function testGetTypeConnectsParent()
+    public function testGetTypeConnectsParent(): void
     {
         $parentType = new FooType();
         $type = new FooSubType();
@@ -164,7 +164,7 @@ class FormRegistryTest extends TestCase
      * @expectedException \Symfony\Component\Form\Exception\LogicException
      * @expectedExceptionMessage Circular reference detected for form type "Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType" (Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType > Symfony\Component\Form\Tests\Fixtures\FormWithSameParentType).
      */
-    public function testFormCannotHaveItselfAsAParent()
+    public function testFormCannotHaveItselfAsAParent(): void
     {
         $type = new FormWithSameParentType();
 
@@ -177,7 +177,7 @@ class FormRegistryTest extends TestCase
      * @expectedException \Symfony\Component\Form\Exception\LogicException
      * @expectedExceptionMessage Circular reference detected for form type "Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo" (Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBar > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeBaz > Symfony\Component\Form\Tests\Fixtures\RecursiveFormTypeFoo).
      */
-    public function testRecursiveFormDependencies()
+    public function testRecursiveFormDependencies(): void
     {
         $foo = new RecursiveFormTypeFoo();
         $bar = new RecursiveFormTypeBar();
@@ -193,12 +193,12 @@ class FormRegistryTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
-    public function testGetTypeThrowsExceptionIfTypeNotFound()
+    public function testGetTypeThrowsExceptionIfTypeNotFound(): void
     {
         $this->registry->getType('bar');
     }
 
-    public function testHasTypeAfterLoadingFromExtension()
+    public function testHasTypeAfterLoadingFromExtension(): void
     {
         $type = new FooType();
         $resolvedType = new ResolvedFormType($type);
@@ -213,22 +213,22 @@ class FormRegistryTest extends TestCase
         $this->assertTrue($this->registry->hasType(get_class($type)));
     }
 
-    public function testHasTypeIfFQCN()
+    public function testHasTypeIfFQCN(): void
     {
         $this->assertTrue($this->registry->hasType('Symfony\Component\Form\Tests\Fixtures\FooType'));
     }
 
-    public function testDoesNotHaveTypeIfNonExistingClass()
+    public function testDoesNotHaveTypeIfNonExistingClass(): void
     {
         $this->assertFalse($this->registry->hasType('Symfony\Blubb'));
     }
 
-    public function testDoesNotHaveTypeIfNoFormType()
+    public function testDoesNotHaveTypeIfNoFormType(): void
     {
         $this->assertFalse($this->registry->hasType('stdClass'));
     }
 
-    public function testGetTypeGuesser()
+    public function testGetTypeGuesser(): void
     {
         $expectedGuesser = new FormTypeGuesserChain(array($this->guesser1, $this->guesser2));
 
@@ -242,7 +242,7 @@ class FormRegistryTest extends TestCase
         $this->assertNull($registry->getTypeGuesser());
     }
 
-    public function testGetExtensions()
+    public function testGetExtensions(): void
     {
         $expectedExtensions = array($this->extension1, $this->extension2);
 

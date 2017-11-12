@@ -15,7 +15,7 @@ use Symfony\Component\DomCrawler\Field\InputFormField;
 
 class InputFormFieldTest extends FormFieldTestCase
 {
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $node = $this->createNode('input', '', array('type' => 'text', 'name' => 'name', 'value' => 'value'));
         $field = new InputFormField($node);

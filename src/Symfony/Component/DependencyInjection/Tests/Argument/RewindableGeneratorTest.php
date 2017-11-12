@@ -16,14 +16,14 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 
 class RewindableGeneratorTest extends TestCase
 {
-    public function testImplementsCountable()
+    public function testImplementsCountable(): void
     {
         $this->assertInstanceOf(\Countable::class, new RewindableGenerator(function () {
             yield 1;
         }, 1));
     }
 
-    public function testCountUsesProvidedValue()
+    public function testCountUsesProvidedValue(): void
     {
         $generator = new RewindableGenerator(function () {
             yield 1;
@@ -32,7 +32,7 @@ class RewindableGeneratorTest extends TestCase
         $this->assertCount(3, $generator);
     }
 
-    public function testCountUsesProvidedValueAsCallback()
+    public function testCountUsesProvidedValueAsCallback(): void
     {
         $called = 0;
         $generator = new RewindableGenerator(function () {

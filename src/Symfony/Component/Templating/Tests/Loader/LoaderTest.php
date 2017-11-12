@@ -17,7 +17,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 class LoaderTest extends TestCase
 {
-    public function testGetSetLogger()
+    public function testGetSetLogger(): void
     {
         $loader = new ProjectTemplateLoader4();
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
@@ -28,7 +28,7 @@ class LoaderTest extends TestCase
 
 class ProjectTemplateLoader4 extends Loader
 {
-    public function load(TemplateReferenceInterface $template)
+    public function load(TemplateReferenceInterface $template): void
     {
     }
 

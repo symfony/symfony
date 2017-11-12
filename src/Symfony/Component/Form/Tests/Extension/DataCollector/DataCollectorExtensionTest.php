@@ -26,13 +26,13 @@ class DataCollectorExtensionTest extends TestCase
      */
     private $dataCollector;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataCollector = $this->getMockBuilder('Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface')->getMock();
         $this->extension = new DataCollectorExtension($this->dataCollector);
     }
 
-    public function testLoadTypeExtensions()
+    public function testLoadTypeExtensions(): void
     {
         $typeExtensions = $this->extension->getTypeExtensions('Symfony\Component\Form\Extension\Core\Type\FormType');
 

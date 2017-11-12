@@ -40,7 +40,7 @@ class FilesystemTestCase extends TestCase
      */
     private static $symlinkOnWindows = null;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             self::$linkOnWindows = true;
@@ -69,7 +69,7 @@ class FilesystemTestCase extends TestCase
         }
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
@@ -78,7 +78,7 @@ class FilesystemTestCase extends TestCase
         $this->workspace = realpath($this->workspace);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (!empty($this->longPathNamesWindows)) {
             foreach ($this->longPathNamesWindows as $path) {
@@ -95,7 +95,7 @@ class FilesystemTestCase extends TestCase
      * @param int    $expectedFilePerms Expected file permissions as three digits (i.e. 755)
      * @param string $filePath
      */
-    protected function assertFilePermissions($expectedFilePerms, $filePath)
+    protected function assertFilePermissions($expectedFilePerms, $filePath): void
     {
         $actualFilePerms = (int) substr(sprintf('%o', fileperms($filePath)), -3);
         $this->assertEquals(
@@ -127,7 +127,7 @@ class FilesystemTestCase extends TestCase
         $this->markTestSkipped('Unable to retrieve file group name');
     }
 
-    protected function markAsSkippedIfLinkIsMissing()
+    protected function markAsSkippedIfLinkIsMissing(): void
     {
         if (!function_exists('link')) {
             $this->markTestSkipped('link is not supported');
@@ -138,7 +138,7 @@ class FilesystemTestCase extends TestCase
         }
     }
 
-    protected function markAsSkippedIfSymlinkIsMissing($relative = false)
+    protected function markAsSkippedIfSymlinkIsMissing($relative = false): void
     {
         if ('\\' === DIRECTORY_SEPARATOR && false === self::$symlinkOnWindows) {
             $this->markTestSkipped('symlink requires "Create symbolic links" privilege on Windows');
@@ -150,14 +150,14 @@ class FilesystemTestCase extends TestCase
         }
     }
 
-    protected function markAsSkippedIfChmodIsMissing()
+    protected function markAsSkippedIfChmodIsMissing(): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }
     }
 
-    protected function markAsSkippedIfPosixIsMissing()
+    protected function markAsSkippedIfPosixIsMissing(): void
     {
         if (!function_exists('posix_isatty')) {
             $this->markTestSkipped('Function posix_isatty is required.');

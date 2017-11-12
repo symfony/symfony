@@ -37,7 +37,7 @@ class DeprecationErrorHandler
      *
      * @param int|string|false $mode The reporting mode, defaults to not allowing any deprecations
      */
-    public static function register($mode = 0)
+    public static function register($mode = 0): void
     {
         if (self::$isRegistered) {
             return;
@@ -188,7 +188,7 @@ class DeprecationErrorHandler
             } else {
                 $colorize = function ($str) { return $str; };
             }
-            register_shutdown_function(function () use ($getMode, &$deprecations, $deprecationHandler, $colorize) {
+            register_shutdown_function(function () use ($getMode, &$deprecations, $deprecationHandler, $colorize): void {
                 $mode = $getMode();
                 if (isset($mode[0]) && '/' === $mode[0]) {
                     return;
@@ -246,7 +246,7 @@ class DeprecationErrorHandler
         }
     }
 
-    public static function collectDeprecations($outputFile)
+    public static function collectDeprecations($outputFile): void
     {
         $deprecations = array();
         $previousErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, &$previousErrorHandler) {
@@ -264,7 +264,7 @@ class DeprecationErrorHandler
             $deprecations[] = array(error_reporting(), $msg);
         });
 
-        register_shutdown_function(function () use ($outputFile, &$deprecations) {
+        register_shutdown_function(function () use ($outputFile, &$deprecations): void {
             file_put_contents($outputFile, serialize($deprecations));
         });
     }

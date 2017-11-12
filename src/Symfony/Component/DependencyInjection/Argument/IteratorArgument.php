@@ -42,7 +42,7 @@ class IteratorArgument implements ArgumentInterface
     /**
      * @param Reference[] $values The service references to lazily iterate over
      */
-    public function setValues(array $values)
+    public function setValues(array $values): void
     {
         foreach ($values as $k => $v) {
             if (null !== $v && !$v instanceof Reference) {

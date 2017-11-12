@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 class UserPasswordEncoderTest extends TestCase
 {
-    public function testEncodePassword()
+    public function testEncodePassword(): void
     {
         $userMock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $userMock->expects($this->any())
@@ -41,7 +41,7 @@ class UserPasswordEncoderTest extends TestCase
         $this->assertEquals('encodedPassword', $encoded);
     }
 
-    public function testIsPasswordValid()
+    public function testIsPasswordValid(): void
     {
         $userMock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $userMock->expects($this->any())

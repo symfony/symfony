@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterMatchCommandTest extends TestCase
 {
-    public function testWithMatchPath()
+    public function testWithMatchPath(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('path_info' => '/foo', 'foo'), array('decorated' => false));
@@ -32,7 +32,7 @@ class RouterMatchCommandTest extends TestCase
         $this->assertContains('Route Name   | foo', $tester->getDisplay());
     }
 
-    public function testWithNotMatchPath()
+    public function testWithNotMatchPath(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('path_info' => '/test', 'foo'), array('decorated' => false));

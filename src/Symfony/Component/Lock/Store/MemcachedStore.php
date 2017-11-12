@@ -61,7 +61,7 @@ class MemcachedStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $token = $this->getToken($key);
         $key->reduceLifetime($this->initialTtl);
@@ -75,7 +75,7 @@ class MemcachedStore implements StoreInterface
         }
     }
 
-    public function waitAndSave(Key $key)
+    public function waitAndSave(Key $key): void
     {
         throw new InvalidArgumentException(sprintf('The store "%s" does not supports blocking locks.', get_class($this)));
     }
@@ -83,7 +83,7 @@ class MemcachedStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function putOffExpiration(Key $key, $ttl)
+    public function putOffExpiration(Key $key, $ttl): void
     {
         if ($ttl < 1) {
             throw new InvalidArgumentException(sprintf('%s() expects a TTL greater or equals to 1. Got %s.', __METHOD__, $ttl));
@@ -124,7 +124,7 @@ class MemcachedStore implements StoreInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(Key $key)
+    public function delete(Key $key): void
     {
         $token = $this->getToken($key);
 

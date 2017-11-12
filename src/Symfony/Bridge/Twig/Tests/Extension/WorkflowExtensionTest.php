@@ -23,7 +23,7 @@ class WorkflowExtensionTest extends TestCase
 {
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!class_exists(Workflow::class)) {
             $this->markTestSkipped('The Workflow component is needed to run tests for this extension.');
@@ -43,7 +43,7 @@ class WorkflowExtensionTest extends TestCase
         $this->extension = new WorkflowExtension($registry);
     }
 
-    public function testCanTransition()
+    public function testCanTransition(): void
     {
         $subject = new \stdClass();
         $subject->marking = array();
@@ -52,7 +52,7 @@ class WorkflowExtensionTest extends TestCase
         $this->assertFalse($this->extension->canTransition($subject, 't2'));
     }
 
-    public function testGetEnabledTransitions()
+    public function testGetEnabledTransitions(): void
     {
         $subject = new \stdClass();
         $subject->marking = array();
@@ -64,7 +64,7 @@ class WorkflowExtensionTest extends TestCase
         $this->assertSame('t1', $transitions[0]->getName());
     }
 
-    public function testHasMarkedPlace()
+    public function testHasMarkedPlace(): void
     {
         $subject = new \stdClass();
         $subject->marking = array();
@@ -75,7 +75,7 @@ class WorkflowExtensionTest extends TestCase
         $this->assertFalse($this->extension->hasMarkedPlace($subject, 'processed'));
     }
 
-    public function testGetMarkedPlaces()
+    public function testGetMarkedPlaces(): void
     {
         $subject = new \stdClass();
         $subject->marking = array();

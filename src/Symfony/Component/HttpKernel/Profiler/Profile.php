@@ -53,7 +53,7 @@ class Profile
      *
      * @param string $token The token
      */
-    public function setToken($token)
+    public function setToken($token): void
     {
         $this->token = $token;
     }
@@ -71,7 +71,7 @@ class Profile
     /**
      * Sets the parent token.
      */
-    public function setParent(Profile $parent)
+    public function setParent(Profile $parent): void
     {
         $this->parent = $parent;
     }
@@ -111,7 +111,7 @@ class Profile
      *
      * @param string $ip
      */
-    public function setIp($ip)
+    public function setIp($ip): void
     {
         $this->ip = $ip;
     }
@@ -126,7 +126,7 @@ class Profile
         return $this->method;
     }
 
-    public function setMethod($method)
+    public function setMethod($method): void
     {
         $this->method = $method;
     }
@@ -141,7 +141,7 @@ class Profile
         return $this->url;
     }
 
-    public function setUrl($url)
+    public function setUrl($url): void
     {
         $this->url = $url;
     }
@@ -163,7 +163,7 @@ class Profile
     /**
      * @param int $time The time
      */
-    public function setTime($time)
+    public function setTime($time): void
     {
         $this->time = $time;
     }
@@ -171,7 +171,7 @@ class Profile
     /**
      * @param int $statusCode
      */
-    public function setStatusCode($statusCode)
+    public function setStatusCode($statusCode): void
     {
         $this->statusCode = $statusCode;
     }
@@ -199,7 +199,7 @@ class Profile
      *
      * @param Profile[] $children
      */
-    public function setChildren(array $children)
+    public function setChildren(array $children): void
     {
         $this->children = array();
         foreach ($children as $child) {
@@ -210,7 +210,7 @@ class Profile
     /**
      * Adds the child token.
      */
-    public function addChild(Profile $child)
+    public function addChild(Profile $child): void
     {
         $this->children[] = $child;
         $child->setParent($this);
@@ -249,7 +249,7 @@ class Profile
      *
      * @param DataCollectorInterface[] $collectors
      */
-    public function setCollectors(array $collectors)
+    public function setCollectors(array $collectors): void
     {
         $this->collectors = array();
         foreach ($collectors as $collector) {
@@ -260,7 +260,7 @@ class Profile
     /**
      * Adds a Collector.
      */
-    public function addCollector(DataCollectorInterface $collector)
+    public function addCollector(DataCollectorInterface $collector): void
     {
         $this->collectors[$collector->getName()] = $collector;
     }

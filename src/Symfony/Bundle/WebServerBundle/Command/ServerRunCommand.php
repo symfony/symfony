@@ -45,7 +45,7 @@ class ServerRunCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(
@@ -120,7 +120,7 @@ EOF
         if ($output->isQuiet()) {
             $disableOutput = true;
         } else {
-            $callback = function ($type, $buffer) use ($output) {
+            $callback = function ($type, $buffer) use ($output): void {
                 if (Process::ERR === $type && $output instanceof ConsoleOutputInterface) {
                     $output = $output->getErrorOutput();
                 }

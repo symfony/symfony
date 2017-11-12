@@ -19,7 +19,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
     protected $loader;
     protected $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader = new AnnotationDirectoryLoader(new FileLocator(), $this->getClassLoader($this->reader));
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $this->reader->expects($this->exactly(4))->method('getClassAnnotation');
 
@@ -40,7 +40,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
     }
 
-    public function testLoadIgnoresHiddenDirectories()
+    public function testLoadIgnoresHiddenDirectories(): void
     {
         $this->expectAnnotationsToBeReadFrom(array(
             'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
@@ -58,7 +58,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $fixturesDir = __DIR__.'/../Fixtures';
 
@@ -69,7 +69,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertFalse($this->loader->supports($fixturesDir, 'foo'), '->supports() checks the resource type if specified');
     }
 
-    private function expectAnnotationsToBeReadFrom(array $classes)
+    private function expectAnnotationsToBeReadFrom(array $classes): void
     {
         $this->reader->expects($this->exactly(count($classes)))
             ->method('getClassAnnotation')

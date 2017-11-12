@@ -34,7 +34,7 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
         return $this->array[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (null === $offset) {
             $this->array[] = $value;
@@ -43,7 +43,7 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
         }
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->array[$offset]);
     }
@@ -63,7 +63,7 @@ class CustomArrayObject implements \ArrayAccess, \IteratorAggregate, \Countable,
         return serialize($this->array);
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $this->array = (array) unserialize((string) $serialized);
     }

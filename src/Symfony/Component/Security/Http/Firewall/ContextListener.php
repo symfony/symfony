@@ -67,7 +67,7 @@ class ContextListener implements ListenerInterface
      *
      * @param bool $logoutOnUserChange
      */
-    public function setLogoutOnUserChange($logoutOnUserChange)
+    public function setLogoutOnUserChange($logoutOnUserChange): void
     {
         // no-op, method to be deprecated in 4.1
     }
@@ -75,7 +75,7 @@ class ContextListener implements ListenerInterface
     /**
      * Reads the Security Token from the session.
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         if (!$this->registered && null !== $this->dispatcher && $event->isMasterRequest()) {
             $this->dispatcher->addListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
@@ -116,7 +116,7 @@ class ContextListener implements ListenerInterface
     /**
      * Writes the security token into the session.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;

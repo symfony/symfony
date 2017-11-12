@@ -11,12 +11,12 @@ class DefinitionBuilderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
      */
-    public function testAddPlaceInvalidName()
+    public function testAddPlaceInvalidName(): void
     {
         $builder = new DefinitionBuilder(array('a"', 'b'));
     }
 
-    public function testSetInitialPlace()
+    public function testSetInitialPlace(): void
     {
         $builder = new DefinitionBuilder(array('a', 'b'));
         $builder->setInitialPlace('b');
@@ -25,7 +25,7 @@ class DefinitionBuilderTest extends TestCase
         $this->assertEquals('b', $definition->getInitialPlace());
     }
 
-    public function testAddTransition()
+    public function testAddTransition(): void
     {
         $places = range('a', 'b');
 
@@ -41,7 +41,7 @@ class DefinitionBuilderTest extends TestCase
         $this->assertSame($transition1, $definition->getTransitions()[1]);
     }
 
-    public function testAddPlace()
+    public function testAddPlace(): void
     {
         $builder = new DefinitionBuilder(array('a'), array());
         $builder->addPlace('b');

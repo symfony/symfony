@@ -37,7 +37,7 @@ class TemplateManagerTest extends TestCase
      */
     protected $templateManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,7 +55,7 @@ class TemplateManagerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function testGetNameOfInvalidTemplate()
+    public function testGetNameOfInvalidTemplate(): void
     {
         $profile = $this->mockProfile();
         $this->templateManager->getName($profile, 'notexistingpanel');
@@ -64,7 +64,7 @@ class TemplateManagerTest extends TestCase
     /**
      * if template exists in both profile and profiler then its name should be returned.
      */
-    public function testGetNameValidTemplate()
+    public function testGetNameValidTemplate(): void
     {
         $this->profiler->expects($this->any())
             ->method('has')

@@ -17,13 +17,13 @@ use Symfony\Component\Config\Loader\DelegatingLoader;
 
 class DelegatingLoaderTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $loader = new DelegatingLoader($resolver = new LoaderResolver());
         $this->assertTrue(true, '__construct() takes a loader resolver as its first argument');
     }
 
-    public function testGetSetResolver()
+    public function testGetSetResolver(): void
     {
         $resolver = new LoaderResolver();
         $loader = new DelegatingLoader($resolver);
@@ -32,7 +32,7 @@ class DelegatingLoaderTest extends TestCase
         $this->assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader1 = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $loader1->expects($this->once())->method('supports')->will($this->returnValue(true));
@@ -45,7 +45,7 @@ class DelegatingLoaderTest extends TestCase
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $loader->expects($this->once())->method('supports')->will($this->returnValue(true));
@@ -59,7 +59,7 @@ class DelegatingLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Config\Exception\FileLoaderLoadException
      */
-    public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded()
+    public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded(): void
     {
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $loader->expects($this->once())->method('supports')->will($this->returnValue(false));

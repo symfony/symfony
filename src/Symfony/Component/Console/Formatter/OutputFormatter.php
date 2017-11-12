@@ -84,7 +84,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function setDecorated($decorated)
+    public function setDecorated($decorated): void
     {
         $this->decorated = (bool) $decorated;
     }
@@ -100,7 +100,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function setStyle($name, OutputFormatterStyleInterface $style)
+    public function setStyle($name, OutputFormatterStyleInterface $style): void
     {
         $this->styles[strtolower($name)] = $style;
     }

@@ -80,7 +80,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param array $headers An array of HTTP headers
      */
-    public function replace(array $headers = array())
+    public function replace(array $headers = array()): void
     {
         $this->headers = array();
         $this->add($headers);
@@ -91,7 +91,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param array $headers An array of HTTP headers
      */
-    public function add(array $headers)
+    public function add(array $headers): void
     {
         foreach ($headers as $key => $values) {
             $this->set($key, $values);
@@ -134,7 +134,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string|array $values  The value or an array of values
      * @param bool         $replace Whether to replace the actual value or not (true by default)
      */
-    public function set($key, $values, $replace = true)
+    public function set($key, $values, $replace = true): void
     {
         $key = str_replace('_', '-', strtolower($key));
 
@@ -189,7 +189,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The HTTP header name
      */
-    public function remove($key)
+    public function remove($key): void
     {
         $key = str_replace('_', '-', strtolower($key));
 
@@ -229,7 +229,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string $key   The Cache-Control directive name
      * @param mixed  $value The Cache-Control directive value
      */
-    public function addCacheControlDirective($key, $value = true)
+    public function addCacheControlDirective($key, $value = true): void
     {
         $this->cacheControl[$key] = $value;
 
@@ -265,7 +265,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The Cache-Control directive
      */
-    public function removeCacheControlDirective($key)
+    public function removeCacheControlDirective($key): void
     {
         unset($this->cacheControl[$key]);
 

@@ -25,7 +25,7 @@ class SessionLogoutHandler implements LogoutHandlerInterface
     /**
      * Invalidate the current session.
      */
-    public function logout(Request $request, Response $response, TokenInterface $token)
+    public function logout(Request $request, Response $response, TokenInterface $token): void
     {
         $request->getSession()->invalidate();
     }

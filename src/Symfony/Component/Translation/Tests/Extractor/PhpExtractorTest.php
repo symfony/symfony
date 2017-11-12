@@ -22,7 +22,7 @@ class PhpExtractorTest extends TestCase
      *
      * @param array|string $resource
      */
-    public function testExtraction($resource)
+    public function testExtraction($resource): void
     {
         // Arrange
         $extractor = new PhpExtractor();

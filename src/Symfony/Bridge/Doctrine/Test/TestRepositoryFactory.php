@@ -40,7 +40,7 @@ final class TestRepositoryFactory implements RepositoryFactory
         return $this->repositoryList[$repositoryHash] = $this->createRepository($entityManager, $entityName);
     }
 
-    public function setRepository(EntityManagerInterface $entityManager, $entityName, ObjectRepository $repository)
+    public function setRepository(EntityManagerInterface $entityManager, $entityName, ObjectRepository $repository): void
     {
         $repositoryHash = $this->getRepositoryHash($entityManager, $entityName);
 

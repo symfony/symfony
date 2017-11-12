@@ -82,12 +82,12 @@ class Command
      *
      * This is mainly useful for the help command.
      */
-    public function ignoreValidationErrors()
+    public function ignoreValidationErrors(): void
     {
         $this->ignoreValidationErrors = true;
     }
 
-    public function setApplication(Application $application = null)
+    public function setApplication(Application $application = null): void
     {
         $this->application = $application;
         if ($application) {
@@ -97,7 +97,7 @@ class Command
         }
     }
 
-    public function setHelperSet(HelperSet $helperSet)
+    public function setHelperSet(HelperSet $helperSet): void
     {
         $this->helperSet = $helperSet;
     }
@@ -138,7 +138,7 @@ class Command
     /**
      * Configures the current command.
      */
-    protected function configure()
+    protected function configure(): void
     {
     }
 
@@ -168,7 +168,7 @@ class Command
      * This means that this is the only place where the command can
      * interactively ask for values of missing required arguments.
      */
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
     }
 
@@ -178,7 +178,7 @@ class Command
      * This is mainly useful when a lot of commands extends one main command
      * where some things need to be initialized based on the input arguments and options.
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
     }
 
@@ -290,7 +290,7 @@ class Command
      *
      * @param bool $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    public function mergeApplicationDefinition($mergeArgs = true)
+    public function mergeApplicationDefinition($mergeArgs = true): void
     {
         if (null === $this->application || (true === $this->applicationDefinitionMerged && ($this->applicationDefinitionMergedWithArgs || !$mergeArgs))) {
             return;
@@ -638,7 +638,7 @@ class Command
      *
      * @throws InvalidArgumentException When the name is invalid
      */
-    private function validateName(string $name)
+    private function validateName(string $name): void
     {
         if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));

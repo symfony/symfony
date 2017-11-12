@@ -46,7 +46,7 @@ class FilterControllerEvent extends KernelEvent
         return $this->controller;
     }
 
-    public function setController(callable $controller)
+    public function setController(callable $controller): void
     {
         $this->controller = $controller;
     }

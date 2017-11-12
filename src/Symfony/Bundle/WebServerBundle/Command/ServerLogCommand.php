@@ -40,7 +40,7 @@ class ServerLogCommand extends Command
         return parent::isEnabled();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         if (!class_exists(ConsoleFormatter::class)) {
             return;
@@ -67,7 +67,7 @@ EOF
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $filter = $input->getOption('filter');
         if ($filter) {
@@ -133,7 +133,7 @@ EOF
         }
     }
 
-    private function displayLog(InputInterface $input, OutputInterface $output, $clientId, array $record)
+    private function displayLog(InputInterface $input, OutputInterface $output, $clientId, array $record): void
     {
         if ($this->handler->isHandling($record)) {
             if (isset($record['log_id'])) {

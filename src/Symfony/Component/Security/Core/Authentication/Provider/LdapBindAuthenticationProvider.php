@@ -49,7 +49,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
      *
      * @param string $queryString
      */
-    public function setQueryString($queryString)
+    public function setQueryString($queryString): void
     {
         $this->queryString = $queryString;
     }
@@ -69,7 +69,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
     /**
      * {@inheritdoc}
      */
-    protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
+    protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token): void
     {
         $username = $token->getUsername();
         $password = $token->getCredentials();

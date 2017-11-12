@@ -17,14 +17,14 @@ class IntegerTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\IntegerType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
     }
 
-    public function testSubmitCastsToInteger()
+    public function testSubmitCastsToInteger(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
 
@@ -34,7 +34,7 @@ class IntegerTypeTest extends BaseTypeTest
         $this->assertSame('1', $form->getViewData());
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }

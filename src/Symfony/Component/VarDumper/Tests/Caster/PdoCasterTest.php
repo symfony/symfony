@@ -26,7 +26,7 @@ class PdoCasterTest extends TestCase
     /**
      * @requires extension pdo_sqlite
      */
-    public function testCastPdo()
+    public function testCastPdo(): void
     {
         $pdo = new \PDO('sqlite::memory:');
         $pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('PDOStatement', array($pdo)));

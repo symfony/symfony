@@ -36,7 +36,7 @@ class ChainLoader extends Loader
     /**
      * Adds a loader instance.
      */
-    public function addLoader(LoaderInterface $loader)
+    public function addLoader(LoaderInterface $loader): void
     {
         $this->loaders[] = $loader;
     }

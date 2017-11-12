@@ -15,12 +15,12 @@ class TextTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\TextType';
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullReturnsNullWithEmptyDataAsString()
+    public function testSubmitNullReturnsNullWithEmptyDataAsString(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, 'name', array(
             'empty_data' => '',
@@ -46,7 +46,7 @@ class TextTypeTest extends BaseTypeTest
      *
      * @see https://github.com/symfony/symfony/issues/1986
      */
-    public function testSetDataThroughParamsWithZero($data, $dataAsString)
+    public function testSetDataThroughParamsWithZero($data, $dataAsString): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'data' => $data,

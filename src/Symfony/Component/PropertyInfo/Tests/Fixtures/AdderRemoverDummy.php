@@ -19,11 +19,11 @@ class AdderRemoverDummy
     private $analyses;
     private $feet;
 
-    public function addAnalyse(Dummy $analyse)
+    public function addAnalyse(Dummy $analyse): void
     {
     }
 
-    public function removeFoot(Dummy $foot)
+    public function removeFoot(Dummy $foot): void
     {
     }
 }

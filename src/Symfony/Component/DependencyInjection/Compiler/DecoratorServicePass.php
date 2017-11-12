@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Alias;
  */
 class DecoratorServicePass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $definitions = new \SplPriorityQueue();
         $order = PHP_INT_MAX;

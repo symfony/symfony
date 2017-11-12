@@ -25,7 +25,7 @@ class ProfilerListenerTest extends TestCase
     /**
      * Test a master and sub request with an exception and `onlyException` profiler option enabled.
      */
-    public function testKernelTerminate()
+    public function testKernelTerminate(): void
     {
         $profile = $this->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profile')
             ->disableOriginalConstructor()

@@ -32,7 +32,7 @@ class LocaleScannerTest extends TestCase
      */
     private $scanner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->directory = sys_get_temp_dir().'/LocaleScannerTest/'.mt_rand(1000, 9999);
         $this->filesystem = new Filesystem();
@@ -56,19 +56,19 @@ class LocaleScannerTest extends TestCase
         file_put_contents($this->directory.'/fr_alias.txt', 'fr_alias{"%%ALIAS"{"fr"}}');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->filesystem->remove($this->directory);
     }
 
-    public function testScanLocales()
+    public function testScanLocales(): void
     {
         $sortedLocales = array('de', 'de_alias', 'en', 'en_alias', 'fr', 'fr_alias');
 
         $this->assertSame($sortedLocales, $this->scanner->scanLocales($this->directory));
     }
 
-    public function testScanAliases()
+    public function testScanAliases(): void
     {
         $sortedAliases = array('de_alias' => 'de', 'en_alias' => 'en', 'fr_alias' => 'fr');
 

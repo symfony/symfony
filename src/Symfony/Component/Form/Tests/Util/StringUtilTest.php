@@ -16,7 +16,7 @@ use Symfony\Component\Form\Util\StringUtil;
 
 class StringUtilTest extends TestCase
 {
-    public function testTrim()
+    public function testTrim(): void
     {
         $data = ' Foo! ';
 
@@ -26,7 +26,7 @@ class StringUtilTest extends TestCase
     /**
      * @dataProvider spaceProvider
      */
-    public function testTrimUtf8Separators($hex)
+    public function testTrimUtf8Separators($hex): void
     {
         // Convert hexadecimal representation into binary
         // H: hex string, high nibble first (UCS-2BE)
@@ -79,7 +79,7 @@ class StringUtilTest extends TestCase
     /**
      * @dataProvider fqcnToBlockPrefixProvider
      */
-    public function testFqcnToBlockPrefix($fqcn, $expectedBlockPrefix)
+    public function testFqcnToBlockPrefix($fqcn, $expectedBlockPrefix): void
     {
         $blockPrefix = StringUtil::fqcnToBlockPrefix($fqcn);
 

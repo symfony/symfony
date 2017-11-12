@@ -285,7 +285,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
      */
     protected $dataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -297,7 +297,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
 
     abstract protected function getDataDirectory();
 
-    public function testGetRegions()
+    public function testGetRegions(): void
     {
         $this->assertSame(static::$territories, $this->dataProvider->getRegions());
     }
@@ -305,7 +305,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetNames($displayLocale)
+    public function testGetNames($displayLocale): void
     {
         $countries = array_keys($this->dataProvider->getNames($displayLocale));
 
@@ -314,7 +314,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
         $this->assertSame(static::$territories, $countries);
     }
 
-    public function testGetNamesDefaultLocale()
+    public function testGetNamesDefaultLocale(): void
     {
         Locale::setDefault('de_AT');
 
@@ -327,7 +327,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocaleAliases
      */
-    public function testGetNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale): void
     {
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
@@ -341,7 +341,7 @@ abstract class AbstractRegionDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetName($displayLocale)
+    public function testGetName($displayLocale): void
     {
         $names = $this->dataProvider->getNames($displayLocale);
 

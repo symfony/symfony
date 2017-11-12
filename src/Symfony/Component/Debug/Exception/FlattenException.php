@@ -87,7 +87,7 @@ class FlattenException
         return $this->statusCode;
     }
 
-    public function setStatusCode($code)
+    public function setStatusCode($code): void
     {
         $this->statusCode = $code;
     }
@@ -97,7 +97,7 @@ class FlattenException
         return $this->headers;
     }
 
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers): void
     {
         $this->headers = $headers;
     }
@@ -107,7 +107,7 @@ class FlattenException
         return $this->class;
     }
 
-    public function setClass($class)
+    public function setClass($class): void
     {
         $this->class = $class;
     }
@@ -117,7 +117,7 @@ class FlattenException
         return $this->file;
     }
 
-    public function setFile($file)
+    public function setFile($file): void
     {
         $this->file = $file;
     }
@@ -127,7 +127,7 @@ class FlattenException
         return $this->line;
     }
 
-    public function setLine($line)
+    public function setLine($line): void
     {
         $this->line = $line;
     }
@@ -137,7 +137,7 @@ class FlattenException
         return $this->message;
     }
 
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->message = $message;
     }
@@ -147,7 +147,7 @@ class FlattenException
         return $this->code;
     }
 
-    public function setCode($code)
+    public function setCode($code): void
     {
         $this->code = $code;
     }
@@ -157,7 +157,7 @@ class FlattenException
         return $this->previous;
     }
 
-    public function setPrevious(FlattenException $previous)
+    public function setPrevious(FlattenException $previous): void
     {
         $this->previous = $previous;
     }
@@ -178,12 +178,12 @@ class FlattenException
         return $this->trace;
     }
 
-    public function setTraceFromException(\Exception $exception)
+    public function setTraceFromException(\Exception $exception): void
     {
         $this->setTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
     }
 
-    public function setTrace($trace, $file, $line)
+    public function setTrace($trace, $file, $line): void
     {
         $this->trace = array();
         $this->trace[] = array(

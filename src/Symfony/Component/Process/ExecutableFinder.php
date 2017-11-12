@@ -24,7 +24,7 @@ class ExecutableFinder
     /**
      * Replaces default suffixes of executable.
      */
-    public function setSuffixes(array $suffixes)
+    public function setSuffixes(array $suffixes): void
     {
         $this->suffixes = $suffixes;
     }
@@ -34,7 +34,7 @@ class ExecutableFinder
      *
      * @param string $suffix
      */
-    public function addSuffix($suffix)
+    public function addSuffix($suffix): void
     {
         $this->suffixes[] = $suffix;
     }

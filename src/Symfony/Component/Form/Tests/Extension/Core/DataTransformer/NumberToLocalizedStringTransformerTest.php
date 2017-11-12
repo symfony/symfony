@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class NumberToLocalizedStringTransformerTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @dataProvider provideTransformations
      */
-    public function testTransform($from, $to, $locale)
+    public function testTransform($from, $to, $locale): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -66,7 +66,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @dataProvider provideTransformationsWithGrouping
      */
-    public function testTransformWithGrouping($from, $to, $locale)
+    public function testTransformWithGrouping($from, $to, $locale): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -78,7 +78,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $this->assertSame($to, $transformer->transform($from));
     }
 
-    public function testTransformWithScale()
+    public function testTransformWithScale(): void
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -183,7 +183,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @dataProvider transformWithRoundingProvider
      */
-    public function testTransformWithRounding($scale, $input, $output, $roundingMode)
+    public function testTransformWithRounding($scale, $input, $output, $roundingMode): void
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -195,7 +195,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformDoesNotRoundIfNoScale()
+    public function testTransformDoesNotRoundIfNoScale(): void
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -210,7 +210,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @dataProvider provideTransformations
      */
-    public function testReverseTransform($to, $from, $locale)
+    public function testReverseTransform($to, $from, $locale): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -225,7 +225,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @dataProvider provideTransformationsWithGrouping
      */
-    public function testReverseTransformWithGrouping($to, $from, $locale)
+    public function testReverseTransformWithGrouping($to, $from, $locale): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
@@ -240,7 +240,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @see https://github.com/symfony/symfony/issues/7609
      */
-    public function testReverseTransformWithGroupingAndFixedSpaces()
+    public function testReverseTransformWithGroupingAndFixedSpaces(): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -252,7 +252,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(1234.5, $transformer->reverseTransform("1\xc2\xa0234,5"));
     }
 
-    public function testReverseTransformWithGroupingButWithoutGroupSeparator()
+    public function testReverseTransformWithGroupingButWithoutGroupSeparator(): void
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -360,21 +360,21 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @dataProvider reverseTransformWithRoundingProvider
      */
-    public function testReverseTransformWithRounding($scale, $input, $output, $roundingMode)
+    public function testReverseTransformWithRounding($scale, $input, $output, $roundingMode): void
     {
         $transformer = new NumberToLocalizedStringTransformer($scale, null, $roundingMode);
 
         $this->assertEquals($output, $transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformDoesNotRoundIfNoScale()
+    public function testReverseTransformDoesNotRoundIfNoScale(): void
     {
         $transformer = new NumberToLocalizedStringTransformer(null, null, NumberToLocalizedStringTransformer::ROUND_DOWN);
 
         $this->assertEquals(1234.547, $transformer->reverseTransform('1234,547'));
     }
 
-    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot(): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
@@ -394,7 +394,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot(): void
     {
         // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
@@ -409,7 +409,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDotWithNoGroupSep()
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDotWithNoGroupSep(): void
     {
         // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
@@ -421,7 +421,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('1234.5');
     }
 
-    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsDotButNoGroupingUsed()
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsDotButNoGroupingUsed(): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -433,7 +433,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
     }
 
-    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma()
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma(): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
@@ -453,7 +453,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma(): void
     {
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
@@ -465,7 +465,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsCommaWithNoGroupSep()
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsCommaWithNoGroupSep(): void
     {
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
@@ -474,7 +474,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('1234,5');
     }
 
-    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsCommaButNoGroupingUsed()
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsCommaButNoGroupingUsed(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -485,7 +485,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testTransformExpectsNumeric()
+    public function testTransformExpectsNumeric(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -495,7 +495,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformExpectsString()
+    public function testReverseTransformExpectsString(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -505,7 +505,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformExpectsValidNumber()
+    public function testReverseTransformExpectsValidNumber(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -517,7 +517,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
      *
      * @see https://github.com/symfony/symfony/issues/3161
      */
-    public function testReverseTransformDisallowsNaN()
+    public function testReverseTransformDisallowsNaN(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -527,7 +527,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformDisallowsNaN2()
+    public function testReverseTransformDisallowsNaN2(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -537,7 +537,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformDisallowsInfinity()
+    public function testReverseTransformDisallowsInfinity(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -547,7 +547,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformDisallowsInfinity2()
+    public function testReverseTransformDisallowsInfinity2(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -557,7 +557,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformDisallowsNegativeInfinity()
+    public function testReverseTransformDisallowsNegativeInfinity(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -567,7 +567,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformDisallowsLeadingExtraCharacters()
+    public function testReverseTransformDisallowsLeadingExtraCharacters(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -578,7 +578,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      * @expectedExceptionMessage The number contains unrecognized characters: "foo3"
      */
-    public function testReverseTransformDisallowsCenteredExtraCharacters()
+    public function testReverseTransformDisallowsCenteredExtraCharacters(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -589,7 +589,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      * @expectedExceptionMessage The number contains unrecognized characters: "foo8"
      */
-    public function testReverseTransformDisallowsCenteredExtraCharactersMultibyte()
+    public function testReverseTransformDisallowsCenteredExtraCharactersMultibyte(): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -605,7 +605,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      * @expectedExceptionMessage The number contains unrecognized characters: "foo8"
      */
-    public function testReverseTransformIgnoresTrailingSpacesInExceptionMessage()
+    public function testReverseTransformIgnoresTrailingSpacesInExceptionMessage(): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -621,7 +621,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      * @expectedExceptionMessage The number contains unrecognized characters: "foo"
      */
-    public function testReverseTransformDisallowsTrailingExtraCharacters()
+    public function testReverseTransformDisallowsTrailingExtraCharacters(): void
     {
         $transformer = new NumberToLocalizedStringTransformer();
 
@@ -632,7 +632,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      * @expectedExceptionMessage The number contains unrecognized characters: "foo"
      */
-    public function testReverseTransformDisallowsTrailingExtraCharactersMultibyte()
+    public function testReverseTransformDisallowsTrailingExtraCharactersMultibyte(): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -644,14 +644,14 @@ class NumberToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform("12\xc2\xa0345,678foo");
     }
 
-    public function testReverseTransformBigInt()
+    public function testReverseTransformBigInt(): void
     {
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
         $this->assertEquals(PHP_INT_MAX - 1, (int) $transformer->reverseTransform((string) (PHP_INT_MAX - 1)));
     }
 
-    public function testReverseTransformSmallInt()
+    public function testReverseTransformSmallInt(): void
     {
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 

@@ -65,7 +65,7 @@ class AnonymousToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->secret, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);

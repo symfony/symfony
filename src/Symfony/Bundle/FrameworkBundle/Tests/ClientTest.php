@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ClientTest extends WebTestCase
 {
-    public function testRebootKernelBetweenRequests()
+    public function testRebootKernelBetweenRequests(): void
     {
         $mock = $this->getKernelMock();
         $mock->expects($this->once())->method('shutdown');
@@ -27,7 +27,7 @@ class ClientTest extends WebTestCase
         $client->request('GET', '/');
     }
 
-    public function testDisabledRebootKernel()
+    public function testDisabledRebootKernel(): void
     {
         $mock = $this->getKernelMock();
         $mock->expects($this->never())->method('shutdown');
@@ -38,7 +38,7 @@ class ClientTest extends WebTestCase
         $client->request('GET', '/');
     }
 
-    public function testEnableRebootKernel()
+    public function testEnableRebootKernel(): void
     {
         $mock = $this->getKernelMock();
         $mock->expects($this->once())->method('shutdown');

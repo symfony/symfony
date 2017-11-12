@@ -39,7 +39,7 @@ class ServiceClosureArgument implements ArgumentInterface
     /**
      * {@inheritdoc}
      */
-    public function setValues(array $values)
+    public function setValues(array $values): void
     {
         if (array(0) !== array_keys($values) || !($values[0] instanceof Reference || null === $values[0])) {
             throw new InvalidArgumentException('A ServiceClosureArgument must hold one and only one Reference.');

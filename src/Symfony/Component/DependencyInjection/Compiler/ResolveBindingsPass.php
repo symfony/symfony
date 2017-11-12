@@ -30,7 +30,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         try {
             parent::process($container);

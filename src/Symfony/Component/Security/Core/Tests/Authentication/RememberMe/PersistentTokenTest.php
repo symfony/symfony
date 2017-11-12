@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 
 class PersistentTokenTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $lastUsed = new \DateTime();
         $token = new PersistentToken('fooclass', 'fooname', 'fooseries', 'footokenvalue', $lastUsed);

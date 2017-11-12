@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ObjectRouteLoaderTest extends TestCase
 {
-    public function testLoadCallsServiceAndReturnsCollection()
+    public function testLoadCallsServiceAndReturnsCollection(): void
     {
         $loader = new ObjectRouteLoaderForTest();
 
@@ -44,7 +44,7 @@ class ObjectRouteLoaderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @dataProvider getBadResourceStrings
      */
-    public function testExceptionWithoutSyntax($resourceString)
+    public function testExceptionWithoutSyntax($resourceString): void
     {
         $loader = new ObjectRouteLoaderForTest();
         $loader->load($resourceString);
@@ -62,7 +62,7 @@ class ObjectRouteLoaderTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testExceptionOnNoObjectReturned()
+    public function testExceptionOnNoObjectReturned(): void
     {
         $loader = new ObjectRouteLoaderForTest();
         $loader->loaderMap = array('my_service' => 'NOT_AN_OBJECT');
@@ -72,7 +72,7 @@ class ObjectRouteLoaderTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      */
-    public function testExceptionOnBadMethod()
+    public function testExceptionOnBadMethod(): void
     {
         $loader = new ObjectRouteLoaderForTest();
         $loader->loaderMap = array('my_service' => new \stdClass());
@@ -82,7 +82,7 @@ class ObjectRouteLoaderTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testExceptionOnMethodNotReturningCollection()
+    public function testExceptionOnMethodNotReturningCollection(): void
     {
         $service = $this->getMockBuilder('stdClass')
             ->setMethods(array('loadRoutes'))

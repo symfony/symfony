@@ -19,7 +19,7 @@ use Symfony\Component\ExpressionLanguage\Tests\Fixtures\TestProvider;
 
 class ExpressionLanguageTest extends TestCase
 {
-    public function testCachedParse()
+    public function testCachedParse(): void
     {
         $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
         $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
@@ -45,7 +45,7 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression): void {
                 $savedParsedExpression = $parsedExpression;
             }))
         ;
@@ -63,7 +63,7 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame($savedParsedExpression, $parsedExpression);
     }
 
-    public function testConstantFunction()
+    public function testConstantFunction(): void
     {
         $expressionLanguage = new ExpressionLanguage();
         $this->assertEquals(PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
@@ -72,7 +72,7 @@ class ExpressionLanguageTest extends TestCase
         $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
     }
 
-    public function testProviders()
+    public function testProviders(): void
     {
         $expressionLanguage = new ExpressionLanguage(null, array(new TestProvider()));
         $this->assertEquals('foo', $expressionLanguage->evaluate('identity("foo")'));
@@ -88,7 +88,7 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider shortCircuitProviderEvaluate
      */
-    public function testShortCircuitOperatorsEvaluate($expression, array $values, $expected)
+    public function testShortCircuitOperatorsEvaluate($expression, array $values, $expected): void
     {
         $expressionLanguage = new ExpressionLanguage();
         $this->assertEquals($expected, $expressionLanguage->evaluate($expression, $values));
@@ -97,7 +97,7 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider shortCircuitProviderCompile
      */
-    public function testShortCircuitOperatorsCompile($expression, array $names, $expected)
+    public function testShortCircuitOperatorsCompile($expression, array $names, $expected): void
     {
         $result = null;
         $expressionLanguage = new ExpressionLanguage();
@@ -128,7 +128,7 @@ class ExpressionLanguageTest extends TestCase
         );
     }
 
-    public function testCachingForOverriddenVariableNames()
+    public function testCachingForOverriddenVariableNames(): void
     {
         $expressionLanguage = new ExpressionLanguage();
         $expression = 'a + b';
@@ -137,7 +137,7 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame('($a + $B)', $result);
     }
 
-    public function testCachingWithDifferentNamesOrder()
+    public function testCachingWithDifferentNamesOrder(): void
     {
         $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
         $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
@@ -163,7 +163,7 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression) {
+            ->will($this->returnCallback(function ($parsedExpression) use (&$savedParsedExpression): void {
                 $savedParsedExpression = $parsedExpression;
             }))
         ;
@@ -183,7 +183,7 @@ class ExpressionLanguageTest extends TestCase
      * @dataProvider getRegisterCallbacks
      * @expectedException \LogicException
      */
-    public function testRegisterAfterParse($registerCallback)
+    public function testRegisterAfterParse($registerCallback): void
     {
         $el = new ExpressionLanguage();
         $el->parse('1 + 1', array());
@@ -194,7 +194,7 @@ class ExpressionLanguageTest extends TestCase
      * @dataProvider getRegisterCallbacks
      * @expectedException \LogicException
      */
-    public function testRegisterAfterEval($registerCallback)
+    public function testRegisterAfterEval($registerCallback): void
     {
         $el = new ExpressionLanguage();
         $el->evaluate('1 + 1');
@@ -205,7 +205,7 @@ class ExpressionLanguageTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessageRegExp  /Unable to call method "\w+" of object "\w+"./
      */
-    public function testCallBadCallable()
+    public function testCallBadCallable(): void
     {
         $el = new ExpressionLanguage();
         $el->evaluate('foo.myfunction()', array('foo' => new \stdClass()));
@@ -215,7 +215,7 @@ class ExpressionLanguageTest extends TestCase
      * @dataProvider getRegisterCallbacks
      * @expectedException \LogicException
      */
-    public function testRegisterAfterCompile($registerCallback)
+    public function testRegisterAfterCompile($registerCallback): void
     {
         $el = new ExpressionLanguage();
         $el->compile('1 + 1');
@@ -226,17 +226,17 @@ class ExpressionLanguageTest extends TestCase
     {
         return array(
             array(
-                function (ExpressionLanguage $el) {
-                    $el->register('fn', function () {}, function () {});
+                function (ExpressionLanguage $el): void {
+                    $el->register('fn', function (): void {}, function (): void {});
                 },
             ),
             array(
-                function (ExpressionLanguage $el) {
-                    $el->addFunction(new ExpressionFunction('fn', function () {}, function () {}));
+                function (ExpressionLanguage $el): void {
+                    $el->addFunction(new ExpressionFunction('fn', function (): void {}, function (): void {}));
                 },
             ),
             array(
-                function (ExpressionLanguage $el) {
+                function (ExpressionLanguage $el): void {
                     $el->registerProvider(new TestProvider());
                 },
             ),

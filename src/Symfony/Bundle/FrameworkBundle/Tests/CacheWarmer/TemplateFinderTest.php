@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BaseBundle\BaseBundle;
 
 class TemplateFinderTest extends TestCase
 {
-    public function testFindAllTemplates()
+    public function testFindAllTemplates(): void
     {
         $kernel = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')

@@ -23,7 +23,7 @@ class ResizeFormListenerTest extends TestCase
     private $factory;
     private $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
@@ -33,7 +33,7 @@ class ResizeFormListenerTest extends TestCase
             ->getForm();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dispatcher = null;
         $this->factory = null;
@@ -63,7 +63,7 @@ class ResizeFormListenerTest extends TestCase
         return $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
     }
 
-    public function testPreSetDataResizesForm()
+    public function testPreSetDataResizesForm(): void
     {
         $this->form->add($this->getForm('0'));
         $this->form->add($this->getForm('1'));
@@ -90,7 +90,7 @@ class ResizeFormListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testPreSetDataRequiresArrayOrTraversable()
+    public function testPreSetDataRequiresArrayOrTraversable(): void
     {
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
@@ -98,7 +98,7 @@ class ResizeFormListenerTest extends TestCase
         $listener->preSetData($event);
     }
 
-    public function testPreSetDataDealsWithNullData()
+    public function testPreSetDataDealsWithNullData(): void
     {
         $this->factory->expects($this->never())->method('createNamed');
 
@@ -108,7 +108,7 @@ class ResizeFormListenerTest extends TestCase
         $listener->preSetData($event);
     }
 
-    public function testPreSubmitResizesUpIfAllowAdd()
+    public function testPreSubmitResizesUpIfAllowAdd(): void
     {
         $this->form->add($this->getForm('0'));
 
@@ -126,7 +126,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertTrue($this->form->has('1'));
     }
 
-    public function testPreSubmitResizesDownIfAllowDelete()
+    public function testPreSubmitResizesDownIfAllowDelete(): void
     {
         $this->form->add($this->getForm('0'));
         $this->form->add($this->getForm('1'));
@@ -141,7 +141,7 @@ class ResizeFormListenerTest extends TestCase
     }
 
     // fix for https://github.com/symfony/symfony/pull/493
-    public function testPreSubmitRemovesZeroKeys()
+    public function testPreSubmitRemovesZeroKeys(): void
     {
         $this->form->add($this->getForm('0'));
 
@@ -153,7 +153,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertFalse($this->form->has('0'));
     }
 
-    public function testPreSubmitDoesNothingIfNotAllowAddNorAllowDelete()
+    public function testPreSubmitDoesNothingIfNotAllowAddNorAllowDelete(): void
     {
         $this->form->add($this->getForm('0'));
         $this->form->add($this->getForm('1'));
@@ -168,7 +168,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertFalse($this->form->has('2'));
     }
 
-    public function testPreSubmitDealsWithNoArrayOrTraversable()
+    public function testPreSubmitDealsWithNoArrayOrTraversable(): void
     {
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
@@ -178,7 +178,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertFalse($this->form->has('1'));
     }
 
-    public function testPreSubmitDealsWithNullData()
+    public function testPreSubmitDealsWithNullData(): void
     {
         $this->form->add($this->getForm('1'));
 
@@ -191,7 +191,7 @@ class ResizeFormListenerTest extends TestCase
     }
 
     // fixes https://github.com/symfony/symfony/pull/40
-    public function testPreSubmitDealsWithEmptyData()
+    public function testPreSubmitDealsWithEmptyData(): void
     {
         $this->form->add($this->getForm('1'));
 
@@ -203,7 +203,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertFalse($this->form->has('1'));
     }
 
-    public function testOnSubmitNormDataRemovesEntriesMissingInTheFormIfAllowDelete()
+    public function testOnSubmitNormDataRemovesEntriesMissingInTheFormIfAllowDelete(): void
     {
         $this->form->add($this->getForm('1'));
 
@@ -215,7 +215,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertEquals(array(1 => 'second'), $event->getData());
     }
 
-    public function testOnSubmitNormDataDoesNothingIfNotAllowDelete()
+    public function testOnSubmitNormDataDoesNothingIfNotAllowDelete(): void
     {
         $this->form->add($this->getForm('1'));
 
@@ -230,7 +230,7 @@ class ResizeFormListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testOnSubmitNormDataRequiresArrayOrTraversable()
+    public function testOnSubmitNormDataRequiresArrayOrTraversable(): void
     {
         $data = 'no array or traversable';
         $event = new FormEvent($this->form, $data);
@@ -238,7 +238,7 @@ class ResizeFormListenerTest extends TestCase
         $listener->onSubmit($event);
     }
 
-    public function testOnSubmitNormDataDealsWithNullData()
+    public function testOnSubmitNormDataDealsWithNullData(): void
     {
         $this->form->add($this->getForm('1'));
 
@@ -250,7 +250,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertEquals(array(), $event->getData());
     }
 
-    public function testOnSubmitDealsWithObjectBackedIteratorAggregate()
+    public function testOnSubmitDealsWithObjectBackedIteratorAggregate(): void
     {
         $this->form->add($this->getForm('1'));
 
@@ -263,7 +263,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertArrayNotHasKey(2, $event->getData());
     }
 
-    public function testOnSubmitDealsWithArrayBackedIteratorAggregate()
+    public function testOnSubmitDealsWithArrayBackedIteratorAggregate(): void
     {
         $this->form->add($this->getForm('1'));
 
@@ -276,7 +276,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertArrayNotHasKey(2, $event->getData());
     }
 
-    public function testOnSubmitDeleteEmptyNotCompoundEntriesIfAllowDelete()
+    public function testOnSubmitDeleteEmptyNotCompoundEntriesIfAllowDelete(): void
     {
         $this->form->setData(array('0' => 'first', '1' => 'second'));
         $this->form->add($this->getForm('0'));
@@ -293,7 +293,7 @@ class ResizeFormListenerTest extends TestCase
         $this->assertEquals(array(0 => 'first'), $event->getData());
     }
 
-    public function testOnSubmitDeleteEmptyCompoundEntriesIfAllowDelete()
+    public function testOnSubmitDeleteEmptyCompoundEntriesIfAllowDelete(): void
     {
         $this->form->setData(array('0' => array('name' => 'John'), '1' => array('name' => 'Jane')));
         $form1 = $this->getBuilder('0')

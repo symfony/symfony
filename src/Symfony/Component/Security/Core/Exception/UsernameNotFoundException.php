@@ -44,7 +44,7 @@ class UsernameNotFoundException extends AuthenticationException
      *
      * @param string $username
      */
-    public function setUsername($username)
+    public function setUsername($username): void
     {
         $this->username = $username;
     }
@@ -63,7 +63,7 @@ class UsernameNotFoundException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function unserialize($str)
+    public function unserialize($str): void
     {
         list($this->username, $parentData) = unserialize($str);
 

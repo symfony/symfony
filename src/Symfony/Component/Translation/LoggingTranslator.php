@@ -64,7 +64,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
         $this->translator->setLocale($locale);
     }
@@ -114,7 +114,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
      * @param string|null $domain
      * @param string|null $locale
      */
-    private function log($id, $domain, $locale)
+    private function log($id, $domain, $locale): void
     {
         if (null === $domain) {
             $domain = 'messages';

@@ -26,17 +26,17 @@ class TestAppKernel extends Kernel
         );
     }
 
-    public function setRootDir($rootDir)
+    public function setRootDir($rootDir): void
     {
         $this->rootDir = $rootDir;
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.DIRECTORY_SEPARATOR.'config.yml');
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         $container->register('logger', NullLogger::class);
     }

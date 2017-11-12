@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SurrogateListenerTest extends TestCase
 {
-    public function testFilterDoesNothingForSubRequests()
+    public function testFilterDoesNothingForSubRequests(): void
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
@@ -37,7 +37,7 @@ class SurrogateListenerTest extends TestCase
         $this->assertEquals('', $event->getResponse()->headers->get('Surrogate-Control'));
     }
 
-    public function testFilterWhenThereIsSomeEsiIncludes()
+    public function testFilterWhenThereIsSomeEsiIncludes(): void
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
@@ -51,7 +51,7 @@ class SurrogateListenerTest extends TestCase
         $this->assertEquals('content="ESI/1.0"', $event->getResponse()->headers->get('Surrogate-Control'));
     }
 
-    public function testFilterWhenThereIsNoEsiIncludes()
+    public function testFilterWhenThereIsNoEsiIncludes(): void
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();

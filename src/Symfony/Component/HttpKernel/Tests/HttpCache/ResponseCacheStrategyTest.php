@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\HttpCache\ResponseCacheStrategy;
 
 class ResponseCacheStrategyTest extends TestCase
 {
-    public function testMinimumSharedMaxAgeWins()
+    public function testMinimumSharedMaxAgeWins(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -40,7 +40,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
     }
 
-    public function testSharedMaxAgeNotSetIfNotSetInAnyEmbeddedRequest()
+    public function testSharedMaxAgeNotSetIfNotSetInAnyEmbeddedRequest(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -58,7 +58,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
     }
 
-    public function testSharedMaxAgeNotSetIfNotSetInMasterRequest()
+    public function testSharedMaxAgeNotSetIfNotSetInMasterRequest(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -76,7 +76,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
     }
 
-    public function testMasterResponseNotCacheableWhenEmbeddedResponseRequiresValidation()
+    public function testMasterResponseNotCacheableWhenEmbeddedResponseRequiresValidation(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -93,7 +93,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($masterResponse->isFresh());
     }
 
-    public function testValidationOnMasterResponseIsNotPossibleWhenItContainsEmbeddedResponses()
+    public function testValidationOnMasterResponseIsNotPossibleWhenItContainsEmbeddedResponses(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -116,7 +116,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertTrue($masterResponse->headers->hasCacheControlDirective('must-revalidate'));
     }
 
-    public function testMasterResponseWithValidationIsUnchangedWhenThereIsNoEmbeddedResponse()
+    public function testMasterResponseWithValidationIsUnchangedWhenThereIsNoEmbeddedResponse(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -127,7 +127,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertTrue($masterResponse->isValidateable());
     }
 
-    public function testMasterResponseWithExpirationIsUnchangedWhenThereIsNoEmbeddedResponse()
+    public function testMasterResponseWithExpirationIsUnchangedWhenThereIsNoEmbeddedResponse(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -138,7 +138,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertTrue($masterResponse->isFresh());
     }
 
-    public function testMasterResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable()
+    public function testMasterResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -159,7 +159,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($masterResponse->isFresh());
     }
 
-    public function testEmbeddingPrivateResponseMakesMainResponsePrivate()
+    public function testEmbeddingPrivateResponseMakesMainResponsePrivate(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -179,7 +179,7 @@ class ResponseCacheStrategyTest extends TestCase
         // that's the more conservative of both the master and embedded response...?
     }
 
-    public function testResponseIsExiprableWhenEmbeddedResponseCombinesExpiryAndValidation()
+    public function testResponseIsExiprableWhenEmbeddedResponseCombinesExpiryAndValidation(): void
     {
         /* When "expiration wins over validation" (https://symfony.com/doc/current/http_cache/validation.html)
          * and both the main and embedded response provide s-maxage, then the more restricting value of both
@@ -201,7 +201,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertSame('60', $masterResponse->headers->getCacheControlDirective('s-maxage'));
     }
 
-    public function testResponseIsExpirableButNotValidateableWhenMasterResponseCombinesExpirationAndValidation()
+    public function testResponseIsExpirableButNotValidateableWhenMasterResponseCombinesExpirationAndValidation(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 

@@ -66,7 +66,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function initialize(array &$array)
+    public function initialize(array &$array): void
     {
         $this->meta = &$array;
 
@@ -100,7 +100,7 @@ class MetadataBag implements SessionBagInterface
      *                      to expire with browser session. Time is in seconds, and is
      *                      not a Unix timestamp.
      */
-    public function stampNew($lifetime = null)
+    public function stampNew($lifetime = null): void
     {
         $this->stampCreated($lifetime);
     }
@@ -136,7 +136,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         // nothing to do
     }
@@ -154,12 +154,12 @@ class MetadataBag implements SessionBagInterface
      *
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
 
-    private function stampCreated($lifetime = null)
+    private function stampCreated($lifetime = null): void
     {
         $timeStamp = time();
         $this->meta[self::CREATED] = $this->meta[self::UPDATED] = $this->lastUsed = $timeStamp;

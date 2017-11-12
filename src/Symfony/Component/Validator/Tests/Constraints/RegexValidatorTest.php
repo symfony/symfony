@@ -22,14 +22,14 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
         return new RegexValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Regex(array('pattern' => '/^[0-9]+$/')));
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Regex(array('pattern' => '/^[0-9]+$/')));
 
@@ -39,7 +39,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Regex(array('pattern' => '/^[0-9]+$/')));
     }
@@ -47,7 +47,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testValidValues($value)
+    public function testValidValues($value): void
     {
         $constraint = new Regex(array('pattern' => '/^[0-9]+$/'));
         $this->validator->validate($value, $constraint);
@@ -68,7 +68,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value)
+    public function testInvalidValues($value): void
     {
         $constraint = new Regex(array(
             'pattern' => '/^[0-9]+$/',

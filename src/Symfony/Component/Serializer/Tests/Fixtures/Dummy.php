@@ -33,7 +33,7 @@ class Dummy implements NormalizableInterface, DenormalizableInterface
         );
     }
 
-    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array())
+    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array()): void
     {
         $this->foo = $data['foo'];
         $this->bar = $data['bar'];

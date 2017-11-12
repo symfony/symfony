@@ -39,7 +39,7 @@ final class BoundArgument implements ArgumentInterface
     /**
      * {@inheritdoc}
      */
-    public function setValues(array $values)
+    public function setValues(array $values): void
     {
         list($this->value, $this->identifier, $this->used) = $values;
     }

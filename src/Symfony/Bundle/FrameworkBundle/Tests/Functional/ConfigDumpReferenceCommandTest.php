@@ -23,14 +23,14 @@ class ConfigDumpReferenceCommandTest extends WebTestCase
 {
     private $application;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $kernel = static::createKernel(array('test_case' => 'ConfigDump', 'root_config' => 'config.yml'));
         $this->application = new Application($kernel);
         $this->application->doRun(new ArrayInput(array()), new NullOutput());
     }
 
-    public function testDumpBundleName()
+    public function testDumpBundleName(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('name' => 'TestBundle'));
@@ -40,7 +40,7 @@ class ConfigDumpReferenceCommandTest extends WebTestCase
         $this->assertContains('    custom:', $tester->getDisplay());
     }
 
-    public function testDumpAtPath()
+    public function testDumpAtPath(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array(
@@ -60,7 +60,7 @@ EOL
             , $tester->getDisplay(true));
     }
 
-    public function testDumpAtPathXml()
+    public function testDumpAtPathXml(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array(

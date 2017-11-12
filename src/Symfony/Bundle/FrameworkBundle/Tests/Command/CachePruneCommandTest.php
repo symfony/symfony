@@ -21,13 +21,13 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePruneCommandTest extends TestCase
 {
-    public function testCommandWithPools()
+    public function testCommandWithPools(): void
     {
         $tester = $this->getCommandTester($this->getKernel(), $this->getRewindableGenerator());
         $tester->execute(array());
     }
 
-    public function testCommandWithNoPools()
+    public function testCommandWithNoPools(): void
     {
         $tester = $this->getCommandTester($this->getKernel(), $this->getEmptyRewindableGenerator());
         $tester->execute(array());

@@ -64,12 +64,12 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
         return serialize(array($this->files, $this->className, $this->hash));
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->files, $this->className, $this->hash) = unserialize($serialized);
     }
 
-    private function loadFiles(\ReflectionClass $class)
+    private function loadFiles(\ReflectionClass $class): void
     {
         foreach ($class->getInterfaces() as $v) {
             $this->loadFiles($v);

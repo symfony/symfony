@@ -25,7 +25,7 @@ class FirewallMap implements FirewallMapInterface
 {
     private $map = array();
 
-    public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = array(), ExceptionListener $exceptionListener = null)
+    public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = array(), ExceptionListener $exceptionListener = null): void
     {
         $this->map[] = array($requestMatcher, $listeners, $exceptionListener);
     }

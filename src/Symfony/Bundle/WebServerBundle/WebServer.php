@@ -25,7 +25,7 @@ class WebServer
     const STARTED = 0;
     const STOPPED = 1;
 
-    public function run(WebServerConfig $config, $disableOutput = true, callable $callback = null)
+    public function run(WebServerConfig $config, $disableOutput = true, callable $callback = null): void
     {
         if ($this->isRunning()) {
             throw new \RuntimeException(sprintf('A process is already listening on http://%s.', $config->getAddress()));
@@ -98,7 +98,7 @@ class WebServer
         return self::STOPPED;
     }
 
-    public function stop($pidFile = null)
+    public function stop($pidFile = null): void
     {
         $pidFile = $pidFile ?: $this->getDefaultPidFile();
         if (!file_exists($pidFile)) {

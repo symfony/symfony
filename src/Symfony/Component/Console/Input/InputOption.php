@@ -153,7 +153,7 @@ class InputOption
      *
      * @throws LogicException When incorrect default value is given
      */
-    public function setDefault($default = null)
+    public function setDefault($default = null): void
     {
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');

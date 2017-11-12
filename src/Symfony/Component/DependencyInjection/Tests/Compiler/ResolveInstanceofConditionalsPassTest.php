@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveInstanceofConditionalsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('foo', self::class)->addTag('tag')->setAutowired(true)->setChanges(array());
@@ -42,7 +42,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame(array(), $parent->getTags());
     }
 
-    public function testProcessInheritance()
+    public function testProcessInheritance(): void
     {
         $container = new ContainerBuilder();
 
@@ -68,7 +68,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame($expected, $container->getDefinition('child')->getMethodCalls());
     }
 
-    public function testProcessDoesReplaceShared()
+    public function testProcessDoesReplaceShared(): void
     {
         $container = new ContainerBuilder();
 
@@ -83,7 +83,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertFalse($def->isShared());
     }
 
-    public function testProcessHandlesMultipleInheritance()
+    public function testProcessHandlesMultipleInheritance(): void
     {
         $container = new ContainerBuilder();
 
@@ -103,7 +103,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertTrue($def->isShared());
     }
 
-    public function testProcessUsesAutoconfiguredInstanceof()
+    public function testProcessUsesAutoconfiguredInstanceof(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -130,7 +130,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame(array('local_instanceof_tag' => array(array()), 'autoconfigured_tag' => array(array())), $def->getTags());
     }
 
-    public function testAutoconfigureInstanceofDoesNotDuplicateTags()
+    public function testAutoconfigureInstanceofDoesNotDuplicateTags(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -153,7 +153,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame(array('duplicated_tag' => array(array(), array('and_attributes' => 1))), $def->getTags());
     }
 
-    public function testProcessDoesNotUseAutoconfiguredInstanceofIfNotEnabled()
+    public function testProcessDoesNotUseAutoconfiguredInstanceofIfNotEnabled(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -175,7 +175,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage "App\FakeInterface" is set as an "instanceof" conditional, but it does not exist.
      */
-    public function testBadInterfaceThrowsException()
+    public function testBadInterfaceThrowsException(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -187,7 +187,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveInstanceofConditionalsPass())->process($container);
     }
 
-    public function testBadInterfaceForAutomaticInstanceofIsOk()
+    public function testBadInterfaceForAutomaticInstanceofIsOk(): void
     {
         $container = new ContainerBuilder();
         $container->register('normal_service', self::class)
@@ -203,7 +203,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Autoconfigured instanceof for type "PHPUnit\Framework\TestCase" defines method calls but these are not supported and should be removed.
      */
-    public function testProcessThrowsExceptionForAutoconfiguredCalls()
+    public function testProcessThrowsExceptionForAutoconfiguredCalls(): void
     {
         $container = new ContainerBuilder();
         $container->registerForAutoconfiguration(parent::class)
@@ -216,7 +216,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Autoconfigured instanceof for type "PHPUnit\Framework\TestCase" defines arguments but these are not supported and should be removed.
      */
-    public function testProcessThrowsExceptionForArguments()
+    public function testProcessThrowsExceptionForArguments(): void
     {
         $container = new ContainerBuilder();
         $container->registerForAutoconfiguration(parent::class)
@@ -225,7 +225,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveInstanceofConditionalsPass())->process($container);
     }
 
-    public function testMergeReset()
+    public function testMergeReset(): void
     {
         $container = new ContainerBuilder();
 

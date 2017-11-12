@@ -31,7 +31,7 @@ abstract class ControllerTraitTest extends TestCase
 {
     abstract protected function createController();
 
-    public function testForward()
+    public function testForward(): void
     {
         $request = Request::create('/');
         $request->setLocale('fr');
@@ -56,7 +56,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('xml--fr', $response->getContent());
     }
 
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $user = new User('user', 'pass');
         $token = new UsernamePasswordToken($user, 'pass', 'default', array('ROLE_USER'));
@@ -67,7 +67,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertSame($controller->getUser(), $user);
     }
 
-    public function testGetUserAnonymousUserConvertedToNull()
+    public function testGetUserAnonymousUserConvertedToNull(): void
     {
         $token = new AnonymousToken('default', 'anon.');
 
@@ -77,7 +77,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertNull($controller->getUser());
     }
 
-    public function testGetUserWithEmptyTokenStorage()
+    public function testGetUserWithEmptyTokenStorage(): void
     {
         $controller = $this->createController();
         $controller->setContainer($this->getContainerWithTokenStorage(null));
@@ -89,7 +89,7 @@ abstract class ControllerTraitTest extends TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage The SecurityBundle is not registered in your application.
      */
-    public function testGetUserWithEmptyContainer()
+    public function testGetUserWithEmptyContainer(): void
     {
         $controller = $this->createController();
         $controller->setContainer(new Container());
@@ -114,7 +114,7 @@ abstract class ControllerTraitTest extends TestCase
         return $container;
     }
 
-    public function testJson()
+    public function testJson(): void
     {
         $controller = $this->createController();
         $controller->setContainer(new Container());
@@ -124,7 +124,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('[]', $response->getContent());
     }
 
-    public function testJsonWithSerializer()
+    public function testJsonWithSerializer(): void
     {
         $container = new Container();
 
@@ -145,7 +145,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('[]', $response->getContent());
     }
 
-    public function testJsonWithSerializerContextOverride()
+    public function testJsonWithSerializerContextOverride(): void
     {
         $container = new Container();
 
@@ -168,7 +168,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('{}', $response->getContent());
     }
 
-    public function testFile()
+    public function testFile(): void
     {
         $container = new Container();
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
@@ -188,7 +188,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
-    public function testFileAsInline()
+    public function testFileAsInline(): void
     {
         $controller = $this->createController();
 
@@ -204,7 +204,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
-    public function testFileWithOwnFileName()
+    public function testFileWithOwnFileName(): void
     {
         $controller = $this->createController();
 
@@ -221,7 +221,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertContains($fileName, $response->headers->get('content-disposition'));
     }
 
-    public function testFileWithOwnFileNameAsInline()
+    public function testFileWithOwnFileNameAsInline(): void
     {
         $controller = $this->createController();
 
@@ -238,7 +238,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertContains($fileName, $response->headers->get('content-disposition'));
     }
 
-    public function testFileFromPath()
+    public function testFileFromPath(): void
     {
         $controller = $this->createController();
 
@@ -254,7 +254,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
-    public function testFileFromPathWithCustomizedFileName()
+    public function testFileFromPathWithCustomizedFileName(): void
     {
         $controller = $this->createController();
 
@@ -273,7 +273,7 @@ abstract class ControllerTraitTest extends TestCase
     /**
      * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException
      */
-    public function testFileWhichDoesNotExist()
+    public function testFileWhichDoesNotExist(): void
     {
         $controller = $this->createController();
 
@@ -281,7 +281,7 @@ abstract class ControllerTraitTest extends TestCase
         $response = $controller->file('some-file.txt', 'test.php');
     }
 
-    public function testIsGranted()
+    public function testIsGranted(): void
     {
         $authorizationChecker = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')->getMock();
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(true);
@@ -298,7 +298,7 @@ abstract class ControllerTraitTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function testdenyAccessUnlessGranted()
+    public function testdenyAccessUnlessGranted(): void
     {
         $authorizationChecker = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')->getMock();
         $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
@@ -312,7 +312,7 @@ abstract class ControllerTraitTest extends TestCase
         $controller->denyAccessUnlessGranted('foo');
     }
 
-    public function testRenderViewTwig()
+    public function testRenderViewTwig(): void
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
@@ -326,7 +326,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('bar', $controller->renderView('foo'));
     }
 
-    public function testRenderTwig()
+    public function testRenderTwig(): void
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
@@ -340,7 +340,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('bar', $controller->render('foo')->getContent());
     }
 
-    public function testStreamTwig()
+    public function testStreamTwig(): void
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
 
@@ -353,7 +353,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $controller->stream('foo'));
     }
 
-    public function testRedirectToRoute()
+    public function testRedirectToRoute(): void
     {
         $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
         $router->expects($this->once())->method('generate')->willReturn('/foo');
@@ -373,7 +373,7 @@ abstract class ControllerTraitTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testAddFlash()
+    public function testAddFlash(): void
     {
         $flashBag = new FlashBag();
         $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->getMock();
@@ -389,14 +389,14 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertSame(array('bar'), $flashBag->get('foo'));
     }
 
-    public function testCreateAccessDeniedException()
+    public function testCreateAccessDeniedException(): void
     {
         $controller = $this->createController();
 
         $this->assertInstanceOf('Symfony\Component\Security\Core\Exception\AccessDeniedException', $controller->createAccessDeniedException());
     }
 
-    public function testIsCsrfTokenValid()
+    public function testIsCsrfTokenValid(): void
     {
         $tokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
         $tokenManager->expects($this->once())->method('isTokenValid')->willReturn(true);
@@ -410,7 +410,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertTrue($controller->isCsrfTokenValid('foo', 'bar'));
     }
 
-    public function testGenerateUrl()
+    public function testGenerateUrl(): void
     {
         $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
         $router->expects($this->once())->method('generate')->willReturn('/foo');
@@ -424,7 +424,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('/foo', $controller->generateUrl('foo'));
     }
 
-    public function testRedirect()
+    public function testRedirect(): void
     {
         $controller = $this->createController();
         $response = $controller->redirect('http://dunglas.fr', 301);
@@ -434,7 +434,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertSame(301, $response->getStatusCode());
     }
 
-    public function testRenderViewTemplating()
+    public function testRenderViewTemplating(): void
     {
         $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
         $templating->expects($this->once())->method('render')->willReturn('bar');
@@ -448,7 +448,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('bar', $controller->renderView('foo'));
     }
 
-    public function testRenderTemplating()
+    public function testRenderTemplating(): void
     {
         $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
         $templating->expects($this->once())->method('render')->willReturn('bar');
@@ -462,7 +462,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals('bar', $controller->render('foo')->getContent());
     }
 
-    public function testStreamTemplating()
+    public function testStreamTemplating(): void
     {
         $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
 
@@ -475,14 +475,14 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $controller->stream('foo'));
     }
 
-    public function testCreateNotFoundException()
+    public function testCreateNotFoundException(): void
     {
         $controller = $this->createController();
 
         $this->assertInstanceOf('Symfony\Component\HttpKernel\Exception\NotFoundHttpException', $controller->createNotFoundException());
     }
 
-    public function testCreateForm()
+    public function testCreateForm(): void
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->getMock();
 
@@ -498,7 +498,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals($form, $controller->createForm('foo'));
     }
 
-    public function testCreateFormBuilder()
+    public function testCreateFormBuilder(): void
     {
         $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilderInterface')->getMock();
 
@@ -514,7 +514,7 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
 
-    public function testGetDoctrine()
+    public function testGetDoctrine(): void
     {
         $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
 

@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  */
 class VarClonerTest extends TestCase
 {
-    public function testMaxIntBoundary()
+    public function testMaxIntBoundary(): void
     {
         $data = array(PHP_INT_MAX => 123);
 
@@ -58,7 +58,7 @@ EOTXT;
         $this->assertSame(sprintf($expected, PHP_INT_MAX), print_r($clone, true));
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $json = json_decode('{"1":{"var":"val"},"2":{"var":"val"}}');
 
@@ -146,7 +146,7 @@ EOTXT;
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    public function testLimits()
+    public function testLimits(): void
     {
         // Level 0:
         $data = array(
@@ -314,7 +314,7 @@ EOTXT;
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    public function testJsonCast()
+    public function testJsonCast(): void
     {
         if (2 == ini_get('xdebug.overload_var_dump')) {
             $this->markTestSkipped('xdebug is active');
@@ -379,7 +379,7 @@ EOTXT;
         $this->assertStringMatchesFormat(\PHP_VERSION_ID >= 70200 ? str_replace('"1"', '1', $expected) : $expected, ob_get_clean());
     }
 
-    public function testCaster()
+    public function testCaster(): void
     {
         $cloner = new VarCloner(array(
             '*' => function ($obj, $array) {

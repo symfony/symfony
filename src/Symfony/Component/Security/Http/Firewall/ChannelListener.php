@@ -38,7 +38,7 @@ class ChannelListener implements ListenerInterface
     /**
      * Handles channel management.
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 

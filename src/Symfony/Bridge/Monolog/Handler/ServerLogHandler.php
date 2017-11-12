@@ -83,7 +83,7 @@ class ServerLogHandler extends AbstractHandler
         return new VarDumperFormatter();
     }
 
-    private static function nullErrorHandler()
+    private static function nullErrorHandler(): void
     {
     }
 

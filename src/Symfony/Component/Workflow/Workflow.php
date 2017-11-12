@@ -240,7 +240,7 @@ class Workflow
         return $event->isBlocked();
     }
 
-    private function leave($subject, Transition $transition, Marking $marking)
+    private function leave($subject, Transition $transition, Marking $marking): void
     {
         $places = $transition->getFroms();
 
@@ -260,7 +260,7 @@ class Workflow
         }
     }
 
-    private function transition($subject, Transition $transition, Marking $marking)
+    private function transition($subject, Transition $transition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -273,7 +273,7 @@ class Workflow
         $this->dispatcher->dispatch(sprintf('workflow.%s.transition.%s', $this->name, $transition->getName()), $event);
     }
 
-    private function enter($subject, Transition $transition, Marking $marking)
+    private function enter($subject, Transition $transition, Marking $marking): void
     {
         $places = $transition->getTos();
 
@@ -293,7 +293,7 @@ class Workflow
         }
     }
 
-    private function entered($subject, Transition $transition, Marking $marking)
+    private function entered($subject, Transition $transition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -309,7 +309,7 @@ class Workflow
         }
     }
 
-    private function completed($subject, Transition $transition, Marking $marking)
+    private function completed($subject, Transition $transition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -322,7 +322,7 @@ class Workflow
         $this->dispatcher->dispatch(sprintf('workflow.%s.completed.%s', $this->name, $transition->getName()), $event);
     }
 
-    private function announce($subject, Transition $initialTransition, Marking $marking)
+    private function announce($subject, Transition $initialTransition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;

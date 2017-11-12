@@ -33,7 +33,7 @@ class EntityFactory implements UserProviderFactoryInterface
         $this->providerId = $providerId;
     }
 
-    public function create(ContainerBuilder $container, $id, $config)
+    public function create(ContainerBuilder $container, $id, $config): void
     {
         $container
             ->setDefinition($id, new ChildDefinition($this->providerId))
@@ -48,7 +48,7 @@ class EntityFactory implements UserProviderFactoryInterface
         return $this->key;
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->children()

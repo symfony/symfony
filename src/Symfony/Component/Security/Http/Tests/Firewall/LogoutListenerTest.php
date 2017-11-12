@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 class LogoutListenerTest extends TestCase
 {
-    public function testHandleUnmatchedPath()
+    public function testHandleUnmatchedPath(): void
     {
         list($listener, $tokenStorage, $httpUtils, $options) = $this->getListener();
 
@@ -35,7 +35,7 @@ class LogoutListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleMatchedPathWithSuccessHandlerAndCsrfValidation()
+    public function testHandleMatchedPathWithSuccessHandlerAndCsrfValidation(): void
     {
         $successHandler = $this->getSuccessHandler();
         $tokenManager = $this->getTokenManager();
@@ -82,7 +82,7 @@ class LogoutListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleMatchedPathWithoutSuccessHandlerAndCsrfValidation()
+    public function testHandleMatchedPathWithoutSuccessHandlerAndCsrfValidation(): void
     {
         $successHandler = $this->getSuccessHandler();
 
@@ -125,7 +125,7 @@ class LogoutListenerTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testSuccessHandlerReturnsNonResponse()
+    public function testSuccessHandlerReturnsNonResponse(): void
     {
         $successHandler = $this->getSuccessHandler();
 
@@ -149,7 +149,7 @@ class LogoutListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\LogoutException
      */
-    public function testCsrfValidationFails()
+    public function testCsrfValidationFails(): void
     {
         $tokenManager = $this->getTokenManager();
 

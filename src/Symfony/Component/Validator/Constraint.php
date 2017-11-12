@@ -177,7 +177,7 @@ abstract class Constraint
      *
      * @throws InvalidOptionsException If an invalid option name is given
      */
-    public function __set($option, $value)
+    public function __set($option, $value): void
     {
         if ('groups' === $option) {
             $this->groups = (array) $value;
@@ -219,7 +219,7 @@ abstract class Constraint
      *
      * @param string $group
      */
-    public function addImplicitGroupName($group)
+    public function addImplicitGroupName($group): void
     {
         if (in_array(self::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
             $this->groups[] = $group;

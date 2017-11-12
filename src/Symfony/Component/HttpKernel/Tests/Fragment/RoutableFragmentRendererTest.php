@@ -20,7 +20,7 @@ class RoutableFragmentRendererTest extends TestCase
     /**
      * @dataProvider getGenerateFragmentUriData
      */
-    public function testGenerateFragmentUri($uri, $controller)
+    public function testGenerateFragmentUri($uri, $controller): void
     {
         $this->assertEquals($uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/')));
     }
@@ -28,7 +28,7 @@ class RoutableFragmentRendererTest extends TestCase
     /**
      * @dataProvider getGenerateFragmentUriData
      */
-    public function testGenerateAbsoluteFragmentUri($uri, $controller)
+    public function testGenerateAbsoluteFragmentUri($uri, $controller): void
     {
         $this->assertEquals('http://localhost'.$uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/'), true));
     }
@@ -45,7 +45,7 @@ class RoutableFragmentRendererTest extends TestCase
         );
     }
 
-    public function testGenerateFragmentUriWithARequest()
+    public function testGenerateFragmentUriWithARequest(): void
     {
         $request = Request::create('/');
         $request->attributes->set('_format', 'json');
@@ -59,7 +59,7 @@ class RoutableFragmentRendererTest extends TestCase
      * @expectedException \LogicException
      * @dataProvider      getGenerateFragmentUriDataWithNonScalar
      */
-    public function testGenerateFragmentUriWithNonScalar($controller)
+    public function testGenerateFragmentUriWithNonScalar($controller): void
     {
         $this->callGenerateFragmentUriMethod($controller, Request::create('/'));
     }

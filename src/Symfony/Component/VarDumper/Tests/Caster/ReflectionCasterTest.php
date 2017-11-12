@@ -24,7 +24,7 @@ class ReflectionCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testReflectionCaster()
+    public function testReflectionCaster(): void
     {
         $var = new \ReflectionClass('ReflectionClass');
 
@@ -62,10 +62,10 @@ EOTXT
         );
     }
 
-    public function testClosureCaster()
+    public function testClosureCaster(): void
     {
         $a = $b = 123;
-        $var = function ($x) use ($a, &$b) {};
+        $var = function ($x) use ($a, &$b): void {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -85,9 +85,9 @@ EOTXT
         );
     }
 
-    public function testClosureCasterExcludingVerbosity()
+    public function testClosureCasterExcludingVerbosity(): void
     {
-        $var = function () {};
+        $var = function (): void {};
 
         $expectedDump = <<<EOTXT
 Closure {
@@ -99,7 +99,7 @@ EOTXT;
         $this->assertDumpEquals($expectedDump, $var, Caster::EXCLUDE_VERBOSE);
     }
 
-    public function testReflectionParameter()
+    public function testReflectionParameter(): void
     {
         $var = new \ReflectionParameter(__NAMESPACE__.'\reflectionParameterFixture', 0);
 
@@ -116,7 +116,7 @@ EOTXT
         );
     }
 
-    public function testReflectionParameterScalar()
+    public function testReflectionParameterScalar(): void
     {
         $f = eval('return function (int $a) {};');
         $var = new \ReflectionParameter($f, 0);
@@ -133,7 +133,7 @@ EOTXT
         );
     }
 
-    public function testReturnType()
+    public function testReturnType(): void
     {
         $f = eval('return function ():int {};');
         $line = __LINE__ - 1;
@@ -152,7 +152,7 @@ EOTXT
         );
     }
 
-    public function testGenerator()
+    public function testGenerator(): void
     {
         if (extension_loaded('xdebug')) {
             $this->markTestSkipped('xdebug is active');
@@ -228,6 +228,6 @@ EODUMP;
     }
 }
 
-function reflectionParameterFixture(NotLoadableClass $arg1 = null, $arg2)
+function reflectionParameterFixture(NotLoadableClass $arg1 = null, $arg2): void
 {
 }

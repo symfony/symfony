@@ -28,7 +28,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
 {
     use ValidatorExtensionTrait;
 
-    public function testSubmitValidatesData()
+    public function testSubmitValidatesData(): void
     {
         $builder = $this->factory->createBuilder(
             FormTypeTest::TESTED_TYPE,
@@ -49,14 +49,14 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $form->submit(array());
     }
 
-    public function testValidConstraint()
+    public function testValidConstraint(): void
     {
         $form = $this->createForm(array('constraints' => $valid = new Valid()));
 
         $this->assertSame(array($valid), $form->getConfig()->getOption('constraints'));
     }
 
-    public function testValidatorInterface()
+    public function testValidatorInterface(): void
     {
         $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
 
@@ -64,7 +64,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
         $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
     }
 
-    public function testGroupSequenceWithConstraintsOption()
+    public function testGroupSequenceWithConstraintsOption(): void
     {
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator()))

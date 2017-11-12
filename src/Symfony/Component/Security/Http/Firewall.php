@@ -56,7 +56,7 @@ class Firewall implements EventSubscriberInterface
         return $this->handleRequest($event, $listeners);
     }
 
-    public function onKernelFinishRequest(FinishRequestEvent $event)
+    public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -77,7 +77,7 @@ class Firewall implements EventSubscriberInterface
         );
     }
 
-    protected function handleRequest(GetResponseEvent $event, $listeners)
+    protected function handleRequest(GetResponseEvent $event, $listeners): void
     {
         foreach ($listeners as $listener) {
             $listener->handle($event);

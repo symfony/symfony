@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class FormRendererTest extends TestCase
 {
-    public function testHumanize()
+    public function testHumanize(): void
     {
         $renderer = $this->getMockBuilder('Symfony\Component\Form\FormRenderer')
             ->setMethods(null)

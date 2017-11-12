@@ -18,7 +18,7 @@ class ExtensionTest extends TestCase
     /**
      * @dataProvider getResolvedEnabledFixtures
      */
-    public function testIsConfigEnabledReturnsTheResolvedValue($enabled)
+    public function testIsConfigEnabledReturnsTheResolvedValue($enabled): void
     {
         $pb = $this->getMockBuilder('Symfony\Component\DependencyInjection\ParameterBag\ParameterBag')
             ->setMethods(array('resolveValue'))
@@ -64,7 +64,7 @@ class ExtensionTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The config array has no 'enabled' key.
      */
-    public function testIsConfigEnabledOnNonEnableableConfig()
+    public function testIsConfigEnabledOnNonEnableableConfig(): void
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->getMock()

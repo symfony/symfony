@@ -19,7 +19,7 @@ class MessageFormatterTest extends TestCase
     /**
      * @dataProvider getTransMessages
      */
-    public function testFormat($expected, $message, $parameters = array())
+    public function testFormat($expected, $message, $parameters = array()): void
     {
         $this->assertEquals($expected, $this->getMessageFormatter()->format($message, 'en', $parameters));
     }
@@ -27,7 +27,7 @@ class MessageFormatterTest extends TestCase
     /**
      * @dataProvider getTransChoiceMessages
      */
-    public function testFormatPlural($expected, $message, $number, $parameters)
+    public function testFormatPlural($expected, $message, $number, $parameters): void
     {
         $this->assertEquals($expected, $this->getMessageFormatter()->choiceFormat($message, $number, 'fr', $parameters));
     }

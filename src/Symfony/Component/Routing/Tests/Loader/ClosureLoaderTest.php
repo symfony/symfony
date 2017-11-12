@@ -18,11 +18,11 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ClosureLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new ClosureLoader();
 
-        $closure = function () {};
+        $closure = function (): void {};
 
         $this->assertTrue($loader->supports($closure), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
@@ -31,7 +31,7 @@ class ClosureLoaderTest extends TestCase
         $this->assertFalse($loader->supports($closure, 'foo'), '->supports() checks the resource type if specified');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new ClosureLoader();
 

@@ -62,7 +62,7 @@ trait LockableTrait
     /**
      * Releases the command lock if there is one.
      */
-    private function release()
+    private function release(): void
     {
         if ($this->lock) {
             $this->lock->release();

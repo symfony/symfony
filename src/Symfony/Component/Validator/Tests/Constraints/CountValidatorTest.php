@@ -27,7 +27,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
 
     abstract protected function createCollection(array $content);
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Count(6));
 
@@ -37,7 +37,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsCountableType()
+    public function testExpectsCountableType(): void
     {
         $this->validator->validate(new \stdClass(), new Count(5));
     }
@@ -72,7 +72,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessElements
      */
-    public function testValidValuesMax($value)
+    public function testValidValuesMax($value): void
     {
         $constraint = new Count(array('max' => 3));
         $this->validator->validate($value, $constraint);
@@ -83,7 +83,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFiveOrMoreElements
      */
-    public function testValidValuesMin($value)
+    public function testValidValuesMin($value): void
     {
         $constraint = new Count(array('min' => 5));
         $this->validator->validate($value, $constraint);
@@ -94,7 +94,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFourElements
      */
-    public function testValidValuesExact($value)
+    public function testValidValuesExact($value): void
     {
         $constraint = new Count(4);
         $this->validator->validate($value, $constraint);
@@ -105,7 +105,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFiveOrMoreElements
      */
-    public function testTooManyValues($value)
+    public function testTooManyValues($value): void
     {
         $constraint = new Count(array(
             'max' => 4,
@@ -126,7 +126,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessElements
      */
-    public function testTooFewValues($value)
+    public function testTooFewValues($value): void
     {
         $constraint = new Count(array(
             'min' => 4,
@@ -147,7 +147,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFiveOrMoreElements
      */
-    public function testTooManyValuesExact($value)
+    public function testTooManyValuesExact($value): void
     {
         $constraint = new Count(array(
             'min' => 4,
@@ -169,7 +169,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessElements
      */
-    public function testTooFewValuesExact($value)
+    public function testTooFewValuesExact($value): void
     {
         $constraint = new Count(array(
             'min' => 4,
@@ -188,7 +188,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testDefaultOption()
+    public function testDefaultOption(): void
     {
         $constraint = new Count(5);
 

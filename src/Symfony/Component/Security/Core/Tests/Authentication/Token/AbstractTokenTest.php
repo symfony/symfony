@@ -48,13 +48,13 @@ class ConcreteToken extends AbstractToken
         return serialize(array($this->credentials, parent::serialize()));
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->credentials, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);
     }
 
-    public function getCredentials()
+    public function getCredentials(): void
     {
     }
 }
@@ -62,7 +62,7 @@ class ConcreteToken extends AbstractToken
 /** @noinspection PhpUndefinedClassInspection */
 class AbstractTokenTest extends TestCase
 {
-    public function testGetUsername()
+    public function testGetUsername(): void
     {
         $token = $this->getToken(array('ROLE_FOO'));
         $token->setUser('fabien');
@@ -77,7 +77,7 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals('fabien', $token->getUsername());
     }
 
-    public function testEraseCredentials()
+    public function testEraseCredentials(): void
     {
         $token = $this->getToken(array('ROLE_FOO'));
 
@@ -88,7 +88,7 @@ class AbstractTokenTest extends TestCase
         $token->eraseCredentials();
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $token = $this->getToken(array('ROLE_FOO', new Role('ROLE_BAR')));
         $token->setAttributes(array('foo' => 'bar'));
@@ -99,7 +99,7 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals($token->getAttributes(), $uToken->getAttributes());
     }
 
-    public function testSerializeWithRoleObjects()
+    public function testSerializeWithRoleObjects(): void
     {
         $user = new User('name', 'password', array(new Role('ROLE_FOO'), new Role('ROLE_BAR')));
         $token = new ConcreteToken($user, $user->getRoles());
@@ -112,7 +112,7 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals($roles, $user->getRoles());
     }
 
-    public function testSerializeParent()
+    public function testSerializeParent(): void
     {
         $user = new TestUser('fabien');
         $token = new ConcreteToken($user, array('ROLE_FOO'));
@@ -126,7 +126,7 @@ class AbstractTokenTest extends TestCase
         );
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $token = $this->getToken(array('ROLE_FOO'));
         $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
@@ -138,7 +138,7 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals(array(new Role('ROLE_FOO'), new Role('ROLE_BAR')), $token->getRoles());
     }
 
-    public function testAuthenticatedFlag()
+    public function testAuthenticatedFlag(): void
     {
         $token = $this->getToken();
         $this->assertFalse($token->isAuthenticated());
@@ -150,7 +150,7 @@ class AbstractTokenTest extends TestCase
         $this->assertFalse($token->isAuthenticated());
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $attributes = array('foo' => 'bar');
         $token = $this->getToken();
@@ -175,7 +175,7 @@ class AbstractTokenTest extends TestCase
     /**
      * @dataProvider getUsers
      */
-    public function testSetUser($user)
+    public function testSetUser($user): void
     {
         $token = $this->getToken();
         $token->setUser($user);
@@ -198,7 +198,7 @@ class AbstractTokenTest extends TestCase
     /**
      * @dataProvider getUserChanges
      */
-    public function testSetUserSetsAuthenticatedToFalseWhenUserChanges($firstUser, $secondUser)
+    public function testSetUserSetsAuthenticatedToFalseWhenUserChanges($firstUser, $secondUser): void
     {
         $token = $this->getToken();
         $token->setAuthenticated(true);
@@ -265,7 +265,7 @@ class AbstractTokenTest extends TestCase
     /**
      * @dataProvider getUsers
      */
-    public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user)
+    public function testSetUserDoesNotSetAuthenticatedToFalseWhenUserDoesNotChange($user): void
     {
         $token = $this->getToken();
         $token->setAuthenticated(true);

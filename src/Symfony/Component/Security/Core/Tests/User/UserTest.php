@@ -19,12 +19,12 @@ class UserTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testConstructorException()
+    public function testConstructorException(): void
     {
         new User('', 'superpass');
     }
 
-    public function testGetRoles()
+    public function testGetRoles(): void
     {
         $user = new User('fabien', 'superpass');
         $this->assertEquals(array(), $user->getRoles());
@@ -33,25 +33,25 @@ class UserTest extends TestCase
         $this->assertEquals(array('ROLE_ADMIN'), $user->getRoles());
     }
 
-    public function testGetPassword()
+    public function testGetPassword(): void
     {
         $user = new User('fabien', 'superpass');
         $this->assertEquals('superpass', $user->getPassword());
     }
 
-    public function testGetUsername()
+    public function testGetUsername(): void
     {
         $user = new User('fabien', 'superpass');
         $this->assertEquals('fabien', $user->getUsername());
     }
 
-    public function testGetSalt()
+    public function testGetSalt(): void
     {
         $user = new User('fabien', 'superpass');
         $this->assertEquals('', $user->getSalt());
     }
 
-    public function testIsAccountNonExpired()
+    public function testIsAccountNonExpired(): void
     {
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isAccountNonExpired());
@@ -60,7 +60,7 @@ class UserTest extends TestCase
         $this->assertFalse($user->isAccountNonExpired());
     }
 
-    public function testIsCredentialsNonExpired()
+    public function testIsCredentialsNonExpired(): void
     {
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isCredentialsNonExpired());
@@ -69,7 +69,7 @@ class UserTest extends TestCase
         $this->assertFalse($user->isCredentialsNonExpired());
     }
 
-    public function testIsAccountNonLocked()
+    public function testIsAccountNonLocked(): void
     {
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isAccountNonLocked());
@@ -78,7 +78,7 @@ class UserTest extends TestCase
         $this->assertFalse($user->isAccountNonLocked());
     }
 
-    public function testIsEnabled()
+    public function testIsEnabled(): void
     {
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isEnabled());
@@ -87,14 +87,14 @@ class UserTest extends TestCase
         $this->assertFalse($user->isEnabled());
     }
 
-    public function testEraseCredentials()
+    public function testEraseCredentials(): void
     {
         $user = new User('fabien', 'superpass');
         $user->eraseCredentials();
         $this->assertEquals('superpass', $user->getPassword());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $user = new User('fabien', 'superpass');
         $this->assertEquals('fabien', (string) $user);

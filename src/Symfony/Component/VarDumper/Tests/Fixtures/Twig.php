@@ -15,7 +15,7 @@ class __TwigTemplate_VarDumperFixture_u75a09 extends Twig\Template
         $this->path = $path;
     }
 
-    protected function doDisplay(array $context, array $blocks = array())
+    protected function doDisplay(array $context, array $blocks = array()): void
     {
         // line 2
         throw new \Exception('Foobar');

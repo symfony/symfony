@@ -50,7 +50,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): void
     {
         $arrayAdapter = new ArrayAdapter();
 
@@ -77,7 +77,7 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
         $this->fallbackPool->commit();
     }
 
-    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values): void
     {
         $phpArrayAdapter->warmUp($values);
     }

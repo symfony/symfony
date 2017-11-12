@@ -74,7 +74,7 @@ class SwitchUserListener implements ListenerInterface
      *
      * @throws \LogicException if switching to a user failed
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         $username = $request->get($this->usernameParameter) ?: $request->headers->get($this->usernameParameter);

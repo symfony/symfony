@@ -34,7 +34,7 @@ class BufferedOutput extends Output
     /**
      * {@inheritdoc}
      */
-    protected function doWrite($message, $newline)
+    protected function doWrite($message, $newline): void
     {
         $this->buffer .= $message;
 

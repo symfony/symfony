@@ -69,12 +69,12 @@ class AppKernel extends Kernel
         return sys_get_temp_dir().'/'.$this->varDir.'/'.$this->testCase.'/logs';
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load($this->rootConfig);
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         $container->register('logger', NullLogger::class);
     }
@@ -84,7 +84,7 @@ class AppKernel extends Kernel
         return serialize(array($this->varDir, $this->testCase, $this->rootConfig, $this->getEnvironment(), $this->isDebug()));
     }
 
-    public function unserialize($str)
+    public function unserialize($str): void
     {
         $a = unserialize($str);
         $this->__construct($a[0], $a[1], $a[2], $a[3], $a[4]);

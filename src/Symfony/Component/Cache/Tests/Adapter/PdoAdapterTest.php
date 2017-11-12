@@ -23,7 +23,7 @@ class PdoAdapterTest extends AdapterTestCase
 
     protected static $dbFile;
 
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         if (!extension_loaded('pdo_sqlite')) {
             self::markTestSkipped('Extension pdo_sqlite required.');
@@ -35,7 +35,7 @@ class PdoAdapterTest extends AdapterTestCase
         $pool->createTable();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         @unlink(self::$dbFile);
     }
@@ -45,7 +45,7 @@ class PdoAdapterTest extends AdapterTestCase
         return new PdoAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }
 
-    public function testCleanupExpiredItems()
+    public function testCleanupExpiredItems(): void
     {
         $pdo = new \PDO('sqlite:'.self::$dbFile);
 

@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\FixUrlProtocolListener;
 
 class FixUrlProtocolListenerTest extends TestCase
 {
-    public function testFixHttpUrl()
+    public function testFixHttpUrl(): void
     {
         $data = 'www.symfony.com';
         $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
@@ -29,7 +29,7 @@ class FixUrlProtocolListenerTest extends TestCase
         $this->assertEquals('http://www.symfony.com', $event->getData());
     }
 
-    public function testSkipKnownUrl()
+    public function testSkipKnownUrl(): void
     {
         $data = 'http://www.symfony.com';
         $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
@@ -55,7 +55,7 @@ class FixUrlProtocolListenerTest extends TestCase
     /**
      * @dataProvider provideUrlsWithSupportedProtocols
      */
-    public function testSkipOtherProtocol($url)
+    public function testSkipOtherProtocol($url): void
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
         $event = new FormEvent($form, $url);

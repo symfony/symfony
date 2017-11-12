@@ -106,7 +106,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     /**
      * Do nothing for non rewindable stream.
      */
-    public function rewind()
+    public function rewind(): void
     {
         if (false === $this->isRewindable()) {
             return;

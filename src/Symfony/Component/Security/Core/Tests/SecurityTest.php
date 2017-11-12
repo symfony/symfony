@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\User\User;
 
 class SecurityTest extends TestCase
 {
-    public function testGetToken()
+    public function testGetToken(): void
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'provider');
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
@@ -40,7 +40,7 @@ class SecurityTest extends TestCase
     /**
      * @dataProvider getUserTests
      */
-    public function testGetUser($userInToken, $expectedUser)
+    public function testGetUser($userInToken, $expectedUser): void
     {
         $token = $this->getMockBuilder(TokenInterface::class)->getMock();
         $token->expects($this->any())
@@ -68,7 +68,7 @@ class SecurityTest extends TestCase
         yield array($user, $user);
     }
 
-    public function testIsGranted()
+    public function testIsGranted(): void
     {
         $authorizationChecker = $this->getMockBuilder(AuthorizationCheckerInterface::class)->getMock();
 

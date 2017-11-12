@@ -21,7 +21,7 @@ use Symfony\Component\CssSelector\Parser\Token;
 class ParserTest extends TestCase
 {
     /** @dataProvider getParserTestData */
-    public function testParser($source, $representation)
+    public function testParser($source, $representation): void
     {
         $parser = new Parser();
 
@@ -31,7 +31,7 @@ class ParserTest extends TestCase
     }
 
     /** @dataProvider getParserExceptionTestData */
-    public function testParserException($source, $message)
+    public function testParserException($source, $message): void
     {
         $parser = new Parser();
 
@@ -44,7 +44,7 @@ class ParserTest extends TestCase
     }
 
     /** @dataProvider getPseudoElementsTestData */
-    public function testPseudoElements($source, $element, $pseudo)
+    public function testPseudoElements($source, $element, $pseudo): void
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
@@ -57,7 +57,7 @@ class ParserTest extends TestCase
     }
 
     /** @dataProvider getSpecificityTestData */
-    public function testSpecificity($source, $value)
+    public function testSpecificity($source, $value): void
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
@@ -69,7 +69,7 @@ class ParserTest extends TestCase
     }
 
     /** @dataProvider getParseSeriesTestData */
-    public function testParseSeries($series, $a, $b)
+    public function testParseSeries($series, $a, $b): void
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
@@ -81,7 +81,7 @@ class ParserTest extends TestCase
     }
 
     /** @dataProvider getParseSeriesExceptionTestData */
-    public function testParseSeriesException($series)
+    public function testParseSeriesException($series): void
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));

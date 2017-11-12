@@ -96,7 +96,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
         return $this->methodRendered;
     }
 
-    public function setMethodRendered()
+    public function setMethodRendered(): void
     {
         $this->methodRendered = true;
     }
@@ -130,7 +130,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @throws BadMethodCallException always as setting a child by name is not allowed
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         throw new BadMethodCallException('Not supported');
     }
@@ -140,7 +140,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param string $name The child name
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         unset($this->children[$name]);
     }

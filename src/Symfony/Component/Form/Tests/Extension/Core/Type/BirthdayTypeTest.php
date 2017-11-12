@@ -21,7 +21,7 @@ class BirthdayTypeTest extends DateTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testSetInvalidYearsOption()
+    public function testSetInvalidYearsOption(): void
     {
         $this->factory->create(static::TESTED_TYPE, null, array(
             'years' => 'bad value',

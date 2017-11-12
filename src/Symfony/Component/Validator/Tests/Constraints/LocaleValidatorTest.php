@@ -22,14 +22,14 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         return new LocaleValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Locale());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Locale());
 
@@ -39,7 +39,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Locale());
     }
@@ -47,7 +47,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidLocales
      */
-    public function testValidLocales($locale)
+    public function testValidLocales($locale): void
     {
         $this->validator->validate($locale, new Locale());
 
@@ -69,7 +69,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidLocales
      */
-    public function testInvalidLocales($locale)
+    public function testInvalidLocales($locale): void
     {
         $constraint = new Locale(array(
             'message' => 'myMessage',

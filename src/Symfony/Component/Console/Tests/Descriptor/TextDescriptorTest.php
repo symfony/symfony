@@ -34,7 +34,7 @@ class TextDescriptorTest extends AbstractDescriptorTest
         ));
     }
 
-    public function testDescribeApplicationWithFilteredNamespace()
+    public function testDescribeApplicationWithFilteredNamespace(): void
     {
         $application = new DescriptorApplication2();
 

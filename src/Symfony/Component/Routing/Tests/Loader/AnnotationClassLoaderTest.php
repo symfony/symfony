@@ -18,7 +18,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     protected $loader;
     private $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testLoadMissingClass()
+    public function testLoadMissingClass(): void
     {
         $this->loader->load('MissingClass');
     }
@@ -37,7 +37,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testLoadAbstractClass()
+    public function testLoadAbstractClass(): void
     {
         $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\AbstractClass');
     }
@@ -45,7 +45,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     /**
      * @dataProvider provideTestSupportsChecksResource
      */
-    public function testSupportsChecksResource($resource, $expectedSupports)
+    public function testSupportsChecksResource($resource, $expectedSupports): void
     {
         $this->assertSame($expectedSupports, $this->loader->supports($resource), '->supports() returns true if the resource is loadable');
     }
@@ -63,7 +63,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         );
     }
 
-    public function testSupportsChecksTypeIfSpecified()
+    public function testSupportsChecksTypeIfSpecified(): void
     {
         $this->assertTrue($this->loader->supports('class', 'annotation'), '->supports() checks the resource type if specified');
         $this->assertFalse($this->loader->supports('class', 'foo'), '->supports() checks the resource type if specified');
@@ -103,7 +103,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     /**
      * @dataProvider getLoadTests
      */
-    public function testLoad($className, $routeData = array(), $methodArgs = array())
+    public function testLoad($className, $routeData = array(), $methodArgs = array()): void
     {
         $routeData = array_replace(array(
             'name' => 'route',
@@ -146,7 +146,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertSame($routeData['condition'], $route->getCondition(), '->load preserves condition annotation');
     }
 
-    public function testClassRouteLoad()
+    public function testClassRouteLoad(): void
     {
         $classRouteData = array(
             'name' => 'prefix_',
@@ -181,7 +181,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertEquals(array_merge($classRouteData['methods'], $methodRouteData['methods']), $route->getMethods(), '->load merges class and method route methods');
     }
 
-    public function testInvokableClassRouteLoad()
+    public function testInvokableClassRouteLoad(): void
     {
         $classRouteData = array(
             'name' => 'route1',
@@ -209,7 +209,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertEquals(array_merge($classRouteData['methods'], $classRouteData['methods']), $route->getMethods(), '->load preserves class route methods');
     }
 
-    public function testInvokableClassWithMethodRouteLoad()
+    public function testInvokableClassWithMethodRouteLoad(): void
     {
         $classRouteData = array(
             'name' => 'route1',

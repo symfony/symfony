@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  */
 abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
-    protected function listBundles($output)
+    protected function listBundles($output): void
     {
         $title = 'Available registered bundles with their extension alias if available';
         $headers = array('Bundle name', 'Extension alias');
@@ -101,7 +101,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         throw new \LogicException($message);
     }
 
-    public function validateConfiguration(ExtensionInterface $extension, $configuration)
+    public function validateConfiguration(ExtensionInterface $extension, $configuration): void
     {
         if (!$configuration) {
             throw new \LogicException(sprintf('The extension with alias "%s" does not have its getConfiguration() method setup', $extension->getAlias()));

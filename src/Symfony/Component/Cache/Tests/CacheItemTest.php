@@ -16,7 +16,7 @@ use Symfony\Component\Cache\CacheItem;
 
 class CacheItemTest extends TestCase
 {
-    public function testValidKey()
+    public function testValidKey(): void
     {
         $this->assertSame('foo', CacheItem::validateKey('foo'));
     }
@@ -26,7 +26,7 @@ class CacheItemTest extends TestCase
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Cache key
      */
-    public function testInvalidKey($key)
+    public function testInvalidKey($key): void
     {
         CacheItem::validateKey($key);
     }
@@ -52,14 +52,14 @@ class CacheItemTest extends TestCase
         );
     }
 
-    public function testTag()
+    public function testTag(): void
     {
         $item = new CacheItem();
 
         $this->assertSame($item, $item->tag('foo'));
         $this->assertSame($item, $item->tag(array('bar', 'baz')));
 
-        call_user_func(\Closure::bind(function () use ($item) {
+        call_user_func(\Closure::bind(function () use ($item): void {
             $this->assertSame(array('foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'), $item->tags);
         }, $this, CacheItem::class));
     }
@@ -69,7 +69,7 @@ class CacheItemTest extends TestCase
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Cache tag
      */
-    public function testInvalidTag($tag)
+    public function testInvalidTag($tag): void
     {
         $item = new CacheItem();
         $item->tag($tag);

@@ -35,7 +35,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
         $this->commandTag = $commandTag;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $commandServices = $container->findTaggedServiceIds($this->commandTag, true);
         $lazyCommandMap = array();

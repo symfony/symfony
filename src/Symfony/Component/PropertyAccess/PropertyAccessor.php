@@ -96,7 +96,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function setValue(&$objectOrArray, $propertyPath, $value)
+    public function setValue(&$objectOrArray, $propertyPath, $value): void
     {
         $propertyPath = $this->getPropertyPath($propertyPath);
 
@@ -159,7 +159,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
     }
 
-    private static function throwInvalidArgumentException($message, $trace, $i)
+    private static function throwInvalidArgumentException($message, $trace, $i): void
     {
         if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file'] && isset($trace[$i]['args'][0])) {
             $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
@@ -497,7 +497,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchIndexException If the array does not implement \ArrayAccess or it is not an array
      */
-    private function writeIndex($zval, $index, $value)
+    private function writeIndex($zval, $index, $value): void
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !is_array($zval[self::VALUE])) {
             throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($zval[self::VALUE])));
@@ -515,7 +515,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException if the property does not exist or is not public
      */
-    private function writeProperty($zval, $property, $value)
+    private function writeProperty($zval, $property, $value): void
     {
         if (!is_object($zval[self::VALUE])) {
             throw new NoSuchPropertyException(sprintf('Cannot write property "%s" to an array. Maybe you should write the property path as "[%1$s]" instead?', $property));
@@ -556,7 +556,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
      */
-    private function writeCollection($zval, $property, $collection, $addMethod, $removeMethod)
+    private function writeCollection($zval, $property, $collection, $addMethod, $removeMethod): void
     {
         // At this point the add and remove methods have been found
         $previousValue = $this->readProperty($zval, $property);

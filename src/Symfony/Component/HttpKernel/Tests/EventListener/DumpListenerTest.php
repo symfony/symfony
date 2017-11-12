@@ -26,7 +26,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class DumpListenerTest extends TestCase
 {
-    public function testSubscribedEvents()
+    public function testSubscribedEvents(): void
     {
         $this->assertSame(
             array(ConsoleEvents::COMMAND => array('configure', 1024)),
@@ -34,7 +34,7 @@ class DumpListenerTest extends TestCase
         );
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $prevDumper = VarDumper::setHandler('var_dump');
         VarDumper::setHandler($prevDumper);
@@ -74,7 +74,7 @@ class MockCloner implements ClonerInterface
 
 class MockDumper implements DataDumperInterface
 {
-    public function dump(Data $data)
+    public function dump(Data $data): void
     {
         echo '+'.$data->getValue();
     }

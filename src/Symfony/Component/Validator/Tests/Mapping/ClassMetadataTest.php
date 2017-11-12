@@ -28,31 +28,31 @@ class ClassMetadataTest extends TestCase
 
     protected $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadata = new ClassMetadata(self::CLASSNAME);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->metadata = null;
     }
 
-    public function testAddConstraintDoesNotAcceptValid()
+    public function testAddConstraintDoesNotAcceptValid(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new Valid());
     }
 
-    public function testAddConstraintRequiresClassConstraints()
+    public function testAddConstraintRequiresClassConstraints(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new PropertyConstraint());
     }
 
-    public function testAddPropertyConstraints()
+    public function testAddPropertyConstraints(): void
     {
         $this->metadata->addPropertyConstraint('firstName', new ConstraintA());
         $this->metadata->addPropertyConstraint('lastName', new ConstraintB());
@@ -60,7 +60,7 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals(array('firstName', 'lastName'), $this->metadata->getConstrainedProperties());
     }
 
-    public function testAddMultiplePropertyConstraints()
+    public function testAddMultiplePropertyConstraints(): void
     {
         $this->metadata->addPropertyConstraints('lastName', array(new ConstraintA(), new ConstraintB()));
 
@@ -76,7 +76,7 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals($constraints, $properties[0]->getConstraints());
     }
 
-    public function testAddGetterConstraints()
+    public function testAddGetterConstraints(): void
     {
         $this->metadata->addGetterConstraint('lastName', new ConstraintA());
         $this->metadata->addGetterConstraint('lastName', new ConstraintB());
@@ -93,7 +93,7 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals($constraints, $properties[0]->getConstraints());
     }
 
-    public function testAddMultipleGetterConstraints()
+    public function testAddMultipleGetterConstraints(): void
     {
         $this->metadata->addGetterConstraints('lastName', array(new ConstraintA(), new ConstraintB()));
 
@@ -109,7 +109,7 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals($constraints, $properties[0]->getConstraints());
     }
 
-    public function testMergeConstraintsMergesClassConstraints()
+    public function testMergeConstraintsMergesClassConstraints(): void
     {
         $parent = new ClassMetadata(self::PARENTCLASS);
         $parent->addConstraint(new ConstraintA());
@@ -132,7 +132,7 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals($constraints, $this->metadata->getConstraints());
     }
 
-    public function testMergeConstraintsMergesMemberConstraints()
+    public function testMergeConstraintsMergesMemberConstraints(): void
     {
         $parent = new ClassMetadata(self::PARENTCLASS);
         $parent->addPropertyConstraint('firstName', new ConstraintA());
@@ -185,7 +185,7 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals($constraintsByGroup, $members[0]->constraintsByGroup);
     }
 
-    public function testMemberMetadatas()
+    public function testMemberMetadatas(): void
     {
         $this->metadata->addPropertyConstraint('firstName', new ConstraintA());
 
@@ -193,7 +193,7 @@ class ClassMetadataTest extends TestCase
         $this->assertFalse($this->metadata->hasPropertyMetadata('non_existent_field'));
     }
 
-    public function testMergeConstraintsKeepsPrivateMembersSeparate()
+    public function testMergeConstraintsKeepsPrivateMembersSeparate(): void
     {
         $parent = new ClassMetadata(self::PARENTCLASS);
         $parent->addPropertyConstraint('internal', new ConstraintA());
@@ -224,14 +224,14 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals($constraints, $members[1]->getConstraints());
     }
 
-    public function testGetReflectionClass()
+    public function testGetReflectionClass(): void
     {
         $reflClass = new \ReflectionClass(self::CLASSNAME);
 
         $this->assertEquals($reflClass, $this->metadata->getReflectionClass());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->metadata->addConstraint(new ConstraintA(array('property1' => 'A')));
         $this->metadata->addConstraint(new ConstraintB(array('groups' => 'TestGroup')));
@@ -243,7 +243,7 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals($this->metadata, $metadata);
     }
 
-    public function testGroupSequencesWorkIfContainingDefaultGroup()
+    public function testGroupSequencesWorkIfContainingDefaultGroup(): void
     {
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup()));
 
@@ -253,7 +253,7 @@ class ClassMetadataTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
      */
-    public function testGroupSequencesFailIfNotContainingDefaultGroup()
+    public function testGroupSequencesFailIfNotContainingDefaultGroup(): void
     {
         $this->metadata->setGroupSequence(array('Foo', 'Bar'));
     }
@@ -261,7 +261,7 @@ class ClassMetadataTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
      */
-    public function testGroupSequencesFailIfContainingDefault()
+    public function testGroupSequencesFailIfContainingDefault(): void
     {
         $this->metadata->setGroupSequence(array('Foo', $this->metadata->getDefaultGroup(), Constraint::DEFAULT_GROUP));
     }
@@ -269,7 +269,7 @@ class ClassMetadataTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
      */
-    public function testGroupSequenceFailsIfGroupSequenceProviderIsSet()
+    public function testGroupSequenceFailsIfGroupSequenceProviderIsSet(): void
     {
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
@@ -279,7 +279,7 @@ class ClassMetadataTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
      */
-    public function testGroupSequenceProviderFailsIfGroupSequenceIsSet()
+    public function testGroupSequenceProviderFailsIfGroupSequenceIsSet(): void
     {
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequence(array('GroupSequenceProviderEntity', 'Foo'));
@@ -289,20 +289,20 @@ class ClassMetadataTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
      */
-    public function testGroupSequenceProviderFailsIfDomainClassIsInvalid()
+    public function testGroupSequenceProviderFailsIfDomainClassIsInvalid(): void
     {
         $metadata = new ClassMetadata('stdClass');
         $metadata->setGroupSequenceProvider(true);
     }
 
-    public function testGroupSequenceProvider()
+    public function testGroupSequenceProvider(): void
     {
         $metadata = new ClassMetadata(self::PROVIDERCLASS);
         $metadata->setGroupSequenceProvider(true);
         $this->assertTrue($metadata->isGroupSequenceProvider());
     }
 
-    public function testMergeConstraintsMergesGroupSequenceProvider()
+    public function testMergeConstraintsMergesGroupSequenceProvider(): void
     {
         $parent = new ClassMetadata(self::PROVIDERCLASS);
         $parent->setGroupSequenceProvider(true);
@@ -316,7 +316,7 @@ class ClassMetadataTest extends TestCase
     /**
      * https://github.com/symfony/symfony/issues/11604.
      */
-    public function testGetPropertyMetadataReturnsEmptyArrayWithoutConfiguredMetadata()
+    public function testGetPropertyMetadataReturnsEmptyArrayWithoutConfiguredMetadata(): void
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }

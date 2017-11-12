@@ -164,7 +164,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @param string $name Root node name
      */
-    public function setRootNodeName($name)
+    public function setRootNodeName($name): void
     {
         $this->rootNodeName = $name;
     }

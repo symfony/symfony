@@ -248,7 +248,7 @@ class Request
      * @param array           $server     The SERVER parameters
      * @param string|resource $content    The raw body data
      */
-    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
+    public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null): void
     {
         $this->request = new ParameterBag($request);
         $this->query = new ParameterBag($query);
@@ -407,7 +407,7 @@ class Request
      *
      * @param callable|null $callable A PHP callable
      */
-    public static function setFactory($callable)
+    public static function setFactory($callable): void
     {
         self::$requestFactory = $callable;
     }
@@ -510,7 +510,7 @@ class Request
      * It overrides $_GET, $_POST, $_REQUEST, $_SERVER, $_COOKIE.
      * $_FILES is never overridden, see rfc1867
      */
-    public function overrideGlobals()
+    public function overrideGlobals(): void
     {
         $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), null, '&')));
 
@@ -549,7 +549,7 @@ class Request
      *
      * @throws \InvalidArgumentException When $trustedHeaderSet is invalid
      */
-    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet)
+    public static function setTrustedProxies(array $proxies, int $trustedHeaderSet): void
     {
         self::$trustedProxies = $proxies;
         self::$trustedHeaderSet = $trustedHeaderSet;
@@ -582,7 +582,7 @@ class Request
      *
      * @param array $hostPatterns A list of trusted host patterns
      */
-    public static function setTrustedHosts(array $hostPatterns)
+    public static function setTrustedHosts(array $hostPatterns): void
     {
         self::$trustedHostPatterns = array_map(function ($hostPattern) {
             return sprintf('#%s#i', $hostPattern);
@@ -655,7 +655,7 @@ class Request
      *
      * The HTTP method can only be overridden when the real HTTP method is POST.
      */
-    public static function enableHttpMethodParameterOverride()
+    public static function enableHttpMethodParameterOverride(): void
     {
         self::$httpMethodParameterOverride = true;
     }
@@ -742,7 +742,7 @@ class Request
      *
      * @param SessionInterface $session The Session
      */
-    public function setSession(SessionInterface $session)
+    public function setSession(SessionInterface $session): void
     {
         $this->session = $session;
     }
@@ -1179,7 +1179,7 @@ class Request
      *
      * @param string $method
      */
-    public function setMethod($method)
+    public function setMethod($method): void
     {
         $this->method = null;
         $this->server->set('REQUEST_METHOD', $method);
@@ -1295,7 +1295,7 @@ class Request
      * @param string       $format    The format
      * @param string|array $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
      */
-    public function setFormat($format, $mimeTypes)
+    public function setFormat($format, $mimeTypes): void
     {
         if (null === static::$formats) {
             static::initializeFormats();
@@ -1331,7 +1331,7 @@ class Request
      *
      * @param string $format The request format
      */
-    public function setRequestFormat($format)
+    public function setRequestFormat($format): void
     {
         $this->format = $format;
     }
@@ -1351,7 +1351,7 @@ class Request
      *
      * @param string $locale
      */
-    public function setDefaultLocale($locale)
+    public function setDefaultLocale($locale): void
     {
         $this->defaultLocale = $locale;
 
@@ -1375,7 +1375,7 @@ class Request
      *
      * @param string $locale
      */
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
         $this->setPhpDefaultLocale($this->locale = $locale);
     }
@@ -1844,7 +1844,7 @@ class Request
     /**
      * Initializes HTTP request formats.
      */
-    protected static function initializeFormats()
+    protected static function initializeFormats(): void
     {
         static::$formats = array(
             'html' => array('text/html', 'application/xhtml+xml'),
@@ -1860,7 +1860,7 @@ class Request
         );
     }
 
-    private function setPhpDefaultLocale(string $locale)
+    private function setPhpDefaultLocale(string $locale): void
     {
         // if either the class Locale doesn't exist, or an exception is thrown when
         // setting the default locale, the intl module is not installed, and

@@ -36,7 +36,7 @@ class TemplatePathsCacheWarmer extends CacheWarmer
      *
      * @param string $cacheDir The cache directory
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): void
     {
         $filesystem = new Filesystem();
         $templates = array();

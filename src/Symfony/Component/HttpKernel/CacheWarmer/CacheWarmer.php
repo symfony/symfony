@@ -18,7 +18,7 @@ namespace Symfony\Component\HttpKernel\CacheWarmer;
  */
 abstract class CacheWarmer implements CacheWarmerInterface
 {
-    protected function writeCacheFile($file, $content)
+    protected function writeCacheFile($file, $content): void
     {
         $tmpFile = @tempnam(dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {

@@ -19,20 +19,20 @@ use Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices;
 
 class AbstractRememberMeServicesTest extends TestCase
 {
-    public function testGetRememberMeParameter()
+    public function testGetRememberMeParameter(): void
     {
         $service = $this->getService(null, array('remember_me_parameter' => 'foo'));
 
         $this->assertEquals('foo', $service->getRememberMeParameter());
     }
 
-    public function testGetSecret()
+    public function testGetSecret(): void
     {
         $service = $this->getService();
         $this->assertEquals('foosecret', $service->getSecret());
     }
 
-    public function testAutoLoginReturnsNullWhenNoCookie()
+    public function testAutoLoginReturnsNullWhenNoCookie(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
 
@@ -42,7 +42,7 @@ class AbstractRememberMeServicesTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface()
+    public function testAutoLoginThrowsExceptionWhenImplementationDoesNotReturnUserInterface(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
@@ -57,7 +57,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $service->autoLogin($request);
     }
 
-    public function testAutoLogin()
+    public function testAutoLogin(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
@@ -86,7 +86,7 @@ class AbstractRememberMeServicesTest extends TestCase
     /**
      * @dataProvider provideOptionsForLogout
      */
-    public function testLogout(array $options)
+    public function testLogout(array $options): void
     {
         $service = $this->getService(null, $options);
         $request = new Request();
@@ -111,7 +111,7 @@ class AbstractRememberMeServicesTest extends TestCase
         );
     }
 
-    public function testLoginFail()
+    public function testLoginFail(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
@@ -121,7 +121,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    public function testLoginSuccessIsNotProcessedWhenTokenDoesNotContainUserInterfaceImplementation()
+    public function testLoginSuccessIsNotProcessedWhenTokenDoesNotContainUserInterfaceImplementation(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
         $request = new Request();
@@ -144,7 +144,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $service->loginSuccess($request, $response, $token);
     }
 
-    public function testLoginSuccessIsNotProcessedWhenRememberMeIsNotRequested()
+    public function testLoginSuccessIsNotProcessedWhenRememberMeIsNotRequested(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
@@ -168,7 +168,7 @@ class AbstractRememberMeServicesTest extends TestCase
         $service->loginSuccess($request, $response, $token);
     }
 
-    public function testLoginSuccessWhenRememberMeAlwaysIsTrue()
+    public function testLoginSuccessWhenRememberMeAlwaysIsTrue(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
         $request = new Request();
@@ -193,7 +193,7 @@ class AbstractRememberMeServicesTest extends TestCase
     /**
      * @dataProvider getPositiveRememberMeParameterValues
      */
-    public function testLoginSuccessWhenRememberMeParameterWithPathIsPositive($value)
+    public function testLoginSuccessWhenRememberMeParameterWithPathIsPositive($value): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo[bar]', 'path' => null, 'domain' => null));
 
@@ -220,7 +220,7 @@ class AbstractRememberMeServicesTest extends TestCase
     /**
      * @dataProvider getPositiveRememberMeParameterValues
      */
-    public function testLoginSuccessWhenRememberMeParameterIsPositive($value)
+    public function testLoginSuccessWhenRememberMeParameterIsPositive($value): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => false, 'remember_me_parameter' => 'foo', 'path' => null, 'domain' => null));
 
@@ -255,7 +255,7 @@ class AbstractRememberMeServicesTest extends TestCase
         );
     }
 
-    public function testEncodeCookieAndDecodeCookieAreInvertible()
+    public function testEncodeCookieAndDecodeCookieAreInvertible(): void
     {
         $cookieParts = array('aa', 'bb', 'cc');
         $service = $this->getService();
@@ -271,7 +271,7 @@ class AbstractRememberMeServicesTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage cookie delimiter
      */
-    public function testThereShouldBeNoCookieDelimiterInCookieParts()
+    public function testThereShouldBeNoCookieDelimiterInCookieParts(): void
     {
         $cookieParts = array('aa', 'b'.AbstractRememberMeServices::COOKIE_DELIMITER.'b', 'cc');
         $service = $this->getService();

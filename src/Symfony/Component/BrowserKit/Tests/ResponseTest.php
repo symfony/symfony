@@ -16,25 +16,25 @@ use Symfony\Component\BrowserKit\Response;
 
 class ResponseTest extends TestCase
 {
-    public function testGetUri()
+    public function testGetUri(): void
     {
         $response = new Response('foo');
         $this->assertEquals('foo', $response->getContent(), '->getContent() returns the content of the response');
     }
 
-    public function testGetStatus()
+    public function testGetStatus(): void
     {
         $response = new Response('foo', 304);
         $this->assertEquals('304', $response->getStatus(), '->getStatus() returns the status of the response');
     }
 
-    public function testGetHeaders()
+    public function testGetHeaders(): void
     {
         $response = new Response('foo', 200, array('foo' => 'bar'));
         $this->assertEquals(array('foo' => 'bar'), $response->getHeaders(), '->getHeaders() returns the headers of the response');
     }
 
-    public function testGetHeader()
+    public function testGetHeader(): void
     {
         $response = new Response('foo', 200, array(
             'Content-Type' => 'text/html',
@@ -51,14 +51,14 @@ class ResponseTest extends TestCase
         $this->assertEquals(array(), $response->getHeader('foo', false), '->getHeader() returns an empty array if the header is not defined and first is set to false');
     }
 
-    public function testMagicToString()
+    public function testMagicToString(): void
     {
         $response = new Response('foo', 304, array('foo' => 'bar'));
 
         $this->assertEquals("foo: bar\n\nfoo", $response->__toString(), '->__toString() returns the headers and the content as a string');
     }
 
-    public function testMagicToStringWithMultipleSetCookieHeader()
+    public function testMagicToStringWithMultipleSetCookieHeader(): void
     {
         $headers = array(
             'content-type' => 'text/html; charset=utf-8',

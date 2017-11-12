@@ -25,7 +25,7 @@ class PhpDocExtractorTest extends TestCase
      */
     private $extractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extractor = new PhpDocExtractor();
     }
@@ -33,7 +33,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtract($property, array $type = null, $shortDescription, $longDescription)
+    public function testExtract($property, array $type = null, $shortDescription, $longDescription): void
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
@@ -43,7 +43,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesWithCustomPrefixesProvider
      */
-    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
+    public function testExtractTypesWithCustomPrefixes($property, array $type = null): void
     {
         $customExtractor = new PhpDocExtractor(null, array('add', 'remove'), array('is', 'can'));
 
@@ -53,7 +53,7 @@ class PhpDocExtractorTest extends TestCase
     /**
      * @dataProvider typesWithNoPrefixesProvider
      */
-    public function testExtractTypesWithNoPrefixes($property, array $type = null)
+    public function testExtractTypesWithNoPrefixes($property, array $type = null): void
     {
         $noPrefixExtractor = new PhpDocExtractor(null, array(), array(), array());
 
@@ -166,7 +166,7 @@ class PhpDocExtractorTest extends TestCase
         );
     }
 
-    public function testReturnNullOnEmptyDocBlock()
+    public function testReturnNullOnEmptyDocBlock(): void
     {
         $this->assertNull($this->extractor->getShortDescription(EmptyDocBlock::class, 'foo'));
     }

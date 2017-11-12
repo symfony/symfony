@@ -322,7 +322,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                      metadata factory does not implement
      *                                      {@link ClassMetadataInterface}
      */
-    private function validateObject($object, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context)
+    private function validateObject($object, $propertyPath, array $groups, $traversalStrategy, ExecutionContextInterface $context): void
     {
         try {
             $classMetadata = $this->metadataFactory->getMetadataFor($object);
@@ -382,7 +382,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @see ClassNode
      * @see CollectionNode
      */
-    private function validateEachObjectIn($collection, $propertyPath, array $groups, ExecutionContextInterface $context)
+    private function validateEachObjectIn($collection, $propertyPath, array $groups, ExecutionContextInterface $context): void
     {
         foreach ($collection as $key => $value) {
             if (is_array($value)) {
@@ -460,7 +460,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @see TraversalStrategy
      */
-    private function validateClassNode($object, $cacheKey, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
+    private function validateClassNode($object, $cacheKey, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context): void
     {
         $context->setNode($object, $object, $metadata, $propertyPath);
 
@@ -647,7 +647,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @see TraversalStrategy
      */
-    private function validateGenericNode($value, $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
+    private function validateGenericNode($value, $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context): void
     {
         $context->setNode($value, $object, $metadata, $propertyPath);
 
@@ -755,7 +755,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *                                                     the group sequence
      * @param ExecutionContextInterface $context           The execution context
      */
-    private function stepThroughGroupSequence($value, $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, $cascadedGroup, ExecutionContextInterface $context)
+    private function stepThroughGroupSequence($value, $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, $cascadedGroup, ExecutionContextInterface $context): void
     {
         $violationCount = count($context->getViolations());
         $cascadedGroups = $cascadedGroup ? array($cascadedGroup) : null;
@@ -805,7 +805,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param string                    $group    The group to validate
      * @param ExecutionContextInterface $context  The execution context
      */
-    private function validateInGroup($value, $cacheKey, MetadataInterface $metadata, $group, ExecutionContextInterface $context)
+    private function validateInGroup($value, $cacheKey, MetadataInterface $metadata, $group, ExecutionContextInterface $context): void
     {
         $context->setGroup($group);
 

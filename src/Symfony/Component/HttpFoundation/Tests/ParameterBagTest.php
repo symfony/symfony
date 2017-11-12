@@ -16,31 +16,31 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterBagTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->testAll();
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
         $this->assertEquals(array('foo' => 'bar'), $bag->all(), '->all() gets all the input');
     }
 
-    public function testKeys()
+    public function testKeys(): void
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
         $this->assertEquals(array('foo'), $bag->keys());
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
         $bag->add(array('bar' => 'bas'));
         $this->assertEquals(array('foo' => 'bar', 'bar' => 'bas'), $bag->all());
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
         $bag->add(array('bar' => 'bas'));
@@ -49,7 +49,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(array('foo' => 'bar'), $bag->all());
     }
 
-    public function testReplace()
+    public function testReplace(): void
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
 
@@ -58,7 +58,7 @@ class ParameterBagTest extends TestCase
         $this->assertFalse($bag->has('foo'), '->replace() overrides previously set the input');
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $bag = new ParameterBag(array('foo' => 'bar', 'null' => null));
 
@@ -67,14 +67,14 @@ class ParameterBagTest extends TestCase
         $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
     }
 
-    public function testGetDoesNotUseDeepByDefault()
+    public function testGetDoesNotUseDeepByDefault(): void
     {
         $bag = new ParameterBag(array('foo' => array('bar' => 'moo')));
 
         $this->assertNull($bag->get('foo[bar]'));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $bag = new ParameterBag(array());
 
@@ -85,7 +85,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('baz', $bag->get('foo'), '->set() overrides previously set parameter');
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $bag = new ParameterBag(array('foo' => 'bar'));
 
@@ -93,7 +93,7 @@ class ParameterBagTest extends TestCase
         $this->assertFalse($bag->has('unknown'), '->has() return false if a parameter is not defined');
     }
 
-    public function testGetAlpha()
+    public function testGetAlpha(): void
     {
         $bag = new ParameterBag(array('word' => 'foo_BAR_012'));
 
@@ -101,7 +101,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('', $bag->getAlpha('unknown'), '->getAlpha() returns empty string if a parameter is not defined');
     }
 
-    public function testGetAlnum()
+    public function testGetAlnum(): void
     {
         $bag = new ParameterBag(array('word' => 'foo_BAR_012'));
 
@@ -109,7 +109,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('', $bag->getAlnum('unknown'), '->getAlnum() returns empty string if a parameter is not defined');
     }
 
-    public function testGetDigits()
+    public function testGetDigits(): void
     {
         $bag = new ParameterBag(array('word' => 'foo_BAR_012'));
 
@@ -117,7 +117,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('', $bag->getDigits('unknown'), '->getDigits() returns empty string if a parameter is not defined');
     }
 
-    public function testGetInt()
+    public function testGetInt(): void
     {
         $bag = new ParameterBag(array('digits' => '0123'));
 
@@ -125,7 +125,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 
-    public function testFilter()
+    public function testFilter(): void
     {
         $bag = new ParameterBag(array(
             'digits' => '0123ab',
@@ -160,7 +160,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(array('bang'), $bag->filter('array', ''), '->filter() gets a value of parameter as an array');
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $parameters = array('foo' => 'bar', 'hello' => 'world');
         $bag = new ParameterBag($parameters);
@@ -174,7 +174,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(count($parameters), $i);
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $parameters = array('foo' => 'bar', 'hello' => 'world');
         $bag = new ParameterBag($parameters);
@@ -182,7 +182,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(count($parameters), count($bag));
     }
 
-    public function testGetBoolean()
+    public function testGetBoolean(): void
     {
         $parameters = array('string_true' => 'true', 'string_false' => 'false');
         $bag = new ParameterBag($parameters);

@@ -66,7 +66,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
      *
      * When guessing, this guesser is preferred over previously registered ones.
      */
-    public function register(ExtensionGuesserInterface $guesser)
+    public function register(ExtensionGuesserInterface $guesser): void
     {
         array_unshift($this->guessers, $guesser);
     }

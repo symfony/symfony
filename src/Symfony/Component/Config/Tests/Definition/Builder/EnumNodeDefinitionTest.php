@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\Builder\EnumNodeDefinition;
 
 class EnumNodeDefinitionTest extends TestCase
 {
-    public function testWithOneValue()
+    public function testWithOneValue(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->values(array('foo'));
@@ -25,7 +25,7 @@ class EnumNodeDefinitionTest extends TestCase
         $this->assertEquals(array('foo'), $node->getValues());
     }
 
-    public function testWithOneDistinctValue()
+    public function testWithOneDistinctValue(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->values(array('foo', 'foo'));
@@ -38,7 +38,7 @@ class EnumNodeDefinitionTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage You must call ->values() on enum nodes.
      */
-    public function testNoValuesPassed()
+    public function testNoValuesPassed(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->getNode();
@@ -48,13 +48,13 @@ class EnumNodeDefinitionTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage ->values() must be called with at least one value.
      */
-    public function testWithNoValues()
+    public function testWithNoValues(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->values(array());
     }
 
-    public function testGetNode()
+    public function testGetNode(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->values(array('foo', 'bar'));
@@ -63,7 +63,7 @@ class EnumNodeDefinitionTest extends TestCase
         $this->assertEquals(array('foo', 'bar'), $node->getValues());
     }
 
-    public function testSetDeprecated()
+    public function testSetDeprecated(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->values(array('foo', 'bar'));

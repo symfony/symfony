@@ -88,7 +88,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $constraint = new Issn();
 
@@ -97,7 +97,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $constraint = new Issn();
 
@@ -109,7 +109,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $constraint = new Issn();
         $this->validator->validate(new \stdClass(), $constraint);
@@ -118,7 +118,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidLowerCasedIssn
      */
-    public function testCaseSensitiveIssns($issn)
+    public function testCaseSensitiveIssns($issn): void
     {
         $constraint = new Issn(array(
             'caseSensitive' => true,
@@ -136,7 +136,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidNonHyphenatedIssn
      */
-    public function testRequireHyphenIssns($issn)
+    public function testRequireHyphenIssns($issn): void
     {
         $constraint = new Issn(array(
             'requireHyphen' => true,
@@ -154,7 +154,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidIssn
      */
-    public function testValidIssn($issn)
+    public function testValidIssn($issn): void
     {
         $constraint = new Issn();
 
@@ -166,7 +166,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidIssn
      */
-    public function testInvalidIssn($issn, $code)
+    public function testInvalidIssn($issn, $code): void
     {
         $constraint = new Issn(array(
             'message' => 'myMessage',

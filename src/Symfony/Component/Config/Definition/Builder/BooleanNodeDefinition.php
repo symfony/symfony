@@ -46,7 +46,7 @@ class BooleanNodeDefinition extends ScalarNodeDefinition
      *
      * @throws InvalidDefinitionException
      */
-    public function cannotBeEmpty()
+    public function cannotBeEmpty(): void
     {
         throw new InvalidDefinitionException('->cannotBeEmpty() is not applicable to BooleanNodeDefinition.');
     }

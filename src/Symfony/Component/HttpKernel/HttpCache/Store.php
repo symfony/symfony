@@ -44,7 +44,7 @@ class Store implements StoreInterface
     /**
      * Cleanups storage.
      */
-    public function cleanup()
+    public function cleanup(): void
     {
         // unlock everything
         foreach ($this->locks as $lock) {
@@ -229,7 +229,7 @@ class Store implements StoreInterface
      *
      * @throws \RuntimeException
      */
-    public function invalidate(Request $request)
+    public function invalidate(Request $request): void
     {
         $modified = false;
         $key = $this->getCacheKey($request);

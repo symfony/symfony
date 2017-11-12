@@ -20,13 +20,13 @@ class BooleanNodeDefinitionTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
      * @expectedExceptionMessage ->cannotBeEmpty() is not applicable to BooleanNodeDefinition.
      */
-    public function testCannotBeEmptyThrowsAnException()
+    public function testCannotBeEmptyThrowsAnException(): void
     {
         $def = new BooleanNodeDefinition('foo');
         $def->cannotBeEmpty();
     }
 
-    public function testSetDeprecated()
+    public function testSetDeprecated(): void
     {
         $def = new BooleanNodeDefinition('foo');
         $def->setDeprecated('The "%path%" node is deprecated.');

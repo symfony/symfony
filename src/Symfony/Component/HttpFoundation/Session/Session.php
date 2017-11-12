@@ -74,7 +74,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function set($name, $value)
+    public function set($name, $value): void
     {
         $this->getAttributeBag()->set($name, $value);
     }
@@ -90,7 +90,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function replace(array $attributes)
+    public function replace(array $attributes): void
     {
         $this->getAttributeBag()->replace($attributes);
     }
@@ -106,7 +106,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         $this->storage->getBag($this->attributeName)->clear();
     }
@@ -160,7 +160,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function save()
+    public function save(): void
     {
         $this->storage->save();
     }
@@ -176,7 +176,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->storage->setId($id);
     }
@@ -192,7 +192,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->storage->setName($name);
     }
@@ -208,7 +208,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function registerBag(SessionBagInterface $bag)
+    public function registerBag(SessionBagInterface $bag): void
     {
         $this->storage->registerBag($bag);
     }

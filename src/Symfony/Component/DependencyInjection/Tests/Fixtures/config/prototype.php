@@ -4,7 +4,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 
-return function (ContainerConfigurator $c) {
+return function (ContainerConfigurator $c): void {
     $di = $c->services()->defaults()
         ->tag('baz');
     $di->load(Prototype::class.'\\', '../Prototype')

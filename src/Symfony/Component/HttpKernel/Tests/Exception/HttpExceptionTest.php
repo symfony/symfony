@@ -21,7 +21,7 @@ class HttpExceptionTest extends TestCase
         );
     }
 
-    public function testHeadersDefault()
+    public function testHeadersDefault(): void
     {
         $exception = $this->createException();
         $this->assertSame(array(), $exception->getHeaders());
@@ -30,7 +30,7 @@ class HttpExceptionTest extends TestCase
     /**
      * @dataProvider headerDataProvider
      */
-    public function testHeadersConstructor($headers)
+    public function testHeadersConstructor($headers): void
     {
         $exception = new HttpException(200, null, null, $headers);
         $this->assertSame($headers, $exception->getHeaders());
@@ -39,7 +39,7 @@ class HttpExceptionTest extends TestCase
     /**
      * @dataProvider headerDataProvider
      */
-    public function testHeadersSetter($headers)
+    public function testHeadersSetter($headers): void
     {
         $exception = $this->createException();
         $exception->setHeaders($headers);

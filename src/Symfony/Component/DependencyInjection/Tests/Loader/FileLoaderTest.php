@@ -31,12 +31,12 @@ class FileLoaderTest extends TestCase
 {
     protected static $fixturesPath;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$fixturesPath = realpath(__DIR__.'/../');
     }
 
-    public function testImportWithGlobPattern()
+    public function testImportWithGlobPattern(): void
     {
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath));
@@ -79,7 +79,7 @@ class FileLoaderTest extends TestCase
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
     }
 
-    public function testRegisterClasses()
+    public function testRegisterClasses(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('sub_dir', 'Sub');
@@ -93,7 +93,7 @@ class FileLoaderTest extends TestCase
         );
     }
 
-    public function testRegisterClassesWithExclude()
+    public function testRegisterClassesWithExclude(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('other_dir', 'OtherDir');
@@ -117,7 +117,7 @@ class FileLoaderTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessageRegExp /Expected to find class "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Prototype\\Bar" in file ".+" while importing services from resource "Prototype\/Sub\/\*", but it was not found\! Check the namespace prefix used with the resource/
      */
-    public function testRegisterClassesWithBadPrefix()
+    public function testRegisterClassesWithBadPrefix(): void
     {
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
@@ -129,7 +129,7 @@ class FileLoaderTest extends TestCase
     /**
      * @dataProvider getIncompatibleExcludeTests
      */
-    public function testRegisterClassesWithIncompatibleExclude($resourcePattern, $excludePattern)
+    public function testRegisterClassesWithIncompatibleExclude($resourcePattern, $excludePattern): void
     {
         $container = new ContainerBuilder();
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));

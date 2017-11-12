@@ -186,7 +186,7 @@ class ExprBuilder
      */
     public function thenInvalid($message)
     {
-        $this->thenPart = function ($v) use ($message) {throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
+        $this->thenPart = function ($v) use ($message): void {throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
 
         return $this;
     }
@@ -200,7 +200,7 @@ class ExprBuilder
      */
     public function thenUnset()
     {
-        $this->thenPart = function ($v) { throw new UnsetKeyException('Unsetting key'); };
+        $this->thenPart = function ($v): void { throw new UnsetKeyException('Unsetting key'); };
 
         return $this;
     }

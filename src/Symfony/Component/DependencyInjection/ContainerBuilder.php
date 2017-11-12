@@ -146,7 +146,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param bool $track True if you want to track resources, false otherwise
      */
-    public function setResourceTracking($track)
+    public function setResourceTracking($track): void
     {
         $this->trackResources = (bool) $track;
     }
@@ -164,12 +164,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the instantiator to be used when fetching proxies.
      */
-    public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator)
+    public function setProxyInstantiator(InstantiatorInterface $proxyInstantiator): void
     {
         $this->proxyInstantiator = $proxyInstantiator;
     }
 
-    public function registerExtension(ExtensionInterface $extension)
+    public function registerExtension(ExtensionInterface $extension): void
     {
         $this->extensions[$extension->getAlias()] = $extension;
 
@@ -464,7 +464,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
-    public function set($id, $service)
+    public function set($id, $service): void
     {
         if ($this->isCompiled() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
             // setting a synthetic service on a compiled container is alright
@@ -481,7 +481,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $id The service identifier
      */
-    public function removeDefinition($id)
+    public function removeDefinition($id): void
     {
         if (isset($this->definitions[$id])) {
             unset($this->definitions[$id]);
@@ -571,7 +571,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      */
-    public function merge(ContainerBuilder $container)
+    public function merge(ContainerBuilder $container): void
     {
         if ($this->isCompiled()) {
             throw new BadMethodCallException('Cannot merge on a compiled container.');
@@ -644,7 +644,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $name   The name of the extension
      * @param array  $config The config to set
      */
-    public function prependExtensionConfig($name, array $config)
+    public function prependExtensionConfig($name, array $config): void
     {
         if (!isset($this->extensionConfigs[$name])) {
             $this->extensionConfigs[$name] = array();
@@ -672,7 +672,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *                                     Set to "true" when you want to use the current ContainerBuilder
      *                                     directly, keep to "false" when the container is dumped instead.
      */
-    public function compile(bool $resolveEnvPlaceholders = false)
+    public function compile(bool $resolveEnvPlaceholders = false): void
     {
         $compiler = $this->getCompiler();
 
@@ -731,7 +731,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds the service aliases.
      */
-    public function addAliases(array $aliases)
+    public function addAliases(array $aliases): void
     {
         foreach ($aliases as $alias => $id) {
             $this->setAlias($alias, $id);
@@ -741,7 +741,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Sets the service aliases.
      */
-    public function setAliases(array $aliases)
+    public function setAliases(array $aliases): void
     {
         $this->aliasDefinitions = array();
         $this->addAliases($aliases);
@@ -780,7 +780,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $alias The alias to remove
      */
-    public function removeAlias($alias)
+    public function removeAlias($alias): void
     {
         if (isset($this->aliasDefinitions[$alias])) {
             unset($this->aliasDefinitions[$alias]);
@@ -865,7 +865,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param Definition[] $definitions An array of service definitions
      */
-    public function addDefinitions(array $definitions)
+    public function addDefinitions(array $definitions): void
     {
         foreach ($definitions as $id => $definition) {
             $this->setDefinition($id, $definition);
@@ -877,7 +877,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param Definition[] $definitions An array of service definitions
      */
-    public function setDefinitions(array $definitions)
+    public function setDefinitions(array $definitions): void
     {
         $this->definitions = array();
         $this->addDefinitions($definitions);
@@ -1204,7 +1204,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return array_values(array_diff($this->findTags(), $this->usedTags));
     }
 
-    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
     {
         $this->expressionLanguageProviders[] = $provider;
     }
@@ -1326,7 +1326,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * @final
      */
-    public function log(CompilerPassInterface $pass, string $message)
+    public function log(CompilerPassInterface $pass, string $message): void
     {
         $this->getCompiler()->log($pass, $message);
     }
@@ -1433,7 +1433,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->proxyInstantiator;
     }
 
-    private function callMethod($service, $call)
+    private function callMethod($service, $call): void
     {
         foreach (self::getServiceConditionals($call[1]) as $s) {
             if (!$this->has($s)) {
@@ -1455,7 +1455,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param object      $service
      * @param string|null $id
      */
-    private function shareService(Definition $definition, $service, $id)
+    private function shareService(Definition $definition, $service, $id): void
     {
         if (null !== $id && $definition->isShared()) {
             $this->services[$id] = $service;

@@ -43,7 +43,7 @@ class ContainerDebugCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(
@@ -101,7 +101,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
@@ -155,7 +155,7 @@ EOF
      *
      * @throws \InvalidArgumentException
      */
-    protected function validateInput(InputInterface $input)
+    protected function validateInput(InputInterface $input): void
     {
         $options = array('tags', 'tag', 'parameters', 'parameter');
 

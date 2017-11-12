@@ -48,7 +48,7 @@ class LogoutUrlGenerator
      * @param CsrfTokenManagerInterface|null $csrfTokenManager A CsrfTokenManagerInterface instance
      * @param string|null                    $context          The listener context
      */
-    public function registerListener($key, $logoutPath, $csrfTokenId, $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null)
+    public function registerListener($key, $logoutPath, $csrfTokenId, $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null): void
     {
         $this->listeners[$key] = array($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context);
     }
@@ -81,7 +81,7 @@ class LogoutUrlGenerator
      * @param string|null $key     The current firewall key
      * @param string|null $context The current firewall context
      */
-    public function setCurrentFirewall($key, $context = null)
+    public function setCurrentFirewall($key, $context = null): void
     {
         $this->currentFirewall = array($key, $context);
     }

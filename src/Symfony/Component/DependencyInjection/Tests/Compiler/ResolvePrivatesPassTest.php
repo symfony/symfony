@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolvePrivatesPassTest extends TestCase
 {
-    public function testPrivateHasHigherPrecedenceThanPublic()
+    public function testPrivateHasHigherPrecedenceThanPublic(): void
     {
         $container = new ContainerBuilder();
 

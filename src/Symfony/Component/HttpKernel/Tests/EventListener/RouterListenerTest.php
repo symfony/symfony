@@ -31,7 +31,7 @@ class RouterListenerTest extends TestCase
 {
     private $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
     }
@@ -39,7 +39,7 @@ class RouterListenerTest extends TestCase
     /**
      * @dataProvider getPortData
      */
-    public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
+    public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort): void
     {
         $urlMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\UrlMatcherInterface')
             ->disableOriginalConstructor()
@@ -82,12 +82,12 @@ class RouterListenerTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testInvalidMatcher()
+    public function testInvalidMatcher(): void
     {
         new RouterListener(new \stdClass(), $this->requestStack);
     }
 
-    public function testRequestMatcher()
+    public function testRequestMatcher(): void
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $request = Request::create('http://localhost/');
@@ -103,7 +103,7 @@ class RouterListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testSubRequestWithDifferentMethod()
+    public function testSubRequestWithDifferentMethod(): void
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $request = Request::create('http://localhost/', 'post');
@@ -133,7 +133,7 @@ class RouterListenerTest extends TestCase
     /**
      * @dataProvider getLoggingParameterData
      */
-    public function testLoggingParameter($parameter, $log, $parameters)
+    public function testLoggingParameter($parameter, $log, $parameters): void
     {
         $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
         $requestMatcher->expects($this->once())
@@ -160,7 +160,7 @@ class RouterListenerTest extends TestCase
         );
     }
 
-    public function testWithBadRequest()
+    public function testWithBadRequest(): void
     {
         $requestStack = new RequestStack();
 
@@ -182,7 +182,7 @@ class RouterListenerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
     }
 
-    public function testNoRoutingConfigurationResponse()
+    public function testNoRoutingConfigurationResponse(): void
     {
         $requestStack = new RequestStack();
 

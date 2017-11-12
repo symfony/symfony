@@ -22,7 +22,7 @@ class ResolveClassPassTest extends TestCase
     /**
      * @dataProvider provideValidClassId
      */
-    public function testResolveClassFromId($serviceId)
+    public function testResolveClassFromId($serviceId): void
     {
         $container = new ContainerBuilder();
         $def = $container->register($serviceId);
@@ -41,7 +41,7 @@ class ResolveClassPassTest extends TestCase
     /**
      * @dataProvider provideInvalidClassId
      */
-    public function testWontResolveClassFromId($serviceId)
+    public function testWontResolveClassFromId($serviceId): void
     {
         $container = new ContainerBuilder();
         $def = $container->register($serviceId);
@@ -58,7 +58,7 @@ class ResolveClassPassTest extends TestCase
         yield array('\DateTime');
     }
 
-    public function testNonFqcnChildDefinition()
+    public function testNonFqcnChildDefinition(): void
     {
         $container = new ContainerBuilder();
         $parent = $container->register('App\Foo', null);
@@ -70,7 +70,7 @@ class ResolveClassPassTest extends TestCase
         $this->assertNull($child->getClass());
     }
 
-    public function testClassFoundChildDefinition()
+    public function testClassFoundChildDefinition(): void
     {
         $container = new ContainerBuilder();
         $parent = $container->register('App\Foo', null);
@@ -86,7 +86,7 @@ class ResolveClassPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Service definition "App\Foo\Child" has a parent but no class, and its name looks like a FQCN. Either the class is missing or you want to inherit it from the parent service. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class.
      */
-    public function testAmbiguousChildDefinition()
+    public function testAmbiguousChildDefinition(): void
     {
         $container = new ContainerBuilder();
         $parent = $container->register('App\Foo', null);

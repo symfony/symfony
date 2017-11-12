@@ -16,7 +16,7 @@ use Symfony\Component\Config\Util\XmlUtils;
 
 class XmlUtilsTest extends TestCase
 {
-    public function testLoadFile()
+    public function testLoadFile(): void
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
@@ -66,7 +66,7 @@ class XmlUtilsTest extends TestCase
      * @expectedException \Symfony\Component\Config\Util\Exception\InvalidXmlException
      * @expectedExceptionMessage The XML is not valid
      */
-    public function testParseWithInvalidValidatorCallable()
+    public function testParseWithInvalidValidatorCallable(): void
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
@@ -76,7 +76,7 @@ class XmlUtilsTest extends TestCase
         XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), array($mock, 'validate'));
     }
 
-    public function testLoadFileWithInternalErrorsEnabled()
+    public function testLoadFileWithInternalErrorsEnabled(): void
     {
         $internalErrors = libxml_use_internal_errors(true);
 
@@ -91,7 +91,7 @@ class XmlUtilsTest extends TestCase
     /**
      * @dataProvider getDataForConvertDomToArray
      */
-    public function testConvertDomToArray($expected, $xml, $root = false, $checkPrefix = true)
+    public function testConvertDomToArray($expected, $xml, $root = false, $checkPrefix = true): void
     {
         $dom = new \DOMDocument();
         $dom->loadXML($root ? $xml : '<root>'.$xml.'</root>');
@@ -125,7 +125,7 @@ class XmlUtilsTest extends TestCase
     /**
      * @dataProvider getDataForPhpize
      */
-    public function testPhpize($expected, $value)
+    public function testPhpize($expected, $value): void
     {
         $this->assertSame($expected, XmlUtils::phpize($value));
     }
@@ -162,7 +162,7 @@ class XmlUtilsTest extends TestCase
         );
     }
 
-    public function testLoadEmptyXmlFile()
+    public function testLoadEmptyXmlFile(): void
     {
         $file = __DIR__.'/../Fixtures/foo.xml';
 
@@ -177,12 +177,12 @@ class XmlUtilsTest extends TestCase
     }
 
     // test for issue https://github.com/symfony/symfony/issues/9731
-    public function testLoadWrongEmptyXMLWithErrorHandler()
+    public function testLoadWrongEmptyXMLWithErrorHandler(): void
     {
         $originalDisableEntities = libxml_disable_entity_loader(false);
         $errorReporting = error_reporting(-1);
 
-        set_error_handler(function ($errno, $errstr) {
+        set_error_handler(function ($errno, $errstr): void {
             throw new \Exception($errstr, $errno);
         });
 

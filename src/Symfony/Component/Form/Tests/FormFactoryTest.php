@@ -48,7 +48,7 @@ class FormFactoryTest extends TestCase
      */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
         $this->guesser2 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
@@ -64,7 +64,7 @@ class FormFactoryTest extends TestCase
             ))));
     }
 
-    public function testCreateNamedBuilderWithTypeName()
+    public function testCreateNamedBuilderWithTypeName(): void
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
@@ -91,7 +91,7 @@ class FormFactoryTest extends TestCase
         $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', null, $options));
     }
 
-    public function testCreateNamedBuilderFillsDataOption()
+    public function testCreateNamedBuilderFillsDataOption(): void
     {
         $givenOptions = array('a' => '1', 'b' => '2');
         $expectedOptions = array_merge($givenOptions, array('data' => 'DATA'));
@@ -119,7 +119,7 @@ class FormFactoryTest extends TestCase
         $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', 'DATA', $givenOptions));
     }
 
-    public function testCreateNamedBuilderDoesNotOverrideExistingDataOption()
+    public function testCreateNamedBuilderDoesNotOverrideExistingDataOption(): void
     {
         $options = array('a' => '1', 'b' => '2', 'data' => 'CUSTOM');
         $resolvedOptions = array('a' => '2', 'b' => '3', 'data' => 'CUSTOM');
@@ -150,7 +150,7 @@ class FormFactoryTest extends TestCase
      * @expectedException        \Symfony\Component\Form\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "string", "stdClass" given
      */
-    public function testCreateNamedBuilderThrowsUnderstandableException()
+    public function testCreateNamedBuilderThrowsUnderstandableException(): void
     {
         $this->factory->createNamedBuilder('name', new \stdClass());
     }
@@ -159,12 +159,12 @@ class FormFactoryTest extends TestCase
      * @expectedException        \Symfony\Component\Form\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "string", "stdClass" given
      */
-    public function testCreateThrowsUnderstandableException()
+    public function testCreateThrowsUnderstandableException(): void
     {
         $this->factory->create(new \stdClass());
     }
 
-    public function testCreateUsesBlockPrefixIfTypeGivenAsString()
+    public function testCreateUsesBlockPrefixIfTypeGivenAsString(): void
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
@@ -203,7 +203,7 @@ class FormFactoryTest extends TestCase
         $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
     }
 
-    public function testCreateNamed()
+    public function testCreateNamed(): void
     {
         $options = array('a' => '1', 'b' => '2');
         $resolvedOptions = array('a' => '2', 'b' => '3');
@@ -234,7 +234,7 @@ class FormFactoryTest extends TestCase
         $this->assertSame('FORM', $this->factory->createNamed('name', 'type', null, $options));
     }
 
-    public function testCreateBuilderForPropertyWithoutTypeGuesser()
+    public function testCreateBuilderForPropertyWithoutTypeGuesser(): void
     {
         $registry = $this->getMockBuilder('Symfony\Component\Form\FormRegistryInterface')->getMock();
         $factory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
@@ -252,7 +252,7 @@ class FormFactoryTest extends TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
-    public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
+    public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence(): void
     {
         $this->guesser1->expects($this->once())
             ->method('guessType')
@@ -284,7 +284,7 @@ class FormFactoryTest extends TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
-    public function testCreateBuilderCreatesTextFormIfNoGuess()
+    public function testCreateBuilderCreatesTextFormIfNoGuess(): void
     {
         $this->guesser1->expects($this->once())
             ->method('guessType')
@@ -303,7 +303,7 @@ class FormFactoryTest extends TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
-    public function testOptionsCanBeOverridden()
+    public function testOptionsCanBeOverridden(): void
     {
         $this->guesser1->expects($this->once())
             ->method('guessType')
@@ -331,7 +331,7 @@ class FormFactoryTest extends TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
-    public function testCreateBuilderUsesMaxLengthIfFound()
+    public function testCreateBuilderUsesMaxLengthIfFound(): void
     {
         $this->guesser1->expects($this->once())
             ->method('guessMaxLength')
@@ -364,7 +364,7 @@ class FormFactoryTest extends TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
-    public function testCreateBuilderUsesMaxLengthAndPattern()
+    public function testCreateBuilderUsesMaxLengthAndPattern(): void
     {
         $this->guesser1->expects($this->once())
             ->method('guessMaxLength')
@@ -399,7 +399,7 @@ class FormFactoryTest extends TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
-    public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
+    public function testCreateBuilderUsesRequiredSettingWithHighestConfidence(): void
     {
         $this->guesser1->expects($this->once())
             ->method('guessRequired')
@@ -432,7 +432,7 @@ class FormFactoryTest extends TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
-    public function testCreateBuilderUsesPatternIfFound()
+    public function testCreateBuilderUsesPatternIfFound(): void
     {
         $this->guesser1->expects($this->once())
             ->method('guessPattern')

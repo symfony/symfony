@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
 class ContainerControllerResolverTest extends ControllerResolverTest
 {
-    public function testGetControllerService()
+    public function testGetControllerService(): void
     {
         $container = $this->createMockContainer();
         $container->expects($this->once())
@@ -37,7 +37,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame('controllerMethod1', $controller[1]);
     }
 
-    public function testGetControllerInvokableService()
+    public function testGetControllerInvokableService(): void
     {
         $invokableController = new InvokableController('bar');
 
@@ -62,7 +62,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertEquals($invokableController, $controller);
     }
 
-    public function testGetControllerInvokableServiceWithClassNameAsName()
+    public function testGetControllerInvokableServiceWithClassNameAsName(): void
     {
         $invokableController = new InvokableController('bar');
         $className = __NAMESPACE__.'\InvokableController';
@@ -88,7 +88,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertEquals($invokableController, $controller);
     }
 
-    public function testNonInstantiableController()
+    public function testNonInstantiableController(): void
     {
         $container = $this->createMockContainer();
         $container->expects($this->once())
@@ -106,7 +106,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame(array(NonInstantiableController::class, 'action'), $controller);
     }
 
-    public function testNonInstantiableControllerWithCorrespondingService()
+    public function testNonInstantiableControllerWithCorrespondingService(): void
     {
         $service = new \stdClass();
 
@@ -134,7 +134,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     /**
      * @dataProvider getUndefinedControllers
      */
-    public function testGetControllerOnNonUndefinedFunction($controller, $exceptionName = null, $exceptionMessage = null)
+    public function testGetControllerOnNonUndefinedFunction($controller, $exceptionName = null, $exceptionMessage = null): void
     {
         // All this logic needs to be duplicated, since calling parent::testGetControllerOnNonUndefinedFunction will override the expected excetion and not use the regex
         $resolver = $this->createControllerResolver();
@@ -185,14 +185,14 @@ class InvokableController
     {
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
     }
 }
 
 abstract class NonInstantiableController
 {
-    public static function action()
+    public static function action(): void
     {
     }
 }

@@ -19,7 +19,7 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 
 class NoTemplatingEntryTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $kernel = new NoTemplatingEntryKernel('dev', true);
         $kernel->boot();
@@ -29,17 +29,17 @@ class NoTemplatingEntryTest extends TestCase
         $this->assertContains('{ a: b }', $content);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->deleteTempDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteTempDir();
     }
 
-    protected function deleteTempDir()
+    protected function deleteTempDir(): void
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/NoTemplatingEntryKernel')) {
             return;
@@ -57,9 +57,9 @@ class NoTemplatingEntryKernel extends Kernel
         return array(new FrameworkBundle(), new TwigBundle());
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(function ($container) {
+        $loader->load(function ($container): void {
             $container->loadFromExtension('framework', array(
                 'secret' => '$ecret',
                 'form' => array('enabled' => false),

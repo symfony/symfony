@@ -19,7 +19,7 @@ class ArrayConverterTest extends TestCase
     /**
      * @dataProvider messagesData
      */
-    public function testDump($input, $expectedOutput)
+    public function testDump($input, $expectedOutput): void
     {
         $this->assertEquals($expectedOutput, ArrayConverter::expandToTree($input));
     }

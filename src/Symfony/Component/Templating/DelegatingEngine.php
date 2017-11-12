@@ -44,7 +44,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function stream($name, array $parameters = array())
+    public function stream($name, array $parameters = array()): void
     {
         $engine = $this->getEngine($name);
         if (!$engine instanceof StreamingEngineInterface) {
@@ -62,7 +62,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         return $this->getEngine($name)->exists($name);
     }
 
-    public function addEngine(EngineInterface $engine)
+    public function addEngine(EngineInterface $engine): void
     {
         $this->engines[] = $engine;
     }

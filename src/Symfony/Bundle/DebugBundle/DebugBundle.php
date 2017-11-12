@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class DebugBundle extends Bundle
 {
-    public function boot()
+    public function boot(): void
     {
         if ($this->container->getParameter('kernel.debug')) {
             $container = $this->container;
@@ -31,10 +31,10 @@ class DebugBundle extends Bundle
             // The dump data collector is used by default, so dump output is sent to
             // the WDT. In a CLI context, if dump is used too soon, the data collector
             // will buffer it, and release it at the end of the script.
-            VarDumper::setHandler(function ($var) use ($container) {
+            VarDumper::setHandler(function ($var) use ($container): void {
                 $dumper = $container->get('data_collector.dump');
                 $cloner = $container->get('var_dumper.cloner');
-                $handler = function ($var) use ($dumper, $cloner) {
+                $handler = function ($var) use ($dumper, $cloner): void {
                     $dumper->dump($cloner->cloneVar($var));
                 };
                 VarDumper::setHandler($handler);
@@ -46,7 +46,7 @@ class DebugBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

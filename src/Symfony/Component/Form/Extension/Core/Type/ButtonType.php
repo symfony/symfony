@@ -24,7 +24,7 @@ class ButtonType extends BaseType implements ButtonTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): void
     {
     }
 
@@ -39,7 +39,7 @@ class ButtonType extends BaseType implements ButtonTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 

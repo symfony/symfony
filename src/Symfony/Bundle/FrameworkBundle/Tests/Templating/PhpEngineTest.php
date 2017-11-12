@@ -23,7 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class PhpEngineTest extends TestCase
 {
-    public function testEvaluateAddsAppGlobal()
+    public function testEvaluateAddsAppGlobal(): void
     {
         $container = $this->getContainer();
         $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
@@ -32,7 +32,7 @@ class PhpEngineTest extends TestCase
         $this->assertSame($app, $globals['app']);
     }
 
-    public function testEvaluateWithoutAvailableRequest()
+    public function testEvaluateWithoutAvailableRequest(): void
     {
         $container = new Container();
         $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');
@@ -46,7 +46,7 @@ class PhpEngineTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testGetInvalidHelper()
+    public function testGetInvalidHelper(): void
     {
         $container = $this->getContainer();
         $loader = $this->getMockForAbstractClass('Symfony\Component\Templating\Loader\Loader');

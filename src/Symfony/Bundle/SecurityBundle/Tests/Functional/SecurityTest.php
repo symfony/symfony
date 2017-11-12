@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\User;
 
 class SecurityTest extends WebTestCase
 {
-    public function testServiceIsFunctional()
+    public function testServiceIsFunctional(): void
     {
         $kernel = self::createKernel(array('test_case' => 'SecurityHelper', 'root_config' => 'config.yml'));
         $kernel->boot();

@@ -17,13 +17,13 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 class FilesLoaderTest extends TestCase
 {
-    public function testCallsGetFileLoaderInstanceForeachPath()
+    public function testCallsGetFileLoaderInstanceForeachPath(): void
     {
         $loader = $this->getFilesLoader($this->getFileLoader());
         $this->assertEquals(4, $loader->getTimesCalled());
     }
 
-    public function testCallsActualFileLoaderForMetadata()
+    public function testCallsActualFileLoaderForMetadata(): void
     {
         $fileLoader = $this->getFileLoader();
         $fileLoader->expects($this->exactly(4))

@@ -57,7 +57,7 @@ class Stopwatch
      *
      * @throws \LogicException When the section to re-open is not reachable
      */
-    public function openSection($id = null)
+    public function openSection($id = null): void
     {
         $current = end($this->activeSections);
 
@@ -81,7 +81,7 @@ class Stopwatch
      *
      * @throws \LogicException When there's no started section to be stopped
      */
-    public function stopSection($id)
+    public function stopSection($id): void
     {
         $this->stop('__section__');
 
@@ -169,7 +169,7 @@ class Stopwatch
     /**
      * Resets the stopwatch to its original state.
      */
-    public function reset()
+    public function reset(): void
     {
         $this->sections = $this->activeSections = array('__root__' => new Section(null, $this->morePrecision));
     }

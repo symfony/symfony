@@ -212,7 +212,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * {@inheritdoc}
      */
-    public function terminate(Request $request, Response $response)
+    public function terminate(Request $request, Response $response): void
     {
         if ($this->getKernel() instanceof TerminableInterface) {
             $this->getKernel()->terminate($request, $response);
@@ -565,7 +565,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @throws \Exception
      */
-    protected function store(Request $request, Response $response)
+    protected function store(Request $request, Response $response): void
     {
         try {
             $this->store->write($request, $response);
@@ -588,7 +588,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Restores the Response body.
      */
-    private function restoreResponseBody(Request $request, Response $response)
+    private function restoreResponseBody(Request $request, Response $response): void
     {
         if ($response->headers->has('X-Body-Eval')) {
             ob_start();
@@ -617,7 +617,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $response->headers->remove('X-Body-File');
     }
 
-    protected function processResponseBody(Request $request, Response $response)
+    protected function processResponseBody(Request $request, Response $response): void
     {
         if (null !== $this->surrogate && $this->surrogate->needsParsing($response)) {
             $this->surrogate->process($request, $response);
@@ -650,7 +650,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     /**
      * Records that an event took place.
      */
-    private function record(Request $request, string $event)
+    private function record(Request $request, string $event): void
     {
         $this->traces[$this->getTraceKey($request)][] = $event;
     }

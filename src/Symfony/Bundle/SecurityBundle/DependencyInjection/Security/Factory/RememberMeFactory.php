@@ -119,7 +119,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         return 'remember-me';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $builder = $node
             ->fixXmlConfig('user_provider')

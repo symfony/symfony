@@ -55,12 +55,12 @@ class PhpArrayAdapterTest extends AdapterTestCase
 
     protected static $file;
 
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         self::$file = sys_get_temp_dir().'/symfony-cache/php-array-adapter-test.php';
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists(sys_get_temp_dir().'/symfony-cache')) {
             FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
@@ -72,7 +72,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         return new PhpArrayAdapterWrapper(self::$file, new NullAdapter());
     }
 
-    public function testStore()
+    public function testStore(): void
     {
         $arrayWithRefs = array();
         $arrayWithRefs[0] = 123;
@@ -99,7 +99,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         }
     }
 
-    public function testStoredFile()
+    public function testStoredFile(): void
     {
         $expected = array(
             'integer' => 42,
@@ -122,7 +122,7 @@ class PhpArrayAdapterWrapper extends PhpArrayAdapter
 {
     public function save(CacheItemInterface $item)
     {
-        call_user_func(\Closure::bind(function () use ($item) {
+        call_user_func(\Closure::bind(function () use ($item): void {
             $this->values[$item->getKey()] = $item->get();
             $this->warmUp($this->values);
             $this->values = eval(substr(file_get_contents($this->file), 6));

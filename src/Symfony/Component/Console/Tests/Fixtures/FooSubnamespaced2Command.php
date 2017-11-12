@@ -9,7 +9,7 @@ class FooSubnamespaced2Command extends Command
     public $input;
     public $output;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('foo:go:bret')
@@ -18,7 +18,7 @@ class FooSubnamespaced2Command extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->input = $input;
         $this->output = $output;

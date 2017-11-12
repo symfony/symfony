@@ -44,7 +44,7 @@ class IcuVersionTest extends TestCase
     /**
      * @dataProvider normalizeProvider
      */
-    public function testNormalize($precision, $version, $result)
+    public function testNormalize($precision, $version, $result): void
     {
         $this->assertSame($result, IcuVersion::normalize($version, $precision));
     }
@@ -105,7 +105,7 @@ class IcuVersionTest extends TestCase
     /**
      * @dataProvider compareProvider
      */
-    public function testCompare($precision, $version1, $operator, $version2, $result)
+    public function testCompare($precision, $version1, $operator, $version2, $result): void
     {
         $this->assertSame($result, IcuVersion::compare($version1, $version2, $operator, $precision));
     }

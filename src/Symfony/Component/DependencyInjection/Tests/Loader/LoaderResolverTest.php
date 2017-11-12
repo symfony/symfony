@@ -28,7 +28,7 @@ class LoaderResolverTest extends TestCase
     /** @var LoaderResolver */
     private $resolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
 
@@ -55,7 +55,7 @@ class LoaderResolverTest extends TestCase
     /**
      * @dataProvider provideResourcesToLoad
      */
-    public function testResolvesForcedType($resource, $type, $expectedClass)
+    public function testResolvesForcedType($resource, $type, $expectedClass): void
     {
         $this->assertInstanceOf($expectedClass, $this->resolver->resolve($resource, $type));
     }

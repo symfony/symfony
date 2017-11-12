@@ -21,7 +21,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testExceptionOnAbstractTaggedSubscriber()
+    public function testExceptionOnAbstractTaggedSubscriber(): void
     {
         $container = $this->createBuilder();
 
@@ -37,7 +37,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testExceptionOnAbstractTaggedListener()
+    public function testExceptionOnAbstractTaggedListener(): void
     {
         $container = $this->createBuilder();
 
@@ -50,7 +50,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessEventListenersWithPriorities()
+    public function testProcessEventListenersWithPriorities(): void
     {
         $container = $this->createBuilder();
 
@@ -78,7 +78,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->assertEquals(array('foo', 'bar'), $calls[1][1][0]);
     }
 
-    public function testProcessEventListenersWithMultipleConnections()
+    public function testProcessEventListenersWithMultipleConnections(): void
     {
         $container = $this->createBuilder(true);
 
@@ -99,7 +99,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->assertEquals($callsDefault, $callsSecond);
     }
 
-    public function testProcessEventSubscribersWithPriorities()
+    public function testProcessEventSubscribersWithPriorities(): void
     {
         $container = $this->createBuilder();
 
@@ -140,7 +140,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->assertEquals(array('b', 'a'), $serviceOrder);
     }
 
-    public function testProcessNoTaggedServices()
+    public function testProcessNoTaggedServices(): void
     {
         $container = $this->createBuilder(true);
 
@@ -151,7 +151,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls());
     }
 
-    private function process(ContainerBuilder $container)
+    private function process(ContainerBuilder $container): void
     {
         $pass = new RegisterEventListenersAndSubscribersPass('doctrine.connections', 'doctrine.dbal.%s_connection.event_manager', 'doctrine');
         $pass->process($container);

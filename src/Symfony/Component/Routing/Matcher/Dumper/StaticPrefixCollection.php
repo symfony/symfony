@@ -58,7 +58,7 @@ class StaticPrefixCollection
      *
      * @param mixed  $route
      */
-    public function addRoute(string $prefix, $route)
+    public function addRoute(string $prefix, $route): void
     {
         $prefix = '/' === $prefix ? $prefix : rtrim($prefix, '/');
         $this->guardAgainstAddingNotAcceptedRoutes($prefix);
@@ -216,7 +216,7 @@ class StaticPrefixCollection
      *
      * @throws \LogicException when a prefix does not belong in a group
      */
-    private function guardAgainstAddingNotAcceptedRoutes(string $prefix)
+    private function guardAgainstAddingNotAcceptedRoutes(string $prefix): void
     {
         if (!$this->accepts($prefix)) {
             $message = sprintf('Could not add route with prefix %s to collection with prefix %s', $prefix, $this->prefix);

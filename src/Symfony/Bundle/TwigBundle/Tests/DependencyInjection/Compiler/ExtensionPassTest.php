@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class ExtensionPassTest extends TestCase
 {
-    public function testProcessDoesNotDropExistingFileLoaderMethodCalls()
+    public function testProcessDoesNotDropExistingFileLoaderMethodCalls(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

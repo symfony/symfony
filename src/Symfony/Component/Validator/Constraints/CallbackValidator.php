@@ -26,7 +26,7 @@ class CallbackValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($object, Constraint $constraint)
+    public function validate($object, Constraint $constraint): void
     {
         if (!$constraint instanceof Callback) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Callback');

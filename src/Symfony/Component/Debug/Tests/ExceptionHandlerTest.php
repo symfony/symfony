@@ -21,17 +21,17 @@ require_once __DIR__.'/HeaderMock.php';
 
 class ExceptionHandlerTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         testHeader();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         testHeader();
     }
 
-    public function testDebug()
+    public function testDebug(): void
     {
         $handler = new ExceptionHandler(false);
 
@@ -52,7 +52,7 @@ class ExceptionHandlerTest extends TestCase
         $this->assertContains('<div class="trace trace-as-html">', $response);
     }
 
-    public function testStatusCode()
+    public function testStatusCode(): void
     {
         $handler = new ExceptionHandler(false, 'iso8859-1');
 
@@ -70,7 +70,7 @@ class ExceptionHandlerTest extends TestCase
         $this->assertSame($expectedHeaders, testHeader());
     }
 
-    public function testHeaders()
+    public function testHeaders(): void
     {
         $handler = new ExceptionHandler(false, 'iso8859-1');
 
@@ -87,7 +87,7 @@ class ExceptionHandlerTest extends TestCase
         $this->assertSame($expectedHeaders, testHeader());
     }
 
-    public function testNestedExceptions()
+    public function testNestedExceptions(): void
     {
         $handler = new ExceptionHandler(true);
         ob_start();
@@ -97,7 +97,7 @@ class ExceptionHandlerTest extends TestCase
         $this->assertStringMatchesFormat('%A<p class="break-long-words trace-message">Foo</p>%A<p class="break-long-words trace-message">Bar</p>%A', $response);
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $exception = new \Exception('foo');
 
@@ -108,14 +108,14 @@ class ExceptionHandlerTest extends TestCase
 
         $handler->handle($exception);
 
-        $handler->setHandler(function ($e) use ($exception) {
+        $handler->setHandler(function ($e) use ($exception): void {
             $this->assertSame($exception, $e);
         });
 
         $handler->handle($exception);
     }
 
-    public function testHandleOutOfMemoryException()
+    public function testHandleOutOfMemoryException(): void
     {
         $exception = new OutOfMemoryException('foo', 0, E_ERROR, __FILE__, __LINE__);
 
@@ -124,7 +124,7 @@ class ExceptionHandlerTest extends TestCase
             ->expects($this->once())
             ->method('sendPhpResponse');
 
-        $handler->setHandler(function ($e) {
+        $handler->setHandler(function ($e): void {
             $this->fail('OutOfMemoryException should bypass the handler');
         });
 

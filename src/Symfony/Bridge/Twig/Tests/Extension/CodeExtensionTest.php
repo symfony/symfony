@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 class CodeExtensionTest extends TestCase
 {
-    public function testFormatFile()
+    public function testFormatFile(): void
     {
         $expected = sprintf('<a href="proto://foobar%s#&amp;line=25" title="Click to open this file" class="file_link">%s at line 25</a>', substr(__FILE__, 5), __FILE__);
         $this->assertEquals($expected, $this->getExtension()->formatFile(__FILE__, 25));
@@ -26,7 +26,7 @@ class CodeExtensionTest extends TestCase
     /**
      * @dataProvider getClassNameProvider
      */
-    public function testGettingClassAbbreviation($class, $abbr)
+    public function testGettingClassAbbreviation($class, $abbr): void
     {
         $this->assertEquals($this->getExtension()->abbrClass($class), $abbr);
     }
@@ -34,7 +34,7 @@ class CodeExtensionTest extends TestCase
     /**
      * @dataProvider getMethodNameProvider
      */
-    public function testGettingMethodAbbreviation($method, $abbr)
+    public function testGettingMethodAbbreviation($method, $abbr): void
     {
         $this->assertEquals($this->getExtension()->abbrMethod($method), $abbr);
     }
@@ -57,7 +57,7 @@ class CodeExtensionTest extends TestCase
         );
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('code', $this->getExtension()->getName());
     }

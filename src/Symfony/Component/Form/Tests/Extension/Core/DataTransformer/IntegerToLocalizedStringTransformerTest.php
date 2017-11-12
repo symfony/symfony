@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class IntegerToLocalizedStringTransformerTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -78,14 +78,14 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @dataProvider transformWithRoundingProvider
      */
-    public function testTransformWithRounding($input, $output, $roundingMode)
+    public function testTransformWithRounding($input, $output, $roundingMode): void
     {
         $transformer = new IntegerToLocalizedStringTransformer(null, null, $roundingMode);
 
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -100,14 +100,14 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(12345, $transformer->reverseTransform('12345,912'));
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $transformer = new IntegerToLocalizedStringTransformer();
 
         $this->assertNull($transformer->reverseTransform(''));
     }
 
-    public function testReverseTransformWithGrouping()
+    public function testReverseTransformWithGrouping(): void
     {
         // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this, false);
@@ -176,7 +176,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @dataProvider reverseTransformWithRoundingProvider
      */
-    public function testReverseTransformWithRounding($input, $output, $roundingMode)
+    public function testReverseTransformWithRounding($input, $output, $roundingMode): void
     {
         $transformer = new IntegerToLocalizedStringTransformer(null, null, $roundingMode);
 
@@ -186,7 +186,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformExpectsString()
+    public function testReverseTransformExpectsString(): void
     {
         $transformer = new IntegerToLocalizedStringTransformer();
 
@@ -196,7 +196,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformExpectsValidNumber()
+    public function testReverseTransformExpectsValidNumber(): void
     {
         $transformer = new IntegerToLocalizedStringTransformer();
 
@@ -206,7 +206,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformDisallowsNaN()
+    public function testReverseTransformDisallowsNaN(): void
     {
         $transformer = new IntegerToLocalizedStringTransformer();
 
@@ -216,7 +216,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformDisallowsNaN2()
+    public function testReverseTransformDisallowsNaN2(): void
     {
         $transformer = new IntegerToLocalizedStringTransformer();
 
@@ -226,7 +226,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformDisallowsInfinity()
+    public function testReverseTransformDisallowsInfinity(): void
     {
         $transformer = new IntegerToLocalizedStringTransformer();
 
@@ -236,7 +236,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformDisallowsNegativeInfinity()
+    public function testReverseTransformDisallowsNegativeInfinity(): void
     {
         $transformer = new IntegerToLocalizedStringTransformer();
 

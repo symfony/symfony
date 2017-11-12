@@ -20,12 +20,12 @@ class ResourceCheckerConfigCacheTest extends TestCase
 {
     private $cacheFile = null;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $files = array($this->cacheFile, "{$this->cacheFile}.meta");
 
@@ -36,14 +36,14 @@ class ResourceCheckerConfigCacheTest extends TestCase
         }
     }
 
-    public function testGetPath()
+    public function testGetPath(): void
     {
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
 
         $this->assertSame($this->cacheFile, $cache->getPath());
     }
 
-    public function testCacheIsNotFreshIfEmpty()
+    public function testCacheIsNotFreshIfEmpty(): void
     {
         $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock()
             ->expects($this->never())->method('supports');
@@ -57,7 +57,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testCacheIsFreshIfNoCheckerProvided()
+    public function testCacheIsFreshIfNoCheckerProvided(): void
     {
         /* For example in prod mode, you may choose not to run any checkers
            at all. In that case, the cache should always be considered fresh. */
@@ -65,13 +65,13 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testCacheIsFreshIfEmptyCheckerIteratorProvided()
+    public function testCacheIsFreshIfEmptyCheckerIteratorProvided(): void
     {
         $cache = new ResourceCheckerConfigCache($this->cacheFile, new \ArrayIterator(array()));
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testResourcesWithoutcheckersAreIgnoredAndConsideredFresh()
+    public function testResourcesWithoutcheckersAreIgnoredAndConsideredFresh(): void
     {
         /* As in the previous test, but this time we have a resource. */
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
@@ -80,7 +80,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertTrue($cache->isFresh()); // no (matching) ResourceChecker passed
     }
 
-    public function testIsFreshWithchecker()
+    public function testIsFreshWithchecker(): void
     {
         $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
 
@@ -98,7 +98,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testIsNotFreshWithchecker()
+    public function testIsNotFreshWithchecker(): void
     {
         $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
 
@@ -116,7 +116,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testCacheIsNotFreshWhenUnserializeFails()
+    public function testCacheIsNotFreshWhenUnserializeFails(): void
     {
         $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
         $cache = new ResourceCheckerConfigCache($this->cacheFile, array($checker));
@@ -128,7 +128,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testCacheKeepsContent()
+    public function testCacheKeepsContent(): void
     {
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
         $cache->write('FOOBAR');
@@ -136,7 +136,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertSame('FOOBAR', file_get_contents($cache->getPath()));
     }
 
-    public function testCacheIsNotFreshIfNotExistsMetaFile()
+    public function testCacheIsNotFreshIfNotExistsMetaFile(): void
     {
         $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
         $cache = new ResourceCheckerConfigCache($this->cacheFile, array($checker));

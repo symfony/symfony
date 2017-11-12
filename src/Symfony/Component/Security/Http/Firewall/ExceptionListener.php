@@ -68,7 +68,7 @@ class ExceptionListener
     /**
      * Registers a onKernelException listener to take care of security exceptions.
      */
-    public function register(EventDispatcherInterface $dispatcher)
+    public function register(EventDispatcherInterface $dispatcher): void
     {
         $dispatcher->addListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'), 1);
     }
@@ -76,7 +76,7 @@ class ExceptionListener
     /**
      * Unregisters the dispatcher.
      */
-    public function unregister(EventDispatcherInterface $dispatcher)
+    public function unregister(EventDispatcherInterface $dispatcher): void
     {
         $dispatcher->removeListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'));
     }
@@ -112,7 +112,7 @@ class ExceptionListener
         }
     }
 
-    private function handleAccessDeniedException(GetResponseForExceptionEvent $event, AccessDeniedException $exception)
+    private function handleAccessDeniedException(GetResponseForExceptionEvent $event, AccessDeniedException $exception): void
     {
         $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
 
@@ -202,7 +202,7 @@ class ExceptionListener
         return $response;
     }
 
-    protected function setTargetPath(Request $request)
+    protected function setTargetPath(Request $request): void
     {
         // session isn't required when using HTTP basic authentication mechanism for example
         if ($request->hasSession() && $request->isMethodSafe(false) && !$request->isXmlHttpRequest()) {

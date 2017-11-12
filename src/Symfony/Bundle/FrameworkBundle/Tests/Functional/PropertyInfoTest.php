@@ -15,7 +15,7 @@ use Symfony\Component\PropertyInfo\Type;
 
 class PropertyInfoTest extends WebTestCase
 {
-    public function testPhpDocPriority()
+    public function testPhpDocPriority(): void
     {
         static::bootKernel(array('test_case' => 'Serializer'));
         $container = static::$kernel->getContainer();
@@ -29,7 +29,7 @@ class Dummy
     /**
      * @param int[] $codes
      */
-    public function setCodes(array $codes)
+    public function setCodes(array $codes): void
     {
     }
 }

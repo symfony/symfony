@@ -52,7 +52,7 @@ class Collection extends Composite
     /**
      * {@inheritdoc}
      */
-    protected function initializeNestedConstraints()
+    protected function initializeNestedConstraints(): void
     {
         parent::initializeNestedConstraints();
 

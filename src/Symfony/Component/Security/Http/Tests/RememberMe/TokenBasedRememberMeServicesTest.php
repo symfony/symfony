@@ -21,14 +21,14 @@ use Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices;
 
 class TokenBasedRememberMeServicesTest extends TestCase
 {
-    public function testAutoLoginReturnsNullWhenNoCookie()
+    public function testAutoLoginReturnsNullWhenNoCookie(): void
     {
         $service = $this->getService(null, array('name' => 'foo'));
 
         $this->assertNull($service->autoLogin(new Request()));
     }
 
-    public function testAutoLoginThrowsExceptionOnInvalidCookie()
+    public function testAutoLoginThrowsExceptionOnInvalidCookie(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
         $request = new Request();
@@ -39,7 +39,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    public function testAutoLoginThrowsExceptionOnNonExistentUser()
+    public function testAutoLoginThrowsExceptionOnNonExistentUser(): void
     {
         $userProvider = $this->getProvider();
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
@@ -56,7 +56,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    public function testAutoLoginDoesNotAcceptCookieWithInvalidHash()
+    public function testAutoLoginDoesNotAcceptCookieWithInvalidHash(): void
     {
         $userProvider = $this->getProvider();
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
@@ -81,7 +81,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    public function testAutoLoginDoesNotAcceptAnExpiredCookie()
+    public function testAutoLoginDoesNotAcceptAnExpiredCookie(): void
     {
         $userProvider = $this->getProvider();
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
@@ -111,7 +111,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
      *
      * @param string $username
      */
-    public function testAutoLogin($username)
+    public function testAutoLogin($username): void
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user
@@ -152,7 +152,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         );
     }
 
-    public function testLogout()
+    public function testLogout(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => false));
         $request = new Request();
@@ -169,7 +169,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $this->assertFalse($cookie->isHttpOnly());
     }
 
-    public function testLoginFail()
+    public function testLoginFail(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => '/foo', 'domain' => 'foodomain.foo'));
         $request = new Request();
@@ -182,7 +182,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $this->assertEquals('foodomain.foo', $cookie->getDomain());
     }
 
-    public function testLoginSuccessIgnoresTokensWhichDoNotContainAnUserInterfaceImplementation()
+    public function testLoginSuccessIgnoresTokensWhichDoNotContainAnUserInterfaceImplementation(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
         $request = new Request();
@@ -203,7 +203,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
         $this->assertCount(0, $cookies);
     }
 
-    public function testLoginSuccess()
+    public function testLoginSuccess(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'lifetime' => 3600, 'always_remember_me' => true));
         $request = new Request();

@@ -10,14 +10,14 @@ class ObjectToPopulateTraitTest extends TestCase
 {
     use ObjectToPopulateTrait;
 
-    public function testExtractObjectToPopulateReturnsNullWhenKeyIsMissing()
+    public function testExtractObjectToPopulateReturnsNullWhenKeyIsMissing(): void
     {
         $object = $this->extractObjectToPopulate(ProxyDummy::class, array());
 
         $this->assertNull($object);
     }
 
-    public function testExtractObjectToPopulateReturnsNullWhenNonObjectIsProvided()
+    public function testExtractObjectToPopulateReturnsNullWhenNonObjectIsProvided(): void
     {
         $object = $this->extractObjectToPopulate(ProxyDummy::class, array(
             'object_to_populate' => 'not an object',
@@ -26,7 +26,7 @@ class ObjectToPopulateTraitTest extends TestCase
         $this->assertNull($object);
     }
 
-    public function testExtractObjectToPopulateReturnsNullWhenTheClassIsNotAnInstanceOfTheProvidedClass()
+    public function testExtractObjectToPopulateReturnsNullWhenTheClassIsNotAnInstanceOfTheProvidedClass(): void
     {
         $object = $this->extractObjectToPopulate(ProxyDummy::class, array(
             'object_to_populate' => new \stdClass(),
@@ -35,7 +35,7 @@ class ObjectToPopulateTraitTest extends TestCase
         $this->assertNull($object);
     }
 
-    public function testExtractObjectToPopulateReturnsObjectWhenEverythingChecksOut()
+    public function testExtractObjectToPopulateReturnsObjectWhenEverythingChecksOut(): void
     {
         $expected = new ProxyDummy();
         $object = $this->extractObjectToPopulate(ProxyDummy::class, array(

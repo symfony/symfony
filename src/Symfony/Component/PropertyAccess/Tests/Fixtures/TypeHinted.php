@@ -23,7 +23,7 @@ class TypeHinted
      */
     private $countable;
 
-    public function setDate(\DateTime $date)
+    public function setDate(\DateTime $date): void
     {
         $this->date = $date;
     }
@@ -44,7 +44,7 @@ class TypeHinted
     /**
      * @param \Countable $countable
      */
-    public function setCountable(\Countable $countable)
+    public function setCountable(\Countable $countable): void
     {
         $this->countable = $countable;
     }

@@ -23,7 +23,7 @@ class RepeatedTypeValidatorExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         // Map errors to the first field
         $errorMapping = function (Options $options) {

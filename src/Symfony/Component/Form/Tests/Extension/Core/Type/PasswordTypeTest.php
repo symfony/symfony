@@ -15,7 +15,7 @@ class PasswordTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\PasswordType';
 
-    public function testEmptyIfNotSubmitted()
+    public function testEmptyIfNotSubmitted(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->setData('pAs5w0rd');
@@ -23,7 +23,7 @@ class PasswordTypeTest extends BaseTypeTest
         $this->assertSame('', $form->createView()->vars['value']);
     }
 
-    public function testEmptyIfSubmitted()
+    public function testEmptyIfSubmitted(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit('pAs5w0rd');
@@ -31,7 +31,7 @@ class PasswordTypeTest extends BaseTypeTest
         $this->assertSame('', $form->createView()->vars['value']);
     }
 
-    public function testNotEmptyIfSubmittedAndNotAlwaysEmpty()
+    public function testNotEmptyIfSubmittedAndNotAlwaysEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array('always_empty' => false));
         $form->submit('pAs5w0rd');
@@ -39,7 +39,7 @@ class PasswordTypeTest extends BaseTypeTest
         $this->assertSame('pAs5w0rd', $form->createView()->vars['value']);
     }
 
-    public function testNotTrimmed()
+    public function testNotTrimmed(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null);
         $form->submit(' pAs5w0rd ');
@@ -47,7 +47,7 @@ class PasswordTypeTest extends BaseTypeTest
         $this->assertSame(' pAs5w0rd ', $form->getData());
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }

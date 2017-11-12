@@ -109,7 +109,7 @@ class ChildDefinition extends Definition
     /**
      * @internal
      */
-    public function setAutoconfigured($autoconfigured)
+    public function setAutoconfigured($autoconfigured): void
     {
         throw new BadMethodCallException('A ChildDefinition cannot be autoconfigured.');
     }
@@ -117,7 +117,7 @@ class ChildDefinition extends Definition
     /**
      * @internal
      */
-    public function setInstanceofConditionals(array $instanceof)
+    public function setInstanceofConditionals(array $instanceof): void
     {
         throw new BadMethodCallException('A ChildDefinition cannot have instanceof conditionals set on it.');
     }
@@ -125,7 +125,7 @@ class ChildDefinition extends Definition
     /**
      * @internal
      */
-    public function setBindings(array $bindings)
+    public function setBindings(array $bindings): void
     {
         throw new BadMethodCallException('A ChildDefinition cannot have bindings set on it.');
     }

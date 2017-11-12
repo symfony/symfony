@@ -18,7 +18,7 @@ class VarDumperTestTraitTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testItComparesLargeData()
+    public function testItComparesLargeData(): void
     {
         $howMany = 700;
         $data = array_fill_keys(range(0, $howMany), array('a', 'b', 'c', 'd'));

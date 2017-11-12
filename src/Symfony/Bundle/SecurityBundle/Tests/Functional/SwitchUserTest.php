@@ -19,7 +19,7 @@ class SwitchUserTest extends WebTestCase
     /**
      * @dataProvider getTestParameters
      */
-    public function testSwitchUser($originalUser, $targetUser, $expectedUser, $expectedStatus)
+    public function testSwitchUser($originalUser, $targetUser, $expectedUser, $expectedStatus): void
     {
         $client = $this->createAuthenticatedClient($originalUser);
 
@@ -29,7 +29,7 @@ class SwitchUserTest extends WebTestCase
         $this->assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public function testSwitchedUserCannotSwitchToOther()
+    public function testSwitchedUserCannotSwitchToOther(): void
     {
         $client = $this->createAuthenticatedClient('user_can_switch');
 
@@ -40,7 +40,7 @@ class SwitchUserTest extends WebTestCase
         $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public function testSwitchedUserExit()
+    public function testSwitchedUserExit(): void
     {
         $client = $this->createAuthenticatedClient('user_can_switch');
 
@@ -51,7 +51,7 @@ class SwitchUserTest extends WebTestCase
         $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public function testSwitchUserStateless()
+    public function testSwitchUserStateless(): void
     {
         $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'switchuser_stateless.yml'));
         $client->request('POST', '/chk', array(), array(), array('HTTP_X_SWITCH_USER' => 'dunglas', 'CONTENT_TYPE' => 'application/json'), '{"user": {"login": "user_can_switch", "password": "test"}}');

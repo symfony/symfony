@@ -82,7 +82,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->providerKey, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);

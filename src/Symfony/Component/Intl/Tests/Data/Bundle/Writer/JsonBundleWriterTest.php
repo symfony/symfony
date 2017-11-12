@@ -32,7 +32,7 @@ class JsonBundleWriterTest extends TestCase
      */
     private $filesystem;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->writer = new JsonBundleWriter();
         $this->directory = sys_get_temp_dir().'/JsonBundleWriterTest/'.mt_rand(1000, 9999);
@@ -41,12 +41,12 @@ class JsonBundleWriterTest extends TestCase
         $this->filesystem->mkdir($this->directory);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->filesystem->remove($this->directory);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $this->writer->write($this->directory, 'en', array(
             'Entry1' => array(
@@ -67,7 +67,7 @@ class JsonBundleWriterTest extends TestCase
     /**
      * @requires extension intl
      */
-    public function testWriteResourceBundle()
+    public function testWriteResourceBundle(): void
     {
         $bundle = new \ResourceBundle('rb', __DIR__.'/Fixtures', false);
 

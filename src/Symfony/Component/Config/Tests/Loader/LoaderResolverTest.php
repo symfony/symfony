@@ -16,7 +16,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 class LoaderResolverTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $resolver = new LoaderResolver(array(
             $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock(),
@@ -25,7 +25,7 @@ class LoaderResolverTest extends TestCase
         $this->assertEquals(array($loader), $resolver->getLoaders(), '__construct() takes an array of loaders as its first argument');
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $resolver = new LoaderResolver(array($loader));
@@ -34,10 +34,10 @@ class LoaderResolverTest extends TestCase
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $loader->expects($this->once())->method('supports')->will($this->returnValue(true));
         $resolver = new LoaderResolver(array($loader));
-        $this->assertEquals($loader, $resolver->resolve(function () {}), '->resolve() returns the loader for the given resource');
+        $this->assertEquals($loader, $resolver->resolve(function (): void {}), '->resolve() returns the loader for the given resource');
     }
 
-    public function testLoaders()
+    public function testLoaders(): void
     {
         $resolver = new LoaderResolver();
         $resolver->addLoader($loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock());

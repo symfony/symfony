@@ -37,7 +37,7 @@ abstract class FileDumper implements DumperInterface
      *
      * @param string $relativePathTemplate A template for the relative paths to files
      */
-    public function setRelativePathTemplate($relativePathTemplate)
+    public function setRelativePathTemplate($relativePathTemplate): void
     {
         $this->relativePathTemplate = $relativePathTemplate;
     }
@@ -47,7 +47,7 @@ abstract class FileDumper implements DumperInterface
      *
      * @param bool
      */
-    public function setBackup($backup)
+    public function setBackup($backup): void
     {
         if (false !== $backup) {
             throw new \LogicException('The backup feature is no longer supported.');
@@ -60,7 +60,7 @@ abstract class FileDumper implements DumperInterface
     /**
      * {@inheritdoc}
      */
-    public function dump(MessageCatalogue $messages, $options = array())
+    public function dump(MessageCatalogue $messages, $options = array()): void
     {
         if (!array_key_exists('path', $options)) {
             throw new InvalidArgumentException('The file dumper needs a path option.');

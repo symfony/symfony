@@ -22,7 +22,7 @@ class StopwatchExtensionTest extends TestCase
     /**
      * @expectedException \Twig\Error\SyntaxError
      */
-    public function testFailIfStoppingWrongEvent()
+    public function testFailIfStoppingWrongEvent(): void
     {
         $this->testTiming('{% stopwatch "foo" %}{% endstopwatch "bar" %}', array());
     }
@@ -30,7 +30,7 @@ class StopwatchExtensionTest extends TestCase
     /**
      * @dataProvider getTimingTemplates
      */
-    public function testTiming($template, $events)
+    public function testTiming($template, $events): void
     {
         $twig = new Environment(new ArrayLoader(array('template' => $template)), array('debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0));
         $twig->addExtension(new StopwatchExtension($this->getStopwatch($events)));

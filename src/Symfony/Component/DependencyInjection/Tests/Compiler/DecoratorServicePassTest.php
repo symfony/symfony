@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 
 class DecoratorServicePassTest extends TestCase
 {
-    public function testProcessWithoutAlias()
+    public function testProcessWithoutAlias(): void
     {
         $container = new ContainerBuilder();
         $fooDefinition = $container
@@ -58,7 +58,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertNull($barExtendedDefinition->getDecoratedService());
     }
 
-    public function testProcessWithAlias()
+    public function testProcessWithAlias(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -83,7 +83,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertNull($fooExtendedDefinition->getDecoratedService());
     }
 
-    public function testProcessWithPriority()
+    public function testProcessWithPriority(): void
     {
         $container = new ContainerBuilder();
         $fooDefinition = $container
@@ -125,7 +125,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertNull($quxDefinition->getDecoratedService());
     }
 
-    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinition()
+    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinition(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -144,7 +144,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(array('bar' => array('attr' => 'baz'), 'foobar' => array('attr' => 'bar')), $container->getDefinition('baz')->getTags());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $repeatedPass = new DecoratorServicePass();
         $repeatedPass->process($container);

@@ -13,7 +13,7 @@ class GraphvizDumperTest extends TestCase
 
     private $dumper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dumper = new GraphvizDumper();
     }
@@ -21,7 +21,7 @@ class GraphvizDumperTest extends TestCase
     /**
      * @dataProvider provideWorkflowDefinitionWithoutMarking
      */
-    public function testDumpWithoutMarking($definition, $expected)
+    public function testDumpWithoutMarking($definition, $expected): void
     {
         $dump = $this->dumper->dump($definition);
 
@@ -31,7 +31,7 @@ class GraphvizDumperTest extends TestCase
     /**
      * @dataProvider provideWorkflowDefinitionWithMarking
      */
-    public function testDumpWithMarking($definition, $marking, $expected)
+    public function testDumpWithMarking($definition, $marking, $expected): void
     {
         $dump = $this->dumper->dump($definition, $marking);
 

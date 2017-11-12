@@ -25,7 +25,7 @@ class AddConsoleCommandPassTest extends TestCase
     /**
      * @dataProvider visibilityProvider
      */
-    public function testProcess($public)
+    public function testProcess($public): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass());
@@ -55,7 +55,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(array($alias => $id), $container->getParameter('console.command.ids'));
     }
 
-    public function testProcessRegistersLazyCommands()
+    public function testProcessRegistersLazyCommands(): void
     {
         $container = new ContainerBuilder();
         $command = $container
@@ -78,7 +78,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(array(array('setName', array('my:command')), array('setAliases', array(array('my:alias')))), $command->getMethodCalls());
     }
 
-    public function testProcessFallsBackToDefaultName()
+    public function testProcessFallsBackToDefaultName(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -123,7 +123,7 @@ class AddConsoleCommandPassTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The service "my-command" tagged "console.command" must not be abstract.
      */
-    public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
+    public function testProcessThrowAnExceptionIfTheServiceIsAbstract(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -141,7 +141,7 @@ class AddConsoleCommandPassTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".
      */
-    public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand()
+    public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -154,7 +154,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->compile();
     }
 
-    public function testProcessPrivateServicesWithSameCommand()
+    public function testProcessPrivateServicesWithSameCommand(): void
     {
         $container = new ContainerBuilder();
         $className = 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand';

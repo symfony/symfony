@@ -17,7 +17,7 @@ use Symfony\Component\Translation\Dumper\XliffFileDumper;
 
 class XliffFileDumperTest extends TestCase
 {
-    public function testFormatCatalogue()
+    public function testFormatCatalogue(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add(array(
@@ -36,7 +36,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatCatalogueXliff2()
+    public function testFormatCatalogueXliff2(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add(array(
@@ -54,7 +54,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatCatalogueWithCustomToolInfo()
+    public function testFormatCatalogueWithCustomToolInfo(): void
     {
         $options = array(
             'default_locale' => 'en_US',
@@ -72,7 +72,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatCatalogueWithTargetAttributesMetadata()
+    public function testFormatCatalogueWithTargetAttributesMetadata(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add(array(
@@ -88,7 +88,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatCatalogueWithNotesMetadata()
+    public function testFormatCatalogueWithNotesMetadata(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add(array(

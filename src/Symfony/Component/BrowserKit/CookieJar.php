@@ -20,7 +20,7 @@ class CookieJar
 {
     protected $cookieJar = array();
 
-    public function set(Cookie $cookie)
+    public function set(Cookie $cookie): void
     {
         $this->cookieJar[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
     }
@@ -84,7 +84,7 @@ class CookieJar
      * @param string $path   The cookie path
      * @param string $domain The cookie domain
      */
-    public function expire($name, $path = '/', $domain = null)
+    public function expire($name, $path = '/', $domain = null): void
     {
         if (null === $path) {
             $path = '/';
@@ -114,7 +114,7 @@ class CookieJar
     /**
      * Removes all the cookies from the jar.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->cookieJar = array();
     }
@@ -125,7 +125,7 @@ class CookieJar
      * @param array  $setCookies Set-Cookie headers from an HTTP response
      * @param string $uri        The base URL
      */
-    public function updateFromSetCookie(array $setCookies, $uri = null)
+    public function updateFromSetCookie(array $setCookies, $uri = null): void
     {
         $cookies = array();
 
@@ -154,7 +154,7 @@ class CookieJar
      * @param Response $response A Response object
      * @param string   $uri      The base URL
      */
-    public function updateFromResponse(Response $response, $uri = null)
+    public function updateFromResponse(Response $response, $uri = null): void
     {
         $this->updateFromSetCookie($response->getHeader('Set-Cookie', false), $uri);
     }
@@ -235,7 +235,7 @@ class CookieJar
     /**
      * Removes all expired cookies.
      */
-    public function flushExpiredCookies()
+    public function flushExpiredCookies(): void
     {
         foreach ($this->cookieJar as $domain => $pathCookies) {
             foreach ($pathCookies as $path => $namedCookies) {

@@ -24,7 +24,7 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['allow_add'] && $options['prototype']) {
             $prototypeOptions = array_replace(array(
@@ -54,7 +54,7 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars = array_replace($view->vars, array(
             'allow_add' => $options['allow_add'],
@@ -70,7 +70,7 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if ($form->getConfig()->hasAttribute('prototype') && $view->vars['prototype']->vars['multipart']) {
             $view->vars['multipart'] = true;
@@ -80,7 +80,7 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $entryOptionsNormalizer = function (Options $options, $value) {
             $value['block_name'] = 'entry';

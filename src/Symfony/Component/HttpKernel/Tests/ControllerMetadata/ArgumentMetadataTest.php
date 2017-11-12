@@ -16,14 +16,14 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 class ArgumentMetadataTest extends TestCase
 {
-    public function testWithBcLayerWithDefault()
+    public function testWithBcLayerWithDefault(): void
     {
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value');
 
         $this->assertFalse($argument->isNullable());
     }
 
-    public function testDefaultValueAvailable()
+    public function testDefaultValueAvailable(): void
     {
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value', true);
 
@@ -35,7 +35,7 @@ class ArgumentMetadataTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testDefaultValueUnavailable()
+    public function testDefaultValueUnavailable(): void
     {
         $argument = new ArgumentMetadata('foo', 'string', false, false, null, false);
 

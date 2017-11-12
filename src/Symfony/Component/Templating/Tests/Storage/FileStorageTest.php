@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Storage\FileStorage;
 
 class FileStorageTest extends TestCase
 {
-    public function testGetContent()
+    public function testGetContent(): void
     {
         $storage = new FileStorage('foo');
         $this->assertInstanceOf('Symfony\Component\Templating\Storage\Storage', $storage, 'FileStorage is an instance of Storage');

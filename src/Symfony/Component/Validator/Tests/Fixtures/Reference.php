@@ -17,7 +17,7 @@ class Reference
 
     private $privateValue;
 
-    public function setPrivateValue($privateValue)
+    public function setPrivateValue($privateValue): void
     {
         $this->privateValue = $privateValue;
     }

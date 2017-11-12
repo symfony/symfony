@@ -31,7 +31,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    public function describe(OutputInterface $output, $object, array $options = array())
+    public function describe(OutputInterface $output, $object, array $options = array()): void
     {
         $decorated = $output->isDecorated();
         $output->setDecorated(false);
@@ -44,7 +44,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function write($content, $decorated = true)
+    protected function write($content, $decorated = true): void
     {
         parent::write($content, $decorated);
     }
@@ -52,7 +52,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputArgument(InputArgument $argument, array $options = array())
+    protected function describeInputArgument(InputArgument $argument, array $options = array()): void
     {
         $this->write(
             '#### `'.($argument->getName() ?: '<none>')."`\n\n"
@@ -66,7 +66,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputOption(InputOption $option, array $options = array())
+    protected function describeInputOption(InputOption $option, array $options = array()): void
     {
         $name = '--'.$option->getName();
         if ($option->getShortcut()) {
@@ -86,7 +86,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputDefinition(InputDefinition $definition, array $options = array())
+    protected function describeInputDefinition(InputDefinition $definition, array $options = array()): void
     {
         if ($showArguments = count($definition->getArguments()) > 0) {
             $this->write('### Arguments');
@@ -112,7 +112,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(Command $command, array $options = array()): void
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
@@ -141,7 +141,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeApplication(Application $application, array $options = array())
+    protected function describeApplication(Application $application, array $options = array()): void
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);

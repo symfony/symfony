@@ -33,7 +33,7 @@ class UserPasswordValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($password, Constraint $constraint)
+    public function validate($password, Constraint $constraint): void
     {
         if (!$constraint instanceof UserPassword) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\UserPassword');

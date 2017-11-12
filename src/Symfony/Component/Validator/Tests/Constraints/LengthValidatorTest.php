@@ -22,14 +22,14 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         return new LengthValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Length(6));
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Length(6));
 
@@ -39,7 +39,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Length(5));
     }
@@ -95,7 +95,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testValidValuesMin($value)
+    public function testValidValuesMin($value): void
     {
         $constraint = new Length(array('min' => 5));
         $this->validator->validate($value, $constraint);
@@ -106,7 +106,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testValidValuesMax($value)
+    public function testValidValuesMax($value): void
     {
         $constraint = new Length(array('max' => 3));
         $this->validator->validate($value, $constraint);
@@ -117,7 +117,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFourCharacters
      */
-    public function testValidValuesExact($value)
+    public function testValidValuesExact($value): void
     {
         $constraint = new Length(4);
         $this->validator->validate($value, $constraint);
@@ -128,7 +128,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesMin($value)
+    public function testInvalidValuesMin($value): void
     {
         $constraint = new Length(array(
             'min' => 4,
@@ -149,7 +149,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testInvalidValuesMax($value)
+    public function testInvalidValuesMax($value): void
     {
         $constraint = new Length(array(
             'max' => 4,
@@ -170,7 +170,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesExactLessThanFour($value)
+    public function testInvalidValuesExactLessThanFour($value): void
     {
         $constraint = new Length(array(
             'min' => 4,
@@ -192,7 +192,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testInvalidValuesExactMoreThanFour($value)
+    public function testInvalidValuesExactMoreThanFour($value): void
     {
         $constraint = new Length(array(
             'min' => 4,
@@ -214,7 +214,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getOneCharset
      */
-    public function testOneCharset($value, $charset, $isValid)
+    public function testOneCharset($value, $charset, $isValid): void
     {
         $constraint = new Length(array(
             'min' => 1,
@@ -237,7 +237,7 @@ class LengthValidatorTest extends ConstraintValidatorTestCase
         }
     }
 
-    public function testConstraintGetDefaultOption()
+    public function testConstraintGetDefaultOption(): void
     {
         $constraint = new Length(5);
 

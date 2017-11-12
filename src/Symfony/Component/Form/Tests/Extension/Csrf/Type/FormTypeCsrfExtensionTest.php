@@ -20,7 +20,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 
 class FormTypeCsrfExtensionTest_ChildType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // The form needs a child in order to trigger CSRF protection by
         // default
@@ -40,7 +40,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
      */
     protected $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenManager = $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock();
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
@@ -48,7 +48,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->tokenManager = null;
         $this->translator = null;
@@ -63,7 +63,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         ));
     }
 
-    public function testCsrfProtectionByDefaultIfRootAndCompound()
+    public function testCsrfProtectionByDefaultIfRootAndCompound(): void
     {
         $view = $this->factory
             ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
@@ -75,7 +75,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertTrue(isset($view['csrf']));
     }
 
-    public function testNoCsrfProtectionByDefaultIfCompoundButNotRoot()
+    public function testNoCsrfProtectionByDefaultIfCompoundButNotRoot(): void
     {
         $view = $this->factory
             ->createNamedBuilder('root', 'Symfony\Component\Form\Extension\Core\Type\FormType')
@@ -92,7 +92,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertFalse(isset($view['csrf']));
     }
 
-    public function testNoCsrfProtectionByDefaultIfRootButNotCompound()
+    public function testNoCsrfProtectionByDefaultIfRootButNotCompound(): void
     {
         $view = $this->factory
             ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
@@ -104,7 +104,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertFalse(isset($view['csrf']));
     }
 
-    public function testCsrfProtectionCanBeDisabled()
+    public function testCsrfProtectionCanBeDisabled(): void
     {
         $view = $this->factory
             ->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
@@ -117,7 +117,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertFalse(isset($view['csrf']));
     }
 
-    public function testGenerateCsrfToken()
+    public function testGenerateCsrfToken(): void
     {
         $this->tokenManager->expects($this->once())
             ->method('getToken')
@@ -136,7 +136,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertEquals('token', $view['csrf']->vars['value']);
     }
 
-    public function testGenerateCsrfTokenUsesFormNameAsIntentionByDefault()
+    public function testGenerateCsrfTokenUsesFormNameAsIntentionByDefault(): void
     {
         $this->tokenManager->expects($this->once())
             ->method('getToken')
@@ -154,7 +154,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertEquals('token', $view['csrf']->vars['value']);
     }
 
-    public function testGenerateCsrfTokenUsesTypeClassAsIntentionIfEmptyFormName()
+    public function testGenerateCsrfTokenUsesTypeClassAsIntentionIfEmptyFormName(): void
     {
         $this->tokenManager->expects($this->once())
             ->method('getToken')
@@ -183,7 +183,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     /**
      * @dataProvider provideBoolean
      */
-    public function testValidateTokenOnSubmitIfRootAndCompound($valid)
+    public function testValidateTokenOnSubmitIfRootAndCompound($valid): void
     {
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
@@ -215,7 +215,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     /**
      * @dataProvider provideBoolean
      */
-    public function testValidateTokenOnSubmitIfRootAndCompoundUsesFormNameAsIntentionByDefault($valid)
+    public function testValidateTokenOnSubmitIfRootAndCompoundUsesFormNameAsIntentionByDefault($valid): void
     {
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
@@ -246,7 +246,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     /**
      * @dataProvider provideBoolean
      */
-    public function testValidateTokenOnSubmitIfRootAndCompoundUsesTypeClassAsIntentionIfEmptyFormName($valid)
+    public function testValidateTokenOnSubmitIfRootAndCompoundUsesTypeClassAsIntentionIfEmptyFormName($valid): void
     {
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')
@@ -274,7 +274,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertSame($valid, $form->isValid());
     }
 
-    public function testFailIfRootAndCompoundAndTokenMissing()
+    public function testFailIfRootAndCompoundAndTokenMissing(): void
     {
         $this->tokenManager->expects($this->never())
             ->method('isTokenValid');
@@ -301,7 +301,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertFalse($form->isValid());
     }
 
-    public function testDontValidateTokenIfCompoundButNoRoot()
+    public function testDontValidateTokenIfCompoundButNoRoot(): void
     {
         $this->tokenManager->expects($this->never())
             ->method('isTokenValid');
@@ -325,7 +325,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         ));
     }
 
-    public function testDontValidateTokenIfRootButNotCompound()
+    public function testDontValidateTokenIfRootButNotCompound(): void
     {
         $this->tokenManager->expects($this->never())
             ->method('isTokenValid');
@@ -343,7 +343,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         ));
     }
 
-    public function testNoCsrfProtectionOnPrototype()
+    public function testNoCsrfProtectionOnPrototype(): void
     {
         $prototypeView = $this->factory
             ->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', null, array(
@@ -361,7 +361,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertCount(1, $prototypeView);
     }
 
-    public function testsTranslateCustomErrorMessage()
+    public function testsTranslateCustomErrorMessage(): void
     {
         $this->tokenManager->expects($this->once())
             ->method('isTokenValid')

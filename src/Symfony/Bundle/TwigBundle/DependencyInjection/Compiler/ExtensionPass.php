@@ -22,7 +22,7 @@ use Symfony\Component\Workflow\Workflow;
  */
 class ExtensionPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!class_exists('Symfony\Component\Asset\Packages')) {
             $container->removeDefinition('twig.extension.assets');

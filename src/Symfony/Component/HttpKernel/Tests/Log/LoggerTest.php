@@ -32,20 +32,20 @@ class LoggerTest extends TestCase
      */
     private $tmpFile;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tmpFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'log';
         $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (!@unlink($this->tmpFile)) {
             file_put_contents($this->tmpFile, '');
         }
     }
 
-    public static function assertLogsMatch(array $expected, array $given)
+    public static function assertLogsMatch(array $expected, array $given): void
     {
         foreach ($given as $k => $line) {
             self::assertThat(1 === preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[\+-][0-9]{2}:[0-9]{2} '.preg_quote($expected[$k]).'/', $line), self::isTrue(), "\"$line\" do not match expected pattern \"$expected[$k]\"");
@@ -62,7 +62,7 @@ class LoggerTest extends TestCase
         return file($this->tmpFile, FILE_IGNORE_NEW_LINES);
     }
 
-    public function testImplements()
+    public function testImplements(): void
     {
         $this->assertInstanceOf(LoggerInterface::class, $this->logger);
     }
@@ -70,7 +70,7 @@ class LoggerTest extends TestCase
     /**
      * @dataProvider provideLevelsAndMessages
      */
-    public function testLogsAtAllLevels($level, $message)
+    public function testLogsAtAllLevels($level, $message): void
     {
         $this->logger->{$level}($message, array('user' => 'Bob'));
         $this->logger->log($level, $message, array('user' => 'Bob'));
@@ -96,7 +96,7 @@ class LoggerTest extends TestCase
         );
     }
 
-    public function testLogLevelDisabled()
+    public function testLogLevelDisabled(): void
     {
         $this->logger = new Logger(LogLevel::INFO, $this->tmpFile);
 
@@ -110,7 +110,7 @@ class LoggerTest extends TestCase
     /**
      * @expectedException \Psr\Log\InvalidArgumentException
      */
-    public function testThrowsOnInvalidLevel()
+    public function testThrowsOnInvalidLevel(): void
     {
         $this->logger->log('invalid level', 'Foo');
     }
@@ -118,7 +118,7 @@ class LoggerTest extends TestCase
     /**
      * @expectedException \Psr\Log\InvalidArgumentException
      */
-    public function testThrowsOnInvalidMinLevel()
+    public function testThrowsOnInvalidMinLevel(): void
     {
         new Logger('invalid');
     }
@@ -126,12 +126,12 @@ class LoggerTest extends TestCase
     /**
      * @expectedException \Psr\Log\InvalidArgumentException
      */
-    public function testInvalidOutput()
+    public function testInvalidOutput(): void
     {
         new Logger(LogLevel::DEBUG, '/');
     }
 
-    public function testContextReplacement()
+    public function testContextReplacement(): void
     {
         $logger = $this->logger;
         $logger->info('{Message {nothing} {user} {foo.bar} a}', array('user' => 'Bob', 'foo.bar' => 'Bar'));
@@ -140,7 +140,7 @@ class LoggerTest extends TestCase
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
-    public function testObjectCastToString()
+    public function testObjectCastToString(): void
     {
         if (method_exists($this, 'createPartialMock')) {
             $dummy = $this->createPartialMock(DummyTest::class, array('__toString'));
@@ -157,7 +157,7 @@ class LoggerTest extends TestCase
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
-    public function testContextCanContainAnything()
+    public function testContextCanContainAnything(): void
     {
         $context = array(
             'bool' => true,
@@ -176,7 +176,7 @@ class LoggerTest extends TestCase
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
-    public function testContextExceptionKeyCanBeExceptionOrOtherValues()
+    public function testContextExceptionKeyCanBeExceptionOrOtherValues(): void
     {
         $logger = $this->logger;
         $logger->warning('Random message', array('exception' => 'oops'));
@@ -189,7 +189,7 @@ class LoggerTest extends TestCase
         $this->assertLogsMatch($expected, $this->getLogs());
     }
 
-    public function testFormatter()
+    public function testFormatter(): void
     {
         $this->logger = new Logger(LogLevel::DEBUG, $this->tmpFile, function ($level, $message, $context) {
             return json_encode(array('level' => $level, 'message' => $message, 'context' => $context)).\PHP_EOL;
@@ -206,7 +206,7 @@ class LoggerTest extends TestCase
 
 class DummyTest
 {
-    public function __toString()
+    public function __toString(): void
     {
     }
 }

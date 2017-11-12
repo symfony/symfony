@@ -103,7 +103,7 @@ class ExceptionHandler
      * The latter takes precedence and any output from the former is cancelled,
      * if and only if nothing bad happens in this handling path.
      */
-    public function handle(\Exception $exception)
+    public function handle(\Exception $exception): void
     {
         if (null === $this->handler || $exception instanceof OutOfMemoryException) {
             $this->sendPhpResponse($exception);
@@ -160,7 +160,7 @@ class ExceptionHandler
      *
      * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
      */
-    public function sendPhpResponse($exception)
+    public function sendPhpResponse($exception): void
     {
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);

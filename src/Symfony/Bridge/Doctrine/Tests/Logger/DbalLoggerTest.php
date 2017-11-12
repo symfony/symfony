@@ -19,7 +19,7 @@ class DbalLoggerTest extends TestCase
     /**
      * @dataProvider getLogFixtures
      */
-    public function testLog($sql, $params, $logParams)
+    public function testLog($sql, $params, $logParams): void
     {
         $logger = $this->getMockBuilder('Psr\\Log\\LoggerInterface')->getMock();
 
@@ -51,7 +51,7 @@ class DbalLoggerTest extends TestCase
         );
     }
 
-    public function testLogNonUtf8()
+    public function testLogNonUtf8(): void
     {
         $logger = $this->getMockBuilder('Psr\\Log\\LoggerInterface')->getMock();
 
@@ -74,7 +74,7 @@ class DbalLoggerTest extends TestCase
         ));
     }
 
-    public function testLogNonUtf8Array()
+    public function testLogNonUtf8Array(): void
     {
         $logger = $this->getMockBuilder('Psr\\Log\\LoggerInterface')->getMock();
 
@@ -105,7 +105,7 @@ class DbalLoggerTest extends TestCase
         ));
     }
 
-    public function testLogLongString()
+    public function testLogLongString(): void
     {
         $logger = $this->getMockBuilder('Psr\\Log\\LoggerInterface')->getMock();
 
@@ -133,7 +133,7 @@ class DbalLoggerTest extends TestCase
         ));
     }
 
-    public function testLogUTF8LongString()
+    public function testLogUTF8LongString(): void
     {
         $logger = $this->getMockBuilder('Psr\\Log\\LoggerInterface')->getMock();
 

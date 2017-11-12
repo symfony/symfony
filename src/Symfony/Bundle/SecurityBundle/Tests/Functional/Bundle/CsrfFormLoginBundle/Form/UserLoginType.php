@@ -39,7 +39,7 @@ class UserLoginType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('username', 'Symfony\Component\Form\Extension\Core\Type\TextType')
@@ -54,7 +54,7 @@ class UserLoginType extends AbstractType
          * request; however, we can match the expected behavior by checking the
          * session for an authentication error and last username.
          */
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($request) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($request): void {
             if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
                 $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
             } else {
@@ -74,7 +74,7 @@ class UserLoginType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         /* Note: the form's csrf_token_id must correspond to that for the form login
          * listener in order for the CSRF token to validate successfully.

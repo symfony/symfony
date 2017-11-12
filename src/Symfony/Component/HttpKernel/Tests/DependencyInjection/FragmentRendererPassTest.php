@@ -26,7 +26,7 @@ class FragmentRendererPassTest extends TestCase
      *
      * @expectedException \InvalidArgumentException
      */
-    public function testContentRendererWithoutInterface()
+    public function testContentRendererWithoutInterface(): void
     {
         // one service, not implementing any interface
         $services = array(
@@ -53,7 +53,7 @@ class FragmentRendererPassTest extends TestCase
         $pass->process($builder);
     }
 
-    public function testValidContentRenderer()
+    public function testValidContentRenderer(): void
     {
         $services = array(
             'my_content_renderer' => array(array('alias' => 'foo')),
@@ -94,7 +94,7 @@ class FragmentRendererPassTest extends TestCase
 
 class RendererService implements FragmentRendererInterface
 {
-    public function render($uri, Request $request = null, array $options = array())
+    public function render($uri, Request $request = null, array $options = array()): void
     {
     }
 

@@ -39,7 +39,7 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
     /**
      * {@inheritdoc}
      */
-    protected function resetService($name)
+    protected function resetService($name): void
     {
         if (!$this->container->initialized($name)) {
             return;

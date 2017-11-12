@@ -22,7 +22,7 @@ class SessionHelperTest extends TestCase
 {
     protected $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $request = new Request();
 
@@ -36,12 +36,12 @@ class SessionHelperTest extends TestCase
         $this->requestStack->push($request);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->requestStack = null;
     }
 
-    public function testFlash()
+    public function testFlash(): void
     {
         $helper = new SessionHelper($this->requestStack);
 
@@ -50,13 +50,13 @@ class SessionHelperTest extends TestCase
         $this->assertEquals(array('bar'), $helper->getFlash('notice'));
     }
 
-    public function testGetFlashes()
+    public function testGetFlashes(): void
     {
         $helper = new SessionHelper($this->requestStack);
         $this->assertEquals(array('notice' => array('bar')), $helper->getFlashes());
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $helper = new SessionHelper($this->requestStack);
 
@@ -66,7 +66,7 @@ class SessionHelperTest extends TestCase
         $this->assertNull($helper->get('foo'));
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $helper = new SessionHelper($this->requestStack);
 

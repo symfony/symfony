@@ -55,7 +55,7 @@ class HttpBasicFactory implements SecurityFactoryInterface
         return 'http-basic';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->children()

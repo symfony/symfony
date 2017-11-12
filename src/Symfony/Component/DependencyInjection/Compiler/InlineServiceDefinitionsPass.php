@@ -27,7 +27,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
     /**
      * {@inheritdoc}
      */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    public function setRepeatedPass(RepeatedPass $repeatedPass): void
     {
         $this->repeatedPass = $repeatedPass;
     }

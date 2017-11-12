@@ -43,7 +43,7 @@ class PropertyInfoPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition($this->propertyInfoService)) {
             return;

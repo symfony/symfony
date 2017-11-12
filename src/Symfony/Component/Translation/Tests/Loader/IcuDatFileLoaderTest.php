@@ -22,13 +22,13 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
-    public function testLoadInvalidResource()
+    public function testLoadInvalidResource(): void
     {
         $loader = new IcuDatFileLoader();
         $loader->load(__DIR__.'/../fixtures/resourcebundle/corrupted/resources', 'es', 'domain2');
     }
 
-    public function testDatEnglishLoad()
+    public function testDatEnglishLoad(): void
     {
         // bundled resource is build using pkgdata command which at least in ICU 4.2 comes in extremely! buggy form
         // you must specify an temporary build directory which is not the same as current directory and
@@ -42,7 +42,7 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
         $this->assertEquals(array(new FileResource($resource.'.dat')), $catalogue->getResources());
     }
 
-    public function testDatFrenchLoad()
+    public function testDatFrenchLoad(): void
     {
         $loader = new IcuDatFileLoader();
         $resource = __DIR__.'/../fixtures/resourcebundle/dat/resources';
@@ -56,7 +56,7 @@ class IcuDatFileLoaderTest extends LocalizedTestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $loader = new IcuDatFileLoader();
         $loader->load(__DIR__.'/../fixtures/non-existing.txt', 'en', 'domain1');

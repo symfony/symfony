@@ -20,11 +20,11 @@ class Php7Dummy
     {
     }
 
-    public function setBar(int $bar)
+    public function setBar(int $bar): void
     {
     }
 
-    public function addBaz(string $baz)
+    public function addBaz(string $baz): void
     {
     }
 }

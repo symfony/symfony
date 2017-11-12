@@ -19,7 +19,7 @@ class ProfilerPassTest extends TestCase
 {
     private $profilerDefinition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->profilerDefinition = new Definition('ProfilerClass');
     }
@@ -32,7 +32,7 @@ class ProfilerPassTest extends TestCase
      *
      *     <tag name="data_collector" template="YourBundle:Collector:templatename" id="your_collector_name" />
      */
-    public function testTemplateNoIdThrowsException()
+    public function testTemplateNoIdThrowsException(): void
     {
         // one service, with a template key, but no id
         $services = array(
@@ -47,7 +47,7 @@ class ProfilerPassTest extends TestCase
         $profilerPass->process($builder);
     }
 
-    public function testValidCollector()
+    public function testValidCollector(): void
     {
         // one service, with a template key, but no id
         $services = array(

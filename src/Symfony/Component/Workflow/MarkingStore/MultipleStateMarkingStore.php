@@ -46,7 +46,7 @@ class MultipleStateMarkingStore implements MarkingStoreInterface
     /**
      * {@inheritdoc}
      */
-    public function setMarking($subject, Marking $marking)
+    public function setMarking($subject, Marking $marking): void
     {
         $this->propertyAccessor->setValue($subject, $this->property, $marking->getPlaces());
     }

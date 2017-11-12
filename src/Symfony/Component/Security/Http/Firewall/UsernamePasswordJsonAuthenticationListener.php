@@ -70,7 +70,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         if (false === strpos($request->getRequestFormat(), 'json')

@@ -37,7 +37,7 @@ class ExceptionListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         $exception = $event->getException();
         $request = $event->getRequest();
@@ -82,7 +82,7 @@ class ExceptionListener implements EventSubscriberInterface
      * @param \Exception $exception The \Exception instance
      * @param string     $message   The error message to log
      */
-    protected function logException(\Exception $exception, $message)
+    protected function logException(\Exception $exception, $message): void
     {
         if (null !== $this->logger) {
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {

@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueReso
 
 class ControllerArgumentValueResolverPassTest extends TestCase
 {
-    public function testServicesAreOrderedAccordingToPriority()
+    public function testServicesAreOrderedAccordingToPriority(): void
     {
         $services = array(
             'n3' => array(array()),
@@ -46,7 +46,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $this->assertEquals($expected, $definition->getArgument(1)->getValues());
     }
 
-    public function testReturningEmptyArrayWhenNoService()
+    public function testReturningEmptyArrayWhenNoService(): void
     {
         $definition = new Definition(ArgumentResolver::class, array(null, array()));
         $container = new ContainerBuilder();
@@ -56,7 +56,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $this->assertEquals(array(), $definition->getArgument(1)->getValues());
     }
 
-    public function testNoArgumentResolver()
+    public function testNoArgumentResolver(): void
     {
         $container = new ContainerBuilder();
 

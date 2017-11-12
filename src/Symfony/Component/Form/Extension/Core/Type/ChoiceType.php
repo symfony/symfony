@@ -51,7 +51,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choiceList = $this->createChoiceList($options);
         $builder->setAttribute('choice_list', $choiceList);
@@ -83,7 +83,7 @@ class ChoiceType extends AbstractType
 
             // Make sure that scalar, submitted values are converted to arrays
             // which can be submitted to the checkboxes/radio buttons
-            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
                 $form = $event->getForm();
                 $data = $event->getData();
 
@@ -155,7 +155,7 @@ class ChoiceType extends AbstractType
 
         // To avoid issues when the submitted choices are arrays (i.e. array to string conversions),
         // we have to ensure that all elements of the submitted choice data are NULL, strings or ints.
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
             $data = $event->getData();
 
             if (!is_array($data)) {
@@ -173,7 +173,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $choiceTranslationDomain = $options['choice_translation_domain'];
         if ($view->parent && null === $choiceTranslationDomain) {
@@ -231,7 +231,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if ($options['expanded']) {
             // Radio buttons should have the same name as the parent
@@ -251,7 +251,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $emptyData = function (Options $options) {
             if ($options['expanded'] && !$options['multiple']) {
@@ -347,7 +347,7 @@ class ChoiceType extends AbstractType
     /**
      * Adds the sub fields for an expanded choice field.
      */
-    private function addSubForms(FormBuilderInterface $builder, array $choiceViews, array $options)
+    private function addSubForms(FormBuilderInterface $builder, array $choiceViews, array $options): void
     {
         foreach ($choiceViews as $name => $choiceView) {
             // Flatten groups

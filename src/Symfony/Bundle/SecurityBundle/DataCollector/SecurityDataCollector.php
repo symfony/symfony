@@ -56,7 +56,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         if (null === $this->tokenStorage) {
             $this->data = array(
@@ -189,12 +189,12 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->data = array();
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data = $this->cloneVar($this->data);
     }

@@ -50,7 +50,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     /**
      * Handles pre-authentication.
      */
-    final public function handle(GetResponseEvent $event)
+    final public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -96,7 +96,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     /**
      * Clears a PreAuthenticatedToken for this provider (if present).
      */
-    private function clearToken(AuthenticationException $exception)
+    private function clearToken(AuthenticationException $exception): void
     {
         $token = $this->tokenStorage->getToken();
         if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey()) {

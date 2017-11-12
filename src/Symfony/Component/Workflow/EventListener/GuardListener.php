@@ -43,7 +43,7 @@ class GuardListener
         $this->validator = $validator;
     }
 
-    public function onTransition(GuardEvent $event, $eventName)
+    public function onTransition(GuardEvent $event, $eventName): void
     {
         if (!isset($this->configuration[$eventName])) {
             return;

@@ -20,7 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
  */
 class TemplateControllerTest extends TestCase
 {
-    public function testTwig()
+    public function testTwig(): void
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $twig->expects($this->once())->method('render')->willReturn('bar');
@@ -30,7 +30,7 @@ class TemplateControllerTest extends TestCase
         $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
     }
 
-    public function testTemplating()
+    public function testTemplating(): void
     {
         $templating = $this->getMockBuilder(EngineInterface::class)->getMock();
         $templating->expects($this->once())->method('render')->willReturn('bar');
@@ -44,7 +44,7 @@ class TemplateControllerTest extends TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage You can not use the TemplateController if the Templating Component or the Twig Bundle are not available.
      */
-    public function testNoTwigNorTemplating()
+    public function testNoTwigNorTemplating(): void
     {
         $controller = new TemplateController();
 

@@ -20,7 +20,7 @@ class AccessDecisionManagerTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testSetUnsupportedStrategy()
+    public function testSetUnsupportedStrategy(): void
     {
         new AccessDecisionManager(array($this->getVoter(VoterInterface::ACCESS_GRANTED)), 'fooBar');
     }
@@ -28,7 +28,7 @@ class AccessDecisionManagerTest extends TestCase
     /**
      * @dataProvider getStrategyTests
      */
-    public function testStrategies($strategy, $voters, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions, $expected)
+    public function testStrategies($strategy, $voters, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions, $expected): void
     {
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $manager = new AccessDecisionManager($voters, $strategy, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions);
@@ -39,7 +39,7 @@ class AccessDecisionManagerTest extends TestCase
     /**
      * @dataProvider getStrategiesWith2RolesTests
      */
-    public function testStrategiesWith2Roles($token, $strategy, $voter, $expected)
+    public function testStrategiesWith2Roles($token, $strategy, $voter, $expected): void
     {
         $manager = new AccessDecisionManager(array($voter), $strategy);
 

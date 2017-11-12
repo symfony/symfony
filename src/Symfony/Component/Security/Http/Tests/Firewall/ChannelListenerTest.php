@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ChannelListenerTest extends TestCase
 {
-    public function testHandleWithNotSecuredRequestAndHttpChannel()
+    public function testHandleWithNotSecuredRequestAndHttpChannel(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
         $request
@@ -55,7 +55,7 @@ class ChannelListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWithSecuredRequestAndHttpsChannel()
+    public function testHandleWithSecuredRequestAndHttpsChannel(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
         $request
@@ -93,7 +93,7 @@ class ChannelListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWithNotSecuredRequestAndHttpsChannel()
+    public function testHandleWithNotSecuredRequestAndHttpsChannel(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
         $request
@@ -136,7 +136,7 @@ class ChannelListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWithSecuredRequestAndHttpChannel()
+    public function testHandleWithSecuredRequestAndHttpChannel(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
         $request

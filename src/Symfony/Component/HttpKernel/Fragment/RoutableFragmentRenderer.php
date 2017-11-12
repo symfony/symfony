@@ -31,7 +31,7 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
      *
      * @see FragmentListener
      */
-    public function setFragmentPath($path)
+    public function setFragmentPath($path): void
     {
         $this->fragmentPath = $path;
     }
@@ -77,7 +77,7 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
         return $request->getBaseUrl().$path;
     }
 
-    private function checkNonScalar($values)
+    private function checkNonScalar($values): void
     {
         foreach ($values as $key => $value) {
             if (is_array($value)) {

@@ -16,7 +16,7 @@ class CsrfFormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFormLoginAndLogoutWithCsrfTokens($config)
+    public function testFormLoginAndLogoutWithCsrfTokens($config): void
     {
         $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
 
@@ -46,7 +46,7 @@ class CsrfFormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFormLoginWithInvalidCsrfToken($config)
+    public function testFormLoginWithInvalidCsrfToken($config): void
     {
         $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
 
@@ -63,7 +63,7 @@ class CsrfFormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFormLoginWithCustomTargetPath($config)
+    public function testFormLoginWithCustomTargetPath($config): void
     {
         $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
 
@@ -83,7 +83,7 @@ class CsrfFormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFormLoginRedirectsToProtectedResourceAfterLogin($config)
+    public function testFormLoginRedirectsToProtectedResourceAfterLogin($config): void
     {
         $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
 

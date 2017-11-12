@@ -56,12 +56,12 @@ class ComposerResource implements SelfCheckingResourceInterface, \Serializable
         return serialize($this->vendors);
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $this->vendors = unserialize($serialized);
     }
 
-    private static function refresh()
+    private static function refresh(): void
     {
         self::$runtimeVendors = array();
 

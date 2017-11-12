@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class FakeClassMetadata extends ClassMetadata
 {
-    public function addCustomPropertyMetadata($propertyName, $metadata)
+    public function addCustomPropertyMetadata($propertyName, $metadata): void
     {
         if (!isset($this->members[$propertyName])) {
             $this->members[$propertyName] = array();

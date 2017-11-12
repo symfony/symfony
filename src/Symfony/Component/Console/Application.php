@@ -87,12 +87,12 @@ class Application
         $this->defaultCommand = 'list';
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
-    public function setCommandLoader(CommandLoaderInterface $commandLoader)
+    public function setCommandLoader(CommandLoaderInterface $commandLoader): void
     {
         $this->commandLoader = $commandLoader;
     }
@@ -220,7 +220,7 @@ class Application
         return $exitCode;
     }
 
-    public function setHelperSet(HelperSet $helperSet)
+    public function setHelperSet(HelperSet $helperSet): void
     {
         $this->helperSet = $helperSet;
     }
@@ -239,7 +239,7 @@ class Application
         return $this->helperSet;
     }
 
-    public function setDefinition(InputDefinition $definition)
+    public function setDefinition(InputDefinition $definition): void
     {
         $this->definition = $definition;
     }
@@ -290,7 +290,7 @@ class Application
      *
      * @param bool $boolean Whether to catch exceptions or not during commands execution
      */
-    public function setCatchExceptions($boolean)
+    public function setCatchExceptions($boolean): void
     {
         $this->catchExceptions = (bool) $boolean;
     }
@@ -310,7 +310,7 @@ class Application
      *
      * @param bool $boolean Whether to automatically exit after a command execution or not
      */
-    public function setAutoExit($boolean)
+    public function setAutoExit($boolean): void
     {
         $this->autoExit = (bool) $boolean;
     }
@@ -330,7 +330,7 @@ class Application
      *
      * @param string $name The application name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -350,7 +350,7 @@ class Application
      *
      * @param string $version The application version
      */
-    public function setVersion($version)
+    public function setVersion($version): void
     {
         $this->version = $version;
     }
@@ -392,7 +392,7 @@ class Application
      *
      * @param Command[] $commands An array of commands
      */
-    public function addCommands(array $commands)
+    public function addCommands(array $commands): void
     {
         foreach ($commands as $command) {
             $this->add($command);
@@ -692,7 +692,7 @@ class Application
     /**
      * Renders a caught exception.
      */
-    public function renderException(\Exception $e, OutputInterface $output)
+    public function renderException(\Exception $e, OutputInterface $output): void
     {
         $output->writeln('', OutputInterface::VERBOSITY_QUIET);
 
@@ -704,7 +704,7 @@ class Application
         }
     }
 
-    protected function doRenderException(\Exception $e, OutputInterface $output)
+    protected function doRenderException(\Exception $e, OutputInterface $output): void
     {
         do {
             $message = trim($e->getMessage());
@@ -767,7 +767,7 @@ class Application
     /**
      * Configures the input and output instances based on the user arguments and options.
      */
-    protected function configureIO(InputInterface $input, OutputInterface $output)
+    protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         if (true === $input->hasParameterOption(array('--ansi'), true)) {
             $output->setDecorated(true);
@@ -1089,7 +1089,7 @@ class Application
         return $namespaces;
     }
 
-    private function init()
+    private function init(): void
     {
         if ($this->initialized) {
             return;

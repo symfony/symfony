@@ -19,7 +19,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class DataCollectorTest extends TestCase
 {
-    public function testCloneVarStringWithScheme()
+    public function testCloneVarStringWithScheme(): void
     {
         $c = new CloneVarDataCollector('scheme://foo');
         $c->collect(new Request(), new Response());
@@ -28,7 +28,7 @@ class DataCollectorTest extends TestCase
         $this->assertEquals($cloner->cloneVar('scheme://foo'), $c->getData());
     }
 
-    public function testCloneVarExistingFilePath()
+    public function testCloneVarExistingFilePath(): void
     {
         $c = new CloneVarDataCollector(array($filePath = tempnam(sys_get_temp_dir(), 'clone_var_data_collector_')));
         $c->collect(new Request(), new Response());

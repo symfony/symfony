@@ -30,7 +30,7 @@ use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
 class SecurityDataCollectorTest extends TestCase
 {
-    public function testCollectWhenSecurityIsDisabled()
+    public function testCollectWhenSecurityIsDisabled(): void
     {
         $collector = new SecurityDataCollector();
         $collector->collect($this->getRequest(), $this->getResponse());
@@ -49,7 +49,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertNull($collector->getFirewall());
     }
 
-    public function testCollectWhenAuthenticationTokenIsNull()
+    public function testCollectWhenAuthenticationTokenIsNull(): void
     {
         $tokenStorage = new TokenStorage();
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
@@ -69,7 +69,7 @@ class SecurityDataCollectorTest extends TestCase
     }
 
     /** @dataProvider provideRoles */
-    public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
+    public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles): void
     {
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken('hhamon', 'P4$$w0rD', 'provider', $roles));
@@ -90,7 +90,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('hhamon', $collector->getUser());
     }
 
-    public function testCollectImpersonatedToken()
+    public function testCollectImpersonatedToken(): void
     {
         $adminToken = new UsernamePasswordToken('yceruto', 'P4$$w0rD', 'provider', array('ROLE_ADMIN'));
 
@@ -117,7 +117,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('hhamon', $collector->getUser());
     }
 
-    public function testGetFirewall()
+    public function testGetFirewall(): void
     {
         $firewallConfig = new FirewallConfig('dummy', 'security.request_matcher.dummy', 'security.user_checker.dummy');
         $request = $this->getRequest();
@@ -151,7 +151,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($firewallConfig->getListeners(), $collected['listeners']->getValue());
     }
 
-    public function testGetFirewallReturnsNull()
+    public function testGetFirewallReturnsNull(): void
     {
         $request = $this->getRequest();
         $response = $this->getResponse();
@@ -185,7 +185,7 @@ class SecurityDataCollectorTest extends TestCase
     /**
      * @group time-sensitive
      */
-    public function testGetListeners()
+    public function testGetListeners(): void
     {
         $request = $this->getRequest();
         $event = new GetResponseEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);

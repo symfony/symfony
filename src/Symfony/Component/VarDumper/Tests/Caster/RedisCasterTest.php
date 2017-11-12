@@ -22,7 +22,7 @@ class RedisCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testNotConnected()
+    public function testNotConnected(): void
     {
         $redis = new \Redis();
 
@@ -35,7 +35,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($xCast, $redis);
     }
 
-    public function testConnected()
+    public function testConnected(): void
     {
         $redis = new \Redis();
         if (!@$redis->connect('127.0.0.1')) {

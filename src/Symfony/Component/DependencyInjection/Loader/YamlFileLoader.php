@@ -109,7 +109,7 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): void
     {
         $path = $this->locator->locate($resource);
 
@@ -166,7 +166,7 @@ class YamlFileLoader extends FileLoader
         return in_array($type, array('yaml', 'yml'), true);
     }
 
-    private function parseImports(array $content, string $file)
+    private function parseImports(array $content, string $file): void
     {
         if (!isset($content['imports'])) {
             return;
@@ -190,7 +190,7 @@ class YamlFileLoader extends FileLoader
         }
     }
 
-    private function parseDefinitions(array $content, string $file)
+    private function parseDefinitions(array $content, string $file): void
     {
         if (!isset($content['services'])) {
             return;
@@ -307,7 +307,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When tags are invalid
      */
-    private function parseDefinition($id, $service, $file, array $defaults)
+    private function parseDefinition($id, $service, $file, array $defaults): void
     {
         if (preg_match('/^_[a-zA-Z0-9_]*$/', $id)) {
             throw new InvalidArgumentException(sprintf('Service names that start with an underscore are reserved. Rename the "%s" service or define it in XML instead.', $id));
@@ -753,7 +753,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads from Extensions.
      */
-    private function loadFromExtensions(array $content)
+    private function loadFromExtensions(array $content): void
     {
         foreach ($content as $namespace => $values) {
             if (in_array($namespace, array('imports', 'parameters', 'services'))) {
@@ -775,7 +775,7 @@ class YamlFileLoader extends FileLoader
      * @param array  $definition The service definition to check
      * @param string $file       The loaded YAML file
      */
-    private function checkDefinition($id, array $definition, $file)
+    private function checkDefinition($id, array $definition, $file): void
     {
         if ($this->isLoadingInstanceof) {
             $keywords = self::$instanceofKeywords;

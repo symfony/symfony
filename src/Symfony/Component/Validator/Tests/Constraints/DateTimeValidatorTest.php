@@ -22,28 +22,28 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
         return new DateTimeValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new DateTime());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new DateTime());
 
         $this->assertNoViolation();
     }
 
-    public function testDateTimeClassIsValid()
+    public function testDateTimeClassIsValid(): void
     {
         $this->validator->validate(new \DateTime(), new DateTime());
 
         $this->assertNoViolation();
     }
 
-    public function testDateTimeImmutableClassIsValid()
+    public function testDateTimeImmutableClassIsValid(): void
     {
         $this->validator->validate(new \DateTimeImmutable(), new DateTime());
 
@@ -53,12 +53,12 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new DateTime());
     }
 
-    public function testDateTimeWithDefaultFormat()
+    public function testDateTimeWithDefaultFormat(): void
     {
         $this->validator->validate('1995-05-10 19:33:00', new DateTime());
 
@@ -75,7 +75,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidDateTimes
      */
-    public function testValidDateTimes($format, $dateTime)
+    public function testValidDateTimes($format, $dateTime): void
     {
         $constraint = new DateTime(array(
             'format' => $format,
@@ -100,7 +100,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidDateTimes
      */
-    public function testInvalidDateTimes($format, $dateTime, $code)
+    public function testInvalidDateTimes($format, $dateTime, $code): void
     {
         $constraint = new DateTime(array(
             'message' => 'myMessage',

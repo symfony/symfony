@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Logout\DefaultLogoutSuccessHandler;
 
 class DefaultLogoutSuccessHandlerTest extends TestCase
 {
-    public function testLogout()
+    public function testLogout(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $response = new Response();

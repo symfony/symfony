@@ -68,7 +68,7 @@ class FormConfigTest extends TestCase
     /**
      * @dataProvider getHtml4Ids
      */
-    public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $expectedException = null)
+    public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $expectedException = null): void
     {
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
 
@@ -83,14 +83,14 @@ class FormConfigTest extends TestCase
         $this->assertSame((string) $name, $formConfigBuilder->getName());
     }
 
-    public function testGetRequestHandlerCreatesNativeRequestHandlerIfNotSet()
+    public function testGetRequestHandlerCreatesNativeRequestHandlerIfNotSet(): void
     {
         $config = $this->getConfigBuilder()->getFormConfig();
 
         $this->assertInstanceOf('Symfony\Component\Form\NativeRequestHandler', $config->getRequestHandler());
     }
 
-    public function testGetRequestHandlerReusesNativeRequestHandlerInstance()
+    public function testGetRequestHandlerReusesNativeRequestHandlerInstance(): void
     {
         $config1 = $this->getConfigBuilder()->getFormConfig();
         $config2 = $this->getConfigBuilder()->getFormConfig();
@@ -98,7 +98,7 @@ class FormConfigTest extends TestCase
         $this->assertSame($config1->getRequestHandler(), $config2->getRequestHandler());
     }
 
-    public function testSetMethodAllowsGet()
+    public function testSetMethodAllowsGet(): void
     {
         $formConfigBuilder = $this->getConfigBuilder();
         $formConfigBuilder->setMethod('GET');
@@ -106,7 +106,7 @@ class FormConfigTest extends TestCase
         self::assertSame('GET', $formConfigBuilder->getMethod());
     }
 
-    public function testSetMethodAllowsPost()
+    public function testSetMethodAllowsPost(): void
     {
         $formConfigBuilder = $this->getConfigBuilder();
         $formConfigBuilder->setMethod('POST');
@@ -114,7 +114,7 @@ class FormConfigTest extends TestCase
         self::assertSame('POST', $formConfigBuilder->getMethod());
     }
 
-    public function testSetMethodAllowsPut()
+    public function testSetMethodAllowsPut(): void
     {
         $formConfigBuilder = $this->getConfigBuilder();
         $formConfigBuilder->setMethod('PUT');
@@ -122,7 +122,7 @@ class FormConfigTest extends TestCase
         self::assertSame('PUT', $formConfigBuilder->getMethod());
     }
 
-    public function testSetMethodAllowsDelete()
+    public function testSetMethodAllowsDelete(): void
     {
         $formConfigBuilder = $this->getConfigBuilder();
         $formConfigBuilder->setMethod('DELETE');
@@ -130,7 +130,7 @@ class FormConfigTest extends TestCase
         self::assertSame('DELETE', $formConfigBuilder->getMethod());
     }
 
-    public function testSetMethodAllowsPatch()
+    public function testSetMethodAllowsPatch(): void
     {
         $formConfigBuilder = $this->getConfigBuilder();
         $formConfigBuilder->setMethod('PATCH');
@@ -141,7 +141,7 @@ class FormConfigTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
-    public function testSetMethodDoesNotAllowOtherValues()
+    public function testSetMethodDoesNotAllowOtherValues(): void
     {
         $this->getConfigBuilder()->setMethod('foo');
     }

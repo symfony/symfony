@@ -89,7 +89,7 @@ class CardSchemeValidator extends ConstraintValidator
      *
      * @param mixed      $value
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof CardScheme) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\CardScheme');

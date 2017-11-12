@@ -27,7 +27,7 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         // Make sure that validation groups end up as null, closure or array
         $validationGroupsNormalizer = function (Options $options, $groups) {

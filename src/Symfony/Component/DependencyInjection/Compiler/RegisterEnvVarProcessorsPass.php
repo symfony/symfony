@@ -29,7 +29,7 @@ class RegisterEnvVarProcessorsPass implements CompilerPassInterface
 {
     private static $allowedTypes = array('array', 'bool', 'float', 'int', 'string');
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $bag = $container->getParameterBag();
         $types = array();

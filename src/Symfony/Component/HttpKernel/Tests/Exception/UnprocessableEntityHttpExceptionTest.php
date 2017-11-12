@@ -14,7 +14,7 @@ class UnprocessableEntityHttpExceptionTest extends HttpExceptionTest
      *
      * @dataProvider headerDataProvider
      */
-    public function testHeadersSetter($headers)
+    public function testHeadersSetter($headers): void
     {
         $exception = new UnprocessableEntityHttpException(10);
         $exception->setHeaders($headers);

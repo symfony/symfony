@@ -30,7 +30,7 @@ class ChainCacheClearer implements CacheClearerInterface
     /**
      * {@inheritdoc}
      */
-    public function clear($cacheDir)
+    public function clear($cacheDir): void
     {
         foreach ($this->clearers as $clearer) {
             $clearer->clear($cacheDir);

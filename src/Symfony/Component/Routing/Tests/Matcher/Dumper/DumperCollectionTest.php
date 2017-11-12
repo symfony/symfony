@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Matcher\Dumper\DumperCollection;
 
 class DumperCollectionTest extends TestCase
 {
-    public function testGetRoot()
+    public function testGetRoot(): void
     {
         $a = new DumperCollection();
 

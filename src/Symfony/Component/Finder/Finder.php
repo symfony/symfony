@@ -357,7 +357,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param string|string[] $pattern VCS patterns to ignore
      */
-    public static function addVCSPattern($pattern)
+    public static function addVCSPattern($pattern): void
     {
         foreach ((array) $pattern as $p) {
             self::$vcsPatterns[] = $p;

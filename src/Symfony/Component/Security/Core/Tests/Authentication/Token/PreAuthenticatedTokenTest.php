@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class PreAuthenticatedTokenTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $token = new PreAuthenticatedToken('foo', 'bar', 'key');
         $this->assertFalse($token->isAuthenticated());
@@ -28,19 +28,19 @@ class PreAuthenticatedTokenTest extends TestCase
         $this->assertEquals('key', $token->getProviderKey());
     }
 
-    public function testGetCredentials()
+    public function testGetCredentials(): void
     {
         $token = new PreAuthenticatedToken('foo', 'bar', 'key');
         $this->assertEquals('bar', $token->getCredentials());
     }
 
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $token = new PreAuthenticatedToken('foo', 'bar', 'key');
         $this->assertEquals('foo', $token->getUser());
     }
 
-    public function testEraseCredentials()
+    public function testEraseCredentials(): void
     {
         $token = new PreAuthenticatedToken('foo', 'bar', 'key');
         $token->eraseCredentials();

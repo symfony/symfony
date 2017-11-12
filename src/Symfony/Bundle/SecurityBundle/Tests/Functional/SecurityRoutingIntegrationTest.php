@@ -16,7 +16,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous($config)
+    public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous($config): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
         $client->request('GET', '/protected_resource');
@@ -27,7 +27,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testRoutingErrorIsExposedWhenNotProtected($config)
+    public function testRoutingErrorIsExposedWhenNotProtected($config): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
         $client->request('GET', '/unprotected_resource');
@@ -38,7 +38,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights($config)
+    public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights($config): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
 
@@ -55,7 +55,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testSecurityConfigurationForSingleIPAddress($config)
+    public function testSecurityConfigurationForSingleIPAddress($config): void
     {
         $allowedClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('REMOTE_ADDR' => '10.10.10.10'));
         $barredClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('REMOTE_ADDR' => '10.10.20.10'));
@@ -67,7 +67,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testSecurityConfigurationForMultipleIPAddresses($config)
+    public function testSecurityConfigurationForMultipleIPAddresses($config): void
     {
         $allowedClientA = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('REMOTE_ADDR' => '1.1.1.1'));
         $allowedClientB = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('REMOTE_ADDR' => '2.2.2.2'));
@@ -81,7 +81,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testSecurityConfigurationForExpression($config)
+    public function testSecurityConfigurationForExpression($config): void
     {
         $allowedClient = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config), array('HTTP_USER_AGENT' => 'Firefox 1.0'));
         $this->assertAllowed($allowedClient, '/protected-via-expression');
@@ -100,13 +100,13 @@ class SecurityRoutingIntegrationTest extends WebTestCase
         $this->assertAllowed($allowedClient, '/protected-via-expression');
     }
 
-    private function assertAllowed($client, $path)
+    private function assertAllowed($client, $path): void
     {
         $client->request('GET', $path);
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
-    private function assertRestricted($client, $path)
+    private function assertRestricted($client, $path): void
     {
         $client->request('GET', $path);
         $this->assertEquals(302, $client->getResponse()->getStatusCode());

@@ -24,7 +24,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
         return new AllValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new All(new Range(array('min' => 4))));
 
@@ -34,7 +34,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testThrowsExceptionIfNotTraversable()
+    public function testThrowsExceptionIfNotTraversable(): void
     {
         $this->validator->validate('foo.barbar', new All(new Range(array('min' => 4))));
     }
@@ -42,7 +42,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidArguments
      */
-    public function testWalkSingleConstraint($array)
+    public function testWalkSingleConstraint($array): void
     {
         $constraint = new Range(array('min' => 4));
 
@@ -60,7 +60,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidArguments
      */
-    public function testWalkMultipleConstraints($array)
+    public function testWalkMultipleConstraints($array): void
     {
         $constraint1 = new Range(array('min' => 4));
         $constraint2 = new NotNull();

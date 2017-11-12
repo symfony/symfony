@@ -5,7 +5,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 //Ensure that questions have the expected outputs
-return function (InputInterface $input, OutputInterface $output) {
+return function (InputInterface $input, OutputInterface $output): void {
     $output = new SymfonyStyle($input, $output);
     $stream = fopen('php://memory', 'r+', false);
 

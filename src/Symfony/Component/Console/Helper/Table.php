@@ -87,7 +87,7 @@ class Table
      * @param string     $name  The style name
      * @param TableStyle $style A TableStyle instance
      */
-    public static function setStyleDefinition($name, TableStyle $style)
+    public static function setStyleDefinition($name, TableStyle $style): void
     {
         if (!self::$styles) {
             self::$styles = self::initStyles();
@@ -270,7 +270,7 @@ class Table
      * | 960-425-059-0 | The Lord of the Rings | J. R. R. Tolkien |
      * +---------------+-----------------------+------------------+
      */
-    public function render()
+    public function render(): void
     {
         $this->calculateNumberOfColumns();
         $rows = $this->buildTableRows($this->rows);
@@ -304,7 +304,7 @@ class Table
      *
      * Example: +-----+-----------+-------+
      */
-    private function renderRowSeparator()
+    private function renderRowSeparator(): void
     {
         if (0 === $count = $this->numberOfColumns) {
             return;
@@ -335,7 +335,7 @@ class Table
      *
      * Example: | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
      */
-    private function renderRow(array $row, string $cellFormat)
+    private function renderRow(array $row, string $cellFormat): void
     {
         if (empty($row)) {
             return;
@@ -383,7 +383,7 @@ class Table
     /**
      * Calculate number of columns for this table.
      */
-    private function calculateNumberOfColumns()
+    private function calculateNumberOfColumns(): void
     {
         if (null !== $this->numberOfColumns) {
             return;
@@ -552,7 +552,7 @@ class Table
     /**
      * Calculates columns widths.
      */
-    private function calculateColumnsWidth(array $rows)
+    private function calculateColumnsWidth(array $rows): void
     {
         for ($column = 0; $column < $this->numberOfColumns; ++$column) {
             $lengths = array();
@@ -603,7 +603,7 @@ class Table
     /**
      * Called after rendering to cleanup cache data.
      */
-    private function cleanup()
+    private function cleanup(): void
     {
         $this->effectiveColumnWidths = array();
         $this->numberOfColumns = null;

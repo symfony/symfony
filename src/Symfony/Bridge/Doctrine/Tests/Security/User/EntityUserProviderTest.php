@@ -19,7 +19,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 class EntityUserProviderTest extends TestCase
 {
-    public function testRefreshUserGetsUserByPrimaryKey()
+    public function testRefreshUserGetsUserByPrimaryKey(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -39,7 +39,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertSame($user1, $provider->refreshUser($user1));
     }
 
-    public function testLoadUserByUsername()
+    public function testLoadUserByUsername(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -54,7 +54,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertSame($user, $provider->loadUserByUsername('user1'));
     }
 
-    public function testLoadUserByUsernameWithUserLoaderRepositoryAndWithoutProperty()
+    public function testLoadUserByUsernameWithUserLoaderRepositoryAndWithoutProperty(): void
     {
         $user = new User(1, 1, 'user1');
 
@@ -84,7 +84,7 @@ class EntityUserProviderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage You must either make the "Symfony\Bridge\Doctrine\Tests\Fixtures\User" entity Doctrine Repository ("Doctrine\ORM\EntityRepository") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.
      */
-    public function testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty()
+    public function testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -98,7 +98,7 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByUsername('user1');
     }
 
-    public function testRefreshUserRequiresId()
+    public function testRefreshUserRequiresId(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -112,7 +112,7 @@ class EntityUserProviderTest extends TestCase
         $provider->refreshUser($user1);
     }
 
-    public function testRefreshInvalidUser()
+    public function testRefreshInvalidUser(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -132,7 +132,7 @@ class EntityUserProviderTest extends TestCase
         $provider->refreshUser($user2);
     }
 
-    public function testSupportProxy()
+    public function testSupportProxy(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -149,7 +149,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertTrue($provider->supportsClass(get_class($user2)));
     }
 
-    public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided()
+    public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided(): void
     {
         $repository = $this->getMockBuilder('\Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface')->getMock();
         $repository->expects($this->once())
@@ -170,7 +170,7 @@ class EntityUserProviderTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testLoadUserByUserNameShouldDeclineInvalidInterface()
+    public function testLoadUserByUserNameShouldDeclineInvalidInterface(): void
     {
         $repository = $this->getMockBuilder('\Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
 
@@ -205,7 +205,7 @@ class EntityUserProviderTest extends TestCase
         return $em;
     }
 
-    private function createSchema($em)
+    private function createSchema($em): void
     {
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema(array(

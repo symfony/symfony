@@ -17,14 +17,14 @@ use Symfony\Component\Form\Tests\Fixtures\FooType;
 
 class AbstractExtensionTest extends TestCase
 {
-    public function testHasType()
+    public function testHasType(): void
     {
         $loader = new ConcreteExtension();
         $this->assertTrue($loader->hasType('Symfony\Component\Form\Tests\Fixtures\FooType'));
         $this->assertFalse($loader->hasType('foo'));
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $loader = new ConcreteExtension();
         $this->assertInstanceOf('Symfony\Component\Form\Tests\Fixtures\FooType', $loader->getType('Symfony\Component\Form\Tests\Fixtures\FooType'));
@@ -38,7 +38,7 @@ class ConcreteExtension extends AbstractExtension
         return array(new FooType());
     }
 
-    protected function loadTypeGuesser()
+    protected function loadTypeGuesser(): void
     {
     }
 }

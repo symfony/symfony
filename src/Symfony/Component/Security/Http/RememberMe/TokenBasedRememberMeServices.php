@@ -67,7 +67,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     /**
      * {@inheritdoc}
      */
-    protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
+    protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token): void
     {
         $user = $token->getUser();
         $expires = time() + $this->options['lifetime'];

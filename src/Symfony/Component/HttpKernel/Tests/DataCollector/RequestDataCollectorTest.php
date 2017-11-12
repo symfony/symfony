@@ -28,7 +28,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class RequestDataCollectorTest extends TestCase
 {
-    public function testCollect()
+    public function testCollect(): void
     {
         $c = new RequestDataCollector();
 
@@ -59,7 +59,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame('application/json', $c->getContentType());
     }
 
-    public function testCollectWithoutRouteParams()
+    public function testCollectWithoutRouteParams(): void
     {
         $request = $this->createRequest(array());
 
@@ -73,7 +73,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * @dataProvider provideControllerCallables
      */
-    public function testControllerInspection($name, $callable, $expected)
+    public function testControllerInspection($name, $callable, $expected): void
     {
         $c = new RequestDataCollector();
         $request = $this->createRequest();
@@ -184,7 +184,7 @@ class RequestDataCollectorTest extends TestCase
         );
     }
 
-    public function testItIgnoresInvalidCallables()
+    public function testItIgnoresInvalidCallables(): void
     {
         $request = $this->createRequestWithSession();
         $response = new RedirectResponse('/');
@@ -233,7 +233,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Inject the given controller callable into the data collector.
      */
-    protected function injectController($collector, $controller, $request)
+    protected function injectController($collector, $controller, $request): void
     {
         $resolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface')->getMock();
         $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->getMockBuilder(ArgumentResolverInterface::class)->getMock());
@@ -244,7 +244,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Dummy method used as controller callable.
      */
-    public static function staticControllerMethod()
+    public static function staticControllerMethod(): void
     {
         throw new \LogicException('Unexpected method call');
     }
@@ -252,7 +252,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Magic method to allow non existing methods to be called and delegated.
      */
-    public function __call($method, $args)
+    public function __call($method, $args): void
     {
         throw new \LogicException('Unexpected method call');
     }
@@ -260,12 +260,12 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Magic method to allow non existing methods to be called and delegated.
      */
-    public static function __callStatic($method, $args)
+    public static function __callStatic($method, $args): void
     {
         throw new \LogicException('Unexpected method call');
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
         throw new \LogicException('Unexpected method call');
     }

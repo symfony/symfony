@@ -35,7 +35,7 @@ class DumpNode extends Node
     /**
      * {@inheritdoc}
      */
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler
             ->write("if (\$this->env->isDebug()) {\n")

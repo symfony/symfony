@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeTokenTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $user = $this->getUser();
         $token = new RememberMeToken($user, 'fookey', 'foo');
@@ -32,7 +32,7 @@ class RememberMeTokenTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testConstructorSecretCannotBeEmptyString()
+    public function testConstructorSecretCannotBeEmptyString(): void
     {
         new RememberMeToken(
             $this->getUser(),

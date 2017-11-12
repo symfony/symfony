@@ -104,7 +104,7 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    private function addCsrfSection(ArrayNodeDefinition $rootNode)
+    private function addCsrfSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -115,7 +115,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addFormSection(ArrayNodeDefinition $rootNode)
+    private function addFormSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -139,7 +139,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addEsiSection(ArrayNodeDefinition $rootNode)
+    private function addEsiSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -151,7 +151,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSsiSection(ArrayNodeDefinition $rootNode)
+    private function addSsiSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -162,7 +162,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function addFragmentsSection(ArrayNodeDefinition $rootNode)
+    private function addFragmentsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -177,7 +177,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addProfilerSection(ArrayNodeDefinition $rootNode)
+    private function addProfilerSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -195,7 +195,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addWorkflowSection(ArrayNodeDefinition $rootNode)
+    private function addWorkflowSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('workflow')
@@ -367,7 +367,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRouterSection(ArrayNodeDefinition $rootNode)
+    private function addRouterSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -394,7 +394,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSessionSection(ArrayNodeDefinition $rootNode)
+    private function addSessionSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -425,7 +425,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRequestSection(ArrayNodeDefinition $rootNode)
+    private function addRequestSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -454,7 +454,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addTemplatingSection(ArrayNodeDefinition $rootNode)
+    private function addTemplatingSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -514,7 +514,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addAssetsSection(ArrayNodeDefinition $rootNode)
+    private function addAssetsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -566,7 +566,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('version')
                                         ->beforeNormalization()
                                         ->ifTrue(function ($v) { return '' === $v; })
-                                        ->then(function ($v) { return; })
+                                        ->then(function ($v): void { return; })
                                         ->end()
                                     ->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
@@ -607,7 +607,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addTranslatorSection(ArrayNodeDefinition $rootNode)
+    private function addTranslatorSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -633,7 +633,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addValidationSection(ArrayNodeDefinition $rootNode)
+    private function addValidationSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -669,7 +669,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addAnnotationsSection(ArrayNodeDefinition $rootNode)
+    private function addAnnotationsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -686,7 +686,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addSerializerSection(ArrayNodeDefinition $rootNode)
+    private function addSerializerSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -712,7 +712,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode)
+    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -728,7 +728,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode)
+    private function addPropertyInfoSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -740,7 +740,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addCacheSection(ArrayNodeDefinition $rootNode)
+    private function addCacheSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -790,7 +790,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addPhpErrorsSection(ArrayNodeDefinition $rootNode)
+    private function addPhpErrorsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -814,7 +814,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addLockSection(ArrayNodeDefinition $rootNode)
+    private function addLockSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()
@@ -857,7 +857,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addWebLinkSection(ArrayNodeDefinition $rootNode)
+    private function addWebLinkSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()

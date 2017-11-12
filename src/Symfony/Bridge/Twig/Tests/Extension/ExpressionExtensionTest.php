@@ -18,7 +18,7 @@ use Twig\Loader\ArrayLoader;
 
 class ExpressionExtensionTest extends TestCase
 {
-    public function testExpressionCreation()
+    public function testExpressionCreation(): void
     {
         $template = "{{ expression('1 == 1') }}";
         $twig = new Environment(new ArrayLoader(array('template' => $template)), array('debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0));

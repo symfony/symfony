@@ -28,7 +28,7 @@ class MongoDbSessionHandlerTest extends TestCase
     private $storage;
     public $options;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,22 +55,22 @@ class MongoDbSessionHandlerTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testConstructorShouldThrowExceptionForMissingOptions()
+    public function testConstructorShouldThrowExceptionForMissingOptions(): void
     {
         new MongoDbSessionHandler($this->mongo, array());
     }
 
-    public function testOpenMethodAlwaysReturnTrue()
+    public function testOpenMethodAlwaysReturnTrue(): void
     {
         $this->assertTrue($this->storage->open('test', 'test'), 'The "open" method should always return true');
     }
 
-    public function testCloseMethodAlwaysReturnTrue()
+    public function testCloseMethodAlwaysReturnTrue(): void
     {
         $this->assertTrue($this->storage->close(), 'The "close" method should always return true');
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $collection = $this->createMongoCollectionMock();
 
@@ -105,7 +105,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertEquals('bar', $this->storage->read('foo'));
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $collection = $this->createMongoCollectionMock();
 
@@ -116,7 +116,7 @@ class MongoDbSessionHandlerTest extends TestCase
 
         $collection->expects($this->once())
             ->method('updateOne')
-            ->will($this->returnCallback(function ($criteria, $updateData, $options) {
+            ->will($this->returnCallback(function ($criteria, $updateData, $options): void {
                 $this->assertEquals(array($this->options['id_field'] => 'foo'), $criteria);
                 $this->assertEquals(array('upsert' => true), $options);
 
@@ -132,7 +132,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertTrue($this->storage->write('foo', 'bar'));
     }
 
-    public function testReplaceSessionData()
+    public function testReplaceSessionData(): void
     {
         $collection = $this->createMongoCollectionMock();
 
@@ -145,7 +145,7 @@ class MongoDbSessionHandlerTest extends TestCase
 
         $collection->expects($this->exactly(2))
             ->method('updateOne')
-            ->will($this->returnCallback(function ($criteria, $updateData, $options) use (&$data) {
+            ->will($this->returnCallback(function ($criteria, $updateData, $options) use (&$data): void {
                 $data = $updateData;
             }));
 
@@ -155,7 +155,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertEquals('foobar', $data['$set'][$this->options['data_field']]->getData());
     }
 
-    public function testDestroy()
+    public function testDestroy(): void
     {
         $collection = $this->createMongoCollectionMock();
 
@@ -171,7 +171,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertTrue($this->storage->destroy('foo'));
     }
 
-    public function testGc()
+    public function testGc(): void
     {
         $collection = $this->createMongoCollectionMock();
 
@@ -182,7 +182,7 @@ class MongoDbSessionHandlerTest extends TestCase
 
         $collection->expects($this->once())
             ->method('deleteMany')
-            ->will($this->returnCallback(function ($criteria) {
+            ->will($this->returnCallback(function ($criteria): void {
                 $this->assertInstanceOf(\MongoDB\BSON\UTCDateTime::class, $criteria[$this->options['expiry_field']]['$lt']);
                 $this->assertGreaterThanOrEqual(time() - 1, round((string) $criteria[$this->options['expiry_field']]['$lt'] / 1000));
             }));
@@ -190,7 +190,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertTrue($this->storage->gc(1));
     }
 
-    public function testGetConnection()
+    public function testGetConnection(): void
     {
         $method = new \ReflectionMethod($this->storage, 'getMongo');
         $method->setAccessible(true);

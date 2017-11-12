@@ -81,7 +81,7 @@ class Route implements \Serializable
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $data = unserialize($serialized);
         $this->path = $data['path'];

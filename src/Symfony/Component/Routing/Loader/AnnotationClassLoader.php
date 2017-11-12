@@ -79,7 +79,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
      *
      * @param string $class A fully-qualified class name
      */
-    public function setRouteAnnotationClass($class)
+    public function setRouteAnnotationClass($class): void
     {
         $this->routeAnnotationClass = $class;
     }
@@ -128,7 +128,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $collection;
     }
 
-    protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method)
+    protected function addRoute(RouteCollection $collection, $annot, $globals, \ReflectionClass $class, \ReflectionMethod $method): void
     {
         $name = $annot->getName();
         if (null === $name) {
@@ -175,14 +175,14 @@ abstract class AnnotationClassLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function setResolver(LoaderResolverInterface $resolver)
+    public function setResolver(LoaderResolverInterface $resolver): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResolver()
+    public function getResolver(): void
     {
     }
 

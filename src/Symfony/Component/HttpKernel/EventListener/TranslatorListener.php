@@ -35,12 +35,12 @@ class TranslatorListener implements EventSubscriberInterface
         $this->requestStack = $requestStack;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $this->setLocale($event->getRequest());
     }
 
-    public function onKernelFinishRequest(FinishRequestEvent $event)
+    public function onKernelFinishRequest(FinishRequestEvent $event): void
     {
         if (null === $parentRequest = $this->requestStack->getParentRequest()) {
             return;
@@ -58,7 +58,7 @@ class TranslatorListener implements EventSubscriberInterface
         );
     }
 
-    private function setLocale(Request $request)
+    private function setLocale(Request $request): void
     {
         try {
             $this->translator->setLocale($request->getLocale());

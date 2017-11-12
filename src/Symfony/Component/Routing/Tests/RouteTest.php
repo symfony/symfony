@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Route;
 
 class RouteTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $route = new Route('/{foo}', array('foo' => 'bar'), array('foo' => '\d+'), array('foo' => 'bar'), '{locale}.example.com');
         $this->assertEquals('/{foo}', $route->getPath(), '__construct() takes a path as its first argument');
@@ -35,7 +35,7 @@ class RouteTest extends TestCase
         $this->assertEquals(array('POST'), $route->getMethods(), '__construct() takes a single method as its seventh argument');
     }
 
-    public function testPath()
+    public function testPath(): void
     {
         $route = new Route('/{foo}');
         $route->setPath('/{bar}');
@@ -49,7 +49,7 @@ class RouteTest extends TestCase
         $this->assertEquals('/path', $route->getPath(), '->setPath() does not allow two slashes "//" at the beginning of the path as it would be confused with a network path when generating the path from the route');
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $route = new Route('/{foo}');
         $route->setOptions(array('foo' => 'bar'));
@@ -64,7 +64,7 @@ class RouteTest extends TestCase
         $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar', 'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler'), $route->getOptions(), '->addDefaults() keep previous defaults');
     }
 
-    public function testOption()
+    public function testOption(): void
     {
         $route = new Route('/{foo}');
         $this->assertFalse($route->hasOption('foo'), '->hasOption() return false if option is not set');
@@ -73,7 +73,7 @@ class RouteTest extends TestCase
         $this->assertTrue($route->hasOption('foo'), '->hasOption() return true if option is set');
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $route = new Route('/{foo}');
         $route->setDefaults(array('foo' => 'bar'));
@@ -96,7 +96,7 @@ class RouteTest extends TestCase
         $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar'), $route->getDefaults(), '->addDefaults() keep previous defaults');
     }
 
-    public function testRequirements()
+    public function testRequirements(): void
     {
         $route = new Route('/{foo}');
         $route->setRequirements(array('foo' => '\d+'));
@@ -113,7 +113,7 @@ class RouteTest extends TestCase
         $this->assertEquals(array('foo' => '\d+', 'bar' => '\d+'), $route->getRequirements(), '->addRequirement() keep previous requirements');
     }
 
-    public function testRequirement()
+    public function testRequirement(): void
     {
         $route = new Route('/{foo}');
         $this->assertFalse($route->hasRequirement('foo'), '->hasRequirement() return false if requirement is not set');
@@ -126,7 +126,7 @@ class RouteTest extends TestCase
      * @dataProvider getInvalidRequirements
      * @expectedException \InvalidArgumentException
      */
-    public function testSetInvalidRequirement($req)
+    public function testSetInvalidRequirement($req): void
     {
         $route = new Route('/{foo}');
         $route->setRequirement('foo', $req);
@@ -143,14 +143,14 @@ class RouteTest extends TestCase
         );
     }
 
-    public function testHost()
+    public function testHost(): void
     {
         $route = new Route('/');
         $route->setHost('{locale}.example.net');
         $this->assertEquals('{locale}.example.net', $route->getHost(), '->setHost() sets the host pattern');
     }
 
-    public function testScheme()
+    public function testScheme(): void
     {
         $route = new Route('/');
         $this->assertEquals(array(), $route->getSchemes(), 'schemes is initialized with array()');
@@ -165,7 +165,7 @@ class RouteTest extends TestCase
         $this->assertTrue($route->hasScheme('httpS'));
     }
 
-    public function testMethod()
+    public function testMethod(): void
     {
         $route = new Route('/');
         $this->assertEquals(array(), $route->getMethods(), 'methods is initialized with array()');
@@ -175,7 +175,7 @@ class RouteTest extends TestCase
         $this->assertEquals(array('GET', 'POST'), $route->getMethods(), '->setMethods() accepts an array of methods and uppercases them');
     }
 
-    public function testCondition()
+    public function testCondition(): void
     {
         $route = new Route('/');
         $this->assertSame('', $route->getCondition());
@@ -183,7 +183,7 @@ class RouteTest extends TestCase
         $this->assertSame('context.getMethod() == "GET"', $route->getCondition());
     }
 
-    public function testCompile()
+    public function testCompile(): void
     {
         $route = new Route('/{foo}');
         $this->assertInstanceOf('Symfony\Component\Routing\CompiledRoute', $compiled = $route->compile(), '->compile() returns a compiled route');
@@ -192,7 +192,7 @@ class RouteTest extends TestCase
         $this->assertNotSame($compiled, $route->compile(), '->compile() recompiles if the route was modified');
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $route = new Route('/prefix/{foo}', array('foo' => 'default'), array('foo' => '\d+'));
 
@@ -207,7 +207,7 @@ class RouteTest extends TestCase
      * Tests that the compiled version is also serialized to prevent the overhead
      * of compiling it again after unserialize.
      */
-    public function testSerializeWhenCompiled()
+    public function testSerializeWhenCompiled(): void
     {
         $route = new Route('/prefix/{foo}', array('foo' => 'default'), array('foo' => '\d+'));
         $route->setHost('{locale}.example.net');
@@ -224,7 +224,7 @@ class RouteTest extends TestCase
      * Tests that unserialization does not fail when the compiled Route is of a
      * class other than CompiledRoute, such as a subclass of it.
      */
-    public function testSerializeWhenCompiledWithClass()
+    public function testSerializeWhenCompiledWithClass(): void
     {
         $route = new Route('/', array(), array(), array('compiler_class' => '\Symfony\Component\Routing\Tests\Fixtures\CustomRouteCompiler'));
         $this->assertInstanceOf('\Symfony\Component\Routing\Tests\Fixtures\CustomCompiledRoute', $route->compile(), '->compile() returned a proper route');
@@ -243,7 +243,7 @@ class RouteTest extends TestCase
      * also works in later symfony versions, i.e. the unserialized route is in the
      * same state as another, semantically equivalent, route.
      */
-    public function testSerializedRepresentationKeepsWorking()
+    public function testSerializedRepresentationKeepsWorking(): void
     {
         $serialized = 'C:31:"Symfony\Component\Routing\Route":934:{a:8:{s:4:"path";s:13:"/prefix/{foo}";s:4:"host";s:20:"{locale}.example.net";s:8:"defaults";a:1:{s:3:"foo";s:7:"default";}s:12:"requirements";a:1:{s:3:"foo";s:3:"\d+";}s:7:"options";a:1:{s:14:"compiler_class";s:39:"Symfony\Component\Routing\RouteCompiler";}s:7:"schemes";a:0:{}s:7:"methods";a:0:{}s:8:"compiled";C:39:"Symfony\Component\Routing\CompiledRoute":569:{a:8:{s:4:"vars";a:2:{i:0;s:6:"locale";i:1;s:3:"foo";}s:11:"path_prefix";s:7:"/prefix";s:10:"path_regex";s:30:"#^/prefix(?:/(?P<foo>\d+))?$#s";s:11:"path_tokens";a:2:{i:0;a:4:{i:0;s:8:"variable";i:1;s:1:"/";i:2;s:3:"\d+";i:3;s:3:"foo";}i:1;a:2:{i:0;s:4:"text";i:1;s:7:"/prefix";}}s:9:"path_vars";a:1:{i:0;s:3:"foo";}s:10:"host_regex";s:39:"#^(?P<locale>[^\.]++)\.example\.net$#si";s:11:"host_tokens";a:2:{i:0;a:2:{i:0;s:4:"text";i:1;s:12:".example.net";}i:1;a:4:{i:0;s:8:"variable";i:1;s:0:"";i:2;s:7:"[^\.]++";i:3;s:6:"locale";}}s:9:"host_vars";a:1:{i:0;s:6:"locale";}}}}}';
         $unserialized = unserialize($serialized);

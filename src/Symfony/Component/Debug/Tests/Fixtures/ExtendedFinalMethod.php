@@ -7,11 +7,11 @@ class ExtendedFinalMethod extends FinalMethod
     /**
      * {@inheritdoc}
      */
-    public function finalMethod()
+    public function finalMethod(): void
     {
     }
 
-    public function anotherMethod()
+    public function anotherMethod(): void
     {
     }
 }

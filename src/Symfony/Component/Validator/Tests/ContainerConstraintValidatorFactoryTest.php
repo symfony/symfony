@@ -21,7 +21,7 @@ use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 
 class ContainerConstraintValidatorFactoryTest extends TestCase
 {
-    public function testGetInstanceCreatesValidator()
+    public function testGetInstanceCreatesValidator(): void
     {
         $class = get_class($this->getMockForAbstractClass(ConstraintValidator::class));
 
@@ -35,7 +35,7 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
         $this->assertInstanceOf($class, $factory->getInstance($constraint));
     }
 
-    public function testGetInstanceReturnsExistingValidator()
+    public function testGetInstanceReturnsExistingValidator(): void
     {
         $factory = new ContainerConstraintValidatorFactory(new Container());
         $v1 = $factory->getInstance(new BlankConstraint());
@@ -43,7 +43,7 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
         $this->assertSame($v1, $v2);
     }
 
-    public function testGetInstanceReturnsService()
+    public function testGetInstanceReturnsService(): void
     {
         $service = 'validator_constraint_service';
         $validator = $this->getMockForAbstractClass(ConstraintValidator::class);
@@ -74,7 +74,7 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
      */
-    public function testGetInstanceInvalidValidatorClass()
+    public function testGetInstanceInvalidValidatorClass(): void
     {
         $constraint = $this->getMockBuilder(Constraint::class)->getMock();
         $constraint

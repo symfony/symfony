@@ -17,14 +17,14 @@ use Symfony\Component\Translation\DataCollector\TranslationDataCollector;
 
 class TranslationDataCollectorTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!class_exists('Symfony\Component\HttpKernel\DataCollector\DataCollector')) {
             $this->markTestSkipped('The "DataCollector" is not available');
         }
     }
 
-    public function testCollectEmptyMessages()
+    public function testCollectEmptyMessages(): void
     {
         $translator = $this->getTranslator();
         $translator->expects($this->any())->method('getCollectedMessages')->will($this->returnValue(array()));
@@ -38,7 +38,7 @@ class TranslationDataCollectorTest extends TestCase
         $this->assertEquals(array(), $dataCollector->getMessages()->getValue());
     }
 
-    public function testCollect()
+    public function testCollect(): void
     {
         $collectedMessages = array(
             array(

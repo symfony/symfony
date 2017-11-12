@@ -33,7 +33,7 @@ trait PhpArrayTrait
      *
      * @param array $values The cached values
      */
-    public function warmUp(array $values)
+    public function warmUp(array $values): void
     {
         if (file_exists($this->file)) {
             if (!is_file($this->file)) {
@@ -126,7 +126,7 @@ EOF;
     /**
      * Load the cache file.
      */
-    private function initialize()
+    private function initialize(): void
     {
         if ($this->zendDetectUnicode) {
             $zmb = ini_set('zend.detect_unicode', 0);

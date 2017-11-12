@@ -21,7 +21,7 @@ class ExpressionRequestMatcherTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testWhenNoExpressionIsSet()
+    public function testWhenNoExpressionIsSet(): void
     {
         $expressionRequestMatcher = new ExpressionRequestMatcher();
         $expressionRequestMatcher->matches(new Request());
@@ -30,7 +30,7 @@ class ExpressionRequestMatcherTest extends TestCase
     /**
      * @dataProvider provideExpressions
      */
-    public function testMatchesWhenParentMatchesIsTrue($expression, $expected)
+    public function testMatchesWhenParentMatchesIsTrue($expression, $expected): void
     {
         $request = Request::create('/foo');
         $expressionRequestMatcher = new ExpressionRequestMatcher();
@@ -42,7 +42,7 @@ class ExpressionRequestMatcherTest extends TestCase
     /**
      * @dataProvider provideExpressions
      */
-    public function testMatchesWhenParentMatchesIsFalse($expression)
+    public function testMatchesWhenParentMatchesIsFalse($expression): void
     {
         $request = Request::create('/foo');
         $request->attributes->set('foo', 'foo');

@@ -77,7 +77,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function extract($resource, MessageCatalogue $catalog)
+    public function extract($resource, MessageCatalogue $catalog): void
     {
         $files = $this->extractFiles($resource);
         foreach ($files as $file) {
@@ -91,7 +91,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function setPrefix($prefix)
+    public function setPrefix($prefix): void
     {
         $this->prefix = $prefix;
     }
@@ -115,7 +115,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * Seeks to a non-whitespace token.
      */
-    private function seekToNextRelevantToken(\Iterator $tokenIterator)
+    private function seekToNextRelevantToken(\Iterator $tokenIterator): void
     {
         for (; $tokenIterator->valid(); $tokenIterator->next()) {
             $t = $tokenIterator->current();
@@ -125,7 +125,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
         }
     }
 
-    private function skipMethodArgument(\Iterator $tokenIterator)
+    private function skipMethodArgument(\Iterator $tokenIterator): void
     {
         $openBraces = 0;
 
@@ -188,7 +188,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      *
      * @param array            $tokens
      */
-    protected function parseTokens($tokens, MessageCatalogue $catalog)
+    protected function parseTokens($tokens, MessageCatalogue $catalog): void
     {
         $tokenIterator = new \ArrayIterator($tokens);
 

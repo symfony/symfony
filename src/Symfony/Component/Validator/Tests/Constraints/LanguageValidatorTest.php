@@ -23,14 +23,14 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         return new LanguageValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Language());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Language());
 
@@ -40,7 +40,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Language());
     }
@@ -48,7 +48,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidLanguages
      */
-    public function testValidLanguages($language)
+    public function testValidLanguages($language): void
     {
         $this->validator->validate($language, new Language());
 
@@ -67,7 +67,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidLanguages
      */
-    public function testInvalidLanguages($language)
+    public function testInvalidLanguages($language): void
     {
         $constraint = new Language(array(
             'message' => 'myMessage',
@@ -89,7 +89,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function testValidateUsingCountrySpecificLocale()
+    public function testValidateUsingCountrySpecificLocale(): void
     {
         IntlTestHelper::requireFullIntl($this, false);
 

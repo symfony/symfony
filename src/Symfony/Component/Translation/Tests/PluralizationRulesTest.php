@@ -36,7 +36,7 @@ class PluralizationRulesTest extends TestCase
      *
      * @dataProvider failingLangcodes
      */
-    public function testFailedLangcodes($nplural, $langCodes)
+    public function testFailedLangcodes($nplural, $langCodes): void
     {
         $matrix = $this->generateTestData($langCodes);
         $this->validateMatrix($nplural, $matrix, false);
@@ -45,7 +45,7 @@ class PluralizationRulesTest extends TestCase
     /**
      * @dataProvider successLangcodes
      */
-    public function testLangcodes($nplural, $langCodes)
+    public function testLangcodes($nplural, $langCodes): void
     {
         $matrix = $this->generateTestData($langCodes);
         $this->validateMatrix($nplural, $matrix);
@@ -95,7 +95,7 @@ class PluralizationRulesTest extends TestCase
      * @param array  $matrix        Containing langcodes and their plural index values
      * @param bool   $expectSuccess
      */
-    protected function validateMatrix($nplural, $matrix, $expectSuccess = true)
+    protected function validateMatrix($nplural, $matrix, $expectSuccess = true): void
     {
         foreach ($matrix as $langCode => $data) {
             $indexes = array_flip($data);

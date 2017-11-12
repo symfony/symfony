@@ -31,7 +31,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
      */
     private $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -55,7 +55,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
-    public function testThemeBlockInheritanceUsingUse()
+    public function testThemeBlockInheritanceUsingUse(): void
     {
         $view = $this->factory
             ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
@@ -70,7 +70,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
     }
 
-    public function testThemeBlockInheritanceUsingExtend()
+    public function testThemeBlockInheritanceUsingExtend(): void
     {
         $view = $this->factory
             ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
@@ -85,7 +85,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         );
     }
 
-    public function testThemeBlockInheritanceUsingDynamicExtend()
+    public function testThemeBlockInheritanceUsingDynamicExtend(): void
     {
         $view = $this->factory
             ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
@@ -118,14 +118,14 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     /**
      * @dataProvider isSelectedChoiceProvider
      */
-    public function testIsChoiceSelected($expected, $choice, $value)
+    public function testIsChoiceSelected($expected, $choice, $value): void
     {
         $choice = new ChoiceView($choice, $choice, $choice.' label');
 
         $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_selected_choice($choice, $value));
     }
 
-    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -137,7 +137,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame('<form name="form" method="get">', $html);
     }
 
-    public function testStartTagHasActionAttributeWhenActionIsZero()
+    public function testStartTagHasActionAttributeWhenActionIsZero(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -193,7 +193,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
     }
 
-    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
+    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true): void
     {
         $this->renderer->setTheme($view, $themes, $useDefaultThemes);
     }

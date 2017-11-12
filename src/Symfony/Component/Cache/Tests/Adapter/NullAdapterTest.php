@@ -25,7 +25,7 @@ class NullAdapterTest extends TestCase
         return new NullAdapter();
     }
 
-    public function testGetItem()
+    public function testGetItem(): void
     {
         $adapter = $this->createCachePool();
 
@@ -34,12 +34,12 @@ class NullAdapterTest extends TestCase
         $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
     }
 
-    public function testHasItem()
+    public function testHasItem(): void
     {
         $this->assertFalse($this->createCachePool()->hasItem('key'));
     }
 
-    public function testGetItems()
+    public function testGetItems(): void
     {
         $adapter = $this->createCachePool();
 
@@ -69,7 +69,7 @@ class NullAdapterTest extends TestCase
         $this->assertSame(4, $count);
     }
 
-    public function testIsHit()
+    public function testIsHit(): void
     {
         $adapter = $this->createCachePool();
 
@@ -77,22 +77,22 @@ class NullAdapterTest extends TestCase
         $this->assertFalse($item->isHit());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->assertTrue($this->createCachePool()->clear());
     }
 
-    public function testDeleteItem()
+    public function testDeleteItem(): void
     {
         $this->assertTrue($this->createCachePool()->deleteItem('key'));
     }
 
-    public function testDeleteItems()
+    public function testDeleteItems(): void
     {
         $this->assertTrue($this->createCachePool()->deleteItems(array('key', 'foo', 'bar')));
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $adapter = $this->createCachePool();
 
@@ -103,7 +103,7 @@ class NullAdapterTest extends TestCase
         $this->assertFalse($adapter->save($item));
     }
 
-    public function testDeferredSave()
+    public function testDeferredSave(): void
     {
         $adapter = $this->createCachePool();
 
@@ -114,7 +114,7 @@ class NullAdapterTest extends TestCase
         $this->assertFalse($adapter->saveDeferred($item));
     }
 
-    public function testCommit()
+    public function testCommit(): void
     {
         $adapter = $this->createCachePool();
 

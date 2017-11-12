@@ -35,7 +35,7 @@ class ContainerAwareLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function addFixture(FixtureInterface $fixture)
+    public function addFixture(FixtureInterface $fixture): void
     {
         if ($fixture instanceof ContainerAwareInterface) {
             $fixture->setContainer($this->container);

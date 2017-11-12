@@ -101,7 +101,7 @@ class MainConfiguration implements ConfigurationInterface
         return $tb;
     }
 
-    private function addRoleHierarchySection(ArrayNodeDefinition $rootNode)
+    private function addRoleHierarchySection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('role', 'role_hierarchy')
@@ -122,7 +122,7 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
-    private function addAccessControlSection(ArrayNodeDefinition $rootNode)
+    private function addAccessControlSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('rule', 'access_control')
@@ -163,7 +163,7 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
-    private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories)
+    private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories): void
     {
         $firewallNodeBuilder = $rootNode
             ->fixXmlConfig('firewall')
@@ -304,7 +304,7 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
-    private function addProvidersSection(ArrayNodeDefinition $rootNode)
+    private function addProvidersSection(ArrayNodeDefinition $rootNode): void
     {
         $providerNodeBuilder = $rootNode
             ->fixXmlConfig('provider')
@@ -364,7 +364,7 @@ class MainConfiguration implements ConfigurationInterface
         ;
     }
 
-    private function addEncodersSection(ArrayNodeDefinition $rootNode)
+    private function addEncodersSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('encoder')

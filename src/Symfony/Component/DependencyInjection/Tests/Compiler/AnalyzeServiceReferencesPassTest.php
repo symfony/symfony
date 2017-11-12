@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AnalyzeServiceReferencesPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -61,7 +61,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         $this->assertSame($ref6, $edges[3]->getValue());
     }
 
-    public function testProcessMarksEdgesLazyWhenReferencedServiceIsLazy()
+    public function testProcessMarksEdgesLazyWhenReferencedServiceIsLazy(): void
     {
         $container = new ContainerBuilder();
 
@@ -85,7 +85,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         $this->assertTrue($edges[0]->isLazy());
     }
 
-    public function testProcessMarksEdgesLazyWhenReferencedFromIteratorArgument()
+    public function testProcessMarksEdgesLazyWhenReferencedFromIteratorArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register('a');
@@ -109,7 +109,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         $this->assertTrue($edges[1]->isLazy());
     }
 
-    public function testProcessDetectsReferencesFromInlinedDefinitions()
+    public function testProcessDetectsReferencesFromInlinedDefinitions(): void
     {
         $container = new ContainerBuilder();
 
@@ -128,7 +128,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         $this->assertSame($ref, $refs[0]->getValue());
     }
 
-    public function testProcessDetectsReferencesFromIteratorArguments()
+    public function testProcessDetectsReferencesFromIteratorArguments(): void
     {
         $container = new ContainerBuilder();
 
@@ -147,7 +147,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         $this->assertSame($ref, $refs[0]->getValue());
     }
 
-    public function testProcessDetectsReferencesFromInlinedFactoryDefinitions()
+    public function testProcessDetectsReferencesFromInlinedFactoryDefinitions(): void
     {
         $container = new ContainerBuilder();
 
@@ -169,7 +169,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         $this->assertCount(1, $refs = $graph->getNode('a')->getInEdges());
     }
 
-    public function testProcessDoesNotSaveDuplicateReferences()
+    public function testProcessDoesNotSaveDuplicateReferences(): void
     {
         $container = new ContainerBuilder();
 
@@ -187,7 +187,7 @@ class AnalyzeServiceReferencesPassTest extends TestCase
         $this->assertCount(2, $graph->getNode('a')->getInEdges());
     }
 
-    public function testProcessDetectsFactoryReferences()
+    public function testProcessDetectsFactoryReferences(): void
     {
         $container = new ContainerBuilder();
 

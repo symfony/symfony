@@ -17,7 +17,7 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
 class NodeTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $node = new Node(array(new ConstantNode('foo')));
 
@@ -29,7 +29,7 @@ EOF
         , (string) $node);
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $node = new Node(array('foo' => 'bar'), array('bar' => 'foo'));
 

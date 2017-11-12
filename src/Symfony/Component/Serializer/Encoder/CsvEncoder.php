@@ -169,7 +169,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     /**
      * Flattens an array and generates keys including the path.
      */
-    private function flatten(array $array, array &$result, string $keySeparator, string $parentKey = '')
+    private function flatten(array $array, array &$result, string $keySeparator, string $parentKey = ''): void
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {

@@ -27,7 +27,7 @@ class FormFieldRegistry
     /**
      * Adds a field to the registry.
      */
-    public function add(FormField $field)
+    public function add(FormField $field): void
     {
         $segments = $this->getSegments($field->getName());
 
@@ -51,7 +51,7 @@ class FormFieldRegistry
      *
      * @param string $name The fully qualified name of the base field
      */
-    public function remove($name)
+    public function remove($name): void
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -115,7 +115,7 @@ class FormFieldRegistry
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function set($name, $value)
+    public function set($name, $value): void
     {
         $target = &$this->get($name);
         if ((!is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {

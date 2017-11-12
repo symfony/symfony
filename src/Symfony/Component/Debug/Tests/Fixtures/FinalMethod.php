@@ -7,11 +7,11 @@ class FinalMethod
     /**
      * @final since version 3.3.
      */
-    public function finalMethod()
+    public function finalMethod(): void
     {
     }
 
-    public function anotherMethod()
+    public function anotherMethod(): void
     {
     }
 }

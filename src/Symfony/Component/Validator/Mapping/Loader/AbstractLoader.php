@@ -47,7 +47,7 @@ abstract class AbstractLoader implements LoaderInterface
      * @param string $alias     The alias
      * @param string $namespace The PHP namespace
      */
-    protected function addNamespaceAlias($alias, $namespace)
+    protected function addNamespaceAlias($alias, $namespace): void
     {
         $this->namespaces[$alias] = $namespace;
     }

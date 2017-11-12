@@ -17,7 +17,7 @@ use Symfony\Component\Console\Command\Command;
 
 class HelperSetTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $mock_helper = $this->getGenericMockHelper('fake_helper');
         $helperset = new HelperSet(array('fake_helper_alias' => $mock_helper));
@@ -26,7 +26,7 @@ class HelperSetTest extends TestCase
         $this->assertTrue($helperset->has('fake_helper_alias'), '__construct sets helper alias for given helper');
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $helperset = new HelperSet();
         $helperset->set($this->getGenericMockHelper('fake_helper', $helperset));
@@ -44,14 +44,14 @@ class HelperSetTest extends TestCase
         $this->assertTrue($helperset->has('fake_helper_alias'), '->set() adds helper alias when set');
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $helperset = new HelperSet(array('fake_helper_alias' => $this->getGenericMockHelper('fake_helper')));
         $this->assertTrue($helperset->has('fake_helper'), '->has() finds set helper');
         $this->assertTrue($helperset->has('fake_helper_alias'), '->has() finds set helper by alias');
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $helper_01 = $this->getGenericMockHelper('fake_helper_01');
         $helper_02 = $this->getGenericMockHelper('fake_helper_02');
@@ -72,7 +72,7 @@ class HelperSetTest extends TestCase
         }
     }
 
-    public function testSetCommand()
+    public function testSetCommand(): void
     {
         $cmd_01 = new Command('foo');
         $cmd_02 = new Command('bar');
@@ -87,7 +87,7 @@ class HelperSetTest extends TestCase
         $this->assertEquals($cmd_02, $helperset->getCommand(), '->setCommand() overwrites stored command with consecutive calls');
     }
 
-    public function testGetCommand()
+    public function testGetCommand(): void
     {
         $cmd = new Command('foo');
         $helperset = new HelperSet();
@@ -95,7 +95,7 @@ class HelperSetTest extends TestCase
         $this->assertEquals($cmd, $helperset->getCommand(), '->getCommand() retrieves stored command');
     }
 
-    public function testIteration()
+    public function testIteration(): void
     {
         $helperset = new HelperSet();
         $helperset->set($this->getGenericMockHelper('fake_helper_01', $helperset));

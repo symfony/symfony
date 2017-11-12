@@ -36,7 +36,7 @@ class Filesystem
      * @throws FileNotFoundException When originFile doesn't exist
      * @throws IOException           When copy fails
      */
-    public function copy($originFile, $targetFile, $overwriteNewerFiles = false)
+    public function copy($originFile, $targetFile, $overwriteNewerFiles = false): void
     {
         $originIsLocal = stream_is_local($originFile) || 0 === stripos($originFile, 'file://');
         if ($originIsLocal && !is_file($originFile)) {
@@ -89,7 +89,7 @@ class Filesystem
      *
      * @throws IOException On any directory creation failure
      */
-    public function mkdir($dirs, $mode = 0777)
+    public function mkdir($dirs, $mode = 0777): void
     {
         foreach ($this->toIterator($dirs) as $dir) {
             if (is_dir($dir)) {
@@ -142,7 +142,7 @@ class Filesystem
      *
      * @throws IOException When touch fails
      */
-    public function touch($files, $time = null, $atime = null)
+    public function touch($files, $time = null, $atime = null): void
     {
         foreach ($this->toIterator($files) as $file) {
             $touch = $time ? @touch($file, $time, $atime) : @touch($file);
@@ -159,7 +159,7 @@ class Filesystem
      *
      * @throws IOException When removal fails
      */
-    public function remove($files)
+    public function remove($files): void
     {
         if ($files instanceof \Traversable) {
             $files = iterator_to_array($files, false);
@@ -198,7 +198,7 @@ class Filesystem
      *
      * @throws IOException When the change fail
      */
-    public function chmod($files, $mode, $umask = 0000, $recursive = false)
+    public function chmod($files, $mode, $umask = 0000, $recursive = false): void
     {
         foreach ($this->toIterator($files) as $file) {
             if (true !== @chmod($file, $mode & ~$umask)) {
@@ -219,7 +219,7 @@ class Filesystem
      *
      * @throws IOException When the change fail
      */
-    public function chown($files, $user, $recursive = false)
+    public function chown($files, $user, $recursive = false): void
     {
         foreach ($this->toIterator($files) as $file) {
             if ($recursive && is_dir($file) && !is_link($file)) {
@@ -246,7 +246,7 @@ class Filesystem
      *
      * @throws IOException When the change fail
      */
-    public function chgrp($files, $group, $recursive = false)
+    public function chgrp($files, $group, $recursive = false): void
     {
         foreach ($this->toIterator($files) as $file) {
             if ($recursive && is_dir($file) && !is_link($file)) {
@@ -274,7 +274,7 @@ class Filesystem
      * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
      */
-    public function rename($origin, $target, $overwrite = false)
+    public function rename($origin, $target, $overwrite = false): void
     {
         // we check that target does not exist
         if (!$overwrite && $this->isReadable($target)) {
@@ -322,7 +322,7 @@ class Filesystem
      *
      * @throws IOException When symlink fails
      */
-    public function symlink($originDir, $targetDir, $copyOnWindows = false)
+    public function symlink($originDir, $targetDir, $copyOnWindows = false): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $originDir = strtr($originDir, '/', '\\');
@@ -360,7 +360,7 @@ class Filesystem
      * @throws FileNotFoundException When original file is missing or not a file
      * @throws IOException           When link fails, including if link already exists
      */
-    public function hardlink($originFile, $targetFiles)
+    public function hardlink($originFile, $targetFiles): void
     {
         if (!$this->exists($originFile)) {
             throw new FileNotFoundException(null, 0, null, $originFile);
@@ -389,7 +389,7 @@ class Filesystem
      * @param string $target
      * @param string $linkType Name of the link type, typically 'symbolic' or 'hard'
      */
-    private function linkException($origin, $target, $linkType)
+    private function linkException($origin, $target, $linkType): void
     {
         $report = error_get_last();
         if (is_array($report)) {
@@ -535,7 +535,7 @@ class Filesystem
      *
      * @throws IOException When file type is unknown
      */
-    public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array())
+    public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array()): void
     {
         $targetDir = rtrim($targetDir, '/\\');
         $originDir = rtrim($originDir, '/\\');
@@ -674,7 +674,7 @@ class Filesystem
      *
      * @throws IOException if the file cannot be written to
      */
-    public function dumpFile($filename, $content)
+    public function dumpFile($filename, $content): void
     {
         $dir = dirname($filename);
 
@@ -707,7 +707,7 @@ class Filesystem
      *
      * @throws IOException If the file is not writable
      */
-    public function appendToFile($filename, $content)
+    public function appendToFile($filename, $content): void
     {
         $dir = dirname($filename);
 

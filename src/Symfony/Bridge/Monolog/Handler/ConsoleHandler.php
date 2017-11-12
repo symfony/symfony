@@ -89,7 +89,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * Sets the console output to use for printing logs.
      */
-    public function setOutput(OutputInterface $output)
+    public function setOutput(OutputInterface $output): void
     {
         $this->output = $output;
     }
@@ -97,7 +97,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * Disables the output.
      */
-    public function close()
+    public function close(): void
     {
         $this->output = null;
 
@@ -108,7 +108,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      * Before a command is executed, the handler gets activated and the console output
      * is set in order to know where to write the logs.
      */
-    public function onCommand(ConsoleCommandEvent $event)
+    public function onCommand(ConsoleCommandEvent $event): void
     {
         $output = $event->getOutput();
         if ($output instanceof ConsoleOutputInterface) {
@@ -121,7 +121,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * After a command has been executed, it disables the output.
      */
-    public function onTerminate(ConsoleTerminateEvent $event)
+    public function onTerminate(ConsoleTerminateEvent $event): void
     {
         $this->close();
     }
@@ -140,7 +140,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     /**
      * {@inheritdoc}
      */
-    protected function write(array $record)
+    protected function write(array $record): void
     {
         // at this point we've determined for sure that we want to output the record, so use the output's own verbosity
         $this->output->write((string) $record['formatted'], false, $this->output->getVerbosity());

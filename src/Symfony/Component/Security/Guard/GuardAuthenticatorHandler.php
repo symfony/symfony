@@ -47,7 +47,7 @@ class GuardAuthenticatorHandler
     /**
      * Authenticates the given token in the system.
      */
-    public function authenticateWithToken(TokenInterface $token, Request $request)
+    public function authenticateWithToken(TokenInterface $token, Request $request): void
     {
         $this->tokenStorage->setToken($token);
 

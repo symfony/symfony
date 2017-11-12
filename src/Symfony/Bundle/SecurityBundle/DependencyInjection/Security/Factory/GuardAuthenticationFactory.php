@@ -34,7 +34,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         return 'guard';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->fixXmlConfig('authenticator')

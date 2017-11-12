@@ -117,7 +117,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * @param FormBuilderInterface $builder The builder to configure
      * @param array                $options The options used for the configuration
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (null !== $this->parent) {
             $this->parent->buildForm($builder, $options);
@@ -139,7 +139,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * @param FormInterface $form    The form corresponding to the view
      * @param array         $options The options used for the configuration
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if (null !== $this->parent) {
             $this->parent->buildView($view, $form, $options);
@@ -161,7 +161,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      * @param FormInterface $form    The form corresponding to the view
      * @param array         $options The options used for the configuration
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if (null !== $this->parent) {
             $this->parent->finishView($view, $form, $options);

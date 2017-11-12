@@ -20,7 +20,7 @@ class NodeBuilderTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testThrowsAnExceptionWhenTryingToCreateANonRegisteredNodeType()
+    public function testThrowsAnExceptionWhenTryingToCreateANonRegisteredNodeType(): void
     {
         $builder = new BaseNodeBuilder();
         $builder->node('', 'foobar');
@@ -29,7 +29,7 @@ class NodeBuilderTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testThrowsAnExceptionWhenTheNodeClassIsNotFound()
+    public function testThrowsAnExceptionWhenTheNodeClassIsNotFound(): void
     {
         $builder = new BaseNodeBuilder();
         $builder
@@ -37,7 +37,7 @@ class NodeBuilderTest extends TestCase
             ->node('', 'noclasstype');
     }
 
-    public function testAddingANewNodeType()
+    public function testAddingANewNodeType(): void
     {
         $class = __NAMESPACE__.'\\SomeNodeDefinition';
 
@@ -49,7 +49,7 @@ class NodeBuilderTest extends TestCase
         $this->assertInstanceOf($class, $node);
     }
 
-    public function testOverridingAnExistingNodeType()
+    public function testOverridingAnExistingNodeType(): void
     {
         $class = __NAMESPACE__.'\\SomeNodeDefinition';
 
@@ -61,7 +61,7 @@ class NodeBuilderTest extends TestCase
         $this->assertInstanceOf($class, $node);
     }
 
-    public function testNodeTypesAreNotCaseSensitive()
+    public function testNodeTypesAreNotCaseSensitive(): void
     {
         $builder = new BaseNodeBuilder();
 
@@ -78,7 +78,7 @@ class NodeBuilderTest extends TestCase
         $this->assertInstanceOf(get_class($node1), $node2);
     }
 
-    public function testNumericNodeCreation()
+    public function testNumericNodeCreation(): void
     {
         $builder = new BaseNodeBuilder();
 

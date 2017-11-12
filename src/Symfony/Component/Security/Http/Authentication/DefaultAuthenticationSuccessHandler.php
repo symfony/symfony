@@ -66,7 +66,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
         return $this->options;
     }
 
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = array_merge($this->defaultOptions, $options);
     }
@@ -86,7 +86,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      *
      * @param string $providerKey
      */
-    public function setProviderKey($providerKey)
+    public function setProviderKey($providerKey): void
     {
         $this->providerKey = $providerKey;
     }

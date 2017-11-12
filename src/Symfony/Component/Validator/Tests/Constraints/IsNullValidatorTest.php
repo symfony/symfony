@@ -22,7 +22,7 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
         return new IsNullValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new IsNull());
 
@@ -32,7 +32,7 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value, $valueAsString)
+    public function testInvalidValues($value, $valueAsString): void
     {
         $constraint = new IsNull(array(
             'message' => 'myMessage',

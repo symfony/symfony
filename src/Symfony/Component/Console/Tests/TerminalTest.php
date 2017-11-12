@@ -16,7 +16,7 @@ use Symfony\Component\Console\Terminal;
 
 class TerminalTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         putenv('COLUMNS=100');
         putenv('LINES=50');
@@ -31,7 +31,7 @@ class TerminalTest extends TestCase
         $this->assertSame(60, $terminal->getHeight());
     }
 
-    public function test_zero_values()
+    public function test_zero_values(): void
     {
         putenv('COLUMNS=0');
         putenv('LINES=0');

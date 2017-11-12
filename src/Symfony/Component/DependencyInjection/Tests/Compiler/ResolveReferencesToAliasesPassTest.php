@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveReferencesToAliasesPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->setAlias('bar', 'foo');
@@ -35,7 +35,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->assertEquals('foo', (string) $arguments[0]);
     }
 
-    public function testProcessRecursively()
+    public function testProcessRecursively(): void
     {
         $container = new ContainerBuilder();
         $container->setAlias('bar', 'foo');
@@ -54,7 +54,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
-    public function testAliasCircularReference()
+    public function testAliasCircularReference(): void
     {
         $container = new ContainerBuilder();
         $container->setAlias('bar', 'foo');
@@ -62,7 +62,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testResolveFactory()
+    public function testResolveFactory(): void
     {
         $container = new ContainerBuilder();
         $container->register('factory', 'Factory');
@@ -83,7 +83,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->assertSame('Factory', (string) $resolvedBarFactory[0]);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new ResolveReferencesToAliasesPass();
         $pass->process($container);

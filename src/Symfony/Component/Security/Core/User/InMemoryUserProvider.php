@@ -49,7 +49,7 @@ class InMemoryUserProvider implements UserProviderInterface
      *
      * @throws \LogicException
      */
-    public function createUser(UserInterface $user)
+    public function createUser(UserInterface $user): void
     {
         if (isset($this->users[strtolower($user->getUsername())])) {
             throw new \LogicException('Another user with the same username already exists.');

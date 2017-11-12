@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Depe
 
 class CustomConfig
 {
-    public function addConfiguration($rootNode)
+    public function addConfiguration($rootNode): void
     {
         $rootNode
             ->children()

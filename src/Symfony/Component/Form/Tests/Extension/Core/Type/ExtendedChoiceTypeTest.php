@@ -21,7 +21,7 @@ class ExtendedChoiceTypeTest extends TestCase
     /**
      * @dataProvider provideTestedTypes
      */
-    public function testChoicesAreOverridden($type)
+    public function testChoicesAreOverridden($type): void
     {
         $factory = Forms::createFormFactoryBuilder()
             ->addTypeExtension(new ChoiceTypeExtension($type))
@@ -40,7 +40,7 @@ class ExtendedChoiceTypeTest extends TestCase
     /**
      * @dataProvider provideTestedTypes
      */
-    public function testChoiceLoaderIsOverridden($type)
+    public function testChoiceLoaderIsOverridden($type): void
     {
         $factory = Forms::createFormFactoryBuilder()
             ->addTypeExtension(new LazyChoiceTypeExtension($type))

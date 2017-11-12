@@ -21,7 +21,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
     /**
      * @dataProvider provideRequestAndResponses
      */
-    public function testGetNonces($nonce, $expectedNonce, Request $request, Response $response)
+    public function testGetNonces($nonce, $expectedNonce, Request $request, Response $response): void
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
 
@@ -31,7 +31,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
     /**
      * @dataProvider provideRequestAndResponsesForOnKernelResponse
      */
-    public function testOnKernelResponse($nonce, $expectedNonce, Request $request, Response $response, array $expectedCsp)
+    public function testOnKernelResponse($nonce, $expectedNonce, Request $request, Response $response, array $expectedCsp): void
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
 

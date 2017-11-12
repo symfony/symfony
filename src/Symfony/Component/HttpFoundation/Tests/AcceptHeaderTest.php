@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\AcceptHeaderItem;
 
 class AcceptHeaderTest extends TestCase
 {
-    public function testFirst()
+    public function testFirst(): void
     {
         $header = AcceptHeader::fromString('text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c');
         $this->assertSame('text/html', $header->first()->getValue());
@@ -26,7 +26,7 @@ class AcceptHeaderTest extends TestCase
     /**
      * @dataProvider provideFromStringData
      */
-    public function testFromString($string, array $items)
+    public function testFromString($string, array $items): void
     {
         $header = AcceptHeader::fromString($string);
         $parsed = array_values($header->all());
@@ -51,7 +51,7 @@ class AcceptHeaderTest extends TestCase
     /**
      * @dataProvider provideToStringData
      */
-    public function testToString(array $items, $string)
+    public function testToString(array $items, $string): void
     {
         $header = new AcceptHeader($items);
         $this->assertEquals($string, (string) $header);
@@ -70,7 +70,7 @@ class AcceptHeaderTest extends TestCase
     /**
      * @dataProvider provideFilterData
      */
-    public function testFilter($string, $filter, array $values)
+    public function testFilter($string, $filter, array $values): void
     {
         $header = AcceptHeader::fromString($string)->filter($filter);
         $this->assertEquals($values, array_keys($header->all()));
@@ -86,7 +86,7 @@ class AcceptHeaderTest extends TestCase
     /**
      * @dataProvider provideSortingData
      */
-    public function testSorting($string, array $values)
+    public function testSorting($string, array $values): void
     {
         $header = AcceptHeader::fromString($string);
         $this->assertEquals($values, array_keys($header->all()));

@@ -52,7 +52,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
      *
      * @throws \InvalidArgumentException
      */
-    public function setTemplating($templating)
+    public function setTemplating($templating): void
     {
         if (null !== $templating && !$templating instanceof EngineInterface && !$templating instanceof Environment) {
             throw new \InvalidArgumentException('The hinclude rendering strategy needs an instance of Twig\Environment or Symfony\Component\Templating\EngineInterface');

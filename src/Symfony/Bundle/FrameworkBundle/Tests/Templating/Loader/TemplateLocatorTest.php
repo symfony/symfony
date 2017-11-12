@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 class TemplateLocatorTest extends TestCase
 {
-    public function testLocateATemplate()
+    public function testLocateATemplate(): void
     {
         $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');
 
@@ -38,7 +38,7 @@ class TemplateLocatorTest extends TestCase
         $this->assertEquals('/path/to/template', $locator->locate($template));
     }
 
-    public function testLocateATemplateFromCacheDir()
+    public function testLocateATemplateFromCacheDir(): void
     {
         $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');
 
@@ -49,7 +49,7 @@ class TemplateLocatorTest extends TestCase
         $this->assertEquals(realpath(__DIR__.'/../../Fixtures/Resources/views/this.is.a.template.format.engine'), $locator->locate($template));
     }
 
-    public function testThrowsExceptionWhenTemplateNotFound()
+    public function testThrowsExceptionWhenTemplateNotFound(): void
     {
         $template = new TemplateReference('bundle', 'controller', 'name', 'format', 'engine');
 
@@ -80,7 +80,7 @@ class TemplateLocatorTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testThrowsAnExceptionWhenTemplateIsNotATemplateReferenceInterface()
+    public function testThrowsAnExceptionWhenTemplateIsNotATemplateReferenceInterface(): void
     {
         $locator = new TemplateLocator($this->getFileLocator());
         $locator->locate('template');

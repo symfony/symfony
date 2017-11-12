@@ -67,7 +67,7 @@ class ProgressIndicator
      *
      * @param string|null $message
      */
-    public function setMessage($message)
+    public function setMessage($message): void
     {
         $this->message = $message;
 
@@ -77,7 +77,7 @@ class ProgressIndicator
     /**
      * Starts the indicator output.
      */
-    public function start($message)
+    public function start($message): void
     {
         if ($this->started) {
             throw new LogicException('Progress indicator already started.');
@@ -95,7 +95,7 @@ class ProgressIndicator
     /**
      * Advances the indicator.
      */
-    public function advance()
+    public function advance(): void
     {
         if (!$this->started) {
             throw new LogicException('Progress indicator has not yet been started.');
@@ -120,7 +120,7 @@ class ProgressIndicator
     /**
      * Finish the indicator with message.
      */
-    public function finish($message)
+    public function finish($message): void
     {
         if (!$this->started) {
             throw new LogicException('Progress indicator has not yet been started.');
@@ -156,7 +156,7 @@ class ProgressIndicator
      * @param string   $name     The placeholder name (including the delimiter char like %)
      * @param callable $callable A PHP callable
      */
-    public static function setPlaceholderFormatterDefinition($name, $callable)
+    public static function setPlaceholderFormatterDefinition($name, $callable): void
     {
         if (!self::$formatters) {
             self::$formatters = self::initPlaceholderFormatters();
@@ -181,7 +181,7 @@ class ProgressIndicator
         return isset(self::$formatters[$name]) ? self::$formatters[$name] : null;
     }
 
-    private function display()
+    private function display(): void
     {
         if (OutputInterface::VERBOSITY_QUIET === $this->output->getVerbosity()) {
             return;
@@ -215,7 +215,7 @@ class ProgressIndicator
     /**
      * Overwrites a previous message to the output.
      */
-    private function overwrite(string $message)
+    private function overwrite(string $message): void
     {
         if ($this->output->isDecorated()) {
             $this->output->write("\x0D\x1B[2K");

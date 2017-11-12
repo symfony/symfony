@@ -19,12 +19,12 @@ class JsonEncodeTest extends TestCase
 {
     private $encode;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encode = new JsonEncode();
     }
 
-    public function testSupportsEncoding()
+    public function testSupportsEncoding(): void
     {
         $this->assertTrue($this->encode->supportsEncoding(JsonEncoder::FORMAT));
         $this->assertFalse($this->encode->supportsEncoding('foobar'));
@@ -33,7 +33,7 @@ class JsonEncodeTest extends TestCase
     /**
      * @dataProvider encodeProvider
      */
-    public function testEncode($toEncode, $expected, $context)
+    public function testEncode($toEncode, $expected, $context): void
     {
         $this->assertEquals(
             $expected,
@@ -52,7 +52,7 @@ class JsonEncodeTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
-    public function testEncodeWithError()
+    public function testEncodeWithError(): void
     {
         $this->encode->encode("\xB1\x31", JsonEncoder::FORMAT);
     }

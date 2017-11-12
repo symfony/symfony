@@ -24,12 +24,12 @@ class PhpBundleReaderTest extends TestCase
      */
     private $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reader = new PhpBundleReader();
     }
 
-    public function testReadReturnsArray()
+    public function testReadReturnsArray(): void
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/php', 'en');
 
@@ -41,7 +41,7 @@ class PhpBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
      */
-    public function testReadFailsIfNonExistingLocale()
+    public function testReadFailsIfNonExistingLocale(): void
     {
         $this->reader->read(__DIR__.'/Fixtures/php', 'foo');
     }
@@ -49,7 +49,7 @@ class PhpBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
      */
-    public function testReadFailsIfNonExistingDirectory()
+    public function testReadFailsIfNonExistingDirectory(): void
     {
         $this->reader->read(__DIR__.'/foo', 'en');
     }
@@ -57,7 +57,7 @@ class PhpBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
      */
-    public function testReadFailsIfNotAFile()
+    public function testReadFailsIfNotAFile(): void
     {
         $this->reader->read(__DIR__.'/Fixtures/NotAFile', 'en');
     }

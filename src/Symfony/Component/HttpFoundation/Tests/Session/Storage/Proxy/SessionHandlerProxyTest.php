@@ -34,19 +34,19 @@ class SessionHandlerProxyTest extends TestCase
      */
     private $proxy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
         $this->proxy = new SessionHandlerProxy($this->mock);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->mock = null;
         $this->proxy = null;
     }
 
-    public function testOpenTrue()
+    public function testOpenTrue(): void
     {
         $this->mock->expects($this->once())
             ->method('open')
@@ -57,7 +57,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertFalse($this->proxy->isActive());
     }
 
-    public function testOpenFalse()
+    public function testOpenFalse(): void
     {
         $this->mock->expects($this->once())
             ->method('open')
@@ -68,7 +68,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertFalse($this->proxy->isActive());
     }
 
-    public function testClose()
+    public function testClose(): void
     {
         $this->mock->expects($this->once())
             ->method('close')
@@ -79,7 +79,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertFalse($this->proxy->isActive());
     }
 
-    public function testCloseFalse()
+    public function testCloseFalse(): void
     {
         $this->mock->expects($this->once())
             ->method('close')
@@ -90,7 +90,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertFalse($this->proxy->isActive());
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $this->mock->expects($this->once())
             ->method('read');
@@ -98,7 +98,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->proxy->read('id');
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $this->mock->expects($this->once())
             ->method('write');
@@ -106,7 +106,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->proxy->write('id', 'data');
     }
 
-    public function testDestroy()
+    public function testDestroy(): void
     {
         $this->mock->expects($this->once())
             ->method('destroy');
@@ -114,7 +114,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->proxy->destroy('id');
     }
 
-    public function testGc()
+    public function testGc(): void
     {
         $this->mock->expects($this->once())
             ->method('gc');

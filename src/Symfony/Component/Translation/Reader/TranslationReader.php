@@ -34,7 +34,7 @@ class TranslationReader implements TranslationReaderInterface
      *
      * @param string          $format The format of the loader
      */
-    public function addLoader($format, LoaderInterface $loader)
+    public function addLoader($format, LoaderInterface $loader): void
     {
         $this->loaders[$format] = $loader;
     }
@@ -42,7 +42,7 @@ class TranslationReader implements TranslationReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function read($directory, MessageCatalogue $catalogue)
+    public function read($directory, MessageCatalogue $catalogue): void
     {
         if (!is_dir($directory)) {
             return;

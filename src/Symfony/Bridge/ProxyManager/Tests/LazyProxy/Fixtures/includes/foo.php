@@ -26,17 +26,17 @@ class ProxyManagerBridgeFooClass
         return $obj;
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->initialized = true;
     }
 
-    public function configure()
+    public function configure(): void
     {
         $this->configured = true;
     }
 
-    public function setBar($value = null)
+    public function setBar($value = null): void
     {
         $this->bar = $value;
     }

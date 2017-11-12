@@ -15,7 +15,7 @@ use Symfony\Component\DomCrawler\Field\TextareaFormField;
 
 class TextareaFormFieldTest extends FormFieldTestCase
 {
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $node = $this->createNode('textarea', 'foo bar');
         $field = new TextareaFormField($node);

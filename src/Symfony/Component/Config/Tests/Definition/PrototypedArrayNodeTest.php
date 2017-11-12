@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\VariableNode;
 
 class PrototypedArrayNodeTest extends TestCase
 {
-    public function testGetDefaultValueReturnsAnEmptyArrayForPrototypes()
+    public function testGetDefaultValueReturnsAnEmptyArrayForPrototypes(): void
     {
         $node = new PrototypedArrayNode('root');
         $prototype = new ArrayNode(null, $node);
@@ -27,7 +27,7 @@ class PrototypedArrayNodeTest extends TestCase
         $this->assertEmpty($node->getDefaultValue());
     }
 
-    public function testGetDefaultValueReturnsDefaultValueForPrototypes()
+    public function testGetDefaultValueReturnsDefaultValueForPrototypes(): void
     {
         $node = new PrototypedArrayNode('root');
         $prototype = new ArrayNode(null, $node);
@@ -37,7 +37,7 @@ class PrototypedArrayNodeTest extends TestCase
     }
 
     // a remapped key (e.g. "mapping" -> "mappings") should be unset after being used
-    public function testRemappedKeysAreUnset()
+    public function testRemappedKeysAreUnset(): void
     {
         $node = new ArrayNode('root');
         $mappingsNode = new PrototypedArrayNode('mappings');
@@ -73,7 +73,7 @@ class PrototypedArrayNodeTest extends TestCase
      *         )
      *     )
      */
-    public function testMappedAttributeKeyIsRemoved()
+    public function testMappedAttributeKeyIsRemoved(): void
     {
         $node = new PrototypedArrayNode('root');
         $node->setKeyAttribute('id', true);
@@ -96,7 +96,7 @@ class PrototypedArrayNodeTest extends TestCase
      * Tests the opposite of the testMappedAttributeKeyIsRemoved because
      * the removal can be toggled with an option.
      */
-    public function testMappedAttributeKeyNotRemoved()
+    public function testMappedAttributeKeyNotRemoved(): void
     {
         $node = new PrototypedArrayNode('root');
         $node->setKeyAttribute('id', false);
@@ -116,7 +116,7 @@ class PrototypedArrayNodeTest extends TestCase
         $this->assertEquals($expected, $normalized);
     }
 
-    public function testAddDefaultChildren()
+    public function testAddDefaultChildren(): void
     {
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setAddChildrenIfNoneSet();
@@ -158,7 +158,7 @@ class PrototypedArrayNodeTest extends TestCase
         $this->assertEquals(array(array('foo' => 'bar'), array('foo' => 'bar')), $node->getDefaultValue());
     }
 
-    public function testDefaultChildrenWinsOverDefaultValue()
+    public function testDefaultChildrenWinsOverDefaultValue(): void
     {
         $node = $this->getPrototypeNodeWithDefaultChildren();
         $node->setAddChildrenIfNoneSet();
@@ -265,7 +265,7 @@ class PrototypedArrayNodeTest extends TestCase
      *
      * @dataProvider getDataForKeyRemovedLeftValueOnly
      */
-    public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, $children, $expected)
+    public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, $children, $expected): void
     {
         $node = new PrototypedArrayNode('root');
         $node->setKeyAttribute('id', true);

@@ -65,7 +65,7 @@ class Container implements ResettableContainerInterface
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen.
      */
-    public function compile()
+    public function compile(): void
     {
         $this->parameterBag->resolve();
 
@@ -126,7 +126,7 @@ class Container implements ResettableContainerInterface
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
      */
-    public function setParameter($name, $value)
+    public function setParameter($name, $value): void
     {
         $this->parameterBag->set($name, $value);
     }
@@ -140,7 +140,7 @@ class Container implements ResettableContainerInterface
      * @param string $id      The service identifier
      * @param object $service The service instance
      */
-    public function set($id, $service)
+    public function set($id, $service): void
     {
         if ('service_container' === $id) {
             throw new InvalidArgumentException('You cannot set service "service_container".');
@@ -287,7 +287,7 @@ class Container implements ResettableContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->services = array();
     }

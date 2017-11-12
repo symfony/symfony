@@ -855,7 +855,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws UnexpectedTypeException  if the name is not a string or an integer
      * @throws InvalidArgumentException if the name contains invalid characters
      */
-    public static function validateName($name)
+    public static function validateName($name): void
     {
         if (null !== $name && !is_string($name) && !is_int($name)) {
             throw new UnexpectedTypeException($name, 'string, integer or null');

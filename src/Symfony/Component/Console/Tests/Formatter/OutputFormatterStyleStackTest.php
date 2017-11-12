@@ -17,7 +17,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 class OutputFormatterStyleStackTest extends TestCase
 {
-    public function testPush()
+    public function testPush(): void
     {
         $stack = new OutputFormatterStyleStack();
         $stack->push($s1 = new OutputFormatterStyle('white', 'black'));
@@ -30,7 +30,7 @@ class OutputFormatterStyleStackTest extends TestCase
         $this->assertEquals($s3, $stack->getCurrent());
     }
 
-    public function testPop()
+    public function testPop(): void
     {
         $stack = new OutputFormatterStyleStack();
         $stack->push($s1 = new OutputFormatterStyle('white', 'black'));
@@ -40,7 +40,7 @@ class OutputFormatterStyleStackTest extends TestCase
         $this->assertEquals($s1, $stack->pop());
     }
 
-    public function testPopEmpty()
+    public function testPopEmpty(): void
     {
         $stack = new OutputFormatterStyleStack();
         $style = new OutputFormatterStyle();
@@ -48,7 +48,7 @@ class OutputFormatterStyleStackTest extends TestCase
         $this->assertEquals($style, $stack->pop());
     }
 
-    public function testPopNotLast()
+    public function testPopNotLast(): void
     {
         $stack = new OutputFormatterStyleStack();
         $stack->push($s1 = new OutputFormatterStyle('white', 'black'));
@@ -62,7 +62,7 @@ class OutputFormatterStyleStackTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testInvalidPop()
+    public function testInvalidPop(): void
     {
         $stack = new OutputFormatterStyleStack();
         $stack->push(new OutputFormatterStyle('white', 'black'));

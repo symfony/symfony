@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class ChainUserProviderTest extends TestCase
 {
-    public function testLoadUserByUsername()
+    public function testLoadUserByUsername(): void
     {
         $provider1 = $this->getProvider();
         $provider1
@@ -43,7 +43,7 @@ class ChainUserProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
-    public function testLoadUserByUsernameThrowsUsernameNotFoundException()
+    public function testLoadUserByUsernameThrowsUsernameNotFoundException(): void
     {
         $provider1 = $this->getProvider();
         $provider1
@@ -65,7 +65,7 @@ class ChainUserProviderTest extends TestCase
         $provider->loadUserByUsername('foo');
     }
 
-    public function testRefreshUser()
+    public function testRefreshUser(): void
     {
         $provider1 = $this->getProvider();
         $provider1
@@ -85,7 +85,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertSame($account, $provider->refreshUser($this->getAccount()));
     }
 
-    public function testRefreshUserAgain()
+    public function testRefreshUserAgain(): void
     {
         $provider1 = $this->getProvider();
         $provider1
@@ -108,7 +108,7 @@ class ChainUserProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\UnsupportedUserException
      */
-    public function testRefreshUserThrowsUnsupportedUserException()
+    public function testRefreshUserThrowsUnsupportedUserException(): void
     {
         $provider1 = $this->getProvider();
         $provider1
@@ -128,7 +128,7 @@ class ChainUserProviderTest extends TestCase
         $provider->refreshUser($this->getAccount());
     }
 
-    public function testSupportsClass()
+    public function testSupportsClass(): void
     {
         $provider1 = $this->getProvider();
         $provider1
@@ -150,7 +150,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertTrue($provider->supportsClass('foo'));
     }
 
-    public function testSupportsClassWhenNotSupported()
+    public function testSupportsClassWhenNotSupported(): void
     {
         $provider1 = $this->getProvider();
         $provider1
@@ -172,7 +172,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertFalse($provider->supportsClass('foo'));
     }
 
-    public function testAcceptsTraversable()
+    public function testAcceptsTraversable(): void
     {
         $provider1 = $this->getProvider();
         $provider1

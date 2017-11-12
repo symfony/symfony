@@ -245,7 +245,7 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException When process is already running
      * @throws LogicException   In case a callback is provided and output has been disabled
      */
-    public function start(callable $callback = null, array $env = array())
+    public function start(callable $callback = null, array $env = array()): void
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
@@ -854,7 +854,7 @@ class Process implements \IteratorAggregate
      *
      * @internal
      */
-    public function addOutput(string $line)
+    public function addOutput(string $line): void
     {
         $this->lastOutputTime = microtime(true);
 
@@ -868,7 +868,7 @@ class Process implements \IteratorAggregate
      *
      * @internal
      */
-    public function addErrorOutput(string $line)
+    public function addErrorOutput(string $line): void
     {
         $this->lastOutputTime = microtime(true);
 
@@ -1150,7 +1150,7 @@ class Process implements \IteratorAggregate
      *
      * @throws ProcessTimedOutException In case the timeout was reached
      */
-    public function checkTimeout()
+    public function checkTimeout(): void
     {
         if (self::STATUS_STARTED !== $this->status) {
             return;
@@ -1219,7 +1219,7 @@ class Process implements \IteratorAggregate
     protected function buildCallback(callable $callback = null)
     {
         if ($this->outputDisabled) {
-            return function ($type, $data) use ($callback) {
+            return function ($type, $data) use ($callback): void {
                 if (null !== $callback) {
                     call_user_func($callback, $type, $data);
                 }
@@ -1228,7 +1228,7 @@ class Process implements \IteratorAggregate
 
         $out = self::OUT;
 
-        return function ($type, $data) use ($callback, $out) {
+        return function ($type, $data) use ($callback, $out): void {
             if ($out == $type) {
                 $this->addOutput($data);
             } else {
@@ -1246,7 +1246,7 @@ class Process implements \IteratorAggregate
      *
      * @param bool $blocking Whether to use a blocking read call
      */
-    protected function updateStatus($blocking)
+    protected function updateStatus($blocking): void
     {
         if (self::STATUS_STARTED !== $this->status) {
             return;
@@ -1295,7 +1295,7 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException in case output has been disabled or process is not started
      */
-    private function readPipesForOutput(string $caller, bool $blocking = false)
+    private function readPipesForOutput(string $caller, bool $blocking = false): void
     {
         if ($this->outputDisabled) {
             throw new LogicException('Output has been disabled.');
@@ -1330,7 +1330,7 @@ class Process implements \IteratorAggregate
      * @param bool $blocking Whether to use blocking calls or not
      * @param bool $close    Whether to close file handles or not
      */
-    private function readPipes(bool $blocking, bool $close)
+    private function readPipes(bool $blocking, bool $close): void
     {
         $result = $this->processPipes->readAndWrite($blocking, $close);
 
@@ -1379,7 +1379,7 @@ class Process implements \IteratorAggregate
     /**
      * Resets data related to the latest run of the process.
      */
-    private function resetProcessData()
+    private function resetProcessData(): void
     {
         $this->starttime = null;
         $this->callback = null;
@@ -1504,7 +1504,7 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException if the process has not run
      */
-    private function requireProcessIsStarted(string $functionName)
+    private function requireProcessIsStarted(string $functionName): void
     {
         if (!$this->isStarted()) {
             throw new LogicException(sprintf('Process must be started before calling %s.', $functionName));
@@ -1516,7 +1516,7 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException if the process is not yet terminated
      */
-    private function requireProcessIsTerminated(string $functionName)
+    private function requireProcessIsTerminated(string $functionName): void
     {
         if (!$this->isTerminated()) {
             throw new LogicException(sprintf('Process must be terminated before calling %s.', $functionName));

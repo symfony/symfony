@@ -61,7 +61,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     /**
      * Configures the error handler.
      */
-    public function configure(Event $event = null)
+    public function configure(Event $event = null): void
     {
         if (!$this->firstCall) {
             return;
@@ -107,7 +107,7 @@ class DebugHandlersListener implements EventSubscriberInterface
                 if ($output instanceof ConsoleOutputInterface) {
                     $output = $output->getErrorOutput();
                 }
-                $this->exceptionHandler = function ($e) use ($app, $output) {
+                $this->exceptionHandler = function ($e) use ($app, $output): void {
                     $app->renderException($e, $output);
                 };
             }

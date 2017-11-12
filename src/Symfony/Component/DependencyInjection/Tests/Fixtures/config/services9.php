@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 require_once __DIR__.'/../includes/classes.php';
 require_once __DIR__.'/../includes/foo.php';
 
-return function (ContainerConfigurator $c) {
+return function (ContainerConfigurator $c): void {
     $p = $c->parameters();
     $p->set('baz_class', 'BazClass');
     $p->set('foo_class', FooClass::class)

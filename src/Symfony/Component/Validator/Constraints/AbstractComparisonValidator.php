@@ -37,7 +37,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof AbstractComparison) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\AbstractComparison');

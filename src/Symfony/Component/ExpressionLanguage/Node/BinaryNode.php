@@ -41,7 +41,7 @@ class BinaryNode extends Node
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $operator = $this->attributes['operator'];
 

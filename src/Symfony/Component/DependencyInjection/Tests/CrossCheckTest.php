@@ -19,7 +19,7 @@ class CrossCheckTest extends TestCase
 {
     protected static $fixturesPath;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$fixturesPath = __DIR__.'/Fixtures/';
 
@@ -30,7 +30,7 @@ class CrossCheckTest extends TestCase
     /**
      * @dataProvider crossCheckLoadersDumpers
      */
-    public function testCrossCheck($fixture, $type)
+    public function testCrossCheck($fixture, $type): void
     {
         $loaderClass = 'Symfony\\Component\\DependencyInjection\\Loader\\'.ucfirst($type).'FileLoader';
         $dumperClass = 'Symfony\\Component\\DependencyInjection\\Dumper\\'.ucfirst($type).'Dumper';

@@ -21,7 +21,7 @@ class UrlType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (null !== $options['default_protocol']) {
             $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
@@ -31,7 +31,7 @@ class UrlType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('default_protocol', 'http');
 

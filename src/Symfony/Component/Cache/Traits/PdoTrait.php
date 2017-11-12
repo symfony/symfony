@@ -36,7 +36,7 @@ trait PdoTrait
     private $connectionOptions = array();
     private $namespace;
 
-    private function init($connOrDsn, $namespace, $defaultLifetime, array $options)
+    private function init($connOrDsn, $namespace, $defaultLifetime, array $options): void
     {
         if (isset($namespace[0]) && preg_match('#[^-+.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(sprintf('Namespace contains "%s" but only characters in [-+.A-Za-z0-9] are allowed.', $match[0]));
@@ -79,7 +79,7 @@ trait PdoTrait
      * @throws DBALException    When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
-    public function createTable()
+    public function createTable(): void
     {
         // connect if we are not yet
         $conn = $this->getConnection();

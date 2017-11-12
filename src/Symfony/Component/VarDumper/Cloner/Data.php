@@ -144,12 +144,12 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->__get($key);
     }
 
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');
     }
 
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');
     }
@@ -261,7 +261,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Dumps data with a DumperInterface dumper.
      */
-    public function dump(DumperInterface $dumper)
+    public function dump(DumperInterface $dumper): void
     {
         $refs = array(0);
         $this->dumpItem($dumper, new Cursor(), $refs, $this->data[$this->position][$this->key]);
@@ -275,7 +275,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array           &$refs  A map of all references discovered while dumping
      * @param mixed           $item   A Stub object or the original value being dumped
      */
-    private function dumpItem($dumper, $cursor, &$refs, $item)
+    private function dumpItem($dumper, $cursor, &$refs, $item): void
     {
         $cursor->refIndex = 0;
         $cursor->softRefTo = $cursor->softRefHandle = $cursor->softRefCount = 0;

@@ -46,7 +46,7 @@ class DoctrineDataCollector extends DataCollector
      *
      * @param string $name
      */
-    public function addLogger($name, DebugStack $logger)
+    public function addLogger($name, DebugStack $logger): void
     {
         $this->loggers[$name] = $logger;
     }
@@ -54,7 +54,7 @@ class DoctrineDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         $queries = array();
         foreach ($this->loggers as $name => $logger) {
@@ -68,7 +68,7 @@ class DoctrineDataCollector extends DataCollector
         );
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = array();
 

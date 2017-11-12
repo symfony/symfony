@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\User;
 
 class InMemoryUserProviderTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $provider = $this->createProvider();
 
@@ -27,7 +27,7 @@ class InMemoryUserProviderTest extends TestCase
         $this->assertFalse($user->isEnabled());
     }
 
-    public function testRefresh()
+    public function testRefresh(): void
     {
         $user = new User('fabien', 'bar');
 
@@ -54,7 +54,7 @@ class InMemoryUserProviderTest extends TestCase
         ));
     }
 
-    public function testCreateUser()
+    public function testCreateUser(): void
     {
         $provider = new InMemoryUserProvider();
         $provider->createUser(new User('fabien', 'foo'));
@@ -66,7 +66,7 @@ class InMemoryUserProviderTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testCreateUserAlreadyExist()
+    public function testCreateUserAlreadyExist(): void
     {
         $provider = new InMemoryUserProvider();
         $provider->createUser(new User('fabien', 'foo'));
@@ -76,7 +76,7 @@ class InMemoryUserProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
-    public function testLoadUserByUsernameDoesNotExist()
+    public function testLoadUserByUsernameDoesNotExist(): void
     {
         $provider = new InMemoryUserProvider();
         $provider->loadUserByUsername('fabien');

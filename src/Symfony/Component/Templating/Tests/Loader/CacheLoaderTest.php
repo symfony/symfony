@@ -20,14 +20,14 @@ use Symfony\Component\Templating\TemplateReference;
 
 class CacheLoaderTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), sys_get_temp_dir());
         $this->assertTrue($loader->getLoader() === $varLoader, '__construct() takes a template loader as its first argument');
         $this->assertEquals(sys_get_temp_dir(), $loader->getDir(), '__construct() takes a directory where to store the cache as its second argument');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.mt_rand(111111, 999999);
         mkdir($dir, 0777, true);

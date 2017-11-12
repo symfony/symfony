@@ -35,7 +35,7 @@ abstract class AbstractDataGenerator
         $this->dirName = $dirName;
     }
 
-    public function generateData(GeneratorConfig $config)
+    public function generateData(GeneratorConfig $config): void
     {
         $filesystem = new Filesystem();
         $localeScanner = new LocaleScanner();

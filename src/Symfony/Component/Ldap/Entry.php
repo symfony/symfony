@@ -77,7 +77,7 @@ class Entry
      *
      * @param string $name
      */
-    public function setAttribute($name, array $value)
+    public function setAttribute($name, array $value): void
     {
         $this->attributes[$name] = $value;
     }
@@ -87,7 +87,7 @@ class Entry
      *
      * @param string $name
      */
-    public function removeAttribute($name)
+    public function removeAttribute($name): void
     {
         unset($this->attributes[$name]);
     }

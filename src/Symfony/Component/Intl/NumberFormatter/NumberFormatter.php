@@ -650,7 +650,7 @@ class NumberFormatter
     /**
      * Set the error to the default U_ZERO_ERROR.
      */
-    protected function resetError()
+    protected function resetError(): void
     {
         IntlGlobals::setError(IntlGlobals::U_ZERO_ERROR);
         $this->errorCode = IntlGlobals::getErrorCode();

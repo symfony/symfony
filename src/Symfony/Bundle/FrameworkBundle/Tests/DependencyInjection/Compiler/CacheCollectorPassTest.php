@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CacheCollectorPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container

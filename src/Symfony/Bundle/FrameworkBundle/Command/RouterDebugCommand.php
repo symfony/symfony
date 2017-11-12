@@ -46,7 +46,7 @@ class RouterDebugCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(
@@ -71,7 +71,7 @@ EOF
      *
      * @throws \InvalidArgumentException When route does not exist
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
         $name = $input->getArgument('name');
@@ -106,7 +106,7 @@ EOF
         }
     }
 
-    private function convertController(Route $route)
+    private function convertController(Route $route): void
     {
         if ($route->hasDefault('_controller')) {
             $nameParser = new ControllerNameParser($this->getApplication()->getKernel());

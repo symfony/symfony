@@ -22,7 +22,7 @@ class BufferingLogger extends AbstractLogger
 {
     private $logs = array();
 
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = array()): void
     {
         $this->logs[] = array($level, $message, $context);
     }

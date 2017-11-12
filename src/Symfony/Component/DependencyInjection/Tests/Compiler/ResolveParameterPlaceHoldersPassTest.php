@@ -21,7 +21,7 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
     private $container;
     private $fooDefinition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compilerPass = new ResolveParameterPlaceHoldersPass();
         $this->container = $this->createContainerBuilder();
@@ -29,42 +29,42 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $this->fooDefinition = $this->container->getDefinition('foo');
     }
 
-    public function testClassParametersShouldBeResolved()
+    public function testClassParametersShouldBeResolved(): void
     {
         $this->assertSame('Foo', $this->fooDefinition->getClass());
     }
 
-    public function testFactoryParametersShouldBeResolved()
+    public function testFactoryParametersShouldBeResolved(): void
     {
         $this->assertSame(array('FooFactory', 'getFoo'), $this->fooDefinition->getFactory());
     }
 
-    public function testArgumentParametersShouldBeResolved()
+    public function testArgumentParametersShouldBeResolved(): void
     {
         $this->assertSame(array('bar', array('bar' => 'baz')), $this->fooDefinition->getArguments());
     }
 
-    public function testMethodCallParametersShouldBeResolved()
+    public function testMethodCallParametersShouldBeResolved(): void
     {
         $this->assertSame(array(array('foobar', array('bar', array('bar' => 'baz')))), $this->fooDefinition->getMethodCalls());
     }
 
-    public function testPropertyParametersShouldBeResolved()
+    public function testPropertyParametersShouldBeResolved(): void
     {
         $this->assertSame(array('bar' => 'baz'), $this->fooDefinition->getProperties());
     }
 
-    public function testFileParametersShouldBeResolved()
+    public function testFileParametersShouldBeResolved(): void
     {
         $this->assertSame('foo.php', $this->fooDefinition->getFile());
     }
 
-    public function testAliasParametersShouldBeResolved()
+    public function testAliasParametersShouldBeResolved(): void
     {
         $this->assertSame('foo', $this->container->getAlias('bar')->__toString());
     }
 
-    public function testBindingsShouldBeResolved()
+    public function testBindingsShouldBeResolved(): void
     {
         list($boundValue) = $this->container->getDefinition('foo')->getBindings()['$baz']->getValues();
 

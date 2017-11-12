@@ -20,7 +20,7 @@ use Symfony\Component\Config\FileLocator;
 
 class PhpFileLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
 
@@ -29,7 +29,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertTrue($loader->supports('with_wrong_ext.yml', 'php'), '->supports() returns true if the resource with forced type is loadable');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
 
@@ -38,7 +38,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals('foo', $container->getParameter('foo'), '->load() loads a PHP file resource');
     }
 
-    public function testConfigServices()
+    public function testConfigServices(): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
@@ -52,7 +52,7 @@ class PhpFileLoaderTest extends TestCase
     /**
      * @dataProvider provideConfig
      */
-    public function testConfig($file)
+    public function testConfig($file): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
@@ -78,7 +78,7 @@ class PhpFileLoaderTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The service "child_service" cannot have a "parent" and also have "autoconfigure". Try disabling autoconfiguration for the service.
      */
-    public function testAutoConfigureAndChildDefinitionNotAllowed()
+    public function testAutoConfigureAndChildDefinitionNotAllowed(): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();

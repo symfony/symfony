@@ -9,11 +9,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class AlternatingRowType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $formFactory = $builder->getFormFactory();
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($formFactory) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($formFactory): void {
             $form = $event->getForm();
             $type = 0 === $form->getName() % 2
                 ? 'Symfony\Component\Form\Extension\Core\Type\TextType'

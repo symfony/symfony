@@ -17,7 +17,7 @@ use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
 
 class XmlReferenceDumperTest extends TestCase
 {
-    public function testDumper()
+    public function testDumper(): void
     {
         $configuration = new ExampleConfiguration();
 
@@ -25,7 +25,7 @@ class XmlReferenceDumperTest extends TestCase
         $this->assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
     }
 
-    public function testNamespaceDumper()
+    public function testNamespaceDumper(): void
     {
         $configuration = new ExampleConfiguration();
 

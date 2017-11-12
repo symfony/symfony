@@ -50,7 +50,7 @@ class Stub implements \Serializable
     /**
      * @internal
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->class, $this->position, $this->cut, $this->type, $this->value, $this->handle, $this->refCount, $this->attr) = \unserialize($serialized);
     }

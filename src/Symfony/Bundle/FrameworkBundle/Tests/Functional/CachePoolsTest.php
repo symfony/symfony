@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class CachePoolsTest extends WebTestCase
 {
-    public function testCachePools()
+    public function testCachePools(): void
     {
         $this->doTestCachePools(array(), AdapterInterface::class);
     }
@@ -25,7 +25,7 @@ class CachePoolsTest extends WebTestCase
     /**
      * @requires extension redis
      */
-    public function testRedisCachePools()
+    public function testRedisCachePools(): void
     {
         try {
             $this->doTestCachePools(array('root_config' => 'redis_config.yml', 'environment' => 'redis_cache'), RedisAdapter::class);
@@ -50,7 +50,7 @@ class CachePoolsTest extends WebTestCase
     /**
      * @requires extension redis
      */
-    public function testRedisCustomCachePools()
+    public function testRedisCustomCachePools(): void
     {
         try {
             $this->doTestCachePools(array('root_config' => 'redis_custom_config.yml', 'environment' => 'custom_redis_cache'), RedisAdapter::class);
@@ -67,7 +67,7 @@ class CachePoolsTest extends WebTestCase
         }
     }
 
-    private function doTestCachePools($options, $adapterClass)
+    private function doTestCachePools($options, $adapterClass): void
     {
         static::bootKernel($options);
         $container = static::$kernel->getContainer();

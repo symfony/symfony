@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AbstractFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         list($container, $authProviderId, $listenerId, $entryPointId) = $this->callFactory('foo', array(
             'use_forward' => true,
@@ -50,7 +50,7 @@ class AbstractFactoryTest extends TestCase
     /**
      * @dataProvider getFailureHandlers
      */
-    public function testDefaultFailureHandler($serviceId, $defaultHandlerInjection)
+    public function testDefaultFailureHandler($serviceId, $defaultHandlerInjection): void
     {
         $options = array(
             'remember_me' => true,
@@ -88,7 +88,7 @@ class AbstractFactoryTest extends TestCase
     /**
      * @dataProvider getSuccessHandlers
      */
-    public function testDefaultSuccessHandler($serviceId, $defaultHandlerInjection)
+    public function testDefaultSuccessHandler($serviceId, $defaultHandlerInjection): void
     {
         $options = array(
             'remember_me' => true,

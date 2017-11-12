@@ -18,14 +18,14 @@ class LanguageTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\LanguageType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
     }
 
-    public function testCountriesAreSelectable()
+    public function testCountriesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -37,7 +37,7 @@ class LanguageTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('my', 'my', 'Burmese'), $choices, '', false, false);
     }
 
-    public function testMultipleLanguagesIsNotIncluded()
+    public function testMultipleLanguagesIsNotIncluded(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE, 'language')
             ->createView()->vars['choices'];
@@ -45,7 +45,7 @@ class LanguageTypeTest extends BaseTypeTest
         $this->assertNotContains(new ChoiceView('mul', 'mul', 'Mehrsprachig'), $choices, '', false, false);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }

@@ -20,7 +20,7 @@ class TestGuess extends Guess
 
 class GuessTest extends TestCase
 {
-    public function testGetBestGuessReturnsGuessWithHighestConfidence()
+    public function testGetBestGuessReturnsGuessWithHighestConfidence(): void
     {
         $guess1 = new TestGuess(Guess::MEDIUM_CONFIDENCE);
         $guess2 = new TestGuess(Guess::LOW_CONFIDENCE);
@@ -32,7 +32,7 @@ class GuessTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testGuessExpectsValidConfidence()
+    public function testGuessExpectsValidConfidence(): void
     {
         new TestGuess(5);
     }

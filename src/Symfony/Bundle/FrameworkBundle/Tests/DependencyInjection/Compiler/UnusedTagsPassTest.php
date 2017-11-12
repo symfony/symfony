@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 
 class UnusedTagsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $pass = new UnusedTagsPass();
 

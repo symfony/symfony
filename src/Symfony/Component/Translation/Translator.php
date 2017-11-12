@@ -89,7 +89,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $this->debug = $debug;
     }
 
-    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
+    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory): void
     {
         $this->configCacheFactory = $configCacheFactory;
     }
@@ -100,7 +100,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * @param string          $format The name of the loader (@see addResource())
      * @param LoaderInterface $loader A LoaderInterface instance
      */
-    public function addLoader($format, LoaderInterface $loader)
+    public function addLoader($format, LoaderInterface $loader): void
     {
         $this->loaders[$format] = $loader;
     }
@@ -115,7 +115,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    public function addResource($format, $resource, $locale, $domain = null)
+    public function addResource($format, $resource, $locale, $domain = null): void
     {
         if (null === $domain) {
             $domain = 'messages';
@@ -135,7 +135,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
         $this->assertValidLocale($locale);
         $this->locale = $locale;
@@ -156,7 +156,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function setFallbackLocales(array $locales)
+    public function setFallbackLocales(array $locales): void
     {
         // needed as the fallback locales are linked to the already loaded catalogues
         $this->catalogues = array();
@@ -249,7 +249,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * @param string $locale
      */
-    protected function loadCatalogue($locale)
+    protected function loadCatalogue($locale): void
     {
         if (null === $this->cacheDir) {
             $this->initializeCatalogue($locale);
@@ -261,7 +261,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * @param string $locale
      */
-    protected function initializeCatalogue($locale)
+    protected function initializeCatalogue($locale): void
     {
         $this->assertValidLocale($locale);
 
@@ -284,7 +284,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
         $this->assertValidLocale($locale);
         $cache = $this->getConfigCacheFactory()->cache($this->getCatalogueCachePath($locale),
-            function (ConfigCacheInterface $cache) use ($locale) {
+            function (ConfigCacheInterface $cache) use ($locale): void {
                 $this->dumpCatalogue($locale, $cache);
             }
         );
@@ -415,7 +415,7 @@ EOF
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    protected function assertValidLocale($locale)
+    protected function assertValidLocale($locale): void
     {
         if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));

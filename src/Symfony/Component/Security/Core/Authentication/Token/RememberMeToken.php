@@ -50,7 +50,7 @@ class RememberMeToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function setAuthenticated($authenticated)
+    public function setAuthenticated($authenticated): void
     {
         if ($authenticated) {
             throw new \LogicException('You cannot set this token to authenticated after creation.');
@@ -102,7 +102,7 @@ class RememberMeToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->secret, $this->providerKey, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);

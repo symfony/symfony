@@ -30,12 +30,12 @@ class RuntimeInstantiatorTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->instantiator = new RuntimeInstantiator();
     }
 
-    public function testInstantiateProxy()
+    public function testInstantiateProxy(): void
     {
         $instance = new \stdClass();
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();

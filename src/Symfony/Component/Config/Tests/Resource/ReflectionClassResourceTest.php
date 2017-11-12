@@ -16,14 +16,14 @@ use Symfony\Component\Config\Resource\ReflectionClassResource;
 
 class ReflectionClassResourceTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $res = new ReflectionClassResource(new \ReflectionClass('ErrorException'));
 
         $this->assertSame('reflection.ErrorException', (string) $res);
     }
 
-    public function testSerializeUnserialize()
+    public function testSerializeUnserialize(): void
     {
         $res = new ReflectionClassResource(new \ReflectionClass(DummyInterface::class));
         $ser = unserialize(serialize($res));
@@ -34,7 +34,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertSame((string) $res, (string) $ser);
     }
 
-    public function testIsFresh()
+    public function testIsFresh(): void
     {
         $res = new ReflectionClassResource(new \ReflectionClass(__CLASS__));
         $mtime = filemtime(__FILE__);
@@ -44,7 +44,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertTrue($res->isFresh($mtime - 86400), '->isFresh() returns true if the resource has not changed');
     }
 
-    public function testIsFreshForDeletedResources()
+    public function testIsFreshForDeletedResources(): void
     {
         $now = time();
         $tmp = sys_get_temp_dir().'/tmp.php';
@@ -61,7 +61,7 @@ class ReflectionClassResourceTest extends TestCase
     /**
      * @dataProvider provideHashedSignature
      */
-    public function testHashedSignature($changeExpected, $changedLine, $changedCode)
+    public function testHashedSignature($changeExpected, $changedLine, $changedCode): void
     {
         $code = <<<'EOPHP'
 /* 0*/

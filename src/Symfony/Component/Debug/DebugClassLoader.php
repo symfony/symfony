@@ -78,7 +78,7 @@ class DebugClassLoader
     /**
      * Wraps all autoloaders.
      */
-    public static function enable()
+    public static function enable(): void
     {
         // Ensures we don't hit https://bugs.php.net/42098
         class_exists('Symfony\Component\Debug\ErrorHandler');
@@ -104,7 +104,7 @@ class DebugClassLoader
     /**
      * Disables the wrapping.
      */
-    public static function disable()
+    public static function disable(): void
     {
         if (!is_array($functions = spl_autoload_functions())) {
             return;

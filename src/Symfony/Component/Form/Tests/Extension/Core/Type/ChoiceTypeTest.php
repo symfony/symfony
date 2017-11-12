@@ -60,7 +60,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ),
     );
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -73,7 +73,7 @@ class ChoiceTypeTest extends BaseTypeTest
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -83,7 +83,7 @@ class ChoiceTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testChoicesOptionExpectsArrayOrTraversable()
+    public function testChoicesOptionExpectsArrayOrTraversable(): void
     {
         $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => new \stdClass(),
@@ -93,19 +93,19 @@ class ChoiceTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testChoiceLoaderOptionExpectsChoiceLoaderInterface()
+    public function testChoiceLoaderOptionExpectsChoiceLoaderInterface(): void
     {
         $this->factory->create(static::TESTED_TYPE, null, array(
             'choice_loader' => new \stdClass(),
         ));
     }
 
-    public function testChoiceListAndChoicesCanBeEmpty()
+    public function testChoiceListAndChoicesCanBeEmpty(): void
     {
         $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->create(static::TESTED_TYPE, null, array()));
     }
 
-    public function testExpandedChoicesOptionsTurnIntoChildren()
+    public function testExpandedChoicesOptionsTurnIntoChildren(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'expanded' => true,
@@ -115,7 +115,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertCount(count($this->choices), $form, 'Each choice should become a new field');
     }
 
-    public function testChoiceListWithScalarValues()
+    public function testChoiceListWithScalarValues(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->scalarChoices,
@@ -129,7 +129,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($view->vars['is_selected']($view->vars['choices'][2], $view->vars['value']), 'Empty value should not be pre selected');
     }
 
-    public function testChoiceListWithScalarValuesAndFalseAsPreSetData()
+    public function testChoiceListWithScalarValuesAndFalseAsPreSetData(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, false, array(
             'choices' => $this->scalarChoices,
@@ -138,7 +138,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($view->vars['is_selected']($view->vars['choices'][1]->value, $view->vars['value']), 'False value should be pre selected');
     }
 
-    public function testExpandedChoiceListWithScalarValues()
+    public function testExpandedChoiceListWithScalarValues(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->scalarChoices,
@@ -150,7 +150,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($view->children[2]->vars['checked'], 'Empty value should be pre selected');
     }
 
-    public function testExpandedChoiceListWithBooleanAndNullValues()
+    public function testExpandedChoiceListWithBooleanAndNullValues(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->booleanChoicesWithNull,
@@ -162,7 +162,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($view->children[2]->vars['checked'], 'Empty value should be pre selected');
     }
 
-    public function testExpandedChoiceListWithScalarValuesAndFalseAsPreSetData()
+    public function testExpandedChoiceListWithScalarValuesAndFalseAsPreSetData(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, false, array(
             'choices' => $this->scalarChoices,
@@ -175,7 +175,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($view->children[2]->vars['checked'], 'Empty value should not be pre selected');
     }
 
-    public function testExpandedChoiceListWithBooleanAndNullValuesAndFalseAsPreSetData()
+    public function testExpandedChoiceListWithBooleanAndNullValuesAndFalseAsPreSetData(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, false, array(
             'choices' => $this->booleanChoicesWithNull,
@@ -187,7 +187,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($view->children[2]->vars['checked'], 'Null value should not be pre selected');
     }
 
-    public function testPlaceholderPresentOnNonRequiredExpandedSingleChoice()
+    public function testPlaceholderPresentOnNonRequiredExpandedSingleChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -200,7 +200,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertCount(count($this->choices) + 1, $form, 'Each choice should become a new field');
     }
 
-    public function testPlaceholderNotPresentIfRequired()
+    public function testPlaceholderNotPresentIfRequired(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -213,7 +213,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertCount(count($this->choices), $form, 'Each choice should become a new field');
     }
 
-    public function testPlaceholderNotPresentIfMultiple()
+    public function testPlaceholderNotPresentIfMultiple(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -226,7 +226,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertCount(count($this->choices), $form, 'Each choice should become a new field');
     }
 
-    public function testPlaceholderNotPresentIfEmptyChoice()
+    public function testPlaceholderNotPresentIfEmptyChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -242,7 +242,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertCount(2, $form, 'Each choice should become a new field');
     }
 
-    public function testPlaceholderWithBooleanChoices()
+    public function testPlaceholderWithBooleanChoices(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -262,7 +262,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($view->vars['is_selected']($view->vars['choices'][1]->value, $view->vars['value']), 'Choice "false" should not be selected');
     }
 
-    public function testPlaceholderWithBooleanChoicesWithFalseAsPreSetData()
+    public function testPlaceholderWithBooleanChoicesWithFalseAsPreSetData(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, false, array(
             'multiple' => false,
@@ -282,7 +282,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($view->vars['is_selected']($view->vars['choices'][1]->value, $view->vars['value']), 'Choice "false" should be selected');
     }
 
-    public function testPlaceholderWithExpandedBooleanChoices()
+    public function testPlaceholderWithExpandedBooleanChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -306,7 +306,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($view->children[1]->vars['checked'], 'Choice "false" should not be selected');
     }
 
-    public function testPlaceholderWithExpandedBooleanChoicesAndWithFalseAsPreSetData()
+    public function testPlaceholderWithExpandedBooleanChoicesAndWithFalseAsPreSetData(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, false, array(
             'multiple' => false,
@@ -330,7 +330,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($view->children[1]->vars['checked'], 'Choice "false" should be selected');
     }
 
-    public function testExpandedChoicesOptionsAreFlattened()
+    public function testExpandedChoicesOptionsAreFlattened(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'expanded' => true,
@@ -349,7 +349,7 @@ class ChoiceTypeTest extends BaseTypeTest
         }
     }
 
-    public function testExpandedChoicesOptionsAreFlattenedObjectChoices()
+    public function testExpandedChoicesOptionsAreFlattenedObjectChoices(): void
     {
         $obj1 = (object) array('id' => 1, 'name' => 'Bernhard');
         $obj2 = (object) array('id' => 2, 'name' => 'Fabien');
@@ -374,7 +374,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->has(5));
     }
 
-    public function testExpandedCheckboxesAreNeverRequired()
+    public function testExpandedCheckboxesAreNeverRequired(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -388,7 +388,7 @@ class ChoiceTypeTest extends BaseTypeTest
         }
     }
 
-    public function testExpandedRadiosAreRequiredIfChoiceChildIsRequired()
+    public function testExpandedRadiosAreRequiredIfChoiceChildIsRequired(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -402,7 +402,7 @@ class ChoiceTypeTest extends BaseTypeTest
         }
     }
 
-    public function testExpandedRadiosAreNotRequiredIfChoiceChildIsNotRequired()
+    public function testExpandedRadiosAreNotRequiredIfChoiceChildIsNotRequired(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -416,7 +416,7 @@ class ChoiceTypeTest extends BaseTypeTest
         }
     }
 
-    public function testSubmitSingleNonExpanded()
+    public function testSubmitSingleNonExpanded(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -431,7 +431,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleNonExpandedInvalidChoice()
+    public function testSubmitSingleNonExpandedInvalidChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -446,7 +446,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($form->isSynchronized());
     }
 
-    public function testSubmitSingleNonExpandedNull()
+    public function testSubmitSingleNonExpandedNull(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -464,7 +464,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -480,7 +480,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleNonExpandedEmpty()
+    public function testSubmitSingleNonExpandedEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -495,7 +495,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleNonExpandedEmptyExplicitEmptyChoice()
+    public function testSubmitSingleNonExpandedEmptyExplicitEmptyChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -518,7 +518,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitSingleNonExpandedEmptyNoChoices()
+    public function testSubmitSingleNonExpandedEmptyNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -533,7 +533,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleNonExpandedFalse()
+    public function testSubmitSingleNonExpandedFalse(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -551,7 +551,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitSingleNonExpandedFalseNoChoices()
+    public function testSubmitSingleNonExpandedFalseNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -566,7 +566,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleNonExpandedObjectChoices()
+    public function testSubmitSingleNonExpandedObjectChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -584,7 +584,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleChoiceWithEmptyData()
+    public function testSubmitSingleChoiceWithEmptyData(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -598,7 +598,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame('test', $form->getData());
     }
 
-    public function testSubmitMultipleChoiceWithEmptyData()
+    public function testSubmitMultipleChoiceWithEmptyData(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -612,7 +612,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame(array('test'), $form->getData());
     }
 
-    public function testSubmitSingleChoiceExpandedWithEmptyData()
+    public function testSubmitSingleChoiceExpandedWithEmptyData(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -626,7 +626,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame('test', $form->getData());
     }
 
-    public function testSubmitMultipleChoiceExpandedWithEmptyData()
+    public function testSubmitMultipleChoiceExpandedWithEmptyData(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -640,7 +640,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame(array('test'), $form->getData());
     }
 
-    public function testSubmitMultipleNonExpanded()
+    public function testSubmitMultipleNonExpanded(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -655,7 +655,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitMultipleNonExpandedEmpty()
+    public function testSubmitMultipleNonExpandedEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -673,7 +673,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitMultipleNonExpandedEmptyNoChoices()
+    public function testSubmitMultipleNonExpandedEmptyNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -688,7 +688,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitMultipleNonExpandedInvalidScalarChoice()
+    public function testSubmitMultipleNonExpandedInvalidScalarChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -703,7 +703,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($form->isSynchronized());
     }
 
-    public function testSubmitMultipleNonExpandedInvalidArrayChoice()
+    public function testSubmitMultipleNonExpandedInvalidArrayChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -718,7 +718,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($form->isSynchronized());
     }
 
-    public function testSubmitMultipleNonExpandedObjectChoices()
+    public function testSubmitMultipleNonExpandedObjectChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -735,7 +735,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleExpandedRequired()
+    public function testSubmitSingleExpandedRequired(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -763,7 +763,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitSingleExpandedRequiredInvalidChoice()
+    public function testSubmitSingleExpandedRequiredInvalidChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -791,7 +791,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitSingleExpandedNonRequired()
+    public function testSubmitSingleExpandedNonRequired(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -821,7 +821,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitSingleExpandedNonRequiredInvalidChoice()
+    public function testSubmitSingleExpandedNonRequiredInvalidChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -849,7 +849,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitSingleExpandedRequiredNull()
+    public function testSubmitSingleExpandedRequiredNull(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -880,7 +880,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitSingleExpandedRequiredNullNoChoices()
+    public function testSubmitSingleExpandedRequiredNullNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -897,7 +897,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleExpandedRequiredEmpty()
+    public function testSubmitSingleExpandedRequiredEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -928,7 +928,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitSingleExpandedRequiredEmptyNoChoices()
+    public function testSubmitSingleExpandedRequiredEmptyNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -945,7 +945,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleExpandedRequiredFalse()
+    public function testSubmitSingleExpandedRequiredFalse(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -976,7 +976,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitSingleExpandedRequiredFalseNoChoices()
+    public function testSubmitSingleExpandedRequiredFalseNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -993,7 +993,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleExpandedNonRequiredNull()
+    public function testSubmitSingleExpandedNonRequiredNull(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1026,7 +1026,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitSingleExpandedNonRequiredNullNoChoices()
+    public function testSubmitSingleExpandedNonRequiredNullNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1043,7 +1043,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleExpandedNonRequiredEmpty()
+    public function testSubmitSingleExpandedNonRequiredEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1076,7 +1076,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitSingleExpandedNonRequiredEmptyNoChoices()
+    public function testSubmitSingleExpandedNonRequiredEmptyNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1093,7 +1093,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleExpandedNonRequiredFalse()
+    public function testSubmitSingleExpandedNonRequiredFalse(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1126,7 +1126,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitSingleExpandedNonRequiredFalseNoChoices()
+    public function testSubmitSingleExpandedNonRequiredFalseNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1143,7 +1143,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleExpandedWithEmptyChild()
+    public function testSubmitSingleExpandedWithEmptyChild(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1165,7 +1165,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[1]->getViewData());
     }
 
-    public function testSubmitSingleExpandedObjectChoices()
+    public function testSubmitSingleExpandedObjectChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1192,7 +1192,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitMultipleExpanded()
+    public function testSubmitMultipleExpanded(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1219,7 +1219,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitMultipleExpandedInvalidScalarChoice()
+    public function testSubmitMultipleExpandedInvalidScalarChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1246,7 +1246,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitMultipleExpandedInvalidArrayChoice()
+    public function testSubmitMultipleExpandedInvalidArrayChoice(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1273,7 +1273,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitMultipleExpandedEmpty()
+    public function testSubmitMultipleExpandedEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1301,7 +1301,7 @@ class ChoiceTypeTest extends BaseTypeTest
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitMultipleExpandedEmptyNoChoices()
+    public function testSubmitMultipleExpandedEmptyNoChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1315,7 +1315,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitMultipleExpandedWithEmptyChild()
+    public function testSubmitMultipleExpandedWithEmptyChild(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1340,7 +1340,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame('2', $form[2]->getViewData());
     }
 
-    public function testSubmitMultipleExpandedObjectChoices()
+    public function testSubmitMultipleExpandedObjectChoices(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1367,7 +1367,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitMultipleChoicesInts()
+    public function testSubmitMultipleChoicesInts(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1379,7 +1379,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSingleSelectedObjectChoices()
+    public function testSingleSelectedObjectChoices(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, $this->objectChoices[3], array(
             'multiple' => false,
@@ -1397,7 +1397,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($selectedChecker($view->vars['choices'][1]->value, $view->vars['value']));
     }
 
-    public function testMultipleSelectedObjectChoices()
+    public function testMultipleSelectedObjectChoices(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, array($this->objectChoices[3]), array(
             'multiple' => true,
@@ -1415,7 +1415,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($selectedChecker($view->vars['choices'][1]->value, $view->vars['value']));
     }
 
-    public function testPassRequiredToView()
+    public function testPassRequiredToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,
@@ -1425,7 +1425,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($view->vars['required']);
     }
 
-    public function testPassNonRequiredToView()
+    public function testPassNonRequiredToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => false,
@@ -1436,7 +1436,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertFalse($view->vars['required']);
     }
 
-    public function testPassMultipleToView()
+    public function testPassMultipleToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1447,7 +1447,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($view->vars['multiple']);
     }
 
-    public function testPassExpandedToView()
+    public function testPassExpandedToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'expanded' => true,
@@ -1458,7 +1458,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertTrue($view->vars['expanded']);
     }
 
-    public function testPassChoiceTranslationDomainToView()
+    public function testPassChoiceTranslationDomainToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,
@@ -1468,7 +1468,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($view->vars['choice_translation_domain']);
     }
 
-    public function testChoiceTranslationDomainWithTrueValueToView()
+    public function testChoiceTranslationDomainWithTrueValueToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,
@@ -1479,7 +1479,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($view->vars['choice_translation_domain']);
     }
 
-    public function testDefaultChoiceTranslationDomainIsSameAsTranslationDomainToView()
+    public function testDefaultChoiceTranslationDomainIsSameAsTranslationDomainToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,
@@ -1490,7 +1490,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertEquals('foo', $view->vars['choice_translation_domain']);
     }
 
-    public function testInheritChoiceTranslationDomainFromParent()
+    public function testInheritChoiceTranslationDomainFromParent(): void
     {
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
@@ -1503,7 +1503,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertEquals('domain', $view['child']->vars['choice_translation_domain']);
     }
 
-    public function testPlaceholderIsNullByDefaultIfRequired()
+    public function testPlaceholderIsNullByDefaultIfRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1515,7 +1515,7 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertNull($view->vars['placeholder']);
     }
 
-    public function testPlaceholderIsEmptyStringByDefaultIfNotRequired()
+    public function testPlaceholderIsEmptyStringByDefaultIfNotRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -1530,7 +1530,7 @@ class ChoiceTypeTest extends BaseTypeTest
     /**
      * @dataProvider getOptionsWithPlaceholder
      */
-    public function testPassPlaceholderToView($multiple, $expanded, $required, $placeholder, $viewValue)
+    public function testPassPlaceholderToView($multiple, $expanded, $required, $placeholder, $viewValue): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => $multiple,
@@ -1548,7 +1548,7 @@ class ChoiceTypeTest extends BaseTypeTest
     /**
      * @dataProvider getOptionsWithPlaceholder
      */
-    public function testDontPassPlaceholderIfContainedInChoices($multiple, $expanded, $required, $placeholder, $viewValue)
+    public function testDontPassPlaceholderIfContainedInChoices($multiple, $expanded, $required, $placeholder, $viewValue): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => $multiple,
@@ -1607,7 +1607,7 @@ class ChoiceTypeTest extends BaseTypeTest
         );
     }
 
-    public function testPassChoicesToView()
+    public function testPassChoicesToView(): void
     {
         $choices = array('A' => 'a', 'B' => 'b', 'C' => 'c', 'D' => 'd');
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -1623,7 +1623,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ), $view->vars['choices']);
     }
 
-    public function testPassPreferredChoicesToView()
+    public function testPassPreferredChoicesToView(): void
     {
         $choices = array('A' => 'a', 'B' => 'b', 'C' => 'c', 'D' => 'd');
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -1642,7 +1642,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ), $view->vars['preferred_choices']);
     }
 
-    public function testPassHierarchicalChoicesToView()
+    public function testPassHierarchicalChoicesToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->groupedChoices,
@@ -1669,7 +1669,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ), $view->vars['preferred_choices']);
     }
 
-    public function testPassChoiceDataToView()
+    public function testPassChoiceDataToView(): void
     {
         $obj1 = (object) array('value' => 'a', 'label' => 'A');
         $obj2 = (object) array('value' => 'b', 'label' => 'B');
@@ -1690,7 +1690,7 @@ class ChoiceTypeTest extends BaseTypeTest
         ), $view->vars['choices']);
     }
 
-    public function testAdjustFullNameForMultipleNonExpanded()
+    public function testAdjustFullNameForMultipleNonExpanded(): void
     {
         $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -1703,14 +1703,14 @@ class ChoiceTypeTest extends BaseTypeTest
     }
 
     // https://github.com/symfony/symfony/issues/3298
-    public function testInitializeWithEmptyChoices()
+    public function testInitializeWithEmptyChoices(): void
     {
         $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'choices' => array(),
         )));
     }
 
-    public function testInitializeWithDefaultObjectChoice()
+    public function testInitializeWithDefaultObjectChoice(): void
     {
         $obj1 = (object) array('value' => 'a', 'label' => 'A');
         $obj2 = (object) array('value' => 'b', 'label' => 'B');
@@ -1737,7 +1737,7 @@ class ChoiceTypeTest extends BaseTypeTest
      *  - Custom type replaces 'choices' normalizer with a custom one.
      * In this case, custom type should not inherit labels from the first added choice type.
      */
-    public function testCustomChoiceTypeDoesNotInheritChoiceLabels()
+    public function testCustomChoiceTypeDoesNotInheritChoiceLabels(): void
     {
         $builder = $this->factory->createBuilder();
         $builder->add('choice', static::TESTED_TYPE, array(
@@ -1759,7 +1759,7 @@ class ChoiceTypeTest extends BaseTypeTest
     /**
      * @dataProvider invalidNestedValueTestMatrix
      */
-    public function testSubmitInvalidNestedValue($multiple, $expanded, $submissionData)
+    public function testSubmitInvalidNestedValue($multiple, $expanded, $submissionData): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,

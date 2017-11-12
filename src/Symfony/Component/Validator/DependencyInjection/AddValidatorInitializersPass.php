@@ -30,7 +30,7 @@ class AddValidatorInitializersPass implements CompilerPassInterface
         $this->initializerTag = $initializerTag;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition($this->builderService)) {
             return;

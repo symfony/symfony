@@ -23,7 +23,7 @@ class FormErrorIteratorTest extends TestCase
     /**
      * @dataProvider findByCodesProvider
      */
-    public function testFindByCodes($code, $violationsCount)
+    public function testFindByCodes($code, $violationsCount): void
     {
         if (!class_exists(ConstraintViolation::class)) {
             $this->markTestSkipped('Validator component required.');

@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticat
 
 class AnonymousAuthenticationProviderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $provider = $this->getProvider('foo');
 
@@ -28,7 +28,7 @@ class AnonymousAuthenticationProviderTest extends TestCase
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
      * @expectedExceptionMessage The token is not supported by this authentication provider.
      */
-    public function testAuthenticateWhenTokenIsNotSupported()
+    public function testAuthenticateWhenTokenIsNotSupported(): void
     {
         $provider = $this->getProvider('foo');
 
@@ -38,14 +38,14 @@ class AnonymousAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testAuthenticateWhenSecretIsNotValid()
+    public function testAuthenticateWhenSecretIsNotValid(): void
     {
         $provider = $this->getProvider('foo');
 
         $provider->authenticate($this->getSupportedToken('bar'));
     }
 
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $provider = $this->getProvider('foo');
         $token = $this->getSupportedToken('foo');

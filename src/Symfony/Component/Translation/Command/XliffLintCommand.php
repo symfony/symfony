@@ -44,7 +44,7 @@ class XliffLintCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Lints a XLIFF file and outputs encountered errors')
@@ -171,7 +171,7 @@ EOF
     {
         $errors = 0;
 
-        array_walk($filesInfo, function (&$v) use (&$errors) {
+        array_walk($filesInfo, function (&$v) use (&$errors): void {
             $v['file'] = (string) $v['file'];
             if (!$v['valid']) {
                 ++$errors;

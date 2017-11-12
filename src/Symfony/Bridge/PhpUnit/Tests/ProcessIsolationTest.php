@@ -16,13 +16,13 @@ class ProcessIsolationTest extends TestCase
     /**
      * @expectedDeprecation Test abc
      */
-    public function testIsolation()
+    public function testIsolation(): void
     {
         @trigger_error('Test abc', E_USER_DEPRECATED);
         $this->addToAssertionCount(1);
     }
 
-    public function testCallingOtherErrorHandler()
+    public function testCallingOtherErrorHandler(): void
     {
         $class = class_exists('PHPUnit\Framework\Exception') ? 'PHPUnit\Framework\Exception' : 'PHPUnit_Framework_Exception';
         if (method_exists($this, 'expectException')) {

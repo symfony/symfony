@@ -84,7 +84,7 @@ abstract class ObjectRouteLoader extends Loader
         return 'service' === $type;
     }
 
-    private function addClassResource(\ReflectionClass $class, RouteCollection $collection)
+    private function addClassResource(\ReflectionClass $class, RouteCollection $collection): void
     {
         do {
             if (is_file($class->getFileName())) {

@@ -16,7 +16,7 @@ use Symfony\Component\Form\CallbackTransformer;
 
 class CallbackTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer = new CallbackTransformer(
             function ($value) { return $value.' has been transformed'; },

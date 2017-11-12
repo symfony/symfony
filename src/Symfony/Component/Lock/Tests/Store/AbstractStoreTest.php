@@ -26,7 +26,7 @@ abstract class AbstractStoreTest extends TestCase
      */
     abstract protected function getStore();
 
-    public function testSave()
+    public function testSave(): void
     {
         $store = $this->getStore();
 
@@ -39,7 +39,7 @@ abstract class AbstractStoreTest extends TestCase
         $this->assertFalse($store->exists($key));
     }
 
-    public function testSaveWithDifferentResources()
+    public function testSaveWithDifferentResources(): void
     {
         $store = $this->getStore();
 
@@ -63,7 +63,7 @@ abstract class AbstractStoreTest extends TestCase
         $this->assertFalse($store->exists($key2));
     }
 
-    public function testSaveWithDifferentKeysOnSameResources()
+    public function testSaveWithDifferentKeysOnSameResources(): void
     {
         $store = $this->getStore();
 
@@ -98,7 +98,7 @@ abstract class AbstractStoreTest extends TestCase
         $this->assertFalse($store->exists($key2));
     }
 
-    public function testSaveTwice()
+    public function testSaveTwice(): void
     {
         $store = $this->getStore();
 

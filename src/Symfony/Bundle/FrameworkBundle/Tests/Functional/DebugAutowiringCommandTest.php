@@ -19,7 +19,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 class DebugAutowiringCommandTest extends WebTestCase
 {
-    public function testBasicFunctionality()
+    public function testBasicFunctionality(): void
     {
         static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
 
@@ -33,7 +33,7 @@ class DebugAutowiringCommandTest extends WebTestCase
         $this->assertContains('alias to http_kernel', $tester->getDisplay());
     }
 
-    public function testSearchArgument()
+    public function testSearchArgument(): void
     {
         static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
 
@@ -47,7 +47,7 @@ class DebugAutowiringCommandTest extends WebTestCase
         $this->assertNotContains('Symfony\Component\Routing\RouterInterface', $tester->getDisplay());
     }
 
-    public function testSearchNoResults()
+    public function testSearchNoResults(): void
     {
         static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
 

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class BarCovTest extends TestCase
 {
-    public function testBarCov()
+    public function testBarCov(): void
     {
         if (!class_exists('PhpUnitCoverageTest\FooCov')) {
             $this->markTestSkipped('This test is not part of the main Symfony test suite. It\'s here to test the CoverageListener.');

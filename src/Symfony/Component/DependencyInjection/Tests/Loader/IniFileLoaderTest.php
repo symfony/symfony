@@ -21,13 +21,13 @@ class IniFileLoaderTest extends TestCase
     protected $container;
     protected $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->loader = new IniFileLoader($this->container, new FileLocator(realpath(__DIR__.'/../Fixtures/').'/ini'));
     }
 
-    public function testIniFileCanBeLoaded()
+    public function testIniFileCanBeLoaded(): void
     {
         $this->loader->load('parameters.ini');
         $this->assertEquals(array('foo' => 'bar', 'bar' => '%foo%'), $this->container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
@@ -36,7 +36,7 @@ class IniFileLoaderTest extends TestCase
     /**
      * @dataProvider getTypeConversions
      */
-    public function testTypeConversions($key, $value, $supported)
+    public function testTypeConversions($key, $value, $supported): void
     {
         $this->loader->load('types.ini');
         $parameters = $this->container->getParameterBag()->all();
@@ -47,7 +47,7 @@ class IniFileLoaderTest extends TestCase
      * @dataProvider getTypeConversions
      * This test illustrates where our conversions differs from INI_SCANNER_TYPED introduced in PHP 5.6.1
      */
-    public function testTypeConversionsWithNativePhp($key, $value, $supported)
+    public function testTypeConversionsWithNativePhp($key, $value, $supported): void
     {
         if (!$supported) {
             $this->markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
@@ -94,7 +94,7 @@ class IniFileLoaderTest extends TestCase
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage The file "foo.ini" does not exist (in:
      */
-    public function testExceptionIsRaisedWhenIniFileDoesNotExist()
+    public function testExceptionIsRaisedWhenIniFileDoesNotExist(): void
     {
         $this->loader->load('foo.ini');
     }
@@ -103,7 +103,7 @@ class IniFileLoaderTest extends TestCase
      * @expectedException        \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The "nonvalid.ini" file is not valid.
      */
-    public function testExceptionIsRaisedWhenIniFileCannotBeParsed()
+    public function testExceptionIsRaisedWhenIniFileCannotBeParsed(): void
     {
         @$this->loader->load('nonvalid.ini');
     }
@@ -112,12 +112,12 @@ class IniFileLoaderTest extends TestCase
      * @expectedException        \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The "almostvalid.ini" file is not valid.
      */
-    public function testExceptionIsRaisedWhenIniFileIsAlmostValid()
+    public function testExceptionIsRaisedWhenIniFileIsAlmostValid(): void
     {
         @$this->loader->load('almostvalid.ini');
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new IniFileLoader(new ContainerBuilder(), new FileLocator());
 

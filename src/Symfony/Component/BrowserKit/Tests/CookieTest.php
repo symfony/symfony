@@ -16,7 +16,7 @@ use Symfony\Component\BrowserKit\Cookie;
 
 class CookieTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $cookie = new Cookie('foo', 'bar', strtotime('Fri, 20-May-2011 15:25:52 GMT'), '/', '.myfoodomain.com', true);
         $this->assertEquals('foo=bar; expires=Fri, 20 May 2011 15:25:52 GMT; domain=.myfoodomain.com; path=/; secure; httponly', (string) $cookie, '->__toString() returns string representation of the cookie');
@@ -34,7 +34,7 @@ class CookieTest extends TestCase
     /**
      * @dataProvider getTestsForToFromString
      */
-    public function testToFromString($cookie, $url = null)
+    public function testToFromString($cookie, $url = null): void
     {
         $this->assertEquals($cookie, (string) Cookie::fromString($cookie, $url));
     }
@@ -53,7 +53,7 @@ class CookieTest extends TestCase
         );
     }
 
-    public function testFromStringIgnoreSecureFlag()
+    public function testFromStringIgnoreSecureFlag(): void
     {
         $this->assertFalse(Cookie::fromString('foo=bar; secure')->isSecure());
         $this->assertFalse(Cookie::fromString('foo=bar; secure', 'http://example.com/')->isSecure());
@@ -62,7 +62,7 @@ class CookieTest extends TestCase
     /**
      * @dataProvider getExpireCookieStrings
      */
-    public function testFromStringAcceptsSeveralExpiresDateFormats($cookie)
+    public function testFromStringAcceptsSeveralExpiresDateFormats($cookie): void
     {
         $this->assertEquals(1596185377, Cookie::fromString($cookie)->getExpiresTime());
     }
@@ -81,14 +81,14 @@ class CookieTest extends TestCase
         );
     }
 
-    public function testFromStringWithCapitalization()
+    public function testFromStringWithCapitalization(): void
     {
         $this->assertEquals('Foo=Bar; path=/', (string) Cookie::fromString('Foo=Bar'));
         $this->assertEquals('foo=bar; expires=Fri, 31 Dec 2010 23:59:59 GMT; path=/', (string) Cookie::fromString('foo=bar; Expires=Fri, 31 Dec 2010 23:59:59 GMT'));
         $this->assertEquals('foo=bar; domain=www.example.org; path=/; httponly', (string) Cookie::fromString('foo=bar; DOMAIN=www.example.org; HttpOnly'));
     }
 
-    public function testFromStringWithUrl()
+    public function testFromStringWithUrl(): void
     {
         $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com/'));
         $this->assertEquals('foo=bar; domain=www.example.com; path=/', (string) Cookie::fromString('foo=bar', 'http://www.example.com'));
@@ -98,32 +98,32 @@ class CookieTest extends TestCase
         $this->assertEquals('foo=bar; domain=www.myotherexample.com; path=/', (string) Cookie::fromString('foo=bar; domain=www.myotherexample.com', 'http://www.example.com/'));
     }
 
-    public function testFromStringThrowsAnExceptionIfCookieIsNotValid()
+    public function testFromStringThrowsAnExceptionIfCookieIsNotValid(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
         Cookie::fromString('foo');
     }
 
-    public function testFromStringIgnoresInvalidExpiresDate()
+    public function testFromStringIgnoresInvalidExpiresDate(): void
     {
         $cookie = Cookie::fromString('foo=bar; expires=Flursday July 31st 2020, 08:49:37 GMT');
 
         $this->assertFalse($cookie->isExpired());
     }
 
-    public function testFromStringThrowsAnExceptionIfUrlIsNotValid()
+    public function testFromStringThrowsAnExceptionIfUrlIsNotValid(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
         Cookie::fromString('foo=bar', 'foobar');
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $cookie = new Cookie('foo', 'bar');
         $this->assertEquals('foo', $cookie->getName(), '->getName() returns the cookie name');
     }
 
-    public function testGetValue()
+    public function testGetValue(): void
     {
         $cookie = new Cookie('foo', 'bar');
         $this->assertEquals('bar', $cookie->getValue(), '->getValue() returns the cookie value');
@@ -132,7 +132,7 @@ class CookieTest extends TestCase
         $this->assertEquals('bar=baz', $cookie->getValue(), '->getValue() returns the urldecoded cookie value');
     }
 
-    public function testGetRawValue()
+    public function testGetRawValue(): void
     {
         $cookie = new Cookie('foo', 'bar=baz'); // decoded value
         $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the urlencoded cookie value');
@@ -140,7 +140,7 @@ class CookieTest extends TestCase
         $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the non-urldecoded cookie value');
     }
 
-    public function testGetPath()
+    public function testGetPath(): void
     {
         $cookie = new Cookie('foo', 'bar', 0);
         $this->assertEquals('/', $cookie->getPath(), '->getPath() returns / is no path is defined');
@@ -149,13 +149,13 @@ class CookieTest extends TestCase
         $this->assertEquals('/foo', $cookie->getPath(), '->getPath() returns the cookie path');
     }
 
-    public function testGetDomain()
+    public function testGetDomain(): void
     {
         $cookie = new Cookie('foo', 'bar', 0, '/', 'foo.com');
         $this->assertEquals('foo.com', $cookie->getDomain(), '->getDomain() returns the cookie domain');
     }
 
-    public function testIsSecure()
+    public function testIsSecure(): void
     {
         $cookie = new Cookie('foo', 'bar');
         $this->assertFalse($cookie->isSecure(), '->isSecure() returns false if not defined');
@@ -164,7 +164,7 @@ class CookieTest extends TestCase
         $this->assertTrue($cookie->isSecure(), '->isSecure() returns the cookie secure flag');
     }
 
-    public function testIsHttponly()
+    public function testIsHttponly(): void
     {
         $cookie = new Cookie('foo', 'bar');
         $this->assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns false if not defined');
@@ -173,7 +173,7 @@ class CookieTest extends TestCase
         $this->assertTrue($cookie->isHttpOnly(), '->isHttpOnly() returns the cookie httponly flag');
     }
 
-    public function testGetExpiresTime()
+    public function testGetExpiresTime(): void
     {
         $cookie = new Cookie('foo', 'bar');
         $this->assertNull($cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
@@ -182,7 +182,7 @@ class CookieTest extends TestCase
         $this->assertEquals($time, $cookie->getExpiresTime(), '->getExpiresTime() returns the expires time');
     }
 
-    public function testIsExpired()
+    public function testIsExpired(): void
     {
         $cookie = new Cookie('foo', 'bar');
         $this->assertFalse($cookie->isExpired(), '->isExpired() returns false when the cookie never expires (null as expires time)');
@@ -198,7 +198,7 @@ class CookieTest extends TestCase
      * @expectedException        \UnexpectedValueException
      * @expectedExceptionMessage The cookie expiration time "string" is not valid.
      */
-    public function testConstructException()
+    public function testConstructException(): void
     {
         $cookie = new Cookie('foo', 'bar', 'string');
     }

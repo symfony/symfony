@@ -49,7 +49,7 @@ class GenrbCompiler implements BundleCompilerInterface
     /**
      * {@inheritdoc}
      */
-    public function compile($sourcePath, $targetDir)
+    public function compile($sourcePath, $targetDir): void
     {
         if (is_dir($sourcePath)) {
             $sourcePath .= '/*.txt';

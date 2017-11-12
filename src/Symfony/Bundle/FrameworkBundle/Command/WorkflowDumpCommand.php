@@ -31,7 +31,7 @@ class WorkflowDumpCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(
@@ -53,7 +53,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $container = $this->getApplication()->getKernel()->getContainer();
         $serviceId = $input->getArgument('name');

@@ -25,7 +25,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
     /**
      * {@inheritdoc}
      */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    public function setRepeatedPass(RepeatedPass $repeatedPass): void
     {
         $this->repeatedPass = $repeatedPass;
     }
@@ -33,7 +33,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
     /**
      * Processes the ContainerBuilder to remove unused definitions.
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $graph = $container->getCompiler()->getServiceReferenceGraph();
 

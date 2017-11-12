@@ -28,7 +28,7 @@ class ArrayAdapterTest extends AdapterTestCase
         return new ArrayAdapter($defaultLifetime);
     }
 
-    public function testGetValuesHitAndMiss()
+    public function testGetValuesHitAndMiss(): void
     {
         /** @var ArrayAdapter $cache */
         $cache = $this->createCachePool();

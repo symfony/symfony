@@ -15,7 +15,7 @@ class DateIntervalNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new DateIntervalNormalizer();
     }
@@ -34,13 +34,13 @@ class DateIntervalNormalizerTest extends TestCase
         return $data;
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new \DateInterval('P00Y00M00DT00H00M00S')));
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $this->assertEquals('P0Y0M0DT0H0M0S', $this->normalizer->normalize(new \DateInterval('PT0S')));
     }
@@ -48,7 +48,7 @@ class DateIntervalNormalizerTest extends TestCase
     /**
      * @dataProvider dataProviderISO
      */
-    public function testNormalizeUsingFormatPassedInContext($format, $output, $input)
+    public function testNormalizeUsingFormatPassedInContext($format, $output, $input): void
     {
         $this->assertEquals($output, $this->normalizer->normalize(new \DateInterval($input), null, array(DateIntervalNormalizer::FORMAT_KEY => $format)));
     }
@@ -56,7 +56,7 @@ class DateIntervalNormalizerTest extends TestCase
     /**
      * @dataProvider dataProviderISO
      */
-    public function testNormalizeUsingFormatPassedInConstructor($format, $output, $input)
+    public function testNormalizeUsingFormatPassedInConstructor($format, $output, $input): void
     {
         $this->assertEquals($output, (new DateIntervalNormalizer($format))->normalize(new \DateInterval($input)));
     }
@@ -65,18 +65,18 @@ class DateIntervalNormalizerTest extends TestCase
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
      * @expectedExceptionMessage The object must be an instance of "\DateInterval".
      */
-    public function testNormalizeInvalidObjectThrowsException()
+    public function testNormalizeInvalidObjectThrowsException(): void
     {
         $this->normalizer->normalize(new \stdClass());
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization('P00Y00M00DT00H00M00S', \DateInterval::class));
         $this->assertFalse($this->normalizer->supportsDenormalization('foo', 'Bar'));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $this->assertDateIntervalEquals(new \DateInterval('P00Y00M00DT00H00M00S'), $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class));
     }
@@ -84,7 +84,7 @@ class DateIntervalNormalizerTest extends TestCase
     /**
      * @dataProvider dataProviderISO
      */
-    public function testDenormalizeUsingFormatPassedInContext($format, $input, $output)
+    public function testDenormalizeUsingFormatPassedInContext($format, $input, $output): void
     {
         $this->assertDateIntervalEquals(new \DateInterval($output), $this->normalizer->denormalize($input, \DateInterval::class, null, array(DateIntervalNormalizer::FORMAT_KEY => $format)));
     }
@@ -92,7 +92,7 @@ class DateIntervalNormalizerTest extends TestCase
     /**
      * @dataProvider dataProviderISO
      */
-    public function testDenormalizeUsingFormatPassedInConstructor($format, $input, $output)
+    public function testDenormalizeUsingFormatPassedInConstructor($format, $input, $output): void
     {
         $this->assertDateIntervalEquals(new \DateInterval($output), (new DateIntervalNormalizer($format))->denormalize($input, \DateInterval::class));
     }
@@ -100,7 +100,7 @@ class DateIntervalNormalizerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
      */
-    public function testDenormalizeExpectsString()
+    public function testDenormalizeExpectsString(): void
     {
         $this->normalizer->denormalize(1234, \DateInterval::class);
     }
@@ -109,7 +109,7 @@ class DateIntervalNormalizerTest extends TestCase
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      * @expectedExceptionMessage Expected a valid ISO 8601 interval string.
      */
-    public function testDenormalizeNonISO8601IntervalStringThrowsException()
+    public function testDenormalizeNonISO8601IntervalStringThrowsException(): void
     {
         $this->normalizer->denormalize('10 years 2 months 3 days', \DateInterval::class, null);
     }
@@ -117,7 +117,7 @@ class DateIntervalNormalizerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
-    public function testDenormalizeInvalidDataThrowsException()
+    public function testDenormalizeInvalidDataThrowsException(): void
     {
         $this->normalizer->denormalize('invalid interval', \DateInterval::class);
     }
@@ -125,12 +125,12 @@ class DateIntervalNormalizerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
-    public function testDenormalizeFormatMismatchThrowsException()
+    public function testDenormalizeFormatMismatchThrowsException(): void
     {
         $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class, null, array(DateIntervalNormalizer::FORMAT_KEY => 'P%yY%mM%dD'));
     }
 
-    private function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)
+    private function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual): void
     {
         $this->assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));
     }

@@ -61,7 +61,7 @@ class SymfonyStyle extends OutputStyle
      * @param bool         $padding  Whether to add vertical padding
      * @param bool         $escape   Whether to escape the message
      */
-    public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false, $escape = true)
+    public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false, $escape = true): void
     {
         $messages = is_array($messages) ? array_values($messages) : array($messages);
 
@@ -73,7 +73,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function title($message)
+    public function title($message): void
     {
         $this->autoPrependBlock();
         $this->writeln(array(
@@ -86,7 +86,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function section($message)
+    public function section($message): void
     {
         $this->autoPrependBlock();
         $this->writeln(array(
@@ -99,7 +99,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function listing(array $elements)
+    public function listing(array $elements): void
     {
         $this->autoPrependText();
         $elements = array_map(function ($element) {
@@ -113,7 +113,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function text($message)
+    public function text($message): void
     {
         $this->autoPrependText();
 
@@ -128,7 +128,7 @@ class SymfonyStyle extends OutputStyle
      *
      * @param string|array $message
      */
-    public function comment($message)
+    public function comment($message): void
     {
         $this->block($message, null, null, '<fg=default;bg=default> // </>', false, false);
     }
@@ -136,7 +136,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function success($message)
+    public function success($message): void
     {
         $this->block($message, 'OK', 'fg=black;bg=green', ' ', true);
     }
@@ -144,7 +144,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function error($message)
+    public function error($message): void
     {
         $this->block($message, 'ERROR', 'fg=white;bg=red', ' ', true);
     }
@@ -152,7 +152,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function warning($message)
+    public function warning($message): void
     {
         $this->block($message, 'WARNING', 'fg=white;bg=red', ' ', true);
     }
@@ -160,7 +160,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function note($message)
+    public function note($message): void
     {
         $this->block($message, 'NOTE', 'fg=yellow', ' ! ');
     }
@@ -168,7 +168,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function caution($message)
+    public function caution($message): void
     {
         $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true);
     }
@@ -176,7 +176,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function table(array $headers, array $rows)
+    public function table(array $headers, array $rows): void
     {
         $style = clone Table::getStyleDefinition('symfony-style-guide');
         $style->setCellHeaderFormat('<info>%s</info>');
@@ -238,7 +238,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function progressStart($max = 0)
+    public function progressStart($max = 0): void
     {
         $this->progressBar = $this->createProgressBar($max);
         $this->progressBar->start();
@@ -247,7 +247,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function progressAdvance($step = 1)
+    public function progressAdvance($step = 1): void
     {
         $this->getProgressBar()->advance($step);
     }
@@ -255,7 +255,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function progressFinish()
+    public function progressFinish(): void
     {
         $this->getProgressBar()->finish();
         $this->newLine(2);
@@ -304,7 +304,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    public function writeln($messages, $type = self::OUTPUT_NORMAL): void
     {
         parent::writeln($messages, $type);
         $this->bufferedOutput->writeln($this->reduceBuffer($messages), $type);
@@ -313,7 +313,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL): void
     {
         parent::write($messages, $newline, $type);
         $this->bufferedOutput->write($this->reduceBuffer($messages), $newline, $type);
@@ -322,7 +322,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function newLine($count = 1)
+    public function newLine($count = 1): void
     {
         parent::newLine($count);
         $this->bufferedOutput->write(str_repeat("\n", $count));

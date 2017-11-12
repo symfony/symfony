@@ -15,7 +15,7 @@ class UrlTypeTest extends TextTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\UrlType';
 
-    public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
+    public function testSubmitAddsDefaultProtocolIfNoneIsIncluded(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, 'name');
 
@@ -25,7 +25,7 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame('http://www.domain.com', $form->getViewData());
     }
 
-    public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
+    public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'default_protocol' => 'http',
@@ -37,7 +37,7 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame('ftp://www.domain.com', $form->getViewData());
     }
 
-    public function testSubmitAddsNoDefaultProtocolIfEmpty()
+    public function testSubmitAddsNoDefaultProtocolIfEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'default_protocol' => 'http',
@@ -49,7 +49,7 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame('', $form->getViewData());
     }
 
-    public function testSubmitAddsNoDefaultProtocolIfNull()
+    public function testSubmitAddsNoDefaultProtocolIfNull(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'default_protocol' => 'http',
@@ -61,7 +61,7 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame('', $form->getViewData());
     }
 
-    public function testSubmitAddsNoDefaultProtocolIfSetToNull()
+    public function testSubmitAddsNoDefaultProtocolIfSetToNull(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'default_protocol' => null,
@@ -76,7 +76,7 @@ class UrlTypeTest extends TextTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testThrowExceptionIfDefaultProtocolIsInvalid()
+    public function testThrowExceptionIfDefaultProtocolIsInvalid(): void
     {
         $this->factory->create(static::TESTED_TYPE, null, array(
             'default_protocol' => array(),

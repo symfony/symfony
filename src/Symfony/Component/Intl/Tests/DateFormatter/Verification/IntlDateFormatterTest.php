@@ -23,7 +23,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireFullIntl($this, false);
 
@@ -33,14 +33,14 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     /**
      * @dataProvider formatTimezoneProvider
      */
-    public function testFormatTimezone($pattern, $timezone, $expected)
+    public function testFormatTimezone($pattern, $timezone, $expected): void
     {
         IntlTestHelper::requireFullIntl($this, '59.1');
 
         parent::testFormatTimezone($pattern, $timezone, $expected);
     }
 
-    public function testFormatUtcAndGmtAreSplit()
+    public function testFormatUtcAndGmtAreSplit(): void
     {
         IntlTestHelper::requireFullIntl($this, '59.1');
 
@@ -50,7 +50,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
     /**
      * @dataProvider dateAndTimeTypeProvider
      */
-    public function testDateAndTimeType($timestamp, $datetype, $timetype, $expected)
+    public function testDateAndTimeType($timestamp, $datetype, $timetype, $expected): void
     {
         IntlTestHelper::requireFullIntl($this, '59.1');
 

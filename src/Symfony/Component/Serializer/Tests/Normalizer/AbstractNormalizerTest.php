@@ -30,14 +30,14 @@ class AbstractNormalizerTest extends TestCase
      */
     private $classMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $loader = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\Loader\LoaderChain')->setConstructorArgs(array(array()))->getMock();
         $this->classMetadata = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory')->setConstructorArgs(array($loader))->getMock();
         $this->normalizer = new AbstractNormalizerDummy($this->classMetadata);
     }
 
-    public function testGetAllowedAttributesAsString()
+    public function testGetAllowedAttributesAsString(): void
     {
         $classMetadata = new ClassMetadata('c');
 
@@ -66,7 +66,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertEquals(array('a3', 'a4'), $result);
     }
 
-    public function testGetAllowedAttributesAsObjects()
+    public function testGetAllowedAttributesAsObjects(): void
     {
         $classMetadata = new ClassMetadata('c');
 
@@ -95,7 +95,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertEquals(array($a3, $a4), $result);
     }
 
-    public function testObjectToPopulateWithProxy()
+    public function testObjectToPopulateWithProxy(): void
     {
         $proxyDummy = new ProxyDummy();
 
@@ -107,7 +107,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertSame('bar', $proxyDummy->getFoo());
     }
 
-    public function testObjectWithStaticConstructor()
+    public function testObjectWithStaticConstructor(): void
     {
         $normalizer = new StaticConstructorNormalizer();
         $dummy = $normalizer->denormalize(array('foo' => 'baz'), StaticConstructorDummy::class);

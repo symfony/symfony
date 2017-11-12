@@ -81,7 +81,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @throws InvalidArgumentException When the color name isn't defined
      */
-    public function setForeground($color = null)
+    public function setForeground($color = null): void
     {
         if (null === $color) {
             $this->foreground = null;
@@ -107,7 +107,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @throws InvalidArgumentException When the color name isn't defined
      */
-    public function setBackground($color = null)
+    public function setBackground($color = null): void
     {
         if (null === $color) {
             $this->background = null;
@@ -133,7 +133,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @throws InvalidArgumentException When the option name isn't defined
      */
-    public function setOption($option)
+    public function setOption($option): void
     {
         if (!isset(static::$availableOptions[$option])) {
             throw new InvalidArgumentException(sprintf(
@@ -155,7 +155,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      *
      * @throws InvalidArgumentException When the option name isn't defined
      */
-    public function unsetOption($option)
+    public function unsetOption($option): void
     {
         if (!isset(static::$availableOptions[$option])) {
             throw new InvalidArgumentException(sprintf(
@@ -174,7 +174,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     /**
      * {@inheritdoc}
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = array();
 

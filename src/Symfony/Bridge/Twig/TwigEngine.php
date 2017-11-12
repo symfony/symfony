@@ -56,7 +56,7 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
      *
      * @throws Error if something went wrong like a thrown exception while rendering the template
      */
-    public function stream($name, array $parameters = array())
+    public function stream($name, array $parameters = array()): void
     {
         $this->load($name)->display($parameters);
     }

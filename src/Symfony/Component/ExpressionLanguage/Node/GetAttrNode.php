@@ -32,7 +32,7 @@ class GetAttrNode extends Node
         );
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         switch ($this->attributes['type']) {
             case self::PROPERTY_CALL:

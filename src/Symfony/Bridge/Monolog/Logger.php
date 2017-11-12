@@ -48,7 +48,7 @@ class Logger extends BaseLogger implements DebugLoggerInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         if ($logger = $this->getDebugLogger()) {
             $logger->clear();

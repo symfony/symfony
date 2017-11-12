@@ -22,7 +22,7 @@ class PropertyInfoPassTest extends TestCase
     /**
      * @dataProvider provideTags
      */
-    public function testServicesAreOrderedAccordingToPriority($index, $tag)
+    public function testServicesAreOrderedAccordingToPriority($index, $tag): void
     {
         $container = new ContainerBuilder();
 
@@ -52,7 +52,7 @@ class PropertyInfoPassTest extends TestCase
         );
     }
 
-    public function testReturningEmptyArrayWhenNoService()
+    public function testReturningEmptyArrayWhenNoService(): void
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds'))->getMock();
 

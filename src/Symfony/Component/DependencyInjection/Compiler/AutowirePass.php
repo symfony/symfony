@@ -40,7 +40,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         try {
             parent::process($container);
@@ -251,7 +251,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Populates the list of available types.
      */
-    private function populateAvailableTypes()
+    private function populateAvailableTypes(): void
     {
         $this->types = array();
 
@@ -263,7 +263,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Populates the list of available types for a given definition.
      */
-    private function populateAvailableType(string $id, Definition $definition)
+    private function populateAvailableType(string $id, Definition $definition): void
     {
         // Never use abstract services
         if ($definition->isAbstract()) {
@@ -286,7 +286,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Associates a type and a service id if applicable.
      */
-    private function set(string $type, string $id)
+    private function set(string $type, string $id): void
     {
         // is this already a type/class that is known to match multiple services?
         if (isset($this->ambiguousServiceTypes[$type])) {

@@ -43,7 +43,7 @@ abstract class AbstractPipes implements PipesInterface
     /**
      * {@inheritdoc}
      */
-    public function close()
+    public function close(): void
     {
         foreach ($this->pipes as $pipe) {
             fclose($pipe);
@@ -67,7 +67,7 @@ abstract class AbstractPipes implements PipesInterface
     /**
      * Unblocks streams.
      */
-    protected function unblock()
+    protected function unblock(): void
     {
         if (!$this->blocked) {
             return;

@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationExc
 
 class CustomUserMessageAuthenticationExceptionTest extends TestCase
 {
-    public function testConstructWithSAfeMessage()
+    public function testConstructWithSAfeMessage(): void
     {
         $e = new CustomUserMessageAuthenticationException('SAFE MESSAGE', array('foo' => true));
 

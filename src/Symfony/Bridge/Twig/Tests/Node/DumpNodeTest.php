@@ -20,7 +20,7 @@ use Twig\Node\Node;
 
 class DumpNodeTest extends TestCase
 {
-    public function testNoVar()
+    public function testNoVar(): void
     {
         $node = new DumpNode('bar', null, 7);
 
@@ -44,7 +44,7 @@ EOTXT;
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }
 
-    public function testIndented()
+    public function testIndented(): void
     {
         $node = new DumpNode('bar', null, 7);
 
@@ -68,7 +68,7 @@ EOTXT;
         $this->assertSame($expected, $compiler->compile($node, 1)->getSource());
     }
 
-    public function testOneVar()
+    public function testOneVar(): void
     {
         $vars = new Node(array(
             new NameExpression('foo', 7),
@@ -91,7 +91,7 @@ EOTXT;
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }
 
-    public function testMultiVars()
+    public function testMultiVars(): void
     {
         $vars = new Node(array(
             new NameExpression('foo', 7),

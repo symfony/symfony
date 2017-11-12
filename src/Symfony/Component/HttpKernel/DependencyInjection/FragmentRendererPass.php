@@ -34,7 +34,7 @@ class FragmentRendererPass implements CompilerPassInterface
         $this->rendererTag = $rendererTag;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition($this->handlerService)) {
             return;

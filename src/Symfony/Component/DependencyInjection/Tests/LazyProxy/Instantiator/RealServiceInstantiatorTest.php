@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInst
  */
 class RealServiceInstantiatorTest extends TestCase
 {
-    public function testInstantiateProxy()
+    public function testInstantiateProxy(): void
     {
         $instantiator = new RealServiceInstantiator();
         $instance = new \stdClass();

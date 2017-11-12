@@ -20,13 +20,13 @@ use Symfony\Component\HttpKernel\UriSigner;
 
 class EsiFragmentRendererTest extends TestCase
 {
-    public function testRenderFallbackToInlineStrategyIfEsiNotSupported()
+    public function testRenderFallbackToInlineStrategyIfEsiNotSupported(): void
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true));
         $strategy->render('/', Request::create('/'));
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
@@ -39,7 +39,7 @@ class EsiFragmentRendererTest extends TestCase
         $this->assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, array('alt' => 'foo'))->getContent());
     }
 
-    public function testRenderControllerReference()
+    public function testRenderControllerReference(): void
     {
         $signer = new UriSigner('foo');
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(), $signer);
@@ -60,7 +60,7 @@ class EsiFragmentRendererTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testRenderControllerReferenceWithoutSignerThrowsException()
+    public function testRenderControllerReferenceWithoutSignerThrowsException(): void
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
@@ -74,7 +74,7 @@ class EsiFragmentRendererTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testRenderAltControllerReferenceWithoutSignerThrowsException()
+    public function testRenderAltControllerReferenceWithoutSignerThrowsException(): void
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 

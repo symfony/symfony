@@ -36,7 +36,7 @@ trait ExpiringStoreTestTrait
      *
      * This test is time sensible: the $clockDelay could be adjust.
      */
-    public function testExpiration()
+    public function testExpiration(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $clockDelay = $this->getClockDelay();
@@ -57,7 +57,7 @@ trait ExpiringStoreTestTrait
      *
      * @expectedException \Symfony\Component\Lock\Exception\LockExpiredException
      */
-    public function testAbortAfterExpiration()
+    public function testAbortAfterExpiration(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -73,7 +73,7 @@ trait ExpiringStoreTestTrait
      *
      * This test is time sensible: the $clockDelay could be adjust.
      */
-    public function testRefreshLock()
+    public function testRefreshLock(): void
     {
         // Amount a microsecond used to order async actions
         $clockDelay = $this->getClockDelay();
@@ -92,7 +92,7 @@ trait ExpiringStoreTestTrait
         $this->assertFalse($store->exists($key));
     }
 
-    public function testSetExpiration()
+    public function testSetExpiration(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
 

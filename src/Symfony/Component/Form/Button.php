@@ -67,7 +67,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -82,7 +82,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -96,7 +96,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -104,7 +104,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function setParent(FormInterface $parent = null)
+    public function setParent(FormInterface $parent = null): void
     {
         $this->parent = $parent;
     }
@@ -127,7 +127,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function add($child, $type = null, array $options = array())
+    public function add($child, $type = null, array $options = array()): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -141,7 +141,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function get($name)
+    public function get($name): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -167,7 +167,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function remove($name)
+    public function remove($name): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -195,7 +195,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @param mixed $modelData
      */
-    public function setData($modelData)
+    public function setData($modelData): void
     {
         // called during initialization of the form tree
         // noop
@@ -204,21 +204,21 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      */
-    public function getData()
+    public function getData(): void
     {
     }
 
     /**
      * Unsupported method.
      */
-    public function getNormData()
+    public function getNormData(): void
     {
     }
 
     /**
      * Unsupported method.
      */
-    public function getViewData()
+    public function getViewData(): void
     {
     }
 
@@ -265,7 +265,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      */
-    public function getPropertyPath()
+    public function getPropertyPath(): void
     {
     }
 
@@ -274,7 +274,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function addError(FormError $error)
+    public function addError(FormError $error): void
     {
         throw new BadMethodCallException('Buttons cannot have errors.');
     }
@@ -334,7 +334,7 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * Unsupported method.
      */
-    public function getTransformationFailure()
+    public function getTransformationFailure(): void
     {
     }
 
@@ -343,7 +343,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function initialize()
+    public function initialize(): void
     {
         throw new BadMethodCallException('Buttons cannot be initialized. Call initialize() on the root form instead.');
     }
@@ -355,7 +355,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function handleRequest($request = null)
+    public function handleRequest($request = null): void
     {
         throw new BadMethodCallException('Buttons cannot handle requests. Call handleRequest() on the root form instead.');
     }

@@ -69,7 +69,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function compileTemporaryBundles(GenrbCompiler $compiler, $sourceDir, $tempDir)
+    protected function compileTemporaryBundles(GenrbCompiler $compiler, $sourceDir, $tempDir): void
     {
         $compiler->compile($sourceDir.'/region', $tempDir);
     }
@@ -77,7 +77,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function preGenerate()
+    protected function preGenerate(): void
     {
         $this->regionCodes = array();
     }
@@ -105,7 +105,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForRoot(BundleReaderInterface $reader, $tempDir)
+    protected function generateDataForRoot(BundleReaderInterface $reader, $tempDir): void
     {
     }
 

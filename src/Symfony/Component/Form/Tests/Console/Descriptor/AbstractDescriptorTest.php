@@ -29,7 +29,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
 abstract class AbstractDescriptorTest extends TestCase
 {
     /** @dataProvider getDescribeDefaultsTestData */
-    public function testDescribeDefaults($object, array $options, $fixtureName)
+    public function testDescribeDefaults($object, array $options, $fixtureName): void
     {
         $describedObject = $this->getObjectDescription($object, $options);
         $expectedDescription = $this->getExpectedDescription($fixtureName);
@@ -42,7 +42,7 @@ abstract class AbstractDescriptorTest extends TestCase
     }
 
     /** @dataProvider getDescribeResolvedFormTypeTestData */
-    public function testDescribeResolvedFormType(ResolvedFormTypeInterface $type, array $options, $fixtureName)
+    public function testDescribeResolvedFormType(ResolvedFormTypeInterface $type, array $options, $fixtureName): void
     {
         $describedObject = $this->getObjectDescription($type, $options);
         $expectedDescription = $this->getExpectedDescription($fixtureName);
@@ -55,7 +55,7 @@ abstract class AbstractDescriptorTest extends TestCase
     }
 
     /** @dataProvider getDescribeOptionTestData */
-    public function testDescribeOption(OptionsResolver $optionsResolver, array $options, $fixtureName)
+    public function testDescribeOption(OptionsResolver $optionsResolver, array $options, $fixtureName): void
     {
         $describedObject = $this->getObjectDescription($optionsResolver, $options);
         $expectedDescription = $this->getExpectedDescription($fixtureName);
@@ -132,7 +132,7 @@ abstract class AbstractDescriptorTest extends TestCase
 
 class FooType extends AbstractType
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('foo');
         $resolver->setDefault('empty_data', function (Options $options, $value) {

@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 
 class ValidatorExtensionTest extends TestCase
 {
-    public function test2Dot5ValidationApi()
+    public function test2Dot5ValidationApi(): void
     {
         $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\RecursiveValidator')
             ->disableOriginalConstructor()

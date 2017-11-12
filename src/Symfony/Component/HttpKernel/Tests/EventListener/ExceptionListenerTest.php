@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\Tests\Logger;
  */
 class ExceptionListenerTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $logger = new TestLogger();
         $l = new ExceptionListener('foo', $logger);
@@ -46,7 +46,7 @@ class ExceptionListenerTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testHandleWithoutLogger($event, $event2)
+    public function testHandleWithoutLogger($event, $event2): void
     {
         $this->iniSet('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
@@ -67,7 +67,7 @@ class ExceptionListenerTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testHandleWithLogger($event, $event2)
+    public function testHandleWithLogger($event, $event2): void
     {
         $logger = new TestLogger();
 
@@ -104,7 +104,7 @@ class ExceptionListenerTest extends TestCase
         );
     }
 
-    public function testSubRequestFormat()
+    public function testSubRequestFormat(): void
     {
         $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
 
@@ -142,7 +142,7 @@ class TestKernel implements HttpKernelInterface
 
 class TestKernelThatThrowsException implements HttpKernelInterface
 {
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true): void
     {
         throw new \RuntimeException('bar');
     }

@@ -28,13 +28,13 @@ class ExceptionCasterTest extends TestCase
         return new \Exception(''.$msg);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         ExceptionCaster::$srcContext = 1;
         ExceptionCaster::$traceArgs = true;
     }
 
-    public function testDefaultSettings()
+    public function testDefaultSettings(): void
     {
         $ref = array('foo');
         $e = $this->getTestException('foo', $ref);
@@ -60,7 +60,7 @@ EODUMP;
         $this->assertSame(array('foo'), $ref);
     }
 
-    public function testSeek()
+    public function testSeek(): void
     {
         $e = $this->getTestException(2);
 
@@ -79,7 +79,7 @@ EODUMP;
         $this->assertStringMatchesFormat($expectedDump, $this->getDump($e, 'trace'));
     }
 
-    public function testNoArgs()
+    public function testNoArgs(): void
     {
         $e = $this->getTestException(1);
         ExceptionCaster::$traceArgs = false;
@@ -104,7 +104,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
-    public function testNoSrcContext()
+    public function testNoSrcContext(): void
     {
         $e = $this->getTestException(1);
         ExceptionCaster::$srcContext = -1;
@@ -124,7 +124,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
-    public function testHtmlDump()
+    public function testHtmlDump(): void
     {
         $e = $this->getTestException(1);
         ExceptionCaster::$srcContext = -1;
@@ -158,7 +158,7 @@ EODUMP;
     /**
      * @requires function Twig\Template::getSourceContext
      */
-    public function testFrameWithTwig()
+    public function testFrameWithTwig(): void
     {
         require_once dirname(__DIR__).'/Fixtures/Twig.php';
 
@@ -208,7 +208,7 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $f);
     }
 
-    public function testExcludeVerbosity()
+    public function testExcludeVerbosity(): void
     {
         $e = $this->getTestException('foo');
 

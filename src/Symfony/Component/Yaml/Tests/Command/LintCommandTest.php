@@ -26,7 +26,7 @@ class LintCommandTest extends TestCase
 {
     private $files;
 
-    public function testLintCorrectFile()
+    public function testLintCorrectFile(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('foo: bar');
@@ -37,7 +37,7 @@ class LintCommandTest extends TestCase
         $this->assertRegExp('/^\/\/ OK in /', trim($tester->getDisplay()));
     }
 
-    public function testLintIncorrectFile()
+    public function testLintIncorrectFile(): void
     {
         $incorrectContent = '
 foo:
@@ -51,7 +51,7 @@ bar';
         $this->assertContains('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
     }
 
-    public function testConstantAsKey()
+    public function testConstantAsKey(): void
     {
         $yaml = <<<YAML
 !php/const 'Symfony\Component\Yaml\Tests\Command\Foo::TEST': bar
@@ -60,7 +60,7 @@ YAML;
         $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
     }
 
-    public function testCustomTags()
+    public function testCustomTags(): void
     {
         $yaml = <<<YAML
 foo: !my_tag {foo: bar}
@@ -69,7 +69,7 @@ YAML;
         $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
     }
 
-    public function testCustomTagsError()
+    public function testCustomTagsError(): void
     {
         $yaml = <<<YAML
 foo: !my_tag {foo: bar}
@@ -81,7 +81,7 @@ YAML;
     /**
      * @expectedException \RuntimeException
      */
-    public function testLintFileNotReadable()
+    public function testLintFileNotReadable(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
@@ -115,13 +115,13 @@ YAML;
         return new CommandTester($command);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->files = array();
         @mkdir(sys_get_temp_dir().'/framework-yml-lint-test');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

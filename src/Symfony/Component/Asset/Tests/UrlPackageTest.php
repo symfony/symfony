@@ -21,7 +21,7 @@ class UrlPackageTest extends TestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testGetUrl($baseUrls, $format, $path, $expected)
+    public function testGetUrl($baseUrls, $format, $path, $expected): void
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format));
         $this->assertEquals($expected, $package->getUrl($path));
@@ -54,7 +54,7 @@ class UrlPackageTest extends TestCase
     /**
      * @dataProvider getContextConfigs
      */
-    public function testGetUrlWithContext($secure, $baseUrls, $format, $path, $expected)
+    public function testGetUrlWithContext($secure, $baseUrls, $format, $path, $expected): void
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format), $this->getContext($secure));
 
@@ -77,7 +77,7 @@ class UrlPackageTest extends TestCase
         );
     }
 
-    public function testVersionStrategyGivesAbsoluteURL()
+    public function testVersionStrategyGivesAbsoluteURL(): void
     {
         $versionStrategy = $this->getMockBuilder('Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface')->getMock();
         $versionStrategy->expects($this->any())
@@ -91,7 +91,7 @@ class UrlPackageTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Asset\Exception\LogicException
      */
-    public function testNoBaseUrls()
+    public function testNoBaseUrls(): void
     {
         new UrlPackage(array(), new EmptyVersionStrategy());
     }
@@ -99,7 +99,7 @@ class UrlPackageTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Asset\Exception\InvalidArgumentException
      */
-    public function testWrongBaseUrl()
+    public function testWrongBaseUrl(): void
     {
         new UrlPackage(array('not-a-url'), new EmptyVersionStrategy());
     }

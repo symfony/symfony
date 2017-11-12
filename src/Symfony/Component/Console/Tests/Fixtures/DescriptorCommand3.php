@@ -15,7 +15,7 @@ use Symfony\Component\Console\Command\Command;
 
 class DescriptorCommand3 extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('descriptor:command3')

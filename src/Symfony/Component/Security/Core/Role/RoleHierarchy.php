@@ -50,7 +50,7 @@ class RoleHierarchy implements RoleHierarchyInterface
         return $reachableRoles;
     }
 
-    protected function buildRoleMap()
+    protected function buildRoleMap(): void
     {
         $this->map = array();
         foreach ($this->hierarchy as $main => $roles) {

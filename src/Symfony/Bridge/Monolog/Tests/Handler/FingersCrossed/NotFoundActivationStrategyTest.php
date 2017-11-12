@@ -23,7 +23,7 @@ class NotFoundActivationStrategyTest extends TestCase
     /**
      * @dataProvider isActivatedProvider
      */
-    public function testIsActivated($url, $record, $expected)
+    public function testIsActivated($url, $record, $expected): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(Request::create($url));

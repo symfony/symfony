@@ -33,7 +33,7 @@ trait BlockingStoreTestTrait
      * @requires extension pcntl
      * @requires function pcntl_sigwaitinfo
      */
-    public function testBlockingLocks()
+    public function testBlockingLocks(): void
     {
         // Amount a microsecond used to order async actions
         $clockDelay = 50000;

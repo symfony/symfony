@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeAuthenticationProviderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $provider = $this->getProvider();
 
@@ -30,7 +30,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
      * @expectedExceptionMessage The token is not supported by this authentication provider.
      */
-    public function testAuthenticateWhenTokenIsNotSupported()
+    public function testAuthenticateWhenTokenIsNotSupported(): void
     {
         $provider = $this->getProvider();
 
@@ -41,7 +41,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testAuthenticateWhenSecretsDoNotMatch()
+    public function testAuthenticateWhenSecretsDoNotMatch(): void
     {
         $provider = $this->getProvider(null, 'secret1');
         $token = $this->getSupportedToken(null, 'secret2');
@@ -52,7 +52,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
      */
-    public function testAuthenticateWhenPreChecksFails()
+    public function testAuthenticateWhenPreChecksFails(): void
     {
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
@@ -64,7 +64,7 @@ class RememberMeAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->exactly(2))

@@ -7,7 +7,7 @@ class AnnotatedClass
     /**
      * @deprecated since version 3.4.
      */
-    public function deprecatedMethod()
+    public function deprecatedMethod(): void
     {
     }
 }

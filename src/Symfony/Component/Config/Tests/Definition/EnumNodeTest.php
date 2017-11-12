@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\EnumNode;
 
 class EnumNodeTest extends TestCase
 {
-    public function testFinalizeValue()
+    public function testFinalizeValue(): void
     {
         $node = new EnumNode('foo', null, array('foo', 'bar'));
         $this->assertSame('foo', $node->finalize('foo'));
@@ -26,18 +26,18 @@ class EnumNodeTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage $values must contain at least one element.
      */
-    public function testConstructionWithNoValues()
+    public function testConstructionWithNoValues(): void
     {
         new EnumNode('foo', null, array());
     }
 
-    public function testConstructionWithOneValue()
+    public function testConstructionWithOneValue(): void
     {
         $node = new EnumNode('foo', null, array('foo'));
         $this->assertSame('foo', $node->finalize('foo'));
     }
 
-    public function testConstructionWithOneDistinctValue()
+    public function testConstructionWithOneDistinctValue(): void
     {
         $node = new EnumNode('foo', null, array('foo', 'foo'));
         $this->assertSame('foo', $node->finalize('foo'));
@@ -47,7 +47,7 @@ class EnumNodeTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage The value "foobar" is not allowed for path "foo". Permissible values: "foo", "bar"
      */
-    public function testFinalizeWithInvalidValue()
+    public function testFinalizeWithInvalidValue(): void
     {
         $node = new EnumNode('foo', null, array('foo', 'bar'));
         $node->finalize('foobar');

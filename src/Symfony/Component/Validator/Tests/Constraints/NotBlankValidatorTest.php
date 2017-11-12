@@ -25,7 +25,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testValidValues($value)
+    public function testValidValues($value): void
     {
         $this->validator->validate($value, new NotBlank());
 
@@ -43,7 +43,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function testNullIsInvalid()
+    public function testNullIsInvalid(): void
     {
         $constraint = new NotBlank(array(
             'message' => 'myMessage',
@@ -57,7 +57,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testBlankIsInvalid()
+    public function testBlankIsInvalid(): void
     {
         $constraint = new NotBlank(array(
             'message' => 'myMessage',
@@ -71,7 +71,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testFalseIsInvalid()
+    public function testFalseIsInvalid(): void
     {
         $constraint = new NotBlank(array(
             'message' => 'myMessage',
@@ -85,7 +85,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testEmptyArrayIsInvalid()
+    public function testEmptyArrayIsInvalid(): void
     {
         $constraint = new NotBlank(array(
             'message' => 'myMessage',

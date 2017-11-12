@@ -90,7 +90,7 @@ class InputArgument
      *
      * @throws LogicException When incorrect default value is given
      */
-    public function setDefault($default = null)
+    public function setDefault($default = null): void
     {
         if (self::REQUIRED === $this->mode && null !== $default) {
             throw new LogicException('Cannot set a default value except for InputArgument::OPTIONAL mode.');

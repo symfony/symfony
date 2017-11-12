@@ -22,20 +22,20 @@ class HIncludeFragmentRendererTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testRenderExceptionWhenControllerAndNoSigner()
+    public function testRenderExceptionWhenControllerAndNoSigner(): void
     {
         $strategy = new HIncludeFragmentRenderer();
         $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'));
     }
 
-    public function testRenderWithControllerAndSigner()
+    public function testRenderWithControllerAndSigner(): void
     {
         $strategy = new HIncludeFragmentRenderer(null, new UriSigner('foo'));
 
         $this->assertEquals('<hx:include src="/_fragment?_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller&amp;_hash=BP%2BOzCD5MRUI%2BHJpgPDOmoju00FnzLhP3TGcSHbbBLs%3D"></hx:include>', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
     }
 
-    public function testRenderWithUri()
+    public function testRenderWithUri(): void
     {
         $strategy = new HIncludeFragmentRenderer();
         $this->assertEquals('<hx:include src="/foo"></hx:include>', $strategy->render('/foo', Request::create('/'))->getContent());
@@ -44,7 +44,7 @@ class HIncludeFragmentRendererTest extends TestCase
         $this->assertEquals('<hx:include src="/foo"></hx:include>', $strategy->render('/foo', Request::create('/'))->getContent());
     }
 
-    public function testRenderWithDefault()
+    public function testRenderWithDefault(): void
     {
         // only default
         $strategy = new HIncludeFragmentRenderer();
@@ -59,7 +59,7 @@ class HIncludeFragmentRendererTest extends TestCase
         $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default'))->getContent());
     }
 
-    public function testRenderWithAttributesOptions()
+    public function testRenderWithAttributesOptions(): void
     {
         // with id
         $strategy = new HIncludeFragmentRenderer();
@@ -74,7 +74,7 @@ class HIncludeFragmentRendererTest extends TestCase
         $this->assertEquals('<hx:include src="/foo" p1="v1" p2="v2" id="bar">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default', 'id' => 'bar', 'attributes' => array('p1' => 'v1', 'p2' => 'v2')))->getContent());
     }
 
-    public function testRenderWithDefaultText()
+    public function testRenderWithDefaultText(): void
     {
         $engine = $this->getMockBuilder('Symfony\\Component\\Templating\\EngineInterface')->getMock();
         $engine->expects($this->once())

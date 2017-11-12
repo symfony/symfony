@@ -22,7 +22,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     private $container;
     private $dataCollectorTranslatorPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
         $this->dataCollectorTranslatorPass = new DataCollectorTranslatorPass();
@@ -44,7 +44,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     /**
      * @dataProvider getImplementingTranslatorBagInterfaceTranslatorClassNames
      */
-    public function testProcessKeepsDataCollectorTranslatorIfItImplementsTranslatorBagInterface($class)
+    public function testProcessKeepsDataCollectorTranslatorIfItImplementsTranslatorBagInterface($class): void
     {
         $this->container->register('translator', $class);
 
@@ -56,7 +56,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     /**
      * @dataProvider getImplementingTranslatorBagInterfaceTranslatorClassNames
      */
-    public function testProcessKeepsDataCollectorIfTranslatorImplementsTranslatorBagInterface($class)
+    public function testProcessKeepsDataCollectorIfTranslatorImplementsTranslatorBagInterface($class): void
     {
         $this->container->register('translator', $class);
 
@@ -76,7 +76,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     /**
      * @dataProvider getNotImplementingTranslatorBagInterfaceTranslatorClassNames
      */
-    public function testProcessRemovesDataCollectorTranslatorIfItDoesNotImplementTranslatorBagInterface($class)
+    public function testProcessRemovesDataCollectorTranslatorIfItDoesNotImplementTranslatorBagInterface($class): void
     {
         $this->container->register('translator', $class);
 
@@ -88,7 +88,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     /**
      * @dataProvider getNotImplementingTranslatorBagInterfaceTranslatorClassNames
      */
-    public function testProcessRemovesDataCollectorIfTranslatorDoesNotImplementTranslatorBagInterface($class)
+    public function testProcessRemovesDataCollectorIfTranslatorDoesNotImplementTranslatorBagInterface($class): void
     {
         $this->container->register('translator', $class);
 
@@ -108,19 +108,19 @@ class DataCollectorTranslatorPassTest extends TestCase
 
 class TranslatorWithTranslatorBag implements TranslatorInterface
 {
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    public function trans($id, array $parameters = array(), $domain = null, $locale = null): void
     {
     }
 
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null): void
     {
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
     }
 
-    public function getLocale()
+    public function getLocale(): void
     {
     }
 }

@@ -866,7 +866,7 @@ class Definition
      *
      * @param string $error
      */
-    public function addError($error)
+    public function addError($error): void
     {
         $this->errors[] = $error;
     }

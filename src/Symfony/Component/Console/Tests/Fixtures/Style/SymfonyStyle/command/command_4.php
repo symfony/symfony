@@ -5,7 +5,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 //Ensure has single blank line after any text and a title
-return function (InputInterface $input, OutputInterface $output) {
+return function (InputInterface $input, OutputInterface $output): void {
     $output = new SymfonyStyle($input, $output);
 
     $output->write('Lorem ipsum dolor sit amet');

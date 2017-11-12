@@ -37,7 +37,7 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
             $this->trait = new Legacy\SymfonyTestsListenerTrait($mockedNamespaces);
         }
 
-        public function globalListenerDisabled()
+        public function globalListenerDisabled(): void
         {
             $this->trait->globalListenerDisabled();
         }

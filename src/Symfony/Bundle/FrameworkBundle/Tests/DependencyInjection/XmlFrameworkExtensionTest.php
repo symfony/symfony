@@ -17,13 +17,13 @@ use Symfony\Component\Config\FileLocator;
 
 class XmlFrameworkExtensionTest extends FrameworkExtensionTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
+    protected function loadFromFile(ContainerBuilder $container, $file): void
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
         $loader->load($file.'.xml');
     }
 
-    public function testAssetsHelperIsRemovedWhenPhpTemplatingEngineIsEnabledAndAssetsAreDisabled()
+    public function testAssetsHelperIsRemovedWhenPhpTemplatingEngineIsEnabledAndAssetsAreDisabled(): void
     {
         $this->markTestSkipped('The assets key cannot be set to false using the XML configuration format.');
     }

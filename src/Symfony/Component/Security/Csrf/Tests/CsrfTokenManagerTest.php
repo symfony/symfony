@@ -35,21 +35,21 @@ class CsrfTokenManagerTest extends TestCase
      */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->generator = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface')->getMock();
         $this->storage = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface')->getMock();
         $this->manager = new CsrfTokenManager($this->generator, $this->storage);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->generator = null;
         $this->storage = null;
         $this->manager = null;
     }
 
-    public function testGetNonExistingToken()
+    public function testGetNonExistingToken(): void
     {
         $this->storage->expects($this->once())
             ->method('hasToken')
@@ -71,7 +71,7 @@ class CsrfTokenManagerTest extends TestCase
         $this->assertSame('TOKEN', $token->getValue());
     }
 
-    public function testUseExistingTokenIfAvailable()
+    public function testUseExistingTokenIfAvailable(): void
     {
         $this->storage->expects($this->once())
             ->method('hasToken')
@@ -90,7 +90,7 @@ class CsrfTokenManagerTest extends TestCase
         $this->assertSame('TOKEN', $token->getValue());
     }
 
-    public function testRefreshTokenAlwaysReturnsNewToken()
+    public function testRefreshTokenAlwaysReturnsNewToken(): void
     {
         $this->storage->expects($this->never())
             ->method('hasToken');
@@ -110,7 +110,7 @@ class CsrfTokenManagerTest extends TestCase
         $this->assertSame('TOKEN', $token->getValue());
     }
 
-    public function testMatchingTokenIsValid()
+    public function testMatchingTokenIsValid(): void
     {
         $this->storage->expects($this->once())
             ->method('hasToken')
@@ -125,7 +125,7 @@ class CsrfTokenManagerTest extends TestCase
         $this->assertTrue($this->manager->isTokenValid(new CsrfToken('token_id', 'TOKEN')));
     }
 
-    public function testNonMatchingTokenIsNotValid()
+    public function testNonMatchingTokenIsNotValid(): void
     {
         $this->storage->expects($this->once())
             ->method('hasToken')
@@ -140,7 +140,7 @@ class CsrfTokenManagerTest extends TestCase
         $this->assertFalse($this->manager->isTokenValid(new CsrfToken('token_id', 'FOOBAR')));
     }
 
-    public function testNonExistingTokenIsNotValid()
+    public function testNonExistingTokenIsNotValid(): void
     {
         $this->storage->expects($this->once())
             ->method('hasToken')
@@ -153,7 +153,7 @@ class CsrfTokenManagerTest extends TestCase
         $this->assertFalse($this->manager->isTokenValid(new CsrfToken('token_id', 'FOOBAR')));
     }
 
-    public function testRemoveToken()
+    public function testRemoveToken(): void
     {
         $this->storage->expects($this->once())
             ->method('removeToken')

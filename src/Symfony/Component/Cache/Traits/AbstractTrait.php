@@ -192,7 +192,7 @@ trait AbstractTrait
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         if ($this->deferred) {
             $this->commit();
@@ -251,7 +251,7 @@ trait AbstractTrait
     /**
      * @internal
      */
-    public static function handleUnserializeCallback($class)
+    public static function handleUnserializeCallback($class): void
     {
         throw new \DomainException('Class not found: '.$class);
     }

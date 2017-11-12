@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class RoleTest extends TestCase
 {
-    public function testGetRole()
+    public function testGetRole(): void
     {
         $role = new Role('FOO');
 

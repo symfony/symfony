@@ -6,7 +6,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Helper\TableCell;
 
 //Ensure formatting tables when using multiple headers with TableCell
-return function (InputInterface $input, OutputInterface $output) {
+return function (InputInterface $input, OutputInterface $output): void {
     $headers = array(
         array(new TableCell('Main table title', array('colspan' => 3))),
         array('ISBN', 'Title', 'Author'),

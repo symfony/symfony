@@ -19,14 +19,14 @@ class MessageSelectorTest extends TestCase
     /**
      * @dataProvider getChooseTests
      */
-    public function testChoose($expected, $id, $number)
+    public function testChoose($expected, $id, $number): void
     {
         $selector = new MessageSelector();
 
         $this->assertEquals($expected, $selector->choose($id, $number, 'en'));
     }
 
-    public function testReturnMessageIfExactlyOneStandardRuleIsGiven()
+    public function testReturnMessageIfExactlyOneStandardRuleIsGiven(): void
     {
         $selector = new MessageSelector();
 
@@ -37,7 +37,7 @@ class MessageSelectorTest extends TestCase
      * @dataProvider getNonMatchingMessages
      * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
-    public function testThrowExceptionIfMatchingMessageCannotBeFound($id, $number)
+    public function testThrowExceptionIfMatchingMessageCannotBeFound($id, $number): void
     {
         $selector = new MessageSelector();
 

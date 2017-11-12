@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class DebugExtensionTest extends TestCase
 {
-    public function testLoadWithoutConfiguration()
+    public function testLoadWithoutConfiguration(): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new DebugExtension());
@@ -49,7 +49,7 @@ class DebugExtensionTest extends TestCase
         return $container;
     }
 
-    private function compileContainer(ContainerBuilder $container)
+    private function compileContainer(ContainerBuilder $container): void
     {
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());

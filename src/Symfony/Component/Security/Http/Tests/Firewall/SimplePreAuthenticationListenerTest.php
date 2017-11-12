@@ -28,7 +28,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
     private $tokenStorage;
     private $token;
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $this->tokenStorage
             ->expects($this->once())
@@ -64,7 +64,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
         $listener->handle($this->event);
     }
 
-    public function testHandlecatchAuthenticationException()
+    public function testHandlecatchAuthenticationException(): void
     {
         $exception = new AuthenticationException('Authentication failed.');
 
@@ -93,7 +93,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
         $listener->handle($this->event);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager')
             ->disableOriginalConstructor()
@@ -116,7 +116,7 @@ class SimplePreAuthenticationListenerTest extends TestCase
         $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->authenticationManager = null;
         $this->dispatcher = null;

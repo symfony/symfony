@@ -35,7 +35,7 @@ class HttpCacheTestCase extends TestCase
      */
     protected $store;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->kernel = null;
 
@@ -53,7 +53,7 @@ class HttpCacheTestCase extends TestCase
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->cache) {
             $this->cache->getStore()->cleanup();
@@ -71,22 +71,22 @@ class HttpCacheTestCase extends TestCase
         $this->clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
-    public function assertHttpKernelIsCalled()
+    public function assertHttpKernelIsCalled(): void
     {
         $this->assertTrue($this->kernel->hasBeenCalled());
     }
 
-    public function assertHttpKernelIsNotCalled()
+    public function assertHttpKernelIsNotCalled(): void
     {
         $this->assertFalse($this->kernel->hasBeenCalled());
     }
 
-    public function assertResponseOk()
+    public function assertResponseOk(): void
     {
         $this->assertEquals(200, $this->response->getStatusCode());
     }
 
-    public function assertTraceContains($trace)
+    public function assertTraceContains($trace): void
     {
         $traces = $this->cache->getTraces();
         $traces = current($traces);
@@ -94,7 +94,7 @@ class HttpCacheTestCase extends TestCase
         $this->assertRegExp('/'.$trace.'/', implode(', ', $traces));
     }
 
-    public function assertTraceNotContains($trace)
+    public function assertTraceNotContains($trace): void
     {
         $traces = $this->cache->getTraces();
         $traces = current($traces);
@@ -102,17 +102,17 @@ class HttpCacheTestCase extends TestCase
         $this->assertNotRegExp('/'.$trace.'/', implode(', ', $traces));
     }
 
-    public function assertExceptionsAreCaught()
+    public function assertExceptionsAreCaught(): void
     {
         $this->assertTrue($this->kernel->isCatchingExceptions());
     }
 
-    public function assertExceptionsAreNotCaught()
+    public function assertExceptionsAreNotCaught(): void
     {
         $this->assertFalse($this->kernel->isCatchingExceptions());
     }
 
-    public function request($method, $uri = '/', $server = array(), $cookies = array(), $esi = false, $headers = array())
+    public function request($method, $uri = '/', $server = array(), $cookies = array(), $esi = false, $headers = array()): void
     {
         if (null === $this->kernel) {
             throw new \LogicException('You must call setNextResponse() before calling request().');
@@ -145,22 +145,22 @@ class HttpCacheTestCase extends TestCase
     }
 
     // A basic response with 200 status code and a tiny body.
-    public function setNextResponse($statusCode = 200, array $headers = array(), $body = 'Hello World', \Closure $customizer = null)
+    public function setNextResponse($statusCode = 200, array $headers = array(), $body = 'Hello World', \Closure $customizer = null): void
     {
         $this->kernel = new TestHttpKernel($body, $statusCode, $headers, $customizer);
     }
 
-    public function setNextResponses($responses)
+    public function setNextResponses($responses): void
     {
         $this->kernel = new TestMultipleHttpKernel($responses);
     }
 
-    public function catchExceptions($catch = true)
+    public function catchExceptions($catch = true): void
     {
         $this->catch = $catch;
     }
 
-    public static function clearDirectory($directory)
+    public static function clearDirectory($directory): void
     {
         if (!is_dir($directory)) {
             return;

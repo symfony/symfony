@@ -16,7 +16,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 
 abstract class AbstractTableLayoutTest extends AbstractLayoutTest
 {
-    public function testRow()
+    public function testRow(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $form->addError(new FormError('[trans]Error![/trans]'));
@@ -40,7 +40,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testLabelIsNotRenderedWhenSetToFalse()
+    public function testLabelIsNotRenderedWhenSetToFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
             'label' => false,
@@ -59,7 +59,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testRepeatedRow()
+    public function testRepeatedRow(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType');
         $html = $this->renderRow($form->createView());
@@ -89,7 +89,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testRepeatedRowWithErrors()
+    public function testRepeatedRowWithErrors(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType');
         $form->addError(new FormError('[trans]Error![/trans]'));
@@ -126,7 +126,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testButtonRow()
+    public function testButtonRow(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType');
         $view = $form->createView();
@@ -145,7 +145,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testRest()
+    public function testRest(): void
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('field1', 'Symfony\Component\Form\Extension\Core\Type\TextType')
@@ -192,7 +192,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testCollection()
+    public function testCollection(): void
     {
         $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', array('a', 'b'), array(
             'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
@@ -210,7 +210,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testEmptyCollection()
+    public function testEmptyCollection(): void
     {
         $form = $this->factory->createNamed('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
             'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
@@ -224,7 +224,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testForm()
+    public function testForm(): void
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->setMethod('PUT')
@@ -276,7 +276,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testFormWidget()
+    public function testFormWidget(): void
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
@@ -313,7 +313,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     }
 
     // https://github.com/symfony/symfony/issues/2308
-    public function testNestedFormError()
+    public function testNestedFormError(): void
     {
         $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add($this->factory
@@ -335,7 +335,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testCsrf()
+    public function testCsrf(): void
     {
         $this->csrfTokenManager->expects($this->any())
             ->method('getToken')
@@ -363,7 +363,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testRepeated()
+    public function testRepeated(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType', 'foobar', array(
             'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
@@ -397,7 +397,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testRepeatedWithCustomOptions()
+    public function testRepeatedWithCustomOptions(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RepeatedType', 'foobar', array(
             'type' => 'Symfony\Component\Form\Extension\Core\Type\PasswordType',
@@ -437,7 +437,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
      * The block "_name_child_label" should be overridden in the theme of the
      * implemented driver.
      */
-    public function testCollectionRowWithCustomBlock()
+    public function testCollectionRowWithCustomBlock(): void
     {
         $collection = array('one', 'two', 'three');
         $form = $this->factory->createNamedBuilder('names', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', $collection)
@@ -454,7 +454,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testFormEndWithRest()
+    public function testFormEndWithRest(): void
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('field1', 'Symfony\Component\Form\Extension\Core\Type\TextType')
@@ -492,7 +492,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         );
     }
 
-    public function testFormEndWithoutRest()
+    public function testFormEndWithoutRest(): void
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('field1', 'Symfony\Component\Form\Extension\Core\Type\TextType')
@@ -508,7 +508,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertEquals('</form>', $html);
     }
 
-    public function testWidgetContainerAttributes()
+    public function testWidgetContainerAttributes(): void
     {
         $form = $this->factory->createNamed('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
@@ -522,7 +522,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $this->assertContains('<table id="form" class="foobar" data-foo="bar">', $html);
     }
 
-    public function testWidgetContainerAttributeNameRepeatedIfTrue()
+    public function testWidgetContainerAttributeNameRepeatedIfTrue(): void
     {
         $form = $this->factory->createNamed('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'attr' => array('foo' => true),

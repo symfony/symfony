@@ -36,7 +36,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
 
     protected $serverParams;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Util\ServerParams')->setMethods(array('getNormalizedIniPostMaxSize', 'getContentLength'))->getMock();
         $this->requestHandler = $this->getRequestHandler();
@@ -64,7 +64,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testSubmitIfNameInRequest($method)
+    public function testSubmitIfNameInRequest($method): void
     {
         $form = $this->getMockForm('param1', $method);
 
@@ -82,7 +82,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testDoNotSubmitIfWrongRequestMethod($method)
+    public function testDoNotSubmitIfWrongRequestMethod($method): void
     {
         $form = $this->getMockForm('param1', $method);
 
@@ -101,7 +101,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testDoNoSubmitSimpleFormIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNoSubmitSimpleFormIfNameNotInRequestAndNotGetRequest($method): void
     {
         $form = $this->getMockForm('param1', $method, false);
 
@@ -118,7 +118,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testDoNotSubmitCompoundFormIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNotSubmitCompoundFormIfNameNotInRequestAndNotGetRequest($method): void
     {
         $form = $this->getMockForm('param1', $method, true);
 
@@ -132,7 +132,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
         $this->requestHandler->handleRequest($form, $this->request);
     }
 
-    public function testDoNotSubmitIfNameNotInRequestAndGetRequest()
+    public function testDoNotSubmitIfNameNotInRequestAndGetRequest(): void
     {
         $form = $this->getMockForm('param1', 'GET');
 
@@ -149,7 +149,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testSubmitFormWithEmptyNameIfAtLeastOneFieldInRequest($method)
+    public function testSubmitFormWithEmptyNameIfAtLeastOneFieldInRequest($method): void
     {
         $form = $this->getMockForm('', $method);
         $form->expects($this->any())
@@ -174,7 +174,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testDoNotSubmitFormWithEmptyNameIfNoFieldInRequest($method)
+    public function testDoNotSubmitFormWithEmptyNameIfNoFieldInRequest($method): void
     {
         $form = $this->getMockForm('', $method);
         $form->expects($this->any())
@@ -197,7 +197,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testMergeParamsAndFiles($method)
+    public function testMergeParamsAndFiles($method): void
     {
         $form = $this->getMockForm('param1', $method);
         $file = $this->getMockFile();
@@ -225,7 +225,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testParamTakesPrecedenceOverFile($method)
+    public function testParamTakesPrecedenceOverFile($method): void
     {
         $form = $this->getMockForm('param1', $method);
         $file = $this->getMockFile();
@@ -246,7 +246,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitFileIfNoParam($method)
+    public function testSubmitFileIfNoParam($method): void
     {
         $form = $this->getMockForm('param1', $method);
         $file = $this->getMockFile();
@@ -267,7 +267,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitMultipleFiles($method)
+    public function testSubmitMultipleFiles($method): void
     {
         $form = $this->getMockForm('param1', $method);
         $file = $this->getMockFile();
@@ -290,7 +290,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider methodExceptGetProvider
      */
-    public function testSubmitFileWithNamelessForm($method)
+    public function testSubmitFileWithNamelessForm($method): void
     {
         $form = $this->getMockForm(null, $method);
         $file = $this->getMockFile();
@@ -311,7 +311,7 @@ abstract class AbstractRequestHandlerTest extends TestCase
     /**
      * @dataProvider getPostMaxSizeFixtures
      */
-    public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = array())
+    public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = array()): void
     {
         $this->serverParams->expects($this->once())
             ->method('getContentLength')

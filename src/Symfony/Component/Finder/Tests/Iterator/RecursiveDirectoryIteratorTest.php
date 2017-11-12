@@ -18,7 +18,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
     /**
      * @group network
      */
-    public function testRewindOnFtp()
+    public function testRewindOnFtp(): void
     {
         try {
             $i = new RecursiveDirectoryIterator('ftp://speedtest.tele2.net/', \RecursiveDirectoryIterator::SKIP_DOTS);
@@ -34,7 +34,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
     /**
      * @group network
      */
-    public function testSeekOnFtp()
+    public function testSeekOnFtp(): void
     {
         try {
             $i = new RecursiveDirectoryIterator('ftp://speedtest.tele2.net/', \RecursiveDirectoryIterator::SKIP_DOTS);

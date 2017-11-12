@@ -199,7 +199,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param HelperInterface $name  The helper instance
      * @param string          $value An alias
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         $this->set($name, $value);
     }
@@ -211,7 +211,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @throws \LogicException
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         throw new \LogicException(sprintf('You can\'t unset a helper (%s).', $name));
     }
@@ -221,7 +221,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param HelperInterface[] $helpers An array of helper
      */
-    public function addHelpers(array $helpers)
+    public function addHelpers(array $helpers): void
     {
         foreach ($helpers as $alias => $helper) {
             $this->set($helper, is_int($alias) ? null : $alias);
@@ -233,7 +233,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param HelperInterface[] $helpers An array of helper
      */
-    public function setHelpers(array $helpers)
+    public function setHelpers(array $helpers): void
     {
         $this->helpers = array();
         $this->addHelpers($helpers);
@@ -245,7 +245,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param HelperInterface $helper The helper instance
      * @param string          $alias  An alias
      */
-    public function set(HelperInterface $helper, $alias = null)
+    public function set(HelperInterface $helper, $alias = null): void
     {
         $this->helpers[$helper->getName()] = $helper;
         if (null !== $alias) {
@@ -290,7 +290,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $template The decorator logical name
      */
-    public function extend($template)
+    public function extend($template): void
     {
         $this->parents[$this->current] = $template;
     }
@@ -327,7 +327,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $charset The charset
      */
-    public function setCharset($charset)
+    public function setCharset($charset): void
     {
         if ('UTF8' === $charset = strtoupper($charset)) {
             $charset = 'UTF-8'; // iconv on Windows requires "UTF-8" instead of "UTF8"
@@ -355,7 +355,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param string   $context The escaper context (html, js, ...)
      * @param callable $escaper A PHP callable
      */
-    public function setEscaper($context, callable $escaper)
+    public function setEscaper($context, callable $escaper): void
     {
         $this->escapers[$context] = $escaper;
         self::$escaperCache[$context] = array();
@@ -383,7 +383,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * @param string $name
      * @param mixed  $value
      */
-    public function addGlobal($name, $value)
+    public function addGlobal($name, $value): void
     {
         $this->globals[$name] = $value;
     }
@@ -415,7 +415,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      * For each function there is a define to avoid problems with strings being
      * incorrectly specified.
      */
-    protected function initializeEscapers()
+    protected function initializeEscapers(): void
     {
         $flags = ENT_QUOTES | ENT_SUBSTITUTE;
 

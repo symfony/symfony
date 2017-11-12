@@ -70,7 +70,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function replace(array $headers = array())
+    public function replace(array $headers = array()): void
     {
         $this->headerNames = array();
 
@@ -101,7 +101,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function set($key, $values, $replace = true)
+    public function set($key, $values, $replace = true): void
     {
         $uniqueKey = str_replace('_', '-', strtolower($key));
 
@@ -133,7 +133,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function remove($key)
+    public function remove($key): void
     {
         $uniqueKey = str_replace('_', '-', strtolower($key));
         unset($this->headerNames[$uniqueKey]);
@@ -171,7 +171,7 @@ class ResponseHeaderBag extends HeaderBag
         return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
     }
 
-    public function setCookie(Cookie $cookie)
+    public function setCookie(Cookie $cookie): void
     {
         $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
         $this->headerNames['set-cookie'] = 'Set-Cookie';
@@ -184,7 +184,7 @@ class ResponseHeaderBag extends HeaderBag
      * @param string $path
      * @param string $domain
      */
-    public function removeCookie($name, $path = '/', $domain = null)
+    public function removeCookie($name, $path = '/', $domain = null): void
     {
         if (null === $path) {
             $path = '/';
@@ -245,7 +245,7 @@ class ResponseHeaderBag extends HeaderBag
      * @param bool   $secure
      * @param bool   $httpOnly
      */
-    public function clearCookie($name, $path = '/', $domain = null, $secure = false, $httpOnly = true)
+    public function clearCookie($name, $path = '/', $domain = null, $secure = false, $httpOnly = true): void
     {
         $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly));
     }
@@ -331,7 +331,7 @@ class ResponseHeaderBag extends HeaderBag
         return $header;
     }
 
-    private function initDate()
+    private function initDate(): void
     {
         $now = \DateTime::createFromFormat('U', time());
         $now->setTimezone(new \DateTimeZone('UTC'));

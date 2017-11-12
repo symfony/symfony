@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 class ContainerTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $sc = new Container();
         $this->assertSame($sc, $sc->get('service_container'), '__construct() automatically registers itself as a service');
@@ -32,7 +32,7 @@ class ContainerTest extends TestCase
     /**
      * @dataProvider dataForTestCamelize
      */
-    public function testCamelize($id, $expected)
+    public function testCamelize($id, $expected): void
     {
         $this->assertEquals($expected, Container::camelize($id), sprintf('Container::camelize("%s")', $id));
     }
@@ -56,7 +56,7 @@ class ContainerTest extends TestCase
     /**
      * @dataProvider dataForTestUnderscore
      */
-    public function testUnderscore($id, $expected)
+    public function testUnderscore($id, $expected): void
     {
         $this->assertEquals($expected, Container::underscore($id), sprintf('Container::underscore("%s")', $id));
     }
@@ -73,7 +73,7 @@ class ContainerTest extends TestCase
         );
     }
 
-    public function testCompile()
+    public function testCompile(): void
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $this->assertFalse($sc->getParameterBag()->isResolved(), '->compile() resolves the parameter bag');
@@ -83,7 +83,7 @@ class ContainerTest extends TestCase
         $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '->compile() copies the current parameters to the new parameter bag');
     }
 
-    public function testIsCompiled()
+    public function testIsCompiled(): void
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $this->assertFalse($sc->isCompiled(), '->isCompiled() returns false if the container is not compiled');
@@ -91,19 +91,19 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->isCompiled(), '->isCompiled() returns true if the container is compiled');
     }
 
-    public function testIsCompiledWithFrozenParameters()
+    public function testIsCompiledWithFrozenParameters(): void
     {
         $sc = new Container(new FrozenParameterBag(array('foo' => 'bar')));
         $this->assertFalse($sc->isCompiled(), '->isCompiled() returns false if the container is not compiled but the parameter bag is already frozen');
     }
 
-    public function testGetParameterBag()
+    public function testGetParameterBag(): void
     {
         $sc = new Container();
         $this->assertEquals(array(), $sc->getParameterBag()->all(), '->getParameterBag() returns an empty array if no parameter has been defined');
     }
 
-    public function testGetSetParameter()
+    public function testGetSetParameter(): void
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $sc->setParameter('bar', 'foo');
@@ -121,7 +121,7 @@ class ContainerTest extends TestCase
         }
     }
 
-    public function testGetSetParameterWithMixedCase()
+    public function testGetSetParameterWithMixedCase(): void
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
 
@@ -130,7 +130,7 @@ class ContainerTest extends TestCase
         $this->assertEquals('baz1', $sc->getParameter('Foo'));
     }
 
-    public function testGetServiceIds()
+    public function testGetServiceIds(): void
     {
         $sc = new Container();
         $sc->set('foo', $obj = new \stdClass());
@@ -142,14 +142,14 @@ class ContainerTest extends TestCase
         $this->assertEquals(array('service_container', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $sc = new Container();
         $sc->set('._. \\o/', $foo = new \stdClass());
         $this->assertSame($foo, $sc->get('._. \\o/'), '->set() sets a service');
     }
 
-    public function testSetWithNullResetTheService()
+    public function testSetWithNullResetTheService(): void
     {
         $sc = new Container();
         $sc->set('foo', new \stdClass());
@@ -157,7 +157,7 @@ class ContainerTest extends TestCase
         $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
     }
 
-    public function testSetReplacesAlias()
+    public function testSetReplacesAlias(): void
     {
         $c = new ProjectServiceContainer();
 
@@ -169,7 +169,7 @@ class ContainerTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The "bar" service is already initialized, you cannot replace it.
      */
-    public function testSetWithNullOnInitializedPredefinedService()
+    public function testSetWithNullOnInitializedPredefinedService(): void
     {
         $sc = new Container();
         $sc->set('foo', new \stdClass());
@@ -182,7 +182,7 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
     }
 
-    public function testSetWithNullOnUninitializedPredefinedService()
+    public function testSetWithNullOnUninitializedPredefinedService(): void
     {
         $sc = new Container();
         $sc->set('foo', new \stdClass());
@@ -195,7 +195,7 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $foo = new \stdClass());
@@ -213,7 +213,7 @@ class ContainerTest extends TestCase
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
     }
 
-    public function testCaseSensitivity()
+    public function testCaseSensitivity(): void
     {
         $sc = new Container();
         $sc->set('foo', $foo1 = new \stdClass());
@@ -224,7 +224,7 @@ class ContainerTest extends TestCase
         $this->assertSame($foo2, $sc->get('Foo'), '->get() returns the service for the given id, case sensitively');
     }
 
-    public function testGetThrowServiceNotFoundException()
+    public function testGetThrowServiceNotFoundException(): void
     {
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $foo = new \stdClass());
@@ -247,7 +247,7 @@ class ContainerTest extends TestCase
         }
     }
 
-    public function testGetCircularReference()
+    public function testGetCircularReference(): void
     {
         $sc = new ProjectServiceContainer();
         try {
@@ -263,7 +263,7 @@ class ContainerTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @expectedExceptionMessage The "request" service is synthetic, it needs to be set at boot time before it can be used.
      */
-    public function testGetSyntheticServiceThrows()
+    public function testGetSyntheticServiceThrows(): void
     {
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
@@ -275,7 +275,7 @@ class ContainerTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @expectedExceptionMessage The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.
      */
-    public function testGetRemovedServiceThrows()
+    public function testGetRemovedServiceThrows(): void
     {
         require_once __DIR__.'/Fixtures/php/services9_compiled.php';
 
@@ -283,7 +283,7 @@ class ContainerTest extends TestCase
         $container->get('inlined');
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $sc = new ProjectServiceContainer();
         $sc->set('foo', new \stdClass());
@@ -294,7 +294,7 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
     }
 
-    public function testInitialized()
+    public function testInitialized(): void
     {
         $sc = new ProjectServiceContainer();
         $sc->set('foo', new \stdClass());
@@ -307,14 +307,14 @@ class ContainerTest extends TestCase
         $this->assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
     }
 
-    public function testInitializedWithPrivateService()
+    public function testInitializedWithPrivateService(): void
     {
         $sc = new ProjectServiceContainer();
         $sc->get('internal_dependency');
         $this->assertFalse($sc->initialized('internal'));
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $c = new Container();
         $c->set('bar', new \stdClass());
@@ -328,7 +328,7 @@ class ContainerTest extends TestCase
      * @expectedException \Exception
      * @expectedExceptionMessage Something went terribly wrong!
      */
-    public function testGetThrowsException()
+    public function testGetThrowsException(): void
     {
         $c = new ProjectServiceContainer();
 
@@ -342,7 +342,7 @@ class ContainerTest extends TestCase
         $c->get('throw_exception');
     }
 
-    public function testGetThrowsExceptionOnServiceConfiguration()
+    public function testGetThrowsExceptionOnServiceConfiguration(): void
     {
         $c = new ProjectServiceContainer();
 
@@ -371,7 +371,7 @@ class ContainerTest extends TestCase
         return $reflection->getValue($obj);
     }
 
-    public function testAlias()
+    public function testAlias(): void
     {
         $c = new ProjectServiceContainer();
 
@@ -379,7 +379,7 @@ class ContainerTest extends TestCase
         $this->assertSame($c->get('alias'), $c->get('bar'));
     }
 
-    public function testThatCloningIsNotSupported()
+    public function testThatCloningIsNotSupported(): void
     {
         $class = new \ReflectionClass('Symfony\Component\DependencyInjection\Container');
         $clone = $class->getMethod('__clone');
@@ -387,7 +387,7 @@ class ContainerTest extends TestCase
         $this->assertTrue($clone->isPrivate());
     }
 
-    public function testCheckExistenceOfAnInternalPrivateService()
+    public function testCheckExistenceOfAnInternalPrivateService(): void
     {
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
@@ -398,7 +398,7 @@ class ContainerTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @expectedExceptionMessage You have requested a non-existent service "internal".
      */
-    public function testRequestAnInternalSharedPrivateService()
+    public function testRequestAnInternalSharedPrivateService(): void
     {
         $c = new ProjectServiceContainer();
         $c->get('internal_dependency');
@@ -459,12 +459,12 @@ class ProjectServiceContainer extends Container
         return $this->get('circular');
     }
 
-    protected function getThrowExceptionService()
+    protected function getThrowExceptionService(): void
     {
         throw new \Exception('Something went terribly wrong!');
     }
 
-    protected function getThrowsExceptionOnServiceConfigurationService()
+    protected function getThrowsExceptionOnServiceConfigurationService(): void
     {
         $this->services['throws_exception_on_service_configuration'] = $instance = new \stdClass();
 

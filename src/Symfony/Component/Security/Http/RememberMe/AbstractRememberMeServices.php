@@ -149,7 +149,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Implementation for LogoutHandlerInterface. Deletes the cookie.
      */
-    public function logout(Request $request, Response $response, TokenInterface $token)
+    public function logout(Request $request, Response $response, TokenInterface $token): void
     {
         $this->cancelCookie($request);
     }
@@ -158,7 +158,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Implementation for RememberMeServicesInterface. Deletes the cookie when
      * an attempted authentication fails.
      */
-    final public function loginFail(Request $request, \Exception $exception = null)
+    final public function loginFail(Request $request, \Exception $exception = null): void
     {
         $this->cancelCookie($request);
         $this->onLoginFail($request, $exception);
@@ -168,7 +168,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Implementation for RememberMeServicesInterface. This is called when an
      * authentication is successful.
      */
-    final public function loginSuccess(Request $request, Response $response, TokenInterface $token)
+    final public function loginSuccess(Request $request, Response $response, TokenInterface $token): void
     {
         // Make sure any old remember-me cookies are cancelled
         $this->cancelCookie($request);
@@ -210,7 +210,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      */
     abstract protected function processAutoLoginCookie(array $cookieParts, Request $request);
 
-    protected function onLoginFail(Request $request, \Exception $exception = null)
+    protected function onLoginFail(Request $request, \Exception $exception = null): void
     {
     }
 
@@ -265,7 +265,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Deletes the remember-me cookie.
      */
-    protected function cancelCookie(Request $request)
+    protected function cancelCookie(Request $request): void
     {
         if (null !== $this->logger) {
             $this->logger->debug('Clearing remember-me cookie.', array('name' => $this->options['name']));

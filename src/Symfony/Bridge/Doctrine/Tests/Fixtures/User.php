@@ -35,15 +35,15 @@ class User implements UserInterface
         $this->name = $name;
     }
 
-    public function getRoles()
+    public function getRoles(): void
     {
     }
 
-    public function getPassword()
+    public function getPassword(): void
     {
     }
 
-    public function getSalt()
+    public function getSalt(): void
     {
     }
 
@@ -52,11 +52,11 @@ class User implements UserInterface
         return $this->name;
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 
-    public function equals(UserInterface $user)
+    public function equals(UserInterface $user): void
     {
     }
 }

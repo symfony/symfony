@@ -33,7 +33,7 @@ class RecursiveValidatorTest extends AbstractTest
         return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $objectInitializers);
     }
 
-    public function testEmptyGroupsArrayDoesNotTriggerDeprecation()
+    public function testEmptyGroupsArrayDoesNotTriggerDeprecation(): void
     {
         $entity = new Entity();
         $childA = new ChildA();
@@ -62,7 +62,7 @@ class RecursiveValidatorTest extends AbstractTest
         $validator->validate($entity, null, array());
     }
 
-    public function testRelationBetweenChildAAndChildB()
+    public function testRelationBetweenChildAAndChildB(): void
     {
         $entity = new Entity();
         $childA = new ChildA();

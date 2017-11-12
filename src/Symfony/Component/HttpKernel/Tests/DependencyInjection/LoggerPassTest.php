@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class LoggerPassTest extends TestCase
 {
-    public function testAlwaysSetAutowiringAlias()
+    public function testAlwaysSetAutowiringAlias(): void
     {
         $container = new ContainerBuilder();
         $container->register('logger', 'Foo');
@@ -32,7 +32,7 @@ class LoggerPassTest extends TestCase
         $this->assertFalse($container->getAlias(LoggerInterface::class)->isPublic());
     }
 
-    public function testDoNotOverrideExistingLogger()
+    public function testDoNotOverrideExistingLogger(): void
     {
         $container = new ContainerBuilder();
         $container->register('logger', 'Foo');
@@ -42,7 +42,7 @@ class LoggerPassTest extends TestCase
         $this->assertSame('Foo', $container->getDefinition('logger')->getClass());
     }
 
-    public function testRegisterLogger()
+    public function testRegisterLogger(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

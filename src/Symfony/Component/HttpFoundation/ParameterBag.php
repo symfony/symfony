@@ -56,7 +56,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param array $parameters An array of parameters
      */
-    public function replace(array $parameters = array())
+    public function replace(array $parameters = array()): void
     {
         $this->parameters = $parameters;
     }
@@ -66,7 +66,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param array $parameters An array of parameters
      */
-    public function add(array $parameters = array())
+    public function add(array $parameters = array()): void
     {
         $this->parameters = array_replace($this->parameters, $parameters);
     }
@@ -90,7 +90,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * @param string $key   The key
      * @param mixed  $value The value
      */
-    public function set($key, $value)
+    public function set($key, $value): void
     {
         $this->parameters[$key] = $value;
     }
@@ -112,7 +112,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The key
      */
-    public function remove($key)
+    public function remove($key): void
     {
         unset($this->parameters[$key]);
     }

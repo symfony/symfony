@@ -46,7 +46,7 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    private function addFormThemesSection(ArrayNodeDefinition $rootNode)
+    private function addFormThemesSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('form_theme')
@@ -66,7 +66,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addGlobalsSection(ArrayNodeDefinition $rootNode)
+    private function addGlobalsSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('global')
@@ -115,7 +115,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addTwigOptions(ArrayNodeDefinition $rootNode)
+    private function addTwigOptions(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->fixXmlConfig('path')
@@ -166,7 +166,7 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addTwigFormatOptions(ArrayNodeDefinition $rootNode)
+    private function addTwigFormatOptions(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
             ->children()

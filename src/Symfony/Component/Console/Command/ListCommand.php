@@ -28,7 +28,7 @@ class ListCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('list')
@@ -66,7 +66,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $helper = new DescriptorHelper();
         $helper->describe($output, $this->getApplication(), array(

@@ -187,7 +187,7 @@ class ArrayChoiceList implements ChoiceListInterface
      *
      * @internal
      */
-    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues)
+    protected function flatten(array $choices, $value, &$choicesByValues, &$keysByValues, &$structuredValues): void
     {
         if (null === $choicesByValues) {
             $choicesByValues = array();

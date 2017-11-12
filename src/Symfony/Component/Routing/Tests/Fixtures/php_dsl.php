@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Routing\Loader\Configurator;
 
-return function (RoutingConfigurator $routes) {
+return function (RoutingConfigurator $routes): void {
     $routes
         ->add('foo', '/foo')
             ->condition('abc')

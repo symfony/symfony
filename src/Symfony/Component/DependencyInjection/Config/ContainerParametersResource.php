@@ -49,7 +49,7 @@ class ContainerParametersResource implements ResourceInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $this->parameters = unserialize($serialized);
     }

@@ -62,7 +62,7 @@ abstract class Client
      *
      * @param bool $followRedirect Whether to follow redirects
      */
-    public function followRedirects($followRedirect = true)
+    public function followRedirects($followRedirect = true): void
     {
         $this->followRedirects = (bool) $followRedirect;
     }
@@ -82,7 +82,7 @@ abstract class Client
      *
      * @param int $maxRedirects
      */
-    public function setMaxRedirects($maxRedirects)
+    public function setMaxRedirects($maxRedirects): void
     {
         $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
         $this->followRedirects = -1 != $this->maxRedirects;
@@ -105,7 +105,7 @@ abstract class Client
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
      */
-    public function insulate($insulated = true)
+    public function insulate($insulated = true): void
     {
         if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
             throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
@@ -119,7 +119,7 @@ abstract class Client
      *
      * @param array $server An array of server parameters
      */
-    public function setServerParameters(array $server)
+    public function setServerParameters(array $server): void
     {
         $this->server = array_merge(array(
             'HTTP_USER_AGENT' => 'Symfony BrowserKit',
@@ -132,7 +132,7 @@ abstract class Client
      * @param string $key   A key of the parameter
      * @param string $value A value of the parameter
      */
-    public function setServerParameter($key, $value)
+    public function setServerParameter($key, $value): void
     {
         $this->server[$key] = $value;
     }
@@ -384,7 +384,7 @@ abstract class Client
      *
      * @throws \LogicException When this abstract class is not implemented
      */
-    protected function getScript($request)
+    protected function getScript($request): void
     {
         throw new \LogicException('To insulate requests, you need to override the getScript() method.');
     }
@@ -530,7 +530,7 @@ abstract class Client
      *
      * It flushes history and all cookies.
      */
-    public function restart()
+    public function restart(): void
     {
         $this->cookieJar->clear();
         $this->history->clear();

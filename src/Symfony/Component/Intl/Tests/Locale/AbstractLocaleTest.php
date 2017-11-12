@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class AbstractLocaleTest extends TestCase
 {
-    public function testSetDefault()
+    public function testSetDefault(): void
     {
         $this->call('setDefault', 'en_GB');
 

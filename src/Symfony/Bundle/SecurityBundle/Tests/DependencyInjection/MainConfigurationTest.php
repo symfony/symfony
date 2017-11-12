@@ -36,7 +36,7 @@ class MainConfigurationTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
-    public function testNoConfigForProvider()
+    public function testNoConfigForProvider(): void
     {
         $config = array(
             'providers' => array(
@@ -52,7 +52,7 @@ class MainConfigurationTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
-    public function testManyConfigForProvider()
+    public function testManyConfigForProvider(): void
     {
         $config = array(
             'providers' => array(
@@ -68,7 +68,7 @@ class MainConfigurationTest extends TestCase
         $processor->processConfiguration($configuration, array($config));
     }
 
-    public function testCsrfAliases()
+    public function testCsrfAliases(): void
     {
         $config = array(
             'firewalls' => array(
@@ -92,7 +92,7 @@ class MainConfigurationTest extends TestCase
         $this->assertEquals('a_token_id', $processedConfig['firewalls']['stub']['logout']['csrf_token_id']);
     }
 
-    public function testDefaultUserCheckers()
+    public function testDefaultUserCheckers(): void
     {
         $processor = new Processor();
         $configuration = new MainConfiguration(array(), array());
@@ -101,7 +101,7 @@ class MainConfigurationTest extends TestCase
         $this->assertEquals('security.user_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 
-    public function testUserCheckers()
+    public function testUserCheckers(): void
     {
         $config = array(
             'firewalls' => array(

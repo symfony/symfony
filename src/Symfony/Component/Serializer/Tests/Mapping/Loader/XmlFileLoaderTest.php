@@ -30,30 +30,30 @@ class XmlFileLoaderTest extends TestCase
      */
     private $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new XmlFileLoader(__DIR__.'/../../Fixtures/serialization.xml');
         $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
     }
 
-    public function testInterface()
+    public function testInterface(): void
     {
         $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\Loader\LoaderInterface', $this->loader);
     }
 
-    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    public function testLoadClassMetadataReturnsTrueIfSuccessful(): void
     {
         $this->assertTrue($this->loader->loadClassMetadata($this->metadata));
     }
 
-    public function testLoadClassMetadata()
+    public function testLoadClassMetadata(): void
     {
         $this->loader->loadClassMetadata($this->metadata);
 
         $this->assertEquals(TestClassMetadataFactory::createXmlCLassMetadata(), $this->metadata);
     }
 
-    public function testMaxDepth()
+    public function testMaxDepth(): void
     {
         $classMetadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy');
         $this->loader->loadClassMetadata($classMetadata);

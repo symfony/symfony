@@ -4,7 +4,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
 
-return function (ContainerConfigurator $c) {
+return function (ContainerConfigurator $c): void {
     $c->parameters()
         ('foo', 'Foo')
         ('bar', 'Bar')

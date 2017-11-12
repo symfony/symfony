@@ -67,7 +67,7 @@ final class User implements AdvancedUserInterface
     /**
      * {@inheritdoc}
      */
-    public function getSalt()
+    public function getSalt(): void
     {
     }
 
@@ -114,7 +114,7 @@ final class User implements AdvancedUserInterface
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 }

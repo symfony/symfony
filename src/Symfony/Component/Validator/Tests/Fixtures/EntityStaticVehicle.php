@@ -18,7 +18,7 @@ class EntityStaticVehicle
 {
     public $wheels;
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('wheels', new Length(array('max' => 99)));
     }

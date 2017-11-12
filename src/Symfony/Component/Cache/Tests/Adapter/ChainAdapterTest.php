@@ -33,7 +33,7 @@ class ChainAdapterTest extends AdapterTestCase
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage At least one adapter must be specified.
      */
-    public function testEmptyAdaptersException()
+    public function testEmptyAdaptersException(): void
     {
         new ChainAdapter(array());
     }
@@ -42,12 +42,12 @@ class ChainAdapterTest extends AdapterTestCase
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage The class "stdClass" does not implement
      */
-    public function testInvalidAdapterException()
+    public function testInvalidAdapterException(): void
     {
         new ChainAdapter(array(new \stdClass()));
     }
 
-    public function testPrune()
+    public function testPrune(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);

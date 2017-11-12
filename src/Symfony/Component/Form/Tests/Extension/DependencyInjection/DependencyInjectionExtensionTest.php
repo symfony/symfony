@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
 
 class DependencyInjectionExtensionTest extends TestCase
 {
-    public function testGetTypeExtensions()
+    public function testGetTypeExtensions(): void
     {
         $container = $this->createContainerMock();
         $container->expects($this->never())->method('get');
@@ -44,7 +44,7 @@ class DependencyInjectionExtensionTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
-    public function testThrowExceptionForInvalidExtendedType()
+    public function testThrowExceptionForInvalidExtendedType(): void
     {
         $container = $this->getMockBuilder('Psr\Container\ContainerInterface')->getMock();
         $container->expects($this->never())->method('get');
@@ -58,7 +58,7 @@ class DependencyInjectionExtensionTest extends TestCase
         $extension->getTypeExtensions('test');
     }
 
-    public function testGetTypeGuesser()
+    public function testGetTypeGuesser(): void
     {
         $container = $this->createContainerMock();
         $extension = new DependencyInjectionExtension($container, array(), array($this->getMockBuilder(FormTypeGuesserInterface::class)->getMock()));
@@ -66,7 +66,7 @@ class DependencyInjectionExtensionTest extends TestCase
         $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
     }
 
-    public function testGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured()
+    public function testGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured(): void
     {
         $container = $this->createContainerMock();
         $extension = new DependencyInjectionExtension($container, array(), array());

@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgume
 
 class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument(array());
@@ -60,7 +60,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame($expectedLog, $container->getCompiler()->getLog());
     }
 
-    public function testSameIdClass()
+    public function testSameIdClass(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument(array());
@@ -79,7 +79,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals($expected, array_keys($container->getDefinition((string) $resolver->getArgument(0))->getArgument(0)));
     }
 
-    public function testInvoke()
+    public function testInvoke(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument(array());
@@ -97,7 +97,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         );
     }
 
-    public function testInvokeSameIdClass()
+    public function testInvokeSameIdClass(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument(array());
@@ -120,25 +120,25 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
 
 class RemoveTestController1
 {
-    public function fooAction(\stdClass $bar, ClassNotInContainer $baz)
+    public function fooAction(\stdClass $bar, ClassNotInContainer $baz): void
     {
     }
 }
 
 class RemoveTestController2
 {
-    public function setTestCase(TestCase $test)
+    public function setTestCase(TestCase $test): void
     {
     }
 
-    public function fooAction(ClassNotInContainer $bar)
+    public function fooAction(ClassNotInContainer $bar): void
     {
     }
 }
 
 class InvokableRegisterTestController
 {
-    public function __invoke(\stdClass $bar)
+    public function __invoke(\stdClass $bar): void
     {
     }
 }

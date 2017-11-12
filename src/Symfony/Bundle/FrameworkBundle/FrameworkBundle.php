@@ -59,7 +59,7 @@ use Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass;
  */
 class FrameworkBundle extends Bundle
 {
-    public function boot()
+    public function boot(): void
     {
         ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
 
@@ -72,7 +72,7 @@ class FrameworkBundle extends Bundle
         }
     }
 
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -123,7 +123,7 @@ class FrameworkBundle extends Bundle
         }
     }
 
-    private function addCompilerPassIfExists(ContainerBuilder $container, $class, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, $priority = 0)
+    private function addCompilerPassIfExists(ContainerBuilder $container, $class, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, $priority = 0): void
     {
         $container->addResource(new ClassExistenceResource($class));
 
@@ -132,7 +132,7 @@ class FrameworkBundle extends Bundle
         }
     }
 
-    public function registerCommands(Application $application)
+    public function registerCommands(Application $application): void
     {
         // noop
     }

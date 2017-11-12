@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 
 class SerializerCacheWarmerTest extends TestCase
 {
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
             $this->markTestSkipped('The Serializer default cache warmer has been introduced in the Serializer Component version 3.2.');
@@ -56,7 +56,7 @@ class SerializerCacheWarmerTest extends TestCase
         $this->assertArrayHasKey('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author', $values);
     }
 
-    public function testWarmUpWithoutLoader()
+    public function testWarmUpWithoutLoader(): void
     {
         if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
             $this->markTestSkipped('The Serializer default cache warmer has been introduced in the Serializer Component version 3.2.');

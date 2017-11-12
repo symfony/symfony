@@ -27,7 +27,7 @@ class LdapUserProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
-    public function testLoadUserByUsernameFailsIfCantConnectToLdap()
+    public function testLoadUserByUsernameFailsIfCantConnectToLdap(): void
     {
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $ldap
@@ -43,7 +43,7 @@ class LdapUserProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
-    public function testLoadUserByUsernameFailsIfNoLdapEntries()
+    public function testLoadUserByUsernameFailsIfNoLdapEntries(): void
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
@@ -76,7 +76,7 @@ class LdapUserProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
-    public function testLoadUserByUsernameFailsIfMoreThanOneLdapEntry()
+    public function testLoadUserByUsernameFailsIfMoreThanOneLdapEntry(): void
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
@@ -109,7 +109,7 @@ class LdapUserProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\InvalidArgumentException
      */
-    public function testLoadUserByUsernameFailsIfMoreThanOneLdapPasswordsInEntry()
+    public function testLoadUserByUsernameFailsIfMoreThanOneLdapPasswordsInEntry(): void
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
@@ -152,7 +152,7 @@ class LdapUserProviderTest extends TestCase
         );
     }
 
-    public function testLoadUserByUsernameShouldNotFailIfEntryHasNoUidKeyAttribute()
+    public function testLoadUserByUsernameShouldNotFailIfEntryHasNoUidKeyAttribute(): void
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
@@ -194,7 +194,7 @@ class LdapUserProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\InvalidArgumentException
      */
-    public function testLoadUserByUsernameFailsIfEntryHasNoPasswordAttribute()
+    public function testLoadUserByUsernameFailsIfEntryHasNoPasswordAttribute(): void
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
@@ -236,7 +236,7 @@ class LdapUserProviderTest extends TestCase
         );
     }
 
-    public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttribute()
+    public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttribute(): void
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
@@ -278,7 +278,7 @@ class LdapUserProviderTest extends TestCase
         );
     }
 
-    public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttributeAndWrongCase()
+    public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttributeAndWrongCase(): void
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
@@ -317,7 +317,7 @@ class LdapUserProviderTest extends TestCase
         $this->assertSame('foo', $provider->loadUserByUsername('Foo')->getUsername());
     }
 
-    public function testLoadUserByUsernameIsSuccessfulWithPasswordAttribute()
+    public function testLoadUserByUsernameIsSuccessfulWithPasswordAttribute(): void
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();

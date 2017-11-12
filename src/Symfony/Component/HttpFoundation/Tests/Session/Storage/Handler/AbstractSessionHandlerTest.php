@@ -17,7 +17,7 @@ class AbstractSessionHandlerTest extends TestCase
 {
     private static $server;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $spec = array(
             1 => array('file', '/dev/null', 'w'),
@@ -29,7 +29,7 @@ class AbstractSessionHandlerTest extends TestCase
         sleep(1);
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         if (self::$server) {
             proc_terminate(self::$server);
@@ -40,7 +40,7 @@ class AbstractSessionHandlerTest extends TestCase
     /**
      * @dataProvider provideSession
      */
-    public function testSession($fixture)
+    public function testSession($fixture): void
     {
         $context = array('http' => array('header' => "Cookie: sid=123abc\r\n"));
         $context = stream_context_create($context);

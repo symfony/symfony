@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
  */
 class ResolveNamedArgumentsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -42,7 +42,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $this->assertEquals(array(array('setApiKey', array('123'))), $definition->getMethodCalls());
     }
 
-    public function testWithFactory()
+    public function testWithFactory(): void
     {
         $container = new ContainerBuilder();
 
@@ -60,7 +60,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
-    public function testClassNull()
+    public function testClassNull(): void
     {
         $container = new ContainerBuilder();
 
@@ -74,7 +74,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
-    public function testClassNotExist()
+    public function testClassNotExist(): void
     {
         $container = new ContainerBuilder();
 
@@ -88,7 +88,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
-    public function testClassNoConstructor()
+    public function testClassNoConstructor(): void
     {
         $container = new ContainerBuilder();
 
@@ -102,7 +102,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
-    public function testArgumentNotFound()
+    public function testArgumentNotFound(): void
     {
         $container = new ContainerBuilder();
 
@@ -113,7 +113,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testTypedArgument()
+    public function testTypedArgument(): void
     {
         $container = new ContainerBuilder();
 
@@ -129,7 +129,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
 
 class NoConstructor
 {
-    public static function create($apiKey)
+    public static function create($apiKey): void
     {
     }
 }

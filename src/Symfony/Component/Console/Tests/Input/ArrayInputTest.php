@@ -19,7 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ArrayInputTest extends TestCase
 {
-    public function testGetFirstArgument()
+    public function testGetFirstArgument(): void
     {
         $input = new ArrayInput(array());
         $this->assertNull($input->getFirstArgument(), '->getFirstArgument() returns null if no argument were passed');
@@ -29,7 +29,7 @@ class ArrayInputTest extends TestCase
         $this->assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
     }
 
-    public function testHasParameterOption()
+    public function testHasParameterOption(): void
     {
         $input = new ArrayInput(array('name' => 'Fabien', '--foo' => 'bar'));
         $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if an option is present in the passed parameters');
@@ -43,7 +43,7 @@ class ArrayInputTest extends TestCase
         $this->assertFalse($input->hasParameterOption('--bar', true), '->hasParameterOption() returns false if an option is present in the passed parameters after an end of options signal');
     }
 
-    public function testGetParameterOption()
+    public function testGetParameterOption(): void
     {
         $input = new ArrayInput(array('name' => 'Fabien', '--foo' => 'bar'));
         $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
@@ -57,7 +57,7 @@ class ArrayInputTest extends TestCase
         $this->assertFalse($input->getParameterOption('--bar', false, true), '->getParameterOption() returns false if an option is present in the passed parameters after an end of options signal');
     }
 
-    public function testParseArguments()
+    public function testParseArguments(): void
     {
         $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));
 
@@ -67,7 +67,7 @@ class ArrayInputTest extends TestCase
     /**
      * @dataProvider provideOptions
      */
-    public function testParseOptions($input, $options, $expectedOptions, $message)
+    public function testParseOptions($input, $options, $expectedOptions, $message): void
     {
         $input = new ArrayInput($input, new InputDefinition($options));
 
@@ -125,7 +125,7 @@ class ArrayInputTest extends TestCase
     /**
      * @dataProvider provideInvalidInput
      */
-    public function testParseInvalidInput($parameters, $definition, $expectedExceptionMessage)
+    public function testParseInvalidInput($parameters, $definition, $expectedExceptionMessage): void
     {
         if (method_exists($this, 'expectException')) {
             $this->expectException('InvalidArgumentException');
@@ -163,7 +163,7 @@ class ArrayInputTest extends TestCase
         );
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $input = new ArrayInput(array('-f' => null, '-b' => 'bar', '--foo' => 'b a z', '--lala' => null, 'test' => 'Foo', 'test2' => "A\nB'C"));
         $this->assertEquals('-f -b=bar --foo='.escapeshellarg('b a z').' --lala Foo '.escapeshellarg("A\nB'C"), (string) $input);

@@ -65,12 +65,12 @@ EOTXT
     }
 
     /** @dataProvider getCastFileInfoTests */
-    public function testCastFileInfo($file, $dump)
+    public function testCastFileInfo($file, $dump): void
     {
         $this->assertDumpMatchesFormat($dump, new \SplFileInfo($file));
     }
 
-    public function testCastFileObject()
+    public function testCastFileObject(): void
     {
         $var = new \SplFileObject(__FILE__);
         $var->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::SKIP_EMPTY);
@@ -122,7 +122,7 @@ EOTXT;
     /**
      * @dataProvider provideCastSplDoublyLinkedList
      */
-    public function testCastSplDoublyLinkedList($modeValue, $modeDump)
+    public function testCastSplDoublyLinkedList($modeValue, $modeDump): void
     {
         $var = new \SplDoublyLinkedList();
         $var->setIteratorMode($modeValue);

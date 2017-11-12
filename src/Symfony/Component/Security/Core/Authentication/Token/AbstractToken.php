@@ -166,7 +166,7 @@ abstract class AbstractToken implements TokenInterface
      *
      * @return array The token attributes
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -188,7 +188,7 @@ abstract class AbstractToken implements TokenInterface
      *
      * @return bool true if the attribute exists, false otherwise
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name): bool
     {
         return array_key_exists($name, $this->attributes);
     }
@@ -202,7 +202,7 @@ abstract class AbstractToken implements TokenInterface
      *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
-    public function getAttribute($name)
+    public function getAttribute(string $name)
     {
         if (!array_key_exists($name, $this->attributes)) {
             throw new \InvalidArgumentException(sprintf('This token has no "%s" attribute.', $name));
@@ -217,7 +217,7 @@ abstract class AbstractToken implements TokenInterface
      * @param string $name  The attribute name
      * @param mixed  $value The attribute value
      */
-    public function setAttribute($name, $value): void
+    public function setAttribute(string $name, $value): void
     {
         $this->attributes[$name] = $value;
     }

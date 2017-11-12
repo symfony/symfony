@@ -41,7 +41,7 @@ class FilterControllerEvent extends KernelEvent
      *
      * @return callable
      */
-    public function getController()
+    public function getController(): callable
     {
         return $this->controller;
     }

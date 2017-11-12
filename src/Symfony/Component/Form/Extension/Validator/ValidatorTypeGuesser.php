@@ -75,7 +75,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return TypeGuess|null The guessed field class and options
      */
-    public function guessTypeForConstraint(Constraint $constraint)
+    public function guessTypeForConstraint(Constraint $constraint): ?TypeGuess
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Type':
@@ -160,7 +160,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return ValueGuess|null The guess whether the field is required
      */
-    public function guessRequiredForConstraint(Constraint $constraint)
+    public function guessRequiredForConstraint(Constraint $constraint): ?ValueGuess
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\NotNull':
@@ -175,7 +175,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return ValueGuess|null The guess for the maximum length
      */
-    public function guessMaxLengthForConstraint(Constraint $constraint)
+    public function guessMaxLengthForConstraint(Constraint $constraint): ?ValueGuess
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Length':
@@ -203,7 +203,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return ValueGuess|null The guess for the pattern
      */
-    public function guessPatternForConstraint(Constraint $constraint)
+    public function guessPatternForConstraint(Constraint $constraint): ?ValueGuess
     {
         switch (get_class($constraint)) {
             case 'Symfony\Component\Validator\Constraints\Length':
@@ -247,7 +247,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *
      * @return Guess|null The guessed value with the highest confidence
      */
-    protected function guess($class, $property, \Closure $closure, $defaultValue = null)
+    protected function guess(string $class, string $property, \Closure $closure, $defaultValue = null): ?Guess
     {
         $guesses = array();
         $classMetadata = $this->metadataFactory->getMetadataFor($class);

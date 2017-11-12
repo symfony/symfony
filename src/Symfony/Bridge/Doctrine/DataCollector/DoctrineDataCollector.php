@@ -46,7 +46,7 @@ class DoctrineDataCollector extends DataCollector
      *
      * @param string $name
      */
-    public function addLogger($name, DebugStack $logger): void
+    public function addLogger(string $name, DebugStack $logger): void
     {
         $this->loggers[$name] = $logger;
     }

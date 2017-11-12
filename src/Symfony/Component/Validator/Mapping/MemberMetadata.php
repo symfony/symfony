@@ -100,7 +100,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -128,7 +128,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      *
      * @return bool
      */
-    public function isPublic($objectOrClassName)
+    public function isPublic($objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isPublic();
     }
@@ -140,7 +140,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      *
      * @return bool
      */
-    public function isProtected($objectOrClassName)
+    public function isProtected($objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isProtected();
     }
@@ -152,7 +152,7 @@ abstract class MemberMetadata extends GenericMetadata implements PropertyMetadat
      *
      * @return bool
      */
-    public function isPrivate($objectOrClassName)
+    public function isPrivate($objectOrClassName): bool
     {
         return $this->getReflectionMember($objectOrClassName)->isPrivate();
     }

@@ -53,7 +53,7 @@ class Tokenizer
      *
      * @return TokenStream
      */
-    public function tokenize(Reader $reader)
+    public function tokenize(Reader $reader): TokenStream
     {
         $stream = new TokenStream();
 

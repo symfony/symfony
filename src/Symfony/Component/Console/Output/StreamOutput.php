@@ -88,7 +88,7 @@ class StreamOutput extends Output
      *
      * @return bool true if the stream supports colorization, false otherwise
      */
-    protected function hasColorSupport()
+    protected function hasColorSupport(): bool
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             return

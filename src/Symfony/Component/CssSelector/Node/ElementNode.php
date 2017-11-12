@@ -39,7 +39,7 @@ class ElementNode extends AbstractNode
     /**
      * @return null|string
      */
-    public function getNamespace()
+    public function getNamespace(): ?string
     {
         return $this->namespace;
     }
@@ -47,7 +47,7 @@ class ElementNode extends AbstractNode
     /**
      * @return null|string
      */
-    public function getElement()
+    public function getElement(): ?string
     {
         return $this->element;
     }

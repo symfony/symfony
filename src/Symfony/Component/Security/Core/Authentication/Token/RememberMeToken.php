@@ -64,7 +64,7 @@ class RememberMeToken extends AbstractToken
      *
      * @return string The provider secret
      */
-    public function getProviderKey()
+    public function getProviderKey(): string
     {
         return $this->providerKey;
     }
@@ -74,7 +74,7 @@ class RememberMeToken extends AbstractToken
      *
      * @return string
      */
-    public function getSecret()
+    public function getSecret(): string
     {
         return $this->secret;
     }

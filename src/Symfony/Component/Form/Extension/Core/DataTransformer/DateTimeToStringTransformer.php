@@ -77,7 +77,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
-    public function transform($dateTime)
+    public function transform(\DateTimeInterface $dateTime): string
     {
         if (null === $dateTime) {
             return '';
@@ -106,7 +106,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not a string,
      *                                       or could not be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(string $value)
     {
         if (empty($value)) {
             return;

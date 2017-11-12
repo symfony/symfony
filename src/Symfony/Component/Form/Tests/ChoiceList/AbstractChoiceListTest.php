@@ -221,9 +221,9 @@ abstract class AbstractChoiceListTest extends TestCase
     /**
      * @return \Symfony\Component\Form\ChoiceList\ChoiceListInterface
      */
-    abstract protected function createChoiceList();
+    abstract protected function createChoiceList(): \Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 
-    abstract protected function getChoices();
+    abstract protected function getChoices(): void;
 
-    abstract protected function getValues();
+    abstract protected function getValues(): void;
 }

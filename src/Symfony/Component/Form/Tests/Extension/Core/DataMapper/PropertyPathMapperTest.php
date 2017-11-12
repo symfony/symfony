@@ -43,7 +43,7 @@ class PropertyPathMapperTest extends TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getPropertyPath($path)
+    private function getPropertyPath($path): \PHPUnit_Framework_MockObject_MockObject
     {
         return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
             ->setConstructorArgs(array($path))
@@ -54,7 +54,7 @@ class PropertyPathMapperTest extends TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getForm(FormConfigInterface $config, bool $synchronized = true, bool $submitted = true)
+    private function getForm(FormConfigInterface $config, bool $synchronized = true, bool $submitted = true): \PHPUnit_Framework_MockObject_MockObject
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->setConstructorArgs(array($config))

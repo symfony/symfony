@@ -44,7 +44,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
      * @param UserProviderInterface             $userProvider        The user provider
      * @param string                            $providerKey         The provider (i.e. firewall) key
      */
-    public function __construct($guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker)
+    public function __construct(iterable $guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker)
     {
         $this->guardAuthenticators = $guardAuthenticators;
         $this->userProvider = $userProvider;
@@ -59,7 +59,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
      *
      * @return TokenInterface
      */
-    public function authenticate(TokenInterface $token)
+    public function authenticate(TokenInterface $token): TokenInterface
     {
         if (!$this->supports($token)) {
             throw new \InvalidArgumentException('GuardAuthenticationProvider only supports GuardTokenInterface.');

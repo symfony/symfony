@@ -66,7 +66,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
      */
-    protected function getBarService()
+    protected function getBarService(): \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
     {
         return $this->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar($this->getEnv('QUZ'));
     }
@@ -140,7 +140,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
      *
      * @throws InvalidArgumentException When the dynamic parameter does not exist
      */
-    private function getDynamicParameter($name)
+    private function getDynamicParameter(string $name)
     {
         switch ($name) {
             case 'bar': $value = $this->getEnv('FOO'); break;
@@ -160,7 +160,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
      *
      * @return array An array of the default parameters
      */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return array(
             'project_dir' => '/foo/bar',

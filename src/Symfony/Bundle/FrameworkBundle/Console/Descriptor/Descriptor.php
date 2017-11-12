@@ -84,7 +84,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return OutputInterface The output
      */
-    protected function getOutput()
+    protected function getOutput(): OutputInterface
     {
         return $this->output;
     }
@@ -95,7 +95,7 @@ abstract class Descriptor implements DescriptorInterface
      * @param string $content
      * @param bool   $decorated
      */
-    protected function write($content, $decorated = false): void
+    protected function write(string $content, bool $decorated = false): void
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
     }
@@ -103,22 +103,22 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Describes an InputArgument instance.
      */
-    abstract protected function describeRouteCollection(RouteCollection $routes, array $options = array());
+    abstract protected function describeRouteCollection(RouteCollection $routes, array $options = array()): void;
 
     /**
      * Describes an InputOption instance.
      */
-    abstract protected function describeRoute(Route $route, array $options = array());
+    abstract protected function describeRoute(Route $route, array $options = array()): void;
 
     /**
      * Describes container parameters.
      */
-    abstract protected function describeContainerParameters(ParameterBag $parameters, array $options = array());
+    abstract protected function describeContainerParameters(ParameterBag $parameters, array $options = array()): void;
 
     /**
      * Describes container tags.
      */
-    abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = array());
+    abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = array()): void;
 
     /**
      * Describes a container service by its name.
@@ -129,7 +129,7 @@ abstract class Descriptor implements DescriptorInterface
      * @param Definition|Alias|object $service
      * @param ContainerBuilder|null   $builder
      */
-    abstract protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null);
+    abstract protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null): void;
 
     /**
      * Describes container services.
@@ -137,22 +137,22 @@ abstract class Descriptor implements DescriptorInterface
      * Common options are:
      * * tag: filters described services by given tag
      */
-    abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = array());
+    abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = array()): void;
 
     /**
      * Describes a service definition.
      */
-    abstract protected function describeContainerDefinition(Definition $definition, array $options = array());
+    abstract protected function describeContainerDefinition(Definition $definition, array $options = array()): void;
 
     /**
      * Describes a service alias.
      */
-    abstract protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null);
+    abstract protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null): void;
 
     /**
      * Describes a container parameter.
      */
-    abstract protected function describeContainerParameter($parameter, array $options = array());
+    abstract protected function describeContainerParameter($parameter, array $options = array()): void;
 
     /**
      * Describes event dispatcher listeners.
@@ -160,14 +160,14 @@ abstract class Descriptor implements DescriptorInterface
      * Common options are:
      * * name: name of listened event
      */
-    abstract protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array());
+    abstract protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array()): void;
 
     /**
      * Describes a callable.
      *
      * @param callable $callable
      */
-    abstract protected function describeCallable($callable, array $options = array());
+    abstract protected function describeCallable(callable $callable, array $options = array()): void;
 
     /**
      * Formats a value as string.
@@ -176,7 +176,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string
      */
-    protected function formatValue($value)
+    protected function formatValue($value): string
     {
         if (is_object($value)) {
             return sprintf('object(%s)', get_class($value));
@@ -196,7 +196,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return string
      */
-    protected function formatParameter($value)
+    protected function formatParameter($value): string
     {
         if (is_bool($value) || is_array($value) || (null === $value)) {
             $jsonString = json_encode($value);
@@ -216,7 +216,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return mixed
      */
-    protected function resolveServiceDefinition(ContainerBuilder $builder, $serviceId)
+    protected function resolveServiceDefinition(ContainerBuilder $builder, string $serviceId)
     {
         if ($builder->hasDefinition($serviceId)) {
             return $builder->getDefinition($serviceId);
@@ -236,7 +236,7 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @return array
      */
-    protected function findDefinitionsByTag(ContainerBuilder $builder, $showPrivate)
+    protected function findDefinitionsByTag(ContainerBuilder $builder, bool $showPrivate): array
     {
         $definitions = array();
         $tags = $builder->findTags();

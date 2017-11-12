@@ -42,7 +42,7 @@ class CodeHelper extends Helper
      *
      * @return string
      */
-    public function formatArgsAsText(array $args)
+    public function formatArgsAsText(array $args): string
     {
         return strip_tags($this->formatArgs($args));
     }
@@ -76,7 +76,7 @@ class CodeHelper extends Helper
      *
      * @return string
      */
-    public function formatArgs(array $args)
+    public function formatArgs(array $args): string
     {
         $result = array();
         foreach ($args as $key => $item) {
@@ -112,7 +112,7 @@ class CodeHelper extends Helper
      *
      * @return string An HTML string
      */
-    public function fileExcerpt($file, $line)
+    public function fileExcerpt(string $file, int $line)
     {
         if (is_readable($file)) {
             if (extension_loaded('fileinfo')) {
@@ -149,7 +149,7 @@ class CodeHelper extends Helper
      *
      * @return string
      */
-    public function formatFile($file, $line, $text = null)
+    public function formatFile(string $file, int $line, string $text = null): string
     {
         $flags = ENT_QUOTES | ENT_SUBSTITUTE;
 
@@ -180,7 +180,7 @@ class CodeHelper extends Helper
      *
      * @return string A link of false
      */
-    public function getFileLink($file, $line)
+    public function getFileLink(string $file, int $line): string
     {
         if ($fmt = $this->fileLinkFormat) {
             return is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);

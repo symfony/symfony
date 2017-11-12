@@ -62,7 +62,7 @@ class DbalLogger implements SQLLogger
      * @param string $message A message to log
      * @param array  $params  The context
      */
-    protected function log($message, array $params): void
+    protected function log(string $message, array $params): void
     {
         $this->logger->debug($message, $params);
     }

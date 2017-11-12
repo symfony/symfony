@@ -58,7 +58,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEn
      *
      * @see http://lxr.php.net/xref/PHP_5_5/ext/standard/password.c#111
      */
-    public function encodePassword($raw, $salt)
+    public function encodePassword(string $raw, string $salt): string
     {
         if ($this->isPasswordTooLong($raw)) {
             throw new BadCredentialsException('Invalid password.');

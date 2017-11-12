@@ -44,7 +44,7 @@ class KernelEvent extends Event
      *
      * @return HttpKernelInterface
      */
-    public function getKernel()
+    public function getKernel(): HttpKernelInterface
     {
         return $this->kernel;
     }
@@ -54,7 +54,7 @@ class KernelEvent extends Event
      *
      * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -65,7 +65,7 @@ class KernelEvent extends Event
      * @return int One of HttpKernelInterface::MASTER_REQUEST and
      *             HttpKernelInterface::SUB_REQUEST
      */
-    public function getRequestType()
+    public function getRequestType(): int
     {
         return $this->requestType;
     }
@@ -75,7 +75,7 @@ class KernelEvent extends Event
      *
      * @return bool True if the request is a master request
      */
-    public function isMasterRequest()
+    public function isMasterRequest(): bool
     {
         return HttpKernelInterface::MASTER_REQUEST === $this->requestType;
     }

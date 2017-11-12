@@ -115,7 +115,7 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
      *
      * @throws \InvalidArgumentException if the template does not exist
      */
-    protected function load($name)
+    protected function load($name): Template
     {
         if ($name instanceof Template) {
             return $name;

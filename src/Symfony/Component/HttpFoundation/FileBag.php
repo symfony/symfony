@@ -111,7 +111,7 @@ class FileBag extends ParameterBag
      *
      * @return array
      */
-    protected function fixPhpFilesArray($data)
+    protected function fixPhpFilesArray($data): array
     {
         if (!is_array($data)) {
             return $data;

@@ -30,7 +30,7 @@ class JsonScriptDataProviderTest extends AbstractScriptDataProviderTest
     /**
      * @return BundleReaderInterface
      */
-    protected function createBundleReader()
+    protected function createBundleReader(): BundleReaderInterface
     {
         return new JsonBundleReader();
     }

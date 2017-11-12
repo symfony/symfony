@@ -139,7 +139,7 @@ abstract class Composite extends Constraint
      *
      * @return string The property name
      */
-    abstract protected function getCompositeOption();
+    abstract protected function getCompositeOption(): string;
 
     /**
      * Initializes the nested constraints.

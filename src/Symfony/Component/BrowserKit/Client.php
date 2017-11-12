@@ -62,7 +62,7 @@ abstract class Client
      *
      * @param bool $followRedirect Whether to follow redirects
      */
-    public function followRedirects($followRedirect = true): void
+    public function followRedirects(bool $followRedirect = true): void
     {
         $this->followRedirects = (bool) $followRedirect;
     }
@@ -72,7 +72,7 @@ abstract class Client
      *
      * @return bool
      */
-    public function isFollowingRedirects()
+    public function isFollowingRedirects(): bool
     {
         return $this->followRedirects;
     }
@@ -82,7 +82,7 @@ abstract class Client
      *
      * @param int $maxRedirects
      */
-    public function setMaxRedirects($maxRedirects): void
+    public function setMaxRedirects(int $maxRedirects): void
     {
         $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
         $this->followRedirects = -1 != $this->maxRedirects;
@@ -93,7 +93,7 @@ abstract class Client
      *
      * @return int
      */
-    public function getMaxRedirects()
+    public function getMaxRedirects(): int
     {
         return $this->maxRedirects;
     }
@@ -105,7 +105,7 @@ abstract class Client
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
      */
-    public function insulate($insulated = true): void
+    public function insulate(bool $insulated = true): void
     {
         if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
             throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
@@ -132,7 +132,7 @@ abstract class Client
      * @param string $key   A key of the parameter
      * @param string $value A value of the parameter
      */
-    public function setServerParameter($key, $value): void
+    public function setServerParameter(string $key, string $value): void
     {
         $this->server[$key] = $value;
     }
@@ -145,7 +145,7 @@ abstract class Client
      *
      * @return string A value of the parameter
      */
-    public function getServerParameter($key, $default = '')
+    public function getServerParameter(string $key, string $default = ''): string
     {
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
@@ -155,7 +155,7 @@ abstract class Client
      *
      * @return History A History instance
      */
-    public function getHistory()
+    public function getHistory(): History
     {
         return $this->history;
     }
@@ -165,7 +165,7 @@ abstract class Client
      *
      * @return CookieJar A CookieJar instance
      */
-    public function getCookieJar()
+    public function getCookieJar(): CookieJar
     {
         return $this->cookieJar;
     }
@@ -175,7 +175,7 @@ abstract class Client
      *
      * @return Crawler|null A Crawler instance
      */
-    public function getCrawler()
+    public function getCrawler(): ?Crawler
     {
         return $this->crawler;
     }
@@ -185,7 +185,7 @@ abstract class Client
      *
      * @return Response|null A BrowserKit Response instance
      */
-    public function getInternalResponse()
+    public function getInternalResponse(): ?Response
     {
         return $this->internalResponse;
     }
@@ -210,7 +210,7 @@ abstract class Client
      *
      * @return Request|null A BrowserKit Request instance
      */
-    public function getInternalRequest()
+    public function getInternalRequest(): ?Request
     {
         return $this->internalRequest;
     }
@@ -235,7 +235,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function click(Link $link)
+    public function click(Link $link): Crawler
     {
         if ($link instanceof Form) {
             return $this->submit($link);
@@ -252,7 +252,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function submit(Form $form, array $values = array())
+    public function submit(Form $form, array $values = array()): Crawler
     {
         $form->setValues($values);
 
@@ -272,7 +272,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function request(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true)
+    public function request(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true): Crawler
     {
         if ($this->isMainRequest) {
             $this->redirectCount = 0;
@@ -408,7 +408,7 @@ abstract class Client
      *
      * @return Response An BrowserKit Response instance
      */
-    protected function filterResponse($response)
+    protected function filterResponse($response): Response
     {
         return $response;
     }
@@ -424,7 +424,7 @@ abstract class Client
      *
      * @return Crawler|null
      */
-    protected function createCrawlerFromContent($uri, $content, $type)
+    protected function createCrawlerFromContent(string $uri, string $content, string $type)
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
             return;
@@ -441,7 +441,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function back()
+    public function back(): Crawler
     {
         do {
             $request = $this->history->back();
@@ -455,7 +455,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function forward()
+    public function forward(): Crawler
     {
         do {
             $request = $this->history->forward();
@@ -469,7 +469,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function reload()
+    public function reload(): Crawler
     {
         return $this->requestFromRequest($this->history->current(), false);
     }
@@ -481,7 +481,7 @@ abstract class Client
      *
      * @throws \LogicException If request was not a redirect
      */
-    public function followRedirect()
+    public function followRedirect(): Crawler
     {
         if (empty($this->redirect)) {
             throw new \LogicException('The request was not redirected.');
@@ -543,7 +543,7 @@ abstract class Client
      *
      * @return string An absolute URI
      */
-    protected function getAbsoluteUri($uri)
+    protected function getAbsoluteUri(string $uri): string
     {
         // already absolute?
         if (0 === strpos($uri, 'http://') || 0 === strpos($uri, 'https://')) {
@@ -590,7 +590,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    protected function requestFromRequest(Request $request, $changeHistory = true)
+    protected function requestFromRequest(Request $request, bool $changeHistory = true): Crawler
     {
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }

@@ -81,7 +81,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param string $info
      */
-    public function setInfo($info): void
+    public function setInfo(string $info): void
     {
         $this->setAttribute('info', $info);
     }
@@ -91,7 +91,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return string The info text
      */
-    public function getInfo()
+    public function getInfo(): string
     {
         return $this->getAttribute('info');
     }
@@ -132,7 +132,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param bool $boolean Required node
      */
-    public function setRequired($boolean): void
+    public function setRequired(bool $boolean): void
     {
         $this->required = (bool) $boolean;
     }
@@ -145,7 +145,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param string|null $message Deprecated message
      */
-    public function setDeprecated($message): void
+    public function setDeprecated(?string $message): void
     {
         $this->deprecationMessage = $message;
     }
@@ -155,7 +155,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @param bool $allow
      */
-    public function setAllowOverwrite($allow): void
+    public function setAllowOverwrite(bool $allow): void
     {
         $this->allowOverwrite = (bool) $allow;
     }
@@ -185,7 +185,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return bool
      */
-    public function isRequired()
+    public function isRequired(): bool
     {
         return $this->required;
     }
@@ -195,7 +195,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return bool
      */
-    public function isDeprecated()
+    public function isDeprecated(): bool
     {
         return null !== $this->deprecationMessage;
     }
@@ -208,7 +208,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return string
      */
-    public function getDeprecationMessage($node, $path)
+    public function getDeprecationMessage(string $node, string $path): string
     {
         return strtr($this->deprecationMessage, array('%node%' => $node, '%path%' => $path));
     }
@@ -218,7 +218,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return string The Node's name
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -228,7 +228,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return string The Node's path
      */
-    public function getPath()
+    public function getPath(): string
     {
         $path = $this->name;
 
@@ -302,7 +302,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return $value The normalized array value
      */
-    protected function preNormalize($value)
+    protected function preNormalize($value): $value
     {
         return $value;
     }
@@ -312,7 +312,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return NodeInterface|null
      */
-    public function getParent()
+    public function getParent(): ?NodeInterface
     {
         return $this->parent;
     }
@@ -355,7 +355,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @throws InvalidTypeException when the value is invalid
      */
-    abstract protected function validateType($value);
+    abstract protected function validateType($value): void;
 
     /**
      * Normalizes the value.

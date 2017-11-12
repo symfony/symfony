@@ -55,7 +55,7 @@ class PropertyAccessorBuilder
     /**
      * @return bool whether the use of "__call" by the PropertyAccessor is enabled
      */
-    public function isMagicCallEnabled()
+    public function isMagicCallEnabled(): bool
     {
         return $this->magicCall;
     }
@@ -92,7 +92,7 @@ class PropertyAccessorBuilder
     /**
      * @return bool whether an exception is thrown or null is returned when reading a non-existing index
      */
-    public function isExceptionOnInvalidIndexEnabled()
+    public function isExceptionOnInvalidIndexEnabled(): bool
     {
         return $this->throwExceptionOnInvalidIndex;
     }
@@ -104,7 +104,7 @@ class PropertyAccessorBuilder
      *
      * @return PropertyAccessorBuilder The builder object
      */
-    public function setCacheItemPool(CacheItemPoolInterface $cacheItemPool = null)
+    public function setCacheItemPool(CacheItemPoolInterface $cacheItemPool = null): PropertyAccessorBuilder
     {
         $this->cacheItemPool = $cacheItemPool;
 
@@ -116,7 +116,7 @@ class PropertyAccessorBuilder
      *
      * @return CacheItemPoolInterface|null
      */
-    public function getCacheItemPool()
+    public function getCacheItemPool(): ?CacheItemPoolInterface
     {
         return $this->cacheItemPool;
     }
@@ -126,7 +126,7 @@ class PropertyAccessorBuilder
      *
      * @return PropertyAccessorInterface The built PropertyAccessor
      */
-    public function getPropertyAccessor()
+    public function getPropertyAccessor(): PropertyAccessorInterface
     {
         return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool);
     }

@@ -36,7 +36,7 @@ class Filesystem
      * @throws FileNotFoundException When originFile doesn't exist
      * @throws IOException           When copy fails
      */
-    public function copy($originFile, $targetFile, $overwriteNewerFiles = false): void
+    public function copy(string $originFile, string $targetFile, bool $overwriteNewerFiles = false): void
     {
         $originIsLocal = stream_is_local($originFile) || 0 === stripos($originFile, 'file://');
         if ($originIsLocal && !is_file($originFile)) {
@@ -116,7 +116,7 @@ class Filesystem
      *
      * @return bool true if the file exists, false otherwise
      */
-    public function exists($files)
+    public function exists($files): bool
     {
         $maxPathLength = PHP_MAXPATHLEN - 2;
 
@@ -274,7 +274,7 @@ class Filesystem
      * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
      */
-    public function rename($origin, $target, $overwrite = false): void
+    public function rename(string $origin, string $target, bool $overwrite = false): void
     {
         // we check that target does not exist
         if (!$overwrite && $this->isReadable($target)) {
@@ -302,7 +302,7 @@ class Filesystem
      *
      * @throws IOException When windows path is longer than 258 characters
      */
-    private function isReadable($filename)
+    private function isReadable(string $filename): bool
     {
         $maxPathLength = PHP_MAXPATHLEN - 2;
 
@@ -322,7 +322,7 @@ class Filesystem
      *
      * @throws IOException When symlink fails
      */
-    public function symlink($originDir, $targetDir, $copyOnWindows = false): void
+    public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = false): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $originDir = strtr($originDir, '/', '\\');
@@ -360,7 +360,7 @@ class Filesystem
      * @throws FileNotFoundException When original file is missing or not a file
      * @throws IOException           When link fails, including if link already exists
      */
-    public function hardlink($originFile, $targetFiles): void
+    public function hardlink(string $originFile, $targetFiles): void
     {
         if (!$this->exists($originFile)) {
             throw new FileNotFoundException(null, 0, null, $originFile);
@@ -389,7 +389,7 @@ class Filesystem
      * @param string $target
      * @param string $linkType Name of the link type, typically 'symbolic' or 'hard'
      */
-    private function linkException($origin, $target, $linkType): void
+    private function linkException(string $origin, string $target, string $linkType): void
     {
         $report = error_get_last();
         if (is_array($report)) {
@@ -416,7 +416,7 @@ class Filesystem
      *
      * @return string|null
      */
-    public function readlink($path, $canonicalize = false)
+    public function readlink(string $path, bool $canonicalize = false)
     {
         if (!$canonicalize && !is_link($path)) {
             return;
@@ -449,7 +449,7 @@ class Filesystem
      *
      * @return string Path of target relative to starting path
      */
-    public function makePathRelative($endPath, $startPath)
+    public function makePathRelative(string $endPath, string $startPath): string
     {
         if (!$this->isAbsolutePath($startPath)) {
             throw new InvalidArgumentException(sprintf('The start path "%s" is not absolute.', $startPath));
@@ -535,7 +535,7 @@ class Filesystem
      *
      * @throws IOException When file type is unknown
      */
-    public function mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array()): void
+    public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = array()): void
     {
         $targetDir = rtrim($targetDir, '/\\');
         $originDir = rtrim($originDir, '/\\');
@@ -603,7 +603,7 @@ class Filesystem
      *
      * @return bool
      */
-    public function isAbsolutePath($file)
+    public function isAbsolutePath(string $file): bool
     {
         return strspn($file, '/\\', 0, 1)
             || (strlen($file) > 3 && ctype_alpha($file[0])
@@ -623,7 +623,7 @@ class Filesystem
      *
      * @return string The new temporary filename (with path), or throw an exception on failure
      */
-    public function tempnam($dir, $prefix)
+    public function tempnam(string $dir, string $prefix): string
     {
         list($scheme, $hierarchy) = $this->getSchemeAndHierarchy($dir);
 
@@ -674,7 +674,7 @@ class Filesystem
      *
      * @throws IOException if the file cannot be written to
      */
-    public function dumpFile($filename, $content): void
+    public function dumpFile(string $filename, string $content): void
     {
         $dir = dirname($filename);
 
@@ -707,7 +707,7 @@ class Filesystem
      *
      * @throws IOException If the file is not writable
      */
-    public function appendToFile($filename, $content): void
+    public function appendToFile(string $filename, string $content): void
     {
         $dir = dirname($filename);
 
@@ -729,7 +729,7 @@ class Filesystem
      *
      * @return \Traversable
      */
-    private function toIterator($files)
+    private function toIterator($files): \Traversable
     {
         if (!$files instanceof \Traversable) {
             $files = new \ArrayObject(is_array($files) ? $files : array($files));

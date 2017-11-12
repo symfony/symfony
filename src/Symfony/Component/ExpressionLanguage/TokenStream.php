@@ -36,7 +36,7 @@ class TokenStream
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return implode("\n", $this->tokens);
     }
@@ -76,7 +76,7 @@ class TokenStream
      *
      * @return bool
      */
-    public function isEOF()
+    public function isEOF(): bool
     {
         return Token::EOF_TYPE === $this->current->type;
     }
@@ -86,7 +86,7 @@ class TokenStream
      *
      * @return string
      */
-    public function getExpression()
+    public function getExpression(): string
     {
         return $this->expression;
     }

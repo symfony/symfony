@@ -46,7 +46,7 @@ class Caster
      *
      * @return array The array-cast of the object, with prefixed dynamic properties
      */
-    public static function castObject($obj, $class, $hasDebugInfo = false)
+    public static function castObject($obj, $class, $hasDebugInfo = false): array
     {
         if ($hasDebugInfo) {
             $a = $obj->__debugInfo();
@@ -104,7 +104,7 @@ class Caster
      *
      * @return array The filtered array
      */
-    public static function filter(array $a, $filter, array $listedProperties = array(), &$count = 0)
+    public static function filter(array $a, int $filter, array $listedProperties = array(), int &$count = 0): array
     {
         $count = 0;
 

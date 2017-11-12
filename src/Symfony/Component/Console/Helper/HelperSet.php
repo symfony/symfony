@@ -43,7 +43,7 @@ class HelperSet implements \IteratorAggregate
      * @param HelperInterface $helper The helper instance
      * @param string          $alias  An alias
      */
-    public function set(HelperInterface $helper, $alias = null): void
+    public function set(HelperInterface $helper, string $alias = null): void
     {
         $this->helpers[$helper->getName()] = $helper;
         if (null !== $alias) {
@@ -60,7 +60,7 @@ class HelperSet implements \IteratorAggregate
      *
      * @return bool true if the helper is defined, false otherwise
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return isset($this->helpers[$name]);
     }
@@ -74,7 +74,7 @@ class HelperSet implements \IteratorAggregate
      *
      * @throws InvalidArgumentException if the helper is not defined
      */
-    public function get($name)
+    public function get(string $name): HelperInterface
     {
         if (!$this->has($name)) {
             throw new InvalidArgumentException(sprintf('The helper "%s" is not defined.', $name));
@@ -93,7 +93,7 @@ class HelperSet implements \IteratorAggregate
      *
      * @return Command A Command instance
      */
-    public function getCommand()
+    public function getCommand(): Command
     {
         return $this->command;
     }

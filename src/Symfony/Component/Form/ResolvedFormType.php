@@ -180,7 +180,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      *
      * @return \Symfony\Component\OptionsResolver\OptionsResolver The options resolver
      */
-    public function getOptionsResolver()
+    public function getOptionsResolver(): \Symfony\Component\OptionsResolver\OptionsResolver
     {
         if (null === $this->optionsResolver) {
             if (null !== $this->parent) {
@@ -211,7 +211,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      *
      * @return FormBuilderInterface The new builder instance
      */
-    protected function newBuilder($name, $dataClass, FormFactoryInterface $factory, array $options)
+    protected function newBuilder(string $name, string $dataClass, FormFactoryInterface $factory, array $options): FormBuilderInterface
     {
         if ($this->innerType instanceof ButtonTypeInterface) {
             return new ButtonBuilder($name, $options);
@@ -233,7 +233,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      *
      * @return FormView A new view instance
      */
-    protected function newView(FormView $parent = null)
+    protected function newView(FormView $parent = null): FormView
     {
         return new FormView($parent);
     }

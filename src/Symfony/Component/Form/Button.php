@@ -53,7 +53,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return bool Always returns false
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return false;
     }
@@ -141,7 +141,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function get($name): void
+    public function get(string $name): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -153,7 +153,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return bool Always returns false
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return false;
     }
@@ -167,7 +167,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws BadMethodCallException
      */
-    public function remove($name): void
+    public function remove(string $name): void
     {
         throw new BadMethodCallException('Buttons cannot have children.');
     }
@@ -227,7 +227,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return array Always returns an empty array
      */
-    public function getExtraData()
+    public function getExtraData(): array
     {
         return array();
     }
@@ -237,7 +237,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return FormConfigInterface The configuration
      */
-    public function getConfig()
+    public function getConfig(): FormConfigInterface
     {
         return $this->config;
     }
@@ -247,7 +247,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return bool true if the button was submitted
      */
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         return $this->submitted;
     }
@@ -257,7 +257,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return string The name of the button
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->config->getName();
     }
@@ -284,7 +284,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return bool Always returns true
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return true;
     }
@@ -294,7 +294,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return bool Always returns false
      */
-    public function isRequired()
+    public function isRequired(): bool
     {
         return false;
     }
@@ -316,7 +316,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return bool Always returns true
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return true;
     }
@@ -326,7 +326,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return bool Always returns true
      */
-    public function isSynchronized()
+    public function isSynchronized(): bool
     {
         return true;
     }
@@ -370,7 +370,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @throws Exception\AlreadySubmittedException if the button has already been submitted
      */
-    public function submit($submittedData, $clearMissing = true)
+    public function submit(?string $submittedData, bool $clearMissing = true)
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once');
@@ -422,7 +422,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return int Always returns 0
      */
-    public function count()
+    public function count(): int
     {
         return 0;
     }
@@ -432,7 +432,7 @@ class Button implements \IteratorAggregate, FormInterface
      *
      * @return \EmptyIterator Always returns an empty iterator
      */
-    public function getIterator()
+    public function getIterator(): \EmptyIterator
     {
         return new \EmptyIterator();
     }

@@ -81,5 +81,5 @@ abstract class BaseValidatorExtensionTest extends TypeTestCase
         $this->assertInstanceOf('Symfony\Component\Validator\Constraints\GroupSequence', $form->getConfig()->getOption('validation_groups'));
     }
 
-    abstract protected function createForm(array $options = array());
+    abstract protected function createForm(array $options = array()): void;
 }

@@ -56,7 +56,7 @@ class CsvFileLoader extends FileLoader
      * @param string $enclosure Enclosure character
      * @param string $escape    Escape character
      */
-    public function setCsvControl($delimiter = ';', $enclosure = '"', $escape = '\\'): void
+    public function setCsvControl(string $delimiter = ';', string $enclosure = '"', string $escape = '\\'): void
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;

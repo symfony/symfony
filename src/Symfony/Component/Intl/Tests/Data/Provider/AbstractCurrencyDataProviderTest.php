@@ -594,7 +594,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
+    abstract protected function getDataDirectory(): void;
 
     public function testGetCurrencies(): void
     {

@@ -46,7 +46,7 @@ class ContainerAwareEventManager extends EventManager
      *
      * @return bool
      */
-    public function dispatchEvent($eventName, EventArgs $eventArgs = null)
+    public function dispatchEvent(string $eventName, EventArgs $eventArgs = null)
     {
         if (isset($this->listeners[$eventName])) {
             $eventArgs = null === $eventArgs ? EventArgs::getEmptyInstance() : $eventArgs;
@@ -71,7 +71,7 @@ class ContainerAwareEventManager extends EventManager
      *
      * @return array The event listeners for the specified event, or all event listeners
      */
-    public function getListeners($event = null)
+    public function getListeners(string $event = null): array
     {
         return $event ? $this->listeners[$event] : $this->listeners;
     }
@@ -83,7 +83,7 @@ class ContainerAwareEventManager extends EventManager
      *
      * @return bool TRUE if the specified event has any listeners, FALSE otherwise
      */
-    public function hasListeners($event)
+    public function hasListeners(string $event): bool
     {
         return isset($this->listeners[$event]) && $this->listeners[$event];
     }

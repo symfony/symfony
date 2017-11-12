@@ -43,11 +43,11 @@ abstract class AbstractHandlerTest extends TestCase
         $this->assertRemainingContent($reader, $value);
     }
 
-    abstract public function getHandleValueTestData();
+    abstract public function getHandleValueTestData(): void;
 
-    abstract public function getDontHandleValueTestData();
+    abstract public function getDontHandleValueTestData(): void;
 
-    abstract protected function generateHandler();
+    abstract protected function generateHandler(): void;
 
     protected function assertStreamEmpty(TokenStream $stream): void
     {

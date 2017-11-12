@@ -62,7 +62,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor
      */
-    protected function getRot13EnvVarProcessorService()
+    protected function getRot13EnvVarProcessorService(): \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor
     {
         return $this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor();
     }
@@ -72,7 +72,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
      *
      * @return \Symfony\Component\DependencyInjection\ServiceLocator
      */
-    protected function getContainer_EnvVarProcessorsLocatorService()
+    protected function getContainer_EnvVarProcessorsLocatorService(): \Symfony\Component\DependencyInjection\ServiceLocator
     {
         return $this->services['container.env_var_processors_locator'] = new \Symfony\Component\DependencyInjection\ServiceLocator(array('rot13' => function () {
             return ($this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] ?? $this->services['Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor'] = new \Symfony\Component\DependencyInjection\Tests\Dumper\Rot13EnvVarProcessor());
@@ -132,7 +132,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
      *
      * @throws InvalidArgumentException When the dynamic parameter does not exist
      */
-    private function getDynamicParameter($name)
+    private function getDynamicParameter(string $name)
     {
         switch ($name) {
             case 'hello': $value = $this->getEnv('rot13:foo'); break;
@@ -148,7 +148,7 @@ class Symfony_DI_PhpDumper_Test_Rot13Parameters extends Container
      *
      * @return array An array of the default parameters
      */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return array(
             'env(foo)' => 'jbeyq',

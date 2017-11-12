@@ -48,7 +48,7 @@ class ExpressionLanguage
      *
      * @return string The compiled PHP source code
      */
-    public function compile($expression, $names = array())
+    public function compile($expression, $names = array()): string
     {
         return $this->getCompiler()->compile($this->parse($expression, $names)->getNodes())->getSource();
     }
@@ -61,7 +61,7 @@ class ExpressionLanguage
      *
      * @return string The result of the evaluation of the expression
      */
-    public function evaluate($expression, $values = array())
+    public function evaluate($expression, $values = array()): string
     {
         return $this->parse($expression, array_keys($values))->getNodes()->evaluate($this->functions, $values);
     }
@@ -74,7 +74,7 @@ class ExpressionLanguage
      *
      * @return ParsedExpression A ParsedExpression instance
      */
-    public function parse($expression, $names)
+    public function parse($expression, $names): ParsedExpression
     {
         if ($expression instanceof ParsedExpression) {
             return $expression;
@@ -111,7 +111,7 @@ class ExpressionLanguage
      *
      * @see ExpressionFunction
      */
-    public function register($name, callable $compiler, callable $evaluator): void
+    public function register(string $name, callable $compiler, callable $evaluator): void
     {
         if (null !== $this->parser) {
             throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');

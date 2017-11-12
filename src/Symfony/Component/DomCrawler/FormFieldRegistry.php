@@ -51,7 +51,7 @@ class FormFieldRegistry
      *
      * @param string $name The fully qualified name of the base field
      */
-    public function remove($name): void
+    public function remove(string $name): void
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -74,7 +74,7 @@ class FormFieldRegistry
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function &get($name)
+    public function &get(string $name)
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -96,7 +96,7 @@ class FormFieldRegistry
      *
      * @return bool Whether the form has the given field
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         try {
             $this->get($name);
@@ -115,7 +115,7 @@ class FormFieldRegistry
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function set($name, $value): void
+    public function set(string $name, $value): void
     {
         $target = &$this->get($name);
         if ((!is_array($value) && $target instanceof Field\FormField) || $target instanceof Field\ChoiceFormField) {
@@ -151,7 +151,7 @@ class FormFieldRegistry
      *
      * @return static
      */
-    private static function create($base, array $values)
+    private static function create(string $base, array $values)
     {
         $registry = new static();
         $registry->base = $base;
@@ -169,7 +169,7 @@ class FormFieldRegistry
      *
      * @return array The list of fields as array((string) Fully qualified name => (mixed) value)
      */
-    private function walk(array $array, $base = '', array &$output = array())
+    private function walk(array $array, string $base = '', array &$output = array()): array
     {
         foreach ($array as $k => $v) {
             $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);
@@ -194,7 +194,7 @@ class FormFieldRegistry
      *
      * @return string[] The list of segments
      */
-    private function getSegments($name)
+    private function getSegments(string $name)
     {
         if (preg_match('/^(?P<base>[^[]+)(?P<extra>(\[.*)|$)/', $name, $m)) {
             $segments = array($m['base']);

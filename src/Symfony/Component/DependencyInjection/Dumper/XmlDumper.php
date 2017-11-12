@@ -40,7 +40,7 @@ class XmlDumper extends Dumper
      *
      * @return string An xml string representing of the service container
      */
-    public function dump(array $options = array())
+    public function dump(array $options = array()): string
     {
         $this->document = new \DOMDocument('1.0', 'utf-8');
         $this->document->formatOutput = true;
@@ -94,7 +94,7 @@ class XmlDumper extends Dumper
      * @param string      $id
      * @param \DOMElement $parent
      */
-    private function addService($definition, $id, \DOMElement $parent): void
+    private function addService(Definition $definition, string $id, \DOMElement $parent): void
     {
         $service = $this->document->createElement('service');
         if (null !== $id) {
@@ -217,7 +217,7 @@ class XmlDumper extends Dumper
      * @param string      $alias
      * @param \DOMElement $parent
      */
-    private function addServiceAlias($alias, Alias $id, \DOMElement $parent): void
+    private function addServiceAlias(string $alias, Alias $id, \DOMElement $parent): void
     {
         $service = $this->document->createElement('service');
         $service->setAttribute('id', $alias);
@@ -257,7 +257,7 @@ class XmlDumper extends Dumper
      * @param \DOMElement $parent
      * @param string      $keyAttribute
      */
-    private function convertParameters(array $parameters, $type, \DOMElement $parent, $keyAttribute = 'key'): void
+    private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key'): void
     {
         $withKeys = array_keys($parameters) !== range(0, count($parameters) - 1);
         foreach ($parameters as $key => $value) {
@@ -312,7 +312,7 @@ class XmlDumper extends Dumper
      *
      * @return array
      */
-    private function escape(array $arguments)
+    private function escape(array $arguments): array
     {
         $args = array();
         foreach ($arguments as $k => $v) {
@@ -337,7 +337,7 @@ class XmlDumper extends Dumper
      *
      * @throws RuntimeException When trying to dump object or resource
      */
-    public static function phpToXml($value)
+    public static function phpToXml($value): string
     {
         switch (true) {
             case null === $value:

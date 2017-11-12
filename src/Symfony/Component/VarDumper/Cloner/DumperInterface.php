@@ -25,7 +25,7 @@ interface DumperInterface
      * @param string $type   The PHP type of the value being dumped
      * @param scalar $value  The scalar value being dumped
      */
-    public function dumpScalar(Cursor $cursor, $type, $value);
+    public function dumpScalar(Cursor $cursor, string $type, scalar $value): void;
 
     /**
      * Dumps a string.
@@ -35,7 +35,7 @@ interface DumperInterface
      * @param bool   $bin    Whether $str is UTF-8 or binary encoded
      * @param int    $cut    The number of characters $str has been cut by
      */
-    public function dumpString(Cursor $cursor, $str, $bin, $cut);
+    public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut): void;
 
     /**
      * Dumps while entering an hash.
@@ -45,7 +45,7 @@ interface DumperInterface
      * @param string $class    The object class, resource type or array count
      * @param bool   $hasChild When the dump of the hash has child item
      */
-    public function enterHash(Cursor $cursor, $type, $class, $hasChild);
+    public function enterHash(Cursor $cursor, int $type, string $class, bool $hasChild): void;
 
     /**
      * Dumps while leaving an hash.
@@ -56,5 +56,5 @@ interface DumperInterface
      * @param bool   $hasChild When the dump of the hash has child item
      * @param int    $cut      The number of items the hash has been cut by
      */
-    public function leaveHash(Cursor $cursor, $type, $class, $hasChild, $cut);
+    public function leaveHash(Cursor $cursor, int $type, string $class, bool $hasChild, int $cut): void;
 }

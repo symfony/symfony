@@ -88,7 +88,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @return self The root collection
      */
-    public function getRoot()
+    public function getRoot(): self
     {
         return (null !== $this->parent) ? $this->parent->getRoot() : $this;
     }
@@ -98,7 +98,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @return self|null The parent collection or null if the collection has no parent
      */
-    protected function getParent()
+    protected function getParent(): ?self
     {
         return $this->parent;
     }
@@ -118,7 +118,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @return bool true if the attribute is defined, false otherwise
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name): bool
     {
         return array_key_exists($name, $this->attributes);
     }
@@ -131,7 +131,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @return mixed The attribute value
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute(string $name, $default = null)
     {
         return $this->hasAttribute($name) ? $this->attributes[$name] : $default;
     }
@@ -142,7 +142,7 @@ class DumperCollection implements \IteratorAggregate
      * @param string $name  The attribute name
      * @param mixed  $value The attribute value
      */
-    public function setAttribute($name, $value): void
+    public function setAttribute(string $name, $value): void
     {
         $this->attributes[$name] = $value;
     }
@@ -152,7 +152,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @param array $attributes The attributes
      */
-    public function setAttributes($attributes): void
+    public function setAttributes(array $attributes): void
     {
         $this->attributes = $attributes;
     }

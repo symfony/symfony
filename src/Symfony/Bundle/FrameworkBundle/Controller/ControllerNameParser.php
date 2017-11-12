@@ -39,7 +39,7 @@ class ControllerNameParser
      * @throws \InvalidArgumentException when the specified bundle is not enabled
      *                                   or the controller cannot be found
      */
-    public function parse($controller)
+    public function parse(string $controller): string
     {
         $parts = explode(':', $controller);
         if (3 !== count($parts) || in_array('', $parts, true)) {
@@ -84,7 +84,7 @@ class ControllerNameParser
      *
      * @throws \InvalidArgumentException when the controller is not valid or cannot be found in any bundle
      */
-    public function build($controller)
+    public function build(string $controller): string
     {
         if (0 === preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)::(.+)Action$#', $controller, $match)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "class::method" string.', $controller));

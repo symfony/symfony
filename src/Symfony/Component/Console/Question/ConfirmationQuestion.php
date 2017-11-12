@@ -38,7 +38,7 @@ class ConfirmationQuestion extends Question
      *
      * @return callable
      */
-    private function getDefaultNormalizer()
+    private function getDefaultNormalizer(): callable
     {
         $default = $this->getDefault();
         $regex = $this->trueAnswerRegex;

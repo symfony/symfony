@@ -62,7 +62,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
      *
      * @return bool If the definition is inlineable
      */
-    private function isInlineableDefinition($id, Definition $definition, ServiceReferenceGraph $graph)
+    private function isInlineableDefinition($id, Definition $definition, ServiceReferenceGraph $graph): bool
     {
         if (!$definition->isShared()) {
             return true;

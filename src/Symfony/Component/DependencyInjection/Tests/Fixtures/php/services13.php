@@ -60,7 +60,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected function getBarService(): \stdClass
     {
         $a = new \stdClass();
         $a->add($this);

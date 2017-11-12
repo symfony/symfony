@@ -25,7 +25,7 @@ abstract class CountValidatorTest extends ConstraintValidatorTestCase
         return new CountValidator();
     }
 
-    abstract protected function createCollection(array $content);
+    abstract protected function createCollection(array $content): void;
 
     public function testNullIsValid(): void
     {

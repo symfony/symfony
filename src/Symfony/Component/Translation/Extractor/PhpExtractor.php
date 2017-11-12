@@ -103,7 +103,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      *
      * @return string
      */
-    protected function normalizeToken($token)
+    protected function normalizeToken($token): string
     {
         if (isset($token[1]) && 'b"' !== $token) {
             return $token[1];
@@ -188,7 +188,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      *
      * @param array            $tokens
      */
-    protected function parseTokens($tokens, MessageCatalogue $catalog): void
+    protected function parseTokens(array $tokens, MessageCatalogue $catalog): void
     {
         $tokenIterator = new \ArrayIterator($tokens);
 
@@ -236,7 +236,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      *
      * @throws \InvalidArgumentException
      */
-    protected function canBeExtracted($file)
+    protected function canBeExtracted(string $file): bool
     {
         return $this->isFile($file) && 'php' === pathinfo($file, PATHINFO_EXTENSION);
     }
@@ -246,7 +246,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
      *
      * @return array
      */
-    protected function extractFromDirectory($directory)
+    protected function extractFromDirectory($directory): array
     {
         $finder = new Finder();
 

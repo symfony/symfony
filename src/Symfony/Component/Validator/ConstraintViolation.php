@@ -68,7 +68,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      *
      * @return string The violation as string
      */
-    public function __toString()
+    public function __toString(): string
     {
         if (is_object($this->root)) {
             $class = 'Object('.get_class($this->root).')';
@@ -153,7 +153,7 @@ class ConstraintViolation implements ConstraintViolationInterface
      *
      * @return Constraint|null The constraint or null if it is not known
      */
-    public function getConstraint()
+    public function getConstraint(): ?Constraint
     {
         return $this->constraint;
     }

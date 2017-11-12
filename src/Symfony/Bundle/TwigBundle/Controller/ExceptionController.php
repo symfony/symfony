@@ -51,7 +51,7 @@ class ExceptionController
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
+    public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null): Response
     {
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
         $showException = $request->attributes->get('showException', $this->debug); // As opposed to an additional parameter, this maintains BC
@@ -75,7 +75,7 @@ class ExceptionController
      *
      * @return string
      */
-    protected function getAndCleanOutputBuffering($startObLevel)
+    protected function getAndCleanOutputBuffering(int $startObLevel): string
     {
         if (ob_get_level() <= $startObLevel) {
             return '';
@@ -93,7 +93,7 @@ class ExceptionController
      *
      * @return string
      */
-    protected function findTemplate(Request $request, $format, $code, $showException)
+    protected function findTemplate(Request $request, string $format, int $code, bool $showException): string
     {
         $name = $showException ? 'exception' : 'error';
         if ($showException && 'html' == $format) {

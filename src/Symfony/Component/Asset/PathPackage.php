@@ -72,7 +72,7 @@ class PathPackage extends Package
      *
      * @return string The base path
      */
-    public function getBasePath()
+    public function getBasePath(): string
     {
         return $this->getContext()->getBasePath().$this->basePath;
     }

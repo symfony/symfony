@@ -91,7 +91,7 @@ class ViolationMapperTest extends TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getDataMapper()
+    private function getDataMapper(): \PHPUnit_Framework_MockObject_MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
     }
@@ -99,7 +99,7 @@ class ViolationMapperTest extends TestCase
     /**
      * @return ConstraintViolation
      */
-    protected function getConstraintViolation($propertyPath)
+    protected function getConstraintViolation($propertyPath): ConstraintViolation
     {
         return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, $propertyPath, null);
     }
@@ -107,7 +107,7 @@ class ViolationMapperTest extends TestCase
     /**
      * @return FormError
      */
-    protected function getFormError(ConstraintViolationInterface $violation, FormInterface $form)
+    protected function getFormError(ConstraintViolationInterface $violation, FormInterface $form): FormError
     {
         $error = new FormError($this->message, $this->messageTemplate, $this->params, null, $violation);
         $error->setOrigin($form);

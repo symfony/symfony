@@ -15,5 +15,5 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 abstract class AbstractStaticMethodLoader
 {
-    abstract public static function loadMetadata(ClassMetadata $metadata);
+    abstract public static function loadMetadata(ClassMetadata $metadata): void;
 }

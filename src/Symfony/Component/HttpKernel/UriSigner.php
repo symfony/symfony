@@ -41,7 +41,7 @@ class UriSigner
      *
      * @return string The signed URI
      */
-    public function sign($uri)
+    public function sign(string $uri): string
     {
         $url = parse_url($uri);
         if (isset($url['query'])) {
@@ -62,7 +62,7 @@ class UriSigner
      *
      * @return bool True if the URI is signed correctly, false otherwise
      */
-    public function check($uri)
+    public function check(string $uri): bool
     {
         $url = parse_url($uri);
         if (isset($url['query'])) {

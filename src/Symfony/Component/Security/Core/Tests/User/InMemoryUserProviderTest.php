@@ -43,7 +43,7 @@ class InMemoryUserProviderTest extends TestCase
     /**
      * @return InMemoryUserProvider
      */
-    protected function createProvider()
+    protected function createProvider(): InMemoryUserProvider
     {
         return new InMemoryUserProvider(array(
             'fabien' => array(

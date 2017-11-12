@@ -49,7 +49,7 @@ class AnonymousToken extends AbstractToken
      *
      * @return string
      */
-    public function getSecret()
+    public function getSecret(): string
     {
         return $this->secret;
     }

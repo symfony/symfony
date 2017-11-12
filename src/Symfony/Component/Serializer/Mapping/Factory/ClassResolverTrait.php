@@ -31,7 +31,7 @@ trait ClassResolverTrait
      *
      * @throws InvalidArgumentException If the class does not exists
      */
-    private function getClass($value)
+    private function getClass($value): string
     {
         if (is_string($value)) {
             if (!class_exists($value) && !interface_exists($value)) {

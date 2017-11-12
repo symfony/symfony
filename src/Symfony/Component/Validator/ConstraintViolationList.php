@@ -40,7 +40,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      *
      * @return string The violation as string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = '';
 

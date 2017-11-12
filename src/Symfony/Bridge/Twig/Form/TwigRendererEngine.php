@@ -76,7 +76,7 @@ class TwigRendererEngine extends AbstractRendererEngine
      *
      * @return bool True if the resource could be loaded, false otherwise
      */
-    protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName)
+    protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool
     {
         // The caller guarantees that $this->resources[$cacheKey][$block] is
         // not set, but it doesn't have to check whether $this->resources[$cacheKey]
@@ -150,7 +150,7 @@ class TwigRendererEngine extends AbstractRendererEngine
      *                         this variable will be kept and be available upon
      *                         further calls to this method using the same theme.
      */
-    protected function loadResourcesFromTheme($cacheKey, &$theme): void
+    protected function loadResourcesFromTheme(string $cacheKey, &$theme): void
     {
         if (!$theme instanceof Template) {
             /* @var Template $theme */

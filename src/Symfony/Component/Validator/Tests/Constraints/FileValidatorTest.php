@@ -468,5 +468,5 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
         return $tests;
     }
 
-    abstract protected function getFile($filename);
+    abstract protected function getFile($filename): void;
 }

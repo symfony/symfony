@@ -136,7 +136,7 @@ final class CacheItem implements CacheItemInterface
      *
      * @return array
      */
-    public function getPreviousTags()
+    public function getPreviousTags(): array
     {
         return $this->prevTags;
     }
@@ -150,7 +150,7 @@ final class CacheItem implements CacheItemInterface
      *
      * @throws InvalidArgumentException When $key is not valid
      */
-    public static function validateKey($key)
+    public static function validateKey(string $key): string
     {
         if (!is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', is_object($key) ? get_class($key) : gettype($key)));

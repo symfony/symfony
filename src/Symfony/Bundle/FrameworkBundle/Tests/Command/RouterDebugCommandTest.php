@@ -50,7 +50,7 @@ class RouterDebugCommandTest extends TestCase
     /**
      * @return CommandTester
      */
-    private function createCommandTester()
+    private function createCommandTester(): CommandTester
     {
         $application = new Application($this->getKernel());
         $application->add(new RouterDebugCommand($this->getRouter()));

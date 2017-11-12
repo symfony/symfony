@@ -750,7 +750,7 @@ class ProgressBarTest extends TestCase
      *
      * @return array
      */
-    public function provideFormat()
+    public function provideFormat(): array
     {
         return array(
             array('normal'),

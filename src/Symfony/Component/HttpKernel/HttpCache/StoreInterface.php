@@ -29,7 +29,7 @@ interface StoreInterface
      *
      * @return Response|null A Response instance, or null if no cache entry was found
      */
-    public function lookup(Request $request);
+    public function lookup(Request $request): ?Response;
 
     /**
      * Writes a cache entry to the store for the given Request and Response.
@@ -39,12 +39,12 @@ interface StoreInterface
      *
      * @return string The key under which the response is stored
      */
-    public function write(Request $request, Response $response);
+    public function write(Request $request, Response $response): string;
 
     /**
      * Invalidates all cache entries that match the request.
      */
-    public function invalidate(Request $request);
+    public function invalidate(Request $request): void;
 
     /**
      * Locks the cache for a given Request.
@@ -58,14 +58,14 @@ interface StoreInterface
      *
      * @return bool False if the lock file does not exist or cannot be unlocked, true otherwise
      */
-    public function unlock(Request $request);
+    public function unlock(Request $request): bool;
 
     /**
      * Returns whether or not a lock exists.
      *
      * @return bool true if lock exists, false otherwise
      */
-    public function isLocked(Request $request);
+    public function isLocked(Request $request): bool;
 
     /**
      * Purges data for the given URL.
@@ -74,10 +74,10 @@ interface StoreInterface
      *
      * @return bool true if the URL exists and has been purged, false otherwise
      */
-    public function purge($url);
+    public function purge(string $url): bool;
 
     /**
      * Cleanups storage.
      */
-    public function cleanup();
+    public function cleanup(): void;
 }

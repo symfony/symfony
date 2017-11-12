@@ -70,7 +70,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array The Constraint instances
      */
-    protected function parseConstraints(\SimpleXMLElement $nodes)
+    protected function parseConstraints(\SimpleXMLElement $nodes): array
     {
         $constraints = array();
 
@@ -104,7 +104,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array The values
      */
-    protected function parseValues(\SimpleXMLElement $nodes)
+    protected function parseValues(\SimpleXMLElement $nodes): array
     {
         $values = array();
 
@@ -138,7 +138,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array The options
      */
-    protected function parseOptions(\SimpleXMLElement $nodes)
+    protected function parseOptions(\SimpleXMLElement $nodes): array
     {
         $options = array();
 
@@ -173,7 +173,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws MappingException If the file could not be loaded
      */
-    protected function parseFile($path)
+    protected function parseFile(string $path): \SimpleXMLElement
     {
         try {
             $dom = XmlUtils::loadFile($path, __DIR__.'/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd');

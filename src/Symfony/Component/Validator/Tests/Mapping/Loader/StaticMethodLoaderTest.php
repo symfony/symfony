@@ -106,7 +106,7 @@ class StaticMethodLoaderTest extends TestCase
 
 interface StaticLoaderInterface
 {
-    public static function loadMetadata(ClassMetadata $metadata);
+    public static function loadMetadata(ClassMetadata $metadata): void;
 }
 
 abstract class AbstractStaticLoader

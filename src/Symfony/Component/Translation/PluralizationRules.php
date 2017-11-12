@@ -28,7 +28,7 @@ class PluralizationRules
      *
      * @return int The plural position
      */
-    public static function get($number, $locale)
+    public static function get(int $number, string $locale): int
     {
         if ('pt_BR' === $locale) {
             // temporary set a locale for brazilian
@@ -192,7 +192,7 @@ class PluralizationRules
      * @param callable $rule   A PHP callable
      * @param string   $locale The locale
      */
-    public static function set(callable $rule, $locale): void
+    public static function set(callable $rule, string $locale): void
     {
         if ('pt_BR' === $locale) {
             // temporary set a locale for brazilian

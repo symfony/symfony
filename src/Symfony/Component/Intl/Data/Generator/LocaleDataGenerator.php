@@ -136,7 +136,7 @@ class LocaleDataGenerator
         }
     }
 
-    private function generateLocaleName($locale, $displayLocale)
+    private function generateLocaleName($locale, $displayLocale): void
     {
         $name = null;
 

@@ -46,7 +46,7 @@ class CombinationExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateChild(XPathExpr $xpath, XPathExpr $combinedXpath)
+    public function translateChild(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
         return $xpath->join('/', $combinedXpath);
     }
@@ -54,7 +54,7 @@ class CombinationExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath)
+    public function translateDirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
         return $xpath
             ->join('/following-sibling::', $combinedXpath)
@@ -65,7 +65,7 @@ class CombinationExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath)
+    public function translateIndirectAdjacent(XPathExpr $xpath, XPathExpr $combinedXpath): XPathExpr
     {
         return $xpath->join('/following-sibling::', $combinedXpath);
     }

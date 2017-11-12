@@ -24,7 +24,7 @@ trait ObjectToPopulateTrait
      *
      * @return object|null an object if things check out, null otherwise
      */
-    protected function extractObjectToPopulate($class, array $context, $key = null)
+    protected function extractObjectToPopulate(string $class, array $context, string $key = null)
     {
         $key = $key ?: 'object_to_populate';
 

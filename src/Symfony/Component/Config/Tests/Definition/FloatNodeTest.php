@@ -30,7 +30,7 @@ class FloatNodeTest extends TestCase
      *
      * @param int $value
      */
-    public function testValidNonEmptyValues($value): void
+    public function testValidNonEmptyValues(int $value): void
     {
         $node = new FloatNode('test');
         $node->setAllowEmptyValue(false);

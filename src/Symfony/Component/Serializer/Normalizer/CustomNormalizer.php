@@ -51,7 +51,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      *
      * @return bool
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof NormalizableInterface;
     }
@@ -65,7 +65,7 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
      *
      * @return bool
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         if (isset($this->cache[$type])) {
             return $this->cache[$type];

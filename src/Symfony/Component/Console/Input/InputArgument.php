@@ -58,7 +58,7 @@ class InputArgument
      *
      * @return string The argument name
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -68,7 +68,7 @@ class InputArgument
      *
      * @return bool true if parameter mode is self::REQUIRED, false otherwise
      */
-    public function isRequired()
+    public function isRequired(): bool
     {
         return self::REQUIRED === (self::REQUIRED & $this->mode);
     }
@@ -78,7 +78,7 @@ class InputArgument
      *
      * @return bool true if mode is self::IS_ARRAY, false otherwise
      */
-    public function isArray()
+    public function isArray(): bool
     {
         return self::IS_ARRAY === (self::IS_ARRAY & $this->mode);
     }
@@ -122,7 +122,7 @@ class InputArgument
      *
      * @return string The description text
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }

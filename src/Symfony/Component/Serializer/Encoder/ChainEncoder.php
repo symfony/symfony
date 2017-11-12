@@ -61,7 +61,7 @@ class ChainEncoder implements ContextAwareEncoderInterface
      *
      * @return bool
      */
-    public function needsNormalization($format, array $context = array())
+    public function needsNormalization(string $format, array $context = array()): bool
     {
         $encoder = $this->getEncoder($format, $context);
 

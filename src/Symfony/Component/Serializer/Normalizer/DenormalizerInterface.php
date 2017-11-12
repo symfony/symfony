@@ -53,5 +53,5 @@ interface DenormalizerInterface
      *
      * @return bool
      */
-    public function supportsDenormalization($data, $type, $format = null);
+    public function supportsDenormalization($data, $type, $format = null): bool;
 }

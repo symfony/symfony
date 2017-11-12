@@ -59,7 +59,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $boolean True if this entity will accept empty values
      */
-    public function setAllowEmptyValue($boolean): void
+    public function setAllowEmptyValue(bool $boolean): void
     {
         $this->allowEmptyValue = (bool) $boolean;
     }
@@ -128,7 +128,7 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return bool
      */
-    protected function isValueEmpty($value)
+    protected function isValueEmpty($value): bool
     {
         return empty($value);
     }

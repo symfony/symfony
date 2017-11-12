@@ -162,7 +162,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function setOption($key, $value): void
+    public function setOption(string $key, $value): void
     {
         if (!array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
@@ -180,7 +180,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function getOption($key)
+    public function getOption(string $key)
     {
         if (!array_key_exists($key, $this->options)) {
             throw new \InvalidArgumentException(sprintf('The Router does not support the "%s" option.', $key));
@@ -267,7 +267,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @return UrlMatcherInterface A UrlMatcherInterface instance
      */
-    public function getMatcher()
+    public function getMatcher(): UrlMatcherInterface
     {
         if (null !== $this->matcher) {
             return $this->matcher;
@@ -312,7 +312,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @return UrlGeneratorInterface A UrlGeneratorInterface instance
      */
-    public function getGenerator()
+    public function getGenerator(): UrlGeneratorInterface
     {
         if (null !== $this->generator) {
             return $this->generator;
@@ -354,7 +354,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * @return GeneratorDumperInterface
      */
-    protected function getGeneratorDumperInstance()
+    protected function getGeneratorDumperInstance(): GeneratorDumperInterface
     {
         return new $this->options['generator_dumper_class']($this->getRouteCollection());
     }
@@ -362,7 +362,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * @return MatcherDumperInterface
      */
-    protected function getMatcherDumperInstance()
+    protected function getMatcherDumperInstance(): MatcherDumperInterface
     {
         return new $this->options['matcher_dumper_class']($this->getRouteCollection());
     }
@@ -373,7 +373,7 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @return ConfigCacheFactoryInterface $configCacheFactory
      */
-    private function getConfigCacheFactory()
+    private function getConfigCacheFactory(): ConfigCacheFactoryInterface
     {
         if (null === $this->configCacheFactory) {
             $this->configCacheFactory = new ConfigCacheFactory($this->options['debug']);

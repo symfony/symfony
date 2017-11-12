@@ -31,7 +31,7 @@ interface ContextualValidatorInterface
      *
      * @return $this
      */
-    public function atPath($path);
+    public function atPath(string $path);
 
     /**
      * Validates a value against a constraint or a list of constraints.
@@ -84,5 +84,5 @@ interface ContextualValidatorInterface
      *
      * @return ConstraintViolationListInterface The constraint violations
      */
-    public function getViolations();
+    public function getViolations(): ConstraintViolationListInterface;
 }

@@ -69,7 +69,7 @@ class ConfigDebugCommandTest extends WebTestCase
     /**
      * @return CommandTester
      */
-    private function createCommandTester()
+    private function createCommandTester(): CommandTester
     {
         $command = $this->application->find('debug:config');
 

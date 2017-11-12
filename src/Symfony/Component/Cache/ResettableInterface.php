@@ -16,5 +16,5 @@ namespace Symfony\Component\Cache;
  */
 interface ResettableInterface
 {
-    public function reset();
+    public function reset(): void;
 }

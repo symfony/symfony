@@ -63,7 +63,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
      *
      * @return \stdClass
      */
-    protected function getBarService()
+    protected function getBarService(): \stdClass
     {
         $this->services['bar'] = $instance = new \stdClass();
 
@@ -99,7 +99,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
      *
      * @return \stdClass
      */
-    protected function getBazService()
+    protected function getBazService(): \stdClass
     {
         $this->services['baz'] = $instance = new \stdClass();
 
@@ -113,7 +113,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
      *
      * @return \stdClass
      */
-    protected function getFoo1Service()
+    protected function getFoo1Service(): \stdClass
     {
         return $this->services['foo1'] = new \stdClass();
     }

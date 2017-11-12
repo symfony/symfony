@@ -69,7 +69,7 @@ class UsernamePasswordToken extends AbstractToken
      *
      * @return string The provider key
      */
-    public function getProviderKey()
+    public function getProviderKey(): string
     {
         return $this->providerKey;
     }

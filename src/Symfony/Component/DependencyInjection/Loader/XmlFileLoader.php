@@ -89,7 +89,7 @@ class XmlFileLoader extends FileLoader
      * @param \DOMDocument $xml
      * @param string       $file
      */
-    private function parseParameters(\DOMDocument $xml, $file): void
+    private function parseParameters(\DOMDocument $xml, string $file): void
     {
         if ($parameters = $this->getChildren($xml->documentElement, 'parameters')) {
             $this->container->getParameterBag()->add($this->getArgumentsAsPhp($parameters[0], 'parameter', $file));
@@ -102,7 +102,7 @@ class XmlFileLoader extends FileLoader
      * @param \DOMDocument $xml
      * @param string       $file
      */
-    private function parseImports(\DOMDocument $xml, $file): void
+    private function parseImports(\DOMDocument $xml, string $file): void
     {
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
@@ -124,7 +124,7 @@ class XmlFileLoader extends FileLoader
      * @param \DOMDocument $xml
      * @param string       $file
      */
-    private function parseDefinitions(\DOMDocument $xml, $file, $defaults): void
+    private function parseDefinitions(\DOMDocument $xml, string $file, $defaults): void
     {
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
@@ -158,7 +158,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array
      */
-    private function getServiceDefaults(\DOMDocument $xml, $file)
+    private function getServiceDefaults(\DOMDocument $xml, $file): array
     {
         $xpath = new \DOMXPath($xml);
         $xpath->registerNamespace('container', self::NS);
@@ -198,7 +198,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return Definition|null
      */
-    private function parseDefinition(\DOMElement $service, $file, array $defaults)
+    private function parseDefinition(\DOMElement $service, string $file, array $defaults)
     {
         if ($alias = $service->getAttribute('alias')) {
             $this->validateAlias($service, $file);
@@ -373,7 +373,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When loading of XML file returns error
      */
-    private function parseFileToDOM($file)
+    private function parseFileToDOM(string $file): \DOMDocument
     {
         try {
             $dom = XmlUtils::loadFile($file, array($this, 'validateSchema'));
@@ -393,7 +393,7 @@ class XmlFileLoader extends FileLoader
      * @param string       $file
      * @param array        $defaults
      */
-    private function processAnonymousServices(\DOMDocument $xml, $file, $defaults): void
+    private function processAnonymousServices(\DOMDocument $xml, string $file, array $defaults): void
     {
         $definitions = array();
         $count = 0;
@@ -447,7 +447,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return mixed
      */
-    private function getArgumentsAsPhp(\DOMElement $node, $name, $file, $lowercase = true, $isChildDefinition = false)
+    private function getArgumentsAsPhp(\DOMElement $node, string $name, string $file, bool $lowercase = true, $isChildDefinition = false)
     {
         $arguments = array();
         foreach ($this->getChildren($node, $name) as $arg) {
@@ -528,7 +528,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return array
      */
-    private function getChildren(\DOMNode $node, $name)
+    private function getChildren(\DOMNode $node, $name): array
     {
         $children = array();
         foreach ($node->childNodes as $child) {
@@ -549,7 +549,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws RuntimeException When extension references a non-existent XSD file
      */
-    public function validateSchema(\DOMDocument $dom)
+    public function validateSchema(\DOMDocument $dom): bool
     {
         $schemaLocations = array('http://symfony.com/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
 
@@ -620,7 +620,7 @@ EOF
      * @param \DOMElement $alias
      * @param string      $file
      */
-    private function validateAlias(\DOMElement $alias, $file): void
+    private function validateAlias(\DOMElement $alias, string $file): void
     {
         foreach ($alias->attributes as $name => $node) {
             if (!in_array($name, array('alias', 'id', 'public'))) {
@@ -643,7 +643,7 @@ EOF
      *
      * @throws InvalidArgumentException When no extension is found corresponding to a tag
      */
-    private function validateExtensions(\DOMDocument $dom, $file): void
+    private function validateExtensions(\DOMDocument $dom, string $file): void
     {
         foreach ($dom->documentElement->childNodes as $node) {
             if (!$node instanceof \DOMElement || 'http://symfony.com/schema/dic/services' === $node->namespaceURI) {
@@ -704,7 +704,7 @@ EOF
      *
      * @return array A PHP array
      */
-    public static function convertDomElementToArray(\DOMElement $element)
+    public static function convertDomElementToArray(\DOMElement $element): array
     {
         return XmlUtils::convertDomElementToArray($element);
     }

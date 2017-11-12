@@ -56,7 +56,7 @@ class RequestStack
     /**
      * @return Request|null
      */
-    public function getCurrentRequest()
+    public function getCurrentRequest(): ?Request
     {
         return end($this->requests) ?: null;
     }

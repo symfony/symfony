@@ -36,7 +36,7 @@ class RoutingConfigurator
     /**
      * @return ImportConfigurator
      */
-    final public function import($resource, $type = null, $ignoreErrors = false)
+    final public function import($resource, $type = null, $ignoreErrors = false): ImportConfigurator
     {
         $this->loader->setCurrentDir(dirname($this->path));
         $subCollection = $this->loader->import($resource, $type, $ignoreErrors, $this->file);
@@ -47,7 +47,7 @@ class RoutingConfigurator
     /**
      * @return CollectionConfigurator
      */
-    final public function collection($name = '')
+    final public function collection($name = ''): CollectionConfigurator
     {
         return new CollectionConfigurator($this->collection, $name);
     }

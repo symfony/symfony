@@ -28,7 +28,7 @@ class MockStream
      *
      * @return bool
      */
-    public function stream_open($path, $mode, $options, &$opened_path)
+    public function stream_open(string $path, string $mode, int $options, string &$opened_path): bool
     {
         return true;
     }
@@ -39,7 +39,7 @@ class MockStream
      *
      * @return array File stats
      */
-    public function url_stat($path, $flags)
+    public function url_stat(string $path, array $flags): array
     {
         return array();
     }

@@ -213,5 +213,5 @@ class XmlUtilsTest extends TestCase
 
 interface Validator
 {
-    public function validate();
+    public function validate(): void;
 }

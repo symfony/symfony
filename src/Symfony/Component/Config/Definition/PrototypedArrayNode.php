@@ -40,7 +40,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @param int $number
      */
-    public function setMinNumberOfElements($number): void
+    public function setMinNumberOfElements(int $number): void
     {
         $this->minNumberOfElements = $number;
     }
@@ -69,7 +69,7 @@ class PrototypedArrayNode extends ArrayNode
      * @param string $attribute The name of the attribute which value is to be used as a key
      * @param bool   $remove    Whether or not to remove the key
      */
-    public function setKeyAttribute($attribute, $remove = true): void
+    public function setKeyAttribute(string $attribute, bool $remove = true): void
     {
         $this->keyAttribute = $attribute;
         $this->removeKeyAttribute = $remove;
@@ -80,7 +80,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @return string The name of the attribute
      */
-    public function getKeyAttribute()
+    public function getKeyAttribute(): string
     {
         return $this->keyAttribute;
     }
@@ -92,7 +92,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @throws \InvalidArgumentException if the default value is not an array
      */
-    public function setDefaultValue($value): void
+    public function setDefaultValue(string $value): void
     {
         if (!is_array($value)) {
             throw new \InvalidArgumentException($this->getPath().': the default value of an array node has to be an array.');
@@ -106,7 +106,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @return bool
      */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return true;
     }
@@ -133,7 +133,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @return array The default value
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): array
     {
         if (null !== $this->defaultChildren) {
             $default = $this->prototype->hasDefaultValue() ? $this->prototype->getDefaultValue() : array();
@@ -161,7 +161,7 @@ class PrototypedArrayNode extends ArrayNode
      *
      * @return PrototypeNodeInterface The prototype
      */
-    public function getPrototype()
+    public function getPrototype(): PrototypeNodeInterface
     {
         return $this->prototype;
     }

@@ -39,7 +39,7 @@ class SwitchUserRole extends Role
      *
      * @return TokenInterface The original TokenInterface instance
      */
-    public function getSource()
+    public function getSource(): TokenInterface
     {
         return $this->source;
     }

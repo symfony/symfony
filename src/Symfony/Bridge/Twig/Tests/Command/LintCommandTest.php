@@ -71,7 +71,7 @@ class LintCommandTest extends TestCase
     /**
      * @return CommandTester
      */
-    private function createCommandTester()
+    private function createCommandTester(): CommandTester
     {
         $command = new LintCommand(new Environment(new FilesystemLoader()));
 
@@ -85,7 +85,7 @@ class LintCommandTest extends TestCase
     /**
      * @return string Path to the new file
      */
-    private function createFile($content)
+    private function createFile($content): string
     {
         $filename = tempnam(sys_get_temp_dir(), 'sf-');
         file_put_contents($filename, $content);

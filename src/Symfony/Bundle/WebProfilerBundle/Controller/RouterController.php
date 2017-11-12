@@ -51,7 +51,7 @@ class RouterController
      *
      * @throws NotFoundHttpException
      */
-    public function panelAction($token)
+    public function panelAction(string $token): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');

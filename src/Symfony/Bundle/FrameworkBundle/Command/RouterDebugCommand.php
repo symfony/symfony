@@ -117,7 +117,7 @@ EOF
         }
     }
 
-    private function extractCallable(Route $route)
+    private function extractCallable(Route $route): void
     {
         if (!$route->hasDefault('_controller')) {
             return;

@@ -67,7 +67,7 @@ abstract class Constraint
      *
      * @throws InvalidArgumentException If the error code does not exist
      */
-    public static function getErrorName($errorCode)
+    public static function getErrorName(string $errorCode): string
     {
         if (!isset(static::$errorNames[$errorCode])) {
             throw new InvalidArgumentException(sprintf(
@@ -177,7 +177,7 @@ abstract class Constraint
      *
      * @throws InvalidOptionsException If an invalid option name is given
      */
-    public function __set($option, $value): void
+    public function __set(string $option, $value): void
     {
         if ('groups' === $option) {
             $this->groups = (array) $value;
@@ -203,7 +203,7 @@ abstract class Constraint
      *
      * @internal this method should not be used or overwritten in userland code
      */
-    public function __get($option)
+    public function __get(string $option)
     {
         if ('groups' === $option) {
             $this->groups = array(self::DEFAULT_GROUP);
@@ -219,7 +219,7 @@ abstract class Constraint
      *
      * @param string $group
      */
-    public function addImplicitGroupName($group): void
+    public function addImplicitGroupName(string $group): void
     {
         if (in_array(self::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
             $this->groups[] = $group;
@@ -248,7 +248,7 @@ abstract class Constraint
      *
      * @see __construct()
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return array();
     }
@@ -262,7 +262,7 @@ abstract class Constraint
      *
      * @return string
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return get_class($this).'Validator';
     }
@@ -290,7 +290,7 @@ abstract class Constraint
      *           {@link \Serializable} in the future. Please don't use or
      *           overwrite it.
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         // Initialize "groups" option if it is not set
         $this->groups;

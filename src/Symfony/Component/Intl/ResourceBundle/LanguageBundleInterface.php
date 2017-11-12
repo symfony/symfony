@@ -28,7 +28,7 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      *
      * @return string|null The name of the language or NULL if not found
      */
-    public function getLanguageName($language, $region = null, $displayLocale = null);
+    public function getLanguageName(string $language, ?string $region = null, string $displayLocale = null): ?string;
 
     /**
      * Returns the names of all known languages.
@@ -38,7 +38,7 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      *
      * @return string[] A list of language names indexed by language codes
      */
-    public function getLanguageNames($displayLocale = null);
+    public function getLanguageNames(string $displayLocale = null);
 
     /**
      * Returns the name of a script.
@@ -50,7 +50,7 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      *
      * @return string|null The name of the script or NULL if not found
      */
-    public function getScriptName($script, $language = null, $displayLocale = null);
+    public function getScriptName(string $script, string $language = null, string $displayLocale = null): ?string;
 
     /**
      * Returns the names of all known scripts.
@@ -60,5 +60,5 @@ interface LanguageBundleInterface extends ResourceBundleInterface
      *
      * @return string[] A list of script names indexed by script codes
      */
-    public function getScriptNames($displayLocale = null);
+    public function getScriptNames(string $displayLocale = null);
 }

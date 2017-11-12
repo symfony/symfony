@@ -106,7 +106,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      *
      * @return array The user roles
      */
-    private function getRoles(UserInterface $user, TokenInterface $token)
+    private function getRoles(UserInterface $user, TokenInterface $token): array
     {
         $roles = $user->getRoles();
 
@@ -131,7 +131,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      *
      * @throws AuthenticationException if the credentials could not be validated
      */
-    abstract protected function retrieveUser($username, UsernamePasswordToken $token);
+    abstract protected function retrieveUser(string $username, UsernamePasswordToken $token): UserInterface;
 
     /**
      * Does additional checks on the user and token (like validating the
@@ -139,5 +139,5 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      *
      * @throws AuthenticationException if the credentials could not be validated
      */
-    abstract protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token);
+    abstract protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token): void;
 }

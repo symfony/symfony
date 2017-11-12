@@ -70,5 +70,5 @@ abstract class AbstractOperationTest extends TestCase
         );
     }
 
-    abstract protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target);
+    abstract protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target): void;
 }

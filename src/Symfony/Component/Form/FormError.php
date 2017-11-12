@@ -61,7 +61,7 @@ class FormError implements \Serializable
      *
      * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
@@ -71,7 +71,7 @@ class FormError implements \Serializable
      *
      * @return string
      */
-    public function getMessageTemplate()
+    public function getMessageTemplate(): string
     {
         return $this->messageTemplate;
     }
@@ -81,7 +81,7 @@ class FormError implements \Serializable
      *
      * @return array
      */
-    public function getMessageParameters()
+    public function getMessageParameters(): array
     {
         return $this->messageParameters;
     }
@@ -91,7 +91,7 @@ class FormError implements \Serializable
      *
      * @return int|null
      */
-    public function getMessagePluralization()
+    public function getMessagePluralization(): ?int
     {
         return $this->messagePluralization;
     }
@@ -129,7 +129,7 @@ class FormError implements \Serializable
      *
      * @return FormInterface The form that caused this error
      */
-    public function getOrigin()
+    public function getOrigin(): FormInterface
     {
         return $this->origin;
     }
@@ -139,7 +139,7 @@ class FormError implements \Serializable
      *
      * @return string The serialized error
      */
-    public function serialize()
+    public function serialize(): string
     {
         return serialize(array(
             $this->message,
@@ -155,7 +155,7 @@ class FormError implements \Serializable
      *
      * @param string $serialized The serialized error
      */
-    public function unserialize($serialized): void
+    public function unserialize(string $serialized): void
     {
         list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized, array('allowed_classes' => false));
     }

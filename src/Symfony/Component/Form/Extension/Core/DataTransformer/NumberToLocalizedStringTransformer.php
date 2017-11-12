@@ -103,7 +103,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not numeric
      *                                       or if the value can not be transformed
      */
-    public function transform($value)
+    public function transform($value): string
     {
         if (null === $value) {
             return '';
@@ -136,7 +136,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      * @throws TransformationFailedException if the given value is not a string
      *                                       or if the value can not be transformed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(string $value)
     {
         if (!is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
@@ -216,7 +216,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @return \NumberFormatter
      */
-    protected function getNumberFormatter()
+    protected function getNumberFormatter(): \NumberFormatter
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 

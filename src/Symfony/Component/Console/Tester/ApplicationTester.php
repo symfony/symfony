@@ -59,7 +59,7 @@ class ApplicationTester
      *
      * @return int The command exit code
      */
-    public function run(array $input, $options = array())
+    public function run(array $input, array $options = array()): int
     {
         $this->input = new ArrayInput($input);
         if (isset($options['interactive'])) {
@@ -107,7 +107,7 @@ class ApplicationTester
      *
      * @return string The display
      */
-    public function getDisplay($normalize = false)
+    public function getDisplay(bool $normalize = false): string
     {
         rewind($this->output->getStream());
 
@@ -127,7 +127,7 @@ class ApplicationTester
      *
      * @return string
      */
-    public function getErrorOutput($normalize = false)
+    public function getErrorOutput(bool $normalize = false): string
     {
         if (!$this->captureStreamsIndependently) {
             throw new \LogicException('The error output is not available when the tester is run without "capture_stderr_separately" option set.');
@@ -149,7 +149,7 @@ class ApplicationTester
      *
      * @return InputInterface The current input instance
      */
-    public function getInput()
+    public function getInput(): InputInterface
     {
         return $this->input;
     }
@@ -159,7 +159,7 @@ class ApplicationTester
      *
      * @return OutputInterface The current output instance
      */
-    public function getOutput()
+    public function getOutput(): OutputInterface
     {
         return $this->output;
     }
@@ -169,7 +169,7 @@ class ApplicationTester
      *
      * @return int The status code
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }

@@ -42,7 +42,7 @@ class TypeGuess extends Guess
      *
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -52,7 +52,7 @@ class TypeGuess extends Guess
      *
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

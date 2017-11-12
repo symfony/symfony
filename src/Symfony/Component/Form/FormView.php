@@ -61,7 +61,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return bool Whether this view's widget is rendered
      */
-    public function isRendered()
+    public function isRendered(): bool
     {
         if (true === $this->rendered || 0 === count($this->children)) {
             return $this->rendered;
@@ -91,7 +91,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @return bool
      */
-    public function isMethodRendered()
+    public function isMethodRendered(): bool
     {
         return $this->methodRendered;
     }
@@ -108,7 +108,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return self The child view
      */
-    public function offsetGet($name)
+    public function offsetGet(string $name): self
     {
         return $this->children[$name];
     }
@@ -120,7 +120,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return bool Whether the child view exists
      */
-    public function offsetExists($name)
+    public function offsetExists(string $name): bool
     {
         return isset($this->children[$name]);
     }
@@ -140,7 +140,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param string $name The child name
      */
-    public function offsetUnset($name): void
+    public function offsetUnset(string $name): void
     {
         unset($this->children[$name]);
     }
@@ -160,7 +160,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return int The number of children views
      */
-    public function count()
+    public function count(): int
     {
         return count($this->children);
     }

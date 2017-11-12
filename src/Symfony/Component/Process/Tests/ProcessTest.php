@@ -1500,7 +1500,7 @@ EOTXT;
      *
      * @return Process
      */
-    private function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60)
+    private function getProcess(string $commandline, ?string $cwd = null, array $env = null, ?string $input = null, int $timeout = 60): Process
     {
         $process = new Process($commandline, $cwd, $env, $input, $timeout);
         $process->inheritEnvironmentVariables();
@@ -1515,7 +1515,7 @@ EOTXT;
     /**
      * @return Process
      */
-    private function getProcessForCode($code, $cwd = null, array $env = null, $input = null, $timeout = 60)
+    private function getProcessForCode($code, $cwd = null, array $env = null, $input = null, $timeout = 60): Process
     {
         return $this->getProcess(array(self::$phpBin, '-r', $code), $cwd, $env, $input, $timeout);
     }

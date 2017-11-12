@@ -45,7 +45,7 @@ class EnumNodeDefinition extends ScalarNodeDefinition
      *
      * @throws \RuntimeException
      */
-    protected function instantiateNode()
+    protected function instantiateNode(): EnumNode
     {
         if (null === $this->values) {
             throw new \RuntimeException('You must call ->values() on enum nodes.');

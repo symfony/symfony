@@ -43,7 +43,7 @@ interface ConfigurableRequirementsInterface
      *
      * @param bool|null $enabled
      */
-    public function setStrictRequirements($enabled);
+    public function setStrictRequirements(?bool $enabled): void;
 
     /**
      * Returns whether to throw an exception on incorrect parameters.
@@ -51,5 +51,5 @@ interface ConfigurableRequirementsInterface
      *
      * @return bool|null
      */
-    public function isStrictRequirements();
+    public function isStrictRequirements(): ?bool;
 }

@@ -49,7 +49,7 @@ abstract class FrameworkExtensionTest extends TestCase
 {
     private static $containerCache = array();
 
-    abstract protected function loadFromFile(ContainerBuilder $container, $file);
+    abstract protected function loadFromFile(ContainerBuilder $container, $file): void;
 
     public function testFormCsrfProtection(): void
     {

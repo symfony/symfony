@@ -104,7 +104,7 @@ class ProjectServiceContainer extends Container
      *
      * @throws InvalidArgumentException When the dynamic parameter does not exist
      */
-    private function getDynamicParameter($name)
+    private function getDynamicParameter(string $name)
     {
         throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
@@ -114,7 +114,7 @@ class ProjectServiceContainer extends Container
      *
      * @return array An array of the default parameters
      */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return array(
             'foo' => 'bar',

@@ -23,7 +23,7 @@ interface FormRendererInterface
      *
      * @return FormRendererEngineInterface The renderer engine
      */
-    public function getEngine();
+    public function getEngine(): FormRendererEngineInterface;
 
     /**
      * Sets the theme(s) to be used for rendering a view and its children.
@@ -34,7 +34,7 @@ interface FormRendererInterface
      * @param bool     $useDefaultThemes If true, will use default themes specified
      *                                   in the renderer
      */
-    public function setTheme(FormView $view, $themes, $useDefaultThemes = true);
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true): void;
 
     /**
      * Renders a named block of the form theme.
@@ -45,7 +45,7 @@ interface FormRendererInterface
      *
      * @return string The HTML markup
      */
-    public function renderBlock(FormView $view, $blockName, array $variables = array());
+    public function renderBlock(FormView $view, string $blockName, array $variables = array()): string;
 
     /**
      * Searches and renders a block for a given name suffix.
@@ -63,7 +63,7 @@ interface FormRendererInterface
      *
      * @return string The HTML markup
      */
-    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = array());
+    public function searchAndRenderBlock(FormView $view, string $blockNameSuffix, array $variables = array()): string;
 
     /**
      * Renders a CSRF token.
@@ -88,7 +88,7 @@ interface FormRendererInterface
      *
      * @return string A CSRF token
      */
-    public function renderCsrfToken($tokenId);
+    public function renderCsrfToken(string $tokenId): string;
 
     /**
      * Makes a technical name human readable.
@@ -101,5 +101,5 @@ interface FormRendererInterface
      *
      * @return string The humanized text
      */
-    public function humanize($text);
+    public function humanize(string $text): string;
 }

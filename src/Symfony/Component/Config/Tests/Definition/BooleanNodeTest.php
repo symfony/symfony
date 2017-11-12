@@ -30,7 +30,7 @@ class BooleanNodeTest extends TestCase
      *
      * @param bool $value
      */
-    public function testValidNonEmptyValues($value): void
+    public function testValidNonEmptyValues(bool $value): void
     {
         $node = new BooleanNode('test');
         $node->setAllowEmptyValue(false);

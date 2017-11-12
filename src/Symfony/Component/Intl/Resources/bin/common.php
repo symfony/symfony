@@ -53,7 +53,7 @@ function run($command): void
     }
 }
 
-function get_icu_version_from_genrb($genrb)
+function get_icu_version_from_genrb($genrb): void
 {
     exec($genrb.' --version 2>&1', $output, $status);
 

@@ -26,7 +26,7 @@ interface LoaderInterface
      *
      * @throws \Exception If something went wrong
      */
-    public function load($resource, $type = null);
+    public function load($resource, $type = null): void;
 
     /**
      * Returns whether this class supports the given resource.
@@ -36,17 +36,17 @@ interface LoaderInterface
      *
      * @return bool True if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null);
+    public function supports($resource, $type = null): bool;
 
     /**
      * Gets the loader resolver.
      *
      * @return LoaderResolverInterface A LoaderResolverInterface instance
      */
-    public function getResolver();
+    public function getResolver(): LoaderResolverInterface;
 
     /**
      * Sets the loader resolver.
      */
-    public function setResolver(LoaderResolverInterface $resolver);
+    public function setResolver(LoaderResolverInterface $resolver): void;
 }

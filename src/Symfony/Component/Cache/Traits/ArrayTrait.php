@@ -32,7 +32,7 @@ trait ArrayTrait
      *
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }

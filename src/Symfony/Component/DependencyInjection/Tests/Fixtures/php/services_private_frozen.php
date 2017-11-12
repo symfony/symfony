@@ -61,7 +61,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getBarServiceService()
+    protected function getBarServiceService(): \stdClass
     {
         $a = ($this->privates['baz_service'] ?? $this->privates['baz_service'] = new \stdClass());
 
@@ -77,7 +77,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getFooServiceService()
+    protected function getFooServiceService(): \stdClass
     {
         $a = ($this->privates['baz_service'] ?? $this->privates['baz_service'] = new \stdClass());
 

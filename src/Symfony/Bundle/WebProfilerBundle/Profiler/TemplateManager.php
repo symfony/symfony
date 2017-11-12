@@ -48,7 +48,7 @@ class TemplateManager
      *
      * @throws NotFoundHttpException
      */
-    public function getName(Profile $profile, $panel)
+    public function getName(Profile $profile, string $panel)
     {
         $templates = $this->getNames($profile);
 
@@ -66,7 +66,7 @@ class TemplateManager
      *
      * @throws \UnexpectedValueException
      */
-    public function getNames(Profile $profile)
+    public function getNames(Profile $profile): array
     {
         $templates = array();
 

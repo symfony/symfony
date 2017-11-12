@@ -100,7 +100,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * @param string          $format The name of the loader (@see addResource())
      * @param LoaderInterface $loader A LoaderInterface instance
      */
-    public function addLoader($format, LoaderInterface $loader): void
+    public function addLoader(string $format, LoaderInterface $loader): void
     {
         $this->loaders[$format] = $loader;
     }
@@ -115,7 +115,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    public function addResource($format, $resource, $locale, $domain = null): void
+    public function addResource(string $format, $resource, $locale, $domain = null): void
     {
         if (null === $domain) {
             $domain = 'messages';
@@ -173,7 +173,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @return array $locales The fallback locales
      */
-    public function getFallbackLocales()
+    public function getFallbackLocales(): array
     {
         return $this->fallbackLocales;
     }
@@ -241,7 +241,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @return array LoaderInterface[]
      */
-    protected function getLoaders()
+    protected function getLoaders(): array
     {
         return $this->loaders;
     }
@@ -249,7 +249,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * @param string $locale
      */
-    protected function loadCatalogue($locale): void
+    protected function loadCatalogue(string $locale): void
     {
         if (null === $this->cacheDir) {
             $this->initializeCatalogue($locale);
@@ -261,7 +261,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * @param string $locale
      */
-    protected function initializeCatalogue($locale): void
+    protected function initializeCatalogue(string $locale): void
     {
         $this->assertValidLocale($locale);
 
@@ -415,7 +415,7 @@ EOF
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    protected function assertValidLocale($locale): void
+    protected function assertValidLocale(string $locale): void
     {
         if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));

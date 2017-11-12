@@ -26,7 +26,7 @@ class Comparator
      *
      * @return string The target value
      */
-    public function getTarget()
+    public function getTarget(): string
     {
         return $this->target;
     }
@@ -36,7 +36,7 @@ class Comparator
      *
      * @param string $target The target value
      */
-    public function setTarget($target): void
+    public function setTarget(string $target): void
     {
         $this->target = $target;
     }
@@ -46,7 +46,7 @@ class Comparator
      *
      * @return string The operator
      */
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->operator;
     }
@@ -58,7 +58,7 @@ class Comparator
      *
      * @throws \InvalidArgumentException
      */
-    public function setOperator($operator): void
+    public function setOperator(string $operator): void
     {
         if (!$operator) {
             $operator = '==';
@@ -78,7 +78,7 @@ class Comparator
      *
      * @return bool
      */
-    public function test($test)
+    public function test($test): bool
     {
         switch ($this->operator) {
             case '>':

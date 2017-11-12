@@ -111,7 +111,7 @@ class TokenBasedRememberMeServicesTest extends TestCase
      *
      * @param string $username
      */
-    public function testAutoLogin($username): void
+    public function testAutoLogin(string $username): void
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user

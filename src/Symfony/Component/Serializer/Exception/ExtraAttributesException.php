@@ -34,7 +34,7 @@ class ExtraAttributesException extends RuntimeException
      *
      * @return array
      */
-    public function getExtraAttributes()
+    public function getExtraAttributes(): array
     {
         return $this->extraAttributes;
     }

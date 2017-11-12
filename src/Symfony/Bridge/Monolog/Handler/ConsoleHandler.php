@@ -169,7 +169,7 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      *
      * @return bool Whether the handler is enabled and verbosity is not set to quiet
      */
-    private function updateLevel()
+    private function updateLevel(): bool
     {
         if (null === $this->output) {
             return false;

@@ -63,7 +63,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      *
      * @throws BadMethodCallException When the extension name does not follow conventions
      */
-    public function getAlias()
+    public function getAlias(): string
     {
         $className = get_class($this);
         if ('Extension' != substr($className, -9)) {
@@ -113,7 +113,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      *
      * @throws InvalidArgumentException When the config is not enableable
      */
-    protected function isConfigEnabled(ContainerBuilder $container, array $config)
+    protected function isConfigEnabled(ContainerBuilder $container, array $config): bool
     {
         if (!array_key_exists('enabled', $config)) {
             throw new InvalidArgumentException("The config array has no 'enabled' key.");

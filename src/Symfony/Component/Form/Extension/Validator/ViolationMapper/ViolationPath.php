@@ -211,7 +211,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @throws OutOfBoundsException if the offset is invalid
      */
-    public function mapsForm($index)
+    public function mapsForm(int $index): bool
     {
         if (!isset($this->mapsForm[$index])) {
             throw new OutOfBoundsException(sprintf('The index %s is not within the violation path', $index));
@@ -225,7 +225,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @return ViolationPathIterator
      */
-    public function getIterator()
+    public function getIterator(): ViolationPathIterator
     {
         return new ViolationPathIterator($this);
     }

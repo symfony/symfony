@@ -26,21 +26,21 @@ interface FormConfigInterface
      *
      * @return EventDispatcherInterface The dispatcher
      */
-    public function getEventDispatcher();
+    public function getEventDispatcher(): EventDispatcherInterface;
 
     /**
      * Returns the name of the form used as HTTP parameter.
      *
      * @return string The form name
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Returns the property path that the form should be mapped to.
      *
      * @return null|PropertyPathInterface The property path
      */
-    public function getPropertyPath();
+    public function getPropertyPath(): ?PropertyPathInterface;
 
     /**
      * Returns whether the form should be mapped to an element of its
@@ -48,21 +48,21 @@ interface FormConfigInterface
      *
      * @return bool Whether the form is mapped
      */
-    public function getMapped();
+    public function getMapped(): bool;
 
     /**
      * Returns whether the form's data should be modified by reference.
      *
      * @return bool Whether to modify the form's data by reference
      */
-    public function getByReference();
+    public function getByReference(): bool;
 
     /**
      * Returns whether the form should read and write the data of its parent.
      *
      * @return bool Whether the form should inherit its parent's data
      */
-    public function getInheritData();
+    public function getInheritData(): bool;
 
     /**
      * Returns whether the form is compound.
@@ -73,14 +73,14 @@ interface FormConfigInterface
      *
      * @return bool Whether the form is compound
      */
-    public function getCompound();
+    public function getCompound(): bool;
 
     /**
      * Returns the form types used to construct the form.
      *
      * @return ResolvedFormTypeInterface The form's type
      */
-    public function getType();
+    public function getType(): ResolvedFormTypeInterface;
 
     /**
      * Returns the view transformers of the form.
@@ -101,28 +101,28 @@ interface FormConfigInterface
      *
      * @return DataMapperInterface The data mapper
      */
-    public function getDataMapper();
+    public function getDataMapper(): DataMapperInterface;
 
     /**
      * Returns whether the form is required.
      *
      * @return bool Whether the form is required
      */
-    public function getRequired();
+    public function getRequired(): bool;
 
     /**
      * Returns whether the form is disabled.
      *
      * @return bool Whether the form is disabled
      */
-    public function getDisabled();
+    public function getDisabled(): bool;
 
     /**
      * Returns whether errors attached to the form will bubble to its parent.
      *
      * @return bool Whether errors will bubble up
      */
-    public function getErrorBubbling();
+    public function getErrorBubbling(): bool;
 
     /**
      * Returns the data that should be returned when the form is empty.
@@ -136,7 +136,7 @@ interface FormConfigInterface
      *
      * @return array An array of key-value combinations
      */
-    public function getAttributes();
+    public function getAttributes(): array;
 
     /**
      * Returns whether the attribute with the given name exists.
@@ -145,7 +145,7 @@ interface FormConfigInterface
      *
      * @return bool Whether the attribute exists
      */
-    public function hasAttribute($name);
+    public function hasAttribute(string $name): bool;
 
     /**
      * Returns the value of the given attribute.
@@ -155,7 +155,7 @@ interface FormConfigInterface
      *
      * @return mixed The attribute value
      */
-    public function getAttribute($name, $default = null);
+    public function getAttribute(string $name, $default = null);
 
     /**
      * Returns the initial data of the form.
@@ -169,7 +169,7 @@ interface FormConfigInterface
      *
      * @return null|string The data class or null
      */
-    public function getDataClass();
+    public function getDataClass(): ?string;
 
     /**
      * Returns whether the form's data is locked.
@@ -180,35 +180,35 @@ interface FormConfigInterface
      *
      * @return bool Whether the data is locked
      */
-    public function getDataLocked();
+    public function getDataLocked(): bool;
 
     /**
      * Returns the form factory used for creating new forms.
      *
      * @return FormFactoryInterface The form factory
      */
-    public function getFormFactory();
+    public function getFormFactory(): FormFactoryInterface;
 
     /**
      * Returns the target URL of the form.
      *
      * @return string The target URL of the form
      */
-    public function getAction();
+    public function getAction(): string;
 
     /**
      * Returns the HTTP method used by the form.
      *
      * @return string The HTTP method of the form
      */
-    public function getMethod();
+    public function getMethod(): string;
 
     /**
      * Returns the request handler used by the form.
      *
      * @return RequestHandlerInterface The request handler
      */
-    public function getRequestHandler();
+    public function getRequestHandler(): RequestHandlerInterface;
 
     /**
      * Returns whether the form should be initialized upon creation.
@@ -216,14 +216,14 @@ interface FormConfigInterface
      * @return bool returns true if the form should be initialized
      *              when created, false otherwise
      */
-    public function getAutoInitialize();
+    public function getAutoInitialize(): bool;
 
     /**
      * Returns all options passed during the construction of the form.
      *
      * @return array The passed options
      */
-    public function getOptions();
+    public function getOptions(): array;
 
     /**
      * Returns whether a specific option exists.
@@ -232,7 +232,7 @@ interface FormConfigInterface
      *
      * @return bool Whether the option exists
      */
-    public function hasOption($name);
+    public function hasOption(string $name): bool;
 
     /**
      * Returns the value of a specific option.
@@ -242,5 +242,5 @@ interface FormConfigInterface
      *
      * @return mixed The option value
      */
-    public function getOption($name, $default = null);
+    public function getOption(string $name, $default = null);
 }

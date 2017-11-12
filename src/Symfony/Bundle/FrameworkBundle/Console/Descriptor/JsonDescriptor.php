@@ -191,7 +191,7 @@ class JsonDescriptor extends Descriptor
     /**
      * @return array
      */
-    protected function getRouteData(Route $route)
+    protected function getRouteData(Route $route): array
     {
         return array(
             'path' => $route->getPath(),

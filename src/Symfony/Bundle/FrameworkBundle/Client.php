@@ -44,7 +44,7 @@ class Client extends BaseClient
      *
      * @return ContainerInterface|null Returns null when the Kernel has been shutdown or not started yet
      */
-    public function getContainer()
+    public function getContainer(): ?ContainerInterface
     {
         return $this->kernel->getContainer();
     }
@@ -54,7 +54,7 @@ class Client extends BaseClient
      *
      * @return KernelInterface
      */
-    public function getKernel()
+    public function getKernel(): KernelInterface
     {
         return $this->kernel;
     }
@@ -159,7 +159,7 @@ class Client extends BaseClient
      *
      * @return string The script content
      */
-    protected function getScript($request)
+    protected function getScript(Request $request): string
     {
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));

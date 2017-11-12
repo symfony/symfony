@@ -198,12 +198,12 @@ abstract class ConstraintValidatorTestCase extends TestCase
     /**
      * @return ConstraintViolationAssertion
      */
-    protected function buildViolation($message)
+    protected function buildViolation($message): ConstraintViolationAssertion
     {
         return new ConstraintViolationAssertion($this->context, $message, $this->constraint);
     }
 
-    abstract protected function createValidator();
+    abstract protected function createValidator(): void;
 }
 
 /**

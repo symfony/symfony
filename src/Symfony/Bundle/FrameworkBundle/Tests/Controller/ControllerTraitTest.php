@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 abstract class ControllerTraitTest extends TestCase
 {
-    abstract protected function createController();
+    abstract protected function createController(): void;
 
     public function testForward(): void
     {
@@ -100,7 +100,7 @@ abstract class ControllerTraitTest extends TestCase
     /**
      * @return Container
      */
-    private function getContainerWithTokenStorage($token = null)
+    private function getContainerWithTokenStorage($token = null): Container
     {
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage')->getMock();
         $tokenStorage

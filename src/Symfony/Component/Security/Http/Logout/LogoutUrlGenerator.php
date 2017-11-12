@@ -48,7 +48,7 @@ class LogoutUrlGenerator
      * @param CsrfTokenManagerInterface|null $csrfTokenManager A CsrfTokenManagerInterface instance
      * @param string|null                    $context          The listener context
      */
-    public function registerListener($key, $logoutPath, $csrfTokenId, $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null): void
+    public function registerListener(string $key, string $logoutPath, string $csrfTokenId, string $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null): void
     {
         $this->listeners[$key] = array($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context);
     }
@@ -60,7 +60,7 @@ class LogoutUrlGenerator
      *
      * @return string The logout path
      */
-    public function getLogoutPath($key = null)
+    public function getLogoutPath(?string $key = null): string
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
@@ -72,7 +72,7 @@ class LogoutUrlGenerator
      *
      * @return string The logout URL
      */
-    public function getLogoutUrl($key = null)
+    public function getLogoutUrl(?string $key = null): string
     {
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
@@ -81,7 +81,7 @@ class LogoutUrlGenerator
      * @param string|null $key     The current firewall key
      * @param string|null $context The current firewall context
      */
-    public function setCurrentFirewall($key, $context = null): void
+    public function setCurrentFirewall(?string $key, ?string $context = null): void
     {
         $this->currentFirewall = array($key, $context);
     }
@@ -94,7 +94,7 @@ class LogoutUrlGenerator
      *
      * @return string The logout URL
      */
-    private function generateLogoutUrl($key, $referenceType)
+    private function generateLogoutUrl(?string $key, int $referenceType): string
     {
         list($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager) = $this->getListener($key);
 
@@ -134,7 +134,7 @@ class LogoutUrlGenerator
      *
      * @throws \InvalidArgumentException if no LogoutListener is registered for the key or could not be found automatically
      */
-    private function getListener($key)
+    private function getListener(?string $key): array
     {
         if (null !== $key) {
             if (isset($this->listeners[$key])) {

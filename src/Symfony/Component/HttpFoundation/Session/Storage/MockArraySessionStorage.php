@@ -218,7 +218,7 @@ class MockArraySessionStorage implements SessionStorageInterface
      *
      * @return MetadataBag
      */
-    public function getMetadataBag()
+    public function getMetadataBag(): MetadataBag
     {
         return $this->metadataBag;
     }
@@ -231,7 +231,7 @@ class MockArraySessionStorage implements SessionStorageInterface
      *
      * @return string
      */
-    protected function generateId()
+    protected function generateId(): string
     {
         return hash('sha256', uniqid('ss_mock_', true));
     }

@@ -27,7 +27,7 @@ interface PropertyAccessExtractorInterface
      *
      * @return bool|null
      */
-    public function isReadable($class, $property, array $context = array());
+    public function isReadable(string $class, string $property, array $context = array()): ?bool;
 
     /**
      * Is the property writable?
@@ -38,5 +38,5 @@ interface PropertyAccessExtractorInterface
      *
      * @return bool|null
      */
-    public function isWritable($class, $property, array $context = array());
+    public function isWritable(string $class, string $property, array $context = array()): ?bool;
 }

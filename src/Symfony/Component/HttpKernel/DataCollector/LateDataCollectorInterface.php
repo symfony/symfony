@@ -21,5 +21,5 @@ interface LateDataCollectorInterface
     /**
      * Collects data as late as possible.
      */
-    public function lateCollect();
+    public function lateCollect(): void;
 }

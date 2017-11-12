@@ -41,7 +41,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException if the given value is not a Boolean
      */
-    public function transform($value)
+    public function transform(bool $value)
     {
         if (null === $value) {
             return;
@@ -63,7 +63,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException if the given value is not a string
      */
-    public function reverseTransform($value)
+    public function reverseTransform(string $value): bool
     {
         if (null === $value) {
             return false;

@@ -87,7 +87,7 @@ class TokenStream
      *
      * @throws InternalErrorException If there is no more token
      */
-    public function getNext()
+    public function getNext(): Token
     {
         if ($this->peeking) {
             $this->peeking = false;
@@ -108,7 +108,7 @@ class TokenStream
      *
      * @return Token
      */
-    public function getPeek()
+    public function getPeek(): Token
     {
         if (!$this->peeking) {
             $this->peeked = $this->getNext();
@@ -135,7 +135,7 @@ class TokenStream
      *
      * @throws SyntaxErrorException If next token is not an identifier
      */
-    public function getNextIdentifier()
+    public function getNextIdentifier(): string
     {
         $next = $this->getNext();
 
@@ -153,7 +153,7 @@ class TokenStream
      *
      * @throws SyntaxErrorException If next token is not an identifier or a star delimiter
      */
-    public function getNextIdentifierOrStar()
+    public function getNextIdentifierOrStar(): ?string
     {
         $next = $this->getNext();
 

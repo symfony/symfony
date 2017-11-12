@@ -37,7 +37,7 @@ class InvalidConfigurationException extends Exception
      *
      * @param string $hint
      */
-    public function addHint($hint): void
+    public function addHint(string $hint): void
     {
         if (!$this->containsHints) {
             $this->message .= "\nHint: ".$hint;

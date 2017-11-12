@@ -164,7 +164,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
      *
      * @return PropertyPathIteratorInterface
      */
-    public function getIterator()
+    public function getIterator(): PropertyPathIteratorInterface
     {
         return new PropertyPathIterator($this);
     }

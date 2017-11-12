@@ -90,7 +90,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
      *
      * @throws \RuntimeException if no engine able to work with the template is found
      */
-    public function getEngine($name)
+    public function getEngine($name): EngineInterface
     {
         foreach ($this->engines as $engine) {
             if ($engine->supports($name)) {

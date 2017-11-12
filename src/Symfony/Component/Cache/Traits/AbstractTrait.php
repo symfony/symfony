@@ -49,7 +49,7 @@ trait AbstractTrait
      *
      * @return bool True if item exists in the cache, false otherwise
      */
-    abstract protected function doHave($id);
+    abstract protected function doHave(string $id): bool;
 
     /**
      * Deletes all items in the pool.
@@ -58,7 +58,7 @@ trait AbstractTrait
      *
      * @return bool True if the pool was successfully cleared, false otherwise
      */
-    abstract protected function doClear($namespace);
+    abstract protected function doClear(string $namespace): bool;
 
     /**
      * Removes multiple items from the pool.
@@ -67,7 +67,7 @@ trait AbstractTrait
      *
      * @return bool True if the items were successfully removed, false otherwise
      */
-    abstract protected function doDelete(array $ids);
+    abstract protected function doDelete(array $ids): bool;
 
     /**
      * Persists several cache items immediately.
@@ -77,7 +77,7 @@ trait AbstractTrait
      *
      * @return array|bool The identifiers that failed to be cached or a boolean stating if caching succeeded or not
      */
-    abstract protected function doSave(array $values, $lifetime);
+    abstract protected function doSave(array $values, int $lifetime);
 
     /**
      * {@inheritdoc}
@@ -180,7 +180,7 @@ trait AbstractTrait
      *
      * @return bool the previous state of versioning
      */
-    public function enableVersioning($enable = true)
+    public function enableVersioning(bool $enable = true): bool
     {
         $wasEnabled = $this->versioningIsEnabled;
         $this->versioningIsEnabled = (bool) $enable;
@@ -209,7 +209,7 @@ trait AbstractTrait
      *
      * @throws \Exception
      */
-    protected static function unserialize($value)
+    protected static function unserialize(string $value)
     {
         if ('b:0;' === $value) {
             return false;

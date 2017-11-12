@@ -30,7 +30,7 @@ class Reference
     /**
      * @return string The service identifier
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }
@@ -40,7 +40,7 @@ class Reference
      *
      * @return int
      */
-    public function getInvalidBehavior()
+    public function getInvalidBehavior(): int
     {
         return $this->invalidBehavior;
     }

@@ -36,7 +36,7 @@ class TypeHinted
     /**
      * @return \Countable
      */
-    public function getCountable()
+    public function getCountable(): \Countable
     {
         return $this->countable;
     }

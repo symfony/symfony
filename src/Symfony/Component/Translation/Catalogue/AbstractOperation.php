@@ -154,5 +154,5 @@ abstract class AbstractOperation implements OperationInterface
      *
      * @param string $domain The domain which the operation will be performed for
      */
-    abstract protected function processDomain($domain);
+    abstract protected function processDomain(string $domain): void;
 }

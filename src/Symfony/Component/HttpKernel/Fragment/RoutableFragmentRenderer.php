@@ -31,7 +31,7 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
      *
      * @see FragmentListener
      */
-    public function setFragmentPath($path): void
+    public function setFragmentPath(string $path): void
     {
         $this->fragmentPath = $path;
     }
@@ -46,7 +46,7 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
      *
      * @return string A fragment URI
      */
-    protected function generateFragmentUri(ControllerReference $reference, Request $request, $absolute = false, $strict = true)
+    protected function generateFragmentUri(ControllerReference $reference, Request $request, bool $absolute = false, bool $strict = true): string
     {
         if ($strict) {
             $this->checkNonScalar($reference->attributes);

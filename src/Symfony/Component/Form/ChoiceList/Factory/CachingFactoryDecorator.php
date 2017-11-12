@@ -47,7 +47,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      *
      * @internal
      */
-    public static function generateHash($value, $namespace = '')
+    public static function generateHash($value, $namespace = ''): string
     {
         if (is_object($value)) {
             $value = spl_object_hash($value);
@@ -70,7 +70,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      *
      * @internal
      */
-    private static function flatten(array $array, &$output): void
+    private static function flatten(array $array, array &$output): void
     {
         if (null === $output) {
             $output = array();
@@ -96,7 +96,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      *
      * @return ChoiceListFactoryInterface The decorated factory
      */
-    public function getDecoratedFactory()
+    public function getDecoratedFactory(): ChoiceListFactoryInterface
     {
         return $this->decoratedFactory;
     }

@@ -1371,7 +1371,7 @@ class FrameworkExtension extends Extension
      *
      * @return string
      */
-    private function getKernelRootHash(ContainerBuilder $container)
+    private function getKernelRootHash(ContainerBuilder $container): string
     {
         if (!$this->kernelRootHash) {
             $this->kernelRootHash = hash('sha256', $container->getParameter('kernel.root_dir'));
@@ -1385,7 +1385,7 @@ class FrameworkExtension extends Extension
      *
      * @return string The XSD base path
      */
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string
     {
         return dirname(__DIR__).'/Resources/config/schema';
     }

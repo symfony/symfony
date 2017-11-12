@@ -84,7 +84,7 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * @throws \InvalidArgumentException
      */
-    protected function createController($controller)
+    protected function createController(string $controller): callable
     {
         if (false === strpos($controller, '::')) {
             throw new \InvalidArgumentException(sprintf('Unable to find controller "%s".', $controller));
@@ -106,7 +106,7 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * @return object
      */
-    protected function instantiateController($class)
+    protected function instantiateController(string $class)
     {
         return new $class();
     }

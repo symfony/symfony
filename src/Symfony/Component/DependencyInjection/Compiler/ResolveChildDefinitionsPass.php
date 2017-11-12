@@ -52,7 +52,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
      *
      * @throws RuntimeException When the definition is invalid
      */
-    private function resolveDefinition(ChildDefinition $definition)
+    private function resolveDefinition(ChildDefinition $definition): Definition
     {
         try {
             return $this->doResolveDefinition($definition);

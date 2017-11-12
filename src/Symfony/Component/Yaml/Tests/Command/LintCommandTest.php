@@ -93,7 +93,7 @@ YAML;
     /**
      * @return string Path to the new file
      */
-    private function createFile($content)
+    private function createFile($content): string
     {
         $filename = tempnam(sys_get_temp_dir().'/framework-yml-lint-test', 'sf-');
         file_put_contents($filename, $content);
@@ -106,7 +106,7 @@ YAML;
     /**
      * @return CommandTester
      */
-    protected function createCommandTester()
+    protected function createCommandTester(): CommandTester
     {
         $application = new Application();
         $application->add(new LintCommand());

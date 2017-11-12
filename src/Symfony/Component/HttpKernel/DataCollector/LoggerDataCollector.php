@@ -73,7 +73,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return array An array of logs
      */
-    public function getLogs()
+    public function getLogs(): array
     {
         return isset($this->data['logs']) ? $this->data['logs'] : array();
     }

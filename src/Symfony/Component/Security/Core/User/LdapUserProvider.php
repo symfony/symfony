@@ -115,7 +115,7 @@ class LdapUserProvider implements UserProviderInterface
      *
      * @return User
      */
-    protected function loadUser($username, Entry $entry)
+    protected function loadUser(string $username, Entry $entry): User
     {
         $password = null;
 
@@ -132,7 +132,7 @@ class LdapUserProvider implements UserProviderInterface
      * @param null|Entry $entry
      * @param string     $attribute
      */
-    private function getAttributeValue(Entry $entry, $attribute)
+    private function getAttributeValue(Entry $entry, string $attribute)
     {
         if (!$entry->hasAttribute($attribute)) {
             throw new InvalidArgumentException(sprintf('Missing attribute "%s" for user "%s".', $attribute, $entry->getDn()));

@@ -353,11 +353,11 @@ abstract class AbstractRequestHandlerTest extends TestCase
         );
     }
 
-    abstract protected function setRequestData($method, $data, $files = array());
+    abstract protected function setRequestData($method, $data, $files = array()): void;
 
-    abstract protected function getRequestHandler();
+    abstract protected function getRequestHandler(): void;
 
-    abstract protected function getMockFile($suffix = '');
+    abstract protected function getMockFile($suffix = ''): void;
 
     protected function getMockForm($name, $method = null, $compound = true)
     {

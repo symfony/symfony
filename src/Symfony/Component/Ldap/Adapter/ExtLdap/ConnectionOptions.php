@@ -59,7 +59,7 @@ final class ConnectionOptions
      *
      * @throws LdapException
      */
-    public static function getOption($name)
+    public static function getOption(string $name): int
     {
         // Convert
         $constantName = self::getOptionName($name);

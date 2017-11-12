@@ -118,7 +118,7 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
      *
      * @return TestFormLoginAuthenticator
      */
-    public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl)
+    public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl): TestFormLoginAuthenticator
     {
         $this->defaultSuccessRedirectUrl = $defaultSuccessRedirectUrl;
 
@@ -130,7 +130,7 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
      *
      * @return TestFormLoginAuthenticator
      */
-    public function setLoginUrl($loginUrl)
+    public function setLoginUrl($loginUrl): TestFormLoginAuthenticator
     {
         $this->loginUrl = $loginUrl;
 

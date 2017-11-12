@@ -33,7 +33,7 @@ class PhpFileLoader extends FileLoader
      *
      * @return RouteCollection A RouteCollection instance
      */
-    public function load($file, $type = null)
+    public function load(string $file, ?string $type = null): RouteCollection
     {
         $path = $this->locator->locate($file);
         $this->setCurrentDir(dirname($path));

@@ -114,7 +114,7 @@ EOF;
     /**
      * @return string Path to the new file
      */
-    private function createFile($content)
+    private function createFile($content): string
     {
         $filename = tempnam(sys_get_temp_dir().'/yml-lint-test', 'sf-');
         file_put_contents($filename, $content);
@@ -127,7 +127,7 @@ EOF;
     /**
      * @return CommandTester
      */
-    private function createCommandTester($application = null)
+    private function createCommandTester($application = null): CommandTester
     {
         if (!$application) {
             $application = new BaseApplication();

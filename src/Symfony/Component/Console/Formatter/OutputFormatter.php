@@ -31,7 +31,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @return string Escaped text
      */
-    public static function escape($text)
+    public static function escape(string $text): string
     {
         $text = preg_replace('/([^\\\\]?)</', '$1\\<', $text);
 
@@ -47,7 +47,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @internal
      */
-    public static function escapeTrailingBackslash($text)
+    public static function escapeTrailingBackslash(string $text): string
     {
         if ('\\' === substr($text, -1)) {
             $len = strlen($text);
@@ -178,7 +178,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * @return OutputFormatterStyleStack
      */
-    public function getStyleStack()
+    public function getStyleStack(): OutputFormatterStyleStack
     {
         return $this->styleStack;
     }

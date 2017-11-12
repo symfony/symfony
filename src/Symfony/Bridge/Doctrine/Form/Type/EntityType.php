@@ -51,7 +51,7 @@ class EntityType extends DoctrineType
      *
      * @return ORMQueryBuilderLoader
      */
-    public function getLoader(ObjectManager $manager, $queryBuilder, $class)
+    public function getLoader(ObjectManager $manager, QueryBuilder $queryBuilder, string $class): ORMQueryBuilderLoader
     {
         return new ORMQueryBuilderLoader($queryBuilder);
     }
@@ -75,7 +75,7 @@ class EntityType extends DoctrineType
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public function getQueryBuilderPartsForCachingHash($queryBuilder)
+    public function getQueryBuilderPartsForCachingHash(QueryBuilder $queryBuilder): array
     {
         return array(
             $queryBuilder->getQuery()->getSQL(),
@@ -88,7 +88,7 @@ class EntityType extends DoctrineType
      *
      * @return array The array representation of the parameter
      */
-    private function parameterToArray(Parameter $parameter)
+    private function parameterToArray(Parameter $parameter): array
     {
         return array($parameter->getName(), $parameter->getType(), $parameter->getValue());
     }

@@ -86,7 +86,7 @@ class CacheLoader extends Loader
      *
      * @return bool
      */
-    public function isFresh(TemplateReferenceInterface $template, $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         return $this->loader->isFresh($template, $time);
     }

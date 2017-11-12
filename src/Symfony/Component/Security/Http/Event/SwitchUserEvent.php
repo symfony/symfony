@@ -37,7 +37,7 @@ class SwitchUserEvent extends Event
     /**
      * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -45,7 +45,7 @@ class SwitchUserEvent extends Event
     /**
      * @return UserInterface
      */
-    public function getTargetUser()
+    public function getTargetUser(): UserInterface
     {
         return $this->targetUser;
     }
@@ -53,7 +53,7 @@ class SwitchUserEvent extends Event
     /**
      * @return TokenInterface|null
      */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         return $this->token;
     }

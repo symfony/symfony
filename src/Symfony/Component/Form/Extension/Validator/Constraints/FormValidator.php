@@ -137,7 +137,7 @@ class FormValidator extends ConstraintValidator
      *
      * @return array The validation groups
      */
-    private static function getValidationGroups(FormInterface $form)
+    private static function getValidationGroups(FormInterface $form): array
     {
         // Determine the clicked button of the complete form tree
         $clickedButton = null;
@@ -175,7 +175,7 @@ class FormValidator extends ConstraintValidator
      *
      * @return array The validation groups
      */
-    private static function resolveValidationGroups($groups, FormInterface $form)
+    private static function resolveValidationGroups($groups, FormInterface $form): array
     {
         if (!is_string($groups) && is_callable($groups)) {
             $groups = call_user_func($groups, $form);

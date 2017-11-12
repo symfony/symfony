@@ -31,7 +31,7 @@ class TraceableValidator implements ValidatorInterface
     /**
      * @return array
      */
-    public function getCollectedData()
+    public function getCollectedData(): array
     {
         return $this->collectedData;
     }

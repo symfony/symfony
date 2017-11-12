@@ -100,7 +100,7 @@ EOF;
      *
      * @return string
      */
-    private function getProxyClassName(Definition $definition)
+    private function getProxyClassName(Definition $definition): string
     {
         return preg_replace('/^.*\\\\/', '', $definition->getClass()).'_'.substr(hash('sha256', spl_object_hash($definition).$this->salt), -7);
     }
@@ -108,7 +108,7 @@ EOF;
     /**
      * @return ClassGenerator
      */
-    private function generateProxyClass(Definition $definition)
+    private function generateProxyClass(Definition $definition): ClassGenerator
     {
         $generatedClass = new ClassGenerator($this->getProxyClassName($definition));
 

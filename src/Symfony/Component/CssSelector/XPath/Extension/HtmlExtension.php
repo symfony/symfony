@@ -66,7 +66,7 @@ class HtmlExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateChecked(XPathExpr $xpath)
+    public function translateChecked(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition(
             '(@checked '
@@ -78,7 +78,7 @@ class HtmlExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateLink(XPathExpr $xpath)
+    public function translateLink(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition("@href and (name(.) = 'a' or name(.) = 'link' or name(.) = 'area')");
     }
@@ -86,7 +86,7 @@ class HtmlExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateDisabled(XPathExpr $xpath)
+    public function translateDisabled(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition(
             '('
@@ -115,7 +115,7 @@ class HtmlExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateEnabled(XPathExpr $xpath)
+    public function translateEnabled(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition(
             '('
@@ -153,7 +153,7 @@ class HtmlExtension extends AbstractExtension
      *
      * @throws ExpressionErrorException
      */
-    public function translateLang(XPathExpr $xpath, FunctionNode $function)
+    public function translateLang(XPathExpr $xpath, FunctionNode $function): XPathExpr
     {
         $arguments = $function->getArguments();
         foreach ($arguments as $token) {
@@ -177,7 +177,7 @@ class HtmlExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateSelected(XPathExpr $xpath)
+    public function translateSelected(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition("(@selected and name(.) = 'option')");
     }
@@ -185,7 +185,7 @@ class HtmlExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateInvalid(XPathExpr $xpath)
+    public function translateInvalid(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition('0');
     }
@@ -193,7 +193,7 @@ class HtmlExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateHover(XPathExpr $xpath)
+    public function translateHover(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition('0');
     }
@@ -201,7 +201,7 @@ class HtmlExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateVisited(XPathExpr $xpath)
+    public function translateVisited(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition('0');
     }

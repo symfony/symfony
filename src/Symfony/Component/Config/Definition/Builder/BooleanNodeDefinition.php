@@ -36,7 +36,7 @@ class BooleanNodeDefinition extends ScalarNodeDefinition
      *
      * @return BooleanNode The node
      */
-    protected function instantiateNode()
+    protected function instantiateNode(): BooleanNode
     {
         return new BooleanNode($this->name, $this->parent);
     }

@@ -47,7 +47,7 @@ class CsvFileDumper extends FileDumper
      * @param string $delimiter Delimiter character
      * @param string $enclosure Enclosure character
      */
-    public function setCsvControl($delimiter = ';', $enclosure = '"'): void
+    public function setCsvControl(string $delimiter = ';', string $enclosure = '"'): void
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;

@@ -27,12 +27,12 @@ interface ExtractorInterface
      * @param string|array     $resource  Files, a file or a directory
      * @param MessageCatalogue $catalogue The catalogue
      */
-    public function extract($resource, MessageCatalogue $catalogue);
+    public function extract($resource, MessageCatalogue $catalogue): void;
 
     /**
      * Sets the prefix that should be used for new found messages.
      *
      * @param string $prefix The prefix
      */
-    public function setPrefix($prefix);
+    public function setPrefix(string $prefix): void;
 }

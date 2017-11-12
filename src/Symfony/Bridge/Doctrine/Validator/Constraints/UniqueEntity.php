@@ -48,7 +48,7 @@ class UniqueEntity extends Constraint
      *
      * @return string
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return $this->service;
     }

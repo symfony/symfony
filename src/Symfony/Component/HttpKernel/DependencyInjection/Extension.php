@@ -27,7 +27,7 @@ abstract class Extension extends BaseExtension
      *
      * @return array An array of classes
      */
-    public function getAnnotatedClassesToCompile()
+    public function getAnnotatedClassesToCompile(): array
     {
         return $this->annotatedClasses;
     }

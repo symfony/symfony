@@ -257,7 +257,7 @@ class NumberFormatter
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
-    public function __construct(?string $locale = 'en', string $style = null, $pattern = null)
+    public function __construct(?string $locale = 'en', string $style = null, string $pattern = null)
     {
         if ('en' !== $locale && null !== $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
@@ -296,7 +296,7 @@ class NumberFormatter
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
-    public static function create($locale = 'en', $style = null, $pattern = null)
+    public static function create(string $locale = 'en', int $style = null, string $pattern = null): self
     {
         return new self($locale, $style, $pattern);
     }
@@ -312,7 +312,7 @@ class NumberFormatter
      * @see http://www.php.net/manual/en/numberformatter.formatcurrency.php
      * @see https://en.wikipedia.org/wiki/ISO_4217#Active_codes
      */
-    public function formatCurrency($value, $currency)
+    public function formatCurrency(float $value, string $currency): string
     {
         if (self::DECIMAL == $this->style) {
             return $this->format($value);
@@ -391,7 +391,7 @@ class NumberFormatter
      *
      * @see http://www.php.net/manual/en/numberformatter.getattribute.php
      */
-    public function getAttribute($attr)
+    public function getAttribute(int $attr)
     {
         return isset($this->attributes[$attr]) ? $this->attributes[$attr] : null;
     }
@@ -403,7 +403,7 @@ class NumberFormatter
      *
      * @see http://www.php.net/manual/en/numberformatter.geterrorcode.php
      */
-    public function getErrorCode()
+    public function getErrorCode(): int
     {
         return $this->errorCode;
     }
@@ -415,7 +415,7 @@ class NumberFormatter
      *
      * @see http://www.php.net/manual/en/numberformatter.geterrormessage.php
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): string
     {
         return $this->errorMessage;
     }
@@ -432,7 +432,7 @@ class NumberFormatter
      *
      * @see http://www.php.net/manual/en/numberformatter.getlocale.php
      */
-    public function getLocale($type = Locale::ACTUAL_LOCALE)
+    public function getLocale(int $type = Locale::ACTUAL_LOCALE): string
     {
         return 'en';
     }
@@ -460,7 +460,7 @@ class NumberFormatter
      *
      * @see http://www.php.net/manual/en/numberformatter.getsymbol.php
      */
-    public function getSymbol($attr)
+    public function getSymbol(int $attr)
     {
         return array_key_exists($this->style, self::$enSymbols) && array_key_exists($attr, self::$enSymbols[$this->style]) ? self::$enSymbols[$this->style][$attr] : false;
     }
@@ -474,7 +474,7 @@ class NumberFormatter
      *
      * @see http://www.php.net/manual/en/numberformatter.gettextattribute.php
      */
-    public function getTextAttribute($attr)
+    public function getTextAttribute(int $attr)
     {
         return array_key_exists($this->style, self::$enTextAttributes) && array_key_exists($attr, self::$enTextAttributes[$this->style]) ? self::$enTextAttributes[$this->style][$attr] : false;
     }
@@ -492,7 +492,7 @@ class NumberFormatter
      *
      * @throws MethodNotImplementedException
      */
-    public function parseCurrency($value, &$currency, &$position = null)
+    public function parseCurrency(string $value, string &$currency, int &$position = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -508,7 +508,7 @@ class NumberFormatter
      *
      * @see http://www.php.net/manual/en/numberformatter.parse.php
      */
-    public function parse($value, $type = self::TYPE_DOUBLE, &$position = 0)
+    public function parse(string $value, int $type = self::TYPE_DOUBLE, int &$position = 0)
     {
         if (self::TYPE_DEFAULT == $type || self::TYPE_CURRENCY == $type) {
             trigger_error(__METHOD__.'(): Unsupported format type '.$type, \E_USER_WARNING);
@@ -562,7 +562,7 @@ class NumberFormatter
      * @throws MethodArgumentValueNotImplementedException When the $attr is not supported
      * @throws MethodArgumentValueNotImplementedException When the $value is not supported
      */
-    public function setAttribute($attr, $value)
+    public function setAttribute(int $attr, int $value): bool
     {
         if (!in_array($attr, self::$supportedAttributes)) {
             $message = sprintf(
@@ -608,7 +608,7 @@ class NumberFormatter
      *
      * @throws MethodNotImplementedException
      */
-    public function setPattern($pattern)
+    public function setPattern(string $pattern)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -625,7 +625,7 @@ class NumberFormatter
      *
      * @throws MethodNotImplementedException
      */
-    public function setSymbol($attr, $value)
+    public function setSymbol(int $attr, string $value)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -642,7 +642,7 @@ class NumberFormatter
      *
      * @throws MethodNotImplementedException
      */
-    public function setTextAttribute($attr, $value)
+    public function setTextAttribute(int $attr, int $value)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -675,7 +675,7 @@ class NumberFormatter
      * @see http://en.wikipedia.org/wiki/Swedish_rounding
      * @see http://www.docjar.com/html/api/com/ibm/icu/util/Currency.java.html#1007
      */
-    private function roundCurrency($value, $currency)
+    private function roundCurrency(float $value, string $currency): float
     {
         $fractionDigits = Intl::getCurrencyBundle()->getFractionDigits($currency);
         $roundingIncrement = Intl::getCurrencyBundle()->getRoundingIncrement($currency);
@@ -740,7 +740,7 @@ class NumberFormatter
      *
      * @return string The formatted number
      */
-    private function formatNumber($value, $precision)
+    private function formatNumber($value, $precision): string
     {
         $precision = $this->getUninitializedPrecision($value, $precision);
 
@@ -755,7 +755,7 @@ class NumberFormatter
      *
      * @return int The precision value
      */
-    private function getUninitializedPrecision($value, $precision)
+    private function getUninitializedPrecision($value, $precision): int
     {
         if (self::CURRENCY == $this->style) {
             return $precision;
@@ -778,7 +778,7 @@ class NumberFormatter
      *
      * @return bool true if the value was set by client, false otherwise
      */
-    private function isInitializedAttribute($attr)
+    private function isInitializedAttribute(string $attr): bool
     {
         return isset($this->initializedAttributes[$attr]);
     }
@@ -847,7 +847,7 @@ class NumberFormatter
      *
      * @return bool true if the rounding mode is invalid, false otherwise
      */
-    private function isInvalidRoundingMode($value)
+    private function isInvalidRoundingMode(int $value): bool
     {
         if (in_array($value, self::$roundingModes, true)) {
             return false;
@@ -864,7 +864,7 @@ class NumberFormatter
      *
      * @return int The normalized value for the attribute (0 or 1)
      */
-    private function normalizeGroupingUsedValue($value)
+    private function normalizeGroupingUsedValue($value): int
     {
         return (int) (bool) (int) $value;
     }
@@ -877,7 +877,7 @@ class NumberFormatter
      *
      * @return int The normalized value for the attribute
      */
-    private function normalizeFractionDigitsValue($value)
+    private function normalizeFractionDigitsValue($value): int
     {
         $value = (int) $value;
 

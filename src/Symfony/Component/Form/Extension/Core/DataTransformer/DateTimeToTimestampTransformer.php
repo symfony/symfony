@@ -30,7 +30,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
-    public function transform($dateTime)
+    public function transform(\DateTimeInterface $dateTime)
     {
         if (null === $dateTime) {
             return;
@@ -53,7 +53,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException If the given value is not a timestamp
      *                                       or if the given timestamp is invalid
      */
-    public function reverseTransform($value)
+    public function reverseTransform(string $value)
     {
         if (null === $value) {
             return;

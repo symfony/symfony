@@ -111,7 +111,7 @@ class FormPassTest extends TestCase
     /**
      * @return array
      */
-    public function addTaggedTypeExtensionsDataProvider()
+    public function addTaggedTypeExtensionsDataProvider(): array
     {
         return array(
             array(

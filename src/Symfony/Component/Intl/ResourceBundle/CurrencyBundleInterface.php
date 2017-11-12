@@ -27,7 +27,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @return string|null The currency symbol or NULL if not found
      */
-    public function getCurrencySymbol($currency, $displayLocale = null);
+    public function getCurrencySymbol(string $currency, string $displayLocale = null): ?string;
 
     /**
      * Returns the name of a currency.
@@ -38,7 +38,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @return string|null The name of the currency or NULL if not found
      */
-    public function getCurrencyName($currency, $displayLocale = null);
+    public function getCurrencyName(string $currency, string $displayLocale = null): ?string;
 
     /**
      * Returns the names of all known currencies.
@@ -48,7 +48,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @return string[] A list of currency names indexed by currency codes
      */
-    public function getCurrencyNames($displayLocale = null);
+    public function getCurrencyNames(string $displayLocale = null);
 
     /**
      * Returns the number of digits after the comma of a currency.
@@ -57,7 +57,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @return int|null The number of digits after the comma or NULL if not found
      */
-    public function getFractionDigits($currency);
+    public function getFractionDigits(string $currency): ?int;
 
     /**
      * Returns the rounding increment of a currency.
@@ -70,5 +70,5 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @return float|int|null The rounding increment or NULL if not found
      */
-    public function getRoundingIncrement($currency);
+    public function getRoundingIncrement(string $currency);
 }

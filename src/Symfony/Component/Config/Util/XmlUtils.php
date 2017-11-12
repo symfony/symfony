@@ -44,7 +44,7 @@ class XmlUtils
      * @throws InvalidXmlException When parsing of XML with schema or callable produces any errors unrelated to the XML parsing itself
      * @throws \RuntimeException   When DOM extension is missing
      */
-    public static function parse($content, $schemaOrCallable = null)
+    public static function parse(string $content, $schemaOrCallable = null): \DOMDocument
     {
         if (!extension_loaded('dom')) {
             throw new \RuntimeException('Extension DOM is required.');
@@ -120,7 +120,7 @@ class XmlUtils
      * @throws XmlParsingException       When XML parsing returns any errors
      * @throws \RuntimeException         When DOM extension is missing
      */
-    public static function loadFile($file, $schemaOrCallable = null)
+    public static function loadFile(string $file, $schemaOrCallable = null): \DOMDocument
     {
         $content = @file_get_contents($file);
         if ('' === trim($content)) {
@@ -154,7 +154,7 @@ class XmlUtils
      *
      * @return array A PHP array
      */
-    public static function convertDomElementToArray(\DOMElement $element, $checkPrefix = true)
+    public static function convertDomElementToArray(\DOMElement $element, bool $checkPrefix = true): array
     {
         $prefix = (string) $element->prefix;
         $empty = true;

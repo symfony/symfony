@@ -34,7 +34,7 @@ class UsernameNotFoundException extends AuthenticationException
      *
      * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -44,7 +44,7 @@ class UsernameNotFoundException extends AuthenticationException
      *
      * @param string $username
      */
-    public function setUsername($username): void
+    public function setUsername(string $username): void
     {
         $this->username = $username;
     }

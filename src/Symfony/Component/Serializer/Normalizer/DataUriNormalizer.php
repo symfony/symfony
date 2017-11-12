@@ -126,7 +126,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @return string
      */
-    private function getMimeType(\SplFileInfo $object)
+    private function getMimeType(\SplFileInfo $object): string
     {
         if ($object instanceof File) {
             return $object->getMimeType();
@@ -146,7 +146,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @return \SplFileObject
      */
-    private function extractSplFileObject(\SplFileInfo $object)
+    private function extractSplFileObject(\SplFileInfo $object): \SplFileObject
     {
         if ($object instanceof \SplFileObject) {
             return $object;

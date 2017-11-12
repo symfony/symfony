@@ -34,7 +34,7 @@ class ExecutableFinder
      *
      * @param string $suffix
      */
-    public function addSuffix($suffix): void
+    public function addSuffix(string $suffix): void
     {
         $this->suffixes[] = $suffix;
     }
@@ -48,7 +48,7 @@ class ExecutableFinder
      *
      * @return string The executable path or default value
      */
-    public function find($name, $default = null, array $extraDirs = array())
+    public function find(string $name, string $default = null, array $extraDirs = array()): string
     {
         if (ini_get('open_basedir')) {
             $searchPath = explode(PATH_SEPARATOR, ini_get('open_basedir'));

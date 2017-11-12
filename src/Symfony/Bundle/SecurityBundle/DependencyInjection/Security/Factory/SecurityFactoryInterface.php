@@ -35,7 +35,7 @@ interface SecurityFactoryInterface
      *               - the listener id
      *               - the entry point id
      */
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint);
+    public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, string $defaultEntryPoint): array;
 
     /**
      * Defines the position at which the provider is called.
@@ -43,7 +43,7 @@ interface SecurityFactoryInterface
      *
      * @return string
      */
-    public function getPosition();
+    public function getPosition(): string;
 
     /**
      * Defines the configuration key used to reference the provider
@@ -51,7 +51,7 @@ interface SecurityFactoryInterface
      *
      * @return string
      */
-    public function getKey();
+    public function getKey(): string;
 
-    public function addConfiguration(NodeDefinition $builder);
+    public function addConfiguration(NodeDefinition $builder): void;
 }

@@ -28,7 +28,7 @@ abstract class Helper implements HelperInterface
      *
      * @param string $charset The charset
      */
-    public function setCharset($charset): void
+    public function setCharset(string $charset): void
     {
         $this->charset = $charset;
     }
@@ -38,7 +38,7 @@ abstract class Helper implements HelperInterface
      *
      * @return string The default charset
      */
-    public function getCharset()
+    public function getCharset(): string
     {
         return $this->charset;
     }

@@ -74,7 +74,7 @@ class DescriptorHelper extends Helper
      *
      * @return $this
      */
-    public function register($format, DescriptorInterface $descriptor)
+    public function register(string $format, DescriptorInterface $descriptor)
     {
         $this->descriptors[$format] = $descriptor;
 

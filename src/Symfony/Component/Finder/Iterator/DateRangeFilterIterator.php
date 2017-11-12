@@ -38,7 +38,7 @@ class DateRangeFilterIterator extends \FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         $fileinfo = $this->current();
 

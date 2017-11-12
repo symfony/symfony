@@ -87,5 +87,5 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
      *
      * @return bool false if there is nothing to warm-up
      */
-    abstract protected function doWarmUp($cacheDir, ArrayAdapter $arrayAdapter);
+    abstract protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter): bool;
 }

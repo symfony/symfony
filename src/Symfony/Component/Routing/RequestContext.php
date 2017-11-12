@@ -69,7 +69,7 @@ class RequestContext
      *
      * @return string The base URL
      */
-    public function getBaseUrl()
+    public function getBaseUrl(): string
     {
         return $this->baseUrl;
     }
@@ -81,7 +81,7 @@ class RequestContext
      *
      * @return $this
      */
-    public function setBaseUrl($baseUrl)
+    public function setBaseUrl(string $baseUrl)
     {
         $this->baseUrl = $baseUrl;
 
@@ -93,7 +93,7 @@ class RequestContext
      *
      * @return string The path info
      */
-    public function getPathInfo()
+    public function getPathInfo(): string
     {
         return $this->pathInfo;
     }
@@ -105,7 +105,7 @@ class RequestContext
      *
      * @return $this
      */
-    public function setPathInfo($pathInfo)
+    public function setPathInfo(string $pathInfo)
     {
         $this->pathInfo = $pathInfo;
 
@@ -119,7 +119,7 @@ class RequestContext
      *
      * @return string The HTTP method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -131,7 +131,7 @@ class RequestContext
      *
      * @return $this
      */
-    public function setMethod($method)
+    public function setMethod(string $method)
     {
         $this->method = strtoupper($method);
 
@@ -145,7 +145,7 @@ class RequestContext
      *
      * @return string The HTTP host
      */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->host;
     }
@@ -157,7 +157,7 @@ class RequestContext
      *
      * @return $this
      */
-    public function setHost($host)
+    public function setHost(string $host)
     {
         $this->host = strtolower($host);
 
@@ -169,7 +169,7 @@ class RequestContext
      *
      * @return string The HTTP scheme
      */
-    public function getScheme()
+    public function getScheme(): string
     {
         return $this->scheme;
     }
@@ -181,7 +181,7 @@ class RequestContext
      *
      * @return $this
      */
-    public function setScheme($scheme)
+    public function setScheme(string $scheme)
     {
         $this->scheme = strtolower($scheme);
 
@@ -193,7 +193,7 @@ class RequestContext
      *
      * @return int The HTTP port
      */
-    public function getHttpPort()
+    public function getHttpPort(): int
     {
         return $this->httpPort;
     }
@@ -205,7 +205,7 @@ class RequestContext
      *
      * @return $this
      */
-    public function setHttpPort($httpPort)
+    public function setHttpPort(int $httpPort)
     {
         $this->httpPort = (int) $httpPort;
 
@@ -217,7 +217,7 @@ class RequestContext
      *
      * @return int The HTTPS port
      */
-    public function getHttpsPort()
+    public function getHttpsPort(): int
     {
         return $this->httpsPort;
     }
@@ -229,7 +229,7 @@ class RequestContext
      *
      * @return $this
      */
-    public function setHttpsPort($httpsPort)
+    public function setHttpsPort(int $httpsPort)
     {
         $this->httpsPort = (int) $httpsPort;
 
@@ -241,7 +241,7 @@ class RequestContext
      *
      * @return string The query string without the "?"
      */
-    public function getQueryString()
+    public function getQueryString(): string
     {
         return $this->queryString;
     }
@@ -253,7 +253,7 @@ class RequestContext
      *
      * @return $this
      */
-    public function setQueryString($queryString)
+    public function setQueryString(string $queryString)
     {
         // string cast to be fault-tolerant, accepting null
         $this->queryString = (string) $queryString;
@@ -266,7 +266,7 @@ class RequestContext
      *
      * @return array The parameters
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
@@ -292,7 +292,7 @@ class RequestContext
      *
      * @return mixed The parameter value or null if nonexistent
      */
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
         return isset($this->parameters[$name]) ? $this->parameters[$name] : null;
     }
@@ -304,7 +304,7 @@ class RequestContext
      *
      * @return bool True if the parameter value is set, false otherwise
      */
-    public function hasParameter($name)
+    public function hasParameter(string $name): bool
     {
         return array_key_exists($name, $this->parameters);
     }
@@ -317,7 +317,7 @@ class RequestContext
      *
      * @return $this
      */
-    public function setParameter($name, $parameter)
+    public function setParameter(string $name, $parameter)
     {
         $this->parameters[$name] = $parameter;
 

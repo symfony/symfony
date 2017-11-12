@@ -86,7 +86,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      *
      * @return string The previous charset
      */
-    public function setCharset($charset)
+    public function setCharset(string $charset): string
     {
         $prev = $this->charset;
 
@@ -105,7 +105,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      *
      * @return string The indent pad
      */
-    public function setIndentPad($pad)
+    public function setIndentPad(string $pad): string
     {
         $prev = $this->indentPad;
         $this->indentPad = $pad;
@@ -121,7 +121,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      *
      * @return string|null The dump as string when $output is true
      */
-    public function dump(Data $data, $output = null)
+    public function dump(Data $data, $output = null): ?string
     {
         $this->decimalPoint = localeconv();
         $this->decimalPoint = $this->decimalPoint['decimal_point'];
@@ -162,7 +162,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      * @param int $depth The recursive depth in the dumped structure for the line being dumped,
      *                   or -1 to signal the end-of-dump to the line dumper callable
      */
-    protected function dumpLine($depth): void
+    protected function dumpLine(int $depth): void
     {
         call_user_func($this->lineDumper, $this->line, $depth, $this->indentPad);
         $this->line = '';
@@ -175,7 +175,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      * @param int    $depth     The recursive depth in the dumped structure
      * @param string $indentPad The line indent pad
      */
-    protected function echoLine($line, $depth, $indentPad): void
+    protected function echoLine(string $line, int $depth, string $indentPad): void
     {
         if (-1 !== $depth) {
             fwrite($this->outputStream, str_repeat($indentPad, $depth).$line."\n");
@@ -189,7 +189,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      *
      * @return string The string converted to UTF-8
      */
-    protected function utf8Encode($s)
+    protected function utf8Encode(string $s): string
     {
         if (preg_match('//u', $s)) {
             return $s;

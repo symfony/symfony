@@ -143,7 +143,7 @@ class WebServer
     /**
      * @return Process The process
      */
-    private function createServerProcess(WebServerConfig $config)
+    private function createServerProcess(WebServerConfig $config): Process
     {
         $finder = new PhpExecutableFinder();
         if (false === $binary = $finder->find()) {

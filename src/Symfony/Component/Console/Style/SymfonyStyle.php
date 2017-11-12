@@ -281,7 +281,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * @return string
      */
-    public function askQuestion(Question $question)
+    public function askQuestion(Question $question): string
     {
         if ($this->input->isInteractive()) {
             $this->autoPrependBlock();
@@ -333,7 +333,7 @@ class SymfonyStyle extends OutputStyle
      *
      * @return self
      */
-    public function getErrorStyle()
+    public function getErrorStyle(): self
     {
         return new self($this->input, $this->getErrorOutput());
     }

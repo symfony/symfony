@@ -193,7 +193,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * @return string The profile filename
      */
-    protected function getFilename($token)
+    protected function getFilename(string $token): string
     {
         // Uses 4 last characters, because first are mostly the same.
         $folderA = substr($token, -2, 2);
@@ -207,7 +207,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * @return string The index filename
      */
-    protected function getIndexFilename()
+    protected function getIndexFilename(): string
     {
         return $this->folder.'/index.csv';
     }

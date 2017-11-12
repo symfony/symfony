@@ -41,7 +41,7 @@ abstract class FileLoader extends Loader
      *
      * @param string $dir
      */
-    public function setCurrentDir($dir): void
+    public function setCurrentDir(string $dir): void
     {
         $this->currentDir = $dir;
     }
@@ -51,7 +51,7 @@ abstract class FileLoader extends Loader
      *
      * @return FileLocatorInterface
      */
-    public function getLocator()
+    public function getLocator(): FileLocatorInterface
     {
         return $this->locator;
     }

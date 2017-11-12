@@ -124,7 +124,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      *
      * @return \ArrayIterator An \ArrayIterator instance
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->getAttributeBag()->all());
     }
@@ -134,7 +134,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      *
      * @return int The number of attributes
      */
-    public function count()
+    public function count(): int
     {
         return count($this->getAttributeBag()->all());
     }
@@ -226,7 +226,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      *
      * @return FlashBagInterface
      */
-    public function getFlashBag()
+    public function getFlashBag(): FlashBagInterface
     {
         return $this->getBag($this->flashName);
     }
@@ -238,7 +238,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      *
      * @return AttributeBagInterface
      */
-    private function getAttributeBag()
+    private function getAttributeBag(): AttributeBagInterface
     {
         return $this->storage->getBag($this->attributeName);
     }

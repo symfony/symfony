@@ -164,7 +164,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @param string $name Root node name
      */
-    public function setRootNodeName($name): void
+    public function setRootNodeName(string $name): void
     {
         $this->rootNodeName = $name;
     }
@@ -174,7 +174,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @return string
      */
-    public function getRootNodeName()
+    public function getRootNodeName(): string
     {
         return $this->rootNodeName;
     }
@@ -212,7 +212,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      * @param \DOMNode             $node
      * @param \DOMDocumentFragment $fragment
      */
-    final protected function appendDocumentFragment(\DOMNode $node, $fragment): bool
+    final protected function appendDocumentFragment(\DOMNode $node, \DOMDocumentFragment $fragment): bool
     {
         if ($fragment instanceof \DOMDocumentFragment) {
             $node->appendChild($fragment);

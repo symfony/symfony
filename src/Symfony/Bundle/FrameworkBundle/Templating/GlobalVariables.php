@@ -42,7 +42,7 @@ class GlobalVariables
         return $this->container->get('security.token_storage')->getToken();
     }
 
-    public function getUser()
+    public function getUser(): void
     {
         if (!$token = $this->getToken()) {
             return;
@@ -59,7 +59,7 @@ class GlobalVariables
     /**
      * @return Request|null The HTTP request object
      */
-    public function getRequest()
+    public function getRequest(): ?Request
     {
         if ($this->container->has('request_stack')) {
             return $this->container->get('request_stack')->getCurrentRequest();
@@ -69,7 +69,7 @@ class GlobalVariables
     /**
      * @return Session|null The session
      */
-    public function getSession()
+    public function getSession(): ?Session
     {
         if ($request = $this->getRequest()) {
             return $request->getSession();
@@ -79,7 +79,7 @@ class GlobalVariables
     /**
      * @return string The current environment string (e.g 'dev')
      */
-    public function getEnvironment()
+    public function getEnvironment(): string
     {
         return $this->container->getParameter('kernel.environment');
     }
@@ -87,7 +87,7 @@ class GlobalVariables
     /**
      * @return bool The current debug mode
      */
-    public function getDebug()
+    public function getDebug(): bool
     {
         return (bool) $this->container->getParameter('kernel.debug');
     }

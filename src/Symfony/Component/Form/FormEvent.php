@@ -32,7 +32,7 @@ class FormEvent extends Event
      *
      * @return FormInterface
      */
-    public function getForm()
+    public function getForm(): FormInterface
     {
         return $this->form;
     }

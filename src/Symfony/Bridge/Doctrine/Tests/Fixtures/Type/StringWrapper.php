@@ -23,7 +23,7 @@ class StringWrapper
     /**
      * @return string
      */
-    public function getString()
+    public function getString(): string
     {
         return $this->string;
     }

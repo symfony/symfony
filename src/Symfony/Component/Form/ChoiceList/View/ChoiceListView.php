@@ -44,7 +44,7 @@ class ChoiceListView
      *
      * @return bool
      */
-    public function hasPlaceholder()
+    public function hasPlaceholder(): bool
     {
         if ($this->preferredChoices) {
             $firstChoice = reset($this->preferredChoices);

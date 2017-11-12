@@ -50,7 +50,7 @@ final class TestRepositoryFactory implements RepositoryFactory
     /**
      * @return ObjectRepository
      */
-    private function createRepository(EntityManagerInterface $entityManager, $entityName)
+    private function createRepository(EntityManagerInterface $entityManager, $entityName): ObjectRepository
     {
         /* @var $metadata ClassMetadata */
         $metadata = $entityManager->getClassMetadata($entityName);

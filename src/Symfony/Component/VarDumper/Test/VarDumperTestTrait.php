@@ -29,7 +29,7 @@ trait VarDumperTestTrait
         $this->assertStringMatchesFormat(rtrim($dump), $this->getDump($data, null, $filter), $message);
     }
 
-    protected function getDump($data, $key = null, $filter = 0)
+    protected function getDump($data, $key = null, $filter = 0): void
     {
         $flags = getenv('DUMP_LIGHT_ARRAY') ? CliDumper::DUMP_LIGHT_ARRAY : 0;
         $flags |= getenv('DUMP_STRING_LENGTH') ? CliDumper::DUMP_STRING_LENGTH : 0;

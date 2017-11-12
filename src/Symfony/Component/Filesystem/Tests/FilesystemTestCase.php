@@ -95,7 +95,7 @@ class FilesystemTestCase extends TestCase
      * @param int    $expectedFilePerms Expected file permissions as three digits (i.e. 755)
      * @param string $filePath
      */
-    protected function assertFilePermissions($expectedFilePerms, $filePath): void
+    protected function assertFilePermissions(int $expectedFilePerms, string $filePath): void
     {
         $actualFilePerms = (int) substr(sprintf('%o', fileperms($filePath)), -3);
         $this->assertEquals(

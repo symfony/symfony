@@ -55,7 +55,7 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
      *
      * @return array An array of options
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

@@ -59,7 +59,7 @@ class SingleStateMarkingStore implements MarkingStoreInterface
     /**
      * @return string
      */
-    public function getProperty()
+    public function getProperty(): string
     {
         return $this->property;
     }

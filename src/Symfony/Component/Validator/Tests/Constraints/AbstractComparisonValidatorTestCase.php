@@ -119,7 +119,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     /**
      * @return array
      */
-    public function provideAllValidComparisons()
+    public function provideAllValidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
@@ -194,12 +194,12 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     /**
      * @return array
      */
-    abstract public function provideValidComparisons();
+    abstract public function provideValidComparisons(): array;
 
     /**
      * @return array
      */
-    abstract public function provideValidComparisonsToPropertyPath();
+    abstract public function provideValidComparisonsToPropertyPath(): array;
 
     /**
      * @dataProvider provideAllInvalidComparisons
@@ -234,7 +234,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     /**
      * @return array
      */
-    public function provideAllInvalidComparisons()
+    public function provideAllInvalidComparisons(): array
     {
         // The provider runs before setUp(), so we need to manually fix
         // the default timezone
@@ -250,14 +250,14 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     /**
      * @return array
      */
-    abstract public function provideInvalidComparisons();
+    abstract public function provideInvalidComparisons(): array;
 
     /**
      * @param array|null $options Options for the constraint
      *
      * @return Constraint
      */
-    abstract protected function createConstraint(array $options = null);
+    abstract protected function createConstraint(array $options = null): Constraint;
 
     /**
      * @return string|null

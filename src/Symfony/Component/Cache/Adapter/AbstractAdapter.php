@@ -85,7 +85,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
      *
      * @return AdapterInterface
      */
-    public static function createSystemCache($namespace, $defaultLifetime, $version, $directory, LoggerInterface $logger = null)
+    public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, LoggerInterface $logger = null): AdapterInterface
     {
         if (null === self::$apcuSupported) {
             self::$apcuSupported = ApcuAdapter::isSupported();

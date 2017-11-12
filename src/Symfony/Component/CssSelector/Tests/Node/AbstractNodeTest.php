@@ -28,7 +28,7 @@ abstract class AbstractNodeTest extends TestCase
         $this->assertEquals($value, $node->getSpecificity()->getValue());
     }
 
-    abstract public function getToStringConversionTestData();
+    abstract public function getToStringConversionTestData(): void;
 
-    abstract public function getSpecificityValueTestData();
+    abstract public function getSpecificityValueTestData(): void;
 }

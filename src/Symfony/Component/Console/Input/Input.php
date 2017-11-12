@@ -58,7 +58,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
     /**
      * Processes command line arguments.
      */
-    abstract protected function parse();
+    abstract protected function parse(): void;
 
     /**
      * {@inheritdoc}
@@ -180,7 +180,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
      *
      * @return string
      */
-    public function escapeToken($token)
+    public function escapeToken(string $token): string
     {
         return preg_match('{^[\w-]+$}', $token) ? $token : escapeshellarg($token);
     }

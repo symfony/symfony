@@ -200,7 +200,7 @@ EOF
         }
     }
 
-    private function getStdin()
+    private function getStdin(): void
     {
         if (0 !== ftell(STDIN)) {
             return;

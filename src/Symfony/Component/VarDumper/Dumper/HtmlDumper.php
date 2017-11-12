@@ -88,7 +88,7 @@ class HtmlDumper extends CliDumper
      *
      * @param string $header An HTML string
      */
-    public function setDumpHeader($header): void
+    public function setDumpHeader(string $header): void
     {
         $this->dumpHeader = $header;
     }
@@ -99,7 +99,7 @@ class HtmlDumper extends CliDumper
      * @param string $prefix The prepended HTML string
      * @param string $suffix The appended HTML string
      */
-    public function setDumpBoundaries($prefix, $suffix): void
+    public function setDumpBoundaries(string $prefix, string $suffix): void
     {
         $this->dumpPrefix = $prefix;
         $this->dumpSuffix = $suffix;

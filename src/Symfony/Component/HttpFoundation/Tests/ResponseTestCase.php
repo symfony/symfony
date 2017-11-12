@@ -85,5 +85,5 @@ abstract class ResponseTestCase extends TestCase
         $this->assertTrue($response->headers->has('Cache-Control'));
     }
 
-    abstract protected function provideResponse();
+    abstract protected function provideResponse(): void;
 }

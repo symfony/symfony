@@ -43,7 +43,7 @@ abstract class AbstractEventDispatcherTest extends TestCase
         $this->listener = null;
     }
 
-    abstract protected function createEventDispatcher();
+    abstract protected function createEventDispatcher(): void;
 
     public function testInitialState(): void
     {

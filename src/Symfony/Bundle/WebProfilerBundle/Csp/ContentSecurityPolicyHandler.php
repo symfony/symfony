@@ -41,7 +41,7 @@ class ContentSecurityPolicyHandler
      *
      * @return array
      */
-    public function getNonces(Request $request, Response $response)
+    public function getNonces(Request $request, Response $response): array
     {
         if ($request->headers->has('X-SymfonyProfiler-Script-Nonce') && $request->headers->has('X-SymfonyProfiler-Style-Nonce')) {
             return array(
@@ -83,7 +83,7 @@ class ContentSecurityPolicyHandler
      *
      * @return array Nonces used by the bundle in Content-Security-Policy header
      */
-    public function updateResponseHeaders(Request $request, Response $response)
+    public function updateResponseHeaders(Request $request, Response $response): array
     {
         if ($this->cspDisabled) {
             $this->removeCspHeaders($response);
@@ -116,7 +116,7 @@ class ContentSecurityPolicyHandler
      *
      * @return array
      */
-    private function updateCspHeaders(Response $response, array $nonces = array())
+    private function updateCspHeaders(Response $response, array $nonces = array()): array
     {
         $nonces = array_replace(array(
             'csp_script_nonce' => $this->generateNonce(),
@@ -164,7 +164,7 @@ class ContentSecurityPolicyHandler
      *
      * @return string
      */
-    private function generateNonce()
+    private function generateNonce(): string
     {
         return $this->nonceGenerator->generate();
     }
@@ -176,7 +176,7 @@ class ContentSecurityPolicyHandler
      *
      * @return string The Content-Security-Policy header
      */
-    private function generateCspHeader(array $directives)
+    private function generateCspHeader(array $directives): string
     {
         return array_reduce(array_keys($directives), function ($res, $name) use ($directives) {
             return ('' !== $res ? $res.'; ' : '').sprintf('%s %s', $name, implode(' ', $directives[$name]));
@@ -190,7 +190,7 @@ class ContentSecurityPolicyHandler
      *
      * @return array The directive set
      */
-    private function parseDirectives($header)
+    private function parseDirectives(string $header): array
     {
         $directives = array();
 
@@ -214,7 +214,7 @@ class ContentSecurityPolicyHandler
      *
      * @return bool
      */
-    private function authorizesInline(array $directivesSet, $type)
+    private function authorizesInline(array $directivesSet, string $type): bool
     {
         if (isset($directivesSet[$type])) {
             $directives = $directivesSet[$type];
@@ -250,7 +250,7 @@ class ContentSecurityPolicyHandler
      *
      * @return array An associative array of headers
      */
-    private function getCspHeaders(Response $response)
+    private function getCspHeaders(Response $response): array
     {
         $headers = array();
 

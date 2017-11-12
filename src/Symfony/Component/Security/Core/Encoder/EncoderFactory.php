@@ -65,7 +65,7 @@ class EncoderFactory implements EncoderFactoryInterface
      *
      * @throws \InvalidArgumentException
      */
-    private function createEncoder(array $config)
+    private function createEncoder(array $config): PasswordEncoderInterface
     {
         if (isset($config['algorithm'])) {
             $config = $this->getEncoderConfigFromAlgorithm($config);

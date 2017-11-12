@@ -50,7 +50,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array The value with normalized keys
      */
-    protected function preNormalize($value)
+    protected function preNormalize($value): array
     {
         if (!$this->normalizeKeys || !is_array($value)) {
             return $value;
@@ -74,7 +74,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array The children
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }
@@ -94,7 +94,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array $remappings an array of the form array(array(string, string))
      */
-    public function getXmlRemappings()
+    public function getXmlRemappings(): array
     {
         return $this->xmlRemappings;
     }
@@ -105,7 +105,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $boolean
      */
-    public function setAddIfNotSet($boolean): void
+    public function setAddIfNotSet(bool $boolean): void
     {
         $this->addIfNotSet = (bool) $boolean;
     }
@@ -115,7 +115,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $allow
      */
-    public function setAllowFalse($allow): void
+    public function setAllowFalse(bool $allow): void
     {
         $this->allowFalse = (bool) $allow;
     }
@@ -125,7 +125,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $allow
      */
-    public function setAllowNewKeys($allow): void
+    public function setAllowNewKeys(bool $allow): void
     {
         $this->allowNewKeys = (bool) $allow;
     }
@@ -135,7 +135,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param bool $boolean
      */
-    public function setPerformDeepMerging($boolean): void
+    public function setPerformDeepMerging(bool $boolean): void
     {
         $this->performDeepMerging = (bool) $boolean;
     }
@@ -146,7 +146,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @param bool $boolean To allow extra keys
      * @param bool $remove  To remove extra keys
      */
-    public function setIgnoreExtraKeys($boolean, $remove = true): void
+    public function setIgnoreExtraKeys(bool $boolean, bool $remove = true): void
     {
         $this->ignoreExtraKeys = (bool) $boolean;
         $this->removeExtraKeys = $this->ignoreExtraKeys && $remove;
@@ -157,7 +157,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param string $name The node's name
      */
-    public function setName($name): void
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -167,7 +167,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return bool
      */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return $this->addIfNotSet;
     }
@@ -179,7 +179,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @throws \RuntimeException if the node has no default value
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): array
     {
         if (!$this->hasDefaultValue()) {
             throw new \RuntimeException(sprintf('The node at path "%s" has no default value.', $this->getPath()));
@@ -332,7 +332,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array The remapped values
      */
-    protected function remapXml($value)
+    protected function remapXml(array $value): array
     {
         foreach ($this->xmlRemappings as list($singular, $plural)) {
             if (!isset($value[$singular])) {

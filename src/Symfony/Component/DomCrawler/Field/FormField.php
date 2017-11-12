@@ -60,7 +60,7 @@ abstract class FormField
      *
      * @return \DOMElement|null
      */
-    public function getLabel()
+    public function getLabel(): ?\DOMElement
     {
         $xpath = new \DOMXPath($this->node->ownerDocument);
 
@@ -84,7 +84,7 @@ abstract class FormField
      *
      * @return string The name of the field
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -104,7 +104,7 @@ abstract class FormField
      *
      * @param string $value The value of the field
      */
-    public function setValue($value): void
+    public function setValue(string $value): void
     {
         $this->value = (string) $value;
     }
@@ -114,7 +114,7 @@ abstract class FormField
      *
      * @return bool true if the field should be included in the submitted values, false otherwise
      */
-    public function hasValue()
+    public function hasValue(): bool
     {
         return true;
     }
@@ -124,7 +124,7 @@ abstract class FormField
      *
      * @return bool
      */
-    public function isDisabled()
+    public function isDisabled(): bool
     {
         return $this->node->hasAttribute('disabled');
     }
@@ -132,5 +132,5 @@ abstract class FormField
     /**
      * Initializes the form field.
      */
-    abstract protected function initialize();
+    abstract protected function initialize(): void;
 }

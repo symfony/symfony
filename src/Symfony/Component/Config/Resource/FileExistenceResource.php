@@ -45,7 +45,7 @@ class FileExistenceResource implements SelfCheckingResourceInterface, \Serializa
     /**
      * @return string The file path to the resource
      */
-    public function getResource()
+    public function getResource(): string
     {
         return $this->resource;
     }

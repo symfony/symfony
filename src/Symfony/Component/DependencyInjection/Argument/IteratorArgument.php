@@ -34,7 +34,7 @@ class IteratorArgument implements ArgumentInterface
     /**
      * @return array The values to lazily iterate over
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }

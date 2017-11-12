@@ -23,7 +23,7 @@ trait BlockingStoreTestTrait
     /**
      * @see AbstractStoreTest::getStore()
      */
-    abstract protected function getStore();
+    abstract protected function getStore(): void;
 
     /**
      * Tests blocking locks thanks to pcntl.

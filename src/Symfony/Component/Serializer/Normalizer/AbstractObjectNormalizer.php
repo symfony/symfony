@@ -216,7 +216,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @param mixed       $value
      * @param string|null $format
      */
-    abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array());
+    abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array()): void;
 
     /**
      * Validates the submitted data and denormalizes it.

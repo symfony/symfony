@@ -97,7 +97,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      *
      * @return bool
      */
-    protected function hasStdoutSupport()
+    protected function hasStdoutSupport(): bool
     {
         return false === $this->isRunningOS400();
     }
@@ -108,7 +108,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      *
      * @return bool
      */
-    protected function hasStderrSupport()
+    protected function hasStderrSupport(): bool
     {
         return false === $this->isRunningOS400();
     }
@@ -119,7 +119,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      *
      * @return bool
      */
-    private function isRunningOS400()
+    private function isRunningOS400(): bool
     {
         $checks = array(
             function_exists('php_uname') ? php_uname('s') : '',

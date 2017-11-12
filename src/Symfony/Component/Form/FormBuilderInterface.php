@@ -29,7 +29,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return self
      */
-    public function add($child, $type = null, array $options = array());
+    public function add($child, $type = null, array $options = array()): self;
 
     /**
      * Creates a form builder.
@@ -40,7 +40,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return self
      */
-    public function create($name, $type = null, array $options = array());
+    public function create(string $name, ?string $type = null, array $options = array()): self;
 
     /**
      * Returns a child by name.
@@ -51,7 +51,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @throws Exception\InvalidArgumentException if the given child does not exist
      */
-    public function get($name);
+    public function get(string $name): self;
 
     /**
      * Removes the field with the given name.
@@ -60,7 +60,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return self
      */
-    public function remove($name);
+    public function remove(string $name): self;
 
     /**
      * Returns whether a field with the given name exists.
@@ -69,19 +69,19 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @return bool
      */
-    public function has($name);
+    public function has(string $name): bool;
 
     /**
      * Returns the children.
      *
      * @return array
      */
-    public function all();
+    public function all(): array;
 
     /**
      * Creates the form.
      *
      * @return FormInterface The form
      */
-    public function getForm();
+    public function getForm(): FormInterface;
 }

@@ -113,7 +113,7 @@ class MemcachedSessionHandler extends AbstractSessionHandler
      *
      * @return \Memcached
      */
-    protected function getMemcached()
+    protected function getMemcached(): \Memcached
     {
         return $this->memcached;
     }

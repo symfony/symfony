@@ -105,9 +105,9 @@ abstract class AbstractDescriptorTest extends TestCase
         yield array($resolvedType->getOptionsResolver(), $options, 'overridden_option_with_default_closures');
     }
 
-    abstract protected function getDescriptor();
+    abstract protected function getDescriptor(): void;
 
-    abstract protected function getFormat();
+    abstract protected function getFormat(): void;
 
     private function getObjectDescription($object, array $options)
     {

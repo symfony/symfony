@@ -52,7 +52,7 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
      *
      * @throws \InvalidArgumentException
      */
-    public function setMaxRunningTime($maxRunningTime): void
+    public function setMaxRunningTime(int $maxRunningTime): void
     {
         if (is_int($maxRunningTime) && $maxRunningTime >= 0) {
             $this->maxRunningTime = $maxRunningTime;
@@ -64,7 +64,7 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
     /**
      * @return int
      */
-    public function getMaxRunningTime()
+    public function getMaxRunningTime(): int
     {
         return $this->maxRunningTime;
     }

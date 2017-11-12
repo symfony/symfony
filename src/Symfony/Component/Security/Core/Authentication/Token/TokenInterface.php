@@ -28,7 +28,7 @@ interface TokenInterface extends \Serializable
      *
      * @return string
      */
-    public function __toString();
+    public function __toString(): string;
 
     /**
      * Returns the user roles.
@@ -59,47 +59,47 @@ interface TokenInterface extends \Serializable
      *
      * @param mixed $user
      */
-    public function setUser($user);
+    public function setUser($user): void;
 
     /**
      * Returns the username.
      *
      * @return string
      */
-    public function getUsername();
+    public function getUsername(): string;
 
     /**
      * Returns whether the user is authenticated or not.
      *
      * @return bool true if the token has been authenticated, false otherwise
      */
-    public function isAuthenticated();
+    public function isAuthenticated(): bool;
 
     /**
      * Sets the authenticated flag.
      *
      * @param bool $isAuthenticated The authenticated flag
      */
-    public function setAuthenticated($isAuthenticated);
+    public function setAuthenticated(bool $isAuthenticated): void;
 
     /**
      * Removes sensitive information from the token.
      */
-    public function eraseCredentials();
+    public function eraseCredentials(): void;
 
     /**
      * Returns the token attributes.
      *
      * @return array The token attributes
      */
-    public function getAttributes();
+    public function getAttributes(): array;
 
     /**
      * Sets the token attributes.
      *
      * @param array $attributes The token attributes
      */
-    public function setAttributes(array $attributes);
+    public function setAttributes(array $attributes): void;
 
     /**
      * Returns true if the attribute exists.
@@ -108,7 +108,7 @@ interface TokenInterface extends \Serializable
      *
      * @return bool true if the attribute exists, false otherwise
      */
-    public function hasAttribute($name);
+    public function hasAttribute(string $name): bool;
 
     /**
      * Returns an attribute value.
@@ -119,7 +119,7 @@ interface TokenInterface extends \Serializable
      *
      * @throws \InvalidArgumentException When attribute doesn't exist for this token
      */
-    public function getAttribute($name);
+    public function getAttribute(string $name);
 
     /**
      * Sets an attribute.
@@ -127,5 +127,5 @@ interface TokenInterface extends \Serializable
      * @param string $name  The attribute name
      * @param mixed  $value The attribute value
      */
-    public function setAttribute($name, $value);
+    public function setAttribute(string $name, $value): void;
 }

@@ -66,7 +66,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      *
      * @return string
      */
-    public function getProviderKey()
+    public function getProviderKey(): string
     {
         return $this->providerKey;
     }

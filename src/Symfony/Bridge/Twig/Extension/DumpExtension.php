@@ -52,7 +52,7 @@ class DumpExtension extends AbstractExtension
         return 'dump';
     }
 
-    public function dump(Environment $env, $context)
+    public function dump(Environment $env, $context): void
     {
         if (!$env->isDebug()) {
             return;

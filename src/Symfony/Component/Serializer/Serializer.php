@@ -200,7 +200,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      *
      * @return NormalizerInterface|null
      */
-    private function getNormalizer($data, $format, array $context)
+    private function getNormalizer($data, $format, array $context): ?NormalizerInterface
     {
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof NormalizerInterface && $normalizer->supportsNormalization($data, $format, $context)) {
@@ -219,7 +219,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      *
      * @return DenormalizerInterface|null
      */
-    private function getDenormalizer($data, $class, $format, array $context)
+    private function getDenormalizer($data, $class, $format, array $context): ?DenormalizerInterface
     {
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof DenormalizerInterface && $normalizer->supportsDenormalization($data, $class, $format, $context)) {

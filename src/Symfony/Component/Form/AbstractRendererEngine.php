@@ -120,7 +120,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @return bool True if the resource could be loaded, false otherwise
      */
-    abstract protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName);
+    abstract protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool;
 
     /**
      * Loads the cache with the resource for a specific level of a block hierarchy.
@@ -138,7 +138,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @return bool True if the resource could be loaded, false otherwise
      */
-    private function loadResourceForBlockNameHierarchy($cacheKey, FormView $view, array $blockNameHierarchy, $hierarchyLevel)
+    private function loadResourceForBlockNameHierarchy(string $cacheKey, FormView $view, array $blockNameHierarchy, int $hierarchyLevel): bool
     {
         $blockName = $blockNameHierarchy[$hierarchyLevel];
 

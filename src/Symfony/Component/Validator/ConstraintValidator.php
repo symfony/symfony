@@ -56,7 +56,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return string The type of the value
      */
-    protected function formatTypeOf($value)
+    protected function formatTypeOf($value): string
     {
         return is_object($value) ? get_class($value) : gettype($value);
     }
@@ -83,7 +83,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return string The string representation of the passed value
      */
-    protected function formatValue($value, $format = 0)
+    protected function formatValue($value, $format = 0): string
     {
         $isDateTime = $value instanceof \DateTimeInterface;
 
@@ -156,7 +156,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @see formatValue()
      */
-    protected function formatValues(array $values, $format = 0)
+    protected function formatValues(array $values, int $format = 0): string
     {
         foreach ($values as $key => $value) {
             $values[$key] = $this->formatValue($value, $format);

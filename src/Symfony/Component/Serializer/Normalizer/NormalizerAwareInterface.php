@@ -23,5 +23,5 @@ interface NormalizerAwareInterface
      *
      * @param NormalizerInterface $normalizer
      */
-    public function setNormalizer(NormalizerInterface $normalizer);
+    public function setNormalizer(NormalizerInterface $normalizer): void;
 }

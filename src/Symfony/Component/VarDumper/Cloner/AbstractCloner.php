@@ -172,7 +172,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @param int $maxItems
      */
-    public function setMaxItems($maxItems): void
+    public function setMaxItems(int $maxItems): void
     {
         $this->maxItems = (int) $maxItems;
     }
@@ -182,7 +182,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @param int $maxString
      */
-    public function setMaxString($maxString): void
+    public function setMaxString(int $maxString): void
     {
         $this->maxString = (int) $maxString;
     }
@@ -193,7 +193,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @param int $minDepth
      */
-    public function setMinDepth($minDepth): void
+    public function setMinDepth(int $minDepth): void
     {
         $this->minDepth = (int) $minDepth;
     }
@@ -206,7 +206,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return Data The cloned variable represented by a Data object
      */
-    public function cloneVar($var, $filter = 0)
+    public function cloneVar($var, $filter = 0): Data
     {
         $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) {
             if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
@@ -243,7 +243,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return array The cloned variable represented in an array
      */
-    abstract protected function doClone($var);
+    abstract protected function doClone($var): array;
 
     /**
      * Casts an object to an array representation.
@@ -253,7 +253,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return array The object casted as array
      */
-    protected function castObject(Stub $stub, $isNested)
+    protected function castObject(Stub $stub, bool $isNested): array
     {
         $obj = $stub->value;
         $class = $stub->class;
@@ -306,7 +306,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return array The resource casted as array
      */
-    protected function castResource(Stub $stub, $isNested)
+    protected function castResource(Stub $stub, bool $isNested): array
     {
         $a = array();
         $res = $stub->value;

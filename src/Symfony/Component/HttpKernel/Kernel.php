@@ -198,7 +198,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @return HttpKernel
      */
-    protected function getHttpKernel()
+    protected function getHttpKernel(): HttpKernel
     {
         return $this->container->get('http_kernel');
     }
@@ -326,7 +326,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @return string The project root dir
      */
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         if (null === $this->projectDir) {
             $r = new \ReflectionObject($this);
@@ -423,7 +423,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @return string The container class
      */
-    protected function getContainerClass()
+    protected function getContainerClass(): string
     {
         return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
     }
@@ -435,7 +435,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @return string
      */
-    protected function getContainerBaseClass()
+    protected function getContainerBaseClass(): string
     {
         return 'Container';
     }
@@ -527,7 +527,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @return array An array of kernel parameters
      */
-    protected function getKernelParameters()
+    protected function getKernelParameters(): array
     {
         $bundles = array();
         $bundlesMetadata = array();
@@ -562,7 +562,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @throws \RuntimeException
      */
-    protected function buildContainer()
+    protected function buildContainer(): ContainerBuilder
     {
         foreach (array('cache' => $this->warmupDir ?: $this->getCacheDir(), 'logs' => $this->getLogDir()) as $name => $dir) {
             if (!is_dir($dir)) {
@@ -619,7 +619,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @return ContainerBuilder
      */
-    protected function getContainerBuilder()
+    protected function getContainerBuilder(): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->getParameterBag()->add($this->getKernelParameters());
@@ -642,7 +642,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * @param string           $class     The name of the class to generate
      * @param string           $baseClass The name of the container's base class
      */
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass): void
+    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, string $class, string $baseClass): void
     {
         // cache the container
         $dumper = new PhpDumper($container);
@@ -677,7 +677,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @return DelegatingLoader The loader
      */
-    protected function getContainerLoader(ContainerInterface $container)
+    protected function getContainerLoader(ContainerInterface $container): DelegatingLoader
     {
         $locator = new FileLocator($this);
         $resolver = new LoaderResolver(array(
@@ -703,7 +703,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      *
      * @return string The PHP string with the comments removed
      */
-    public static function stripComments($source)
+    public static function stripComments(string $source): string
     {
         if (!function_exists('token_get_all')) {
             return $source;

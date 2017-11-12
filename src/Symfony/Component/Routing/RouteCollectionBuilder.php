@@ -56,7 +56,7 @@ class RouteCollectionBuilder
      *
      * @throws FileLoaderLoadException
      */
-    public function import($resource, $prefix = '/', $type = null)
+    public function import($resource, $prefix = '/', $type = null): self
     {
         /** @var RouteCollection[] $collections */
         $collections = $this->load($resource, $type);
@@ -93,7 +93,7 @@ class RouteCollectionBuilder
      *
      * @return Route
      */
-    public function add($path, $controller, $name = null)
+    public function add(string $path, string $controller, ?string $name = null): Route
     {
         $route = new Route($path);
         $route->setDefault('_controller', $controller);
@@ -107,7 +107,7 @@ class RouteCollectionBuilder
      *
      * @return self
      */
-    public function createBuilder()
+    public function createBuilder(): self
     {
         return new self($this->loader);
     }
@@ -117,7 +117,7 @@ class RouteCollectionBuilder
      *
      * @param string                 $prefix
      */
-    public function mount($prefix, RouteCollectionBuilder $builder): void
+    public function mount(string $prefix, RouteCollectionBuilder $builder): void
     {
         $builder->prefix = trim(trim($prefix), '/');
         $this->routes[] = $builder;
@@ -130,7 +130,7 @@ class RouteCollectionBuilder
      *
      * @return $this
      */
-    public function addRoute(Route $route, $name = null)
+    public function addRoute(Route $route, ?string $name = null)
     {
         if (null === $name) {
             // used as a flag to know which routes will need a name later
@@ -149,7 +149,7 @@ class RouteCollectionBuilder
      *
      * @return $this
      */
-    public function setHost($pattern)
+    public function setHost(string $pattern)
     {
         $this->host = $pattern;
 
@@ -163,7 +163,7 @@ class RouteCollectionBuilder
      *
      * @return $this
      */
-    public function setCondition($condition)
+    public function setCondition(string $condition)
     {
         $this->condition = $condition;
 
@@ -179,7 +179,7 @@ class RouteCollectionBuilder
      *
      * @return $this
      */
-    public function setDefault($key, $value)
+    public function setDefault(string $key, $value)
     {
         $this->defaults[$key] = $value;
 
@@ -195,7 +195,7 @@ class RouteCollectionBuilder
      *
      * @return $this
      */
-    public function setRequirement($key, $regex)
+    public function setRequirement(string $key, $regex)
     {
         $this->requirements[$key] = $regex;
 
@@ -211,7 +211,7 @@ class RouteCollectionBuilder
      *
      * @return $this
      */
-    public function setOption($key, $value)
+    public function setOption(string $key, $value)
     {
         $this->options[$key] = $value;
 
@@ -264,7 +264,7 @@ class RouteCollectionBuilder
      *
      * @return RouteCollection
      */
-    public function build()
+    public function build(): RouteCollection
     {
         $routeCollection = new RouteCollection();
 

@@ -30,7 +30,7 @@ class Scope
      *
      * @return self
      */
-    public function enter()
+    public function enter(): self
     {
         return new self($this);
     }
@@ -40,7 +40,7 @@ class Scope
      *
      * @return self|null
      */
-    public function leave()
+    public function leave(): ?self
     {
         $this->left = true;
 
@@ -57,7 +57,7 @@ class Scope
      *
      * @throws \LogicException
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         if ($this->left) {
             throw new \LogicException('Left scope is not mutable.');
@@ -75,7 +75,7 @@ class Scope
      *
      * @return bool
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         if (array_key_exists($key, $this->data)) {
             return true;
@@ -96,7 +96,7 @@ class Scope
      *
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get(string $key, $default = null)
     {
         if (array_key_exists($key, $this->data)) {
             return $this->data[$key];

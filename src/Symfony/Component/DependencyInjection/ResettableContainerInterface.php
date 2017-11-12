@@ -27,5 +27,5 @@ interface ResettableContainerInterface extends ContainerInterface
      * meant as a way to release references for ref-counting.
      * A subsequent call to ContainerInterface::get will recreate a new instance of the shared service.
      */
-    public function reset();
+    public function reset(): void;
 }

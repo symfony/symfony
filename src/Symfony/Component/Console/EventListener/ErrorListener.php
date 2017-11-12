@@ -31,7 +31,7 @@ class ErrorListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    public function onConsoleError(ConsoleErrorEvent $event)
+    public function onConsoleError(ConsoleErrorEvent $event): void
     {
         if (null === $this->logger) {
             return;
@@ -46,7 +46,7 @@ class ErrorListener implements EventSubscriberInterface
         $this->logger->error('Error thrown while running command "{command}". Message: "{message}"', array('error' => $error, 'command' => $inputString, 'message' => $error->getMessage()));
     }
 
-    public function onConsoleTerminate(ConsoleTerminateEvent $event)
+    public function onConsoleTerminate(ConsoleTerminateEvent $event): void
     {
         if (null === $this->logger) {
             return;

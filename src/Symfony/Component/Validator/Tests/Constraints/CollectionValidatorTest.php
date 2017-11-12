@@ -26,7 +26,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         return new CollectionValidator();
     }
 
-    abstract protected function prepareTestData(array $contents);
+    abstract protected function prepareTestData(array $contents): void;
 
     public function testNullIsValid(): void
     {

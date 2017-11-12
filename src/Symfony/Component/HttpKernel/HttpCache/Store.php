@@ -87,7 +87,7 @@ class Store implements StoreInterface
      *
      * @return bool False if the lock file does not exist or cannot be unlocked, true otherwise
      */
-    public function unlock(Request $request)
+    public function unlock(Request $request): bool
     {
         $key = $this->getCacheKey($request);
 
@@ -169,7 +169,7 @@ class Store implements StoreInterface
      *
      * @throws \RuntimeException
      */
-    public function write(Request $request, Response $response)
+    public function write(Request $request, Response $response): string
     {
         $key = $this->getCacheKey($request);
         $storedEnv = $this->persistRequest($request);
@@ -219,7 +219,7 @@ class Store implements StoreInterface
      *
      * @return string
      */
-    protected function generateContentDigest(Response $response)
+    protected function generateContentDigest(Response $response): string
     {
         return 'en'.hash('sha256', $response->getContent());
     }
@@ -261,7 +261,7 @@ class Store implements StoreInterface
      *
      * @return bool true if the two environments match, false otherwise
      */
-    private function requestsMatch($vary, $env1, $env2)
+    private function requestsMatch(string $vary, array $env1, array $env2): bool
     {
         if (empty($vary)) {
             return true;
@@ -288,7 +288,7 @@ class Store implements StoreInterface
      *
      * @return array An array of data associated with the key
      */
-    private function getMetadata($key)
+    private function getMetadata(string $key): array
     {
         if (!$entries = $this->load($key)) {
             return array();
@@ -306,7 +306,7 @@ class Store implements StoreInterface
      *
      * @return bool true if the URL exists with either HTTP or HTTPS scheme and has been purged, false otherwise
      */
-    public function purge($url)
+    public function purge(string $url): bool
     {
         $http = preg_replace('#^https:#', 'http:', $url);
         $https = preg_replace('#^http:#', 'https:', $url);
@@ -324,7 +324,7 @@ class Store implements StoreInterface
      *
      * @return bool true if the URL exists and has been purged, false otherwise
      */
-    private function doPurge($url)
+    private function doPurge(string $url): bool
     {
         $key = $this->getCacheKey(Request::create($url));
         if (isset($this->locks[$key])) {
@@ -349,7 +349,7 @@ class Store implements StoreInterface
      *
      * @return string The data associated with the key
      */
-    private function load($key)
+    private function load(string $key): string
     {
         $path = $this->getPath($key);
 
@@ -364,7 +364,7 @@ class Store implements StoreInterface
      *
      * @return bool
      */
-    private function save($key, $data)
+    private function save(string $key, string $data): bool
     {
         $path = $this->getPath($key);
 
@@ -419,7 +419,7 @@ class Store implements StoreInterface
      *
      * @return string A key for the given Request
      */
-    protected function generateCacheKey(Request $request)
+    protected function generateCacheKey(Request $request): string
     {
         return 'md'.hash('sha256', $request->getUri());
     }
@@ -429,7 +429,7 @@ class Store implements StoreInterface
      *
      * @return string A key for the given Request
      */
-    private function getCacheKey(Request $request)
+    private function getCacheKey(Request $request): string
     {
         if (isset($this->keyCache[$request])) {
             return $this->keyCache[$request];
@@ -443,7 +443,7 @@ class Store implements StoreInterface
      *
      * @return array An array of HTTP headers
      */
-    private function persistRequest(Request $request)
+    private function persistRequest(Request $request): array
     {
         return $request->headers->all();
     }
@@ -453,7 +453,7 @@ class Store implements StoreInterface
      *
      * @return array An array of HTTP headers
      */
-    private function persistResponse(Response $response)
+    private function persistResponse(Response $response): array
     {
         $headers = $response->headers->all();
         $headers['X-Status'] = array($response->getStatusCode());
@@ -469,7 +469,7 @@ class Store implements StoreInterface
      *
      * @return Response
      */
-    private function restoreResponse($headers, $body = null)
+    private function restoreResponse(array $headers, string $body = null): Response
     {
         $status = $headers['X-Status'][0];
         unset($headers['X-Status']);

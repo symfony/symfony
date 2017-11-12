@@ -26,5 +26,5 @@ interface RouteCompilerInterface
      * @throws \LogicException If the Route cannot be compiled because the
      *                         path or host pattern is invalid
      */
-    public static function compile(Route $route);
+    public static function compile(Route $route): CompiledRoute;
 }

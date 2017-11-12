@@ -59,7 +59,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \Foo
      */
-    protected function getFooService()
+    protected function getFooService(): \Foo
     {
         return $this->services['foo'] = new \Foo();
     }

@@ -218,7 +218,7 @@ class EventDispatcher implements EventDispatcherInterface
      *
      * @param string $eventName The name of the event
      */
-    private function sortListeners($eventName): void
+    private function sortListeners(string $eventName): void
     {
         krsort($this->listeners[$eventName]);
         $this->sorted[$eventName] = array();

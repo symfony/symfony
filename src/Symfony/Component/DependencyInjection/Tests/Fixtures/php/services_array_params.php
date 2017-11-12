@@ -65,7 +65,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \BarClass
      */
-    protected function getBarService()
+    protected function getBarService(): \BarClass
     {
         $this->services['bar'] = $instance = new \BarClass();
 
@@ -127,7 +127,7 @@ class ProjectServiceContainer extends Container
      *
      * @throws InvalidArgumentException When the dynamic parameter does not exist
      */
-    private function getDynamicParameter($name)
+    private function getDynamicParameter(string $name)
     {
         switch ($name) {
             case 'array_2': $value = array(
@@ -145,7 +145,7 @@ class ProjectServiceContainer extends Container
      *
      * @return array An array of the default parameters
      */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return array(
             'array_1' => array(

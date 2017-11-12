@@ -94,7 +94,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param \SessionHandlerInterface|null $handler
      * @param MetadataBag                   $metaBag MetadataBag
      */
-    public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
+    public function __construct(array $options = array(), ?\SessionHandlerInterface $handler = null, MetadataBag $metaBag = null)
     {
         $this->setMetadataBag($metaBag);
 
@@ -321,7 +321,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @return MetadataBag
      */
-    public function getMetadataBag()
+    public function getMetadataBag(): MetadataBag
     {
         return $this->metadataBag;
     }
@@ -391,7 +391,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function setSaveHandler($saveHandler = null): void
+    public function setSaveHandler(?\SessionHandlerInterface $saveHandler = null): void
     {
         if (!$saveHandler instanceof AbstractProxy &&
             !$saveHandler instanceof \SessionHandlerInterface &&

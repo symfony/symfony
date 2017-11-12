@@ -38,7 +38,7 @@ class TemplateReference extends BaseTemplateReference
      *
      * @return string A path to the template or a resource
      */
-    public function getPath()
+    public function getPath(): string
     {
         $controller = str_replace('\\', '/', $this->get('controller'));
 

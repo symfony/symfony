@@ -122,7 +122,7 @@ class AutowirePass extends AbstractRecursivePass
      *
      * @return array
      */
-    private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls)
+    private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls): array
     {
         foreach ($methodCalls as $i => $call) {
             list($method, $arguments) = $call;
@@ -222,7 +222,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * @return TypedReference|null A reference to the service matching the given type, if any
      */
-    private function getAutowiredReference(TypedReference $reference, $deprecationMessage)
+    private function getAutowiredReference(TypedReference $reference, $deprecationMessage): ?TypedReference
     {
         $this->lastFailure = null;
         $type = $reference->getType();

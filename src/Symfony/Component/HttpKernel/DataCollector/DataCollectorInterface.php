@@ -24,17 +24,17 @@ interface DataCollectorInterface
     /**
      * Collects data for the given Request and Response.
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null);
+    public function collect(Request $request, Response $response, \Exception $exception = null): void;
 
     /**
      * Returns the name of the collector.
      *
      * @return string The collector name
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Resets this data collector to its initial state.
      */
-    public function reset();
+    public function reset(): void;
 }

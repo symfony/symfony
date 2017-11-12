@@ -29,7 +29,7 @@ interface FormRegistryInterface
      *
      * @throws Exception\InvalidArgumentException if the type can not be retrieved from any extension
      */
-    public function getType($name);
+    public function getType(string $name): ResolvedFormTypeInterface;
 
     /**
      * Returns whether the given form type is supported.
@@ -38,14 +38,14 @@ interface FormRegistryInterface
      *
      * @return bool Whether the type is supported
      */
-    public function hasType($name);
+    public function hasType(string $name): bool;
 
     /**
      * Returns the guesser responsible for guessing types.
      *
      * @return FormTypeGuesserInterface|null
      */
-    public function getTypeGuesser();
+    public function getTypeGuesser(): ?FormTypeGuesserInterface;
 
     /**
      * Returns the extensions loaded by the framework.

@@ -90,7 +90,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
      *
      * @return array $locales The fallback locales
      */
-    public function getFallbackLocales()
+    public function getFallbackLocales(): array
     {
         if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {
             return $this->translator->getFallbackLocales();
@@ -114,7 +114,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
      * @param string|null $domain
      * @param string|null $locale
      */
-    private function log($id, $domain, $locale): void
+    private function log(string $id, ?string $domain, ?string $locale): void
     {
         if (null === $domain) {
             $domain = 'messages';

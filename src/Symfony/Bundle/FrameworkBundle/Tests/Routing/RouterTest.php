@@ -240,7 +240,7 @@ class RouterTest extends TestCase
     /**
      * @return \Symfony\Component\DependencyInjection\Container
      */
-    private function getServiceContainer(RouteCollection $routes)
+    private function getServiceContainer(RouteCollection $routes): \Symfony\Component\DependencyInjection\Container
     {
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
 

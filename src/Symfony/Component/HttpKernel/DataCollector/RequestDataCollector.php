@@ -261,7 +261,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      *
      * @return string The route
      */
-    public function getRoute()
+    public function getRoute(): string
     {
         return $this->data['route'];
     }
@@ -278,7 +278,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      *
      * @return array The parameters
      */
-    public function getRouteParams()
+    public function getRouteParams(): array
     {
         return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params']->getValue() : array();
     }

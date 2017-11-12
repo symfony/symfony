@@ -48,7 +48,7 @@ class AcceptHeader
      *
      * @return self
      */
-    public static function fromString($headerValue)
+    public static function fromString(string $headerValue): self
     {
         $index = 0;
 
@@ -65,7 +65,7 @@ class AcceptHeader
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return implode(',', $this->items);
     }
@@ -77,7 +77,7 @@ class AcceptHeader
      *
      * @return bool
      */
-    public function has($value)
+    public function has(string $value): bool
     {
         return isset($this->items[$value]);
     }
@@ -89,7 +89,7 @@ class AcceptHeader
      *
      * @return AcceptHeaderItem|null
      */
-    public function get($value)
+    public function get(string $value): ?AcceptHeaderItem
     {
         return isset($this->items[$value]) ? $this->items[$value] : null;
     }
@@ -126,7 +126,7 @@ class AcceptHeader
      *
      * @return self
      */
-    public function filter($pattern)
+    public function filter(string $pattern): self
     {
         return new self(array_filter($this->items, function (AcceptHeaderItem $item) use ($pattern) {
             return preg_match($pattern, $item->getValue());
@@ -138,7 +138,7 @@ class AcceptHeader
      *
      * @return AcceptHeaderItem|null
      */
-    public function first()
+    public function first(): ?AcceptHeaderItem
     {
         $this->sort();
 

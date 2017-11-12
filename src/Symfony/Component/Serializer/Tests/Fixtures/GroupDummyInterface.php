@@ -21,5 +21,5 @@ interface GroupDummyInterface
     /**
      * @Groups({"a", "name_converter"})
      */
-    public function getSymfony();
+    public function getSymfony(): void;
 }

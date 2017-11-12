@@ -28,12 +28,12 @@ interface MatcherDumperInterface
      *
      * @return string Executable code
      */
-    public function dump(array $options = array());
+    public function dump(array $options = array()): string;
 
     /**
      * Gets the routes to dump.
      *
      * @return RouteCollection A RouteCollection instance
      */
-    public function getRoutes();
+    public function getRoutes(): RouteCollection;
 }

@@ -48,7 +48,7 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
     /**
      * @return string The file path to the resource
      */
-    public function getResource()
+    public function getResource(): string
     {
         return $this->resource;
     }
@@ -58,7 +58,7 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
      *
      * @return string|null
      */
-    public function getPattern()
+    public function getPattern(): ?string
     {
         return $this->pattern;
     }

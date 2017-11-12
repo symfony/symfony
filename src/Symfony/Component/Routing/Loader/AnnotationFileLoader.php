@@ -50,7 +50,7 @@ class AnnotationFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When the file does not exist or its routes cannot be parsed
      */
-    public function load($file, $type = null)
+    public function load(string $file, ?string $type = null): RouteCollection
     {
         $path = $this->locator->locate($file);
 
@@ -81,7 +81,7 @@ class AnnotationFileLoader extends FileLoader
      *
      * @return string|false Full class name if found, false otherwise
      */
-    protected function findClass($file)
+    protected function findClass(string $file)
     {
         $class = false;
         $namespace = false;

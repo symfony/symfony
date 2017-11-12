@@ -29,5 +29,5 @@ interface ResourceInterface
      *
      * @return string A string representation unique to the underlying Resource
      */
-    public function __toString();
+    public function __toString(): string;
 }

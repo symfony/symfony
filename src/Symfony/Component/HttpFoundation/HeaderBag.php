@@ -36,7 +36,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return string The headers
      */
-    public function __toString()
+    public function __toString(): string
     {
         if (!$headers = $this->all()) {
             return '';
@@ -60,7 +60,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return array An array of headers
      */
-    public function all()
+    public function all(): array
     {
         return $this->headers;
     }
@@ -70,7 +70,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return array An array of parameter keys
      */
-    public function keys()
+    public function keys(): array
     {
         return array_keys($this->all());
     }
@@ -107,7 +107,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
      */
-    public function get($key, $default = null, $first = true)
+    public function get(string $key, $default = null, $first = true)
     {
         $key = str_replace('_', '-', strtolower($key));
         $headers = $this->all();
@@ -134,7 +134,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string|array $values  The value or an array of values
      * @param bool         $replace Whether to replace the actual value or not (true by default)
      */
-    public function set($key, $values, $replace = true): void
+    public function set(string $key, $values, $replace = true): void
     {
         $key = str_replace('_', '-', strtolower($key));
 
@@ -166,7 +166,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return bool true if the parameter exists, false otherwise
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return array_key_exists(str_replace('_', '-', strtolower($key)), $this->all());
     }
@@ -179,7 +179,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return bool true if the value is contained in the header, false otherwise
      */
-    public function contains($key, $value)
+    public function contains(string $key, string $value): bool
     {
         return in_array($value, $this->get($key, null, false));
     }
@@ -189,7 +189,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The HTTP header name
      */
-    public function remove($key): void
+    public function remove(string $key): void
     {
         $key = str_replace('_', '-', strtolower($key));
 
@@ -210,7 +210,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @throws \RuntimeException When the HTTP header is not parseable
      */
-    public function getDate($key, \DateTime $default = null)
+    public function getDate(string $key, \DateTime $default = null): ?\DateTime
     {
         if (null === $value = $this->get($key)) {
             return $default;
@@ -229,7 +229,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string $key   The Cache-Control directive name
      * @param mixed  $value The Cache-Control directive value
      */
-    public function addCacheControlDirective($key, $value = true): void
+    public function addCacheControlDirective(string $key, $value = true): void
     {
         $this->cacheControl[$key] = $value;
 
@@ -243,7 +243,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return bool true if the directive exists, false otherwise
      */
-    public function hasCacheControlDirective($key)
+    public function hasCacheControlDirective(string $key): bool
     {
         return array_key_exists($key, $this->cacheControl);
     }
@@ -255,7 +255,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return mixed|null The directive value if defined, null otherwise
      */
-    public function getCacheControlDirective($key)
+    public function getCacheControlDirective(string $key)
     {
         return array_key_exists($key, $this->cacheControl) ? $this->cacheControl[$key] : null;
     }
@@ -265,7 +265,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string $key The Cache-Control directive
      */
-    public function removeCacheControlDirective($key): void
+    public function removeCacheControlDirective(string $key): void
     {
         unset($this->cacheControl[$key]);
 
@@ -277,7 +277,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return \ArrayIterator An \ArrayIterator instance
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->headers);
     }
@@ -287,7 +287,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return int The number of headers
      */
-    public function count()
+    public function count(): int
     {
         return count($this->headers);
     }
@@ -318,7 +318,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @return array An array representing the attribute values
      */
-    protected function parseCacheControl($header)
+    protected function parseCacheControl(string $header): array
     {
         $cacheControl = array();
         preg_match_all('#([a-zA-Z][a-zA-Z_-]*)\s*(?:=(?:"([^"]*)"|([^ \t",;]*)))?#', $header, $matches, PREG_SET_ORDER);

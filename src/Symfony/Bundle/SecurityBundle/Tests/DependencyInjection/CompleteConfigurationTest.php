@@ -23,9 +23,9 @@ use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
-    abstract protected function getLoader(ContainerBuilder $container);
+    abstract protected function getLoader(ContainerBuilder $container): void;
 
-    abstract protected function getFileExtension();
+    abstract protected function getFileExtension(): void;
 
     public function testRolesHierarchy(): void
     {

@@ -42,7 +42,7 @@ class Factory implements LoggerAwareInterface
      *
      * @return Lock
      */
-    public function createLock($resource, $ttl = 300.0, $autoRelease = true)
+    public function createLock(string $resource, float $ttl = 300.0, bool $autoRelease = true): Lock
     {
         $lock = new Lock(new Key($resource), $this->store, $ttl, $autoRelease);
         $lock->setLogger($this->logger);

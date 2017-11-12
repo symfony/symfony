@@ -47,7 +47,7 @@ class Workflow
      *
      * @throws LogicException
      */
-    public function getMarking($subject)
+    public function getMarking($subject): Marking
     {
         $marking = $this->markingStore->getMarking($subject);
 
@@ -90,7 +90,7 @@ class Workflow
      *
      * @return bool true if the transition is enabled
      */
-    public function can($subject, $transitionName)
+    public function can($subject, $transitionName): bool
     {
         $transitions = $this->definition->getTransitions();
         $marking = $this->getMarking($subject);
@@ -123,7 +123,7 @@ class Workflow
      * @throws LogicException If the transition is not applicable
      * @throws LogicException If the transition does not exist
      */
-    public function apply($subject, $transitionName)
+    public function apply($subject, $transitionName): Marking
     {
         $transitions = $this->getEnabledTransitions($subject);
 
@@ -192,7 +192,7 @@ class Workflow
     /**
      * @return Definition
      */
-    public function getDefinition()
+    public function getDefinition(): Definition
     {
         return $this->definition;
     }
@@ -200,7 +200,7 @@ class Workflow
     /**
      * @return MarkingStoreInterface
      */
-    public function getMarkingStore()
+    public function getMarkingStore(): MarkingStoreInterface
     {
         return $this->markingStore;
     }

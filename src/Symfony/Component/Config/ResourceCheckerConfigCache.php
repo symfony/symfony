@@ -62,7 +62,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      *
      * @return bool true if the cache is fresh, false otherwise
      */
-    public function isFresh()
+    public function isFresh(): bool
     {
         if (!is_file($this->file)) {
             return false;
@@ -116,7 +116,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      *
      * @throws \RuntimeException When cache file can't be written
      */
-    public function write($content, array $metadata = null): void
+    public function write(string $content, array $metadata = null): void
     {
         $mode = 0666;
         $umask = umask();
@@ -147,7 +147,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      *
      * @return string The meta file path
      */
-    private function getMetaFile()
+    private function getMetaFile(): string
     {
         return $this->file.'.meta';
     }

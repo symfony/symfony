@@ -55,7 +55,7 @@ class Package implements PackageInterface
     /**
      * @return ContextInterface
      */
-    protected function getContext()
+    protected function getContext(): ContextInterface
     {
         return $this->context;
     }
@@ -63,7 +63,7 @@ class Package implements PackageInterface
     /**
      * @return VersionStrategyInterface
      */
-    protected function getVersionStrategy()
+    protected function getVersionStrategy(): VersionStrategyInterface
     {
         return $this->versionStrategy;
     }

@@ -23,5 +23,5 @@ interface IOExceptionInterface extends ExceptionInterface
      *
      * @return string The path
      */
-    public function getPath();
+    public function getPath(): string;
 }

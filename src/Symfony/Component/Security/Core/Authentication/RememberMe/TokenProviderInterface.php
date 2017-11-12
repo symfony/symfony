@@ -29,14 +29,14 @@ interface TokenProviderInterface
      *
      * @throws TokenNotFoundException if the token is not found
      */
-    public function loadTokenBySeries($series);
+    public function loadTokenBySeries(string $series): PersistentTokenInterface;
 
     /**
      * Deletes all tokens belonging to series.
      *
      * @param string $series
      */
-    public function deleteTokenBySeries($series);
+    public function deleteTokenBySeries(string $series): void;
 
     /**
      * Updates the token according to this data.
@@ -47,10 +47,10 @@ interface TokenProviderInterface
      *
      * @throws TokenNotFoundException if the token is not found
      */
-    public function updateToken($series, $tokenValue, \DateTime $lastUsed);
+    public function updateToken(string $series, string $tokenValue, \DateTime $lastUsed): void;
 
     /**
      * Creates a new token.
      */
-    public function createNewToken(PersistentTokenInterface $token);
+    public function createNewToken(PersistentTokenInterface $token): void;
 }

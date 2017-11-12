@@ -47,7 +47,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @return array An array of headers
      */
-    public function allPreserveCase()
+    public function allPreserveCase(): array
     {
         $headers = array();
         foreach ($this->all() as $name => $value) {
@@ -184,7 +184,7 @@ class ResponseHeaderBag extends HeaderBag
      * @param string $path
      * @param string $domain
      */
-    public function removeCookie($name, $path = '/', $domain = null): void
+    public function removeCookie(string $name, string $path = '/', string $domain = null): void
     {
         if (null === $path) {
             $path = '/';
@@ -214,7 +214,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @throws \InvalidArgumentException When the $format is invalid
      */
-    public function getCookies($format = self::COOKIES_FLAT)
+    public function getCookies(string $format = self::COOKIES_FLAT): array
     {
         if (!in_array($format, array(self::COOKIES_FLAT, self::COOKIES_ARRAY))) {
             throw new \InvalidArgumentException(sprintf('Format "%s" invalid (%s).', $format, implode(', ', array(self::COOKIES_FLAT, self::COOKIES_ARRAY))));
@@ -245,7 +245,7 @@ class ResponseHeaderBag extends HeaderBag
      * @param bool   $secure
      * @param bool   $httpOnly
      */
-    public function clearCookie($name, $path = '/', $domain = null, $secure = false, $httpOnly = true): void
+    public function clearCookie(string $name, string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true): void
     {
         $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly));
     }
@@ -265,7 +265,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @see RFC 6266
      */
-    public function makeDisposition($disposition, $filename, $filenameFallback = '')
+    public function makeDisposition(string $disposition, string $filename, string $filenameFallback = ''): string
     {
         if (!in_array($disposition, array(self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE))) {
             throw new \InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
@@ -307,7 +307,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @return string
      */
-    protected function computeCacheControlValue()
+    protected function computeCacheControlValue(): string
     {
         if (!$this->cacheControl && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
             return 'no-cache, private';

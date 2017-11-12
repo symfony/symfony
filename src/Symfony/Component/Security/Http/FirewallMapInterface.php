@@ -32,5 +32,5 @@ interface FirewallMapInterface
      *
      * @return array of the format array(array(AuthenticationListener), ExceptionListener)
      */
-    public function getListeners(Request $request);
+    public function getListeners(Request $request): array;
 }

@@ -133,7 +133,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         $event->setResponse($response);
     }
 
-    private function onSuccess(Request $request, TokenInterface $token)
+    private function onSuccess(Request $request, TokenInterface $token): void
     {
         if (null !== $this->logger) {
             $this->logger->info('User has been authenticated successfully.', array('username' => $token->getUsername()));

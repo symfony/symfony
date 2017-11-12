@@ -27,7 +27,7 @@ interface LocaleBundleInterface extends ResourceBundleInterface
      *
      * @return string|null The name of the locale or NULL if not found
      */
-    public function getLocaleName($locale, $displayLocale = null);
+    public function getLocaleName(string $locale, string $displayLocale = null): ?string;
 
     /**
      * Returns the names of all known locales.
@@ -37,5 +37,5 @@ interface LocaleBundleInterface extends ResourceBundleInterface
      *
      * @return string[] A list of locale names indexed by locale codes
      */
-    public function getLocaleNames($displayLocale = null);
+    public function getLocaleNames(string $displayLocale = null);
 }

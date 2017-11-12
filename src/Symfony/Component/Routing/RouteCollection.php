@@ -61,7 +61,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @return int The number of routes
      */
-    public function count()
+    public function count(): int
     {
         return count($this->routes);
     }
@@ -72,7 +72,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param string $name  The route name
      * @param Route  $route A Route instance
      */
-    public function add($name, Route $route): void
+    public function add(string $name, Route $route): void
     {
         unset($this->routes[$name]);
 
@@ -96,7 +96,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @return Route|null A Route instance or null when not found
      */
-    public function get($name)
+    public function get(string $name): ?Route
     {
         return isset($this->routes[$name]) ? $this->routes[$name] : null;
     }
@@ -138,7 +138,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
      */
-    public function addPrefix($prefix, array $defaults = array(), array $requirements = array()): void
+    public function addPrefix(string $prefix, array $defaults = array(), array $requirements = array()): void
     {
         $prefix = trim(trim($prefix), '/');
 
@@ -160,7 +160,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
      */
-    public function setHost($pattern, array $defaults = array(), array $requirements = array()): void
+    public function setHost(string $pattern, array $defaults = array(), array $requirements = array()): void
     {
         foreach ($this->routes as $route) {
             $route->setHost($pattern);
@@ -176,7 +176,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @param string $condition The condition
      */
-    public function setCondition($condition): void
+    public function setCondition(string $condition): void
     {
         foreach ($this->routes as $route) {
             $route->setCondition($condition);

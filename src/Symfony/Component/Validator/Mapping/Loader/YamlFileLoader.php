@@ -78,7 +78,7 @@ class YamlFileLoader extends FileLoader
      *
      * @return array An array of values or Constraint instances
      */
-    protected function parseNodes(array $nodes)
+    protected function parseNodes(array $nodes): array
     {
         $values = array();
 
@@ -113,7 +113,7 @@ class YamlFileLoader extends FileLoader
      * @throws \InvalidArgumentException If the file could not be loaded or did
      *                                   not contain a YAML array
      */
-    private function parseFile($path)
+    private function parseFile(string $path): array
     {
         try {
             $classes = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);

@@ -66,7 +66,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
     /**
      * @return Data
      */
-    public function getCalls()
+    public function getCalls(): Data
     {
         return $this->data['calls'];
     }
@@ -74,7 +74,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
     /**
      * @return int
      */
-    public function getViolationsCount()
+    public function getViolationsCount(): int
     {
         return $this->data['violations_count'];
     }

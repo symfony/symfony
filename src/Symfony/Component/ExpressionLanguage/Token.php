@@ -46,7 +46,7 @@ class Token
      *
      * @return string A string representation of the token
      */
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf('%3d %-11s %s', $this->cursor, strtoupper($this->type), $this->value);
     }
@@ -59,7 +59,7 @@ class Token
      *
      * @return bool
      */
-    public function test($type, $value = null)
+    public function test($type, $value = null): bool
     {
         return $this->type === $type && (null === $value || $this->value == $value);
     }

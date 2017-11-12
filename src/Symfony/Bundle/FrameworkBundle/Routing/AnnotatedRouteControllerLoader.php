@@ -37,7 +37,7 @@ class AnnotatedRouteControllerLoader extends AnnotationClassLoader
      *
      * @return string
      */
-    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
+    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
     {
         return preg_replace(array(
             '/(bundle|controller)_/',

@@ -69,7 +69,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @return string The iterated error messages
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = '';
 
@@ -91,7 +91,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @return FormInterface The form whose errors are iterated by this object
      */
-    public function getForm()
+    public function getForm(): FormInterface
     {
         return $this->form;
     }
@@ -120,7 +120,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @return int The 0-indexed position
      */
-    public function key()
+    public function key(): int
     {
         return key($this->errors);
     }
@@ -130,7 +130,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @return bool Whether the iterator is valid
      */
-    public function valid()
+    public function valid(): bool
     {
         return null !== key($this->errors);
     }
@@ -153,7 +153,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @return bool Whether that position exists
      */
-    public function offsetExists($position)
+    public function offsetExists(int $position): bool
     {
         return isset($this->errors[$position]);
     }
@@ -167,7 +167,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @throws OutOfBoundsException If the given position does not exist
      */
-    public function offsetGet($position)
+    public function offsetGet(int $position)
     {
         if (!isset($this->errors[$position])) {
             throw new OutOfBoundsException('The offset '.$position.' does not exist.');
@@ -202,7 +202,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @return bool Whether the current element is an instance of this class
      */
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return current($this->errors) instanceof self;
     }
@@ -232,7 +232,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @return int The number of iterated elements
      */
-    public function count()
+    public function count(): int
     {
         return count($this->errors);
     }
@@ -244,7 +244,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @throws OutOfBoundsException If the position is invalid
      */
-    public function seek($position): void
+    public function seek(int $position): void
     {
         if (!isset($this->errors[$position])) {
             throw new OutOfBoundsException('The offset '.$position.' does not exist.');
@@ -285,7 +285,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      * @return string The indented string
      */
-    private static function indent($string)
+    private static function indent(string $string): string
     {
         return rtrim(self::INDENTATION.str_replace("\n", "\n".self::INDENTATION, $string), ' ');
     }

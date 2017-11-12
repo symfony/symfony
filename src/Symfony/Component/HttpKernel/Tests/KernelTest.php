@@ -568,7 +568,7 @@ EOF;
      *
      * @return BundleInterface
      */
-    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
+    protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null): BundleInterface
     {
         $bundle = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')
@@ -611,7 +611,7 @@ EOF;
      *
      * @return Kernel
      */
-    protected function getKernel(array $methods = array(), array $bundles = array())
+    protected function getKernel(array $methods = array(), array $bundles = array()): Kernel
     {
         $methods[] = 'registerBundles';
 

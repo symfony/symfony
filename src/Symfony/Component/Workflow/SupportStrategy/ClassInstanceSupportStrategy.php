@@ -27,7 +27,7 @@ final class ClassInstanceSupportStrategy implements SupportStrategyInterface
     /**
      * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }

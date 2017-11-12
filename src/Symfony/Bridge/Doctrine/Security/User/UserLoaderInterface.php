@@ -35,5 +35,5 @@ interface UserLoaderInterface
      *
      * @return UserInterface|null
      */
-    public function loadUserByUsername($username);
+    public function loadUserByUsername(string $username): ?UserInterface;
 }

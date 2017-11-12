@@ -290,7 +290,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      *
      * @return array A group array
      */
-    protected function normalizeGroups($groups)
+    protected function normalizeGroups($groups): array
     {
         if (is_array($groups)) {
             return $groups;

@@ -53,7 +53,7 @@ class Command
     /**
      * @return string|null The default command name or null when no default name is set
      */
-    public static function getDefaultName()
+    public static function getDefaultName(): ?string
     {
         $class = get_called_class();
         $r = new \ReflectionProperty($class, 'defaultName');
@@ -107,7 +107,7 @@ class Command
      *
      * @return HelperSet A HelperSet instance
      */
-    public function getHelperSet()
+    public function getHelperSet(): HelperSet
     {
         return $this->helperSet;
     }
@@ -117,7 +117,7 @@ class Command
      *
      * @return Application An Application instance
      */
-    public function getApplication()
+    public function getApplication(): Application
     {
         return $this->application;
     }
@@ -130,7 +130,7 @@ class Command
      *
      * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return true;
     }
@@ -196,7 +196,7 @@ class Command
      * @see setCode()
      * @see execute()
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         // force the creation of the synopsis before the merge with the app definition
         $this->getSynopsis(true);
@@ -290,7 +290,7 @@ class Command
      *
      * @param bool $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    public function mergeApplicationDefinition($mergeArgs = true): void
+    public function mergeApplicationDefinition(bool $mergeArgs = true): void
     {
         if (null === $this->application || (true === $this->applicationDefinitionMerged && ($this->applicationDefinitionMergedWithArgs || !$mergeArgs))) {
             return;
@@ -335,7 +335,7 @@ class Command
      *
      * @return InputDefinition An InputDefinition instance
      */
-    public function getDefinition()
+    public function getDefinition(): InputDefinition
     {
         return $this->definition;
     }
@@ -350,7 +350,7 @@ class Command
      *
      * @return InputDefinition An InputDefinition instance
      */
-    public function getNativeDefinition()
+    public function getNativeDefinition(): InputDefinition
     {
         return $this->getDefinition();
     }
@@ -365,7 +365,7 @@ class Command
      *
      * @return $this
      */
-    public function addArgument($name, $mode = null, $description = '', $default = null)
+    public function addArgument(string $name, int $mode = null, string $description = '', $default = null)
     {
         $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
 
@@ -383,7 +383,7 @@ class Command
      *
      * @return $this
      */
-    public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
+    public function addOption(string $name, string $shortcut = null, int $mode = null, string $description = '', $default = null)
     {
         $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
 
@@ -404,7 +404,7 @@ class Command
      *
      * @throws InvalidArgumentException When the name is invalid
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->validateName($name);
 
@@ -425,7 +425,7 @@ class Command
      *
      * @return $this
      */
-    public function setProcessTitle($title)
+    public function setProcessTitle(string $title)
     {
         $this->processTitle = $title;
 
@@ -437,7 +437,7 @@ class Command
      *
      * @return string The command name
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -447,7 +447,7 @@ class Command
      *
      * @return Command The current instance
      */
-    public function setHidden($hidden)
+    public function setHidden(bool $hidden): Command
     {
         $this->hidden = (bool) $hidden;
 
@@ -457,7 +457,7 @@ class Command
     /**
      * @return bool whether the command should be publicly shown or not
      */
-    public function isHidden()
+    public function isHidden(): bool
     {
         return $this->hidden;
     }
@@ -469,7 +469,7 @@ class Command
      *
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
 
@@ -481,7 +481,7 @@ class Command
      *
      * @return string The description for the command
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -493,7 +493,7 @@ class Command
      *
      * @return $this
      */
-    public function setHelp($help)
+    public function setHelp(string $help)
     {
         $this->help = $help;
 
@@ -505,7 +505,7 @@ class Command
      *
      * @return string The help for the command
      */
-    public function getHelp()
+    public function getHelp(): string
     {
         return $this->help;
     }
@@ -516,7 +516,7 @@ class Command
      *
      * @return string The processed help for the command
      */
-    public function getProcessedHelp()
+    public function getProcessedHelp(): string
     {
         $name = $this->name;
 
@@ -561,7 +561,7 @@ class Command
      *
      * @return array An array of aliases for the command
      */
-    public function getAliases()
+    public function getAliases(): array
     {
         return $this->aliases;
     }
@@ -573,7 +573,7 @@ class Command
      *
      * @return string The synopsis
      */
-    public function getSynopsis($short = false)
+    public function getSynopsis(bool $short = false): string
     {
         $key = $short ? 'short' : 'long';
 
@@ -591,7 +591,7 @@ class Command
      *
      * @return $this
      */
-    public function addUsage($usage)
+    public function addUsage(string $usage)
     {
         if (0 !== strpos($usage, $this->name)) {
             $usage = sprintf('%s %s', $this->name, $usage);
@@ -607,7 +607,7 @@ class Command
      *
      * @return array
      */
-    public function getUsages()
+    public function getUsages(): array
     {
         return $this->usages;
     }
@@ -622,7 +622,7 @@ class Command
      * @throws LogicException           if no HelperSet is defined
      * @throws InvalidArgumentException if the helper is not defined
      */
-    public function getHelper($name)
+    public function getHelper(string $name)
     {
         if (null === $this->helperSet) {
             throw new LogicException(sprintf('Cannot retrieve helper "%s" because there is no HelperSet defined. Did you forget to add your command to the application or to set the application on the command using the setApplication() method? You can also set the HelperSet directly using the setHelperSet() method.', $name));

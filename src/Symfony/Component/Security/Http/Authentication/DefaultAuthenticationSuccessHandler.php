@@ -61,7 +61,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      *
      * @return array An array of options
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -76,7 +76,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      *
      * @return string
      */
-    public function getProviderKey()
+    public function getProviderKey(): string
     {
         return $this->providerKey;
     }
@@ -86,7 +86,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      *
      * @param string $providerKey
      */
-    public function setProviderKey($providerKey): void
+    public function setProviderKey(string $providerKey): void
     {
         $this->providerKey = $providerKey;
     }
@@ -96,7 +96,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      *
      * @return string
      */
-    protected function determineTargetUrl(Request $request)
+    protected function determineTargetUrl(Request $request): string
     {
         if ($this->options['always_use_default_target_path']) {
             return $this->options['default_target_path'];

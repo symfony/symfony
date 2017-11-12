@@ -80,7 +80,7 @@ class Profiler
      *
      * @return Profile A Profile instance
      */
-    public function loadProfile($token)
+    public function loadProfile(string $token): Profile
     {
         return $this->storage->read($token);
     }
@@ -90,7 +90,7 @@ class Profiler
      *
      * @return bool
      */
-    public function saveProfile(Profile $profile)
+    public function saveProfile(Profile $profile): bool
     {
         // late collect
         foreach ($profile->getCollectors() as $collector) {
@@ -129,7 +129,7 @@ class Profiler
      *
      * @see http://php.net/manual/en/datetime.formats.php for the supported date/time formats
      */
-    public function find($ip, $url, $limit, $method, $start, $end, $statusCode = null)
+    public function find(string $ip, string $url, string $limit, string $method, string $start, string $end, string $statusCode = null): array
     {
         return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end), $statusCode);
     }
@@ -181,7 +181,7 @@ class Profiler
      *
      * @return array An array of collectors
      */
-    public function all()
+    public function all(): array
     {
         return $this->collectors;
     }
@@ -214,7 +214,7 @@ class Profiler
      *
      * @return bool
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return isset($this->collectors[$name]);
     }
@@ -228,7 +228,7 @@ class Profiler
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */
-    public function get($name)
+    public function get(string $name): DataCollectorInterface
     {
         if (!isset($this->collectors[$name])) {
             throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
@@ -237,7 +237,7 @@ class Profiler
         return $this->collectors[$name];
     }
 
-    private function getTimestamp($value)
+    private function getTimestamp($value): void
     {
         if (null === $value || '' == $value) {
             return;

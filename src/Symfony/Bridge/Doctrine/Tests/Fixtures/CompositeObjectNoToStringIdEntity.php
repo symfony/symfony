@@ -38,7 +38,7 @@ class CompositeObjectNoToStringIdEntity
     /**
      * @return SingleIntIdNoToStringEntity
      */
-    public function getObjectOne()
+    public function getObjectOne(): SingleIntIdNoToStringEntity
     {
         return $this->objectOne;
     }
@@ -46,7 +46,7 @@ class CompositeObjectNoToStringIdEntity
     /**
      * @return SingleIntIdNoToStringEntity
      */
-    public function getObjectTwo()
+    public function getObjectTwo(): SingleIntIdNoToStringEntity
     {
         return $this->objectTwo;
     }

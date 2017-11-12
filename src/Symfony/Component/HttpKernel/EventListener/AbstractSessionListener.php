@@ -50,5 +50,5 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
      *
      * @return SessionInterface|null A SessionInterface instance or null if no session is available
      */
-    abstract protected function getSession();
+    abstract protected function getSession(): ?SessionInterface;
 }

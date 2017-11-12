@@ -76,7 +76,7 @@ class TemplateIterator implements \IteratorAggregate
      *
      * @return array
      */
-    private function findTemplatesInDirectory($dir, $namespace = null)
+    private function findTemplatesInDirectory(string $dir, ?string $namespace = null): array
     {
         if (!is_dir($dir)) {
             return array();

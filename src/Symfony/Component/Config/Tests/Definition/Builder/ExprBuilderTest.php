@@ -210,7 +210,7 @@ class ExprBuilderTest extends TestCase
      *
      * @return TreeBuilder
      */
-    protected function getTestBuilder()
+    protected function getTestBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder();
 
@@ -231,7 +231,7 @@ class ExprBuilderTest extends TestCase
      *
      * @return array The finalized config values
      */
-    protected function finalizeTestBuilder($testBuilder, $config = null)
+    protected function finalizeTestBuilder(TreeBuilder $testBuilder, array $config = null): array
     {
         return $testBuilder
             ->end()
@@ -249,7 +249,7 @@ class ExprBuilderTest extends TestCase
      *
      * @return \Closure
      */
-    protected function returnClosure($val)
+    protected function returnClosure($val): \Closure
     {
         return function ($v) use ($val) {
             return $val;

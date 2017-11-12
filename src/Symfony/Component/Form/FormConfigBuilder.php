@@ -883,7 +883,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return bool Whether the name is valid
      */
-    public static function isValidName($name)
+    public static function isValidName(string $name): bool
     {
         return '' === $name || null === $name || preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $name);
     }

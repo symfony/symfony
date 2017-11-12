@@ -39,7 +39,7 @@ class Event
      *
      * @return bool Whether propagation was already stopped for this event
      */
-    public function isPropagationStopped()
+    public function isPropagationStopped(): bool
     {
         return $this->propagationStopped;
     }

@@ -126,7 +126,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @return string The request method
      */
-    private static function getRequestMethod()
+    private static function getRequestMethod(): string
     {
         $method = isset($_SERVER['REQUEST_METHOD'])
             ? strtoupper($_SERVER['REQUEST_METHOD'])
@@ -156,7 +156,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @return array
      */
-    private static function fixPhpFilesArray($data)
+    private static function fixPhpFilesArray($data): array
     {
         if (!is_array($data)) {
             return $data;
@@ -194,7 +194,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @return array|null Returns the stripped upload data
      */
-    private static function stripEmptyFiles($data)
+    private static function stripEmptyFiles($data): ?array
     {
         if (!is_array($data)) {
             return $data;

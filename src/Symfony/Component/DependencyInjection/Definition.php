@@ -66,7 +66,7 @@ class Definition
      *
      * @return array An array of changes for this Definition
      */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
@@ -126,7 +126,7 @@ class Definition
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    public function setDecoratedService($id, $renamedId = null, $priority = 0)
+    public function setDecoratedService(?string $id, ?string $renamedId = null, int $priority = 0)
     {
         if ($renamedId && $id == $renamedId) {
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
@@ -148,7 +148,7 @@ class Definition
      *
      * @return null|array An array composed of the decorated service id, the new id for it and the priority of decoration, null if no service is decorated
      */
-    public function getDecoratedService()
+    public function getDecoratedService(): ?array
     {
         return $this->decoratedService;
     }
@@ -160,7 +160,7 @@ class Definition
      *
      * @return $this
      */
-    public function setClass($class)
+    public function setClass(string $class)
     {
         $this->changes['class'] = true;
 
@@ -174,7 +174,7 @@ class Definition
      *
      * @return string|null The service class
      */
-    public function getClass()
+    public function getClass(): ?string
     {
         return $this->class;
     }
@@ -208,7 +208,7 @@ class Definition
      *
      * @return array
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -221,7 +221,7 @@ class Definition
      *
      * @return $this
      */
-    public function setProperty($name, $value)
+    public function setProperty(string $name, $value)
     {
         $this->properties[$name] = $value;
 
@@ -291,7 +291,7 @@ class Definition
      *
      * @return array The array of arguments
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
@@ -339,7 +339,7 @@ class Definition
      *
      * @throws InvalidArgumentException on empty $method param
      */
-    public function addMethodCall($method, array $arguments = array())
+    public function addMethodCall(string $method, array $arguments = array())
     {
         if (empty($method)) {
             throw new InvalidArgumentException('Method name cannot be empty.');
@@ -356,7 +356,7 @@ class Definition
      *
      * @return $this
      */
-    public function removeMethodCall($method)
+    public function removeMethodCall(string $method)
     {
         foreach ($this->calls as $i => $call) {
             if ($call[0] === $method) {
@@ -375,7 +375,7 @@ class Definition
      *
      * @return bool
      */
-    public function hasMethodCall($method)
+    public function hasMethodCall(string $method): bool
     {
         foreach ($this->calls as $call) {
             if ($call[0] === $method) {
@@ -391,7 +391,7 @@ class Definition
      *
      * @return array An array of method calls
      */
-    public function getMethodCalls()
+    public function getMethodCalls(): array
     {
         return $this->calls;
     }
@@ -427,7 +427,7 @@ class Definition
      *
      * @return $this
      */
-    public function setAutoconfigured($autoconfigured)
+    public function setAutoconfigured(bool $autoconfigured)
     {
         $this->changes['autoconfigured'] = true;
 
@@ -439,7 +439,7 @@ class Definition
     /**
      * @return bool
      */
-    public function isAutoconfigured()
+    public function isAutoconfigured(): bool
     {
         return $this->autoconfigured;
     }
@@ -461,7 +461,7 @@ class Definition
      *
      * @return array An array of tags
      */
-    public function getTags()
+    public function getTags(): array
     {
         return $this->tags;
     }
@@ -473,7 +473,7 @@ class Definition
      *
      * @return array An array of attributes
      */
-    public function getTag($name)
+    public function getTag(string $name): array
     {
         return isset($this->tags[$name]) ? $this->tags[$name] : array();
     }
@@ -486,7 +486,7 @@ class Definition
      *
      * @return $this
      */
-    public function addTag($name, array $attributes = array())
+    public function addTag(string $name, array $attributes = array())
     {
         $this->tags[$name][] = $attributes;
 
@@ -500,7 +500,7 @@ class Definition
      *
      * @return bool
      */
-    public function hasTag($name)
+    public function hasTag(string $name): bool
     {
         return isset($this->tags[$name]);
     }
@@ -512,7 +512,7 @@ class Definition
      *
      * @return $this
      */
-    public function clearTag($name)
+    public function clearTag(string $name)
     {
         unset($this->tags[$name]);
 
@@ -538,7 +538,7 @@ class Definition
      *
      * @return $this
      */
-    public function setFile($file)
+    public function setFile(string $file)
     {
         $this->changes['file'] = true;
 
@@ -552,7 +552,7 @@ class Definition
      *
      * @return string|null The full pathname to include
      */
-    public function getFile()
+    public function getFile(): ?string
     {
         return $this->file;
     }
@@ -564,7 +564,7 @@ class Definition
      *
      * @return $this
      */
-    public function setShared($shared)
+    public function setShared(bool $shared)
     {
         $this->changes['shared'] = true;
 
@@ -578,7 +578,7 @@ class Definition
      *
      * @return bool
      */
-    public function isShared()
+    public function isShared(): bool
     {
         return $this->shared;
     }
@@ -590,7 +590,7 @@ class Definition
      *
      * @return $this
      */
-    public function setPublic($boolean)
+    public function setPublic(bool $boolean)
     {
         $this->changes['public'] = true;
 
@@ -605,7 +605,7 @@ class Definition
      *
      * @return bool
      */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->public;
     }
@@ -622,7 +622,7 @@ class Definition
      *
      * @return $this
      */
-    public function setPrivate($boolean)
+    public function setPrivate(bool $boolean)
     {
         $this->private = (bool) $boolean;
 
@@ -634,7 +634,7 @@ class Definition
      *
      * @return bool
      */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return $this->private;
     }
@@ -646,7 +646,7 @@ class Definition
      *
      * @return $this
      */
-    public function setLazy($lazy)
+    public function setLazy(bool $lazy)
     {
         $this->changes['lazy'] = true;
 
@@ -660,7 +660,7 @@ class Definition
      *
      * @return bool
      */
-    public function isLazy()
+    public function isLazy(): bool
     {
         return $this->lazy;
     }
@@ -673,7 +673,7 @@ class Definition
      *
      * @return $this
      */
-    public function setSynthetic($boolean)
+    public function setSynthetic(bool $boolean)
     {
         $this->synthetic = (bool) $boolean;
 
@@ -686,7 +686,7 @@ class Definition
      *
      * @return bool
      */
-    public function isSynthetic()
+    public function isSynthetic(): bool
     {
         return $this->synthetic;
     }
@@ -699,7 +699,7 @@ class Definition
      *
      * @return $this
      */
-    public function setAbstract($boolean)
+    public function setAbstract(bool $boolean)
     {
         $this->abstract = (bool) $boolean;
 
@@ -712,7 +712,7 @@ class Definition
      *
      * @return bool
      */
-    public function isAbstract()
+    public function isAbstract(): bool
     {
         return $this->abstract;
     }
@@ -728,7 +728,7 @@ class Definition
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function setDeprecated($status = true, $template = null)
+    public function setDeprecated(bool $status = true, string $template = null)
     {
         if (null !== $template) {
             if (preg_match('#[\r\n]|\*/#', $template)) {
@@ -755,7 +755,7 @@ class Definition
      *
      * @return bool
      */
-    public function isDeprecated()
+    public function isDeprecated(): bool
     {
         return $this->deprecated;
     }
@@ -767,7 +767,7 @@ class Definition
      *
      * @return string
      */
-    public function getDeprecationMessage($id)
+    public function getDeprecationMessage(string $id): string
     {
         return str_replace('%service_id%', $id, $this->deprecationTemplate ?: self::$defaultDeprecationTemplate);
     }
@@ -797,7 +797,7 @@ class Definition
      *
      * @return callable|null The PHP callable to call
      */
-    public function getConfigurator()
+    public function getConfigurator(): ?callable
     {
         return $this->configurator;
     }
@@ -807,7 +807,7 @@ class Definition
      *
      * @return bool
      */
-    public function isAutowired()
+    public function isAutowired(): bool
     {
         return $this->autowired;
     }
@@ -819,7 +819,7 @@ class Definition
      *
      * @return $this
      */
-    public function setAutowired($autowired)
+    public function setAutowired(bool $autowired)
     {
         $this->changes['autowired'] = true;
 
@@ -833,7 +833,7 @@ class Definition
      *
      * @return array
      */
-    public function getBindings()
+    public function getBindings(): array
     {
         return $this->bindings;
     }
@@ -866,7 +866,7 @@ class Definition
      *
      * @param string $error
      */
-    public function addError($error): void
+    public function addError(string $error): void
     {
         $this->errors[] = $error;
     }
@@ -876,7 +876,7 @@ class Definition
      *
      * @return array
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }

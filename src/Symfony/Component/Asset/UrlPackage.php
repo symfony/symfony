@@ -99,7 +99,7 @@ class UrlPackage extends Package
      *
      * @return string The base URL
      */
-    public function getBaseUrl($path)
+    public function getBaseUrl(string $path): string
     {
         if (1 === count($this->baseUrls)) {
             return $this->baseUrls[0];
@@ -118,7 +118,7 @@ class UrlPackage extends Package
      *
      * @return int The base URL index for the given path
      */
-    protected function chooseBaseUrl($path)
+    protected function chooseBaseUrl(string $path): int
     {
         return (int) fmod(hexdec(substr(hash('sha256', $path), 0, 10)), count($this->baseUrls));
     }

@@ -267,7 +267,7 @@ abstract class AbstractScriptDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
+    abstract protected function getDataDirectory(): void;
 
     public function testGetScripts(): void
     {

@@ -119,7 +119,7 @@ class BinaryFileResponse extends Response
      *
      * @return File The file to stream
      */
-    public function getFile()
+    public function getFile(): File
     {
         return $this->file;
     }
@@ -153,7 +153,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function setContentDisposition($disposition, $filename = '', $filenameFallback = '')
+    public function setContentDisposition(string $disposition, string $filename = '', string $filenameFallback = '')
     {
         if ('' === $filename) {
             $filename = $this->file->getFilename();
@@ -350,7 +350,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function deleteFileAfterSend($shouldDelete)
+    public function deleteFileAfterSend(bool $shouldDelete)
     {
         $this->deleteFileAfterSend = $shouldDelete;
 

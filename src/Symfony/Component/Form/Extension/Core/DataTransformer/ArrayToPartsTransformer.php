@@ -49,7 +49,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
         return $result;
     }
 
-    public function reverseTransform($array)
+    public function reverseTransform($array): void
     {
         if (!is_array($array)) {
             throw new TransformationFailedException('Expected an array.');

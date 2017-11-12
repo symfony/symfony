@@ -61,7 +61,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return $this
      */
-    public function info($info)
+    public function info(string $info)
     {
         return $this->attribute('info', $info);
     }
@@ -86,7 +86,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return $this
      */
-    public function attribute($key, $value)
+    public function attribute(string $key, $value)
     {
         $this->attributes[$key] = $value;
 
@@ -110,7 +110,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return NodeInterface
      */
-    public function getNode($forceRootNode = false)
+    public function getNode(bool $forceRootNode = false): NodeInterface
     {
         if ($forceRootNode) {
             $this->parent = null;
@@ -167,7 +167,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return $this
      */
-    public function setDeprecated($message = 'The child node "%node%" at path "%path%" is deprecated.')
+    public function setDeprecated(string $message = 'The child node "%node%" at path "%path%" is deprecated.')
     {
         $this->deprecationMessage = $message;
 
@@ -251,7 +251,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return ExprBuilder
      */
-    public function beforeNormalization()
+    public function beforeNormalization(): ExprBuilder
     {
         return $this->normalization()->before();
     }
@@ -277,7 +277,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return ExprBuilder
      */
-    public function validate()
+    public function validate(): ExprBuilder
     {
         return $this->validation()->rule();
     }
@@ -289,7 +289,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return $this
      */
-    public function cannotBeOverwritten($deny = true)
+    public function cannotBeOverwritten(bool $deny = true)
     {
         $this->merge()->denyOverwrite($deny);
 
@@ -301,7 +301,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return ValidationBuilder
      */
-    protected function validation()
+    protected function validation(): ValidationBuilder
     {
         if (null === $this->validation) {
             $this->validation = new ValidationBuilder($this);
@@ -315,7 +315,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return MergeBuilder
      */
-    protected function merge()
+    protected function merge(): MergeBuilder
     {
         if (null === $this->merge) {
             $this->merge = new MergeBuilder($this);
@@ -329,7 +329,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @return NormalizationBuilder
      */
-    protected function normalization()
+    protected function normalization(): NormalizationBuilder
     {
         if (null === $this->normalization) {
             $this->normalization = new NormalizationBuilder($this);
@@ -345,5 +345,5 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @throws InvalidDefinitionException When the definition is invalid
      */
-    abstract protected function createNode();
+    abstract protected function createNode(): NodeInterface;
 }

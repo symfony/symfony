@@ -106,7 +106,7 @@ class Symfony_DI_PhpDumper_Test_Base64Parameters extends Container
      *
      * @throws InvalidArgumentException When the dynamic parameter does not exist
      */
-    private function getDynamicParameter($name)
+    private function getDynamicParameter(string $name)
     {
         switch ($name) {
             case 'hello': $value = $this->getEnv('base64:foo'); break;
@@ -122,7 +122,7 @@ class Symfony_DI_PhpDumper_Test_Base64Parameters extends Container
      *
      * @return array An array of the default parameters
      */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return array(
             'env(foo)' => 'd29ybGQ=',

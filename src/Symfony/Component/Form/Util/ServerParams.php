@@ -30,7 +30,7 @@ class ServerParams
      *
      * @return bool
      */
-    public function hasPostMaxSizeBeenExceeded()
+    public function hasPostMaxSizeBeenExceeded(): bool
     {
         $contentLength = $this->getContentLength();
         $maxContentLength = $this->getPostMaxSize();
@@ -78,7 +78,7 @@ class ServerParams
      *
      * @return string
      */
-    public function getNormalizedIniPostMaxSize()
+    public function getNormalizedIniPostMaxSize(): string
     {
         return strtoupper(trim(ini_get('post_max_size')));
     }

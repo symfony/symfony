@@ -48,7 +48,7 @@ interface RememberMeServicesInterface
      *
      * @return TokenInterface
      */
-    public function autoLogin(Request $request);
+    public function autoLogin(Request $request): TokenInterface;
 
     /**
      * Called whenever an interactive authentication attempt was made, but the
@@ -56,7 +56,7 @@ interface RememberMeServicesInterface
      *
      * This method needs to take care of invalidating the cookie.
      */
-    public function loginFail(Request $request, \Exception $exception = null);
+    public function loginFail(Request $request, \Exception $exception = null): void;
 
     /**
      * Called whenever an interactive authentication attempt is successful
@@ -69,5 +69,5 @@ interface RememberMeServicesInterface
      * (such as a HTTP POST parameter) that indicates the browser has explicitly
      * requested for the authentication to be remembered.
      */
-    public function loginSuccess(Request $request, Response $response, TokenInterface $token);
+    public function loginSuccess(Request $request, Response $response, TokenInterface $token): void;
 }

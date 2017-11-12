@@ -28,7 +28,7 @@ class TransDefaultDomainTokenParser extends AbstractTokenParser
      *
      * @return Node
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $expr = $this->parser->getExpressionParser()->parseExpression();
 
@@ -42,7 +42,7 @@ class TransDefaultDomainTokenParser extends AbstractTokenParser
      *
      * @return string The tag name
      */
-    public function getTag()
+    public function getTag(): string
     {
         return 'trans_default_domain';
     }

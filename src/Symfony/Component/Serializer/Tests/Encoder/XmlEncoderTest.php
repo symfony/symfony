@@ -680,7 +680,7 @@ XML;
     /**
      * @return XmlEncoder
      */
-    private function createXmlEncoderWithDateTimeNormalizer()
+    private function createXmlEncoderWithDateTimeNormalizer(): XmlEncoder
     {
         $encoder = new XmlEncoder();
         $serializer = new Serializer(array($this->createMockDateTimeNormalizer()), array('xml' => new XmlEncoder()));
@@ -714,7 +714,7 @@ XML;
     /**
      * @return string
      */
-    private function createXmlWithDateTime()
+    private function createXmlWithDateTime(): string
     {
         return sprintf('<?xml version="1.0"?>
 <response><dateTime>%s</dateTime></response>
@@ -724,7 +724,7 @@ XML;
     /**
      * @return string
      */
-    private function createXmlWithDateTimeField()
+    private function createXmlWithDateTimeField(): string
     {
         return sprintf('<?xml version="1.0"?>
 <response><foo dateTime="%s"/></response>

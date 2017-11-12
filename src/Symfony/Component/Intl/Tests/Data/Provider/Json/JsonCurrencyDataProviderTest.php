@@ -30,7 +30,7 @@ class JsonCurrencyDataProviderTest extends AbstractCurrencyDataProviderTest
     /**
      * @return BundleReaderInterface
      */
-    protected function createBundleReader()
+    protected function createBundleReader(): BundleReaderInterface
     {
         return new JsonBundleReader();
     }

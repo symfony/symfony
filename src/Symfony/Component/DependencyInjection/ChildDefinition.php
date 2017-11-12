@@ -38,7 +38,7 @@ class ChildDefinition extends Definition
      *
      * @return string
      */
-    public function getParent()
+    public function getParent(): string
     {
         return $this->parent;
     }
@@ -50,7 +50,7 @@ class ChildDefinition extends Definition
      *
      * @return $this
      */
-    public function setParent($parent)
+    public function setParent(string $parent)
     {
         $this->parent = $parent;
 
@@ -93,7 +93,7 @@ class ChildDefinition extends Definition
      *
      * @throws InvalidArgumentException when $index isn't an integer
      */
-    public function replaceArgument($index, $value)
+    public function replaceArgument($index, $value): self
     {
         if (is_int($index)) {
             $this->arguments['index_'.$index] = $value;

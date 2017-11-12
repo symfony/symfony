@@ -115,7 +115,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
      *
      * @return string File path
      */
-    private function getFilePath()
+    private function getFilePath(): string
     {
         return $this->savePath.'/'.$this->id.'.mocksess';
     }

@@ -33,7 +33,7 @@ class ChainExtractor implements ExtractorInterface
      * @param string             $format    The format of the loader
      * @param ExtractorInterface $extractor The loader
      */
-    public function addExtractor($format, ExtractorInterface $extractor): void
+    public function addExtractor(string $format, ExtractorInterface $extractor): void
     {
         $this->extractors[$format] = $extractor;
     }

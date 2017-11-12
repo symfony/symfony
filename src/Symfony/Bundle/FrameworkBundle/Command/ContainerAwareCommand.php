@@ -32,7 +32,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
      *
      * @throws \LogicException
      */
-    protected function getContainer()
+    protected function getContainer(): ContainerInterface
     {
         if (null === $this->container) {
             $application = $this->getApplication();

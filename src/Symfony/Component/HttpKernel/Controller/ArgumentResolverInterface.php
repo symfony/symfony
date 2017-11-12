@@ -31,5 +31,5 @@ interface ArgumentResolverInterface
      *
      * @throws \RuntimeException When no value could be provided for a required argument
      */
-    public function getArguments(Request $request, $controller);
+    public function getArguments(Request $request, callable $controller): array;
 }

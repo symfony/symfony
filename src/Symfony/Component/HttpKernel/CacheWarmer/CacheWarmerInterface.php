@@ -28,5 +28,5 @@ interface CacheWarmerInterface extends WarmableInterface
      *
      * @return bool true if the warmer is optional, false otherwise
      */
-    public function isOptional();
+    public function isOptional(): bool;
 }

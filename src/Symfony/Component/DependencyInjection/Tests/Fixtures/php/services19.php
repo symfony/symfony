@@ -60,7 +60,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getServiceFromAnonymousFactoryService()
+    protected function getServiceFromAnonymousFactoryService(): \Bar\FooClass
     {
         return $this->services['service_from_anonymous_factory'] = (new \Bar\FooClass())->getInstance();
     }
@@ -70,7 +70,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \Bar\FooClass
      */
-    protected function getServiceWithMethodCallAndFactoryService()
+    protected function getServiceWithMethodCallAndFactoryService(): \Bar\FooClass
     {
         $this->services['service_with_method_call_and_factory'] = $instance = new \Bar\FooClass();
 

@@ -103,7 +103,7 @@ class JsonDescriptor extends Descriptor
     /**
      * @return array
      */
-    private function getInputArgumentData(InputArgument $argument)
+    private function getInputArgumentData(InputArgument $argument): array
     {
         return array(
             'name' => $argument->getName(),
@@ -117,7 +117,7 @@ class JsonDescriptor extends Descriptor
     /**
      * @return array
      */
-    private function getInputOptionData(InputOption $option)
+    private function getInputOptionData(InputOption $option): array
     {
         return array(
             'name' => '--'.$option->getName(),
@@ -133,7 +133,7 @@ class JsonDescriptor extends Descriptor
     /**
      * @return array
      */
-    private function getInputDefinitionData(InputDefinition $definition)
+    private function getInputDefinitionData(InputDefinition $definition): array
     {
         $inputArguments = array();
         foreach ($definition->getArguments() as $name => $argument) {
@@ -151,7 +151,7 @@ class JsonDescriptor extends Descriptor
     /**
      * @return array
      */
-    private function getCommandData(Command $command)
+    private function getCommandData(Command $command): array
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);

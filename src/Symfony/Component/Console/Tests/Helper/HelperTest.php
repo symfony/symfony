@@ -48,7 +48,7 @@ class HelperTest extends TestCase
      * @param int    $secs
      * @param string $expectedFormat
      */
-    public function testFormatTime($secs, $expectedFormat): void
+    public function testFormatTime(int $secs, string $expectedFormat): void
     {
         $this->assertEquals($expectedFormat, Helper::formatTime($secs));
     }

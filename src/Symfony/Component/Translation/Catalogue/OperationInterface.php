@@ -39,7 +39,7 @@ interface OperationInterface
      *
      * @return array
      */
-    public function getDomains();
+    public function getDomains(): array;
 
     /**
      * Returns all valid messages ('all') after operation.
@@ -48,7 +48,7 @@ interface OperationInterface
      *
      * @return array
      */
-    public function getMessages($domain);
+    public function getMessages(string $domain): array;
 
     /**
      * Returns new messages ('new') after operation.
@@ -57,7 +57,7 @@ interface OperationInterface
      *
      * @return array
      */
-    public function getNewMessages($domain);
+    public function getNewMessages(string $domain): array;
 
     /**
      * Returns obsolete messages ('obsolete') after operation.
@@ -66,12 +66,12 @@ interface OperationInterface
      *
      * @return array
      */
-    public function getObsoleteMessages($domain);
+    public function getObsoleteMessages(string $domain): array;
 
     /**
      * Returns resulting catalogue ('result').
      *
      * @return MessageCatalogueInterface
      */
-    public function getResult();
+    public function getResult(): MessageCatalogueInterface;
 }

@@ -56,7 +56,7 @@ abstract class AbstractUriElement
      *
      * @return \DOMElement A \DOMElement instance
      */
-    public function getNode()
+    public function getNode(): \DOMElement
     {
         return $this->node;
     }
@@ -66,7 +66,7 @@ abstract class AbstractUriElement
      *
      * @return string The method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -76,7 +76,7 @@ abstract class AbstractUriElement
      *
      * @return string The URI
      */
-    public function getUri()
+    public function getUri(): string
     {
         $uri = trim($this->getRawUri());
 
@@ -125,7 +125,7 @@ abstract class AbstractUriElement
      *
      * @return string
      */
-    abstract protected function getRawUri();
+    abstract protected function getRawUri(): string;
 
     /**
      * Returns the canonicalized URI path (see RFC 3986, section 5.2.4).
@@ -134,7 +134,7 @@ abstract class AbstractUriElement
      *
      * @return string
      */
-    protected function canonicalizePath($path)
+    protected function canonicalizePath(string $path): string
     {
         if ('' === $path || '/' === $path) {
             return $path;
@@ -164,7 +164,7 @@ abstract class AbstractUriElement
      *
      * @throws \LogicException If given node is not an anchor
      */
-    abstract protected function setNode(\DOMElement $node);
+    abstract protected function setNode(\DOMElement $node): void;
 
     /**
      * Removes the query string and the anchor from the given uri.

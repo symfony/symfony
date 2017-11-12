@@ -91,7 +91,7 @@ class InputOption
      *
      * @return string The shortcut
      */
-    public function getShortcut()
+    public function getShortcut(): string
     {
         return $this->shortcut;
     }
@@ -101,7 +101,7 @@ class InputOption
      *
      * @return string The name
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -111,7 +111,7 @@ class InputOption
      *
      * @return bool true if value mode is not self::VALUE_NONE, false otherwise
      */
-    public function acceptValue()
+    public function acceptValue(): bool
     {
         return $this->isValueRequired() || $this->isValueOptional();
     }
@@ -121,7 +121,7 @@ class InputOption
      *
      * @return bool true if value mode is self::VALUE_REQUIRED, false otherwise
      */
-    public function isValueRequired()
+    public function isValueRequired(): bool
     {
         return self::VALUE_REQUIRED === (self::VALUE_REQUIRED & $this->mode);
     }
@@ -131,7 +131,7 @@ class InputOption
      *
      * @return bool true if value mode is self::VALUE_OPTIONAL, false otherwise
      */
-    public function isValueOptional()
+    public function isValueOptional(): bool
     {
         return self::VALUE_OPTIONAL === (self::VALUE_OPTIONAL & $this->mode);
     }
@@ -141,7 +141,7 @@ class InputOption
      *
      * @return bool true if mode is self::VALUE_IS_ARRAY, false otherwise
      */
-    public function isArray()
+    public function isArray(): bool
     {
         return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
     }
@@ -185,7 +185,7 @@ class InputOption
      *
      * @return string The description text
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -195,7 +195,7 @@ class InputOption
      *
      * @return bool
      */
-    public function equals(InputOption $option)
+    public function equals(InputOption $option): bool
     {
         return $option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()

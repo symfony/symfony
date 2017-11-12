@@ -39,5 +39,5 @@ abstract class AbstractIntlGlobalsTest extends TestCase
         $this->assertSame($errorName, $this->getIntlErrorName($errorCode));
     }
 
-    abstract protected function getIntlErrorName($errorCode);
+    abstract protected function getIntlErrorName($errorCode): void;
 }

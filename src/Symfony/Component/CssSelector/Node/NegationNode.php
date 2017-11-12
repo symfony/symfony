@@ -35,7 +35,7 @@ class NegationNode extends AbstractNode
     /**
      * @return NodeInterface
      */
-    public function getSelector()
+    public function getSelector(): NodeInterface
     {
         return $this->selector;
     }
@@ -43,7 +43,7 @@ class NegationNode extends AbstractNode
     /**
      * @return NodeInterface
      */
-    public function getSubSelector()
+    public function getSubSelector(): NodeInterface
     {
         return $this->subSelector;
     }

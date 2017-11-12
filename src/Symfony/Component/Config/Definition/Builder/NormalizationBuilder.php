@@ -35,7 +35,7 @@ class NormalizationBuilder
      *
      * @return $this
      */
-    public function remap($key, $plural = null)
+    public function remap(string $key, string $plural = null)
     {
         $this->remappings[] = array($key, null === $plural ? $key.'s' : $plural);
 

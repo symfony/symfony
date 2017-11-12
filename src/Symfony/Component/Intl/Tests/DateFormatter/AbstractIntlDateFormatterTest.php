@@ -930,22 +930,22 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
      *
      * @return mixed
      */
-    abstract protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null);
+    abstract protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, int $calendar = IntlDateFormatter::GREGORIAN, $pattern = null);
 
     /**
      * @return string
      */
-    abstract protected function getIntlErrorMessage();
+    abstract protected function getIntlErrorMessage(): string;
 
     /**
      * @return int
      */
-    abstract protected function getIntlErrorCode();
+    abstract protected function getIntlErrorCode(): int;
 
     /**
      * @param int $errorCode
      *
      * @return bool
      */
-    abstract protected function isIntlFailure($errorCode);
+    abstract protected function isIntlFailure(int $errorCode): bool;
 }

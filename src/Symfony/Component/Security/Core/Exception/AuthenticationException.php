@@ -28,7 +28,7 @@ class AuthenticationException extends \RuntimeException implements \Serializable
      *
      * @return TokenInterface
      */
-    public function getToken()
+    public function getToken(): TokenInterface
     {
         return $this->token;
     }
@@ -65,7 +65,7 @@ class AuthenticationException extends \RuntimeException implements \Serializable
      *
      * @return string
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'An authentication exception occurred.';
     }
@@ -75,7 +75,7 @@ class AuthenticationException extends \RuntimeException implements \Serializable
      *
      * @return array
      */
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return array();
     }

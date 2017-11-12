@@ -805,22 +805,22 @@ abstract class AbstractNumberFormatterTest extends TestCase
      *
      * @return \NumberFormatter
      */
-    abstract protected function getNumberFormatter($locale = 'en', $style = null, $pattern = null);
+    abstract protected function getNumberFormatter(string $locale = 'en', $style = null, $pattern = null): \NumberFormatter;
 
     /**
      * @return string
      */
-    abstract protected function getIntlErrorMessage();
+    abstract protected function getIntlErrorMessage(): string;
 
     /**
      * @return int
      */
-    abstract protected function getIntlErrorCode();
+    abstract protected function getIntlErrorCode(): int;
 
     /**
      * @param int $errorCode
      *
      * @return bool
      */
-    abstract protected function isIntlFailure($errorCode);
+    abstract protected function isIntlFailure(int $errorCode): bool;
 }

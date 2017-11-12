@@ -228,7 +228,7 @@ class Response
      *
      * @see prepare()
      */
-    public function __toString()
+    public function __toString(): string
     {
         return
             sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText)."\r\n".
@@ -402,7 +402,7 @@ class Response
      *
      * @return string Content
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }

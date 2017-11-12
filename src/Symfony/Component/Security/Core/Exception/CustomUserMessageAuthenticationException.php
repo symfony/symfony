@@ -39,7 +39,7 @@ class CustomUserMessageAuthenticationException extends AuthenticationException
      * @param string $messageKey  The message or message key
      * @param array  $messageData Data to be passed into the translator
      */
-    public function setSafeMessage($messageKey, array $messageData = array()): void
+    public function setSafeMessage(string $messageKey, array $messageData = array()): void
     {
         $this->messageKey = $messageKey;
         $this->messageData = $messageData;

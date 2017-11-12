@@ -88,7 +88,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return self
      */
-    public function setCircularReferenceLimit($circularReferenceLimit)
+    public function setCircularReferenceLimit(int $circularReferenceLimit): self
     {
         $this->circularReferenceLimit = $circularReferenceLimit;
 
@@ -102,7 +102,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return self
      */
-    public function setCircularReferenceHandler(callable $circularReferenceHandler)
+    public function setCircularReferenceHandler(callable $circularReferenceHandler): self
     {
         $this->circularReferenceHandler = $circularReferenceHandler;
 
@@ -118,7 +118,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @throws InvalidArgumentException if a non-callable callback is set
      */
-    public function setCallbacks(array $callbacks)
+    public function setCallbacks(array $callbacks): self
     {
         foreach ($callbacks as $attribute => $callback) {
             if (!is_callable($callback)) {
@@ -138,7 +138,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return self
      */
-    public function setIgnoredAttributes(array $ignoredAttributes)
+    public function setIgnoredAttributes(array $ignoredAttributes): self
     {
         $this->ignoredAttributes = $ignoredAttributes;
 
@@ -155,7 +155,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @throws CircularReferenceException
      */
-    protected function isCircularReference($object, &$context)
+    protected function isCircularReference($object, &$context): bool
     {
         $objectHash = spl_object_hash($object);
 
@@ -240,7 +240,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return bool
      */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array()): bool
     {
         if (in_array($attribute, $this->ignoredAttributes)) {
             return false;
@@ -266,7 +266,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return array
      */
-    protected function prepareForDenormalization($data)
+    protected function prepareForDenormalization($data): array
     {
         return (array) $data;
     }
@@ -281,7 +281,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @return \ReflectionMethod|null
      */
-    protected function getConstructor(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes): ?\ReflectionMethod
     {
         return $reflectionClass->getConstructor();
     }
@@ -303,7 +303,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @throws RuntimeException
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
             unset($context[static::OBJECT_TO_POPULATE]);
@@ -377,7 +377,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @internal
      */
-    protected function createChildContext(array $parentContext, $attribute)
+    protected function createChildContext(array $parentContext, string $attribute): array
     {
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];

@@ -45,7 +45,7 @@ abstract class Helper implements HelperInterface
      *
      * @return int The length of the string
      */
-    public static function strlen($string)
+    public static function strlen(string $string): int
     {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return strlen($string);
@@ -63,7 +63,7 @@ abstract class Helper implements HelperInterface
      *
      * @return string The string subset
      */
-    public static function substr($string, $from, $length = null)
+    public static function substr(string $string, int $from, ?int $length = null): string
     {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return substr($string, $from, $length);

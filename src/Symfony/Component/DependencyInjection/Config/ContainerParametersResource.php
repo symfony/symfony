@@ -57,7 +57,7 @@ class ContainerParametersResource implements ResourceInterface, \Serializable
     /**
      * @return array Tracked parameters
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }

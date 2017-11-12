@@ -40,7 +40,7 @@ interface ConstraintViolationInterface
      *
      * @return string The violation message
      */
-    public function getMessage();
+    public function getMessage(): string;
 
     /**
      * Returns the raw violation message.
@@ -51,7 +51,7 @@ interface ConstraintViolationInterface
      *
      * @return string The raw violation message
      */
-    public function getMessageTemplate();
+    public function getMessageTemplate(): string;
 
     /**
      * Returns the parameters to be inserted into the raw violation message.
@@ -61,7 +61,7 @@ interface ConstraintViolationInterface
      *
      * @see getMessageTemplate()
      */
-    public function getParameters();
+    public function getParameters(): array;
 
     /**
      * Returns a number for pluralizing the violation message.
@@ -79,7 +79,7 @@ interface ConstraintViolationInterface
      *
      * @return int|null The number to use to pluralize of the message
      */
-    public function getPlural();
+    public function getPlural(): ?int;
 
     /**
      * Returns the root element of the validation.
@@ -103,7 +103,7 @@ interface ConstraintViolationInterface
      *                dots, while array access is denoted by square brackets,
      *                for example "addresses[1].street".
      */
-    public function getPropertyPath();
+    public function getPropertyPath(): string;
 
     /**
      * Returns the value that caused the violation.
@@ -118,5 +118,5 @@ interface ConstraintViolationInterface
      *
      * @return string|null The error code
      */
-    public function getCode();
+    public function getCode(): ?string;
 }

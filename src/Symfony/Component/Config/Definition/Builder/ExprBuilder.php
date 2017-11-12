@@ -93,7 +93,7 @@ class ExprBuilder
      *
      * @return ExprBuilder
      */
-    public function ifEmpty()
+    public function ifEmpty(): ExprBuilder
     {
         $this->ifPart = function ($v) { return empty($v); };
 
@@ -184,7 +184,7 @@ class ExprBuilder
      *
      * @throws \InvalidArgumentException
      */
-    public function thenInvalid($message)
+    public function thenInvalid(string $message)
     {
         $this->thenPart = function ($v) use ($message): void {throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
 
@@ -231,7 +231,7 @@ class ExprBuilder
      *
      * @return array
      */
-    public static function buildExpressions(array $expressions)
+    public static function buildExpressions(array $expressions): array
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof self) {

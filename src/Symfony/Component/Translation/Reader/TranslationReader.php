@@ -34,7 +34,7 @@ class TranslationReader implements TranslationReaderInterface
      *
      * @param string          $format The format of the loader
      */
-    public function addLoader($format, LoaderInterface $loader): void
+    public function addLoader(string $format, LoaderInterface $loader): void
     {
         $this->loaders[$format] = $loader;
     }

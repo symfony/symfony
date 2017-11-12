@@ -50,7 +50,7 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
      *
      * @return bool
      */
-    protected function isAccepted($string)
+    protected function isAccepted(string $string): bool
     {
         // should at least not match one rule to exclude
         foreach ($this->noMatchRegexps as $regex) {
@@ -81,7 +81,7 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
      *
      * @return bool Whether the given string is a regex
      */
-    protected function isRegex($str)
+    protected function isRegex(string $str): bool
     {
         if (preg_match('/^(.{3,}?)[imsxuADU]*$/', $str, $m)) {
             $start = substr($m[1], 0, 1);
@@ -108,5 +108,5 @@ abstract class MultiplePcreFilterIterator extends \FilterIterator
      *
      * @return string regexp corresponding to a given string
      */
-    abstract protected function toRegex($str);
+    abstract protected function toRegex(string $str): string;
 }

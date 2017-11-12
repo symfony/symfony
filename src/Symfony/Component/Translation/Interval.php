@@ -45,7 +45,7 @@ class Interval
      *
      * @throws InvalidArgumentException
      */
-    public static function test($number, $interval)
+    public static function test(int $number, string $interval): bool
     {
         $interval = trim($interval);
 
@@ -77,7 +77,7 @@ class Interval
      *
      * @return string A Regexp (without the delimiters)
      */
-    public static function getIntervalRegexp()
+    public static function getIntervalRegexp(): string
     {
         return <<<EOF
         ({\s*

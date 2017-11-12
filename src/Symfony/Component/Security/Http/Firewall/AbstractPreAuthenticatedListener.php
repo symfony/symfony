@@ -113,5 +113,5 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
      *
      * @return array An array composed of the user and the credentials
      */
-    abstract protected function getPreAuthenticatedData(Request $request);
+    abstract protected function getPreAuthenticatedData(Request $request): array;
 }

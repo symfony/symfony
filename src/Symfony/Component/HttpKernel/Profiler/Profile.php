@@ -53,7 +53,7 @@ class Profile
      *
      * @param string $token The token
      */
-    public function setToken($token): void
+    public function setToken(string $token): void
     {
         $this->token = $token;
     }
@@ -63,7 +63,7 @@ class Profile
      *
      * @return string The token
      */
-    public function getToken()
+    public function getToken(): string
     {
         return $this->token;
     }
@@ -81,7 +81,7 @@ class Profile
      *
      * @return self
      */
-    public function getParent()
+    public function getParent(): self
     {
         return $this->parent;
     }
@@ -91,7 +91,7 @@ class Profile
      *
      * @return null|string The parent token
      */
-    public function getParentToken()
+    public function getParentToken(): ?string
     {
         return $this->parent ? $this->parent->getToken() : null;
     }
@@ -101,7 +101,7 @@ class Profile
      *
      * @return string The IP
      */
-    public function getIp()
+    public function getIp(): string
     {
         return $this->ip;
     }
@@ -111,7 +111,7 @@ class Profile
      *
      * @param string $ip
      */
-    public function setIp($ip): void
+    public function setIp(string $ip): void
     {
         $this->ip = $ip;
     }
@@ -121,7 +121,7 @@ class Profile
      *
      * @return string The request method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
@@ -136,7 +136,7 @@ class Profile
      *
      * @return string The URL
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -151,7 +151,7 @@ class Profile
      *
      * @return int The time
      */
-    public function getTime()
+    public function getTime(): int
     {
         if (null === $this->time) {
             return 0;
@@ -163,7 +163,7 @@ class Profile
     /**
      * @param int $time The time
      */
-    public function setTime($time): void
+    public function setTime(int $time): void
     {
         $this->time = $time;
     }
@@ -171,7 +171,7 @@ class Profile
     /**
      * @param int $statusCode
      */
-    public function setStatusCode($statusCode): void
+    public function setStatusCode(int $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
@@ -179,7 +179,7 @@ class Profile
     /**
      * @return int
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -225,7 +225,7 @@ class Profile
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */
-    public function getCollector($name)
+    public function getCollector(string $name): DataCollectorInterface
     {
         if (!isset($this->collectors[$name])) {
             throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
@@ -272,7 +272,7 @@ class Profile
      *
      * @return bool
      */
-    public function hasCollector($name)
+    public function hasCollector(string $name): bool
     {
         return isset($this->collectors[$name]);
     }

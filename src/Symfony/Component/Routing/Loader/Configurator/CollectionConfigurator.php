@@ -53,7 +53,7 @@ class CollectionConfigurator
      *
      * @return self
      */
-    final public function collection($name = '')
+    final public function collection($name = ''): self
     {
         return new self($this->collection, $this->name.$name);
     }

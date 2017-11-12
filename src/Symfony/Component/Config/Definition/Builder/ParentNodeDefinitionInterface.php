@@ -18,9 +18,9 @@ namespace Symfony\Component\Config\Definition\Builder;
  */
 interface ParentNodeDefinitionInterface
 {
-    public function children();
+    public function children(): void;
 
-    public function append(NodeDefinition $node);
+    public function append(NodeDefinition $node): void;
 
-    public function setBuilder(NodeBuilder $builder);
+    public function setBuilder(NodeBuilder $builder): void;
 }

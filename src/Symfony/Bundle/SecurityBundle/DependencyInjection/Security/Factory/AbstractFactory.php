@@ -104,7 +104,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @return string never null, the id of the authentication provider
      */
-    abstract protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId);
+    abstract protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string;
 
     /**
      * Subclasses must return the id of the abstract listener template.
@@ -121,7 +121,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @return string
      */
-    abstract protected function getListenerId();
+    abstract protected function getListenerId(): string;
 
     /**
      * Subclasses may create an entry point of their as they see fit. The
@@ -134,7 +134,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @return string the entry point id
      */
-    protected function createEntryPoint($container, $id, $config, $defaultEntryPointId)
+    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, string $defaultEntryPointId): string
     {
         return $defaultEntryPointId;
     }
@@ -145,7 +145,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @return bool Whether a possibly configured RememberMeServices should be set for this listener
      */
-    protected function isRememberMeAware($config)
+    protected function isRememberMeAware($config): bool
     {
         return $config['remember_me'];
     }

@@ -750,7 +750,7 @@ class Form implements \IteratorAggregate, FormInterface
      * @return Button|null The clicked button or NULL if the form was not
      *                     submitted
      */
-    public function getClickedButton()
+    public function getClickedButton(): ?Button
     {
         if ($this->clickedButton) {
             return $this->clickedButton;
@@ -928,7 +928,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return bool
      */
-    public function offsetExists($name)
+    public function offsetExists(string $name): bool
     {
         return $this->has($name);
     }
@@ -942,7 +942,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @throws \OutOfBoundsException if the named child does not exist
      */
-    public function offsetGet($name)
+    public function offsetGet(string $name): FormInterface
     {
         return $this->get($name);
     }
@@ -958,7 +958,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @see self::add()
      */
-    public function offsetSet($name, $child): void
+    public function offsetSet(string $name, FormInterface $child): void
     {
         $this->add($child);
     }
@@ -970,7 +970,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @throws AlreadySubmittedException if the form has already been submitted
      */
-    public function offsetUnset($name): void
+    public function offsetUnset(string $name): void
     {
         $this->remove($name);
     }
@@ -990,7 +990,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return int The number of embedded form children
      */
-    public function count()
+    public function count(): int
     {
         return count($this->children);
     }
@@ -1058,7 +1058,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @throws TransformationFailedException If the value cannot be transformed to "model" format
      */
-    private function normToModel($value)
+    private function normToModel(string $value)
     {
         try {
             $transformers = $this->config->getModelTransformers();
@@ -1121,7 +1121,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @throws TransformationFailedException If the value cannot be transformed to "normalized" format
      */
-    private function viewToNorm($value)
+    private function viewToNorm(string $value)
     {
         $transformers = $this->config->getViewTransformers();
 

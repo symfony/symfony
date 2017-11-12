@@ -70,7 +70,7 @@ class DebugClassLoader
      *
      * @return callable The wrapped class loader
      */
-    public function getClassLoader()
+    public function getClassLoader(): callable
     {
         return $this->classLoader;
     }
@@ -132,7 +132,7 @@ class DebugClassLoader
      *
      * @throws \RuntimeException
      */
-    public function loadClass($class)
+    public function loadClass(string $class): ?bool
     {
         $e = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
 
@@ -366,7 +366,7 @@ class DebugClassLoader
      *
      * @return string[]
      */
-    private function getOwnInterfaces($class, $parent)
+    private function getOwnInterfaces(string $class, $parent)
     {
         $ownInterfaces = class_implements($class, false);
 

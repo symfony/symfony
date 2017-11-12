@@ -46,7 +46,7 @@ final class Definition
     /**
      * @return string|null
      */
-    public function getInitialPlace()
+    public function getInitialPlace(): ?string
     {
         return $this->initialPlace;
     }

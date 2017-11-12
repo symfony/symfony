@@ -82,7 +82,7 @@ class ExceptionListener implements EventSubscriberInterface
      * @param \Exception $exception The \Exception instance
      * @param string     $message   The error message to log
      */
-    protected function logException(\Exception $exception, $message): void
+    protected function logException(\Exception $exception, string $message): void
     {
         if (null !== $this->logger) {
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
@@ -101,7 +101,7 @@ class ExceptionListener implements EventSubscriberInterface
      *
      * @return Request $request The cloned request
      */
-    protected function duplicateRequest(\Exception $exception, Request $request)
+    protected function duplicateRequest(\Exception $exception, Request $request): Request
     {
         $attributes = array(
             '_controller' => $this->controller,

@@ -54,7 +54,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      *
      * @return Data
      */
-    protected function cloneVar($var)
+    protected function cloneVar($var): Data
     {
         if ($var instanceof Data) {
             return $var;

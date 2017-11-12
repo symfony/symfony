@@ -92,7 +92,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      *
      * @return array $locales The fallback locales
      */
-    public function getFallbackLocales()
+    public function getFallbackLocales(): array
     {
         if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {
             return $this->translator->getFallbackLocales();
@@ -112,7 +112,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * @return array
      */
-    public function getCollectedMessages()
+    public function getCollectedMessages(): array
     {
         return $this->messages;
     }
@@ -125,7 +125,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      * @param array|null  $parameters
      * @param int|null    $number
      */
-    private function collectMessage($locale, $domain, $id, $translation, $parameters = array(), $number = null): void
+    private function collectMessage(?string $locale, ?string $domain, string $id, string $translation, ?array $parameters = array(), ?int $number = null): void
     {
         if (null === $domain) {
             $domain = 'messages';

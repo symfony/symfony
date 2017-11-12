@@ -40,7 +40,7 @@ class FilterControllerArgumentsEvent extends FilterControllerEvent
     /**
      * @return array
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }

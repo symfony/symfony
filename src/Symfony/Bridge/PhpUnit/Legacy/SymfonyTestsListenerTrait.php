@@ -319,7 +319,7 @@ class SymfonyTestsListenerTrait
      *
      * @return bool
      */
-    private function willBeIsolated($test)
+    private function willBeIsolated(TestCase $test): bool
     {
         if ($test->isInIsolation()) {
             return false;

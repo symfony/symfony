@@ -38,7 +38,7 @@ class AcceptHeaderItem
      *
      * @return self
      */
-    public static function fromString($itemValue)
+    public static function fromString(string $itemValue): self
     {
         $bits = preg_split('/\s*(?:;*("[^"]+");*|;*(\'[^\']+\');*|;+)\s*/', $itemValue, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         $value = array_shift($bits);
@@ -65,7 +65,7 @@ class AcceptHeaderItem
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = $this->value.($this->quality < 1 ? ';q='.$this->quality : '');
         if (count($this->attributes) > 0) {
@@ -84,7 +84,7 @@ class AcceptHeaderItem
      *
      * @return $this
      */
-    public function setValue($value)
+    public function setValue(string $value)
     {
         $this->value = $value;
 
@@ -96,7 +96,7 @@ class AcceptHeaderItem
      *
      * @return string
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -108,7 +108,7 @@ class AcceptHeaderItem
      *
      * @return $this
      */
-    public function setQuality($quality)
+    public function setQuality(float $quality)
     {
         $this->quality = $quality;
 
@@ -120,7 +120,7 @@ class AcceptHeaderItem
      *
      * @return float
      */
-    public function getQuality()
+    public function getQuality(): float
     {
         return $this->quality;
     }
@@ -132,7 +132,7 @@ class AcceptHeaderItem
      *
      * @return $this
      */
-    public function setIndex($index)
+    public function setIndex(int $index)
     {
         $this->index = $index;
 
@@ -144,7 +144,7 @@ class AcceptHeaderItem
      *
      * @return int
      */
-    public function getIndex()
+    public function getIndex(): int
     {
         return $this->index;
     }
@@ -156,7 +156,7 @@ class AcceptHeaderItem
      *
      * @return bool
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name): bool
     {
         return isset($this->attributes[$name]);
     }
@@ -169,7 +169,7 @@ class AcceptHeaderItem
      *
      * @return mixed
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute(string $name, $default = null)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
     }
@@ -179,7 +179,7 @@ class AcceptHeaderItem
      *
      * @return array
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -192,7 +192,7 @@ class AcceptHeaderItem
      *
      * @return $this
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, string $value)
     {
         if ('q' === $name) {
             $this->quality = (float) $value;

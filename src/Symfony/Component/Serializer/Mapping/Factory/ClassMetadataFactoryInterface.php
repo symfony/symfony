@@ -40,7 +40,7 @@ interface ClassMetadataFactoryInterface
      *
      * @throws InvalidArgumentException
      */
-    public function getMetadataFor($value);
+    public function getMetadataFor($value): ClassMetadataInterface;
 
     /**
      * Checks if class has metadata.
@@ -49,5 +49,5 @@ interface ClassMetadataFactoryInterface
      *
      * @return bool
      */
-    public function hasMetadataFor($value);
+    public function hasMetadataFor($value): bool;
 }

@@ -842,7 +842,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
+    abstract protected function getDataDirectory(): void;
 
     public function testGetLanguages(): void
     {

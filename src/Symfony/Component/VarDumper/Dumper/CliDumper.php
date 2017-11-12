@@ -83,7 +83,7 @@ class CliDumper extends AbstractDumper
      *
      * @param bool $colors
      */
-    public function setColors($colors): void
+    public function setColors(bool $colors): void
     {
         $this->colors = (bool) $colors;
     }
@@ -93,7 +93,7 @@ class CliDumper extends AbstractDumper
      *
      * @param int $maxStringWidth
      */
-    public function setMaxStringWidth($maxStringWidth): void
+    public function setMaxStringWidth(int $maxStringWidth): void
     {
         $this->maxStringWidth = (int) $maxStringWidth;
     }
@@ -303,7 +303,7 @@ class CliDumper extends AbstractDumper
      * @param bool   $hasChild When the dump of the hash has child item
      * @param int    $cut      The number of items the hash has been cut by
      */
-    protected function dumpEllipsis(Cursor $cursor, $hasChild, $cut): void
+    protected function dumpEllipsis(Cursor $cursor, bool $hasChild, int $cut): void
     {
         if ($cut) {
             $this->line .= ' …';
@@ -409,7 +409,7 @@ class CliDumper extends AbstractDumper
      *
      * @return string The value with style decoration
      */
-    protected function style($style, $value, $attr = array())
+    protected function style(string $style, string $value, array $attr = array()): string
     {
         if (null === $this->colors) {
             $this->colors = $this->supportsColors();
@@ -464,7 +464,7 @@ class CliDumper extends AbstractDumper
     /**
      * @return bool Tells if the current output stream supports ANSI colors or not
      */
-    protected function supportsColors()
+    protected function supportsColors(): bool
     {
         if ($this->outputStream !== static::$defaultOutput) {
             return @(is_resource($this->outputStream) && function_exists('posix_isatty') && posix_isatty($this->outputStream));

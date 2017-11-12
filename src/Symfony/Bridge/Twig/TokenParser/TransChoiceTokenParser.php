@@ -33,7 +33,7 @@ class TransChoiceTokenParser extends TransTokenParser
      *
      * @throws SyntaxError
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
@@ -86,7 +86,7 @@ class TransChoiceTokenParser extends TransTokenParser
      *
      * @return string The tag name
      */
-    public function getTag()
+    public function getTag(): string
     {
         return 'transchoice';
     }

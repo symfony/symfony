@@ -40,7 +40,7 @@ class FilterResponseEvent extends KernelEvent
      *
      * @return Response
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }

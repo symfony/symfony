@@ -99,7 +99,7 @@ class NamespacedAttributeBag extends AttributeBag
      *
      * @return array
      */
-    protected function &resolveAttributePath($name, $writeContext = false)
+    protected function &resolveAttributePath(string $name, bool $writeContext = false): array
     {
         $array = &$this->attributes;
         $name = (0 === strpos($name, $this->namespaceCharacter)) ? substr($name, 1) : $name;
@@ -142,7 +142,7 @@ class NamespacedAttributeBag extends AttributeBag
      *
      * @return string
      */
-    protected function resolveKey($name)
+    protected function resolveKey(string $name): string
     {
         if (false !== $pos = strrpos($name, $this->namespaceCharacter)) {
             $name = substr($name, $pos + 1);

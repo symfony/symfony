@@ -62,11 +62,11 @@ abstract class Descriptor implements DescriptorInterface
         }
     }
 
-    abstract protected function describeDefaults(array $options);
+    abstract protected function describeDefaults(array $options): void;
 
-    abstract protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array());
+    abstract protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array()): void;
 
-    abstract protected function describeOption(OptionsResolver $optionsResolver, array $options);
+    abstract protected function describeOption(OptionsResolver $optionsResolver, array $options): void;
 
     protected function collectOptions(ResolvedFormTypeInterface $type): void
     {

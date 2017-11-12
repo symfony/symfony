@@ -40,7 +40,7 @@ class ArgumentMetadata
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -52,7 +52,7 @@ class ArgumentMetadata
      *
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -62,7 +62,7 @@ class ArgumentMetadata
      *
      * @return bool
      */
-    public function isVariadic()
+    public function isVariadic(): bool
     {
         return $this->isVariadic;
     }
@@ -74,7 +74,7 @@ class ArgumentMetadata
      *
      * @return bool
      */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return $this->hasDefaultValue;
     }
@@ -84,7 +84,7 @@ class ArgumentMetadata
      *
      * @return bool
      */
-    public function isNullable()
+    public function isNullable(): bool
     {
         return $this->isNullable;
     }

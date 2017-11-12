@@ -58,7 +58,7 @@ class PluralizationRulesTest extends TestCase
      *
      * @return array
      */
-    public function successLangcodes()
+    public function successLangcodes(): array
     {
         return array(
             array('1', array('ay', 'bo', 'cgg', 'dz', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky')),
@@ -77,7 +77,7 @@ class PluralizationRulesTest extends TestCase
      *
      * @return array with nplural together with langcodes
      */
-    public function failingLangcodes()
+    public function failingLangcodes(): array
     {
         return array(
             array('1', array('fa')),
@@ -95,7 +95,7 @@ class PluralizationRulesTest extends TestCase
      * @param array  $matrix        Containing langcodes and their plural index values
      * @param bool   $expectSuccess
      */
-    protected function validateMatrix($nplural, $matrix, $expectSuccess = true): void
+    protected function validateMatrix(string $nplural, array $matrix, bool $expectSuccess = true): void
     {
         foreach ($matrix as $langCode => $data) {
             $indexes = array_flip($data);

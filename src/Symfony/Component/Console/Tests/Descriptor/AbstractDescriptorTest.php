@@ -83,9 +83,9 @@ abstract class AbstractDescriptorTest extends TestCase
         return $this->getDescriptionTestData(ObjectsProvider::getApplications());
     }
 
-    abstract protected function getDescriptor();
+    abstract protected function getDescriptor(): void;
 
-    abstract protected function getFormat();
+    abstract protected function getFormat(): void;
 
     protected function getDescriptionTestData(array $objects)
     {

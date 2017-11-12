@@ -220,7 +220,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      *
      * @return mixed
      */
-    public function __call($method, $arguments)
+    public function __call(string $method, array $arguments)
     {
         return call_user_func_array(array($this->dispatcher, $method), $arguments);
     }
@@ -231,7 +231,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      * @param string $eventName The event name
      * @param Event  $event     The event
      */
-    protected function preDispatch($eventName, Event $event): void
+    protected function preDispatch(string $eventName, Event $event): void
     {
     }
 
@@ -241,7 +241,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      * @param string $eventName The event name
      * @param Event  $event     The event
      */
-    protected function postDispatch($eventName, Event $event): void
+    protected function postDispatch(string $eventName, Event $event): void
     {
     }
 

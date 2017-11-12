@@ -72,7 +72,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1
      */
-    protected function getC1Service()
+    protected function getC1Service(): \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1
     {
         return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1();
     }
@@ -82,7 +82,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2
      */
-    protected function getC2Service()
+    protected function getC2Service(): \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2
     {
         require_once $this->targetDirs[1].'/includes/HotPath/C2.php';
         require_once $this->targetDirs[1].'/includes/HotPath/C3.php';
@@ -141,7 +141,7 @@ class ProjectServiceContainer extends Container
      *
      * @throws InvalidArgumentException When the dynamic parameter does not exist
      */
-    private function getDynamicParameter($name)
+    private function getDynamicParameter(string $name)
     {
         throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
@@ -151,7 +151,7 @@ class ProjectServiceContainer extends Container
      *
      * @return array An array of the default parameters
      */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return array(
             'inline_requires' => true,

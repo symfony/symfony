@@ -36,7 +36,7 @@ class Compiler
      *
      * @return string The PHP code
      */
-    public function getSource()
+    public function getSource(): string
     {
         return $this->source;
     }
@@ -80,7 +80,7 @@ class Compiler
      *
      * @return $this
      */
-    public function raw($string)
+    public function raw(string $string)
     {
         $this->source .= $string;
 
@@ -94,7 +94,7 @@ class Compiler
      *
      * @return $this
      */
-    public function string($value)
+    public function string(string $value)
     {
         $this->source .= sprintf('"%s"', addcslashes($value, "\0\t\"\$\\"));
 

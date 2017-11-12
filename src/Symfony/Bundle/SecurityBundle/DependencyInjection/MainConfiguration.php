@@ -39,7 +39,7 @@ class MainConfiguration implements ConfigurationInterface
      *
      * @return TreeBuilder The tree builder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $tb = new TreeBuilder();
         $rootNode = $tb->root('security');

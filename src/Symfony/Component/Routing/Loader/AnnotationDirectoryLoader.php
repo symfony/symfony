@@ -32,7 +32,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      *
      * @throws \InvalidArgumentException When the directory does not exist or its routes cannot be parsed
      */
-    public function load($path, $type = null)
+    public function load(string $path, ?string $type = null): RouteCollection
     {
         $dir = $this->locator->locate($path);
 

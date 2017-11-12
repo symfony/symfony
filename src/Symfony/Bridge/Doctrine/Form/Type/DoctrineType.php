@@ -54,7 +54,7 @@ abstract class DoctrineType extends AbstractType
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public static function createChoiceLabel($choice)
+    public static function createChoiceLabel($choice): string
     {
         return (string) $choice;
     }
@@ -76,7 +76,7 @@ abstract class DoctrineType extends AbstractType
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public static function createChoiceName($choice, $key, $value)
+    public static function createChoiceName($choice, $key, $value): string
     {
         return str_replace('-', '_', (string) $value);
     }
@@ -273,7 +273,7 @@ abstract class DoctrineType extends AbstractType
      *
      * @return EntityLoaderInterface
      */
-    abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class);
+    abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class): EntityLoaderInterface;
 
     public function getParent()
     {

@@ -46,7 +46,7 @@ class StringInput extends ArgvInput
      *
      * @throws InvalidArgumentException When unable to parse input (should never happen)
      */
-    private function tokenize($input)
+    private function tokenize(string $input): array
     {
         $tokens = array();
         $length = strlen($input);

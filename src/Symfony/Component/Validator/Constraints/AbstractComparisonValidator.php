@@ -103,7 +103,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
      *
      * @return bool true if the relationship is valid, false otherwise
      */
-    abstract protected function compareValues($value1, $value2);
+    abstract protected function compareValues($value1, $value2): bool;
 
     /**
      * Returns the error code used if the comparison fails.

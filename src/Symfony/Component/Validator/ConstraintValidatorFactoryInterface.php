@@ -23,5 +23,5 @@ interface ConstraintValidatorFactoryInterface
      *
      * @return ConstraintValidatorInterface
      */
-    public function getInstance(Constraint $constraint);
+    public function getInstance(Constraint $constraint): ConstraintValidatorInterface;
 }

@@ -45,7 +45,7 @@ class Question
      *
      * @return string
      */
-    public function getQuestion()
+    public function getQuestion(): string
     {
         return $this->question;
     }
@@ -65,7 +65,7 @@ class Question
      *
      * @return bool
      */
-    public function isHidden()
+    public function isHidden(): bool
     {
         return $this->hidden;
     }
@@ -79,7 +79,7 @@ class Question
      *
      * @throws LogicException In case the autocompleter is also used
      */
-    public function setHidden($hidden)
+    public function setHidden(bool $hidden)
     {
         if ($this->autocompleterValues) {
             throw new LogicException('A hidden question cannot use the autocompleter.');
@@ -95,7 +95,7 @@ class Question
      *
      * @return bool
      */
-    public function isHiddenFallback()
+    public function isHiddenFallback(): bool
     {
         return $this->hiddenFallback;
     }
@@ -107,7 +107,7 @@ class Question
      *
      * @return $this
      */
-    public function setHiddenFallback($fallback)
+    public function setHiddenFallback(bool $fallback)
     {
         $this->hiddenFallback = (bool) $fallback;
 
@@ -174,7 +174,7 @@ class Question
      *
      * @return null|callable
      */
-    public function getValidator()
+    public function getValidator(): ?callable
     {
         return $this->validator;
     }
@@ -190,7 +190,7 @@ class Question
      *
      * @throws InvalidArgumentException in case the number of attempts is invalid
      */
-    public function setMaxAttempts($attempts)
+    public function setMaxAttempts(?int $attempts)
     {
         if (null !== $attempts && $attempts < 1) {
             throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
@@ -208,7 +208,7 @@ class Question
      *
      * @return null|int
      */
-    public function getMaxAttempts()
+    public function getMaxAttempts(): ?int
     {
         return $this->attempts;
     }
@@ -236,7 +236,7 @@ class Question
      *
      * @return callable
      */
-    public function getNormalizer()
+    public function getNormalizer(): callable
     {
         return $this->normalizer;
     }

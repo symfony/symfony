@@ -57,7 +57,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return \DOMElement A \DOMElement instance
      */
-    public function getFormNode()
+    public function getFormNode(): \DOMElement
     {
         return $this->node;
     }
@@ -85,7 +85,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of field values
      */
-    public function getValues()
+    public function getValues(): array
     {
         $values = array();
         foreach ($this->fields->all() as $name => $field) {
@@ -106,7 +106,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of file field values
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
             return array();
@@ -135,7 +135,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of field values
      */
-    public function getPhpValues()
+    public function getPhpValues(): array
     {
         $values = array();
         foreach ($this->getValues() as $name => $value) {
@@ -162,7 +162,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of file field values
      */
-    public function getPhpFiles()
+    public function getPhpFiles(): array
     {
         $values = array();
         foreach ($this->getFiles() as $name => $value) {
@@ -198,7 +198,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return string The URI
      */
-    public function getUri()
+    public function getUri(): string
     {
         $uri = parent::getUri();
 
@@ -236,7 +236,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return string The method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         if (null !== $this->method) {
             return $this->method;
@@ -257,7 +257,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return bool true if the field exists, false otherwise
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return $this->fields->has($name);
     }
@@ -267,7 +267,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      */
-    public function remove($name): void
+    public function remove(string $name): void
     {
         $this->fields->remove($name);
     }
@@ -281,7 +281,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
-    public function get($name)
+    public function get(string $name): FormField
     {
         return $this->fields->get($name);
     }
@@ -311,7 +311,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return bool true if the field exists, false otherwise
      */
-    public function offsetExists($name)
+    public function offsetExists(string $name): bool
     {
         return $this->has($name);
     }
@@ -325,7 +325,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetGet($name)
+    public function offsetGet(string $name): FormField
     {
         return $this->fields->get($name);
     }
@@ -338,7 +338,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetSet($name, $value): void
+    public function offsetSet(string $name, $value): void
     {
         $this->fields->set($name, $value);
     }
@@ -348,7 +348,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      */
-    public function offsetUnset($name): void
+    public function offsetUnset(string $name): void
     {
         $this->fields->remove($name);
     }
@@ -358,7 +358,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return self
      */
-    public function disableValidation()
+    public function disableValidation(): self
     {
         foreach ($this->fields->all() as $field) {
             if ($field instanceof Field\ChoiceFormField) {

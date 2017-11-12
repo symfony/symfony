@@ -54,7 +54,7 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
      *
      * @return InstanceofConfigurator
      */
-    final public function instanceof(string $fqcn)
+    final public function instanceof(string $fqcn): InstanceofConfigurator
     {
         return $this->parent->instanceof($fqcn);
     }

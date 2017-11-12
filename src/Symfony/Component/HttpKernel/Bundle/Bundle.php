@@ -65,7 +65,7 @@ abstract class Bundle implements BundleInterface
      *
      * @throws \LogicException
      */
-    public function getContainerExtension()
+    public function getContainerExtension(): ?ExtensionInterface
     {
         if (null === $this->extension) {
             $extension = $this->createContainerExtension();
@@ -102,7 +102,7 @@ abstract class Bundle implements BundleInterface
      *
      * @return string The Bundle namespace
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         if (null === $this->namespace) {
             $this->parseClassName();
@@ -116,7 +116,7 @@ abstract class Bundle implements BundleInterface
      *
      * @return string The Bundle absolute path
      */
-    public function getPath()
+    public function getPath(): string
     {
         if (null === $this->path) {
             $reflected = new \ReflectionObject($this);
@@ -131,7 +131,7 @@ abstract class Bundle implements BundleInterface
      *
      * @return string The Bundle name
      */
-    final public function getName()
+    final public function getName(): string
     {
         if (null === $this->name) {
             $this->parseClassName();
@@ -149,7 +149,7 @@ abstract class Bundle implements BundleInterface
      *
      * @return string
      */
-    protected function getContainerExtensionClass()
+    protected function getContainerExtensionClass(): string
     {
         $basename = preg_replace('/Bundle$/', '', $this->getName());
 
@@ -161,7 +161,7 @@ abstract class Bundle implements BundleInterface
      *
      * @return ExtensionInterface|null
      */
-    protected function createContainerExtension()
+    protected function createContainerExtension(): ?ExtensionInterface
     {
         if (class_exists($class = $this->getContainerExtensionClass())) {
             return new $class();

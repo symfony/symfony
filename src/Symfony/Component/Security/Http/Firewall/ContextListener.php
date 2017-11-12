@@ -67,7 +67,7 @@ class ContextListener implements ListenerInterface
      *
      * @param bool $logoutOnUserChange
      */
-    public function setLogoutOnUserChange($logoutOnUserChange): void
+    public function setLogoutOnUserChange(bool $logoutOnUserChange): void
     {
         // no-op, method to be deprecated in 4.1
     }
@@ -152,7 +152,7 @@ class ContextListener implements ListenerInterface
      *
      * @throws \RuntimeException
      */
-    protected function refreshUser(TokenInterface $token)
+    protected function refreshUser(TokenInterface $token): ?TokenInterface
     {
         $user = $token->getUser();
         if (!$user instanceof UserInterface) {

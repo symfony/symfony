@@ -58,7 +58,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @return self
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (null === self::$instance) {
             self::$instance = new self();
@@ -115,7 +115,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * @throws FileNotFoundException
      * @throws AccessDeniedException
      */
-    public function guess($path)
+    public function guess(string $path): string
     {
         if (!is_file($path)) {
             throw new FileNotFoundException($path);

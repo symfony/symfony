@@ -87,7 +87,7 @@ class Table
      * @param string     $name  The style name
      * @param TableStyle $style A TableStyle instance
      */
-    public static function setStyleDefinition($name, TableStyle $style): void
+    public static function setStyleDefinition(string $name, TableStyle $style): void
     {
         if (!self::$styles) {
             self::$styles = self::initStyles();
@@ -103,7 +103,7 @@ class Table
      *
      * @return TableStyle
      */
-    public static function getStyleDefinition($name)
+    public static function getStyleDefinition(string $name): TableStyle
     {
         if (!self::$styles) {
             self::$styles = self::initStyles();
@@ -135,7 +135,7 @@ class Table
      *
      * @return TableStyle
      */
-    public function getStyle()
+    public function getStyle(): TableStyle
     {
         return $this->style;
     }
@@ -148,7 +148,7 @@ class Table
      *
      * @return $this
      */
-    public function setColumnStyle($columnIndex, $name)
+    public function setColumnStyle(int $columnIndex, $name)
     {
         $columnIndex = (int) $columnIndex;
 
@@ -166,7 +166,7 @@ class Table
      *
      * @return TableStyle
      */
-    public function getColumnStyle($columnIndex)
+    public function getColumnStyle(int $columnIndex): TableStyle
     {
         if (isset($this->columnStyles[$columnIndex])) {
             return $this->columnStyles[$columnIndex];
@@ -183,7 +183,7 @@ class Table
      *
      * @return $this
      */
-    public function setColumnWidth($columnIndex, $width)
+    public function setColumnWidth(int $columnIndex, int $width)
     {
         $this->columnWidths[(int) $columnIndex] = (int) $width;
 

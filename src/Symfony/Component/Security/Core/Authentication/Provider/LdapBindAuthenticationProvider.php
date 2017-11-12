@@ -49,7 +49,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
      *
      * @param string $queryString
      */
-    public function setQueryString($queryString): void
+    public function setQueryString(string $queryString): void
     {
         $this->queryString = $queryString;
     }

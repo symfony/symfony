@@ -75,7 +75,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @throws TransformationFailedException if the given value is not a \DateTimeInterface
      *                                       or if the date could not be transformed
      */
-    public function transform($dateTime)
+    public function transform(\DateTimeInterface $dateTime)
     {
         if (null === $dateTime) {
             return '';
@@ -155,7 +155,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @throws TransformationFailedException in case the date formatter can not be constructed
      */
-    protected function getIntlDateFormatter($ignoreTimezone = false)
+    protected function getIntlDateFormatter(bool $ignoreTimezone = false): \IntlDateFormatter
     {
         $dateFormat = $this->dateFormat;
         $timeFormat = $this->timeFormat;
@@ -184,7 +184,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @return bool
      */
-    protected function isPatternDateOnly()
+    protected function isPatternDateOnly(): bool
     {
         if (null === $this->pattern) {
             return false;

@@ -253,7 +253,7 @@ class ChoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $emptyData = function (Options $options) {
+        $emptyData = function (Options $options): void {
             if ($options['expanded'] && !$options['multiple']) {
                 return;
             }
@@ -269,7 +269,7 @@ class ChoiceType extends AbstractType
             return $options['required'] ? null : '';
         };
 
-        $placeholderNormalizer = function (Options $options, $placeholder) {
+        $placeholderNormalizer = function (Options $options, $placeholder): void {
             if ($options['multiple']) {
                 // never use an empty value for this case
                 return;

@@ -46,7 +46,7 @@ class ExceptionController
      *
      * @throws NotFoundHttpException
      */
-    public function showAction($token)
+    public function showAction(string $token): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -86,7 +86,7 @@ class ExceptionController
      *
      * @throws NotFoundHttpException
      */
-    public function cssAction($token)
+    public function cssAction(string $token): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');

@@ -65,7 +65,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getTestService()
+    protected function getTestService(): \stdClass
     {
         return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')));
     }
@@ -124,7 +124,7 @@ class ProjectServiceContainer extends Container
      *
      * @throws InvalidArgumentException When the dynamic parameter does not exist
      */
-    private function getDynamicParameter($name)
+    private function getDynamicParameter(string $name)
     {
         switch ($name) {
             case 'foo': $value = ('wiz'.$this->targetDirs[1]); break;
@@ -141,7 +141,7 @@ class ProjectServiceContainer extends Container
      *
      * @return array An array of the default parameters
      */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return array(
             'bar' => __DIR__,

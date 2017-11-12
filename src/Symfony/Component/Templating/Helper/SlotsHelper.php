@@ -31,7 +31,7 @@ class SlotsHelper extends Helper
      *
      * @throws \InvalidArgumentException if a slot with the same name is already started
      */
-    public function start($name): void
+    public function start(string $name): void
     {
         if (in_array($name, $this->openSlots)) {
             throw new \InvalidArgumentException(sprintf('A slot named "%s" is already started.', $name));
@@ -67,7 +67,7 @@ class SlotsHelper extends Helper
      *
      * @return bool
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return isset($this->slots[$name]);
     }
@@ -80,7 +80,7 @@ class SlotsHelper extends Helper
      *
      * @return string The slot content
      */
-    public function get($name, $default = false)
+    public function get(string $name, $default = false): string
     {
         return isset($this->slots[$name]) ? $this->slots[$name] : $default;
     }
@@ -91,7 +91,7 @@ class SlotsHelper extends Helper
      * @param string $name    The slot name
      * @param string $content The slot content
      */
-    public function set($name, $content): void
+    public function set(string $name, string $content): void
     {
         $this->slots[$name] = $content;
     }
@@ -104,7 +104,7 @@ class SlotsHelper extends Helper
      *
      * @return bool true if the slot is defined or if a default content has been provided, false otherwise
      */
-    public function output($name, $default = false)
+    public function output(string $name, $default = false): bool
     {
         if (!isset($this->slots[$name])) {
             if (false !== $default) {
@@ -126,7 +126,7 @@ class SlotsHelper extends Helper
      *
      * @return string The canonical name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'slots';
     }

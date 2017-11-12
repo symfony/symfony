@@ -363,7 +363,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * @return string
      */
-    private function formatRouterConfig(array $array)
+    private function formatRouterConfig(array $array): string
     {
         if (!$array) {
             return 'NONE';

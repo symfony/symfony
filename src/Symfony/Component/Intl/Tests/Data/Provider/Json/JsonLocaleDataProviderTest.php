@@ -30,7 +30,7 @@ class JsonLocaleDataProviderTest extends AbstractLocaleDataProviderTest
     /**
      * @return BundleReaderInterface
      */
-    protected function createBundleReader()
+    protected function createBundleReader(): BundleReaderInterface
     {
         return new JsonBundleReader();
     }

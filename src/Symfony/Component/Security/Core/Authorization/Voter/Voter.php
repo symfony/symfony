@@ -54,7 +54,7 @@ abstract class Voter implements VoterInterface
      *
      * @return bool True if the attribute and subject are supported, false otherwise
      */
-    abstract protected function supports($attribute, $subject);
+    abstract protected function supports(string $attribute, $subject): bool;
 
     /**
      * Perform a single access check operation on a given attribute, subject and token.
@@ -65,5 +65,5 @@ abstract class Voter implements VoterInterface
      *
      * @return bool
      */
-    abstract protected function voteOnAttribute($attribute, $subject, TokenInterface $token);
+    abstract protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool;
 }

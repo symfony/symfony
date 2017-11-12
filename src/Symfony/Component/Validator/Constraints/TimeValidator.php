@@ -33,7 +33,7 @@ class TimeValidator extends ConstraintValidator
      *
      * @internal
      */
-    public static function checkTime($hour, $minute, $second)
+    public static function checkTime(int $hour, int $minute, int $second): bool
     {
         return $hour >= 0 && $hour < 24 && $minute >= 0 && $minute < 60 && $second >= 0 && $second < 60;
     }

@@ -62,7 +62,7 @@ class StopwatchEvent
      *
      * @return string The category
      */
-    public function getCategory()
+    public function getCategory(): string
     {
         return $this->category;
     }
@@ -72,7 +72,7 @@ class StopwatchEvent
      *
      * @return float The origin in milliseconds
      */
-    public function getOrigin()
+    public function getOrigin(): float
     {
         return $this->origin;
     }
@@ -112,7 +112,7 @@ class StopwatchEvent
      *
      * @return bool
      */
-    public function isStarted()
+    public function isStarted(): bool
     {
         return !empty($this->started);
     }
@@ -152,7 +152,7 @@ class StopwatchEvent
      *
      * @return int The time (in milliseconds)
      */
-    public function getStartTime()
+    public function getStartTime(): int
     {
         return isset($this->periods[0]) ? $this->periods[0]->getStartTime() : 0;
     }
@@ -162,7 +162,7 @@ class StopwatchEvent
      *
      * @return int The time (in milliseconds)
      */
-    public function getEndTime()
+    public function getEndTime(): int
     {
         $count = count($this->periods);
 
@@ -174,7 +174,7 @@ class StopwatchEvent
      *
      * @return int The duration (in milliseconds)
      */
-    public function getDuration()
+    public function getDuration(): int
     {
         $periods = $this->periods;
         $stopped = count($periods);
@@ -198,7 +198,7 @@ class StopwatchEvent
      *
      * @return int The memory usage (in bytes)
      */
-    public function getMemory()
+    public function getMemory(): int
     {
         $memory = 0;
         foreach ($this->periods as $period) {
@@ -215,7 +215,7 @@ class StopwatchEvent
      *
      * @return float Time in ms
      */
-    protected function getNow()
+    protected function getNow(): float
     {
         return $this->formatTime(microtime(true) * 1000 - $this->origin);
     }
@@ -229,7 +229,7 @@ class StopwatchEvent
      *
      * @throws \InvalidArgumentException When the raw time is not valid
      */
-    private function formatTime($time)
+    private function formatTime($time): float
     {
         if (!is_numeric($time)) {
             throw new \InvalidArgumentException('The time must be a numerical value');
@@ -241,7 +241,7 @@ class StopwatchEvent
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return sprintf('%s: %.2F MiB - %d ms', $this->getCategory(), $this->getMemory() / 1024 / 1024, $this->getDuration());
     }

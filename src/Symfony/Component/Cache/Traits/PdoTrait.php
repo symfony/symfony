@@ -386,7 +386,7 @@ trait PdoTrait
     /**
      * @return string
      */
-    private function getServerVersion()
+    private function getServerVersion(): string
     {
         if (null === $this->serverVersion) {
             $conn = $this->conn instanceof \PDO ? $this->conn : $this->conn->getWrappedConnection();

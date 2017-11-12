@@ -267,7 +267,7 @@ class DoctrineExtensionTest extends TestCase
     /**
      * @return \Symfony\Component\DependencyInjection\ContainerBuilder
      */
-    protected function createContainer(array $data = array())
+    protected function createContainer(array $data = array()): \Symfony\Component\DependencyInjection\ContainerBuilder
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(
             'kernel.bundles' => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),

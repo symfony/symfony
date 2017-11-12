@@ -61,7 +61,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
      *
      * @return \FooCircular
      */
-    protected function getFooService()
+    protected function getFooService(): \FooCircular
     {
         $a = new \BarCircular();
 

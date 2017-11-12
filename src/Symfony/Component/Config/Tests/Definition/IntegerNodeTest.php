@@ -30,7 +30,7 @@ class IntegerNodeTest extends TestCase
      *
      * @param int $value
      */
-    public function testValidNonEmptyValues($value): void
+    public function testValidNonEmptyValues(int $value): void
     {
         $node = new IntegerNode('test');
         $node->setAllowEmptyValue(false);

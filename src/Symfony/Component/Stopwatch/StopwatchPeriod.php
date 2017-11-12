@@ -69,7 +69,7 @@ class StopwatchPeriod
      *
      * @return int The memory usage (in bytes)
      */
-    public function getMemory()
+    public function getMemory(): int
     {
         return $this->memory;
     }

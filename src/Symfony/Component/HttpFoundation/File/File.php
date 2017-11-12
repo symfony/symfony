@@ -53,7 +53,7 @@ class File extends \SplFileInfo
      * @see ExtensionGuesser
      * @see getMimeType()
      */
-    public function guessExtension()
+    public function guessExtension(): ?string
     {
         $type = $this->getMimeType();
         $guesser = ExtensionGuesser::getInstance();
@@ -72,7 +72,7 @@ class File extends \SplFileInfo
      *
      * @see MimeTypeGuesser
      */
-    public function getMimeType()
+    public function getMimeType(): ?string
     {
         $guesser = MimeTypeGuesser::getInstance();
 
@@ -89,7 +89,7 @@ class File extends \SplFileInfo
      *
      * @throws FileException if the target file could not be created
      */
-    public function move($directory, $name = null)
+    public function move(string $directory, string $name = null): self
     {
         $target = $this->getTargetFile($directory, $name);
 
@@ -125,7 +125,7 @@ class File extends \SplFileInfo
      *
      * @return string containing
      */
-    protected function getName($name)
+    protected function getName(string $name): string
     {
         $originalName = str_replace('\\', '/', $name);
         $pos = strrpos($originalName, '/');

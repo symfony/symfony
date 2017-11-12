@@ -109,23 +109,23 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html, $xpath);
     }
 
-    abstract protected function renderForm(FormView $view, array $vars = array());
+    abstract protected function renderForm(FormView $view, array $vars = array()): void;
 
-    abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
+    abstract protected function renderLabel(FormView $view, $label = null, array $vars = array()): void;
 
-    abstract protected function renderErrors(FormView $view);
+    abstract protected function renderErrors(FormView $view): void;
 
-    abstract protected function renderWidget(FormView $view, array $vars = array());
+    abstract protected function renderWidget(FormView $view, array $vars = array()): void;
 
-    abstract protected function renderRow(FormView $view, array $vars = array());
+    abstract protected function renderRow(FormView $view, array $vars = array()): void;
 
-    abstract protected function renderRest(FormView $view, array $vars = array());
+    abstract protected function renderRest(FormView $view, array $vars = array()): void;
 
-    abstract protected function renderStart(FormView $view, array $vars = array());
+    abstract protected function renderStart(FormView $view, array $vars = array()): void;
 
-    abstract protected function renderEnd(FormView $view, array $vars = array());
+    abstract protected function renderEnd(FormView $view, array $vars = array()): void;
 
-    abstract protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true);
+    abstract protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true): void;
 
     public function testLabel(): void
     {

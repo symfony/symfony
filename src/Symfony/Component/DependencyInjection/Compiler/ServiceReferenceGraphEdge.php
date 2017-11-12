@@ -50,7 +50,7 @@ class ServiceReferenceGraphEdge
      *
      * @return ServiceReferenceGraphNode
      */
-    public function getSourceNode()
+    public function getSourceNode(): ServiceReferenceGraphNode
     {
         return $this->sourceNode;
     }
@@ -60,7 +60,7 @@ class ServiceReferenceGraphEdge
      *
      * @return ServiceReferenceGraphNode
      */
-    public function getDestNode()
+    public function getDestNode(): ServiceReferenceGraphNode
     {
         return $this->destNode;
     }
@@ -70,7 +70,7 @@ class ServiceReferenceGraphEdge
      *
      * @return bool
      */
-    public function isLazy()
+    public function isLazy(): bool
     {
         return $this->lazy;
     }
@@ -80,7 +80,7 @@ class ServiceReferenceGraphEdge
      *
      * @return bool
      */
-    public function isWeak()
+    public function isWeak(): bool
     {
         return $this->weak;
     }

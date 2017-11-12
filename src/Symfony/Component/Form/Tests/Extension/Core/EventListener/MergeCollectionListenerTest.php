@@ -35,7 +35,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         $this->form = null;
     }
 
-    abstract protected function getBuilder($name = 'name');
+    abstract protected function getBuilder($name = 'name'): void;
 
     protected function getForm($name = 'name', $propertyPath = null)
     {
@@ -67,7 +67,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         );
     }
 
-    abstract protected function getData(array $data);
+    abstract protected function getData(array $data): void;
 
     /**
      * @dataProvider getBooleanMatrix1

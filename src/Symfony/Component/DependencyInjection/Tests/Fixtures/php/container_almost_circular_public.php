@@ -61,7 +61,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      *
      * @return \BarCircular
      */
-    protected function getBarService()
+    protected function getBarService(): \BarCircular
     {
         $this->services['bar'] = $instance = new \BarCircular();
 
@@ -75,7 +75,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      *
      * @return \FooCircular
      */
-    protected function getFooService()
+    protected function getFooService(): \FooCircular
     {
         $a = ($this->services['bar'] ?? $this->getBarService());
 
@@ -91,7 +91,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      *
      * @return \FoobarCircular
      */
-    protected function getFoobarService()
+    protected function getFoobarService(): \FoobarCircular
     {
         $a = ($this->services['foo'] ?? $this->getFooService());
 

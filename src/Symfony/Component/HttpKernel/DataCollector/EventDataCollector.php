@@ -78,7 +78,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @see TraceableEventDispatcherInterface
      */
-    public function getCalledListeners()
+    public function getCalledListeners(): array
     {
         return $this->data['called_listeners'];
     }
@@ -102,7 +102,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
      *
      * @see TraceableEventDispatcherInterface
      */
-    public function getNotCalledListeners()
+    public function getNotCalledListeners(): array
     {
         return $this->data['not_called_listeners'];
     }

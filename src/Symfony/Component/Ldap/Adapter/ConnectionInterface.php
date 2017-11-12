@@ -21,7 +21,7 @@ interface ConnectionInterface
      *
      * @return bool
      */
-    public function isBound();
+    public function isBound(): bool;
 
     /**
      * Binds the connection against a DN and password.
@@ -29,5 +29,5 @@ interface ConnectionInterface
      * @param string $dn       The user's DN
      * @param string $password The associated password
      */
-    public function bind($dn = null, $password = null);
+    public function bind(string $dn = null, string $password = null): void;
 }

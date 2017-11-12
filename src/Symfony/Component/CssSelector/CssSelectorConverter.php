@@ -58,7 +58,7 @@ class CssSelectorConverter
      *
      * @return string
      */
-    public function toXPath($cssExpr, $prefix = 'descendant-or-self::')
+    public function toXPath(string $cssExpr, string $prefix = 'descendant-or-self::'): string
     {
         return $this->translator->cssToXPath($cssExpr, $prefix);
     }

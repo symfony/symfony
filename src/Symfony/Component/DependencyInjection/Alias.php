@@ -29,7 +29,7 @@ class Alias
      *
      * @return bool
      */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->public;
     }
@@ -41,7 +41,7 @@ class Alias
      *
      * @return $this
      */
-    public function setPublic($boolean)
+    public function setPublic(bool $boolean)
     {
         $this->public = (bool) $boolean;
         $this->private = false;
@@ -61,7 +61,7 @@ class Alias
      *
      * @return $this
      */
-    public function setPrivate($boolean)
+    public function setPrivate(bool $boolean)
     {
         $this->private = (bool) $boolean;
 
@@ -73,7 +73,7 @@ class Alias
      *
      * @return bool
      */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return $this->private;
     }
@@ -83,7 +83,7 @@ class Alias
      *
      * @return string The alias id
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }

@@ -63,11 +63,11 @@ abstract class AbstractValidatorTest extends TestCase
         $this->referenceMetadata = null;
     }
 
-    abstract protected function validate($value, $constraints = null, $groups = null);
+    abstract protected function validate($value, $constraints = null, $groups = null): void;
 
-    abstract protected function validateProperty($object, $propertyName, $groups = null);
+    abstract protected function validateProperty($object, $propertyName, $groups = null): void;
 
-    abstract protected function validatePropertyValue($object, $propertyName, $value, $groups = null);
+    abstract protected function validatePropertyValue($object, $propertyName, $value, $groups = null): void;
 
     public function testValidate(): void
     {

@@ -27,7 +27,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    abstract protected function getContainer(array $array);
+    abstract protected function getContainer(array $array): void;
 
     public function getValidPropertyPaths()
     {

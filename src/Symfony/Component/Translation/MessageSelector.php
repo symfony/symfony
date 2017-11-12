@@ -47,7 +47,7 @@ class MessageSelector
      *
      * @throws InvalidArgumentException
      */
-    public function choose($message, $number, $locale)
+    public function choose(string $message, int $number, string $locale): string
     {
         preg_match_all('/(?:\|\||[^\|])++/', $message, $parts);
         $explicitRules = array();

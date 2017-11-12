@@ -154,7 +154,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      *
      * @return bool
      */
-    protected function requiresAuthentication(Request $request)
+    protected function requiresAuthentication(Request $request): bool
     {
         return $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
     }

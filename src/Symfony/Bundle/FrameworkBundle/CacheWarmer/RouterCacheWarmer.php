@@ -39,7 +39,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
      *
      * @param string $cacheDir The cache directory
      */
-    public function warmUp($cacheDir): void
+    public function warmUp(string $cacheDir): void
     {
         $router = $this->container->get('router');
 
@@ -53,7 +53,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
      *
      * @return bool always true
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }

@@ -95,7 +95,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return StoreInterface $store A StoreInterface instance
      */
-    public function getStore()
+    public function getStore(): StoreInterface
     {
         return $this->store;
     }
@@ -105,7 +105,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return array An array of events
      */
-    public function getTraces()
+    public function getTraces(): array
     {
         return $this->traces;
     }
@@ -115,7 +115,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return string A log message
      */
-    public function getLog()
+    public function getLog(): string
     {
         $log = array();
         foreach ($this->traces as $request => $traces) {
@@ -130,7 +130,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return Request A Request instance
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -140,7 +140,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return HttpKernelInterface An HttpKernelInterface instance
      */
-    public function getKernel()
+    public function getKernel(): HttpKernelInterface
     {
         return $this->kernel;
     }
@@ -152,7 +152,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @throws \LogicException
      */
-    public function getSurrogate()
+    public function getSurrogate(): SurrogateInterface
     {
         return $this->surrogate;
     }
@@ -227,7 +227,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return Response A Response instance
      */
-    protected function pass(Request $request, $catch = false)
+    protected function pass(Request $request, bool $catch = false): Response
     {
         $this->record($request, 'pass');
 
@@ -246,7 +246,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @see RFC2616 13.10
      */
-    protected function invalidate(Request $request, $catch = false)
+    protected function invalidate(Request $request, bool $catch = false): Response
     {
         $response = $this->pass($request, $catch);
 
@@ -293,7 +293,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @throws \Exception
      */
-    protected function lookup(Request $request, $catch = false)
+    protected function lookup(Request $request, bool $catch = false): Response
     {
         try {
             $entry = $this->store->lookup($request);
@@ -338,7 +338,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return Response A Response instance
      */
-    protected function validate(Request $request, Response $entry, $catch = false)
+    protected function validate(Request $request, Response $entry, bool $catch = false): Response
     {
         $subRequest = clone $request;
 
@@ -400,7 +400,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return Response A Response instance
      */
-    protected function fetch(Request $request, $catch = false)
+    protected function fetch(Request $request, bool $catch = false): Response
     {
         $subRequest = clone $request;
 
@@ -434,7 +434,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return Response A Response instance
      */
-    protected function forward(Request $request, $catch = false, Response $entry = null)
+    protected function forward(Request $request, bool $catch = false, Response $entry = null): Response
     {
         if ($this->surrogate) {
             $this->surrogate->addSurrogateCapability($request);
@@ -502,7 +502,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return bool true if the cache entry if fresh enough, false otherwise
      */
-    protected function isFreshEnough(Request $request, Response $entry)
+    protected function isFreshEnough(Request $request, Response $entry): bool
     {
         if (!$entry->isFresh()) {
             return $this->lock($request, $entry);
@@ -520,7 +520,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return bool true if the cache entry can be returned even if it is staled, false otherwise
      */
-    protected function lock(Request $request, Response $entry)
+    protected function lock(Request $request, Response $entry): bool
     {
         // try to acquire a lock to call the backend
         $lock = $this->store->lock($request);
@@ -630,7 +630,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return bool true if the Request is private, false otherwise
      */
-    private function isPrivateRequest(Request $request)
+    private function isPrivateRequest(Request $request): bool
     {
         foreach ($this->options['private_headers'] as $key) {
             $key = strtolower(str_replace('HTTP_', '', $key));

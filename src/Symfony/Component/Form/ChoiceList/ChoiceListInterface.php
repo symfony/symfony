@@ -30,7 +30,7 @@ interface ChoiceListInterface
      *
      * @return array The selectable choices indexed by the corresponding values
      */
-    public function getChoices();
+    public function getChoices(): array;
 
     /**
      * Returns the values for the choices.
@@ -99,7 +99,7 @@ interface ChoiceListInterface
      *
      * @return array An array of choices
      */
-    public function getChoicesForValues(array $values);
+    public function getChoicesForValues(array $values): array;
 
     /**
      * Returns the values corresponding to the given choices.

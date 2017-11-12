@@ -30,7 +30,7 @@ class SemaphoreStore implements StoreInterface
      *
      * @internal
      */
-    public static function isSupported()
+    public static function isSupported(): bool
     {
         return extension_loaded('sysvsem');
     }

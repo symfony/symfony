@@ -29,7 +29,7 @@ class FormThemeTokenParser extends AbstractTokenParser
      *
      * @return Node
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
@@ -61,7 +61,7 @@ class FormThemeTokenParser extends AbstractTokenParser
      *
      * @return string The tag name
      */
-    public function getTag()
+    public function getTag(): string
     {
         return 'form_theme';
     }

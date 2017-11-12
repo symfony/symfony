@@ -31,7 +31,7 @@ class PhpGeneratorDumper extends GeneratorDumper
      *
      * @return string A PHP class representing the generator class
      */
-    public function dump(array $options = array())
+    public function dump(array $options = array()): string
     {
         $options = array_merge(array(
             'class' => 'ProjectUrlGenerator',
@@ -74,7 +74,7 @@ EOF;
      *
      * @return string PHP code
      */
-    private function generateDeclaredRoutes()
+    private function generateDeclaredRoutes(): string
     {
         $routes = "array(\n";
         foreach ($this->getRoutes()->all() as $name => $route) {
@@ -100,7 +100,7 @@ EOF;
      *
      * @return string PHP code
      */
-    private function generateGenerateMethod()
+    private function generateGenerateMethod(): string
     {
         return <<<'EOF'
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)

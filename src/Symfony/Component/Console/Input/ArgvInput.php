@@ -93,7 +93,7 @@ class ArgvInput extends Input
      *
      * @param string $token The current token
      */
-    private function parseShortOption($token): void
+    private function parseShortOption(string $token): void
     {
         $name = substr($token, 1);
 
@@ -116,7 +116,7 @@ class ArgvInput extends Input
      *
      * @throws RuntimeException When option given doesn't exist
      */
-    private function parseShortOptionSet($name): void
+    private function parseShortOptionSet(string $name): void
     {
         $len = strlen($name);
         for ($i = 0; $i < $len; ++$i) {
@@ -140,7 +140,7 @@ class ArgvInput extends Input
      *
      * @param string $token The current token
      */
-    private function parseLongOption($token): void
+    private function parseLongOption(string $token): void
     {
         $name = substr($token, 2);
 
@@ -161,7 +161,7 @@ class ArgvInput extends Input
      *
      * @throws RuntimeException When too many arguments are given
      */
-    private function parseArgument($token): void
+    private function parseArgument(string $token): void
     {
         $c = count($this->arguments);
 
@@ -194,7 +194,7 @@ class ArgvInput extends Input
      *
      * @throws RuntimeException When option given doesn't exist
      */
-    private function addShortOption($shortcut, $value): void
+    private function addShortOption(string $shortcut, $value): void
     {
         if (!$this->definition->hasShortcut($shortcut)) {
             throw new RuntimeException(sprintf('The "-%s" option does not exist.', $shortcut));
@@ -211,7 +211,7 @@ class ArgvInput extends Input
      *
      * @throws RuntimeException When option given doesn't exist
      */
-    private function addLongOption($name, $value): void
+    private function addLongOption(string $name, $value): void
     {
         if (!$this->definition->hasOption($name)) {
             throw new RuntimeException(sprintf('The "--%s" option does not exist.', $name));
@@ -319,7 +319,7 @@ class ArgvInput extends Input
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $tokens = array_map(function ($token) {
             if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {

@@ -60,7 +60,7 @@ class PhpEngineTest extends TestCase
      *
      * @return Container
      */
-    protected function getContainer()
+    protected function getContainer(): Container
     {
         $container = new Container();
         $session = new Session(new MockArraySessionStorage());

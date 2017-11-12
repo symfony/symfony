@@ -40,7 +40,7 @@ interface EngineInterface
      *
      * @throws \RuntimeException if the template cannot be rendered
      */
-    public function render($name, array $parameters = array());
+    public function render($name, array $parameters = array()): string;
 
     /**
      * Returns true if the template exists.
@@ -51,7 +51,7 @@ interface EngineInterface
      *
      * @throws \RuntimeException if the engine cannot handle the template name
      */
-    public function exists($name);
+    public function exists($name): bool;
 
     /**
      * Returns true if this class is able to render the given template.
@@ -60,5 +60,5 @@ interface EngineInterface
      *
      * @return bool true if this class supports the given template, false otherwise
      */
-    public function supports($name);
+    public function supports($name): bool;
 }

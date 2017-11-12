@@ -26,5 +26,5 @@ interface AuthorizationCheckerInterface
      *
      * @return bool
      */
-    public function isGranted($attributes, $subject = null);
+    public function isGranted($attributes, $subject = null): bool;
 }

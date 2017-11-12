@@ -163,7 +163,7 @@ class OutputFormatterTest extends TestCase
      *
      * @dataProvider provideInlineStyleOptionsCases
      */
-    public function testInlineStyleOptions($tag, $expected = null, $input = null): void
+    public function testInlineStyleOptions(string $tag, ?string $expected = null, ?string $input = null): void
     {
         $styleString = substr($tag, 1, -1);
         $formatter = new OutputFormatter(true);

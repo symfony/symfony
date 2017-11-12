@@ -369,7 +369,7 @@ class Filesystem
             throw new FileNotFoundException(sprintf('Origin file "%s" is not a file', $originFile));
         }
 
-        foreach ($this->toIterator($targetFiles) as $targetFile) {
+        foreach ($this->toIterable($targetFiles) as $targetFile) {
             if (is_file($targetFile)) {
                 if (fileinode($originFile) === fileinode($targetFile)) {
                     continue;

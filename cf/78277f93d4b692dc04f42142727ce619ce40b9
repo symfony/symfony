@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by mcg-web at 2017-11-10T07:58:17Z
+
+Thanks for review, I changed the phpdoc and added a test to cover this.
+
+---------------------------------------------------------------------------
+
+by mcg-web at 2017-11-10T20:58:01Z
+
+PhpDoc and tests can effectively be merged in lower branch version. But removing the typeHint is a 4.0 issue... Should I open an other PR on a lower branch? @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-10T22:28:48Z
+
+Removing the type will come naturally when merging up to master I think.
+
+---------------------------------------------------------------------------
+
+by mcg-web at 2017-11-11T07:17:08Z
+
+I moved it to lower active branch 2.7.

@@ -63,7 +63,7 @@ class FilesystemLoader extends BaseFilesystemLoader
      *
      * @throws LoaderError if the template could not be found
      */
-    protected function findTemplate($template, $throw = true)
+    protected function findTemplate($template, $throw = true): string
     {
         $logicalName = (string) $template;
 

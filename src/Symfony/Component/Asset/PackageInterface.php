@@ -25,7 +25,7 @@ interface PackageInterface
      *
      * @return string The version string
      */
-    public function getVersion($path);
+    public function getVersion(string $path): string;
 
     /**
      * Returns an absolute or root-relative public path.
@@ -34,5 +34,5 @@ interface PackageInterface
      *
      * @return string The public path
      */
-    public function getUrl($path);
+    public function getUrl(string $path): string;
 }

@@ -23,7 +23,7 @@ class ExpressionRequestMatcher extends RequestMatcher
     private $language;
     private $expression;
 
-    public function setExpression(ExpressionLanguage $language, $expression)
+    public function setExpression(ExpressionLanguage $language, $expression): void
     {
         $this->language = $language;
         $this->expression = $expression;

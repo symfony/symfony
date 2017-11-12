@@ -57,7 +57,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return \DOMElement A \DOMElement instance
      */
-    public function getFormNode()
+    public function getFormNode(): \DOMElement
     {
         return $this->node;
     }
@@ -85,7 +85,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of field values
      */
-    public function getValues()
+    public function getValues(): array
     {
         $values = array();
         foreach ($this->fields->all() as $name => $field) {
@@ -106,7 +106,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of file field values
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         if (!in_array($this->getMethod(), array('POST', 'PUT', 'DELETE', 'PATCH'))) {
             return array();
@@ -135,7 +135,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of field values
      */
-    public function getPhpValues()
+    public function getPhpValues(): array
     {
         $values = array();
         foreach ($this->getValues() as $name => $value) {
@@ -162,7 +162,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return array An array of file field values
      */
-    public function getPhpFiles()
+    public function getPhpFiles(): array
     {
         $values = array();
         foreach ($this->getFiles() as $name => $value) {
@@ -173,7 +173,7 @@ class Form extends Link implements \ArrayAccess
 
                 array_walk_recursive(
                     $expandedValue,
-                    function (&$value, $key) {
+                    function (&$value, $key): void {
                         if (ctype_digit($value) && ('size' === $key || 'error' === $key)) {
                             $value = (int) $value;
                         }
@@ -198,7 +198,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return string The URI
      */
-    public function getUri()
+    public function getUri(): string
     {
         $uri = parent::getUri();
 
@@ -236,7 +236,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return string The method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         if (null !== $this->method) {
             return $this->method;
@@ -257,7 +257,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return bool true if the field exists, false otherwise
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return $this->fields->has($name);
     }
@@ -267,7 +267,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      */
-    public function remove($name)
+    public function remove(string $name): void
     {
         $this->fields->remove($name);
     }
@@ -281,7 +281,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
-    public function get($name)
+    public function get(string $name): FormField
     {
         return $this->fields->get($name);
     }
@@ -289,7 +289,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets a named field.
      */
-    public function set(FormField $field)
+    public function set(FormField $field): void
     {
         $this->fields->add($field);
     }
@@ -311,7 +311,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @return bool true if the field exists, false otherwise
      */
-    public function offsetExists($name)
+    public function offsetExists(string $name): bool
     {
         return $this->has($name);
     }
@@ -325,7 +325,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetGet($name)
+    public function offsetGet(string $name): FormField
     {
         return $this->fields->get($name);
     }
@@ -338,7 +338,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetSet($name, $value)
+    public function offsetSet(string $name, $value): void
     {
         $this->fields->set($name, $value);
     }
@@ -348,17 +348,15 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      */
-    public function offsetUnset($name)
+    public function offsetUnset(string $name): void
     {
         $this->fields->remove($name);
     }
 
     /**
      * Disables validation.
-     *
-     * @return self
      */
-    public function disableValidation()
+    public function disableValidation(): self
     {
         foreach ($this->fields->all() as $field) {
             if ($field instanceof Field\ChoiceFormField) {
@@ -376,7 +374,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
-    protected function setNode(\DOMElement $node)
+    protected function setNode(\DOMElement $node): void
     {
         $this->button = $node;
         if ('button' === $node->nodeName || ('input' === $node->nodeName && in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
@@ -411,7 +409,7 @@ class Form extends Link implements \ArrayAccess
      * the form node or the entire document depending on whether we need
      * to find non-descendant elements through HTML5 'form' attribute.
      */
-    private function initialize()
+    private function initialize(): void
     {
         $this->fields = new FormFieldRegistry();
 
@@ -461,7 +459,7 @@ class Form extends Link implements \ArrayAccess
         }
     }
 
-    private function addField(\DOMElement $node)
+    private function addField(\DOMElement $node): void
     {
         if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {
             return;

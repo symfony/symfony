@@ -32,7 +32,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeRouteCollection(RouteCollection $routes, array $options = array())
+    protected function describeRouteCollection(RouteCollection $routes, array $options = array()): void
     {
         $data = array();
         foreach ($routes->all() as $name => $route) {
@@ -45,7 +45,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeRoute(Route $route, array $options = array())
+    protected function describeRoute(Route $route, array $options = array()): void
     {
         $this->writeData($this->getRouteData($route), $options);
     }
@@ -53,7 +53,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = array()): void
     {
         $this->writeData($this->sortParameters($parameters), $options);
     }
@@ -61,7 +61,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = array()): void
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
         $data = array();
@@ -79,7 +79,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
+    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -97,7 +97,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = array()): void
     {
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $showPrivate = isset($options['show_private']) && $options['show_private'];
@@ -131,7 +131,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerDefinition(Definition $definition, array $options = array())
+    protected function describeContainerDefinition(Definition $definition, array $options = array()): void
     {
         $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']), $options);
     }
@@ -154,7 +154,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array())
+    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array()): void
     {
         $this->writeData($this->getEventDispatcherListenersData($eventDispatcher, array_key_exists('event', $options) ? $options['event'] : null), $options);
     }
@@ -162,7 +162,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeCallable($callable, array $options = array())
+    protected function describeCallable($callable, array $options = array()): void
     {
         $this->writeData($this->getCallableData($callable, $options), $options);
     }
@@ -170,7 +170,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerParameter($parameter, array $options = array())
+    protected function describeContainerParameter($parameter, array $options = array()): void
     {
         $key = isset($options['parameter']) ? $options['parameter'] : '';
 
@@ -188,10 +188,7 @@ class JsonDescriptor extends Descriptor
         $this->write(json_encode($data, $flags | JSON_PRETTY_PRINT)."\n");
     }
 
-    /**
-     * @return array
-     */
-    protected function getRouteData(Route $route)
+    protected function getRouteData(Route $route): array
     {
         return array(
             'path' => $route->getPath(),

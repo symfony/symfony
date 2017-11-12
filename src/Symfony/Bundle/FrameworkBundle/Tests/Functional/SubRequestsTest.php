@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 class SubRequestsTest extends WebTestCase
 {
-    public function testStateAfterSubRequest()
+    public function testStateAfterSubRequest(): void
     {
         $client = $this->createClient(array('test_case' => 'Session', 'root_config' => 'config.yml'));
         $client->request('GET', 'https://localhost/subrequest/en');
@@ -21,7 +21,7 @@ class SubRequestsTest extends WebTestCase
         $this->assertEquals('--fr/json--en/html--fr/json--http://localhost/subrequest/fragment/en', $client->getResponse()->getContent());
     }
 
-    public function testSubRequestControllerServicesAreResolved()
+    public function testSubRequestControllerServicesAreResolved(): void
     {
         $client = $this->createClient(array('test_case' => 'ControllerServiceResolution', 'root_config' => 'config.yml'));
         $client->request('GET', 'https://localhost/subrequest');

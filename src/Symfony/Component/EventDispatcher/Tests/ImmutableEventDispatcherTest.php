@@ -30,13 +30,13 @@ class ImmutableEventDispatcherTest extends TestCase
      */
     private $dispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->innerDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->dispatcher = new ImmutableEventDispatcher($this->innerDispatcher);
     }
 
-    public function testDispatchDelegates()
+    public function testDispatchDelegates(): void
     {
         $event = new Event();
 
@@ -48,7 +48,7 @@ class ImmutableEventDispatcherTest extends TestCase
         $this->assertSame('result', $this->dispatcher->dispatch('event', $event));
     }
 
-    public function testGetListenersDelegates()
+    public function testGetListenersDelegates(): void
     {
         $this->innerDispatcher->expects($this->once())
             ->method('getListeners')
@@ -58,7 +58,7 @@ class ImmutableEventDispatcherTest extends TestCase
         $this->assertSame('result', $this->dispatcher->getListeners('event'));
     }
 
-    public function testHasListenersDelegates()
+    public function testHasListenersDelegates(): void
     {
         $this->innerDispatcher->expects($this->once())
             ->method('hasListeners')
@@ -71,7 +71,7 @@ class ImmutableEventDispatcherTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      */
-    public function testAddListenerDisallowed()
+    public function testAddListenerDisallowed(): void
     {
         $this->dispatcher->addListener('event', function () { return 'foo'; });
     }
@@ -79,7 +79,7 @@ class ImmutableEventDispatcherTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      */
-    public function testAddSubscriberDisallowed()
+    public function testAddSubscriberDisallowed(): void
     {
         $subscriber = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventSubscriberInterface')->getMock();
 
@@ -89,7 +89,7 @@ class ImmutableEventDispatcherTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      */
-    public function testRemoveListenerDisallowed()
+    public function testRemoveListenerDisallowed(): void
     {
         $this->dispatcher->removeListener('event', function () { return 'foo'; });
     }
@@ -97,7 +97,7 @@ class ImmutableEventDispatcherTest extends TestCase
     /**
      * @expectedException \BadMethodCallException
      */
-    public function testRemoveSubscriberDisallowed()
+    public function testRemoveSubscriberDisallowed(): void
     {
         $subscriber = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventSubscriberInterface')->getMock();
 

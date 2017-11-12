@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 class MaxIdLengthAdapterTest extends TestCase
 {
-    public function testLongKey()
+    public function testLongKey(): void
     {
         $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
             ->setConstructorArgs(array(str_repeat('-', 10)))
@@ -38,7 +38,7 @@ class MaxIdLengthAdapterTest extends TestCase
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Namespace must be 26 chars max, 40 given ("----------------------------------------")
      */
-    public function testTooLongNamespace()
+    public function testTooLongNamespace(): void
     {
         $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
             ->setConstructorArgs(array(str_repeat('-', 40)))

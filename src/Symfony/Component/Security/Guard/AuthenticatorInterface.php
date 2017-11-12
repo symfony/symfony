@@ -41,7 +41,7 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @return bool
      */
-    public function supports(Request $request);
+    public function supports(Request $request): bool;
 
     /**
      * Get the authentication credentials from the request and return them
@@ -83,7 +83,7 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @return UserInterface|null
      */
-    public function getUser($credentials, UserProviderInterface $userProvider);
+    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface;
 
     /**
      * Returns true if the credentials are valid.
@@ -101,7 +101,7 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @throws AuthenticationException
      */
-    public function checkCredentials($credentials, UserInterface $user);
+    public function checkCredentials($credentials, UserInterface $user): bool;
 
     /**
      * Create an authenticated token for the given user.
@@ -117,7 +117,7 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @return GuardTokenInterface
      */
-    public function createAuthenticatedToken(UserInterface $user, $providerKey);
+    public function createAuthenticatedToken(UserInterface $user, string $providerKey): GuardTokenInterface;
 
     /**
      * Called when authentication executed, but failed (e.g. wrong username password).
@@ -133,7 +133,7 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @return Response|null
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception);
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response;
 
     /**
      * Called when authentication executed and was successful!
@@ -150,7 +150,7 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @return Response|null
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey);
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?Response;
 
     /**
      * Does this method support remember me cookies?
@@ -166,5 +166,5 @@ interface AuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @return bool
      */
-    public function supportsRememberMe();
+    public function supportsRememberMe(): bool;
 }

@@ -30,13 +30,13 @@ class TranslationNodeVisitor extends AbstractNodeVisitor
     private $enabled = false;
     private $messages = array();
 
-    public function enable()
+    public function enable(): void
     {
         $this->enabled = true;
         $this->messages = array();
     }
 
-    public function disable()
+    public function disable(): void
     {
         $this->enabled = false;
         $this->messages = array();

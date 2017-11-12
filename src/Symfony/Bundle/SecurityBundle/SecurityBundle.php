@@ -36,7 +36,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\Ldap
  */
 class SecurityBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -58,7 +58,7 @@ class SecurityBundle extends Bundle
         $container->addCompilerPass(new AddSecurityVotersPass());
     }
 
-    public function registerCommands(Application $application)
+    public function registerCommands(Application $application): void
     {
         // noop
     }

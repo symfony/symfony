@@ -160,7 +160,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @param callable[] $casters A map of casters
      */
-    public function addCasters(array $casters)
+    public function addCasters(array $casters): void
     {
         foreach ($casters as $type => $callback) {
             $this->casters[strtolower($type)][] = is_string($callback) && false !== strpos($callback, '::') ? explode('::', $callback, 2) : $callback;
@@ -169,20 +169,16 @@ abstract class AbstractCloner implements ClonerInterface
 
     /**
      * Sets the maximum number of items to clone past the minimum depth in nested structures.
-     *
-     * @param int $maxItems
      */
-    public function setMaxItems($maxItems)
+    public function setMaxItems(int $maxItems): void
     {
         $this->maxItems = (int) $maxItems;
     }
 
     /**
      * Sets the maximum cloned length for strings.
-     *
-     * @param int $maxString
      */
-    public function setMaxString($maxString)
+    public function setMaxString(int $maxString): void
     {
         $this->maxString = (int) $maxString;
     }
@@ -190,10 +186,8 @@ abstract class AbstractCloner implements ClonerInterface
     /**
      * Sets the minimum tree depth where we are guaranteed to clone all the items.  After this
      * depth is reached, only setMaxItems items will be cloned.
-     *
-     * @param int $minDepth
      */
-    public function setMinDepth($minDepth)
+    public function setMinDepth(int $minDepth): void
     {
         $this->minDepth = (int) $minDepth;
     }
@@ -206,7 +200,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return Data The cloned variable represented by a Data object
      */
-    public function cloneVar($var, $filter = 0)
+    public function cloneVar($var, $filter = 0): Data
     {
         $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) {
             if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
@@ -243,7 +237,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return array The cloned variable represented in an array
      */
-    abstract protected function doClone($var);
+    abstract protected function doClone($var): array;
 
     /**
      * Casts an object to an array representation.
@@ -253,7 +247,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return array The object casted as array
      */
-    protected function castObject(Stub $stub, $isNested)
+    protected function castObject(Stub $stub, bool $isNested): array
     {
         $obj = $stub->value;
         $class = $stub->class;
@@ -306,7 +300,7 @@ abstract class AbstractCloner implements ClonerInterface
      *
      * @return array The resource casted as array
      */
-    protected function castResource(Stub $stub, $isNested)
+    protected function castResource(Stub $stub, bool $isNested): array
     {
         $a = array();
         $res = $stub->value;

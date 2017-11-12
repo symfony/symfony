@@ -26,7 +26,7 @@ interface ParameterBagInterface
      *
      * @throws LogicException if the ParameterBagInterface can not be cleared
      */
-    public function clear();
+    public function clear(): void;
 
     /**
      * Adds parameters to the service container parameters.
@@ -35,14 +35,14 @@ interface ParameterBagInterface
      *
      * @throws LogicException if the parameter can not be added
      */
-    public function add(array $parameters);
+    public function add(array $parameters): void;
 
     /**
      * Gets the service container parameters.
      *
      * @return array An array of parameters
      */
-    public function all();
+    public function all(): array;
 
     /**
      * Gets a service container parameter.
@@ -53,14 +53,14 @@ interface ParameterBagInterface
      *
      * @throws ParameterNotFoundException if the parameter is not defined
      */
-    public function get($name);
+    public function get(string $name);
 
     /**
      * Removes a parameter.
      *
      * @param string $name The parameter name
      */
-    public function remove($name);
+    public function remove(string $name): void;
 
     /**
      * Sets a service container parameter.
@@ -70,7 +70,7 @@ interface ParameterBagInterface
      *
      * @throws LogicException if the parameter can not be set
      */
-    public function set($name, $value);
+    public function set(string $name, $value): void;
 
     /**
      * Returns true if a parameter name is defined.
@@ -79,12 +79,12 @@ interface ParameterBagInterface
      *
      * @return bool true if the parameter name is defined, false otherwise
      */
-    public function has($name);
+    public function has(string $name): bool;
 
     /**
      * Replaces parameter placeholders (%name%) by their values for all parameters.
      */
-    public function resolve();
+    public function resolve(): void;
 
     /**
      * Replaces parameter placeholders (%name%) by their values.
@@ -93,7 +93,7 @@ interface ParameterBagInterface
      *
      * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
      */
-    public function resolveValue($value);
+    public function resolveValue($value): void;
 
     /**
      * Escape parameter placeholders %.

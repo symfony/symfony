@@ -24,7 +24,7 @@ use Twig\Node\Expression\FunctionExpression;
  */
 class RenderBlockNode extends FunctionExpression
 {
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler->addDebugInfo($this);
         $arguments = iterator_to_array($this->getNode('arguments'));

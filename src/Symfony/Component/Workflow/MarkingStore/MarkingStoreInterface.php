@@ -31,7 +31,7 @@ interface MarkingStoreInterface
      *
      * @return Marking The marking
      */
-    public function getMarking($subject);
+    public function getMarking($subject): Marking;
 
     /**
      * Sets a Marking to a subject.
@@ -39,5 +39,5 @@ interface MarkingStoreInterface
      * @param object  $subject A subject
      * @param Marking $marking A marking
      */
-    public function setMarking($subject, Marking $marking);
+    public function setMarking($subject, Marking $marking): void;
 }

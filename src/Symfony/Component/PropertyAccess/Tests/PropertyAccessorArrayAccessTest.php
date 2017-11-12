@@ -22,12 +22,12 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
      */
     protected $propertyAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    abstract protected function getContainer(array $array);
+    abstract protected function getContainer(array $array): void;
 
     public function getValidPropertyPaths()
     {
@@ -40,7 +40,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testGetValue($collection, $path, $value)
+    public function testGetValue($collection, $path, $value): void
     {
         $this->assertSame($value, $this->propertyAccessor->getValue($collection, $path));
     }
@@ -48,7 +48,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
      */
-    public function testGetValueFailsIfNoSuchIndex()
+    public function testGetValueFailsIfNoSuchIndex(): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
@@ -62,7 +62,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testSetValue($collection, $path)
+    public function testSetValue($collection, $path): void
     {
         $this->propertyAccessor->setValue($collection, $path, 'Updated');
 
@@ -72,7 +72,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testIsReadable($collection, $path)
+    public function testIsReadable($collection, $path): void
     {
         $this->assertTrue($this->propertyAccessor->isReadable($collection, $path));
     }
@@ -80,7 +80,7 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
     /**
      * @dataProvider getValidPropertyPaths
      */
-    public function testIsWritable($collection, $path)
+    public function testIsWritable($collection, $path): void
     {
         $this->assertTrue($this->propertyAccessor->isWritable($collection, $path));
     }

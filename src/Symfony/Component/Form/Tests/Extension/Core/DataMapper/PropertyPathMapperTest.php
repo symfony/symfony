@@ -33,7 +33,7 @@ class PropertyPathMapperTest extends TestCase
      */
     private $propertyAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->propertyAccessor = $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->getMock();
@@ -43,7 +43,7 @@ class PropertyPathMapperTest extends TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getPropertyPath($path)
+    private function getPropertyPath($path): \PHPUnit_Framework_MockObject_MockObject
     {
         return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
             ->setConstructorArgs(array($path))
@@ -54,7 +54,7 @@ class PropertyPathMapperTest extends TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getForm(FormConfigInterface $config, bool $synchronized = true, bool $submitted = true)
+    private function getForm(FormConfigInterface $config, bool $synchronized = true, bool $submitted = true): \PHPUnit_Framework_MockObject_MockObject
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->setConstructorArgs(array($config))
@@ -72,7 +72,7 @@ class PropertyPathMapperTest extends TestCase
         return $form;
     }
 
-    public function testMapDataToFormsPassesObjectRefIfByReference()
+    public function testMapDataToFormsPassesObjectRefIfByReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -95,7 +95,7 @@ class PropertyPathMapperTest extends TestCase
         $this->assertSame($engine, $form->getData());
     }
 
-    public function testMapDataToFormsPassesObjectCloneIfNotByReference()
+    public function testMapDataToFormsPassesObjectCloneIfNotByReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -117,7 +117,7 @@ class PropertyPathMapperTest extends TestCase
         $this->assertEquals($engine, $form->getData());
     }
 
-    public function testMapDataToFormsIgnoresEmptyPropertyPath()
+    public function testMapDataToFormsIgnoresEmptyPropertyPath(): void
     {
         $car = new \stdClass();
 
@@ -132,7 +132,7 @@ class PropertyPathMapperTest extends TestCase
         $this->assertNull($form->getData());
     }
 
-    public function testMapDataToFormsIgnoresUnmapped()
+    public function testMapDataToFormsIgnoresUnmapped(): void
     {
         $car = new \stdClass();
         $propertyPath = $this->getPropertyPath('engine');
@@ -151,7 +151,7 @@ class PropertyPathMapperTest extends TestCase
         $this->assertNull($form->getData());
     }
 
-    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull()
+    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull(): void
     {
         $default = new \stdClass();
         $propertyPath = $this->getPropertyPath('engine');
@@ -176,7 +176,7 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapDataToForms(null, array($form));
     }
 
-    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsEmptyArray()
+    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsEmptyArray(): void
     {
         $default = new \stdClass();
         $propertyPath = $this->getPropertyPath('engine');
@@ -201,7 +201,7 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapDataToForms(array(), array($form));
     }
 
-    public function testMapFormsToDataWritesBackIfNotByReference()
+    public function testMapFormsToDataWritesBackIfNotByReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -220,7 +220,7 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapFormsToData(array($form), $car);
     }
 
-    public function testMapFormsToDataWritesBackIfByReferenceButNoReference()
+    public function testMapFormsToDataWritesBackIfByReferenceButNoReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -239,7 +239,7 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapFormsToData(array($form), $car);
     }
 
-    public function testMapFormsToDataWritesBackIfByReferenceAndReference()
+    public function testMapFormsToDataWritesBackIfByReferenceAndReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -263,7 +263,7 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapFormsToData(array($form), $car);
     }
 
-    public function testMapFormsToDataIgnoresUnmapped()
+    public function testMapFormsToDataIgnoresUnmapped(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -282,7 +282,7 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapFormsToData(array($form), $car);
     }
 
-    public function testMapFormsToDataIgnoresUnsubmittedForms()
+    public function testMapFormsToDataIgnoresUnsubmittedForms(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -300,7 +300,7 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapFormsToData(array($form), $car);
     }
 
-    public function testMapFormsToDataIgnoresEmptyData()
+    public function testMapFormsToDataIgnoresEmptyData(): void
     {
         $car = new \stdClass();
         $propertyPath = $this->getPropertyPath('engine');
@@ -317,7 +317,7 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapFormsToData(array($form), $car);
     }
 
-    public function testMapFormsToDataIgnoresUnsynchronized()
+    public function testMapFormsToDataIgnoresUnsynchronized(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -335,7 +335,7 @@ class PropertyPathMapperTest extends TestCase
         $this->mapper->mapFormsToData(array($form), $car);
     }
 
-    public function testMapFormsToDataIgnoresDisabled()
+    public function testMapFormsToDataIgnoresDisabled(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();

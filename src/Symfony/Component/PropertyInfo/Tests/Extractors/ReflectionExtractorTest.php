@@ -26,12 +26,12 @@ class ReflectionExtractorTest extends TestCase
      */
     private $extractor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extractor = new ReflectionExtractor();
     }
 
-    public function testGetProperties()
+    public function testGetProperties(): void
     {
         $this->assertSame(
             array(
@@ -61,7 +61,7 @@ class ReflectionExtractorTest extends TestCase
         );
     }
 
-    public function testGetPropertiesWithCustomPrefixes()
+    public function testGetPropertiesWithCustomPrefixes(): void
     {
         $customExtractor = new ReflectionExtractor(array('add', 'remove'), array('is', 'can'));
 
@@ -89,7 +89,7 @@ class ReflectionExtractorTest extends TestCase
         );
     }
 
-    public function testGetPropertiesWithNoPrefixes()
+    public function testGetPropertiesWithNoPrefixes(): void
     {
         $noPrefixExtractor = new ReflectionExtractor(array(), array(), array());
 
@@ -116,7 +116,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider typesProvider
      */
-    public function testExtractors($property, array $type = null)
+    public function testExtractors($property, array $type = null): void
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property, array()));
     }
@@ -139,7 +139,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider php7TypesProvider
      */
-    public function testExtractPhp7Type($property, array $type = null)
+    public function testExtractPhp7Type($property, array $type = null): void
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php7Dummy', $property, array()));
     }
@@ -157,7 +157,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider php71TypesProvider
      */
-    public function testExtractPhp71Type($property, array $type = null)
+    public function testExtractPhp71Type($property, array $type = null): void
     {
         $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy', $property, array()));
     }
@@ -176,7 +176,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider getReadableProperties
      */
-    public function testIsReadable($property, $expected)
+    public function testIsReadable($property, $expected): void
     {
         $this->assertSame(
             $expected,
@@ -206,7 +206,7 @@ class ReflectionExtractorTest extends TestCase
     /**
      * @dataProvider getWritableProperties
      */
-    public function testIsWritable($property, $expected)
+    public function testIsWritable($property, $expected): void
     {
         $this->assertSame(
             $expected,
@@ -232,7 +232,7 @@ class ReflectionExtractorTest extends TestCase
         );
     }
 
-    public function testSingularize()
+    public function testSingularize(): void
     {
         $this->assertTrue($this->extractor->isWritable(AdderRemoverDummy::class, 'analyses'));
         $this->assertTrue($this->extractor->isWritable(AdderRemoverDummy::class, 'feet'));

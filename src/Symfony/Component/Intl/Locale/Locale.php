@@ -52,7 +52,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function acceptFromHttp($header)
+    public static function acceptFromHttp(string $header)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -78,7 +78,6 @@ class Locale
      *
      * @param string $langtag      The language tag to check
      * @param string $locale       The language range to check against
-     * @param bool   $canonicalize
      *
      * @return string The corresponding locale code
      *
@@ -86,7 +85,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function filterMatches($langtag, $locale, $canonicalize = false)
+    public static function filterMatches(string $langtag, string $locale, bool $canonicalize = false)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -102,7 +101,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getAllVariants($locale)
+    public static function getAllVariants(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -114,7 +113,7 @@ class Locale
      *
      * @see http://www.php.net/manual/en/locale.getdefault.php
      */
-    public static function getDefault()
+    public static function getDefault(): string
     {
         return 'en';
     }
@@ -131,7 +130,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayLanguage($locale, $inLocale = null)
+    public static function getDisplayLanguage(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -148,7 +147,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayName($locale, $inLocale = null)
+    public static function getDisplayName(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -165,7 +164,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayRegion($locale, $inLocale = null)
+    public static function getDisplayRegion(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -182,7 +181,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayScript($locale, $inLocale = null)
+    public static function getDisplayScript(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -199,7 +198,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getDisplayVariant($locale, $inLocale = null)
+    public static function getDisplayVariant(string $locale, string $inLocale = null)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -215,7 +214,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getKeywords($locale)
+    public static function getKeywords(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -231,7 +230,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getPrimaryLanguage($locale)
+    public static function getPrimaryLanguage(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -247,7 +246,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getRegion($locale)
+    public static function getRegion(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -263,7 +262,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function getScript($locale)
+    public static function getScript(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -280,7 +279,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function lookup(array $langtag, $locale, $canonicalize = false, $default = null)
+    public static function lookup(array $langtag, string $locale, bool $canonicalize = false, string $default = null): void
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -296,7 +295,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function parseLocale($locale)
+    public static function parseLocale(string $locale)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -312,7 +311,7 @@ class Locale
      *
      * @throws MethodNotImplementedException
      */
-    public static function setDefault($locale)
+    public static function setDefault(string $locale): bool
     {
         if ('en' !== $locale) {
             throw new MethodNotImplementedException(__METHOD__);

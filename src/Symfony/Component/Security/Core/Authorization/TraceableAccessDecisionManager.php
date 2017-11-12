@@ -60,10 +60,7 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         return $result;
     }
 
-    /**
-     * @return string
-     */
-    public function getStrategy()
+    public function getStrategy(): string
     {
         // The $strategy property is misleading because it stores the name of its
         // method (e.g. 'decideAffirmative') instead of the original strategy name
@@ -74,15 +71,12 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @return iterable|VoterInterface[]
      */
-    public function getVoters()
+    public function getVoters(): iterable
     {
         return $this->voters;
     }
 
-    /**
-     * @return array
-     */
-    public function getDecisionLog()
+    public function getDecisionLog(): array
     {
         return $this->decisionLog;
     }

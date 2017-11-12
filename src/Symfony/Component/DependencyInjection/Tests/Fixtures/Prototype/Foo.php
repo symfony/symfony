@@ -8,7 +8,7 @@ class Foo
     {
     }
 
-    function setFoo(self $foo)
+    function setFoo(self $foo): void
     {
     }
 }

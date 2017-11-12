@@ -23,7 +23,7 @@ class ProcessHelperTest extends TestCase
     /**
      * @dataProvider provideCommandsAndOutput
      */
-    public function testVariousProcessRuns($expected, $cmd, $verbosity, $error)
+    public function testVariousProcessRuns($expected, $cmd, $verbosity, $error): void
     {
         $helper = new ProcessHelper();
         $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
@@ -32,14 +32,14 @@ class ProcessHelperTest extends TestCase
         $this->assertEquals($expected, $this->getOutput($output));
     }
 
-    public function testPassedCallbackIsExecuted()
+    public function testPassedCallbackIsExecuted(): void
     {
         $helper = new ProcessHelper();
         $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
         $output = $this->getOutputStream(StreamOutput::VERBOSITY_NORMAL);
 
         $executed = false;
-        $callback = function () use (&$executed) { $executed = true; };
+        $callback = function () use (&$executed): void { $executed = true; };
 
         $helper->run($output, 'php -r "echo 42;"', null, $callback);
         $this->assertTrue($executed);

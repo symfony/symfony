@@ -54,7 +54,7 @@ abstract class DoctrineType extends AbstractType
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public static function createChoiceLabel($choice)
+    public static function createChoiceLabel($choice): string
     {
         return (string) $choice;
     }
@@ -76,7 +76,7 @@ abstract class DoctrineType extends AbstractType
      * @internal This method is public to be usable as callback. It should not
      *           be used in user code.
      */
-    public static function createChoiceName($choice, $key, $value)
+    public static function createChoiceName($choice, $key, $value): string
     {
         return str_replace('-', '_', (string) $value);
     }
@@ -104,7 +104,7 @@ abstract class DoctrineType extends AbstractType
         $this->registry = $registry;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['multiple']) {
             $builder
@@ -114,7 +114,7 @@ abstract class DoctrineType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $choiceLoader = function (Options $options) {
             // Unless the choices are given explicitly, load them on demand
@@ -268,20 +268,17 @@ abstract class DoctrineType extends AbstractType
     /**
      * Return the default loader object.
      *
-     * @param ObjectManager $manager
-     * @param mixed         $queryBuilder
-     * @param string        $class
-     *
-     * @return EntityLoaderInterface
+     * @param mixed  $queryBuilder
+     * @param string $class
      */
-    abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class);
+    abstract public function getLoader(ObjectManager $manager, $queryBuilder, $class): EntityLoaderInterface;
 
     public function getParent()
     {
         return 'Symfony\Component\Form\Extension\Core\Type\ChoiceType';
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->choiceLoaders = array();
     }

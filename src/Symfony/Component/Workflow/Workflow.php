@@ -47,7 +47,7 @@ class Workflow
      *
      * @throws LogicException
      */
-    public function getMarking($subject)
+    public function getMarking($subject): Marking
     {
         $marking = $this->markingStore->getMarking($subject);
 
@@ -90,7 +90,7 @@ class Workflow
      *
      * @return bool true if the transition is enabled
      */
-    public function can($subject, $transitionName)
+    public function can($subject, $transitionName): bool
     {
         $transitions = $this->definition->getTransitions();
         $marking = $this->getMarking($subject);
@@ -123,7 +123,7 @@ class Workflow
      * @throws LogicException If the transition is not applicable
      * @throws LogicException If the transition does not exist
      */
-    public function apply($subject, $transitionName)
+    public function apply($subject, $transitionName): Marking
     {
         $transitions = $this->getEnabledTransitions($subject);
 
@@ -189,18 +189,12 @@ class Workflow
         return $this->name;
     }
 
-    /**
-     * @return Definition
-     */
-    public function getDefinition()
+    public function getDefinition(): Definition
     {
         return $this->definition;
     }
 
-    /**
-     * @return MarkingStoreInterface
-     */
-    public function getMarkingStore()
+    public function getMarkingStore(): MarkingStoreInterface
     {
         return $this->markingStore;
     }
@@ -222,8 +216,6 @@ class Workflow
 
     /**
      * @param object     $subject
-     * @param Marking    $marking
-     * @param Transition $transition
      *
      * @return bool|void boolean true if this transition is guarded, ie you cannot use it
      */
@@ -242,7 +234,7 @@ class Workflow
         return $event->isBlocked();
     }
 
-    private function leave($subject, Transition $transition, Marking $marking)
+    private function leave($subject, Transition $transition, Marking $marking): void
     {
         $places = $transition->getFroms();
 
@@ -262,7 +254,7 @@ class Workflow
         }
     }
 
-    private function transition($subject, Transition $transition, Marking $marking)
+    private function transition($subject, Transition $transition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -275,7 +267,7 @@ class Workflow
         $this->dispatcher->dispatch(sprintf('workflow.%s.transition.%s', $this->name, $transition->getName()), $event);
     }
 
-    private function enter($subject, Transition $transition, Marking $marking)
+    private function enter($subject, Transition $transition, Marking $marking): void
     {
         $places = $transition->getTos();
 
@@ -295,7 +287,7 @@ class Workflow
         }
     }
 
-    private function entered($subject, Transition $transition, Marking $marking)
+    private function entered($subject, Transition $transition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -311,7 +303,7 @@ class Workflow
         }
     }
 
-    private function completed($subject, Transition $transition, Marking $marking)
+    private function completed($subject, Transition $transition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;
@@ -324,7 +316,7 @@ class Workflow
         $this->dispatcher->dispatch(sprintf('workflow.%s.completed.%s', $this->name, $transition->getName()), $event);
     }
 
-    private function announce($subject, Transition $initialTransition, Marking $marking)
+    private function announce($subject, Transition $initialTransition, Marking $marking): void
     {
         if (null === $this->dispatcher) {
             return;

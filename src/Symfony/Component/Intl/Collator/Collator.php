@@ -86,11 +86,10 @@ class Collator
      *
      * @param string $locale The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      *
-     * @return self
      *
      * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      */
-    public static function create($locale)
+    public static function create(string $locale): self
     {
         return new self($locale);
     }
@@ -106,7 +105,7 @@ class Collator
      *
      * @return bool True on success or false on failure
      */
-    public function asort(&$array, $sortFlag = self::SORT_REGULAR)
+    public function asort(array &$array, int $sortFlag = self::SORT_REGULAR): bool
     {
         $intlToPlainFlagMap = array(
             self::SORT_REGULAR => \SORT_REGULAR,
@@ -134,7 +133,7 @@ class Collator
      *
      * @throws MethodNotImplementedException
      */
-    public function compare($str1, $str2)
+    public function compare(string $str1, string $str2)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -150,7 +149,7 @@ class Collator
      *
      * @throws MethodNotImplementedException
      */
-    public function getAttribute($attr)
+    public function getAttribute(int $attr)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -160,7 +159,7 @@ class Collator
      *
      * @return int The error code from last collator call
      */
-    public function getErrorCode()
+    public function getErrorCode(): int
     {
         return IntlGlobals::U_ZERO_ERROR;
     }
@@ -170,7 +169,7 @@ class Collator
      *
      * @return string The error message from last collator call
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): string
     {
         return 'U_ZERO_ERROR';
     }
@@ -183,7 +182,7 @@ class Collator
      * @return string The locale used to create the collator. Currently always
      *                returns "en".
      */
-    public function getLocale($type = Locale::ACTUAL_LOCALE)
+    public function getLocale(int $type = Locale::ACTUAL_LOCALE): string
     {
         return 'en';
     }
@@ -199,7 +198,7 @@ class Collator
      *
      * @throws MethodNotImplementedException
      */
-    public function getSortKey($string)
+    public function getSortKey(string $string)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -230,7 +229,7 @@ class Collator
      *
      * @throws MethodNotImplementedException
      */
-    public function setAttribute($attr, $val)
+    public function setAttribute(int $attr, int $val)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -252,7 +251,7 @@ class Collator
      *
      * @throws MethodNotImplementedException
      */
-    public function setStrength($strength)
+    public function setStrength(int $strength)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -268,7 +267,7 @@ class Collator
      *
      * @throws MethodNotImplementedException
      */
-    public function sortWithSortKeys(&$arr)
+    public function sortWithSortKeys(array &$arr)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -288,7 +287,7 @@ class Collator
      *
      * @throws MethodNotImplementedException
      */
-    public function sort(&$arr, $sortFlag = self::SORT_REGULAR)
+    public function sort(array &$arr, int $sortFlag = self::SORT_REGULAR)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }

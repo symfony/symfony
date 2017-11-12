@@ -33,7 +33,7 @@ class DateValidator extends ConstraintValidator
      *
      * @internal
      */
-    public static function checkDate($year, $month, $day)
+    public static function checkDate(int $year, int $month, int $day): bool
     {
         return checkdate($month, $day, $year);
     }
@@ -41,7 +41,7 @@ class DateValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof Date) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Date');

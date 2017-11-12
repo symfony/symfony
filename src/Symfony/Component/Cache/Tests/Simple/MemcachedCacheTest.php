@@ -24,7 +24,7 @@ class MemcachedCacheTest extends CacheTestCase
 
     protected static $client;
 
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         if (!MemcachedCache::isSupported()) {
             self::markTestSkipped('Extension memcached >=2.2.0 required.');
@@ -45,7 +45,7 @@ class MemcachedCacheTest extends CacheTestCase
         return new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $client = MemcachedCache::createConnection(array(), array(
             'libketama_compatible' => false,
@@ -67,7 +67,7 @@ class MemcachedCacheTest extends CacheTestCase
      * @expectedException \ErrorException
      * @expectedExceptionMessage constant(): Couldn't find constant Memcached::
      */
-    public function testBadOptions($name, $value)
+    public function testBadOptions($name, $value): void
     {
         MemcachedCache::createConnection(array(), array($name => $value));
     }
@@ -82,7 +82,7 @@ class MemcachedCacheTest extends CacheTestCase
         );
     }
 
-    public function testDefaultOptions()
+    public function testDefaultOptions(): void
     {
         $this->assertTrue(MemcachedCache::isSupported());
 
@@ -97,7 +97,7 @@ class MemcachedCacheTest extends CacheTestCase
      * @expectedException \Symfony\Component\Cache\Exception\CacheException
      * @expectedExceptionMessage MemcachedAdapter: "serializer" option must be "php" or "igbinary".
      */
-    public function testOptionSerializer()
+    public function testOptionSerializer(): void
     {
         if (!\Memcached::HAVE_JSON) {
             $this->markTestSkipped('Memcached::HAVE_JSON required');
@@ -109,7 +109,7 @@ class MemcachedCacheTest extends CacheTestCase
     /**
      * @dataProvider provideServersSetting
      */
-    public function testServersSetting($dsn, $host, $port)
+    public function testServersSetting($dsn, $host, $port): void
     {
         $client1 = MemcachedCache::createConnection($dsn);
         $client2 = MemcachedCache::createConnection(array($dsn));

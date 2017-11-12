@@ -28,7 +28,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  */
 class TraceableFirewallListenerTest extends TestCase
 {
-    public function testOnKernelRequestRecordsListeners()
+    public function testOnKernelRequestRecordsListeners(): void
     {
         $request = new Request();
         $event = new GetResponseEvent($this->getMockBuilder(HttpKernelInterface::class)->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);

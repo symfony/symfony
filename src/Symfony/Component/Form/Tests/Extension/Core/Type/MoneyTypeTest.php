@@ -17,7 +17,7 @@ class MoneyTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\MoneyType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // we test against different locales, so we need the full
         // implementation
@@ -26,7 +26,7 @@ class MoneyTypeTest extends BaseTypeTest
         parent::setUp();
     }
 
-    public function testPassMoneyPatternToView()
+    public function testPassMoneyPatternToView(): void
     {
         \Locale::setDefault('de_DE');
 
@@ -36,7 +36,7 @@ class MoneyTypeTest extends BaseTypeTest
         $this->assertSame('{{ widget }} €', $view->vars['money_pattern']);
     }
 
-    public function testMoneyPatternWorksForYen()
+    public function testMoneyPatternWorksForYen(): void
     {
         \Locale::setDefault('en_US');
 
@@ -47,7 +47,7 @@ class MoneyTypeTest extends BaseTypeTest
     }
 
     // https://github.com/symfony/symfony/issues/5458
-    public function testPassDifferentPatternsForDifferentCurrencies()
+    public function testPassDifferentPatternsForDifferentCurrencies(): void
     {
         \Locale::setDefault('de_DE');
 
@@ -58,7 +58,7 @@ class MoneyTypeTest extends BaseTypeTest
         $this->assertSame('{{ widget }} €', $view2->vars['money_pattern']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }

@@ -19,7 +19,7 @@ class BaseDateTimeTransformerTest extends TestCase
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      * @expectedExceptionMessage this_timezone_does_not_exist
      */
-    public function testConstructFailsIfInputTimezoneIsInvalid()
+    public function testConstructFailsIfInputTimezoneIsInvalid(): void
     {
         $this->getMockBuilder('Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer')->setConstructorArgs(array('this_timezone_does_not_exist'))->getMock();
     }
@@ -28,7 +28,7 @@ class BaseDateTimeTransformerTest extends TestCase
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      * @expectedExceptionMessage that_timezone_does_not_exist
      */
-    public function testConstructFailsIfOutputTimezoneIsInvalid()
+    public function testConstructFailsIfOutputTimezoneIsInvalid(): void
     {
         $this->getMockBuilder('Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer')->setConstructorArgs(array(null, 'that_timezone_does_not_exist'))->getMock();
     }

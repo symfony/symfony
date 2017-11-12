@@ -33,7 +33,7 @@ class SimpleFormFactory extends FormLoginFactory
         return 'simple-form';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         parent::addConfiguration($node);
 

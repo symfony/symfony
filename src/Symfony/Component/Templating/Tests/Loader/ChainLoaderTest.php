@@ -21,27 +21,27 @@ class ChainLoaderTest extends TestCase
     protected $loader1;
     protected $loader2;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $fixturesPath = realpath(__DIR__.'/../Fixtures/');
         $this->loader1 = new FilesystemLoader($fixturesPath.'/null/%name%');
         $this->loader2 = new FilesystemLoader($fixturesPath.'/templates/%name%');
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $loader = new ProjectTemplateLoader1(array($this->loader1, $this->loader2));
         $this->assertEquals(array($this->loader1, $this->loader2), $loader->getLoaders(), '__construct() takes an array of template loaders as its second argument');
     }
 
-    public function testAddLoader()
+    public function testAddLoader(): void
     {
         $loader = new ProjectTemplateLoader1(array($this->loader1));
         $loader->addLoader($this->loader2);
         $this->assertEquals(array($this->loader1, $this->loader2), $loader->getLoaders(), '->addLoader() adds a template loader at the end of the loaders');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new ProjectTemplateLoader1(array($this->loader1, $this->loader2));
         $this->assertFalse($loader->load(new TemplateReference('bar', 'php')), '->load() returns false if the template is not found');

@@ -39,7 +39,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         return new ImageValidator();
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -50,28 +50,28 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->imageCorrupted = __DIR__.'/Fixtures/test_corrupted.gif';
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Image());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Image());
 
         $this->assertNoViolation();
     }
 
-    public function testValidImage()
+    public function testValidImage(): void
     {
         $this->validator->validate($this->image, new Image());
 
         $this->assertNoViolation();
     }
 
-    public function testFileNotFound()
+    public function testFileNotFound(): void
     {
         // Check that the logic from FileValidator still works
         $constraint = new Image(array(
@@ -86,7 +86,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidSize()
+    public function testValidSize(): void
     {
         $constraint = new Image(array(
             'minWidth' => 1,
@@ -100,7 +100,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testWidthTooSmall()
+    public function testWidthTooSmall(): void
     {
         $constraint = new Image(array(
             'minWidth' => 3,
@@ -116,7 +116,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testWidthTooBig()
+    public function testWidthTooBig(): void
     {
         $constraint = new Image(array(
             'maxWidth' => 1,
@@ -132,7 +132,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testHeightTooSmall()
+    public function testHeightTooSmall(): void
     {
         $constraint = new Image(array(
             'minHeight' => 3,
@@ -148,7 +148,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testHeightTooBig()
+    public function testHeightTooBig(): void
     {
         $constraint = new Image(array(
             'maxHeight' => 1,
@@ -164,7 +164,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testPixelsTooFew()
+    public function testPixelsTooFew(): void
     {
         $constraint = new Image(array(
             'minPixels' => 5,
@@ -182,7 +182,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testPixelsTooMany()
+    public function testPixelsTooMany(): void
     {
         $constraint = new Image(array(
             'maxPixels' => 3,
@@ -203,7 +203,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidMinWidth()
+    public function testInvalidMinWidth(): void
     {
         $constraint = new Image(array(
             'minWidth' => '1abc',
@@ -215,7 +215,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidMaxWidth()
+    public function testInvalidMaxWidth(): void
     {
         $constraint = new Image(array(
             'maxWidth' => '1abc',
@@ -227,7 +227,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidMinHeight()
+    public function testInvalidMinHeight(): void
     {
         $constraint = new Image(array(
             'minHeight' => '1abc',
@@ -239,7 +239,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidMaxHeight()
+    public function testInvalidMaxHeight(): void
     {
         $constraint = new Image(array(
             'maxHeight' => '1abc',
@@ -251,7 +251,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidMinPixels()
+    public function testInvalidMinPixels(): void
     {
         $constraint = new Image(array(
             'minPixels' => '1abc',
@@ -263,7 +263,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidMaxPixels()
+    public function testInvalidMaxPixels(): void
     {
         $constraint = new Image(array(
             'maxPixels' => '1abc',
@@ -272,7 +272,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($this->image, $constraint);
     }
 
-    public function testRatioTooSmall()
+    public function testRatioTooSmall(): void
     {
         $constraint = new Image(array(
             'minRatio' => 2,
@@ -288,7 +288,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testRatioTooBig()
+    public function testRatioTooBig(): void
     {
         $constraint = new Image(array(
             'maxRatio' => 0.5,
@@ -304,7 +304,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testMaxRatioUsesTwoDecimalsOnly()
+    public function testMaxRatioUsesTwoDecimalsOnly(): void
     {
         $constraint = new Image(array(
             'maxRatio' => 1.33,
@@ -318,7 +318,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidMinRatio()
+    public function testInvalidMinRatio(): void
     {
         $constraint = new Image(array(
             'minRatio' => '1abc',
@@ -330,7 +330,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidMaxRatio()
+    public function testInvalidMaxRatio(): void
     {
         $constraint = new Image(array(
             'maxRatio' => '1abc',
@@ -339,7 +339,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($this->image, $constraint);
     }
 
-    public function testSquareNotAllowed()
+    public function testSquareNotAllowed(): void
     {
         $constraint = new Image(array(
             'allowSquare' => false,
@@ -355,7 +355,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testLandscapeNotAllowed()
+    public function testLandscapeNotAllowed(): void
     {
         $constraint = new Image(array(
             'allowLandscape' => false,
@@ -371,7 +371,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testPortraitNotAllowed()
+    public function testPortraitNotAllowed(): void
     {
         $constraint = new Image(array(
             'allowPortrait' => false,
@@ -387,7 +387,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testCorrupted()
+    public function testCorrupted(): void
     {
         if (!function_exists('imagecreatefromstring')) {
             $this->markTestSkipped('This test require GD extension');

@@ -38,7 +38,6 @@ class LogoutListener implements ListenerInterface
     private $csrfTokenManager;
 
     /**
-     * @param TokenStorageInterface          $tokenStorage
      * @param HttpUtils                      $httpUtils        An HttpUtils instance
      * @param LogoutSuccessHandlerInterface  $successHandler   A LogoutSuccessHandlerInterface instance
      * @param array                          $options          An array of options to process a logout attempt
@@ -58,7 +57,7 @@ class LogoutListener implements ListenerInterface
         $this->handlers = array();
     }
 
-    public function addHandler(LogoutHandlerInterface $handler)
+    public function addHandler(LogoutHandlerInterface $handler): void
     {
         $this->handlers[] = $handler;
     }
@@ -72,7 +71,7 @@ class LogoutListener implements ListenerInterface
      * @throws LogoutException   if the CSRF token is invalid
      * @throws \RuntimeException if the LogoutSuccessHandlerInterface instance does not return a response
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -111,10 +110,8 @@ class LogoutListener implements ListenerInterface
      * The default implementation only processed requests to a specific path,
      * but a subclass could change this to logout requests where
      * certain parameters is present.
-     *
-     * @return bool
      */
-    protected function requiresLogout(Request $request)
+    protected function requiresLogout(Request $request): bool
     {
         return isset($this->options['logout_path']) && $this->httpUtils->checkRequestPath($request, $this->options['logout_path']);
     }

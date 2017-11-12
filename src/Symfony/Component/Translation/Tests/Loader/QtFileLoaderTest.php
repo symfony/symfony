@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class QtFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/resources.ts';
@@ -31,7 +31,7 @@ class QtFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.ts';
@@ -41,7 +41,7 @@ class QtFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
-    public function testLoadNonLocalResource()
+    public function testLoadNonLocalResource(): void
     {
         $loader = new QtFileLoader();
         $resource = 'http://domain1.com/resources.ts';
@@ -51,14 +51,14 @@ class QtFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
-    public function testLoadInvalidResource()
+    public function testLoadInvalidResource(): void
     {
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/invalid-xml-resources.xlf';
         $loader->load($resource, 'en', 'domain1');
     }
 
-    public function testLoadEmptyResource()
+    public function testLoadEmptyResource(): void
     {
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/empty.xlf';

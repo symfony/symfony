@@ -24,7 +24,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     private static $domain = 'domain';
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
-    public function testDefaultDomainAssignment(Node $node)
+    public function testDefaultDomainAssignment(Node $node): void
     {
         $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $visitor = new TranslationDefaultDomainNodeVisitor();
@@ -50,7 +50,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     }
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
-    public function testNewModuleWithoutDefaultDomainTag(Node $node)
+    public function testNewModuleWithoutDefaultDomainTag(Node $node): void
     {
         $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $visitor = new TranslationDefaultDomainNodeVisitor();

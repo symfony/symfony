@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
  */
 class SerializerPassTest extends TestCase
 {
-    public function testThrowExceptionWhenNoNormalizers()
+    public function testThrowExceptionWhenNoNormalizers(): void
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds'))->getMock();
 
@@ -43,7 +43,7 @@ class SerializerPassTest extends TestCase
         $serializerPass->process($container);
     }
 
-    public function testThrowExceptionWhenNoEncoders()
+    public function testThrowExceptionWhenNoEncoders(): void
     {
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition'))->getMock();
@@ -70,7 +70,7 @@ class SerializerPassTest extends TestCase
         $serializerPass->process($container);
     }
 
-    public function testServicesAreOrderedAccordingToPriority()
+    public function testServicesAreOrderedAccordingToPriority(): void
     {
         $container = new ContainerBuilder();
 

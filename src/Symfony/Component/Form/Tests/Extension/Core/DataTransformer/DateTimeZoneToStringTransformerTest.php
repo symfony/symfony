@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class DateTimeZoneToStringTransformerTest extends TestCase
 {
-    public function testSingle()
+    public function testSingle(): void
     {
         $transformer = new DateTimeZoneToStringTransformer();
 
@@ -27,7 +27,7 @@ class DateTimeZoneToStringTransformerTest extends TestCase
         $this->assertEquals(new \DateTimeZone('Europe/Amsterdam'), $transformer->reverseTransform('Europe/Amsterdam'));
     }
 
-    public function testMultiple()
+    public function testMultiple(): void
     {
         $transformer = new DateTimeZoneToStringTransformer(true);
 
@@ -41,7 +41,7 @@ class DateTimeZoneToStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testInvalidTimezone()
+    public function testInvalidTimezone(): void
     {
         (new DateTimeZoneToStringTransformer())->transform(1);
     }
@@ -49,7 +49,7 @@ class DateTimeZoneToStringTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testUnknownTimezone()
+    public function testUnknownTimezone(): void
     {
         (new DateTimeZoneToStringTransformer(true))->reverseTransform(array('Foo/Bar'));
     }

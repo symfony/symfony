@@ -19,7 +19,7 @@ class IpUtilsTest extends TestCase
     /**
      * @dataProvider getIpv4Data
      */
-    public function testIpv4($matches, $remoteAddr, $cidr)
+    public function testIpv4($matches, $remoteAddr, $cidr): void
     {
         $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
     }
@@ -45,7 +45,7 @@ class IpUtilsTest extends TestCase
     /**
      * @dataProvider getIpv6Data
      */
-    public function testIpv6($matches, $remoteAddr, $cidr)
+    public function testIpv6($matches, $remoteAddr, $cidr): void
     {
         if (!defined('AF_INET6')) {
             $this->markTestSkipped('Only works when PHP is compiled without the option "disable-ipv6".');
@@ -74,7 +74,7 @@ class IpUtilsTest extends TestCase
      * @expectedException \RuntimeException
      * @requires extension sockets
      */
-    public function testAnIpv6WithOptionDisabledIpv6()
+    public function testAnIpv6WithOptionDisabledIpv6(): void
     {
         if (defined('AF_INET6')) {
             $this->markTestSkipped('Only works when PHP is compiled with the option "disable-ipv6".');
@@ -86,7 +86,7 @@ class IpUtilsTest extends TestCase
     /**
      * @dataProvider invalidIpAddressData
      */
-    public function testInvalidIpAddressesDoNotMatch($requestIp, $proxyIp)
+    public function testInvalidIpAddressesDoNotMatch($requestIp, $proxyIp): void
     {
         $this->assertFalse(IpUtils::checkIp4($requestIp, $proxyIp));
     }

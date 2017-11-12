@@ -241,7 +241,7 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->caches as $cache) {
             if ($cache instanceof ResettableInterface) {

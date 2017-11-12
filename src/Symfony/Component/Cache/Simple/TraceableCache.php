@@ -198,7 +198,7 @@ class TraceableCache implements CacheInterface, PruneableInterface, ResettableIn
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         if (!$this->pool instanceof ResettableInterface) {
             return;

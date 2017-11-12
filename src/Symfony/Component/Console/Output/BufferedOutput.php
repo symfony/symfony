@@ -20,10 +20,8 @@ class BufferedOutput extends Output
 
     /**
      * Empties buffer and returns its content.
-     *
-     * @return string
      */
-    public function fetch()
+    public function fetch(): string
     {
         $content = $this->buffer;
         $this->buffer = '';
@@ -34,7 +32,7 @@ class BufferedOutput extends Output
     /**
      * {@inheritdoc}
      */
-    protected function doWrite($message, $newline)
+    protected function doWrite($message, $newline): void
     {
         $this->buffer .= $message;
 

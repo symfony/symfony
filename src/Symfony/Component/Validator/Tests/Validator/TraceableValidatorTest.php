@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TraceableValidatorTest extends TestCase
 {
-    public function testValidate()
+    public function testValidate(): void
     {
         $originalValidator = $this->createMock(ValidatorInterface::class);
         $violations = new ConstraintViolationList(array(
@@ -68,7 +68,7 @@ class TraceableValidatorTest extends TestCase
         $this->assertCount(2, $collectedData);
     }
 
-    public function testForwardsToOriginalValidator()
+    public function testForwardsToOriginalValidator(): void
     {
         $originalValidator = $this->createMock(ValidatorInterface::class);
         $validator = new TraceableValidator($originalValidator);

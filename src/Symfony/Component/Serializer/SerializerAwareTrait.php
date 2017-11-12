@@ -28,7 +28,7 @@ trait SerializerAwareTrait
      *
      * @param SerializerInterface $serializer A SerializerInterface instance
      */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         $this->serializer = $serializer;
     }

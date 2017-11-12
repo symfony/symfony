@@ -21,7 +21,7 @@ class GuardListenerTest extends TestCase
     private $validator;
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configuration = array(
             'test_is_granted' => 'is_granted("something")',
@@ -38,14 +38,14 @@ class GuardListenerTest extends TestCase
         $this->listener = new GuardListener($configuration, $expressionLanguage, $tokenStorage, $this->authenticationChecker, $trustResolver, null, $this->validator);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->authenticationChecker = null;
         $this->validator = null;
         $this->listener = null;
     }
 
-    public function testWithNotSupportedEvent()
+    public function testWithNotSupportedEvent(): void
     {
         $event = $this->createEvent();
         $this->configureAuthenticationChecker(false);
@@ -56,7 +56,7 @@ class GuardListenerTest extends TestCase
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testWithSecuritySupportedEventAndReject()
+    public function testWithSecuritySupportedEventAndReject(): void
     {
         $event = $this->createEvent();
         $this->configureAuthenticationChecker(true, false);
@@ -66,7 +66,7 @@ class GuardListenerTest extends TestCase
         $this->assertTrue($event->isBlocked());
     }
 
-    public function testWithSecuritySupportedEventAndAccept()
+    public function testWithSecuritySupportedEventAndAccept(): void
     {
         $event = $this->createEvent();
         $this->configureAuthenticationChecker(true, true);
@@ -76,7 +76,7 @@ class GuardListenerTest extends TestCase
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testWithValidatorSupportedEventAndReject()
+    public function testWithValidatorSupportedEventAndReject(): void
     {
         $event = $this->createEvent();
         $this->configureValidator(true, false);
@@ -86,7 +86,7 @@ class GuardListenerTest extends TestCase
         $this->assertTrue($event->isBlocked());
     }
 
-    public function testWithValidatorSupportedEventAndAccept()
+    public function testWithValidatorSupportedEventAndAccept(): void
     {
         $event = $this->createEvent();
         $this->configureValidator(true, true);
@@ -105,7 +105,7 @@ class GuardListenerTest extends TestCase
         return new GuardEvent($subject, $subject->marking, $transition);
     }
 
-    private function configureAuthenticationChecker($isUsed, $granted = true)
+    private function configureAuthenticationChecker($isUsed, $granted = true): void
     {
         if (!$isUsed) {
             $this->authenticationChecker
@@ -123,7 +123,7 @@ class GuardListenerTest extends TestCase
         ;
     }
 
-    private function configureValidator($isUsed, $valid = true)
+    private function configureValidator($isUsed, $valid = true): void
     {
         if (!$isUsed) {
             $this->validator

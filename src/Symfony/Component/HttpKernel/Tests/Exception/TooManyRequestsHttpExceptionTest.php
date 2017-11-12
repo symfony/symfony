@@ -6,13 +6,13 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class TooManyRequestsHttpExceptionTest extends HttpExceptionTest
 {
-    public function testHeadersDefaultRertyAfter()
+    public function testHeadersDefaultRertyAfter(): void
     {
         $exception = new TooManyRequestsHttpException(10);
         $this->assertSame(array('Retry-After' => 10), $exception->getHeaders());
     }
 
-    public function testWithHeaderConstruct()
+    public function testWithHeaderConstruct(): void
     {
         $headers = array(
             'Cache-Control' => 'public, s-maxage=69',
@@ -28,7 +28,7 @@ class TooManyRequestsHttpExceptionTest extends HttpExceptionTest
     /**
      * @dataProvider headerDataProvider
      */
-    public function testHeadersSetter($headers)
+    public function testHeadersSetter($headers): void
     {
         $exception = new TooManyRequestsHttpException(10);
         $exception->setHeaders($headers);

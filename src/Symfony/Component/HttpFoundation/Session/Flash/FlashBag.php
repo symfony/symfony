@@ -38,7 +38,7 @@ class FlashBag implements FlashBagInterface
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -46,7 +46,7 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function initialize(array &$flashes)
+    public function initialize(array &$flashes): void
     {
         $this->flashes = &$flashes;
     }
@@ -54,7 +54,7 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function add($type, $message)
+    public function add($type, $message): void
     {
         $this->flashes[$type][] = $message;
     }
@@ -105,7 +105,7 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function set($type, $messages)
+    public function set($type, $messages): void
     {
         $this->flashes[$type] = (array) $messages;
     }
@@ -113,7 +113,7 @@ class FlashBag implements FlashBagInterface
     /**
      * {@inheritdoc}
      */
-    public function setAll(array $messages)
+    public function setAll(array $messages): void
     {
         $this->flashes = $messages;
     }

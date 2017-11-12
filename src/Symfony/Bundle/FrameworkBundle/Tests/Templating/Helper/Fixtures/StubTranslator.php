@@ -25,11 +25,11 @@ class StubTranslator implements TranslatorInterface
         return '[trans]'.$id.'[/trans]';
     }
 
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
     }
 
-    public function getLocale()
+    public function getLocale(): void
     {
     }
 }

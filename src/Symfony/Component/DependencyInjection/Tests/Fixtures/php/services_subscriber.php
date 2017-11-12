@@ -31,13 +31,13 @@ class ProjectServiceContainer extends Container
         $this->aliases = array();
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->privates = array();
         parent::reset();
     }
 
-    public function compile()
+    public function compile(): void
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
@@ -62,7 +62,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
      */
-    protected function getTestServiceSubscriberService()
+    protected function getTestServiceSubscriberService(): \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
     {
         return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber();
     }
@@ -72,7 +72,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
      */
-    protected function getFooServiceService()
+    protected function getFooServiceService(): \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber
     {
         return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber(new \Symfony\Component\DependencyInjection\ServiceLocator(array('Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => function (): ?\Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition {
             return ($this->privates['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] ?? $this->privates['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition());

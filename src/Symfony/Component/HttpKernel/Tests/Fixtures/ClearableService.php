@@ -6,7 +6,7 @@ class ClearableService
 {
     public static $counter = 0;
 
-    public function clear()
+    public function clear(): void
     {
         ++self::$counter;
     }

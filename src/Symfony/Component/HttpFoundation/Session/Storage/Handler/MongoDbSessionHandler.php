@@ -181,7 +181,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     /**
      * @return \MongoCollection
      */
-    private function getCollection()
+    private function getCollection(): \MongoCollection
     {
         if (null === $this->collection) {
             $this->collection = $this->mongo->selectCollection($this->options['database'], $this->options['collection']);
@@ -193,7 +193,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     /**
      * @return \MongoDB\Client
      */
-    protected function getMongo()
+    protected function getMongo(): \MongoDB\Client
     {
         return $this->mongo;
     }

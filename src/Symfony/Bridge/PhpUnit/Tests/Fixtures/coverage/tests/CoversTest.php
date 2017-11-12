@@ -16,7 +16,7 @@ class CoversTest extends TestCase
     /**
      * @covers \DateTime
      */
-    public function test()
+    public function test(): void
     {
         $this->assertTrue(true);
     }

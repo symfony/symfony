@@ -9,13 +9,13 @@ class GeneratorDemo
         yield 1;
     }
 
-    public function baz()
+    public function baz(): void
     {
         yield from bar();
     }
 }
 
-function bar()
+function bar(): void
 {
     yield from GeneratorDemo::foo();
 }

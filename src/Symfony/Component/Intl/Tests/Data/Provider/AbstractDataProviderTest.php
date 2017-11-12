@@ -667,7 +667,7 @@ abstract class AbstractDataProviderTest extends TestCase
 
     private static $rootLocales;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         Locale::setDefault('en');
         Locale::setDefaultFallback('en');
@@ -720,10 +720,7 @@ abstract class AbstractDataProviderTest extends TestCase
         return self::$rootLocales;
     }
 
-    /**
-     * @return BundleEntryReader
-     */
-    protected function createEntryReader()
+    protected function createEntryReader(): BundleEntryReader
     {
         $entryReader = new BundleEntryReader($this->createBundleReader());
         $entryReader->setLocaleAliases($this->getLocaleAliases());
@@ -731,8 +728,5 @@ abstract class AbstractDataProviderTest extends TestCase
         return $entryReader;
     }
 
-    /**
-     * @return BundleReaderInterface
-     */
-    abstract protected function createBundleReader();
+    abstract protected function createBundleReader(): BundleReaderInterface;
 }

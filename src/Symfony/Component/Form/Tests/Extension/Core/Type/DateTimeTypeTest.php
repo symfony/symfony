@@ -17,14 +17,14 @@ class DateTimeTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\DateTimeType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         \Locale::setDefault('en');
 
         parent::setUp();
     }
 
-    public function testSubmitDateTime()
+    public function testSubmitDateTime(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
@@ -52,7 +52,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertDateTimeEquals($dateTime, $form->getData());
     }
 
-    public function testSubmitString()
+    public function testSubmitString(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
@@ -78,7 +78,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertEquals('2010-06-02 03:04:00', $form->getData());
     }
 
-    public function testSubmitTimestamp()
+    public function testSubmitTimestamp(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
@@ -106,7 +106,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertEquals($dateTime->format('U'), $form->getData());
     }
 
-    public function testSubmitWithoutMinutes()
+    public function testSubmitWithoutMinutes(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
@@ -136,7 +136,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:00:00 UTC'), $form->getData());
     }
 
-    public function testSubmitWithSeconds()
+    public function testSubmitWithSeconds(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
@@ -168,7 +168,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $form->getData());
     }
 
-    public function testSubmitDifferentTimezones()
+    public function testSubmitDifferentTimezones(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'America/New_York',
@@ -200,7 +200,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertEquals($dateTime->format('Y-m-d H:i:s'), $form->getData());
     }
 
-    public function testSubmitDifferentTimezonesDateTime()
+    public function testSubmitDifferentTimezonesDateTime(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'America/New_York',
@@ -219,7 +219,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
     }
 
-    public function testSubmitStringSingleText()
+    public function testSubmitStringSingleText(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
@@ -234,7 +234,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertEquals('2010-06-02T03:04:00Z', $form->getViewData());
     }
 
-    public function testSubmitStringSingleTextWithSeconds()
+    public function testSubmitStringSingleTextWithSeconds(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'model_timezone' => 'UTC',
@@ -250,7 +250,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertEquals('2010-06-02T03:04:05Z', $form->getViewData());
     }
 
-    public function testSubmitDifferentPattern()
+    public function testSubmitDifferentPattern(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'date_format' => 'MM*yyyy*dd',
@@ -269,14 +269,14 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertDateTimeEquals($dateTime, $form->getData());
     }
 
-    public function testInitializeWithDateTime()
+    public function testInitializeWithDateTime(): void
     {
         // Throws an exception if "data_class" option is not explicitly set
         // to null in the type
         $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $this->factory->create(static::TESTED_TYPE, new \DateTime()));
     }
 
-    public function testSingleTextWidgetShouldUseTheRightInputType()
+    public function testSingleTextWidgetShouldUseTheRightInputType(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
@@ -286,7 +286,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertEquals('datetime', $view->vars['type']);
     }
 
-    public function testPassDefaultPlaceholderToViewIfNotRequired()
+    public function testPassDefaultPlaceholderToViewIfNotRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => false,
@@ -302,7 +302,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('', $view['time']['second']->vars['placeholder']);
     }
 
-    public function testPassNoPlaceholderToViewIfRequired()
+    public function testPassNoPlaceholderToViewIfRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => true,
@@ -318,7 +318,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertNull($view['time']['second']->vars['placeholder']);
     }
 
-    public function testPassPlaceholderAsString()
+    public function testPassPlaceholderAsString(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'placeholder' => 'Empty',
@@ -334,7 +334,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('Empty', $view['time']['second']->vars['placeholder']);
     }
 
-    public function testPassPlaceholderAsArray()
+    public function testPassPlaceholderAsArray(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'placeholder' => array(
@@ -357,7 +357,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('Empty second', $view['time']['second']->vars['placeholder']);
     }
 
-    public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
+    public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => false,
@@ -379,7 +379,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('Empty second', $view['time']['second']->vars['placeholder']);
     }
 
-    public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
+    public function testPassPlaceholderAsPartialArrayAddNullIfRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => true,
@@ -401,7 +401,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('Empty second', $view['time']['second']->vars['placeholder']);
     }
 
-    public function testPassHtml5TypeIfSingleTextAndHtml5Format()
+    public function testPassHtml5TypeIfSingleTextAndHtml5Format(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
@@ -411,7 +411,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('datetime', $view->vars['type']);
     }
 
-    public function testDontPassHtml5TypeIfHtml5NotAllowed()
+    public function testDontPassHtml5TypeIfHtml5NotAllowed(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
@@ -422,7 +422,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertFalse(isset($view->vars['type']));
     }
 
-    public function testDontPassHtml5TypeIfNotHtml5Format()
+    public function testDontPassHtml5TypeIfNotHtml5Format(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',
@@ -433,7 +433,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertFalse(isset($view->vars['type']));
     }
 
-    public function testDontPassHtml5TypeIfNotSingleText()
+    public function testDontPassHtml5TypeIfNotSingleText(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'text',
@@ -443,7 +443,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertFalse(isset($view->vars['type']));
     }
 
-    public function testDateTypeChoiceErrorsBubbleUp()
+    public function testDateTypeChoiceErrorsBubbleUp(): void
     {
         $error = new FormError('Invalid!');
         $form = $this->factory->create(static::TESTED_TYPE, null);
@@ -454,7 +454,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
-    public function testDateTypeSingleTextErrorsBubbleUp()
+    public function testDateTypeSingleTextErrorsBubbleUp(): void
     {
         $error = new FormError('Invalid!');
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -467,7 +467,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
-    public function testTimeTypeChoiceErrorsBubbleUp()
+    public function testTimeTypeChoiceErrorsBubbleUp(): void
     {
         $error = new FormError('Invalid!');
         $form = $this->factory->create(static::TESTED_TYPE, null);
@@ -478,7 +478,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
-    public function testTimeTypeSingleTextErrorsBubbleUp()
+    public function testTimeTypeSingleTextErrorsBubbleUp(): void
     {
         $error = new FormError('Invalid!');
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -491,7 +491,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
-    public function testPassDefaultChoiceTranslationDomain()
+    public function testPassDefaultChoiceTranslationDomain(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'with_seconds' => true,
@@ -507,7 +507,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertFalse($view['time']['second']->vars['choice_translation_domain']);
     }
 
-    public function testPassChoiceTranslationDomainAsString()
+    public function testPassChoiceTranslationDomainAsString(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'choice_translation_domain' => 'messages',
@@ -523,7 +523,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('messages', $view['time']['second']->vars['choice_translation_domain']);
     }
 
-    public function testPassChoiceTranslationDomainAsArray()
+    public function testPassChoiceTranslationDomainAsArray(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'choice_translation_domain' => array(
@@ -544,7 +544,7 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertSame('test', $view['time']['second']->vars['choice_translation_domain']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, array(
             // View data is an array of choice values array
@@ -553,7 +553,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ));
     }
 
-    public function testSubmitNullWithText()
+    public function testSubmitNullWithText(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'text',
@@ -569,7 +569,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ), $form->getViewData());
     }
 
-    public function testSubmitNullWithSingleText()
+    public function testSubmitNullWithSingleText(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'widget' => 'single_text',

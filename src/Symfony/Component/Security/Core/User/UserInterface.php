@@ -59,7 +59,7 @@ interface UserInterface
      *
      * @return string The password
      */
-    public function getPassword();
+    public function getPassword(): string;
 
     /**
      * Returns the salt that was originally used to encode the password.
@@ -68,14 +68,14 @@ interface UserInterface
      *
      * @return string|null The salt
      */
-    public function getSalt();
+    public function getSalt(): ?string;
 
     /**
      * Returns the username used to authenticate the user.
      *
      * @return string The username
      */
-    public function getUsername();
+    public function getUsername(): string;
 
     /**
      * Removes sensitive data from the user.
@@ -83,5 +83,5 @@ interface UserInterface
      * This is important if, at any given point, sensitive information like
      * the plain-text password is stored on this object.
      */
-    public function eraseCredentials();
+    public function eraseCredentials(): void;
 }

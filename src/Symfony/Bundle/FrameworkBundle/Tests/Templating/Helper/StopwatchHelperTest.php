@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper;
 
 class StopwatchHelperTest extends TestCase
 {
-    public function testDevEnvironment()
+    public function testDevEnvironment(): void
     {
         $stopwatch = $this->getMockBuilder('Symfony\Component\Stopwatch\Stopwatch')->getMock();
         $stopwatch->expects($this->once())
@@ -27,7 +27,7 @@ class StopwatchHelperTest extends TestCase
         $helper->start('foo');
     }
 
-    public function testProdEnvironment()
+    public function testProdEnvironment(): void
     {
         $helper = new StopwatchHelper(null);
         $helper->start('foo');

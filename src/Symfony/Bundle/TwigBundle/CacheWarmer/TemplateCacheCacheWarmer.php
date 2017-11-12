@@ -54,7 +54,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscribe
      *
      * @param string $cacheDir The cache directory
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir): void
     {
         if (null === $this->finder) {
             return;
@@ -86,7 +86,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscribe
      *
      * @return bool always true
      */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return true;
     }
@@ -109,7 +109,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface, ServiceSubscribe
      *
      * @return array An array of templates of type TemplateReferenceInterface
      */
-    private function findTemplatesInFolder($namespace, $dir)
+    private function findTemplatesInFolder(string $namespace, string $dir): array
     {
         if (!is_dir($dir)) {
             return array();

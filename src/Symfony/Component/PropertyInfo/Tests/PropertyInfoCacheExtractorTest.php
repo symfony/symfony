@@ -19,44 +19,44 @@ use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
  */
 class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->propertyInfo = new PropertyInfoCacheExtractor($this->propertyInfo, new ArrayAdapter());
     }
 
-    public function testGetShortDescription()
+    public function testGetShortDescription(): void
     {
         parent::testGetShortDescription();
         parent::testGetShortDescription();
     }
 
-    public function testGetLongDescription()
+    public function testGetLongDescription(): void
     {
         parent::testGetLongDescription();
         parent::testGetLongDescription();
     }
 
-    public function testGetTypes()
+    public function testGetTypes(): void
     {
         parent::testGetTypes();
         parent::testGetTypes();
     }
 
-    public function testIsReadable()
+    public function testIsReadable(): void
     {
         parent::testIsReadable();
         parent::testIsReadable();
     }
 
-    public function testIsWritable()
+    public function testIsWritable(): void
     {
         parent::testIsWritable();
         parent::testIsWritable();
     }
 
-    public function testGetProperties()
+    public function testGetProperties(): void
     {
         parent::testGetProperties();
         parent::testGetProperties();

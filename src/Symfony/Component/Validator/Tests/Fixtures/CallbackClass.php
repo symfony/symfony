@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 class CallbackClass
 {
-    public static function callback($object, ExecutionContextInterface $context)
+    public static function callback($object, ExecutionContextInterface $context): void
     {
     }
 }

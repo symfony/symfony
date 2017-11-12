@@ -26,7 +26,7 @@ class DoctrineExtensionTest extends TestCase
      */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class DoctrineExtensionTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testFixManagersAutoMappingsWithTwoAutomappings()
+    public function testFixManagersAutoMappingsWithTwoAutomappings(): void
     {
         $emConfigs = array(
             'em1' => array(
@@ -145,7 +145,7 @@ class DoctrineExtensionTest extends TestCase
     /**
      * @dataProvider getAutomappingData
      */
-    public function testFixManagersAutoMappings(array $originalEm1, array $originalEm2, array $expectedEm1, array $expectedEm2)
+    public function testFixManagersAutoMappings(array $originalEm1, array $originalEm2, array $expectedEm1, array $expectedEm2): void
     {
         $emConfigs = array(
             'em1' => $originalEm1,
@@ -189,7 +189,7 @@ class DoctrineExtensionTest extends TestCase
     /**
      * @dataProvider providerBasicDrivers
      */
-    public function testLoadBasicCacheDriver(string $class, array $config, array $expectedCalls = array())
+    public function testLoadBasicCacheDriver(string $class, array $config, array $expectedCalls = array()): void
     {
         $container = $this->createContainer();
         $cacheName = 'metadata_cache';
@@ -217,7 +217,7 @@ class DoctrineExtensionTest extends TestCase
         }
     }
 
-    public function testServiceCacheDriver()
+    public function testServiceCacheDriver(): void
     {
         $cacheName = 'metadata_cache';
         $container = $this->createContainer();
@@ -241,7 +241,7 @@ class DoctrineExtensionTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage "unrecognized_type" is an unrecognized Doctrine cache driver.
      */
-    public function testUnrecognizedCacheDriverException()
+    public function testUnrecognizedCacheDriverException(): void
     {
         $cacheName = 'metadata_cache';
         $container = $this->createContainer();
@@ -255,7 +255,7 @@ class DoctrineExtensionTest extends TestCase
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
     }
 
-    protected function invokeLoadCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
+    protected function invokeLoadCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName): void
     {
         $method = new \ReflectionMethod($this->extension, 'loadObjectManagerCacheDriver');
 
@@ -267,7 +267,7 @@ class DoctrineExtensionTest extends TestCase
     /**
      * @return \Symfony\Component\DependencyInjection\ContainerBuilder
      */
-    protected function createContainer(array $data = array())
+    protected function createContainer(array $data = array()): \Symfony\Component\DependencyInjection\ContainerBuilder
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(
             'kernel.bundles' => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),

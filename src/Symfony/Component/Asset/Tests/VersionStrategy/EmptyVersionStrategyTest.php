@@ -16,7 +16,7 @@ use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 
 class EmptyVersionStrategyTest extends TestCase
 {
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $emptyVersionStrategy = new EmptyVersionStrategy();
         $path = 'test-path';
@@ -24,7 +24,7 @@ class EmptyVersionStrategyTest extends TestCase
         $this->assertEmpty($emptyVersionStrategy->getVersion($path));
     }
 
-    public function testApplyVersion()
+    public function testApplyVersion(): void
     {
         $emptyVersionStrategy = new EmptyVersionStrategy();
         $path = 'test-path';

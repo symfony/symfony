@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
  */
 class TraceableTagAwareAdapterTest extends TraceableAdapterTest
 {
-    public function testInvalidateTags()
+    public function testInvalidateTags(): void
     {
         $pool = new TraceableTagAwareAdapter(new TagAwareAdapter(new FilesystemAdapter()));
         $pool->invalidateTags(array('foo'));

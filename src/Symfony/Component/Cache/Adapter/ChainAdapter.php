@@ -56,7 +56,7 @@ class ChainAdapter implements AdapterInterface, PruneableInterface, ResettableIn
         $this->adapterCount = count($this->adapters);
 
         $this->saveUp = \Closure::bind(
-            function ($adapter, $item) use ($maxLifetime) {
+            function ($adapter, $item) use ($maxLifetime): void {
                 $origDefaultLifetime = $item->defaultLifetime;
 
                 if (0 < $maxLifetime && ($origDefaultLifetime <= 0 || $maxLifetime < $origDefaultLifetime)) {
@@ -253,7 +253,7 @@ class ChainAdapter implements AdapterInterface, PruneableInterface, ResettableIn
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->adapters as $adapter) {
             if ($adapter instanceof ResettableInterface) {

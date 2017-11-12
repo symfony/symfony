@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouterTest extends TestCase
 {
-    public function testGenerateWithServiceParam()
+    public function testGenerateWithServiceParam(): void
     {
         $routes = new RouteCollection();
 
@@ -44,7 +44,7 @@ class RouterTest extends TestCase
         $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
-    public function testDefaultsPlaceholders()
+    public function testDefaultsPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -83,7 +83,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testRequirementsPlaceholders()
+    public function testRequirementsPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -115,7 +115,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testPatternPlaceholders()
+    public function testPatternPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -137,7 +137,7 @@ class RouterTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Using "%env(FOO)%" is not allowed in routing configuration.
      */
-    public function testEnvPlaceholders()
+    public function testEnvPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -147,7 +147,7 @@ class RouterTest extends TestCase
         $router->getRouteCollection();
     }
 
-    public function testHostPlaceholders()
+    public function testHostPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -172,7 +172,7 @@ class RouterTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
      * @expectedExceptionMessage You have requested a non-existent parameter "nope".
      */
-    public function testExceptionOnNonExistentParameter()
+    public function testExceptionOnNonExistentParameter(): void
     {
         $routes = new RouteCollection();
 
@@ -188,7 +188,7 @@ class RouterTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type object.
      */
-    public function testExceptionOnNonStringParameter()
+    public function testExceptionOnNonStringParameter(): void
     {
         $routes = new RouteCollection();
 
@@ -204,7 +204,7 @@ class RouterTest extends TestCase
     /**
      * @dataProvider getNonStringValues
      */
-    public function testDefaultValuesAsNonStrings($value)
+    public function testDefaultValuesAsNonStrings($value): void
     {
         $routes = new RouteCollection();
         $routes->add('foo', new Route('foo', array('foo' => $value), array('foo' => '\d+')));
@@ -218,7 +218,7 @@ class RouterTest extends TestCase
         $this->assertSame($value, $route->getDefault('foo'));
     }
 
-    public function testGetRouteCollectionAddsContainerParametersResource()
+    public function testGetRouteCollectionAddsContainerParametersResource(): void
     {
         $routeCollection = $this->getMockBuilder(RouteCollection::class)->getMock();
         $routeCollection->method('getIterator')->willReturn(new \ArrayIterator(array(new Route('/%locale%'))));
@@ -240,7 +240,7 @@ class RouterTest extends TestCase
     /**
      * @return \Symfony\Component\DependencyInjection\Container
      */
-    private function getServiceContainer(RouteCollection $routes)
+    private function getServiceContainer(RouteCollection $routes): \Symfony\Component\DependencyInjection\Container
     {
         $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
 

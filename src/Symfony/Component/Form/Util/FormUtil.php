@@ -34,7 +34,7 @@ class FormUtil
      *
      * @return bool
      */
-    public static function isEmpty($data)
+    public static function isEmpty($data): bool
     {
         // Should not do a check for array() === $data!!!
         // This method is used in occurrences where arrays are

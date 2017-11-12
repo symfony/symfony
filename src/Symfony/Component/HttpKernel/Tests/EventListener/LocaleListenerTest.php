@@ -21,12 +21,12 @@ class LocaleListenerTest extends TestCase
 {
     private $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->disableOriginalConstructor()->getMock();
     }
 
-    public function testDefaultLocaleWithoutSession()
+    public function testDefaultLocaleWithoutSession(): void
     {
         $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request = Request::create('/'));
@@ -35,7 +35,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('fr', $request->getLocale());
     }
 
-    public function testLocaleFromRequestAttribute()
+    public function testLocaleFromRequestAttribute(): void
     {
         $request = Request::create('/');
         $request->cookies->set(session_name(), 'value');
@@ -48,7 +48,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('es', $request->getLocale());
     }
 
-    public function testLocaleSetForRoutingContext()
+    public function testLocaleSetForRoutingContext(): void
     {
         // the request context is updated
         $context = $this->getMockBuilder('Symfony\Component\Routing\RequestContext')->getMock();
@@ -64,7 +64,7 @@ class LocaleListenerTest extends TestCase
         $listener->onKernelRequest($this->getEvent($request));
     }
 
-    public function testRouterResetWithParentRequestOnKernelFinishRequest()
+    public function testRouterResetWithParentRequestOnKernelFinishRequest(): void
     {
         // the request context is updated
         $context = $this->getMockBuilder('Symfony\Component\Routing\RequestContext')->getMock();
@@ -84,7 +84,7 @@ class LocaleListenerTest extends TestCase
         $listener->onKernelFinishRequest($event);
     }
 
-    public function testRequestLocaleIsNotOverridden()
+    public function testRequestLocaleIsNotOverridden(): void
     {
         $request = Request::create('/');
         $request->setLocale('de');

@@ -26,7 +26,7 @@ interface InputInterface
      *
      * @return string The value of the first argument or null otherwise
      */
-    public function getFirstArgument();
+    public function getFirstArgument(): string;
 
     /**
      * Returns true if the raw parameters (not parsed) contain a value.
@@ -39,7 +39,7 @@ interface InputInterface
      *
      * @return bool true if the value is contained in the raw parameters
      */
-    public function hasParameterOption($values, $onlyParams = false);
+    public function hasParameterOption($values, $onlyParams = false): bool;
 
     /**
      * Returns the value of a raw option (not parsed).
@@ -58,21 +58,21 @@ interface InputInterface
     /**
      * Binds the current Input instance with the given arguments and options.
      */
-    public function bind(InputDefinition $definition);
+    public function bind(InputDefinition $definition): void;
 
     /**
      * Validates the input.
      *
      * @throws RuntimeException When not enough arguments are given
      */
-    public function validate();
+    public function validate(): void;
 
     /**
      * Returns all the given arguments merged with the default values.
      *
      * @return array
      */
-    public function getArguments();
+    public function getArguments(): array;
 
     /**
      * Returns the argument value for a given argument name.
@@ -83,7 +83,7 @@ interface InputInterface
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function getArgument($name);
+    public function getArgument(string $name);
 
     /**
      * Sets an argument value by name.
@@ -93,7 +93,7 @@ interface InputInterface
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function setArgument($name, $value);
+    public function setArgument(string $name, string $value): void;
 
     /**
      * Returns true if an InputArgument object exists by name or position.
@@ -102,14 +102,14 @@ interface InputInterface
      *
      * @return bool true if the InputArgument object exists, false otherwise
      */
-    public function hasArgument($name);
+    public function hasArgument($name): bool;
 
     /**
      * Returns all the given options merged with the default values.
      *
      * @return array
      */
-    public function getOptions();
+    public function getOptions(): array;
 
     /**
      * Returns the option value for a given option name.
@@ -120,7 +120,7 @@ interface InputInterface
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function getOption($name);
+    public function getOption(string $name);
 
     /**
      * Sets an option value by name.
@@ -130,7 +130,7 @@ interface InputInterface
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function setOption($name, $value);
+    public function setOption(string $name, $value): void;
 
     /**
      * Returns true if an InputOption object exists by name.
@@ -139,19 +139,19 @@ interface InputInterface
      *
      * @return bool true if the InputOption object exists, false otherwise
      */
-    public function hasOption($name);
+    public function hasOption(string $name): bool;
 
     /**
      * Is this input means interactive?
      *
      * @return bool
      */
-    public function isInteractive();
+    public function isInteractive(): bool;
 
     /**
      * Sets the input interactivity.
      *
      * @param bool $interactive If the input should be interactive
      */
-    public function setInteractive($interactive);
+    public function setInteractive(bool $interactive): void;
 }

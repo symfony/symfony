@@ -65,7 +65,7 @@ class JsonDecode implements DecoderInterface
      *
      * @see http://php.net/json_decode json_decode
      */
-    public function decode($data, $format, array $context = array())
+    public function decode(string $data, string $format, array $context = array())
     {
         $context = $this->resolveContext($context);
 
@@ -92,10 +92,8 @@ class JsonDecode implements DecoderInterface
 
     /**
      * Merges the default options of the Json Decoder with the passed context.
-     *
-     * @return array
      */
-    private function resolveContext(array $context)
+    private function resolveContext(array $context): array
     {
         $defaultOptions = array(
             'json_decode_associative' => $this->associative,

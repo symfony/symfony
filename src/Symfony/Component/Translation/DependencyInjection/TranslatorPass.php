@@ -29,7 +29,7 @@ class TranslatorPass implements CompilerPassInterface
         $this->loaderTag = $loaderTag;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition($this->translatorServiceId)) {
             return;

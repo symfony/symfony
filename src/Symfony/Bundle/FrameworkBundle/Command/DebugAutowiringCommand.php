@@ -30,7 +30,7 @@ class DebugAutowiringCommand extends ContainerDebugCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(

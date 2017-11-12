@@ -31,7 +31,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @return string Escaped text
      */
-    public static function escape($text)
+    public static function escape(string $text): string
     {
         $text = preg_replace('/([^\\\\]?)</', '$1\\<', $text);
 
@@ -47,7 +47,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @internal
      */
-    public static function escapeTrailingBackslash($text)
+    public static function escapeTrailingBackslash(string $text): string
     {
         if ('\\' === substr($text, -1)) {
             $len = strlen($text);
@@ -84,7 +84,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function setDecorated($decorated)
+    public function setDecorated($decorated): void
     {
         $this->decorated = (bool) $decorated;
     }
@@ -100,7 +100,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function setStyle($name, OutputFormatterStyleInterface $style)
+    public function setStyle($name, OutputFormatterStyleInterface $style): void
     {
         $this->styles[strtolower($name)] = $style;
     }
@@ -175,10 +175,7 @@ class OutputFormatter implements OutputFormatterInterface
         return str_replace('\\<', '<', $output);
     }
 
-    /**
-     * @return OutputFormatterStyleStack
-     */
-    public function getStyleStack()
+    public function getStyleStack(): OutputFormatterStyleStack
     {
         return $this->styleStack;
     }

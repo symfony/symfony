@@ -9,7 +9,7 @@ class InternalClass
 {
     use InternalTrait2;
 
-    public function usedInInternalClass()
+    public function usedInInternalClass(): void
     {
     }
 }

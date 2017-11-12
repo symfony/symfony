@@ -16,7 +16,7 @@ class ProfilerTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testProfilerIsDisabled($insulate)
+    public function testProfilerIsDisabled($insulate): void
     {
         $client = $this->createClient(array('test_case' => 'Profiler', 'root_config' => 'config.yml'));
         if ($insulate) {

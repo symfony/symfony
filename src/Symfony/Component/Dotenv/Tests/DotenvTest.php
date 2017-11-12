@@ -20,7 +20,7 @@ class DotenvTest extends TestCase
     /**
      * @dataProvider getEnvDataWithFormatErrors
      */
-    public function testParseWithFormatError($data, $error)
+    public function testParseWithFormatError($data, $error): void
     {
         $dotenv = new Dotenv();
 
@@ -54,7 +54,7 @@ class DotenvTest extends TestCase
     /**
      * @dataProvider getEnvData
      */
-    public function testParse($data, $expected)
+    public function testParse($data, $expected): void
     {
         $dotenv = new Dotenv();
         $this->assertSame($expected, $dotenv->parse($data));
@@ -154,7 +154,7 @@ class DotenvTest extends TestCase
         return $tests;
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         unset($_ENV['FOO']);
         unset($_ENV['BAR']);
@@ -189,13 +189,13 @@ class DotenvTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Dotenv\Exception\PathException
      */
-    public function testLoadDirectory()
+    public function testLoadDirectory(): void
     {
         $dotenv = new Dotenv();
         $dotenv->load(__DIR__);
     }
 
-    public function testServerSuperglobalIsNotOverriden()
+    public function testServerSuperglobalIsNotOverriden(): void
     {
         $originalValue = $_SERVER['argc'];
 
@@ -205,7 +205,7 @@ class DotenvTest extends TestCase
         $this->assertSame($originalValue, $_SERVER['argc']);
     }
 
-    public function testEnvVarIsNotOverriden()
+    public function testEnvVarIsNotOverriden(): void
     {
         putenv('TEST_ENV_VAR=original_value');
         $_SERVER['TEST_ENV_VAR'] = 'original_value';
@@ -216,7 +216,7 @@ class DotenvTest extends TestCase
         $this->assertSame('original_value', getenv('TEST_ENV_VAR'));
     }
 
-    public function testHttpVarIsPartiallyOverriden()
+    public function testHttpVarIsPartiallyOverriden(): void
     {
         $_SERVER['HTTP_TEST_ENV_VAR'] = 'http_value';
 
@@ -228,7 +228,7 @@ class DotenvTest extends TestCase
         $this->assertSame('http_value', $_SERVER['HTTP_TEST_ENV_VAR']);
     }
 
-    public function testMemorizingLoadedVarsNamesInSpecialVar()
+    public function testMemorizingLoadedVarsNamesInSpecialVar(): void
     {
         // Special variable not exists
         unset($_ENV['SYMFONY_DOTENV_VARS']);
@@ -266,7 +266,7 @@ class DotenvTest extends TestCase
         $this->assertSame('APP_ENV,DATABASE_URL', getenv('SYMFONY_DOTENV_VARS'));
     }
 
-    public function testOverridingEnvVarsWithNamesMemorizedInSpecialVar()
+    public function testOverridingEnvVarsWithNamesMemorizedInSpecialVar(): void
     {
         putenv('SYMFONY_DOTENV_VARS=FOO,BAR,BAZ');
 

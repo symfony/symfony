@@ -35,11 +35,10 @@ class Inline
     private static $constantSupport = false;
 
     /**
-     * @param int         $flags
      * @param int|null    $parsedLineNumber
      * @param string|null $parsedFilename
      */
-    public static function initialize($flags, $parsedLineNumber = null, $parsedFilename = null)
+    public static function initialize(int $flags, ?int $parsedLineNumber = null, ?string $parsedFilename = null): void
     {
         self::$exceptionOnInvalidType = (bool) (Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE & $flags);
         self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);
@@ -702,8 +701,6 @@ EOF;
 
     /**
      * Gets a regex that matches a YAML number in hexadecimal notation.
-     *
-     * @return string
      */
     private static function getHexRegex(): string
     {

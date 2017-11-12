@@ -36,7 +36,7 @@ class ProxyAdapterTest extends AdapterTestCase
      * @expectedException \Exception
      * @expectedExceptionMessage OK bar
      */
-    public function testProxyfiedItem()
+    public function testProxyfiedItem(): void
     {
         $item = new CacheItem();
         $pool = new ProxyAdapter(new TestingArrayAdapter($item));
@@ -62,7 +62,7 @@ class TestingArrayAdapter extends ArrayAdapter
         return $this->item;
     }
 
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): void
     {
         if ($item === $this->item) {
             throw new \Exception('OK '.$item->get());

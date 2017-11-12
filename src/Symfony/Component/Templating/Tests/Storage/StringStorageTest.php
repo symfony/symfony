@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Storage\StringStorage;
 
 class StringStorageTest extends TestCase
 {
-    public function testGetContent()
+    public function testGetContent(): void
     {
         $storage = new StringStorage('foo');
         $this->assertInstanceOf('Symfony\Component\Templating\Storage\Storage', $storage, 'StringStorage is an instance of Storage');

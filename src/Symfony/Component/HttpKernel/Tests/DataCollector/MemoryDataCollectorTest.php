@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MemoryDataCollectorTest extends TestCase
 {
-    public function testCollect()
+    public function testCollect(): void
     {
         $collector = new MemoryDataCollector();
         $collector->collect(new Request(), new Response());
@@ -29,7 +29,7 @@ class MemoryDataCollectorTest extends TestCase
     }
 
     /** @dataProvider getBytesConversionTestData */
-    public function testBytesConversion($limit, $bytes)
+    public function testBytesConversion($limit, $bytes): void
     {
         $collector = new MemoryDataCollector();
         $method = new \ReflectionMethod($collector, 'convertToBytes');

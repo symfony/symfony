@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfiguration
 
 class MergeExtensionConfigurationPassTest extends TestCase
 {
-    public function testAutoloadMainExtension()
+    public function testAutoloadMainExtension(): void
     {
         $container = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\ContainerBuilder')->setMethods(array('getExtensionConfig', 'loadFromExtension', 'getParameterBag', 'getDefinitions', 'getAliases', 'getExtensions'))->getMock();
         $params = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\ParameterBag\\ParameterBag')->getMock();

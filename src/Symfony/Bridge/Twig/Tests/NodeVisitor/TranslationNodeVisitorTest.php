@@ -23,7 +23,7 @@ use Twig\Node\Node;
 class TranslationNodeVisitorTest extends TestCase
 {
     /** @dataProvider getMessagesExtractionTestData */
-    public function testMessagesExtraction(Node $node, array $expectedMessages)
+    public function testMessagesExtraction(Node $node, array $expectedMessages): void
     {
         $env = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $visitor = new TranslationNodeVisitor();
@@ -33,7 +33,7 @@ class TranslationNodeVisitorTest extends TestCase
         $this->assertEquals($expectedMessages, $visitor->getMessages());
     }
 
-    public function testMessageExtractionWithInvalidDomainNode()
+    public function testMessageExtractionWithInvalidDomainNode(): void
     {
         $message = 'new key';
 

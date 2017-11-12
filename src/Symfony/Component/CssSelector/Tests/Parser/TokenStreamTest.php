@@ -17,7 +17,7 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
 
 class TokenStreamTest extends TestCase
 {
-    public function testGetNext()
+    public function testGetNext(): void
     {
         $stream = new TokenStream();
         $stream->push($t1 = new Token(Token::TYPE_IDENTIFIER, 'h1', 0));
@@ -29,7 +29,7 @@ class TokenStreamTest extends TestCase
         $this->assertSame($t3, $stream->getNext());
     }
 
-    public function testGetPeek()
+    public function testGetPeek(): void
     {
         $stream = new TokenStream();
         $stream->push($t1 = new Token(Token::TYPE_IDENTIFIER, 'h1', 0));
@@ -43,7 +43,7 @@ class TokenStreamTest extends TestCase
         $this->assertSame($t2, $stream->getNext());
     }
 
-    public function testGetNextIdentifier()
+    public function testGetNextIdentifier(): void
     {
         $stream = new TokenStream();
         $stream->push(new Token(Token::TYPE_IDENTIFIER, 'h1', 0));
@@ -51,7 +51,7 @@ class TokenStreamTest extends TestCase
         $this->assertEquals('h1', $stream->getNextIdentifier());
     }
 
-    public function testFailToGetNextIdentifier()
+    public function testFailToGetNextIdentifier(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
 
@@ -60,7 +60,7 @@ class TokenStreamTest extends TestCase
         $stream->getNextIdentifier();
     }
 
-    public function testGetNextIdentifierOrStar()
+    public function testGetNextIdentifierOrStar(): void
     {
         $stream = new TokenStream();
 
@@ -71,7 +71,7 @@ class TokenStreamTest extends TestCase
         $this->assertNull($stream->getNextIdentifierOrStar());
     }
 
-    public function testFailToGetNextIdentifierOrStar()
+    public function testFailToGetNextIdentifierOrStar(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\CssSelector\Exception\SyntaxErrorException');
 
@@ -80,7 +80,7 @@ class TokenStreamTest extends TestCase
         $stream->getNextIdentifierOrStar();
     }
 
-    public function testSkipWhitespace()
+    public function testSkipWhitespace(): void
     {
         $stream = new TokenStream();
         $stream->push($t1 = new Token(Token::TYPE_IDENTIFIER, 'h1', 0));

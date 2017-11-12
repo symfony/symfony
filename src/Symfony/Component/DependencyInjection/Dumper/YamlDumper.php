@@ -41,7 +41,7 @@ class YamlDumper extends Dumper
      *
      * @return string A YAML string representing of the service container
      */
-    public function dump(array $options = array())
+    public function dump(array $options = array()): string
     {
         if (!class_exists('Symfony\Component\Yaml\Dumper')) {
             throw new RuntimeException('Unable to dump the container as the Symfony Yaml Component is not installed.');
@@ -197,10 +197,8 @@ class YamlDumper extends Dumper
      * Dumps callable to YAML format.
      *
      * @param callable $callable
-     *
-     * @return callable
      */
-    private function dumpCallable($callable)
+    private function dumpCallable(callable $callable): callable
     {
         if (is_array($callable)) {
             if ($callable[0] instanceof Reference) {

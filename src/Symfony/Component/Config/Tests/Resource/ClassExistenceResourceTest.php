@@ -18,19 +18,19 @@ use Symfony\Component\Config\Tests\Fixtures\BadParent;
 
 class ClassExistenceResourceTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $res = new ClassExistenceResource('BarClass');
         $this->assertSame('BarClass', (string) $res);
     }
 
-    public function testGetResource()
+    public function testGetResource(): void
     {
         $res = new ClassExistenceResource('BarClass');
         $this->assertSame('BarClass', $res->getResource());
     }
 
-    public function testIsFreshWhenClassDoesNotExist()
+    public function testIsFreshWhenClassDoesNotExist(): void
     {
         $res = new ClassExistenceResource('Symfony\Component\Config\Tests\Fixtures\BarClass');
 
@@ -48,16 +48,16 @@ EOF
         $this->assertFalse($res->isFresh(time()));
     }
 
-    public function testIsFreshWhenClassExists()
+    public function testIsFreshWhenClassExists(): void
     {
         $res = new ClassExistenceResource('Symfony\Component\Config\Tests\Resource\ClassExistenceResourceTest');
 
         $this->assertTrue($res->isFresh(time()));
     }
 
-    public function testExistsKo()
+    public function testExistsKo(): void
     {
-        spl_autoload_register($autoloader = function ($class) use (&$loadedClass) { $loadedClass = $class; });
+        spl_autoload_register($autoloader = function ($class) use (&$loadedClass): void { $loadedClass = $class; });
 
         try {
             $res = new ClassExistenceResource('MissingFooClass');
@@ -75,7 +75,7 @@ EOF
         }
     }
 
-    public function testBadParentWithTimestamp()
+    public function testBadParentWithTimestamp(): void
     {
         $res = new ClassExistenceResource(BadParent::class, false);
         $this->assertTrue($res->isFresh(time()));
@@ -85,13 +85,13 @@ EOF
      * @expectedException \ReflectionException
      * @expectedExceptionMessage Class Symfony\Component\Config\Tests\Fixtures\MissingParent not found
      */
-    public function testBadParentWithNoTimestamp()
+    public function testBadParentWithNoTimestamp(): void
     {
         $res = new ClassExistenceResource(BadParent::class, false);
         $res->isFresh(0);
     }
 
-    public function testConditionalClass()
+    public function testConditionalClass(): void
     {
         $res = new ClassExistenceResource(ConditionalClass::class, false);
 

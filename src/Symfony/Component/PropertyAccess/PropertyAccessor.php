@@ -96,7 +96,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function setValue(&$objectOrArray, $propertyPath, $value)
+    public function setValue(&$objectOrArray, $propertyPath, $value): void
     {
         $propertyPath = $this->getPropertyPath($propertyPath);
 
@@ -159,7 +159,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
     }
 
-    private static function throwInvalidArgumentException($message, $trace, $i)
+    private static function throwInvalidArgumentException($message, $trace, $i): void
     {
         if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file'] && isset($trace[$i]['args'][0])) {
             $pos = strpos($message, $delim = 'must be of the type ') ?: (strpos($message, $delim = 'must be an instance of ') ?: strpos($message, $delim = 'must implement interface '));
@@ -247,7 +247,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @throws UnexpectedTypeException if a value within the path is neither object nor array
      * @throws NoSuchIndexException    If a non-existing index is accessed
      */
-    private function readPropertiesUntil($zval, PropertyPathInterface $propertyPath, $lastIndex, $ignoreInvalidIndices = true)
+    private function readPropertiesUntil(array $zval, PropertyPathInterface $propertyPath, int $lastIndex, bool $ignoreInvalidIndices = true): array
     {
         if (!is_object($zval[self::VALUE]) && !is_array($zval[self::VALUE])) {
             throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, 0);
@@ -331,7 +331,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchIndexException If the array does not implement \ArrayAccess or it is not an array
      */
-    private function readIndex($zval, $index)
+    private function readIndex(array $zval, $index): array
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !is_array($zval[self::VALUE])) {
             throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, get_class($zval[self::VALUE])));
@@ -364,7 +364,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException if the property does not exist or is not public
      */
-    private function readProperty($zval, $property)
+    private function readProperty(array $zval, string $property): array
     {
         if (!is_object($zval[self::VALUE])) {
             throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%1$s]" instead.', $property));
@@ -410,13 +410,8 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * Guesses how to read the property value.
-     *
-     * @param string $class
-     * @param string $property
-     *
-     * @return array
      */
-    private function getReadAccessInfo($class, $property)
+    private function getReadAccessInfo(string $class, string $property): array
     {
         $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 
@@ -497,7 +492,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchIndexException If the array does not implement \ArrayAccess or it is not an array
      */
-    private function writeIndex($zval, $index, $value)
+    private function writeIndex(array $zval, $index, $value): void
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !is_array($zval[self::VALUE])) {
             throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($zval[self::VALUE])));
@@ -515,7 +510,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @throws NoSuchPropertyException if the property does not exist or is not public
      */
-    private function writeProperty($zval, $property, $value)
+    private function writeProperty(array $zval, string $property, $value): void
     {
         if (!is_object($zval[self::VALUE])) {
             throw new NoSuchPropertyException(sprintf('Cannot write property "%s" to an array. Maybe you should write the property path as "[%1$s]" instead?', $property));
@@ -556,7 +551,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param string             $addMethod    The add*() method
      * @param string             $removeMethod The remove*() method
      */
-    private function writeCollection($zval, $property, $collection, $addMethod, $removeMethod)
+    private function writeCollection(array $zval, string $property, $collection, $addMethod, $removeMethod): void
     {
         // At this point the add and remove methods have been found
         $previousValue = $this->readProperty($zval, $property);
@@ -713,7 +708,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return array|null An array containing the adder and remover when found, null otherwise
      */
-    private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
+    private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars): ?array
     {
         foreach ($singulars as $singular) {
             $addMethod = 'add'.$singular;
@@ -781,16 +776,12 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Creates the APCu adapter if applicable.
      *
-     * @param string               $namespace
-     * @param int                  $defaultLifetime
-     * @param string               $version
      * @param LoggerInterface|null $logger
      *
-     * @return AdapterInterface
      *
      * @throws RuntimeException When the Cache Component isn't available
      */
-    public static function createCache($namespace, $defaultLifetime, $version, LoggerInterface $logger = null)
+    public static function createCache(string $namespace, int $defaultLifetime, string $version, LoggerInterface $logger = null): AdapterInterface
     {
         if (!class_exists('Symfony\Component\Cache\Adapter\ApcuAdapter')) {
             throw new \RuntimeException(sprintf('The Symfony Cache component must be installed to use %s().', __METHOD__));

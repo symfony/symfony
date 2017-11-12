@@ -56,7 +56,7 @@ class ContainerControllerResolver extends ControllerResolver
      * @throws \LogicException           When the name could not be parsed
      * @throws \InvalidArgumentException When the controller class does not exist
      */
-    protected function createController($controller)
+    protected function createController(string $controller)
     {
         if (false !== strpos($controller, '::')) {
             return parent::createController($controller);

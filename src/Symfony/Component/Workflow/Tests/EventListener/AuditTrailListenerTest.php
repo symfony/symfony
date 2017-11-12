@@ -14,7 +14,7 @@ class AuditTrailListenerTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    public function testItWorks()
+    public function testItWorks(): void
     {
         $definition = $this->createSimpleWorkflowDefinition();
 
@@ -44,7 +44,7 @@ class Logger extends AbstractLogger
 {
     public $logs = array();
 
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = array()): void
     {
         $this->logs[] = $message;
     }

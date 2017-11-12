@@ -42,7 +42,7 @@ class ExpressionExtension extends AbstractExtension
      *
      * @return string The extension name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'expression';
     }

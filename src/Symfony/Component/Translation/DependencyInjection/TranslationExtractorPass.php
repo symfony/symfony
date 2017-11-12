@@ -30,7 +30,7 @@ class TranslationExtractorPass implements CompilerPassInterface
         $this->extractorTag = $extractorTag;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition($this->extractorServiceId)) {
             return;

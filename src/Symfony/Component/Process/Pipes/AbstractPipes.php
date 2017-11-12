@@ -43,7 +43,7 @@ abstract class AbstractPipes implements PipesInterface
     /**
      * {@inheritdoc}
      */
-    public function close()
+    public function close(): void
     {
         foreach ($this->pipes as $pipe) {
             fclose($pipe);
@@ -53,10 +53,8 @@ abstract class AbstractPipes implements PipesInterface
 
     /**
      * Returns true if a system call has been interrupted.
-     *
-     * @return bool
      */
-    protected function hasSystemCallBeenInterrupted()
+    protected function hasSystemCallBeenInterrupted(): bool
     {
         $lastError = error_get_last();
 
@@ -67,7 +65,7 @@ abstract class AbstractPipes implements PipesInterface
     /**
      * Unblocks streams.
      */
-    protected function unblock()
+    protected function unblock(): void
     {
         if (!$this->blocked) {
             return;
@@ -88,7 +86,7 @@ abstract class AbstractPipes implements PipesInterface
      *
      * @throws InvalidArgumentException When an input iterator yields a non supported value
      */
-    protected function write()
+    protected function write(): void
     {
         if (!isset($this->pipes[0])) {
             return;

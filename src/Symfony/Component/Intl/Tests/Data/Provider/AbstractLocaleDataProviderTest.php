@@ -25,7 +25,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
      */
     protected $dataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,14 +35,14 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
+    abstract protected function getDataDirectory(): void;
 
-    public function testGetLocales()
+    public function testGetLocales(): void
     {
         $this->assertSame($this->getLocales(), $this->dataProvider->getLocales());
     }
 
-    public function testGetLocaleAliases()
+    public function testGetLocaleAliases(): void
     {
         $this->assertSame($this->getLocaleAliases(), $this->dataProvider->getAliases());
     }
@@ -50,7 +50,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetNames($displayLocale)
+    public function testGetNames($displayLocale): void
     {
         $locales = array_keys($this->dataProvider->getNames($displayLocale));
 
@@ -62,7 +62,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty(array_diff($locales, $this->getLocales()));
     }
 
-    public function testGetNamesDefaultLocale()
+    public function testGetNamesDefaultLocale(): void
     {
         Locale::setDefault('de_AT');
 
@@ -75,7 +75,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocaleAliases
      */
-    public function testGetNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale): void
     {
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
@@ -89,7 +89,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetName($displayLocale)
+    public function testGetName($displayLocale): void
     {
         $names = $this->dataProvider->getNames($displayLocale);
 
@@ -98,7 +98,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
         }
     }
 
-    public function testGetNameDefaultLocale()
+    public function testGetNameDefaultLocale(): void
     {
         Locale::setDefault('de_AT');
 

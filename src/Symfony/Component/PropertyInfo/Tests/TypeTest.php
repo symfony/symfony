@@ -19,7 +19,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class TypeTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $type = new Type('object', true, 'ArrayObject', true, new Type('int'), new Type('string'));
 
@@ -37,7 +37,7 @@ class TypeTest extends TestCase
         $this->assertEquals(Type::BUILTIN_TYPE_STRING, $collectionValueType->getBuiltinType());
     }
 
-    public function testIterable()
+    public function testIterable(): void
     {
         $type = new Type('iterable');
         $this->assertSame('iterable', $type->getBuiltinType());
@@ -47,7 +47,7 @@ class TypeTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage "foo" is not a valid PHP type.
      */
-    public function testInvalidType()
+    public function testInvalidType(): void
     {
         new Type('foo');
     }

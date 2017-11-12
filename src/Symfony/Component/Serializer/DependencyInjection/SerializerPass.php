@@ -38,7 +38,7 @@ class SerializerPass implements CompilerPassInterface
         $this->encoderTag = $encoderTag;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition($this->serializerService)) {
             return;

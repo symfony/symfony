@@ -50,7 +50,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         $this->eraseCredentials = $eraseCredentials;
     }
 
-    public function setEventDispatcher(EventDispatcherInterface $dispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->eventDispatcher = $dispatcher;
     }

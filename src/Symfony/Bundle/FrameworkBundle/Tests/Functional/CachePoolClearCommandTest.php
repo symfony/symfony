@@ -20,12 +20,12 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class CachePoolClearCommandTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         static::bootKernel(array('test_case' => 'CachePoolClear', 'root_config' => 'config.yml'));
     }
 
-    public function testClearPrivatePool()
+    public function testClearPrivatePool(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(array('pools' => array('cache.private_pool')), array('decorated' => false));
@@ -35,7 +35,7 @@ class CachePoolClearCommandTest extends WebTestCase
         $this->assertContains('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    public function testClearPublicPool()
+    public function testClearPublicPool(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(array('pools' => array('cache.public_pool')), array('decorated' => false));
@@ -45,7 +45,7 @@ class CachePoolClearCommandTest extends WebTestCase
         $this->assertContains('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    public function testClearPoolWithCustomClearer()
+    public function testClearPoolWithCustomClearer(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(array('pools' => array('cache.pool_with_clearer')), array('decorated' => false));
@@ -55,7 +55,7 @@ class CachePoolClearCommandTest extends WebTestCase
         $this->assertContains('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    public function testCallClearer()
+    public function testCallClearer(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(array('pools' => array('cache.app_clearer')), array('decorated' => false));
@@ -69,7 +69,7 @@ class CachePoolClearCommandTest extends WebTestCase
      * @expectedException        \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @expectedExceptionMessage You have requested a non-existent service "unknown_pool"
      */
-    public function testClearUnexistingPool()
+    public function testClearUnexistingPool(): void
     {
         $this->createCommandTester()
             ->execute(array('pools' => array('unknown_pool')), array('decorated' => false));

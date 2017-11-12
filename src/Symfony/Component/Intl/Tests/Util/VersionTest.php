@@ -48,7 +48,7 @@ class VersionTest extends TestCase
     /**
      * @dataProvider normalizeProvider
      */
-    public function testNormalize($precision, $version, $result)
+    public function testNormalize($precision, $version, $result): void
     {
         $this->assertSame($result, Version::normalize($version, $precision));
     }
@@ -81,7 +81,7 @@ class VersionTest extends TestCase
     /**
      * @dataProvider compareProvider
      */
-    public function testCompare($precision, $version1, $operator, $version2, $result)
+    public function testCompare($precision, $version1, $operator, $version2, $result): void
     {
         $this->assertSame($result, Version::compare($version1, $version2, $operator, $precision));
     }

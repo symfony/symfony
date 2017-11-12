@@ -20,7 +20,7 @@ class ChoiceToValueTransformerTest extends TestCase
     protected $transformer;
     protected $transformerWithNull;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $list = new ArrayChoiceList(array('', false, 'X', true));
         $listWithNull = new ArrayChoiceList(array('', false, 'X', null));
@@ -29,7 +29,7 @@ class ChoiceToValueTransformerTest extends TestCase
         $this->transformerWithNull = new ChoiceToValueTransformer($listWithNull);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->transformer = null;
         $this->transformerWithNull = null;
@@ -49,7 +49,7 @@ class ChoiceToValueTransformerTest extends TestCase
     /**
      * @dataProvider transformProvider
      */
-    public function testTransform($in, $out, $inWithNull, $outWithNull)
+    public function testTransform($in, $out, $inWithNull, $outWithNull): void
     {
         $this->assertSame($out, $this->transformer->transform($in));
         $this->assertSame($outWithNull, $this->transformerWithNull->transform($inWithNull));
@@ -70,7 +70,7 @@ class ChoiceToValueTransformerTest extends TestCase
     /**
      * @dataProvider reverseTransformProvider
      */
-    public function testReverseTransform($in, $out, $inWithNull, $outWithNull)
+    public function testReverseTransform($in, $out, $inWithNull, $outWithNull): void
     {
         $this->assertSame($out, $this->transformer->reverseTransform($in));
         $this->assertSame($outWithNull, $this->transformerWithNull->reverseTransform($inWithNull));
@@ -90,7 +90,7 @@ class ChoiceToValueTransformerTest extends TestCase
      * @dataProvider reverseTransformExpectsStringOrNullProvider
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformExpectsStringOrNull($value)
+    public function testReverseTransformExpectsStringOrNull($value): void
     {
         $this->transformer->reverseTransform($value);
     }

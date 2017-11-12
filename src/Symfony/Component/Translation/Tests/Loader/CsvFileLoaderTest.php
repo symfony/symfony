@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class CsvFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new CsvFileLoader();
         $resource = __DIR__.'/../fixtures/resources.csv';
@@ -28,7 +28,7 @@ class CsvFileLoaderTest extends TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
-    public function testLoadDoesNothingIfEmpty()
+    public function testLoadDoesNothingIfEmpty(): void
     {
         $loader = new CsvFileLoader();
         $resource = __DIR__.'/../fixtures/empty.csv';
@@ -42,7 +42,7 @@ class CsvFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $loader = new CsvFileLoader();
         $resource = __DIR__.'/../fixtures/not-exists.csv';
@@ -52,7 +52,7 @@ class CsvFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
-    public function testLoadNonLocalResource()
+    public function testLoadNonLocalResource(): void
     {
         $loader = new CsvFileLoader();
         $resource = 'http://example.com/resources.csv';

@@ -52,7 +52,7 @@ class PhpProcess extends Process
     /**
      * Sets the path to the PHP binary to use.
      */
-    public function setPhpBinary($php)
+    public function setPhpBinary($php): void
     {
         $this->setCommandLine($php);
     }
@@ -60,7 +60,7 @@ class PhpProcess extends Process
     /**
      * {@inheritdoc}
      */
-    public function start(callable $callback = null, array $env = array())
+    public function start(callable $callback = null, array $env = array()): void
     {
         if (null === $this->getCommandLine()) {
             throw new RuntimeException('Unable to find the PHP executable.');

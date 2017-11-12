@@ -68,7 +68,7 @@ class StreamOutput extends Output
     /**
      * {@inheritdoc}
      */
-    protected function doWrite($message, $newline)
+    protected function doWrite($message, $newline): void
     {
         if (false === @fwrite($this->stream, $message) || ($newline && (false === @fwrite($this->stream, PHP_EOL)))) {
             // should never happen
@@ -88,7 +88,7 @@ class StreamOutput extends Output
      *
      * @return bool true if the stream supports colorization, false otherwise
      */
-    protected function hasColorSupport()
+    protected function hasColorSupport(): bool
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             return

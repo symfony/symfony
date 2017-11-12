@@ -22,7 +22,7 @@ class DefinitionErrorExceptionPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Things went wrong!
      */
-    public function testThrowsException()
+    public function testThrowsException(): void
     {
         $container = new ContainerBuilder();
         $def = new Definition();
@@ -37,7 +37,7 @@ class DefinitionErrorExceptionPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testNoExceptionThrown()
+    public function testNoExceptionThrown(): void
     {
         $container = new ContainerBuilder();
         $def = new Definition();

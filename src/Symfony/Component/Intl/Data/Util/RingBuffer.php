@@ -65,7 +65,7 @@ class RingBuffer implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         if (false !== ($keyToRemove = array_search($this->cursor, $this->indices))) {
             unset($this->indices[$keyToRemove]);
@@ -80,7 +80,7 @@ class RingBuffer implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         if (isset($this->indices[$key])) {
             $this->values[$this->indices[$key]] = null;

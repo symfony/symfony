@@ -584,7 +584,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      */
     protected $dataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -594,9 +594,9 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
+    abstract protected function getDataDirectory(): void;
 
-    public function testGetCurrencies()
+    public function testGetCurrencies(): void
     {
         $this->assertSame(static::$currencies, $this->dataProvider->getCurrencies());
     }
@@ -604,7 +604,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetNames($displayLocale)
+    public function testGetNames($displayLocale): void
     {
         $names = $this->dataProvider->getNames($displayLocale);
 
@@ -622,7 +622,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         $this->assertEquals($sortedNames, $names);
     }
 
-    public function testGetNamesDefaultLocale()
+    public function testGetNamesDefaultLocale(): void
     {
         Locale::setDefault('de_AT');
 
@@ -635,7 +635,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocaleAliases
      */
-    public function testGetNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale): void
     {
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
@@ -649,7 +649,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetName($displayLocale)
+    public function testGetName($displayLocale): void
     {
         $expected = $this->dataProvider->getNames($displayLocale);
         $actual = array();
@@ -661,7 +661,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         $this->assertSame($expected, $actual);
     }
 
-    public function testGetNameDefaultLocale()
+    public function testGetNameDefaultLocale(): void
     {
         Locale::setDefault('de_AT');
 
@@ -678,7 +678,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetSymbol($displayLocale)
+    public function testGetSymbol($displayLocale): void
     {
         $currencies = $this->dataProvider->getCurrencies();
 
@@ -698,7 +698,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideCurrencies
      */
-    public function testGetFractionDigits($currency)
+    public function testGetFractionDigits($currency): void
     {
         $this->assertInternalType('numeric', $this->dataProvider->getFractionDigits($currency));
     }
@@ -706,7 +706,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideCurrencies
      */
-    public function testGetRoundingIncrement($currency)
+    public function testGetRoundingIncrement($currency): void
     {
         $this->assertInternalType('numeric', $this->dataProvider->getRoundingIncrement($currency));
     }
@@ -722,7 +722,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideCurrenciesWithNumericEquivalent
      */
-    public function testGetNumericCode($currency)
+    public function testGetNumericCode($currency): void
     {
         $this->assertSame(static::$alpha3ToNumeric[$currency], $this->dataProvider->getNumericCode($currency));
     }
@@ -739,7 +739,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      * @dataProvider provideCurrenciesWithoutNumericEquivalent
      * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
-    public function testGetNumericCodeFailsIfNoNumericEquivalent($currency)
+    public function testGetNumericCodeFailsIfNoNumericEquivalent($currency): void
     {
         $this->dataProvider->getNumericCode($currency);
     }
@@ -758,7 +758,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideValidNumericCodes
      */
-    public function testForNumericCode($numeric, $expected)
+    public function testForNumericCode($numeric, $expected): void
     {
         $actual = $this->dataProvider->forNumericCode($numeric);
 
@@ -784,7 +784,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
      * @dataProvider provideInvalidNumericCodes
      * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
-    public function testForNumericCodeFailsIfInvalidNumericCode($currency)
+    public function testForNumericCodeFailsIfInvalidNumericCode($currency): void
     {
         $this->dataProvider->forNumericCode($currency);
     }

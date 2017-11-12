@@ -32,7 +32,7 @@ class CsrfToken
      *
      * @return string The token ID
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -42,7 +42,7 @@ class CsrfToken
      *
      * @return string The token value
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -52,7 +52,7 @@ class CsrfToken
      *
      * @return string The token value
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->value;
     }

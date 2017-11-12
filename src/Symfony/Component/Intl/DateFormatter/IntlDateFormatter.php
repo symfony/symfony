@@ -160,7 +160,6 @@ class IntlDateFormatter
      *                         One of the calendar constants
      * @param string $pattern  Optional pattern to use when formatting
      *
-     * @return self
      *
      * @see http://www.php.net/manual/en/intldateformatter.create.php
      * @see http://userguide.icu-project.org/formatparse/datetime
@@ -168,7 +167,7 @@ class IntlDateFormatter
      * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      * @throws MethodArgumentValueNotImplementedException When $calendar different than GREGORIAN is passed
      */
-    public static function create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
+    public static function create(string $locale, int $datetype, int $timetype, string $timezone = null, int $calendar = self::GREGORIAN, string $pattern = null): self
     {
         return new self($locale, $datetype, $timetype, $timezone, $calendar, $pattern);
     }
@@ -248,7 +247,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.getcalendar.php
      */
-    public function getCalendar()
+    public function getCalendar(): int
     {
         return self::GREGORIAN;
     }
@@ -274,7 +273,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.getdatetype.php
      */
-    public function getDateType()
+    public function getDateType(): int
     {
         return $this->datetype;
     }
@@ -286,7 +285,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.geterrorcode.php
      */
-    public function getErrorCode()
+    public function getErrorCode(): int
     {
         return $this->errorCode;
     }
@@ -298,7 +297,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.geterrormessage.php
      */
-    public function getErrorMessage()
+    public function getErrorMessage(): string
     {
         return $this->errorMessage;
     }
@@ -313,7 +312,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.getlocale.php
      */
-    public function getLocale($type = Locale::ACTUAL_LOCALE)
+    public function getLocale(int $type = Locale::ACTUAL_LOCALE): string
     {
         return 'en';
     }
@@ -325,7 +324,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.getpattern.php
      */
-    public function getPattern()
+    public function getPattern(): string
     {
         return $this->pattern;
     }
@@ -337,7 +336,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.gettimetype.php
      */
-    public function getTimeType()
+    public function getTimeType(): int
     {
         return $this->timetype;
     }
@@ -349,7 +348,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.gettimezoneid.php
      */
-    public function getTimeZoneId()
+    public function getTimeZoneId(): string
     {
         if (!$this->uninitializedTimeZoneId) {
             return $this->timeZoneId;
@@ -381,7 +380,7 @@ class IntlDateFormatter
      *
      * @throws MethodNotImplementedException
      */
-    public function isLenient()
+    public function isLenient(): bool
     {
         return false;
     }
@@ -401,7 +400,7 @@ class IntlDateFormatter
      *
      * @throws MethodNotImplementedException
      */
-    public function localtime($value, &$position = 0)
+    public function localtime(string $value, int &$position = 0)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -421,7 +420,7 @@ class IntlDateFormatter
      *
      * @throws MethodArgumentNotImplementedException When $position different than null, behavior not implemented
      */
-    public function parse($value, &$position = null)
+    public function parse(string $value, int &$position = null): int
     {
         // We don't calculate the position when parsing the value
         if (null !== $position) {
@@ -451,7 +450,7 @@ class IntlDateFormatter
      *
      * @throws MethodNotImplementedException
      */
-    public function setCalendar($calendar)
+    public function setCalendar(string $calendar)
     {
         throw new MethodNotImplementedException(__METHOD__);
     }
@@ -473,7 +472,7 @@ class IntlDateFormatter
      *
      * @throws MethodArgumentValueNotImplementedException When $lenient is true
      */
-    public function setLenient($lenient)
+    public function setLenient(bool $lenient): bool
     {
         if ($lenient) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'lenient', $lenient, 'Only the strict parser is supported');
@@ -492,7 +491,7 @@ class IntlDateFormatter
      * @see http://www.php.net/manual/en/intldateformatter.setpattern.php
      * @see http://userguide.icu-project.org/formatparse/datetime
      */
-    public function setPattern($pattern)
+    public function setPattern(string $pattern): bool
     {
         if (null === $pattern) {
             $pattern = $this->getDefaultPattern();
@@ -514,7 +513,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.settimezoneid.php
      */
-    public function setTimeZoneId($timeZoneId)
+    public function setTimeZoneId(string $timeZoneId): bool
     {
         if (null === $timeZoneId) {
             $timeZoneId = date_default_timezone_get();
@@ -558,7 +557,7 @@ class IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.settimezone.php
      */
-    public function setTimeZone($timeZone)
+    public function setTimeZone($timeZone): bool
     {
         if ($timeZone instanceof \IntlTimeZone) {
             $timeZone = $timeZone->getID();
@@ -580,11 +579,10 @@ class IntlDateFormatter
      * Create and returns a DateTime object with the specified timestamp and with the
      * current time zone.
      *
-     * @param int $timestamp
      *
      * @return \DateTime
      */
-    protected function createDateTime($timestamp)
+    protected function createDateTime(int $timestamp): \DateTime
     {
         $dateTime = new \DateTime();
         $dateTime->setTimestamp($timestamp);
@@ -595,10 +593,8 @@ class IntlDateFormatter
 
     /**
      * Returns a pattern string based in the datetype and timetype values.
-     *
-     * @return string
      */
-    protected function getDefaultPattern()
+    protected function getDefaultPattern(): string
     {
         $patternParts = array();
         if (self::NONE !== $this->datetype) {

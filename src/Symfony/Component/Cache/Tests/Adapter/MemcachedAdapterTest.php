@@ -23,7 +23,7 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     protected static $client;
 
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         if (!MemcachedAdapter::isSupported()) {
             self::markTestSkipped('Extension memcached >=2.2.0 required.');
@@ -44,7 +44,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         return new MemcachedAdapter($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $client = MemcachedAdapter::createConnection(array(), array(
             'libketama_compatible' => false,
@@ -66,7 +66,7 @@ class MemcachedAdapterTest extends AdapterTestCase
      * @expectedException \ErrorException
      * @expectedExceptionMessage constant(): Couldn't find constant Memcached::
      */
-    public function testBadOptions($name, $value)
+    public function testBadOptions($name, $value): void
     {
         MemcachedAdapter::createConnection(array(), array($name => $value));
     }
@@ -81,7 +81,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         );
     }
 
-    public function testDefaultOptions()
+    public function testDefaultOptions(): void
     {
         $this->assertTrue(MemcachedAdapter::isSupported());
 
@@ -96,7 +96,7 @@ class MemcachedAdapterTest extends AdapterTestCase
      * @expectedException \Symfony\Component\Cache\Exception\CacheException
      * @expectedExceptionMessage MemcachedAdapter: "serializer" option must be "php" or "igbinary".
      */
-    public function testOptionSerializer()
+    public function testOptionSerializer(): void
     {
         if (!\Memcached::HAVE_JSON) {
             $this->markTestSkipped('Memcached::HAVE_JSON required');
@@ -108,7 +108,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideServersSetting
      */
-    public function testServersSetting($dsn, $host, $port)
+    public function testServersSetting($dsn, $host, $port): void
     {
         $client1 = MemcachedAdapter::createConnection($dsn);
         $client2 = MemcachedAdapter::createConnection(array($dsn));
@@ -165,7 +165,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     /**
      * @dataProvider provideDsnWithOptions
      */
-    public function testDsnWithOptions($dsn, array $options, array $expectedOptions)
+    public function testDsnWithOptions($dsn, array $options, array $expectedOptions): void
     {
         $client = MemcachedAdapter::createConnection($dsn, $options);
 

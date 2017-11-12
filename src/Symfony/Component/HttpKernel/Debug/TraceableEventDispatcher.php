@@ -27,7 +27,7 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
     /**
      * {@inheritdoc}
      */
-    protected function preDispatch($eventName, Event $event)
+    protected function preDispatch($eventName, Event $event): void
     {
         switch ($eventName) {
             case KernelEvents::REQUEST:
@@ -58,7 +58,7 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
     /**
      * {@inheritdoc}
      */
-    protected function postDispatch($eventName, Event $event)
+    protected function postDispatch($eventName, Event $event): void
     {
         switch ($eventName) {
             case KernelEvents::CONTROLLER_ARGUMENTS:

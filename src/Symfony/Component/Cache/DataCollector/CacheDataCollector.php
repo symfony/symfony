@@ -29,11 +29,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
      */
     private $instances = array();
 
-    /**
-     * @param string           $name
-     * @param TraceableAdapter $instance
-     */
-    public function addInstance($name, TraceableAdapter $instance)
+    public function addInstance(string $name, TraceableAdapter $instance): void
     {
         $this->instances[$name] = $instance;
     }
@@ -41,7 +37,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         $empty = array('calls' => array(), 'config' => array(), 'options' => array(), 'statistics' => array());
         $this->data = array('instances' => $empty, 'total' => $empty);
@@ -53,7 +49,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
         $this->data['total']['statistics'] = $this->calculateTotalStatistics();
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = array();
         foreach ($this->instances as $instance) {
@@ -62,7 +58,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
         }
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data = $this->cloneVar($this->data);
     }
@@ -77,20 +73,16 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
 
     /**
      * Method returns amount of logged Cache reads: "get" calls.
-     *
-     * @return array
      */
-    public function getStatistics()
+    public function getStatistics(): array
     {
         return $this->data['instances']['statistics'];
     }
 
     /**
      * Method returns the statistic totals.
-     *
-     * @return array
      */
-    public function getTotals()
+    public function getTotals(): array
     {
         return $this->data['total']['statistics'];
     }

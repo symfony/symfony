@@ -46,7 +46,7 @@ final class Definition
     /**
      * @return string|null
      */
-    public function getInitialPlace()
+    public function getInitialPlace(): ?string
     {
         return $this->initialPlace;
     }
@@ -67,7 +67,7 @@ final class Definition
         return $this->transitions;
     }
 
-    private function setInitialPlace(string $place = null)
+    private function setInitialPlace(string $place = null): void
     {
         if (null === $place) {
             return;
@@ -80,7 +80,7 @@ final class Definition
         $this->initialPlace = $place;
     }
 
-    private function addPlace(string $place)
+    private function addPlace(string $place): void
     {
         if (!preg_match('{^[\w\d_-]+$}', $place)) {
             throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $place));
@@ -93,7 +93,7 @@ final class Definition
         $this->places[$place] = $place;
     }
 
-    private function addTransition(Transition $transition)
+    private function addTransition(Transition $transition): void
     {
         $name = $transition->getName();
 

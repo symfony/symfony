@@ -57,7 +57,7 @@ class Stopwatch
      *
      * @throws \LogicException When the section to re-open is not reachable
      */
-    public function openSection($id = null)
+    public function openSection(?string $id = null): void
     {
         $current = end($this->activeSections);
 
@@ -81,7 +81,7 @@ class Stopwatch
      *
      * @throws \LogicException When there's no started section to be stopped
      */
-    public function stopSection($id)
+    public function stopSection(string $id): void
     {
         $this->stop('__section__');
 
@@ -98,10 +98,8 @@ class Stopwatch
      *
      * @param string $name     The event name
      * @param string $category The event category
-     *
-     * @return StopwatchEvent
      */
-    public function start($name, $category = null)
+    public function start(string $name, string $category = null): StopwatchEvent
     {
         return end($this->activeSections)->startEvent($name, $category);
     }
@@ -110,10 +108,8 @@ class Stopwatch
      * Checks if the event was started.
      *
      * @param string $name The event name
-     *
-     * @return bool
      */
-    public function isStarted($name)
+    public function isStarted(string $name): bool
     {
         return end($this->activeSections)->isEventStarted($name);
     }
@@ -122,10 +118,8 @@ class Stopwatch
      * Stops an event.
      *
      * @param string $name The event name
-     *
-     * @return StopwatchEvent
      */
-    public function stop($name)
+    public function stop(string $name): StopwatchEvent
     {
         return end($this->activeSections)->stopEvent($name);
     }
@@ -134,10 +128,8 @@ class Stopwatch
      * Stops then restarts an event.
      *
      * @param string $name The event name
-     *
-     * @return StopwatchEvent
      */
-    public function lap($name)
+    public function lap(string $name): StopwatchEvent
     {
         return end($this->activeSections)->stopEvent($name)->start();
     }
@@ -146,10 +138,8 @@ class Stopwatch
      * Returns a specific event by name.
      *
      * @param string $name The event name
-     *
-     * @return StopwatchEvent
      */
-    public function getEvent($name)
+    public function getEvent(string $name): StopwatchEvent
     {
         return end($this->activeSections)->getEvent($name);
     }
@@ -161,7 +151,7 @@ class Stopwatch
      *
      * @return StopwatchEvent[]
      */
-    public function getSectionEvents($id)
+    public function getSectionEvents(string $id)
     {
         return isset($this->sections[$id]) ? $this->sections[$id]->getEvents() : array();
     }
@@ -169,7 +159,7 @@ class Stopwatch
     /**
      * Resets the stopwatch to its original state.
      */
-    public function reset()
+    public function reset(): void
     {
         $this->sections = $this->activeSections = array('__root__' => new Section(null, $this->morePrecision));
     }

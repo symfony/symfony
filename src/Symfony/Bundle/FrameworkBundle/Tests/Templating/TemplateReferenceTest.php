@@ -16,7 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 
 class TemplateReferenceTest extends TestCase
 {
-    public function testGetPathWorksWithNamespacedControllers()
+    public function testGetPathWorksWithNamespacedControllers(): void
     {
         $reference = new TemplateReference('AcmeBlogBundle', 'Admin\Post', 'index', 'html', 'twig');
 

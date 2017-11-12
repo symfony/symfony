@@ -42,7 +42,7 @@ class EventDispatcherDebugCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(
@@ -69,7 +69,7 @@ EOF
      *
      * @throws \LogicException
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
 

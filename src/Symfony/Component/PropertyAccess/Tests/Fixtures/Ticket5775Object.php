@@ -20,11 +20,11 @@ class Ticket5775Object
         return $this->property;
     }
 
-    private function setProperty()
+    private function setProperty(): void
     {
     }
 
-    public function __set($property, $value)
+    public function __set($property, $value): void
     {
         $this->$property = $value;
     }

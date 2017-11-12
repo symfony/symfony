@@ -20,10 +20,7 @@ class StringWrapper
         $this->string = $string;
     }
 
-    /**
-     * @return string
-     */
-    public function getString()
+    public function getString(): string
     {
         return $this->string;
     }

@@ -34,13 +34,12 @@ class UniqueEntityValidator extends ConstraintValidator
     }
 
     /**
-     * @param object     $entity
-     * @param Constraint $constraint
+     * @param object $entity
      *
      * @throws UnexpectedTypeException
      * @throws ConstraintDefinitionException
      */
-    public function validate($entity, Constraint $constraint)
+    public function validate($entity, Constraint $constraint): void
     {
         if (!$constraint instanceof UniqueEntity) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\UniqueEntity');
@@ -195,7 +194,7 @@ class UniqueEntityValidator extends ConstraintValidator
             return sprintf('object("%s")', $idClass);
         }
 
-        array_walk($identifiers, function (&$id, $field) {
+        array_walk($identifiers, function (&$id, $field): void {
             if (!is_object($id) || $id instanceof \DateTimeInterface) {
                 $idAsString = $this->formatValue($id, self::PRETTY_DATE);
             } else {

@@ -140,7 +140,7 @@ class Finder implements \IteratorAggregate, \Countable
      * @see DateRangeFilterIterator
      * @see DateComparator
      */
-    public function date($date)
+    public function date(string $date)
     {
         $this->dates[] = new Comparator\DateComparator($date);
 
@@ -162,7 +162,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function name($pattern)
+    public function name(string $pattern)
     {
         $this->names[] = $pattern;
 
@@ -178,7 +178,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function notName($pattern)
+    public function notName(string $pattern)
     {
         $this->notNames[] = $pattern;
 
@@ -199,7 +199,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilecontentFilterIterator
      */
-    public function contains($pattern)
+    public function contains(string $pattern)
     {
         $this->contains[] = $pattern;
 
@@ -220,7 +220,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilecontentFilterIterator
      */
-    public function notContains($pattern)
+    public function notContains(string $pattern)
     {
         $this->notContains[] = $pattern;
 
@@ -243,7 +243,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function path($pattern)
+    public function path(string $pattern)
     {
         $this->paths[] = $pattern;
 
@@ -266,7 +266,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see FilenameFilterIterator
      */
-    public function notPath($pattern)
+    public function notPath(string $pattern)
     {
         $this->notPaths[] = $pattern;
 
@@ -319,7 +319,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see ExcludeDirectoryFilterIterator
      */
-    public function ignoreDotFiles($ignoreDotFiles)
+    public function ignoreDotFiles(bool $ignoreDotFiles)
     {
         if ($ignoreDotFiles) {
             $this->ignore |= static::IGNORE_DOT_FILES;
@@ -339,7 +339,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @see ExcludeDirectoryFilterIterator
      */
-    public function ignoreVCS($ignoreVCS)
+    public function ignoreVCS(bool $ignoreVCS)
     {
         if ($ignoreVCS) {
             $this->ignore |= static::IGNORE_VCS_FILES;
@@ -357,7 +357,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param string|string[] $pattern VCS patterns to ignore
      */
-    public static function addVCSPattern($pattern)
+    public static function addVCSPattern($pattern): void
     {
         foreach ((array) $pattern as $p) {
             self::$vcsPatterns[] = $p;
@@ -506,11 +506,10 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * By default, scanning unreadable directories content throws an AccessDeniedException.
      *
-     * @param bool $ignore
      *
      * @return $this
      */
-    public function ignoreUnreadableDirs($ignore = true)
+    public function ignoreUnreadableDirs(bool $ignore = true)
     {
         $this->ignoreUnreadableDirs = (bool) $ignore;
 
@@ -608,10 +607,8 @@ class Finder implements \IteratorAggregate, \Countable
 
     /**
      * Check if the any results were found.
-     *
-     * @return bool
      */
-    public function hasResults()
+    public function hasResults(): bool
     {
         foreach ($this->getIterator() as $_) {
             return true;
@@ -622,10 +619,8 @@ class Finder implements \IteratorAggregate, \Countable
 
     /**
      * Counts all the results collected by the iterators.
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return iterator_count($this->getIterator());
     }

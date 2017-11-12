@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  */
 class HtmlDumperTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         require __DIR__.'/../Fixtures/dumb-var.php';
 
@@ -112,7 +112,7 @@ EOTXT
         );
     }
 
-    public function testCharset()
+    public function testCharset(): void
     {
         $var = mb_convert_encoding('Словарь', 'CP1251', 'UTF-8');
 
@@ -135,7 +135,7 @@ EOTXT
         );
     }
 
-    public function testAppend()
+    public function testAppend(): void
     {
         $out = fopen('php://memory', 'r+b');
 

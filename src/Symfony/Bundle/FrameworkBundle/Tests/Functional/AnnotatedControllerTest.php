@@ -16,7 +16,7 @@ class AnnotatedControllerTest extends WebTestCase
     /**
      * @dataProvider getRoutes
      */
-    public function testAnnotatedController($path, $expectedValue)
+    public function testAnnotatedController($path, $expectedValue): void
     {
         $client = $this->createClient(array('test_case' => 'AnnotatedController', 'root_config' => 'config.yml'));
         $client->request('GET', '/annotated'.$path);

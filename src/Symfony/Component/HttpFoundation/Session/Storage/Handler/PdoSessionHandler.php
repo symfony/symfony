@@ -204,7 +204,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      * @throws \PDOException    When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
-    public function createTable()
+    public function createTable(): void
     {
         // connect if we are not yet
         $this->getConnection();
@@ -250,7 +250,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * @return bool Whether current session expired
      */
-    public function isSessionExpired()
+    public function isSessionExpired(): bool
     {
         return $this->sessionExpired;
     }
@@ -432,7 +432,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * @param string $dsn DSN string
      */
-    private function connect($dsn)
+    private function connect(string $dsn): void
     {
         $this->pdo = new \PDO($dsn, $this->username, $this->password, $this->connectionOptions);
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
@@ -451,7 +451,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      * due to http://www.mysqlperformanceblog.com/2013/12/12/one-more-innodb-gap-lock-to-avoid/ .
      * So we change it to READ COMMITTED.
      */
-    private function beginTransaction()
+    private function beginTransaction(): void
     {
         if (!$this->inTransaction) {
             if ('sqlite' === $this->driver) {
@@ -469,7 +469,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Helper method to commit a transaction.
      */
-    private function commit()
+    private function commit(): void
     {
         if ($this->inTransaction) {
             try {
@@ -491,7 +491,7 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Helper method to rollback a transaction.
      */
-    private function rollback()
+    private function rollback(): void
     {
         // We only need to rollback if we are in a transaction. Otherwise the resulting
         // error would hide the real problem why rollback was called. We might not be
@@ -517,7 +517,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * @return string The session data
      */
-    protected function doRead($sessionId)
+    protected function doRead(string $sessionId): string
     {
         if (self::LOCK_ADVISORY === $this->lockMode) {
             $this->unlockStatements[] = $this->doAdvisoryLock($sessionId);
@@ -586,7 +586,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *       - for oci using DBMS_LOCK.REQUEST
      *       - for sqlsrv using sp_getapplock with LockOwner = Session
      */
-    private function doAdvisoryLock(string $sessionId)
+    private function doAdvisoryLock(string $sessionId): \PDOStatement
     {
         switch ($this->driver) {
             case 'mysql':
@@ -741,7 +741,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *
      * @return \PDO
      */
-    protected function getConnection()
+    protected function getConnection(): \PDO
     {
         if (null === $this->pdo) {
             $this->connect($this->dsn ?: ini_get('session.save_path'));

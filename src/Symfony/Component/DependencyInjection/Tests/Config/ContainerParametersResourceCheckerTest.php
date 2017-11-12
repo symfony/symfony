@@ -28,14 +28,14 @@ class ContainerParametersResourceCheckerTest extends TestCase
     /** @var ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resource = new ContainerParametersResource(array('locales' => array('fr', 'en'), 'default_locale' => 'fr'));
         $this->container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $this->resourceChecker = new ContainerParametersResourceChecker($this->container);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->resourceChecker->supports($this->resource));
     }
@@ -43,7 +43,7 @@ class ContainerParametersResourceCheckerTest extends TestCase
     /**
      * @dataProvider isFreshProvider
      */
-    public function testIsFresh(callable $mockContainer, $expected)
+    public function testIsFresh(callable $mockContainer, $expected): void
     {
         $mockContainer($this->container);
 
@@ -52,15 +52,15 @@ class ContainerParametersResourceCheckerTest extends TestCase
 
     public function isFreshProvider()
     {
-        yield 'not fresh on missing parameter' => array(function (\PHPUnit_Framework_MockObject_MockObject $container) {
+        yield 'not fresh on missing parameter' => array(function (\PHPUnit_Framework_MockObject_MockObject $container): void {
             $container->method('hasParameter')->with('locales')->willReturn(false);
         }, false);
 
-        yield 'not fresh on different value' => array(function (\PHPUnit_Framework_MockObject_MockObject $container) {
+        yield 'not fresh on different value' => array(function (\PHPUnit_Framework_MockObject_MockObject $container): void {
             $container->method('getParameter')->with('locales')->willReturn(array('nl', 'es'));
         }, false);
 
-        yield 'fresh on every identical parameters' => array(function (\PHPUnit_Framework_MockObject_MockObject $container) {
+        yield 'fresh on every identical parameters' => array(function (\PHPUnit_Framework_MockObject_MockObject $container): void {
             $container->expects($this->exactly(2))->method('hasParameter')->willReturn(true);
             $container->expects($this->exactly(2))->method('getParameter')
                 ->withConsecutive(

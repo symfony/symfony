@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ResolveControllerNameSubscriberTest extends TestCase
 {
-    public function testReplacesControllerAttribute()
+    public function testReplacesControllerAttribute(): void
     {
         $parser = $this->getMockBuilder(ControllerNameParser::class)->disableOriginalConstructor()->getMock();
         $parser->expects($this->any())
@@ -40,7 +40,7 @@ class ResolveControllerNameSubscriberTest extends TestCase
     /**
      * @dataProvider provideSkippedControllers
      */
-    public function testSkipsOtherControllerFormats($controller)
+    public function testSkipsOtherControllerFormats($controller): void
     {
         $parser = $this->getMockBuilder(ControllerNameParser::class)->disableOriginalConstructor()->getMock();
         $parser->expects($this->never())
@@ -58,6 +58,6 @@ class ResolveControllerNameSubscriberTest extends TestCase
     public function provideSkippedControllers()
     {
         yield array('Other:format');
-        yield array(function () {});
+        yield array(function (): void {});
     }
 }

@@ -61,7 +61,7 @@ class FileLinkFormatter implements \Serializable
         return serialize($this->getFileLinkFormat());
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $this->fileLinkFormat = unserialize($serialized, array('allowed_classes' => false));
     }

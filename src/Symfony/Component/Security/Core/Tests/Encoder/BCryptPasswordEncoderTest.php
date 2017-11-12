@@ -25,7 +25,7 @@ class BCryptPasswordEncoderTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testCostBelowRange()
+    public function testCostBelowRange(): void
     {
         new BCryptPasswordEncoder(3);
     }
@@ -33,7 +33,7 @@ class BCryptPasswordEncoderTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testCostAboveRange()
+    public function testCostAboveRange(): void
     {
         new BCryptPasswordEncoder(32);
     }
@@ -41,7 +41,7 @@ class BCryptPasswordEncoderTest extends TestCase
     /**
      * @dataProvider validRangeData
      */
-    public function testCostInRange($cost)
+    public function testCostInRange($cost): void
     {
         $this->assertInstanceOf('Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder', new BCryptPasswordEncoder($cost));
     }
@@ -49,19 +49,19 @@ class BCryptPasswordEncoderTest extends TestCase
     public function validRangeData()
     {
         $costs = range(4, 31);
-        array_walk($costs, function (&$cost) { $cost = array($cost); });
+        array_walk($costs, function (&$cost): void { $cost = array($cost); });
 
         return $costs;
     }
 
-    public function testResultLength()
+    public function testResultLength(): void
     {
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
         $result = $encoder->encodePassword(self::PASSWORD, null);
         $this->assertEquals(60, strlen($result));
     }
 
-    public function testValidation()
+    public function testValidation(): void
     {
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
         $result = $encoder->encodePassword(self::PASSWORD, null);
@@ -72,14 +72,14 @@ class BCryptPasswordEncoderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testEncodePasswordLength()
+    public function testEncodePasswordLength(): void
     {
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
 
         $encoder->encodePassword(str_repeat('a', 73), 'salt');
     }
 
-    public function testCheckPasswordLength()
+    public function testCheckPasswordLength(): void
     {
         $encoder = new BCryptPasswordEncoder(self::VALID_COST);
         $result = $encoder->encodePassword(str_repeat('a', 72), null);

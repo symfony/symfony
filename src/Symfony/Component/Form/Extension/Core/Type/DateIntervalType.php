@@ -46,7 +46,7 @@ class DateIntervalType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['with_years'] && !$options['with_months'] && !$options['with_weeks'] && !$options['with_days'] && !$options['with_hours'] && !$options['with_minutes'] && !$options['with_seconds']) {
             throw new InvalidConfigurationException('You must enable at least one interval field.');
@@ -159,7 +159,7 @@ class DateIntervalType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $vars = array(
             'widget' => $options['widget'],
@@ -174,7 +174,7 @@ class DateIntervalType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $timeParts = $this->timeParts;
         $compound = function (Options $options) {

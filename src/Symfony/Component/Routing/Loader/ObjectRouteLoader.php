@@ -32,7 +32,7 @@ abstract class ObjectRouteLoader extends Loader
      *
      * @return object
      */
-    abstract protected function getServiceObject($id);
+    abstract protected function getServiceObject(string $id);
 
     /**
      * Calls the service that will load the routes.
@@ -42,7 +42,7 @@ abstract class ObjectRouteLoader extends Loader
      *
      * @return RouteCollection
      */
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): RouteCollection
     {
         $parts = explode(':', $resource);
         if (2 != count($parts)) {
@@ -84,7 +84,7 @@ abstract class ObjectRouteLoader extends Loader
         return 'service' === $type;
     }
 
-    private function addClassResource(\ReflectionClass $class, RouteCollection $collection)
+    private function addClassResource(\ReflectionClass $class, RouteCollection $collection): void
     {
         do {
             if (is_file($class->getFileName())) {

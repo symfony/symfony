@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TimeDataCollectorTest extends TestCase
 {
-    public function testCollect()
+    public function testCollect(): void
     {
         $c = new TimeDataCollector();
 

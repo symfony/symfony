@@ -81,7 +81,7 @@ class Route implements \Serializable
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         $data = unserialize($serialized);
         $this->path = $data['path'];
@@ -105,7 +105,7 @@ class Route implements \Serializable
      *
      * @return string The path pattern
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
@@ -119,7 +119,7 @@ class Route implements \Serializable
      *
      * @return $this
      */
-    public function setPath($pattern)
+    public function setPath(string $pattern)
     {
         // A pattern must start with a slash and must not have multiple slashes at the beginning because the
         // generated path for this route would be confused with a network path, e.g. '//domain.com/path'.
@@ -134,7 +134,7 @@ class Route implements \Serializable
      *
      * @return string The host pattern
      */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->host;
     }
@@ -148,7 +148,7 @@ class Route implements \Serializable
      *
      * @return $this
      */
-    public function setHost($pattern)
+    public function setHost(string $pattern)
     {
         $this->host = (string) $pattern;
         $this->compiled = null;
@@ -188,11 +188,10 @@ class Route implements \Serializable
     /**
      * Checks if a scheme requirement has been set.
      *
-     * @param string $scheme
      *
      * @return bool true if the scheme requirement exists, otherwise false
      */
-    public function hasScheme($scheme)
+    public function hasScheme(string $scheme): bool
     {
         return in_array(strtolower($scheme), $this->schemes, true);
     }
@@ -231,7 +230,7 @@ class Route implements \Serializable
      *
      * @return array The options
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -283,7 +282,7 @@ class Route implements \Serializable
      *
      * @return $this
      */
-    public function setOption($name, $value)
+    public function setOption(string $name, $value)
     {
         $this->options[$name] = $value;
         $this->compiled = null;
@@ -298,7 +297,7 @@ class Route implements \Serializable
      *
      * @return mixed The option value or null when not given
      */
-    public function getOption($name)
+    public function getOption(string $name)
     {
         return isset($this->options[$name]) ? $this->options[$name] : null;
     }
@@ -310,7 +309,7 @@ class Route implements \Serializable
      *
      * @return bool true if the option is set, false otherwise
      */
-    public function hasOption($name)
+    public function hasOption(string $name): bool
     {
         return array_key_exists($name, $this->options);
     }
@@ -320,7 +319,7 @@ class Route implements \Serializable
      *
      * @return array The defaults
      */
-    public function getDefaults()
+    public function getDefaults(): array
     {
         return $this->defaults;
     }
@@ -367,7 +366,7 @@ class Route implements \Serializable
      *
      * @return mixed The default value or null when not given
      */
-    public function getDefault($name)
+    public function getDefault(string $name)
     {
         return isset($this->defaults[$name]) ? $this->defaults[$name] : null;
     }
@@ -379,7 +378,7 @@ class Route implements \Serializable
      *
      * @return bool true if the default value is set, false otherwise
      */
-    public function hasDefault($name)
+    public function hasDefault(string $name): bool
     {
         return array_key_exists($name, $this->defaults);
     }
@@ -392,7 +391,7 @@ class Route implements \Serializable
      *
      * @return $this
      */
-    public function setDefault($name, $default)
+    public function setDefault(string $name, $default)
     {
         $this->defaults[$name] = $default;
         $this->compiled = null;
@@ -405,7 +404,7 @@ class Route implements \Serializable
      *
      * @return array The requirements
      */
-    public function getRequirements()
+    public function getRequirements(): array
     {
         return $this->requirements;
     }
@@ -452,7 +451,7 @@ class Route implements \Serializable
      *
      * @return string|null The regex or null when not given
      */
-    public function getRequirement($key)
+    public function getRequirement(string $key): ?string
     {
         return isset($this->requirements[$key]) ? $this->requirements[$key] : null;
     }
@@ -464,7 +463,7 @@ class Route implements \Serializable
      *
      * @return bool true if a requirement is specified, false otherwise
      */
-    public function hasRequirement($key)
+    public function hasRequirement(string $key): bool
     {
         return array_key_exists($key, $this->requirements);
     }
@@ -477,7 +476,7 @@ class Route implements \Serializable
      *
      * @return $this
      */
-    public function setRequirement($key, $regex)
+    public function setRequirement(string $key, string $regex)
     {
         $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
         $this->compiled = null;
@@ -490,7 +489,7 @@ class Route implements \Serializable
      *
      * @return string The condition
      */
-    public function getCondition()
+    public function getCondition(): string
     {
         return $this->condition;
     }
@@ -504,7 +503,7 @@ class Route implements \Serializable
      *
      * @return $this
      */
-    public function setCondition($condition)
+    public function setCondition(string $condition)
     {
         $this->condition = (string) $condition;
         $this->compiled = null;
@@ -522,7 +521,7 @@ class Route implements \Serializable
      *
      * @see RouteCompiler which is responsible for the compilation process
      */
-    public function compile()
+    public function compile(): CompiledRoute
     {
         if (null !== $this->compiled) {
             return $this->compiled;

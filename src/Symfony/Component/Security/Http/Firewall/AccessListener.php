@@ -45,7 +45,7 @@ class AccessListener implements ListenerInterface
      * @throws AccessDeniedException
      * @throws AuthenticationCredentialsNotFoundException
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         if (null === $token = $this->tokenStorage->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');

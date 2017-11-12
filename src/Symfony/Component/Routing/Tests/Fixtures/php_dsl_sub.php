@@ -2,7 +2,7 @@
 
 namespace Symfony\Component\Routing\Loader\Configurator;
 
-return function (RoutingConfigurator $routes) {
+return function (RoutingConfigurator $routes): void {
     $add = $routes->collection('c_')
         ->prefix('pub');
 

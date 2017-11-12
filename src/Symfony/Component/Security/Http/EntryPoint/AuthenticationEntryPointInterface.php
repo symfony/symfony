@@ -41,5 +41,5 @@ interface AuthenticationEntryPointInterface
      *
      * @return Response
      */
-    public function start(Request $request, AuthenticationException $authException = null);
+    public function start(Request $request, AuthenticationException $authException = null): Response;
 }

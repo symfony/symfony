@@ -21,7 +21,7 @@ class RepeatedType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Overwrite required option for child fields
         $options['first_options']['required'] = $options['required'];
@@ -44,7 +44,7 @@ class RepeatedType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(array(
             'type' => __NAMESPACE__.'\TextType',

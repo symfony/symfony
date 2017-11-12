@@ -65,7 +65,7 @@ class Container implements ResettableContainerInterface
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen.
      */
-    public function compile()
+    public function compile(): void
     {
         $this->parameterBag->resolve();
 
@@ -76,10 +76,8 @@ class Container implements ResettableContainerInterface
 
     /**
      * Returns true if the container is compiled.
-     *
-     * @return bool
      */
-    public function isCompiled()
+    public function isCompiled(): bool
     {
         return $this->compiled;
     }
@@ -89,7 +87,7 @@ class Container implements ResettableContainerInterface
      *
      * @return ParameterBagInterface A ParameterBagInterface instance
      */
-    public function getParameterBag()
+    public function getParameterBag(): ParameterBagInterface
     {
         return $this->parameterBag;
     }
@@ -103,7 +101,7 @@ class Container implements ResettableContainerInterface
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
-    public function getParameter($name)
+    public function getParameter(string $name)
     {
         return $this->parameterBag->get($name);
     }
@@ -115,7 +113,7 @@ class Container implements ResettableContainerInterface
      *
      * @return bool The presence of parameter in container
      */
-    public function hasParameter($name)
+    public function hasParameter(string $name): bool
     {
         return $this->parameterBag->has($name);
     }
@@ -126,7 +124,7 @@ class Container implements ResettableContainerInterface
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
      */
-    public function setParameter($name, $value)
+    public function setParameter(string $name, $value): void
     {
         $this->parameterBag->set($name, $value);
     }
@@ -140,7 +138,7 @@ class Container implements ResettableContainerInterface
      * @param string $id      The service identifier
      * @param object $service The service instance
      */
-    public function set($id, $service)
+    public function set(string $id, $service): void
     {
         if ('service_container' === $id) {
             throw new InvalidArgumentException('You cannot set service "service_container".');
@@ -178,7 +176,7 @@ class Container implements ResettableContainerInterface
      *
      * @return bool true if the service is defined, false otherwise
      */
-    public function has($id)
+    public function has(string $id): bool
     {
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
@@ -207,7 +205,7 @@ class Container implements ResettableContainerInterface
      *
      * @see Reference
      */
-    public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
@@ -271,7 +269,7 @@ class Container implements ResettableContainerInterface
      *
      * @return bool true if service has already been initialized, false otherwise
      */
-    public function initialized($id)
+    public function initialized(string $id): bool
     {
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
@@ -287,7 +285,7 @@ class Container implements ResettableContainerInterface
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->services = array();
     }
@@ -297,17 +295,15 @@ class Container implements ResettableContainerInterface
      *
      * @return array An array of all defined service ids
      */
-    public function getServiceIds()
+    public function getServiceIds(): array
     {
         return array_unique(array_merge(array('service_container'), array_keys($this->fileMap), array_keys($this->methodMap), array_keys($this->services)));
     }
 
     /**
      * Gets service ids that existed at compile time.
-     *
-     * @return array
      */
-    public function getRemovedIds()
+    public function getRemovedIds(): array
     {
         return array();
     }
@@ -319,7 +315,7 @@ class Container implements ResettableContainerInterface
      *
      * @return string The camelized string
      */
-    public static function camelize($id)
+    public static function camelize(string $id): string
     {
         return strtr(ucwords(strtr($id, array('_' => ' ', '.' => '_ ', '\\' => '_ '))), array(' ' => ''));
     }
@@ -331,7 +327,7 @@ class Container implements ResettableContainerInterface
      *
      * @return string The underscored string
      */
-    public static function underscore($id)
+    public static function underscore(string $id): string
     {
         return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), str_replace('_', '.', $id)));
     }
@@ -355,7 +351,7 @@ class Container implements ResettableContainerInterface
      *
      * @throws EnvNotFoundException When the environment variable is not found and has no default value
      */
-    protected function getEnv($name)
+    protected function getEnv(string $name)
     {
         if (isset($this->resolving[$envName = "env($name)"])) {
             throw new ParameterCircularReferenceException(array_keys($this->resolving));

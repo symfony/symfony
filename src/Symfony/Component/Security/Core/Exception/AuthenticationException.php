@@ -25,15 +25,13 @@ class AuthenticationException extends \RuntimeException implements \Serializable
 
     /**
      * Get the token.
-     *
-     * @return TokenInterface
      */
-    public function getToken()
+    public function getToken(): TokenInterface
     {
         return $this->token;
     }
 
-    public function setToken(TokenInterface $token)
+    public function setToken(TokenInterface $token): void
     {
         $this->token = $token;
     }
@@ -49,7 +47,7 @@ class AuthenticationException extends \RuntimeException implements \Serializable
         ));
     }
 
-    public function unserialize($str)
+    public function unserialize($str): void
     {
         list(
             $this->token,
@@ -62,20 +60,16 @@ class AuthenticationException extends \RuntimeException implements \Serializable
 
     /**
      * Message key to be used by the translation component.
-     *
-     * @return string
      */
-    public function getMessageKey()
+    public function getMessageKey(): string
     {
         return 'An authentication exception occurred.';
     }
 
     /**
      * Message data to be used by the translation component.
-     *
-     * @return array
      */
-    public function getMessageData()
+    public function getMessageData(): array
     {
         return array();
     }

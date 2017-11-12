@@ -24,5 +24,5 @@ interface RequestHandlerInterface
      * @param FormInterface $form    The form to submit
      * @param mixed         $request The current request
      */
-    public function handleRequest(FormInterface $form, $request = null);
+    public function handleRequest(FormInterface $form, $request = null): void;
 }

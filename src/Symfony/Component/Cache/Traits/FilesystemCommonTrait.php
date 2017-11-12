@@ -23,7 +23,7 @@ trait FilesystemCommonTrait
     private $directory;
     private $tmp;
 
-    private function init($namespace, $directory)
+    private function init($namespace, $directory): void
     {
         if (!isset($directory[0])) {
             $directory = sys_get_temp_dir().'/symfony-cache';
@@ -111,7 +111,7 @@ trait FilesystemCommonTrait
     /**
      * @internal
      */
-    public static function throwError($type, $message, $file, $line)
+    public static function throwError($type, $message, $file, $line): void
     {
         throw new \ErrorException($message, 0, $type, $file, $line);
     }

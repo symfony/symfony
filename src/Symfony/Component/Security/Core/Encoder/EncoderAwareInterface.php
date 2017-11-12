@@ -24,5 +24,5 @@ interface EncoderAwareInterface
      *
      * @return string
      */
-    public function getEncoderName();
+    public function getEncoderName(): string;
 }

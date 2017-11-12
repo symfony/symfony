@@ -294,7 +294,7 @@ final class Dotenv
         return $value;
     }
 
-    private function skipEmptyLines()
+    private function skipEmptyLines(): void
     {
         if (preg_match('/(?:\s*+(?:#[^\n]*+)?+)++/A', $this->data, $match, null, $this->cursor)) {
             $this->moveCursor($match[0]);
@@ -389,7 +389,7 @@ final class Dotenv
         return str_replace('\\$', '$', $value);
     }
 
-    private function moveCursor($text)
+    private function moveCursor($text): void
     {
         $this->cursor += strlen($text);
         $this->lineno += substr_count($text, "\n");

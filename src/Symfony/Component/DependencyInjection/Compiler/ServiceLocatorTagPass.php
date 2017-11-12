@@ -70,12 +70,9 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     }
 
     /**
-     * @param ContainerBuilder $container
      * @param Reference[]      $refMap
-     *
-     * @return Reference
      */
-    public static function register(ContainerBuilder $container, array $refMap)
+    public static function register(ContainerBuilder $container, array $refMap): Reference
     {
         foreach ($refMap as $id => $ref) {
             if (!$ref instanceof Reference) {

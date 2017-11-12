@@ -20,7 +20,7 @@ class FileTest extends TestCase
     /**
      * @dataProvider provideValidSizes
      */
-    public function testMaxSize($maxSize, $bytes, $binaryFormat)
+    public function testMaxSize($maxSize, $bytes, $binaryFormat): void
     {
         $file = new File(array('maxSize' => $maxSize));
 
@@ -31,7 +31,7 @@ class FileTest extends TestCase
     /**
      * @dataProvider provideValidSizes
      */
-    public function testMaxSizeCanBeSetAfterInitialization($maxSize, $bytes, $binaryFormat)
+    public function testMaxSizeCanBeSetAfterInitialization($maxSize, $bytes, $binaryFormat): void
     {
         $file = new File();
         $file->maxSize = $maxSize;
@@ -44,7 +44,7 @@ class FileTest extends TestCase
      * @dataProvider provideInvalidSizes
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
+    public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize): void
     {
         $file = new File(array('maxSize' => 1000));
         $file->maxSize = $maxSize;
@@ -53,7 +53,7 @@ class FileTest extends TestCase
     /**
      * @dataProvider provideInvalidSizes
      */
-    public function testMaxSizeCannotBeSetToInvalidValueAfterInitialization($maxSize)
+    public function testMaxSizeCannotBeSetToInvalidValueAfterInitialization($maxSize): void
     {
         $file = new File(array('maxSize' => 1000));
 
@@ -69,7 +69,7 @@ class FileTest extends TestCase
      * @dataProvider provideInValidSizes
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalidMaxSize($maxSize)
+    public function testInvalidMaxSize($maxSize): void
     {
         new File(array('maxSize' => $maxSize));
     }
@@ -105,7 +105,7 @@ class FileTest extends TestCase
     /**
      * @dataProvider provideFormats
      */
-    public function testBinaryFormat($maxSize, $guessedFormat, $binaryFormat)
+    public function testBinaryFormat($maxSize, $guessedFormat, $binaryFormat): void
     {
         $file = new File(array('maxSize' => $maxSize, 'binaryFormat' => $guessedFormat));
 

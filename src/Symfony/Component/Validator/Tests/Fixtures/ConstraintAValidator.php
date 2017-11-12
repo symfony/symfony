@@ -19,14 +19,14 @@ class ConstraintAValidator extends ConstraintValidator
 {
     public static $passedContext;
 
-    public function initialize(ExecutionContextInterface $context)
+    public function initialize(ExecutionContextInterface $context): void
     {
         parent::initialize($context);
 
         self::$passedContext = $context;
     }
 
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if ('VALID' != $value) {
             $this->context->addViolation('message', array('param' => 'value'));

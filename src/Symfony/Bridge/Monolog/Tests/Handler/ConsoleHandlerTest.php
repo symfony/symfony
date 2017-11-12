@@ -29,13 +29,13 @@ use Symfony\Component\Console\Command\Command;
  */
 class ConsoleHandlerTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $handler = new ConsoleHandler(null, false);
         $this->assertFalse($handler->getBubble(), 'the bubble parameter gets propagated');
     }
 
-    public function testIsHandling()
+    public function testIsHandling(): void
     {
         $handler = new ConsoleHandler();
         $this->assertFalse($handler->isHandling(array()), '->isHandling returns false when no output is set');
@@ -44,7 +44,7 @@ class ConsoleHandlerTest extends TestCase
     /**
      * @dataProvider provideVerbosityMappingTests
      */
-    public function testVerbosityMapping($verbosity, $level, $isHandling, array $map = array())
+    public function testVerbosityMapping($verbosity, $level, $isHandling, array $map = array()): void
     {
         $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output
@@ -108,7 +108,7 @@ class ConsoleHandlerTest extends TestCase
         );
     }
 
-    public function testVerbosityChanged()
+    public function testVerbosityChanged(): void
     {
         $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output
@@ -130,7 +130,7 @@ class ConsoleHandlerTest extends TestCase
         );
     }
 
-    public function testGetFormatter()
+    public function testGetFormatter(): void
     {
         $handler = new ConsoleHandler();
         $this->assertInstanceOf('Symfony\Bridge\Monolog\Formatter\ConsoleFormatter', $handler->getFormatter(),
@@ -138,7 +138,7 @@ class ConsoleHandlerTest extends TestCase
         );
     }
 
-    public function testWritingAndFormatting()
+    public function testWritingAndFormatting(): void
     {
         $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output
@@ -168,7 +168,7 @@ class ConsoleHandlerTest extends TestCase
         $this->assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
     }
 
-    public function testLogsFromListeners()
+    public function testLogsFromListeners(): void
     {
         $output = new BufferedOutput();
         $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
@@ -179,19 +179,19 @@ class ConsoleHandlerTest extends TestCase
         $logger->pushHandler($handler);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger): void {
             $logger->addInfo('Before command message.');
         });
-        $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger): void {
             $logger->addInfo('Before terminate message.');
         });
 
         $dispatcher->addSubscriber($handler);
 
-        $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger): void {
             $logger->addInfo('After command message.');
         });
-        $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger): void {
             $logger->addInfo('After terminate message.');
         });
 

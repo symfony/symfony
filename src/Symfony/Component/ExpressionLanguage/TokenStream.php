@@ -33,10 +33,8 @@ class TokenStream
 
     /**
      * Returns a string representation of the token stream.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return implode("\n", $this->tokens);
     }
@@ -44,7 +42,7 @@ class TokenStream
     /**
      * Sets the pointer to the next token and returns the old one.
      */
-    public function next()
+    public function next(): void
     {
         if (!isset($this->tokens[$this->position])) {
             throw new SyntaxError('Unexpected end of expression', $this->current->cursor, $this->expression);
@@ -62,7 +60,7 @@ class TokenStream
      * @param string|null $value   The token value
      * @param string|null $message The syntax error message
      */
-    public function expect($type, $value = null, $message = null)
+    public function expect($type, $value = null, $message = null): void
     {
         $token = $this->current;
         if (!$token->test($type, $value)) {
@@ -73,20 +71,16 @@ class TokenStream
 
     /**
      * Checks if end of stream was reached.
-     *
-     * @return bool
      */
-    public function isEOF()
+    public function isEOF(): bool
     {
         return Token::EOF_TYPE === $this->current->type;
     }
 
     /**
      * @internal
-     *
-     * @return string
      */
-    public function getExpression()
+    public function getExpression(): string
     {
         return $this->expression;
     }

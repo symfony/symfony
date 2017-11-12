@@ -62,7 +62,7 @@ class ConsoleLogger extends AbstractLogger
     /**
      * {@inheritdoc}
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = array()): void
     {
         if (!isset($this->verbosityLevelMap[$level])) {
             throw new InvalidArgumentException(sprintf('The log level "%s" does not exist.', $level));
@@ -87,10 +87,8 @@ class ConsoleLogger extends AbstractLogger
 
     /**
      * Returns true when any messages have been logged at error levels.
-     *
-     * @return bool
      */
-    public function hasErrored()
+    public function hasErrored(): bool
     {
         return $this->errored;
     }

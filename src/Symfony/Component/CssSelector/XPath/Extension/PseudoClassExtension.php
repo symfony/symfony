@@ -46,7 +46,7 @@ class PseudoClassExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateRoot(XPathExpr $xpath)
+    public function translateRoot(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition('not(parent::*)');
     }
@@ -54,7 +54,7 @@ class PseudoClassExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateFirstChild(XPathExpr $xpath)
+    public function translateFirstChild(XPathExpr $xpath): XPathExpr
     {
         return $xpath
             ->addStarPrefix()
@@ -65,7 +65,7 @@ class PseudoClassExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateLastChild(XPathExpr $xpath)
+    public function translateLastChild(XPathExpr $xpath): XPathExpr
     {
         return $xpath
             ->addStarPrefix()
@@ -78,7 +78,7 @@ class PseudoClassExtension extends AbstractExtension
      *
      * @throws ExpressionErrorException
      */
-    public function translateFirstOfType(XPathExpr $xpath)
+    public function translateFirstOfType(XPathExpr $xpath): XPathExpr
     {
         if ('*' === $xpath->getElement()) {
             throw new ExpressionErrorException('"*:first-of-type" is not implemented.');
@@ -94,7 +94,7 @@ class PseudoClassExtension extends AbstractExtension
      *
      * @throws ExpressionErrorException
      */
-    public function translateLastOfType(XPathExpr $xpath)
+    public function translateLastOfType(XPathExpr $xpath): XPathExpr
     {
         if ('*' === $xpath->getElement()) {
             throw new ExpressionErrorException('"*:last-of-type" is not implemented.');
@@ -108,7 +108,7 @@ class PseudoClassExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateOnlyChild(XPathExpr $xpath)
+    public function translateOnlyChild(XPathExpr $xpath): XPathExpr
     {
         return $xpath
             ->addStarPrefix()
@@ -121,7 +121,7 @@ class PseudoClassExtension extends AbstractExtension
      *
      * @throws ExpressionErrorException
      */
-    public function translateOnlyOfType(XPathExpr $xpath)
+    public function translateOnlyOfType(XPathExpr $xpath): XPathExpr
     {
         if ('*' === $xpath->getElement()) {
             throw new ExpressionErrorException('"*:only-of-type" is not implemented.');
@@ -133,7 +133,7 @@ class PseudoClassExtension extends AbstractExtension
     /**
      * @return XPathExpr
      */
-    public function translateEmpty(XPathExpr $xpath)
+    public function translateEmpty(XPathExpr $xpath): XPathExpr
     {
         return $xpath->addCondition('not(*) and not(string-length())');
     }

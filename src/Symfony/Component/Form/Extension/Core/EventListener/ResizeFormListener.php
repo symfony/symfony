@@ -32,8 +32,6 @@ class ResizeFormListener implements EventSubscriberInterface
     private $deleteEmpty;
 
     /**
-     * @param string        $type
-     * @param array         $options
      * @param bool          $allowAdd    Whether children could be added to the group
      * @param bool          $allowDelete Whether children could be removed from the group
      * @param bool|callable $deleteEmpty
@@ -57,7 +55,7 @@ class ResizeFormListener implements EventSubscriberInterface
         );
     }
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -83,7 +81,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
-    public function preSubmit(FormEvent $event)
+    public function preSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -113,7 +111,7 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
-    public function onSubmit(FormEvent $event)
+    public function onSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData();

@@ -22,7 +22,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlEncoderTest extends TestCase
 {
-    public function testEncode()
+    public function testEncode(): void
     {
         $encoder = new YamlEncoder();
 
@@ -30,7 +30,7 @@ class YamlEncoderTest extends TestCase
         $this->assertEquals('{ foo: 1 }', $encoder->encode(array('foo' => 1), 'yaml'));
     }
 
-    public function testSupportsEncoding()
+    public function testSupportsEncoding(): void
     {
         $encoder = new YamlEncoder();
 
@@ -38,7 +38,7 @@ class YamlEncoderTest extends TestCase
         $this->assertFalse($encoder->supportsEncoding('json'));
     }
 
-    public function testDecode()
+    public function testDecode(): void
     {
         $encoder = new YamlEncoder();
 
@@ -46,7 +46,7 @@ class YamlEncoderTest extends TestCase
         $this->assertEquals(array('foo' => 1), $encoder->decode('{ foo: 1 }', 'yaml'));
     }
 
-    public function testSupportsDecoding()
+    public function testSupportsDecoding(): void
     {
         $encoder = new YamlEncoder();
 
@@ -54,7 +54,7 @@ class YamlEncoderTest extends TestCase
         $this->assertFalse($encoder->supportsDecoding('json'));
     }
 
-    public function testContext()
+    public function testContext(): void
     {
         $encoder = new YamlEncoder(new Dumper(), new Parser(), array('yaml_inline' => 1, 'yaml_indent' => 4, 'yaml_flags' => Yaml::DUMP_OBJECT | Yaml::PARSE_OBJECT));
 

@@ -32,7 +32,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
     /**
      * Checks the ContainerBuilder object for circular references.
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $graph = $container->getCompiler()->getServiceReferenceGraph();
 
@@ -51,7 +51,7 @@ class CheckCircularReferencesPass implements CompilerPassInterface
      *
      * @throws ServiceCircularReferenceException when a circular reference is found
      */
-    private function checkOutEdges(array $edges)
+    private function checkOutEdges(array $edges): void
     {
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();

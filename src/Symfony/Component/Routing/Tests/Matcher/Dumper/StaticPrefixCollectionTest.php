@@ -11,7 +11,7 @@ class StaticPrefixCollectionTest extends TestCase
     /**
      * @dataProvider routeProvider
      */
-    public function testGrouping(array $routes, $expected)
+    public function testGrouping(array $routes, $expected): void
     {
         $collection = new StaticPrefixCollection('/');
 

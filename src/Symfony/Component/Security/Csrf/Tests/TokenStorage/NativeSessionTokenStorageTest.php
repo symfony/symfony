@@ -29,21 +29,21 @@ class NativeSessionTokenStorageTest extends TestCase
      */
     private $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $_SESSION = array();
 
         $this->storage = new NativeSessionTokenStorage(self::SESSION_NAMESPACE);
     }
 
-    public function testStoreTokenInClosedSession()
+    public function testStoreTokenInClosedSession(): void
     {
         $this->storage->setToken('token_id', 'TOKEN');
 
         $this->assertSame(array(self::SESSION_NAMESPACE => array('token_id' => 'TOKEN')), $_SESSION);
     }
 
-    public function testStoreTokenInClosedSessionWithExistingSessionId()
+    public function testStoreTokenInClosedSessionWithExistingSessionId(): void
     {
         session_id('foobar');
 
@@ -55,7 +55,7 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->assertSame(array(self::SESSION_NAMESPACE => array('token_id' => 'TOKEN')), $_SESSION);
     }
 
-    public function testStoreTokenInActiveSession()
+    public function testStoreTokenInActiveSession(): void
     {
         session_start();
 
@@ -67,7 +67,7 @@ class NativeSessionTokenStorageTest extends TestCase
     /**
      * @depends testStoreTokenInClosedSession
      */
-    public function testCheckToken()
+    public function testCheckToken(): void
     {
         $this->assertFalse($this->storage->hasToken('token_id'));
 
@@ -79,7 +79,7 @@ class NativeSessionTokenStorageTest extends TestCase
     /**
      * @depends testStoreTokenInClosedSession
      */
-    public function testGetExistingToken()
+    public function testGetExistingToken(): void
     {
         $this->storage->setToken('token_id', 'TOKEN');
 
@@ -89,7 +89,7 @@ class NativeSessionTokenStorageTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException
      */
-    public function testGetNonExistingToken()
+    public function testGetNonExistingToken(): void
     {
         $this->storage->getToken('token_id');
     }
@@ -97,7 +97,7 @@ class NativeSessionTokenStorageTest extends TestCase
     /**
      * @depends testCheckToken
      */
-    public function testRemoveNonExistingToken()
+    public function testRemoveNonExistingToken(): void
     {
         $this->assertNull($this->storage->removeToken('token_id'));
         $this->assertFalse($this->storage->hasToken('token_id'));
@@ -106,7 +106,7 @@ class NativeSessionTokenStorageTest extends TestCase
     /**
      * @depends testCheckToken
      */
-    public function testRemoveExistingToken()
+    public function testRemoveExistingToken(): void
     {
         $this->storage->setToken('token_id', 'TOKEN');
 

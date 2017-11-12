@@ -22,7 +22,7 @@ use Symfony\Component\Lock\StoreInterface;
  */
 class LockTest extends TestCase
 {
-    public function testAcquireNoBlocking()
+    public function testAcquireNoBlocking(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -35,7 +35,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(false));
     }
 
-    public function testAcquireReturnsFalse()
+    public function testAcquireReturnsFalse(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -49,7 +49,7 @@ class LockTest extends TestCase
         $this->assertFalse($lock->acquire(false));
     }
 
-    public function testAcquireBlocking()
+    public function testAcquireBlocking(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -65,7 +65,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(true));
     }
 
-    public function testAcquireSetsTtl()
+    public function testAcquireSetsTtl(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -82,7 +82,7 @@ class LockTest extends TestCase
         $lock->acquire();
     }
 
-    public function testRefresh()
+    public function testRefresh(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -96,7 +96,7 @@ class LockTest extends TestCase
         $lock->refresh();
     }
 
-    public function testIsAquired()
+    public function testIsAquired(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -111,7 +111,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->isAcquired());
     }
 
-    public function testRelease()
+    public function testRelease(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -131,7 +131,7 @@ class LockTest extends TestCase
         $lock->release();
     }
 
-    public function testReleaseOnDestruction()
+    public function testReleaseOnDestruction(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -150,7 +150,7 @@ class LockTest extends TestCase
         unset($lock);
     }
 
-    public function testNoAutoReleaseWhenNotConfigured()
+    public function testNoAutoReleaseWhenNotConfigured(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -172,7 +172,7 @@ class LockTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Lock\Exception\LockReleasingException
      */
-    public function testReleaseThrowsExceptionIfNotWellDeleted()
+    public function testReleaseThrowsExceptionIfNotWellDeleted(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -195,7 +195,7 @@ class LockTest extends TestCase
     /**
      * @dataProvider provideExpiredDates
      */
-    public function testExpiration($ttls, $expected)
+    public function testExpiration($ttls, $expected): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();

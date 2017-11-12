@@ -37,7 +37,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function add(Response $response)
+    public function add(Response $response): void
     {
         if (!$response->isFresh() || !$response->isCacheable()) {
             $this->cacheable = false;
@@ -57,7 +57,7 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function update(Response $response)
+    public function update(Response $response): void
     {
         // if we have no embedded Response, do nothing
         if (0 === $this->embeddedResponses) {

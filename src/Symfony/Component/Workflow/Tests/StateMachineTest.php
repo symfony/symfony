@@ -9,7 +9,7 @@ class StateMachineTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    public function testCan()
+    public function testCan(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 
@@ -26,7 +26,7 @@ class StateMachineTest extends TestCase
         $this->assertFalse($net->can($subject, 't1'));
     }
 
-    public function testCanWithMultipleTransition()
+    public function testCanWithMultipleTransition(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 

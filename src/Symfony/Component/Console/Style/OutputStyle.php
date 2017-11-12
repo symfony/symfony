@@ -33,17 +33,12 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     /**
      * {@inheritdoc}
      */
-    public function newLine($count = 1)
+    public function newLine($count = 1): void
     {
         $this->output->write(str_repeat(PHP_EOL, $count));
     }
 
-    /**
-     * @param int $max
-     *
-     * @return ProgressBar
-     */
-    public function createProgressBar($max = 0)
+    public function createProgressBar(int $max = 0): ProgressBar
     {
         return new ProgressBar($this->output, $max);
     }
@@ -51,7 +46,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     /**
      * {@inheritdoc}
      */
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
+    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL): void
     {
         $this->output->write($messages, $newline, $type);
     }
@@ -59,7 +54,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     /**
      * {@inheritdoc}
      */
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
+    public function writeln($messages, $type = self::OUTPUT_NORMAL): void
     {
         $this->output->writeln($messages, $type);
     }
@@ -67,7 +62,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     /**
      * {@inheritdoc}
      */
-    public function setVerbosity($level)
+    public function setVerbosity($level): void
     {
         $this->output->setVerbosity($level);
     }
@@ -83,7 +78,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     /**
      * {@inheritdoc}
      */
-    public function setDecorated($decorated)
+    public function setDecorated($decorated): void
     {
         $this->output->setDecorated($decorated);
     }
@@ -99,7 +94,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     /**
      * {@inheritdoc}
      */
-    public function setFormatter(OutputFormatterInterface $formatter)
+    public function setFormatter(OutputFormatterInterface $formatter): void
     {
         $this->output->setFormatter($formatter);
     }

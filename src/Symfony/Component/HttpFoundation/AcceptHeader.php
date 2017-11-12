@@ -43,12 +43,8 @@ class AcceptHeader
 
     /**
      * Builds an AcceptHeader instance from a string.
-     *
-     * @param string $headerValue
-     *
-     * @return self
      */
-    public static function fromString($headerValue)
+    public static function fromString(string $headerValue): self
     {
         $index = 0;
 
@@ -62,22 +58,16 @@ class AcceptHeader
 
     /**
      * Returns header value's string representation.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return implode(',', $this->items);
     }
 
     /**
      * Tests if header has given value.
-     *
-     * @param string $value
-     *
-     * @return bool
      */
-    public function has($value)
+    public function has(string $value): bool
     {
         return isset($this->items[$value]);
     }
@@ -85,11 +75,10 @@ class AcceptHeader
     /**
      * Returns given value's item, if exists.
      *
-     * @param string $value
      *
      * @return AcceptHeaderItem|null
      */
-    public function get($value)
+    public function get(string $value): ?AcceptHeaderItem
     {
         return isset($this->items[$value]) ? $this->items[$value] : null;
     }
@@ -121,12 +110,8 @@ class AcceptHeader
 
     /**
      * Filters items on their value using given regex.
-     *
-     * @param string $pattern
-     *
-     * @return self
      */
-    public function filter($pattern)
+    public function filter(string $pattern): self
     {
         return new self(array_filter($this->items, function (AcceptHeaderItem $item) use ($pattern) {
             return preg_match($pattern, $item->getValue());
@@ -138,7 +123,7 @@ class AcceptHeader
      *
      * @return AcceptHeaderItem|null
      */
-    public function first()
+    public function first(): ?AcceptHeaderItem
     {
         $this->sort();
 
@@ -148,7 +133,7 @@ class AcceptHeader
     /**
      * Sorts items by descending quality.
      */
-    private function sort()
+    private function sort(): void
     {
         if (!$this->sorted) {
             uasort($this->items, function (AcceptHeaderItem $a, AcceptHeaderItem $b) {

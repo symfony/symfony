@@ -62,7 +62,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->clonesIndex = ++$this->clonesCount;
     }
 
-    public function dump(Data $data)
+    public function dump(Data $data): void
     {
         if ($this->stopwatch) {
             $this->stopwatch->start('dump');
@@ -136,7 +136,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
     }
 
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         // Sub-requests and programmatic calls stay in the collected profile.
         if ($this->dumper || ($this->requestStack && $this->requestStack->getMasterRequest() !== $request) || $request->isXmlHttpRequest() || $request->headers->has('Origin')) {
@@ -164,7 +164,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->stopwatch->reset();
         $this->data = array();
@@ -193,7 +193,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         return $ser;
     }
 
-    public function unserialize($data)
+    public function unserialize($data): void
     {
         parent::unserialize($data);
         $charset = array_pop($this->data);
@@ -265,10 +265,10 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
     }
 
-    private function doDump($data, $name, $file, $line)
+    private function doDump($data, $name, $file, $line): void
     {
         if ($this->dumper instanceof CliDumper) {
-            $contextDumper = function ($name, $file, $line, $fmt) {
+            $contextDumper = function ($name, $file, $line, $fmt): void {
                 if ($this instanceof HtmlDumper) {
                     if ($file) {
                         $s = $this->style('meta', '%s');
@@ -301,7 +301,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     {
         $html = '';
 
-        $dumper = new HtmlDumper(function ($line) use (&$html) { $html .= $line; }, $this->charset);
+        $dumper = new HtmlDumper(function ($line) use (&$html): void { $html .= $line; }, $this->charset);
         $dumper->setDumpHeader('');
         $dumper->setDumpBoundaries('', '');
 

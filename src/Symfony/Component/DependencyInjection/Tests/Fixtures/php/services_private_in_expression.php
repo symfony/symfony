@@ -30,13 +30,13 @@ class ProjectServiceContainer extends Container
         $this->aliases = array();
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->privates = array();
         parent::reset();
     }
 
-    public function compile()
+    public function compile(): void
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
@@ -61,7 +61,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getPublicFooService()
+    protected function getPublicFooService(): \stdClass
     {
         return $this->services['public_foo'] = new \stdClass(($this->privates['private_foo'] ?? $this->privates['private_foo'] = new \stdClass()));
     }

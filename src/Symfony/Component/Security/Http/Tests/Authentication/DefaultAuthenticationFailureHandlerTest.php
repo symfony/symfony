@@ -26,7 +26,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     private $session;
     private $exception;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->httpKernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $this->httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();
@@ -38,7 +38,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->exception = $this->getMockBuilder('Symfony\Component\Security\Core\Exception\AuthenticationException')->setMethods(array('getMessage'))->getMock();
     }
 
-    public function testForward()
+    public function testForward(): void
     {
         $options = array('failure_forward' => true);
 
@@ -60,7 +60,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertSame($response, $result);
     }
 
-    public function testRedirect()
+    public function testRedirect(): void
     {
         $response = new Response();
         $this->httpUtils->expects($this->once())
@@ -73,7 +73,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertSame($response, $result);
     }
 
-    public function testExceptionIsPersistedInSession()
+    public function testExceptionIsPersistedInSession(): void
     {
         $this->session->expects($this->once())
             ->method('set')->with(Security::AUTHENTICATION_ERROR, $this->exception);
@@ -82,7 +82,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testExceptionIsPassedInRequestOnForward()
+    public function testExceptionIsPassedInRequestOnForward(): void
     {
         $options = array('failure_forward' => true);
 
@@ -100,7 +100,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testRedirectIsLogged()
+    public function testRedirectIsLogged(): void
     {
         $this->logger
             ->expects($this->once())
@@ -111,7 +111,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testForwardIsLogged()
+    public function testForwardIsLogged(): void
     {
         $options = array('failure_forward' => true);
 
@@ -128,7 +128,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testFailurePathCanBeOverwritten()
+    public function testFailurePathCanBeOverwritten(): void
     {
         $options = array('failure_path' => '/auth/login');
 
@@ -139,7 +139,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testFailurePathCanBeOverwrittenWithRequest()
+    public function testFailurePathCanBeOverwrittenWithRequest(): void
     {
         $this->request->expects($this->once())
             ->method('get')->with('_failure_path')
@@ -152,7 +152,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testFailurePathCanBeOverwrittenWithNestedAttributeInRequest()
+    public function testFailurePathCanBeOverwrittenWithNestedAttributeInRequest(): void
     {
         $this->request->expects($this->once())
             ->method('get')->with('_failure_path')
@@ -165,7 +165,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testFailurePathParameterCanBeOverwritten()
+    public function testFailurePathParameterCanBeOverwritten(): void
     {
         $options = array('failure_path_parameter' => '_my_failure_path');
 

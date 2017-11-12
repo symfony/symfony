@@ -25,7 +25,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         return new TagAwareAdapter(new FilesystemAdapter('', $defaultLifetime));
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
     }
@@ -33,14 +33,14 @@ class TagAwareAdapterTest extends AdapterTestCase
     /**
      * @expectedException \Psr\Cache\InvalidArgumentException
      */
-    public function testInvalidTag()
+    public function testInvalidTag(): void
     {
         $pool = $this->createCachePool();
         $item = $pool->getItem('foo');
         $item->tag(':');
     }
 
-    public function testInvalidateTags()
+    public function testInvalidateTags(): void
     {
         $pool = $this->createCachePool();
 
@@ -71,7 +71,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertTrue($pool->getItem('foo')->isHit());
     }
 
-    public function testTagsAreCleanedOnSave()
+    public function testTagsAreCleanedOnSave(): void
     {
         $pool = $this->createCachePool();
 
@@ -85,7 +85,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertTrue($pool->getItem('k')->isHit());
     }
 
-    public function testTagsAreCleanedOnDelete()
+    public function testTagsAreCleanedOnDelete(): void
     {
         $pool = $this->createCachePool();
 
@@ -99,7 +99,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertTrue($pool->getItem('k')->isHit());
     }
 
-    public function testTagItemExpiry()
+    public function testTagItemExpiry(): void
     {
         $pool = $this->createCachePool(10);
 
@@ -116,7 +116,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($pool->getItem('foo')->isHit());
     }
 
-    public function testGetPreviousTags()
+    public function testGetPreviousTags(): void
     {
         $pool = $this->createCachePool();
 
@@ -127,7 +127,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertSame(array('foo' => 'foo'), $i->getPreviousTags());
     }
 
-    public function testPrune()
+    public function testPrune(): void
     {
         $cache = new TagAwareAdapter($this->getPruneableMock());
         $this->assertTrue($cache->prune());

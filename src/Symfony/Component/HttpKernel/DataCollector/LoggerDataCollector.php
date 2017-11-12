@@ -38,7 +38,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         // everything is done as late as possible
     }
@@ -46,7 +46,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         if ($this->logger instanceof DebugLoggerInterface) {
             $this->logger->clear();
@@ -57,7 +57,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function lateCollect()
+    public function lateCollect(): void
     {
         if (null !== $this->logger) {
             $containerDeprecationLogs = $this->getContainerDeprecationLogs();
@@ -73,7 +73,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return array An array of logs
      */
-    public function getLogs()
+    public function getLogs(): array
     {
         return isset($this->data['logs']) ? $this->data['logs'] : array();
     }

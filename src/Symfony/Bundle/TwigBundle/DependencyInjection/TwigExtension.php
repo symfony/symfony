@@ -32,7 +32,7 @@ use Twig\Loader\LoaderInterface;
  */
 class TwigExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.xml');
@@ -195,7 +195,7 @@ class TwigExtension extends Extension
      *
      * @return string The XSD base path
      */
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string
     {
         return __DIR__.'/../Resources/config/schema';
     }

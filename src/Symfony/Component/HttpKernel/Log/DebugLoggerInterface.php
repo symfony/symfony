@@ -27,17 +27,17 @@ interface DebugLoggerInterface
      *
      * @return array An array of logs
      */
-    public function getLogs();
+    public function getLogs(): array;
 
     /**
      * Returns the number of errors.
      *
      * @return int The number of errors
      */
-    public function countErrors();
+    public function countErrors(): int;
 
     /**
      * Removes all log records.
      */
-    public function clear();
+    public function clear(): void;
 }

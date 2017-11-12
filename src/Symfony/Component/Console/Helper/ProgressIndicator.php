@@ -34,10 +34,9 @@ class ProgressIndicator
     private static $formats;
 
     /**
-     * @param OutputInterface $output
-     * @param string|null     $format                  Indicator format
-     * @param int             $indicatorChangeInterval Change interval in milliseconds
-     * @param array|null      $indicatorValues         Animated indicator characters
+     * @param string|null $format                  Indicator format
+     * @param int         $indicatorChangeInterval Change interval in milliseconds
+     * @param array|null  $indicatorValues         Animated indicator characters
      */
     public function __construct(OutputInterface $output, string $format = null, int $indicatorChangeInterval = 100, array $indicatorValues = null)
     {
@@ -68,7 +67,7 @@ class ProgressIndicator
      *
      * @param string|null $message
      */
-    public function setMessage($message)
+    public function setMessage(?string $message): void
     {
         $this->message = $message;
 
@@ -77,10 +76,8 @@ class ProgressIndicator
 
     /**
      * Starts the indicator output.
-     *
-     * @param $message
      */
-    public function start($message)
+    public function start($message): void
     {
         if ($this->started) {
             throw new LogicException('Progress indicator already started.');
@@ -98,7 +95,7 @@ class ProgressIndicator
     /**
      * Advances the indicator.
      */
-    public function advance()
+    public function advance(): void
     {
         if (!$this->started) {
             throw new LogicException('Progress indicator has not yet been started.');
@@ -122,10 +119,8 @@ class ProgressIndicator
 
     /**
      * Finish the indicator with message.
-     *
-     * @param $message
      */
-    public function finish($message)
+    public function finish($message): void
     {
         if (!$this->started) {
             throw new LogicException('Progress indicator has not yet been started.');
@@ -144,7 +139,7 @@ class ProgressIndicator
      *
      * @return string|null A format string
      */
-    public static function getFormatDefinition($name)
+    public static function getFormatDefinition(string $name): ?string
     {
         if (!self::$formats) {
             self::$formats = self::initFormats();
@@ -161,7 +156,7 @@ class ProgressIndicator
      * @param string   $name     The placeholder name (including the delimiter char like %)
      * @param callable $callable A PHP callable
      */
-    public static function setPlaceholderFormatterDefinition($name, $callable)
+    public static function setPlaceholderFormatterDefinition(string $name, callable $callable): void
     {
         if (!self::$formatters) {
             self::$formatters = self::initPlaceholderFormatters();
@@ -177,7 +172,7 @@ class ProgressIndicator
      *
      * @return callable|null A PHP callable
      */
-    public static function getPlaceholderFormatterDefinition($name)
+    public static function getPlaceholderFormatterDefinition(string $name): ?callable
     {
         if (!self::$formatters) {
             self::$formatters = self::initPlaceholderFormatters();
@@ -186,7 +181,7 @@ class ProgressIndicator
         return isset(self::$formatters[$name]) ? self::$formatters[$name] : null;
     }
 
-    private function display()
+    private function display(): void
     {
         if (OutputInterface::VERBOSITY_QUIET === $this->output->getVerbosity()) {
             return;
@@ -220,7 +215,7 @@ class ProgressIndicator
     /**
      * Overwrites a previous message to the output.
      */
-    private function overwrite(string $message)
+    private function overwrite(string $message): void
     {
         if ($this->output->isDecorated()) {
             $this->output->write("\x0D\x1B[2K");

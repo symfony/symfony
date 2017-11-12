@@ -24,12 +24,12 @@ class RingBufferTest extends TestCase
      */
     private $buffer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->buffer = new RingBuffer(2);
     }
 
-    public function testWriteWithinBuffer()
+    public function testWriteWithinBuffer(): void
     {
         $this->buffer[0] = 'foo';
         $this->buffer['bar'] = 'baz';
@@ -40,7 +40,7 @@ class RingBufferTest extends TestCase
         $this->assertSame('baz', $this->buffer['bar']);
     }
 
-    public function testWritePastBuffer()
+    public function testWritePastBuffer(): void
     {
         $this->buffer[0] = 'foo';
         $this->buffer['bar'] = 'baz';
@@ -55,17 +55,17 @@ class RingBufferTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\OutOfBoundsException
      */
-    public function testReadNonExistingFails()
+    public function testReadNonExistingFails(): void
     {
         $this->buffer['foo'];
     }
 
-    public function testQueryNonExisting()
+    public function testQueryNonExisting(): void
     {
         $this->assertFalse(isset($this->buffer['foo']));
     }
 
-    public function testUnsetNonExistingSucceeds()
+    public function testUnsetNonExistingSucceeds(): void
     {
         unset($this->buffer['foo']);
 
@@ -75,7 +75,7 @@ class RingBufferTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\OutOfBoundsException
      */
-    public function testReadOverwrittenFails()
+    public function testReadOverwrittenFails(): void
     {
         $this->buffer[0] = 'foo';
         $this->buffer['bar'] = 'baz';
@@ -84,12 +84,12 @@ class RingBufferTest extends TestCase
         $this->buffer[0];
     }
 
-    public function testQueryOverwritten()
+    public function testQueryOverwritten(): void
     {
         $this->assertFalse(isset($this->buffer[0]));
     }
 
-    public function testUnsetOverwrittenSucceeds()
+    public function testUnsetOverwrittenSucceeds(): void
     {
         $this->buffer[0] = 'foo';
         $this->buffer['bar'] = 'baz';

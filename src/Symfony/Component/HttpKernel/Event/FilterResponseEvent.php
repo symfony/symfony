@@ -37,10 +37,8 @@ class FilterResponseEvent extends KernelEvent
 
     /**
      * Returns the current response object.
-     *
-     * @return Response
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }
@@ -48,7 +46,7 @@ class FilterResponseEvent extends KernelEvent
     /**
      * Sets a new response object.
      */
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): void
     {
         $this->response = $response;
     }

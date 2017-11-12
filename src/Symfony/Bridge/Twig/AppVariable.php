@@ -29,22 +29,22 @@ class AppVariable
     private $environment;
     private $debug;
 
-    public function setTokenStorage(TokenStorageInterface $tokenStorage)
+    public function setTokenStorage(TokenStorageInterface $tokenStorage): void
     {
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function setRequestStack(RequestStack $requestStack)
+    public function setRequestStack(RequestStack $requestStack): void
     {
         $this->requestStack = $requestStack;
     }
 
-    public function setEnvironment($environment)
+    public function setEnvironment($environment): void
     {
         $this->environment = $environment;
     }
 
-    public function setDebug($debug)
+    public function setDebug($debug): void
     {
         $this->debug = (bool) $debug;
     }
@@ -56,7 +56,7 @@ class AppVariable
      *
      * @throws \RuntimeException When the TokenStorage is not available
      */
-    public function getToken()
+    public function getToken(): ?TokenInterface
     {
         if (null === $tokenStorage = $this->tokenStorage) {
             throw new \RuntimeException('The "app.token" variable is not available.');
@@ -93,7 +93,7 @@ class AppVariable
      *
      * @return Request|null The HTTP request object
      */
-    public function getRequest()
+    public function getRequest(): ?Request
     {
         if (null === $this->requestStack) {
             throw new \RuntimeException('The "app.request" variable is not available.');
@@ -107,7 +107,7 @@ class AppVariable
      *
      * @return Session|null The session
      */
-    public function getSession()
+    public function getSession(): ?Session
     {
         if (null === $this->requestStack) {
             throw new \RuntimeException('The "app.session" variable is not available.');
@@ -123,7 +123,7 @@ class AppVariable
      *
      * @return string The current environment string (e.g 'dev')
      */
-    public function getEnvironment()
+    public function getEnvironment(): string
     {
         if (null === $this->environment) {
             throw new \RuntimeException('The "app.environment" variable is not available.');
@@ -137,7 +137,7 @@ class AppVariable
      *
      * @return bool The current debug mode
      */
-    public function getDebug()
+    public function getDebug(): bool
     {
         if (null === $this->debug) {
             throw new \RuntimeException('The "app.debug" variable is not available.');
@@ -151,10 +151,8 @@ class AppVariable
      *  * getFlashes() returns all the flash messages
      *  * getFlashes('notice') returns a simple array with flash messages of that type
      *  * getFlashes(array('notice', 'error')) returns a nested array of type => messages.
-     *
-     * @return array
      */
-    public function getFlashes($types = null)
+    public function getFlashes($types = null): array
     {
         // needed to avoid starting the session automatically when looking for flash messages
         try {

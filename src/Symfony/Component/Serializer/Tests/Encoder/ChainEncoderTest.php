@@ -26,7 +26,7 @@ class ChainEncoderTest extends TestCase
     private $encoder1;
     private $encoder2;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encoder1 = $this
             ->getMockBuilder('Symfony\Component\Serializer\Encoder\EncoderInterface')
@@ -56,7 +56,7 @@ class ChainEncoderTest extends TestCase
         $this->chainEncoder = new ChainEncoder(array($this->encoder1, $this->encoder2));
     }
 
-    public function testSupportsEncoding()
+    public function testSupportsEncoding(): void
     {
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_1));
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_2));
@@ -64,7 +64,7 @@ class ChainEncoderTest extends TestCase
         $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, array('foo' => 'bar')));
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $this->encoder1->expects($this->never())->method('encode');
         $this->encoder2->expects($this->once())->method('encode');
@@ -75,12 +75,12 @@ class ChainEncoderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
      */
-    public function testEncodeUnsupportedFormat()
+    public function testEncodeUnsupportedFormat(): void
     {
         $this->chainEncoder->encode(array('foo' => 123), self::FORMAT_3);
     }
 
-    public function testNeedsNormalizationBasic()
+    public function testNeedsNormalizationBasic(): void
     {
         $this->assertTrue($this->chainEncoder->needsNormalization(self::FORMAT_1));
         $this->assertTrue($this->chainEncoder->needsNormalization(self::FORMAT_2));
@@ -89,7 +89,7 @@ class ChainEncoderTest extends TestCase
     /**
      * @dataProvider booleanProvider
      */
-    public function testNeedsNormalizationChainNormalizationAware($bool)
+    public function testNeedsNormalizationChainNormalizationAware($bool): void
     {
         $chainEncoder = $this
             ->getMockBuilder('Symfony\Component\Serializer\Tests\Encoder\ChainNormalizationAwareEncoder')
@@ -103,7 +103,7 @@ class ChainEncoderTest extends TestCase
         $this->assertEquals($bool, $sut->needsNormalization(self::FORMAT_1));
     }
 
-    public function testNeedsNormalizationNormalizationAware()
+    public function testNeedsNormalizationNormalizationAware(): void
     {
         $encoder = new NormalizationAwareEncoder();
         $sut = new ChainEncoder(array($encoder));
@@ -131,7 +131,7 @@ class NormalizationAwareEncoder implements EncoderInterface, NormalizationAwareI
         return true;
     }
 
-    public function encode($data, $format, array $context = array())
+    public function encode($data, $format, array $context = array()): void
     {
     }
 }

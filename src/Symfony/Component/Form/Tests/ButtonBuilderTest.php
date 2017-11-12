@@ -35,7 +35,7 @@ class ButtonBuilderTest extends TestCase
     /**
      * @dataProvider getValidNames
      */
-    public function testValidNames($name)
+    public function testValidNames($name): void
     {
         $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder($name));
     }
@@ -52,7 +52,7 @@ class ButtonBuilderTest extends TestCase
     /**
      * @dataProvider getInvalidNames
      */
-    public function testInvalidNames($name)
+    public function testInvalidNames($name): void
     {
         if (method_exists($this, 'expectException')) {
             $this->expectException(InvalidArgumentException::class);

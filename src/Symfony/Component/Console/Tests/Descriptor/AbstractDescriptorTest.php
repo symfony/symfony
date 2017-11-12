@@ -22,31 +22,31 @@ use Symfony\Component\Console\Output\BufferedOutput;
 abstract class AbstractDescriptorTest extends TestCase
 {
     /** @dataProvider getDescribeInputArgumentTestData */
-    public function testDescribeInputArgument(InputArgument $argument, $expectedDescription)
+    public function testDescribeInputArgument(InputArgument $argument, $expectedDescription): void
     {
         $this->assertDescription($expectedDescription, $argument);
     }
 
     /** @dataProvider getDescribeInputOptionTestData */
-    public function testDescribeInputOption(InputOption $option, $expectedDescription)
+    public function testDescribeInputOption(InputOption $option, $expectedDescription): void
     {
         $this->assertDescription($expectedDescription, $option);
     }
 
     /** @dataProvider getDescribeInputDefinitionTestData */
-    public function testDescribeInputDefinition(InputDefinition $definition, $expectedDescription)
+    public function testDescribeInputDefinition(InputDefinition $definition, $expectedDescription): void
     {
         $this->assertDescription($expectedDescription, $definition);
     }
 
     /** @dataProvider getDescribeCommandTestData */
-    public function testDescribeCommand(Command $command, $expectedDescription)
+    public function testDescribeCommand(Command $command, $expectedDescription): void
     {
         $this->assertDescription($expectedDescription, $command);
     }
 
     /** @dataProvider getDescribeApplicationTestData */
-    public function testDescribeApplication(Application $application, $expectedDescription)
+    public function testDescribeApplication(Application $application, $expectedDescription): void
     {
         // Replaces the dynamic placeholders of the command help text with a static version.
         // The placeholder %command.full_name% includes the script path that is not predictable
@@ -83,9 +83,9 @@ abstract class AbstractDescriptorTest extends TestCase
         return $this->getDescriptionTestData(ObjectsProvider::getApplications());
     }
 
-    abstract protected function getDescriptor();
+    abstract protected function getDescriptor(): void;
 
-    abstract protected function getFormat();
+    abstract protected function getFormat(): void;
 
     protected function getDescriptionTestData(array $objects)
     {
@@ -98,7 +98,7 @@ abstract class AbstractDescriptorTest extends TestCase
         return $data;
     }
 
-    protected function assertDescription($expectedDescription, $describedObject, array $options = array())
+    protected function assertDescription($expectedDescription, $describedObject, array $options = array()): void
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $this->getDescriptor()->describe($output, $describedObject, $options + array('raw_output' => true));

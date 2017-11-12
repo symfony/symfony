@@ -31,7 +31,7 @@ class AddConstraintValidatorsPass implements CompilerPassInterface
         $this->constraintValidatorTag = $constraintValidatorTag;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition($this->validatorFactoryServiceId)) {
             return;

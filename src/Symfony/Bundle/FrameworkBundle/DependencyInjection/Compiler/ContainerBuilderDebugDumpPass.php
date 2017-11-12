@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class ContainerBuilderDebugDumpPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $cache = new ConfigCache($container->getParameter('debug.container.dump'), true);
         if (!$cache->isFresh()) {

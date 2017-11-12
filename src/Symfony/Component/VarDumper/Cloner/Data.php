@@ -36,7 +36,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * @return string The type of the value
      */
-    public function getType()
+    public function getType(): string
     {
         $item = $this->data[$this->position][$this->key];
 
@@ -65,7 +65,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return scalar|array|null|Data[] A native representation of the original value
      */
-    public function getValue($recursive = false)
+    public function getValue(bool $recursive = false)
     {
         $item = $this->data[$this->position][$this->key];
 
@@ -144,12 +144,12 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->__get($key);
     }
 
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');
     }
 
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         throw new \BadMethodCallException(self::class.' objects are immutable.');
     }
@@ -172,7 +172,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return self A clone of $this
      */
-    public function withMaxDepth($maxDepth)
+    public function withMaxDepth(int $maxDepth): self
     {
         $data = clone $this;
         $data->maxDepth = (int) $maxDepth;
@@ -187,7 +187,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return self A clone of $this
      */
-    public function withMaxItemsPerDepth($maxItemsPerDepth)
+    public function withMaxItemsPerDepth(int $maxItemsPerDepth): self
     {
         $data = clone $this;
         $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
@@ -202,7 +202,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return self A clone of $this
      */
-    public function withRefHandles($useRefHandles)
+    public function withRefHandles(bool $useRefHandles): self
     {
         $data = clone $this;
         $data->useRefHandles = $useRefHandles ? -1 : 0;
@@ -261,7 +261,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Dumps data with a DumperInterface dumper.
      */
-    public function dump(DumperInterface $dumper)
+    public function dump(DumperInterface $dumper): void
     {
         $refs = array(0);
         $this->dumpItem($dumper, new Cursor(), $refs, $this->data[$this->position][$this->key]);
@@ -275,7 +275,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array           &$refs  A map of all references discovered while dumping
      * @param mixed           $item   A Stub object or the original value being dumped
      */
-    private function dumpItem($dumper, $cursor, &$refs, $item)
+    private function dumpItem(DumperInterface $dumper, Cursor $cursor, array &$refs, $item): void
     {
         $cursor->refIndex = 0;
         $cursor->softRefTo = $cursor->softRefHandle = $cursor->softRefCount = 0;
@@ -373,7 +373,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * Dumps children of hash structures.
      *
-     * @param DumperInterface $dumper
      * @param Cursor          $parentCursor The cursor of the parent hash
      * @param array           &$refs        A map of all references discovered while dumping
      * @param array           $children     The children to dump
@@ -383,7 +382,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return int The final number of removed items
      */
-    private function dumpChildren($dumper, $parentCursor, &$refs, $children, $hashCut, $hashType, $dumpKeys)
+    private function dumpChildren(DumperInterface $dumper, Cursor $parentCursor, array &$refs, array $children, int $hashCut, string $hashType, bool $dumpKeys): int
     {
         $cursor = clone $parentCursor;
         ++$cursor->depth;

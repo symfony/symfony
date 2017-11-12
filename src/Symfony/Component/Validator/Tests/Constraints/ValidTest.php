@@ -19,14 +19,14 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class ValidTest extends TestCase
 {
-    public function testGroupsCanBeSet()
+    public function testGroupsCanBeSet(): void
     {
         $constraint = new Valid(array('groups' => 'foo'));
 
         $this->assertSame(array('foo'), $constraint->groups);
     }
 
-    public function testGroupsAreNullByDefault()
+    public function testGroupsAreNullByDefault(): void
     {
         $constraint = new Valid();
 

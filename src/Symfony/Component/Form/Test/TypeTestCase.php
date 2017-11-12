@@ -27,7 +27,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
      */
     protected $dispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (in_array(ValidatorExtensionTrait::class, class_uses($this))) {
             $this->validator = null;
@@ -53,12 +53,12 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         return $extensions;
     }
 
-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual): void
     {
         self::assertEquals($expected->format('c'), $actual->format('c'));
     }
 
-    public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)
+    public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual): void
     {
         self::assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));
     }

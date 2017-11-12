@@ -9,7 +9,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 class DelegatingLoaderTest extends TestCase
 {
-    public function testConstructorApi()
+    public function testConstructorApi(): void
     {
         $controllerNameParser = $this->getMockBuilder(ControllerNameParser::class)
             ->disableOriginalConstructor()

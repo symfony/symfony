@@ -23,7 +23,7 @@ class TranslationDebugCommandTest extends TestCase
     private $fs;
     private $translationDir;
 
-    public function testDebugMissingMessages()
+    public function testDebugMissingMessages(): void
     {
         $tester = $this->createCommandTester(array('foo' => 'foo'));
         $tester->execute(array('locale' => 'en', 'bundle' => 'foo'));
@@ -31,7 +31,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/missing/', $tester->getDisplay());
     }
 
-    public function testDebugUnusedMessages()
+    public function testDebugUnusedMessages(): void
     {
         $tester = $this->createCommandTester(array(), array('foo' => 'foo'));
         $tester->execute(array('locale' => 'en', 'bundle' => 'foo'));
@@ -39,7 +39,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/unused/', $tester->getDisplay());
     }
 
-    public function testDebugFallbackMessages()
+    public function testDebugFallbackMessages(): void
     {
         $tester = $this->createCommandTester(array(), array('foo' => 'foo'));
         $tester->execute(array('locale' => 'fr', 'bundle' => 'foo'));
@@ -47,7 +47,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/fallback/', $tester->getDisplay());
     }
 
-    public function testNoDefinedMessages()
+    public function testNoDefinedMessages(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(array('locale' => 'fr', 'bundle' => 'test'));
@@ -55,7 +55,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/No defined or extracted messages for locale "fr"/', $tester->getDisplay());
     }
 
-    public function testDebugDefaultDirectory()
+    public function testDebugDefaultDirectory(): void
     {
         $tester = $this->createCommandTester(array('foo' => 'foo'), array('bar' => 'bar'));
         $tester->execute(array('locale' => 'en'));
@@ -64,7 +64,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/unused/', $tester->getDisplay());
     }
 
-    public function testDebugCustomDirectory()
+    public function testDebugCustomDirectory(): void
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
@@ -82,7 +82,7 @@ class TranslationDebugCommandTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testDebugInvalidDirectory()
+    public function testDebugInvalidDirectory(): void
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
@@ -94,7 +94,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester->execute(array('locale' => 'en', 'bundle' => 'dir'));
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
@@ -102,15 +102,12 @@ class TranslationDebugCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/Resources/views');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fs->remove($this->translationDir);
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester($extractedMessages = array(), $loadedMessages = array(), $kernel = null)
+    private function createCommandTester($extractedMessages = array(), $loadedMessages = array(), $kernel = null): CommandTester
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
@@ -126,7 +123,7 @@ class TranslationDebugCommandTest extends TestCase
             ->expects($this->any())
             ->method('extract')
             ->will(
-                $this->returnCallback(function ($path, $catalogue) use ($extractedMessages) {
+                $this->returnCallback(function ($path, $catalogue) use ($extractedMessages): void {
                     $catalogue->add($extractedMessages);
                 })
             );
@@ -136,7 +133,7 @@ class TranslationDebugCommandTest extends TestCase
             ->expects($this->any())
             ->method('read')
             ->will(
-                $this->returnCallback(function ($path, $catalogue) use ($loadedMessages) {
+                $this->returnCallback(function ($path, $catalogue) use ($loadedMessages): void {
                     $catalogue->add($loadedMessages);
                 })
             );

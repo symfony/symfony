@@ -85,7 +85,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return $this->called;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->called = false;
     }

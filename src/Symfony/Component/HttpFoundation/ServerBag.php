@@ -22,10 +22,8 @@ class ServerBag extends ParameterBag
 {
     /**
      * Gets the HTTP headers.
-     *
-     * @return array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         $headers = array();
         $contentHeaders = array('CONTENT_LENGTH' => true, 'CONTENT_MD5' => true, 'CONTENT_TYPE' => true);

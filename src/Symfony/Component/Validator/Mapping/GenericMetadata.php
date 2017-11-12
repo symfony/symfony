@@ -176,10 +176,8 @@ class GenericMetadata implements MetadataInterface
 
     /**
      * Returns whether this element has any constraints.
-     *
-     * @return bool
      */
-    public function hasConstraints()
+    public function hasConstraints(): bool
     {
         return count($this->constraints) > 0;
     }

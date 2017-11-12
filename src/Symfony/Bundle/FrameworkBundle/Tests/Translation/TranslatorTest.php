@@ -22,18 +22,18 @@ class TranslatorTest extends TestCase
 {
     protected $tmpDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tmpDir = sys_get_temp_dir().'/sf2_translation';
         $this->deleteTmpDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteTmpDir();
     }
 
-    protected function deleteTmpDir()
+    protected function deleteTmpDir(): void
     {
         if (!file_exists($dir = $this->tmpDir)) {
             return;
@@ -43,7 +43,7 @@ class TranslatorTest extends TestCase
         $fs->remove($dir);
     }
 
-    public function testTransWithoutCaching()
+    public function testTransWithoutCaching(): void
     {
         $translator = $this->getTranslator($this->getLoader());
         $translator->setLocale('fr');
@@ -60,7 +60,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
-    public function testTransWithCaching()
+    public function testTransWithCaching(): void
     {
         // prime the cache
         $translator = $this->getTranslator($this->getLoader(), array('cache_dir' => $this->tmpDir));
@@ -100,7 +100,7 @@ class TranslatorTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid "invalid locale" locale.
      */
-    public function testTransWithCachingWithInvalidLocale()
+    public function testTransWithCachingWithInvalidLocale(): void
     {
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
@@ -108,7 +108,7 @@ class TranslatorTest extends TestCase
         $translator->trans('foo');
     }
 
-    public function testLoadResourcesWithoutCaching()
+    public function testLoadResourcesWithoutCaching(): void
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(
@@ -123,7 +123,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
-    public function testGetDefaultLocale()
+    public function testGetDefaultLocale(): void
     {
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $translator = new Translator($container, new MessageFormatter(), 'en');
@@ -135,7 +135,7 @@ class TranslatorTest extends TestCase
      * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      * @expectedExceptionMessage The Translator does not support the following options: 'foo'
      */
-    public function testInvalidOptions()
+    public function testInvalidOptions(): void
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
@@ -143,7 +143,7 @@ class TranslatorTest extends TestCase
     }
 
     /** @dataProvider getDebugModeAndCacheDirCombinations */
-    public function testResourceFilesOptionLoadsBeforeOtherAddedResources($debug, $enableCache)
+    public function testResourceFilesOptionLoadsBeforeOtherAddedResources($debug, $enableCache): void
     {
         $someCatalogue = $this->getCatalogue('some_locale', array());
 
@@ -287,7 +287,7 @@ class TranslatorTest extends TestCase
         return $translator;
     }
 
-    public function testWarmup()
+    public function testWarmup(): void
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(

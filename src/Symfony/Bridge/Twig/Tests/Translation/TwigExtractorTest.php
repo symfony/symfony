@@ -24,7 +24,7 @@ class TwigExtractorTest extends TestCase
     /**
      * @dataProvider getExtractData
      */
-    public function testExtract($template, $messages)
+    public function testExtract($template, $messages): void
     {
         $loader = $this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock();
         $twig = new Environment($loader, array(
@@ -79,7 +79,7 @@ class TwigExtractorTest extends TestCase
      * @expectedException \Twig\Error\Error
      * @dataProvider resourcesWithSyntaxErrorsProvider
      */
-    public function testExtractSyntaxError($resources)
+    public function testExtractSyntaxError($resources): void
     {
         $twig = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock());
         $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
@@ -100,10 +100,7 @@ class TwigExtractorTest extends TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function resourcesWithSyntaxErrorsProvider()
+    public function resourcesWithSyntaxErrorsProvider(): array
     {
         return array(
             array(__DIR__.'/../Fixtures'),
@@ -115,7 +112,7 @@ class TwigExtractorTest extends TestCase
     /**
      * @dataProvider resourceProvider
      */
-    public function testExtractWithFiles($resource)
+    public function testExtractWithFiles($resource): void
     {
         $loader = new ArrayLoader(array());
         $twig = new Environment($loader, array(
@@ -134,10 +131,7 @@ class TwigExtractorTest extends TestCase
         $this->assertEquals('Hi!', $catalogue->get('Hi!', 'messages'));
     }
 
-    /**
-     * @return array
-     */
-    public function resourceProvider()
+    public function resourceProvider(): array
     {
         $directory = __DIR__.'/../Fixtures/extractor/';
 

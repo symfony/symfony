@@ -78,11 +78,11 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * Does nothing. The data is collected during the form event listeners.
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = array(
             'forms' => array(),
@@ -94,7 +94,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function associateFormWithView(FormInterface $form, FormView $view)
+    public function associateFormWithView(FormInterface $form, FormView $view): void
     {
         $this->formsByView[spl_object_hash($view)] = spl_object_hash($form);
     }
@@ -102,7 +102,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function collectConfiguration(FormInterface $form)
+    public function collectConfiguration(FormInterface $form): void
     {
         $hash = spl_object_hash($form);
 
@@ -123,7 +123,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function collectDefaultData(FormInterface $form)
+    public function collectDefaultData(FormInterface $form): void
     {
         $hash = spl_object_hash($form);
 
@@ -144,7 +144,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function collectSubmittedData(FormInterface $form)
+    public function collectSubmittedData(FormInterface $form): void
     {
         $hash = spl_object_hash($form);
 
@@ -178,7 +178,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function collectViewVariables(FormView $view)
+    public function collectViewVariables(FormView $view): void
     {
         $hash = spl_object_hash($view);
 
@@ -199,7 +199,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function buildPreliminaryFormTree(FormInterface $form)
+    public function buildPreliminaryFormTree(FormInterface $form): void
     {
         $this->data['forms'][$form->getName()] = &$this->recursiveBuildPreliminaryFormTree($form, $this->data['forms_by_hash']);
     }
@@ -207,7 +207,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function buildFinalFormTree(FormInterface $form, FormView $view)
+    public function buildFinalFormTree(FormInterface $form, FormView $view): void
     {
         $this->data['forms'][$form->getName()] = &$this->recursiveBuildFinalFormTree($form, $view, $this->data['forms_by_hash']);
     }

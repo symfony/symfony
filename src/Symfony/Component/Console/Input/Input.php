@@ -46,7 +46,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
     /**
      * {@inheritdoc}
      */
-    public function bind(InputDefinition $definition)
+    public function bind(InputDefinition $definition): void
     {
         $this->arguments = array();
         $this->options = array();
@@ -58,12 +58,12 @@ abstract class Input implements InputInterface, StreamableInputInterface
     /**
      * Processes command line arguments.
      */
-    abstract protected function parse();
+    abstract protected function parse(): void;
 
     /**
      * {@inheritdoc}
      */
-    public function validate()
+    public function validate(): void
     {
         $definition = $this->definition;
         $givenArguments = $this->arguments;
@@ -88,7 +88,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
     /**
      * {@inheritdoc}
      */
-    public function setInteractive($interactive)
+    public function setInteractive($interactive): void
     {
         $this->interactive = (bool) $interactive;
     }
@@ -116,7 +116,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
     /**
      * {@inheritdoc}
      */
-    public function setArgument($name, $value)
+    public function setArgument($name, $value): void
     {
         if (!$this->definition->hasArgument($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
@@ -156,7 +156,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
     /**
      * {@inheritdoc}
      */
-    public function setOption($name, $value)
+    public function setOption($name, $value): void
     {
         if (!$this->definition->hasOption($name)) {
             throw new InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
@@ -175,12 +175,8 @@ abstract class Input implements InputInterface, StreamableInputInterface
 
     /**
      * Escapes a token through escapeshellarg if it contains unsafe chars.
-     *
-     * @param string $token
-     *
-     * @return string
      */
-    public function escapeToken($token)
+    public function escapeToken(string $token): string
     {
         return preg_match('{^[\w-]+$}', $token) ? $token : escapeshellarg($token);
     }
@@ -188,7 +184,7 @@ abstract class Input implements InputInterface, StreamableInputInterface
     /**
      * {@inheritdoc}
      */
-    public function setStream($stream)
+    public function setStream($stream): void
     {
         $this->stream = $stream;
     }

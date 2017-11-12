@@ -40,7 +40,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
      *
      * @return string The violation as string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = '';
 
@@ -54,7 +54,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function add(ConstraintViolationInterface $violation)
+    public function add(ConstraintViolationInterface $violation): void
     {
         $this->violations[] = $violation;
     }
@@ -62,7 +62,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function addAll(ConstraintViolationListInterface $otherList)
+    public function addAll(ConstraintViolationListInterface $otherList): void
     {
         foreach ($otherList as $violation) {
             $this->violations[] = $violation;
@@ -92,7 +92,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function set($offset, ConstraintViolationInterface $violation)
+    public function set($offset, ConstraintViolationInterface $violation): void
     {
         $this->violations[$offset] = $violation;
     }
@@ -100,7 +100,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function remove($offset)
+    public function remove($offset): void
     {
         unset($this->violations[$offset]);
     }
@@ -142,7 +142,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $violation)
+    public function offsetSet($offset, $violation): void
     {
         if (null === $offset) {
             $this->add($violation);
@@ -154,7 +154,7 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->remove($offset);
     }

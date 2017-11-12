@@ -55,10 +55,8 @@ class CssSelectorConverter
      *
      * @param string $cssExpr The CSS expression
      * @param string $prefix  An optional prefix for the XPath expression
-     *
-     * @return string
      */
-    public function toXPath($cssExpr, $prefix = 'descendant-or-self::')
+    public function toXPath(string $cssExpr, string $prefix = 'descendant-or-self::'): string
     {
         return $this->translator->cssToXPath($cssExpr, $prefix);
     }

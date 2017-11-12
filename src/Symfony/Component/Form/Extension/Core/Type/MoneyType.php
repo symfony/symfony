@@ -25,7 +25,7 @@ class MoneyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->addViewTransformer(new MoneyToLocalizedStringTransformer(
@@ -40,7 +40,7 @@ class MoneyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['money_pattern'] = self::getPattern($options['currency']);
     }
@@ -48,7 +48,7 @@ class MoneyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(array(
             'scale' => 2,

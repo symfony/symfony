@@ -20,7 +20,7 @@ class X509AuthenticationListenerTest extends TestCase
     /**
      * @dataProvider dataProviderGetPreAuthenticatedData
      */
-    public function testGetPreAuthenticatedData($user, $credentials)
+    public function testGetPreAuthenticatedData($user, $credentials): void
     {
         $serverVars = array();
         if ('' !== $user) {
@@ -56,7 +56,7 @@ class X509AuthenticationListenerTest extends TestCase
     /**
      * @dataProvider dataProviderGetPreAuthenticatedDataNoUser
      */
-    public function testGetPreAuthenticatedDataNoUser($emailAddress)
+    public function testGetPreAuthenticatedDataNoUser($emailAddress): void
     {
         $credentials = 'CN=Sample certificate DN/emailAddress='.$emailAddress;
         $request = new Request(array(), array(), array(), array(), array(), array('SSL_CLIENT_S_DN' => $credentials));
@@ -85,7 +85,7 @@ class X509AuthenticationListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testGetPreAuthenticatedDataNoData()
+    public function testGetPreAuthenticatedDataNoData(): void
     {
         $request = new Request(array(), array(), array(), array(), array(), array());
 
@@ -101,7 +101,7 @@ class X509AuthenticationListenerTest extends TestCase
         $result = $method->invokeArgs($listener, array($request));
     }
 
-    public function testGetPreAuthenticatedDataWithDifferentKeys()
+    public function testGetPreAuthenticatedDataWithDifferentKeys(): void
     {
         $userCredentials = array('TheUser', 'TheCredentials');
 

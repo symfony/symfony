@@ -21,7 +21,7 @@ class AssetsHelperTest extends TestCase
 {
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $fooPackage = new Package(new StaticVersionStrategy('42', '%s?v=%s'));
         $barPackage = new Package(new StaticVersionStrategy('22', '%s?%s'));
@@ -31,13 +31,13 @@ class AssetsHelperTest extends TestCase
         $this->helper = new AssetsHelper($packages);
     }
 
-    public function testGetUrl()
+    public function testGetUrl(): void
     {
         $this->assertEquals('me.png?v=42', $this->helper->getUrl('me.png'));
         $this->assertEquals('me.png?22', $this->helper->getUrl('me.png', 'bar'));
     }
 
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $this->assertEquals('42', $this->helper->getVersion('/'));
         $this->assertEquals('22', $this->helper->getVersion('/', 'bar'));

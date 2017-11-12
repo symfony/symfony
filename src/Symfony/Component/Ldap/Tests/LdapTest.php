@@ -25,13 +25,13 @@ class LdapTest extends TestCase
     /** @var Ldap */
     private $ldap;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->adapter = $this->getMockBuilder(AdapterInterface::class)->getMock();
         $this->ldap = new Ldap($this->adapter);
     }
 
-    public function testLdapBind()
+    public function testLdapBind(): void
     {
         $connection = $this->getMockBuilder(ConnectionInterface::class)->getMock();
         $connection
@@ -47,7 +47,7 @@ class LdapTest extends TestCase
         $this->ldap->bind('foo', 'bar');
     }
 
-    public function testLdapEscape()
+    public function testLdapEscape(): void
     {
         $this->adapter
             ->expects($this->once())
@@ -57,7 +57,7 @@ class LdapTest extends TestCase
         $this->ldap->escape('foo', 'bar', 'baz');
     }
 
-    public function testLdapQuery()
+    public function testLdapQuery(): void
     {
         $this->adapter
             ->expects($this->once())
@@ -70,13 +70,13 @@ class LdapTest extends TestCase
     /**
      * @requires extension ldap
      */
-    public function testLdapCreate()
+    public function testLdapCreate(): void
     {
         $ldap = Ldap::create('ext_ldap');
         $this->assertInstanceOf(Ldap::class, $ldap);
     }
 
-    public function testCreateWithInvalidAdapterName()
+    public function testCreateWithInvalidAdapterName(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(DriverNotFoundException::class);
         Ldap::create('foo');

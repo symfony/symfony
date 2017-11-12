@@ -16,7 +16,7 @@ use Symfony\Component\CssSelector\Parser\Reader;
 
 class ReaderTest extends TestCase
 {
-    public function testIsEOF()
+    public function testIsEOF(): void
     {
         $reader = new Reader('');
         $this->assertTrue($reader->isEOF());
@@ -31,7 +31,7 @@ class ReaderTest extends TestCase
         $this->assertTrue($reader->isEOF());
     }
 
-    public function testGetRemainingLength()
+    public function testGetRemainingLength(): void
     {
         $reader = new Reader('hello');
         $this->assertEquals(5, $reader->getRemainingLength());
@@ -43,7 +43,7 @@ class ReaderTest extends TestCase
         $this->assertEquals(0, $reader->getRemainingLength());
     }
 
-    public function testGetSubstring()
+    public function testGetSubstring(): void
     {
         $reader = new Reader('hello');
         $this->assertEquals('he', $reader->getSubstring(2));
@@ -54,7 +54,7 @@ class ReaderTest extends TestCase
         $this->assertEquals('lo', $reader->getSubstring(2, 1));
     }
 
-    public function testGetOffset()
+    public function testGetOffset(): void
     {
         $reader = new Reader('hello');
         $this->assertEquals(2, $reader->getOffset('ll'));
@@ -65,7 +65,7 @@ class ReaderTest extends TestCase
         $this->assertFalse($reader->getOffset('he'));
     }
 
-    public function testFindPattern()
+    public function testFindPattern(): void
     {
         $reader = new Reader('hello');
 
@@ -77,7 +77,7 @@ class ReaderTest extends TestCase
         $this->assertEquals(array('llo'), $reader->findPattern('/^llo$/'));
     }
 
-    public function testMoveForward()
+    public function testMoveForward(): void
     {
         $reader = new Reader('hello');
         $this->assertEquals(0, $reader->getPosition());
@@ -86,14 +86,14 @@ class ReaderTest extends TestCase
         $this->assertEquals(2, $reader->getPosition());
     }
 
-    public function testToEnd()
+    public function testToEnd(): void
     {
         $reader = new Reader('hello');
         $reader->moveToEnd();
         $this->assertTrue($reader->isEOF());
     }
 
-    private function assignPosition(Reader $reader, $value)
+    private function assignPosition(Reader $reader, $value): void
     {
         $position = new \ReflectionProperty($reader, 'position');
         $position->setAccessible(true);

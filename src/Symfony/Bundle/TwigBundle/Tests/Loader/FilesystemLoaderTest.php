@@ -17,7 +17,7 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 
 class FilesystemLoaderTest extends TestCase
 {
-    public function testGetSourceContext()
+    public function testGetSourceContext(): void
     {
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
         $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
@@ -36,7 +36,7 @@ class FilesystemLoaderTest extends TestCase
         $this->assertEquals("This is a layout\n", $loader->getSourceContext('TwigBundle::layout.html.twig')->getCode());
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         // should return true for templates that Twig does not find, but Symfony does
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
@@ -54,7 +54,7 @@ class FilesystemLoaderTest extends TestCase
     /**
      * @expectedException \Twig\Error\LoaderError
      */
-    public function testTwigErrorIfLocatorThrowsInvalid()
+    public function testTwigErrorIfLocatorThrowsInvalid(): void
     {
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
         $parser
@@ -78,7 +78,7 @@ class FilesystemLoaderTest extends TestCase
     /**
      * @expectedException \Twig\Error\LoaderError
      */
-    public function testTwigErrorIfLocatorReturnsFalse()
+    public function testTwigErrorIfLocatorReturnsFalse(): void
     {
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
         $parser
@@ -103,7 +103,7 @@ class FilesystemLoaderTest extends TestCase
      * @expectedException \Twig\Error\LoaderError
      * @expectedExceptionMessageRegExp /Unable to find template "name\.format\.engine" \(looked into: .*Tests.Loader.\.\..DependencyInjection.Fixtures.Resources.views\)/
      */
-    public function testTwigErrorIfTemplateDoesNotExist()
+    public function testTwigErrorIfTemplateDoesNotExist(): void
     {
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
         $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
@@ -116,7 +116,7 @@ class FilesystemLoaderTest extends TestCase
         $method->invoke($loader, 'name.format.engine');
     }
 
-    public function testTwigSoftErrorIfTemplateDoesNotExist()
+    public function testTwigSoftErrorIfTemplateDoesNotExist(): void
     {
         $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
         $locator = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();

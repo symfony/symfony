@@ -19,7 +19,7 @@ class BooleanNodeTest extends TestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testNormalize($value)
+    public function testNormalize($value): void
     {
         $node = new BooleanNode('test');
         $this->assertSame($value, $node->normalize($value));
@@ -27,10 +27,8 @@ class BooleanNodeTest extends TestCase
 
     /**
      * @dataProvider getValidValues
-     *
-     * @param bool $value
      */
-    public function testValidNonEmptyValues($value)
+    public function testValidNonEmptyValues(bool $value): void
     {
         $node = new BooleanNode('test');
         $node->setAllowEmptyValue(false);
@@ -50,7 +48,7 @@ class BooleanNodeTest extends TestCase
      * @dataProvider getInvalidValues
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues($value): void
     {
         $node = new BooleanNode('test');
         $node->normalize($value);

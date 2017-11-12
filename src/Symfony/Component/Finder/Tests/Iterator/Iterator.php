@@ -23,12 +23,12 @@ class Iterator implements \Iterator
         $this->rewind();
     }
 
-    public function attach(\SplFileInfo $fileinfo)
+    public function attach(\SplFileInfo $fileinfo): void
     {
         $this->values[] = $fileinfo;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->values);
     }
@@ -38,7 +38,7 @@ class Iterator implements \Iterator
         return false !== $this->current();
     }
 
-    public function next()
+    public function next(): void
     {
         next($this->values);
     }

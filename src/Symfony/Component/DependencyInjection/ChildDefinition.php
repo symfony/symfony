@@ -35,10 +35,8 @@ class ChildDefinition extends Definition
 
     /**
      * Returns the Definition to inherit from.
-     *
-     * @return string
      */
-    public function getParent()
+    public function getParent(): string
     {
         return $this->parent;
     }
@@ -46,11 +44,10 @@ class ChildDefinition extends Definition
     /**
      * Sets the Definition to inherit from.
      *
-     * @param string $parent
      *
      * @return $this
      */
-    public function setParent($parent)
+    public function setParent(string $parent)
     {
         $this->parent = $parent;
 
@@ -93,7 +90,7 @@ class ChildDefinition extends Definition
      *
      * @throws InvalidArgumentException when $index isn't an integer
      */
-    public function replaceArgument($index, $value)
+    public function replaceArgument($index, $value): self
     {
         if (is_int($index)) {
             $this->arguments['index_'.$index] = $value;
@@ -109,7 +106,7 @@ class ChildDefinition extends Definition
     /**
      * @internal
      */
-    public function setAutoconfigured($autoconfigured)
+    public function setAutoconfigured($autoconfigured): void
     {
         throw new BadMethodCallException('A ChildDefinition cannot be autoconfigured.');
     }
@@ -117,7 +114,7 @@ class ChildDefinition extends Definition
     /**
      * @internal
      */
-    public function setInstanceofConditionals(array $instanceof)
+    public function setInstanceofConditionals(array $instanceof): void
     {
         throw new BadMethodCallException('A ChildDefinition cannot have instanceof conditionals set on it.');
     }
@@ -125,7 +122,7 @@ class ChildDefinition extends Definition
     /**
      * @internal
      */
-    public function setBindings(array $bindings)
+    public function setBindings(array $bindings): void
     {
         throw new BadMethodCallException('A ChildDefinition cannot have bindings set on it.');
     }

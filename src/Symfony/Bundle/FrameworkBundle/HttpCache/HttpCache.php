@@ -49,7 +49,7 @@ abstract class HttpCache extends BaseHttpCache
      *
      * @return Response A Response instance
      */
-    protected function forward(Request $request, $raw = false, Response $entry = null)
+    protected function forward(Request $request, bool $raw = false, Response $entry = null): Response
     {
         $this->getKernel()->boot();
         $this->getKernel()->getContainer()->set('cache', $this);
@@ -62,7 +62,7 @@ abstract class HttpCache extends BaseHttpCache
      *
      * @return array An array of options
      */
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return array();
     }

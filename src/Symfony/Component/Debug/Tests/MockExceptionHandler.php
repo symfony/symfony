@@ -17,7 +17,7 @@ class MockExceptionHandler extends ExceptionHandler
 {
     public $e;
 
-    public function handle(\Exception $e)
+    public function handle(\Exception $e): void
     {
         $this->e = $e;
     }

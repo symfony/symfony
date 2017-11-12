@@ -42,7 +42,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
     /**
      * Handles anonymous authentication.
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         if (null !== $this->tokenStorage->getToken()) {
             return;

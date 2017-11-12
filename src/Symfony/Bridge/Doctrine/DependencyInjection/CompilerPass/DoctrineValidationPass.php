@@ -31,7 +31,7 @@ class DoctrineValidationPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->updateValidatorMappingFiles($container, 'xml', 'xml');
         $this->updateValidatorMappingFiles($container, 'yaml', 'yml');
@@ -41,7 +41,7 @@ class DoctrineValidationPass implements CompilerPassInterface
      * Gets the validation mapping files for the format and extends them with
      * files matching a doctrine search pattern (Resources/config/validation.orm.xml).
      */
-    private function updateValidatorMappingFiles(ContainerBuilder $container, string $mapping, string $extension)
+    private function updateValidatorMappingFiles(ContainerBuilder $container, string $mapping, string $extension): void
     {
         if (!$container->hasParameter('validator.mapping.loader.'.$mapping.'_files_loader.mapping_files')) {
             return;

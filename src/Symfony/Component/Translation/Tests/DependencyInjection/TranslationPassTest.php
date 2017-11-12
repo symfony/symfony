@@ -20,7 +20,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 
 class TranslationPassTest extends TestCase
 {
-    public function testValidCollector()
+    public function testValidCollector(): void
     {
         $loader = (new Definition())
             ->addTag('translation.loader', array('alias' => 'xliff', 'legacy-alias' => 'xlf'));

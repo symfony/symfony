@@ -8,7 +8,7 @@ use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 
 class MultipleStateMarkingStoreTest extends TestCase
 {
-    public function testGetSetMarking()
+    public function testGetSetMarking(): void
     {
         $subject = new \stdClass();
         $subject->myMarks = null;

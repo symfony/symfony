@@ -38,7 +38,7 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
         );
     }
 
-    public function onSubmit(FormEvent $event)
+    public function onSubmit(FormEvent $event): void
     {
         $collection = $event->getForm()->getData();
         $data = $event->getData();

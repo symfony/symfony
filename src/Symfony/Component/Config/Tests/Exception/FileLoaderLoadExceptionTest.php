@@ -16,31 +16,31 @@ use Symfony\Component\Config\Exception\FileLoaderLoadException;
 
 class FileLoaderLoadExceptionTest extends TestCase
 {
-    public function testMessageCannotLoadResource()
+    public function testMessageCannotLoadResource(): void
     {
         $exception = new FileLoaderLoadException('resource', null);
         $this->assertEquals('Cannot load resource "resource".', $exception->getMessage());
     }
 
-    public function testMessageCannotLoadResourceWithType()
+    public function testMessageCannotLoadResourceWithType(): void
     {
         $exception = new FileLoaderLoadException('resource', null, null, null, 'foobar');
         $this->assertEquals('Cannot load resource "resource". Make sure there is a loader supporting the "foobar" type.', $exception->getMessage());
     }
 
-    public function testMessageCannotLoadResourceWithAnnotationType()
+    public function testMessageCannotLoadResourceWithAnnotationType(): void
     {
         $exception = new FileLoaderLoadException('resource', null, null, null, 'annotation');
         $this->assertEquals('Cannot load resource "resource". Make sure annotations are installed and enabled.', $exception->getMessage());
     }
 
-    public function testMessageCannotImportResourceFromSource()
+    public function testMessageCannotImportResourceFromSource(): void
     {
         $exception = new FileLoaderLoadException('resource', 'sourceResource');
         $this->assertEquals('Cannot import resource "resource" from "sourceResource".', $exception->getMessage());
     }
 
-    public function testMessageCannotImportBundleResource()
+    public function testMessageCannotImportBundleResource(): void
     {
         $exception = new FileLoaderLoadException('@resource', 'sourceResource');
         $this->assertEquals(
@@ -51,7 +51,7 @@ class FileLoaderLoadExceptionTest extends TestCase
         );
     }
 
-    public function testMessageHasPreviousErrorWithDotAndUnableToLoad()
+    public function testMessageHasPreviousErrorWithDotAndUnableToLoad(): void
     {
         $exception = new FileLoaderLoadException(
             'resource',
@@ -65,7 +65,7 @@ class FileLoaderLoadExceptionTest extends TestCase
         );
     }
 
-    public function testMessageHasPreviousErrorWithoutDotAndUnableToLoad()
+    public function testMessageHasPreviousErrorWithoutDotAndUnableToLoad(): void
     {
         $exception = new FileLoaderLoadException(
             'resource',
@@ -79,7 +79,7 @@ class FileLoaderLoadExceptionTest extends TestCase
         );
     }
 
-    public function testMessageHasPreviousErrorAndUnableToLoadBundle()
+    public function testMessageHasPreviousErrorAndUnableToLoadBundle(): void
     {
         $exception = new FileLoaderLoadException(
             '@resource',

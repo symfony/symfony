@@ -28,10 +28,8 @@ class GetResponseEvent extends KernelEvent
 
     /**
      * Returns the response object.
-     *
-     * @return Response
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }
@@ -39,7 +37,7 @@ class GetResponseEvent extends KernelEvent
     /**
      * Sets a response and stops event propagation.
      */
-    public function setResponse(Response $response)
+    public function setResponse(Response $response): void
     {
         $this->response = $response;
 
@@ -51,7 +49,7 @@ class GetResponseEvent extends KernelEvent
      *
      * @return bool Whether a response was set
      */
-    public function hasResponse()
+    public function hasResponse(): bool
     {
         return null !== $this->response;
     }

@@ -46,7 +46,7 @@ class Profiler
     /**
      * Disables the profiler.
      */
-    public function disable()
+    public function disable(): void
     {
         $this->enabled = false;
     }
@@ -54,7 +54,7 @@ class Profiler
     /**
      * Enables the profiler.
      */
-    public function enable()
+    public function enable(): void
     {
         $this->enabled = true;
     }
@@ -80,17 +80,15 @@ class Profiler
      *
      * @return Profile A Profile instance
      */
-    public function loadProfile($token)
+    public function loadProfile(string $token): Profile
     {
         return $this->storage->read($token);
     }
 
     /**
      * Saves a Profile.
-     *
-     * @return bool
      */
-    public function saveProfile(Profile $profile)
+    public function saveProfile(Profile $profile): bool
     {
         // late collect
         foreach ($profile->getCollectors() as $collector) {
@@ -109,7 +107,7 @@ class Profiler
     /**
      * Purges all data from the storage.
      */
-    public function purge()
+    public function purge(): void
     {
         $this->storage->purge();
     }
@@ -129,7 +127,7 @@ class Profiler
      *
      * @see http://php.net/manual/en/datetime.formats.php for the supported date/time formats
      */
-    public function find($ip, $url, $limit, $method, $start, $end, $statusCode = null)
+    public function find(string $ip, string $url, string $limit, string $method, string $start, string $end, string $statusCode = null): array
     {
         return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end), $statusCode);
     }
@@ -168,7 +166,7 @@ class Profiler
         return $profile;
     }
 
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->collectors as $collector) {
             $collector->reset();
@@ -181,7 +179,7 @@ class Profiler
      *
      * @return array An array of collectors
      */
-    public function all()
+    public function all(): array
     {
         return $this->collectors;
     }
@@ -191,7 +189,7 @@ class Profiler
      *
      * @param DataCollectorInterface[] $collectors An array of collectors
      */
-    public function set(array $collectors = array())
+    public function set(array $collectors = array()): void
     {
         $this->collectors = array();
         foreach ($collectors as $collector) {
@@ -202,7 +200,7 @@ class Profiler
     /**
      * Adds a Collector.
      */
-    public function add(DataCollectorInterface $collector)
+    public function add(DataCollectorInterface $collector): void
     {
         $this->collectors[$collector->getName()] = $collector;
     }
@@ -211,10 +209,8 @@ class Profiler
      * Returns true if a Collector for the given name exists.
      *
      * @param string $name A collector name
-     *
-     * @return bool
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return isset($this->collectors[$name]);
     }
@@ -228,7 +224,7 @@ class Profiler
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */
-    public function get($name)
+    public function get(string $name): DataCollectorInterface
     {
         if (!isset($this->collectors[$name])) {
             throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
@@ -237,7 +233,7 @@ class Profiler
         return $this->collectors[$name];
     }
 
-    private function getTimestamp($value)
+    private function getTimestamp($value): void
     {
         if (null === $value || '' == $value) {
             return;

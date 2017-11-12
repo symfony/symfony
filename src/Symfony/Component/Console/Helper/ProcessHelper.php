@@ -35,7 +35,7 @@ class ProcessHelper extends Helper
      *
      * @return Process The process that ran
      */
-    public function run(OutputInterface $output, $cmd, $error = null, callable $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE)
+    public function run(OutputInterface $output, $cmd, $error = null, callable $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE): Process
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -89,7 +89,7 @@ class ProcessHelper extends Helper
      *
      * @see run()
      */
-    public function mustRun(OutputInterface $output, $cmd, $error = null, callable $callback = null)
+    public function mustRun(OutputInterface $output, $cmd, $error = null, callable $callback = null): Process
     {
         $process = $this->run($output, $cmd, $error, $callback);
 
@@ -106,10 +106,8 @@ class ProcessHelper extends Helper
      * @param OutputInterface $output   An OutputInterface interface
      * @param Process         $process  The Process
      * @param callable|null   $callback A PHP callable
-     *
-     * @return callable
      */
-    public function wrapCallback(OutputInterface $output, Process $process, callable $callback = null)
+    public function wrapCallback(OutputInterface $output, Process $process, callable $callback = null): callable
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -117,7 +115,7 @@ class ProcessHelper extends Helper
 
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
-        return function ($type, $buffer) use ($output, $process, $callback, $formatter) {
+        return function ($type, $buffer) use ($output, $process, $callback, $formatter): void {
             $output->write($formatter->progress(spl_object_hash($process), $this->escapeString($buffer), Process::ERR === $type));
 
             if (null !== $callback) {

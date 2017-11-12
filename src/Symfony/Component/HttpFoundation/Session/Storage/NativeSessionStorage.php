@@ -94,7 +94,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * @param \SessionHandlerInterface|null $handler
      * @param MetadataBag                   $metaBag MetadataBag
      */
-    public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
+    public function __construct(array $options = array(), ?\SessionHandlerInterface $handler = null, MetadataBag $metaBag = null)
     {
         $this->setMetadataBag($metaBag);
 
@@ -164,7 +164,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->saveHandler->setId($id);
     }
@@ -180,7 +180,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->saveHandler->setName($name);
     }
@@ -219,7 +219,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function save()
+    public function save(): void
     {
         $session = $_SESSION;
 
@@ -233,7 +233,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         // Register custom error handler to catch a possible failure warning during session write
-        set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+        set_error_handler(function ($errno, $errstr, $errfile, $errline): void {
             throw new \ErrorException($errstr, $errno, E_WARNING, $errfile, $errline);
         }, E_WARNING);
 
@@ -263,7 +263,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         // clear out the bags
         foreach ($this->bags as $bag) {
@@ -280,7 +280,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function registerBag(SessionBagInterface $bag)
+    public function registerBag(SessionBagInterface $bag): void
     {
         if ($this->started) {
             throw new \LogicException('Cannot register a bag when the session is already started.');
@@ -307,7 +307,7 @@ class NativeSessionStorage implements SessionStorageInterface
         return $this->bags[$name];
     }
 
-    public function setMetadataBag(MetadataBag $metaBag = null)
+    public function setMetadataBag(MetadataBag $metaBag = null): void
     {
         if (null === $metaBag) {
             $metaBag = new MetadataBag();
@@ -318,10 +318,8 @@ class NativeSessionStorage implements SessionStorageInterface
 
     /**
      * Gets the MetadataBag.
-     *
-     * @return MetadataBag
      */
-    public function getMetadataBag()
+    public function getMetadataBag(): MetadataBag
     {
         return $this->metadataBag;
     }
@@ -344,7 +342,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @see http://php.net/session.configuration
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         if (headers_sent()) {
             return;
@@ -391,7 +389,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function setSaveHandler($saveHandler = null)
+    public function setSaveHandler(?\SessionHandlerInterface $saveHandler = null): void
     {
         if (!$saveHandler instanceof AbstractProxy &&
             !$saveHandler instanceof \SessionHandlerInterface &&
@@ -426,7 +424,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * PHP takes the return value from the read() handler, unserializes it
      * and populates $_SESSION with the result automatically.
      */
-    protected function loadSession(array &$session = null)
+    protected function loadSession(array &$session = null): void
     {
         if (null === $session) {
             $session = &$_SESSION;

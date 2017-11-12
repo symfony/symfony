@@ -18,7 +18,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 class FileLoaderTest extends TestCase
 {
-    public function testImportWithFileLocatorDelegation()
+    public function testImportWithFileLocatorDelegation(): void
     {
         $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
 
@@ -68,7 +68,7 @@ class FileLoaderTest extends TestCase
         }
     }
 
-    public function testImportWithGlobLikeResource()
+    public function testImportWithGlobLikeResource(): void
     {
         $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
         $loader = new TestFileLoader($locatorMock);
@@ -76,7 +76,7 @@ class FileLoaderTest extends TestCase
         $this->assertSame('[foo]', $loader->import('[foo]'));
     }
 
-    public function testImportWithNoGlobMatch()
+    public function testImportWithNoGlobMatch(): void
     {
         $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
         $loader = new TestFileLoader($locatorMock);
@@ -84,7 +84,7 @@ class FileLoaderTest extends TestCase
         $this->assertNull($loader->import('./*.abc'));
     }
 
-    public function testImportWithSimpleGlob()
+    public function testImportWithSimpleGlob(): void
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__));
 
@@ -106,22 +106,22 @@ class TestFileLoader extends FileLoader
         return $this->supports;
     }
 
-    public function addLoading($resource)
+    public function addLoading($resource): void
     {
         self::$loading[$resource] = true;
     }
 
-    public function removeLoading($resource)
+    public function removeLoading($resource): void
     {
         unset(self::$loading[$resource]);
     }
 
-    public function clearLoading()
+    public function clearLoading(): void
     {
         self::$loading = array();
     }
 
-    public function setSupports($supports)
+    public function setSupports($supports): void
     {
         $this->supports = $supports;
     }

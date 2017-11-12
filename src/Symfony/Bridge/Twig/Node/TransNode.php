@@ -46,7 +46,7 @@ class TransNode extends Node
         parent::__construct($nodes, array(), $lineno, $tag);
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler->addDebugInfo($this);
 

@@ -33,7 +33,7 @@ class ClosureLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): void
     {
         call_user_func($resource, $this->container);
     }

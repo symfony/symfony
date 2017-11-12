@@ -31,7 +31,7 @@ class StringUtil
      *
      * @return string
      */
-    public static function trim($string)
+    public static function trim(string $string): string
     {
         if (null !== $result = @preg_replace('/^[\pZ\p{Cc}]+|[\pZ\p{Cc}]+$/u', '', $string)) {
             return $result;
@@ -47,7 +47,7 @@ class StringUtil
      *
      * @return string|null The block prefix or null if not a valid FQCN
      */
-    public static function fqcnToBlockPrefix($fqcn)
+    public static function fqcnToBlockPrefix(string $fqcn): ?string
     {
         // Non-greedy ("+?") to match "type" suffix, if present
         if (preg_match('~([^\\\\]+?)(type)?$~i', $fqcn, $matches)) {

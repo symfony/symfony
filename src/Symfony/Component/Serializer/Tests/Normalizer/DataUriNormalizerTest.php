@@ -29,18 +29,18 @@ class DataUriNormalizerTest extends TestCase
      */
     private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new DataUriNormalizer();
     }
 
-    public function testInterface()
+    public function testInterface(): void
     {
         $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $this->normalizer);
         $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $this->normalizer);
     }
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
         $this->assertTrue($this->normalizer->supportsNormalization(new \SplFileObject('data:,Hello%2C%20World!')));
@@ -49,7 +49,7 @@ class DataUriNormalizerTest extends TestCase
     /**
      * @requires extension fileinfo
      */
-    public function testNormalizeHttpFoundationFile()
+    public function testNormalizeHttpFoundationFile(): void
     {
         $file = new File(__DIR__.'/../Fixtures/test.gif');
 
@@ -59,7 +59,7 @@ class DataUriNormalizerTest extends TestCase
     /**
      * @requires extension fileinfo
      */
-    public function testNormalizeSplFileInfo()
+    public function testNormalizeSplFileInfo(): void
     {
         $file = new \SplFileInfo(__DIR__.'/../Fixtures/test.gif');
 
@@ -69,7 +69,7 @@ class DataUriNormalizerTest extends TestCase
     /**
      * @requires extension fileinfo
      */
-    public function testNormalizeText()
+    public function testNormalizeText(): void
     {
         $file = new \SplFileObject(__DIR__.'/../Fixtures/test.txt');
 
@@ -79,7 +79,7 @@ class DataUriNormalizerTest extends TestCase
         $this->assertSame(self::TEST_TXT_CONTENT, file_get_contents($data));
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization('foo', 'Bar'));
         $this->assertTrue($this->normalizer->supportsDenormalization(self::TEST_GIF_DATA, 'SplFileInfo'));
@@ -87,7 +87,7 @@ class DataUriNormalizerTest extends TestCase
         $this->assertTrue($this->normalizer->supportsDenormalization(self::TEST_TXT_DATA, 'Symfony\Component\HttpFoundation\File\File'));
     }
 
-    public function testDenormalizeSplFileInfo()
+    public function testDenormalizeSplFileInfo(): void
     {
         $file = $this->normalizer->denormalize(self::TEST_TXT_DATA, 'SplFileInfo');
 
@@ -95,7 +95,7 @@ class DataUriNormalizerTest extends TestCase
         $this->assertSame(file_get_contents(self::TEST_TXT_DATA), $this->getContent($file));
     }
 
-    public function testDenormalizeSplFileObject()
+    public function testDenormalizeSplFileObject(): void
     {
         $file = $this->normalizer->denormalize(self::TEST_TXT_DATA, 'SplFileObject');
 
@@ -103,7 +103,7 @@ class DataUriNormalizerTest extends TestCase
         $this->assertEquals(file_get_contents(self::TEST_TXT_DATA), $this->getContent($file));
     }
 
-    public function testDenormalizeHttpFoundationFile()
+    public function testDenormalizeHttpFoundationFile(): void
     {
         $file = $this->normalizer->denormalize(self::TEST_GIF_DATA, 'Symfony\Component\HttpFoundation\File\File');
 
@@ -115,7 +115,7 @@ class DataUriNormalizerTest extends TestCase
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      * @expectedExceptionMessage The provided "data:" URI is not valid.
      */
-    public function testGiveNotAccessToLocalFiles()
+    public function testGiveNotAccessToLocalFiles(): void
     {
         $this->normalizer->denormalize('/etc/shadow', 'SplFileObject');
     }
@@ -124,7 +124,7 @@ class DataUriNormalizerTest extends TestCase
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      * @dataProvider invalidUriProvider
      */
-    public function testInvalidData($uri)
+    public function testInvalidData($uri): void
     {
         $this->normalizer->denormalize($uri, 'SplFileObject');
     }
@@ -149,7 +149,7 @@ class DataUriNormalizerTest extends TestCase
     /**
      * @dataProvider validUriProvider
      */
-    public function testValidData($uri)
+    public function testValidData($uri): void
     {
         $this->assertInstanceOf('SplFileObject', $this->normalizer->denormalize($uri, 'SplFileObject'));
     }

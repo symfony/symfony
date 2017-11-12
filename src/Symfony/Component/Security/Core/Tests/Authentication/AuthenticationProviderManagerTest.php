@@ -27,7 +27,7 @@ class AuthenticationProviderManagerTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testAuthenticateWithoutProviders()
+    public function testAuthenticateWithoutProviders(): void
     {
         new AuthenticationProviderManager(array());
     }
@@ -35,14 +35,14 @@ class AuthenticationProviderManagerTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testAuthenticateWithProvidersWithIncorrectInterface()
+    public function testAuthenticateWithProvidersWithIncorrectInterface(): void
     {
         (new AuthenticationProviderManager(array(
             new \stdClass(),
         )))->authenticate($this->getMockBuilder(TokenInterface::class)->getMock());
     }
 
-    public function testAuthenticateWhenNoProviderSupportsToken()
+    public function testAuthenticateWhenNoProviderSupportsToken(): void
     {
         $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(false),
@@ -56,7 +56,7 @@ class AuthenticationProviderManagerTest extends TestCase
         }
     }
 
-    public function testAuthenticateWhenProviderReturnsAccountStatusException()
+    public function testAuthenticateWhenProviderReturnsAccountStatusException(): void
     {
         $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(true, null, 'Symfony\Component\Security\Core\Exception\AccountStatusException'),
@@ -70,7 +70,7 @@ class AuthenticationProviderManagerTest extends TestCase
         }
     }
 
-    public function testAuthenticateWhenProviderReturnsAuthenticationException()
+    public function testAuthenticateWhenProviderReturnsAuthenticationException(): void
     {
         $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(true, null, 'Symfony\Component\Security\Core\Exception\AuthenticationException'),
@@ -84,7 +84,7 @@ class AuthenticationProviderManagerTest extends TestCase
         }
     }
 
-    public function testAuthenticateWhenOneReturnsAuthenticationExceptionButNotAll()
+    public function testAuthenticateWhenOneReturnsAuthenticationExceptionButNotAll(): void
     {
         $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(true, null, 'Symfony\Component\Security\Core\Exception\AuthenticationException'),
@@ -95,7 +95,7 @@ class AuthenticationProviderManagerTest extends TestCase
         $this->assertSame($expected, $token);
     }
 
-    public function testAuthenticateReturnsTokenOfTheFirstMatchingProvider()
+    public function testAuthenticateReturnsTokenOfTheFirstMatchingProvider(): void
     {
         $second = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
         $second
@@ -111,7 +111,7 @@ class AuthenticationProviderManagerTest extends TestCase
         $this->assertSame($expected, $token);
     }
 
-    public function testEraseCredentialFlag()
+    public function testEraseCredentialFlag(): void
     {
         $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar', 'key')),
@@ -128,7 +128,7 @@ class AuthenticationProviderManagerTest extends TestCase
         $this->assertEquals('bar', $token->getCredentials());
     }
 
-    public function testAuthenticateDispatchesAuthenticationFailureEvent()
+    public function testAuthenticateDispatchesAuthenticationFailureEvent(): void
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
@@ -152,7 +152,7 @@ class AuthenticationProviderManagerTest extends TestCase
         }
     }
 
-    public function testAuthenticateDispatchesAuthenticationSuccessEvent()
+    public function testAuthenticateDispatchesAuthenticationSuccessEvent(): void
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
 

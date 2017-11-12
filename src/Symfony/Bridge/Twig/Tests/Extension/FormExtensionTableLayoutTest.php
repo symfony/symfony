@@ -30,7 +30,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
      */
     private $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
-    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -64,7 +64,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         $this->assertSame('<form name="form" method="get">', $html);
     }
 
-    public function testStartTagHasActionAttributeWhenActionIsZero()
+    public function testStartTagHasActionAttributeWhenActionIsZero(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -120,7 +120,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
     }
 
-    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
+    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true): void
     {
         $this->renderer->setTheme($view, $themes, $useDefaultThemes);
     }

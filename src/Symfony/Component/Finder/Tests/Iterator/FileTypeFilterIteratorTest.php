@@ -18,7 +18,7 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($mode, $expected)
+    public function testAccept($mode, $expected): void
     {
         $inner = new InnerTypeIterator(self::$files);
 

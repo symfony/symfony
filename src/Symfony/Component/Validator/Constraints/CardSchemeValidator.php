@@ -88,9 +88,8 @@ class CardSchemeValidator extends ConstraintValidator
      * Validates a creditcard belongs to a specified scheme.
      *
      * @param mixed      $value
-     * @param Constraint $constraint
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof CardScheme) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\CardScheme');

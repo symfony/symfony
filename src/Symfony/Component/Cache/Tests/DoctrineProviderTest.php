@@ -18,7 +18,7 @@ use Symfony\Component\Cache\DoctrineProvider;
 
 class DoctrineProviderTest extends TestCase
 {
-    public function testProvider()
+    public function testProvider(): void
     {
         $pool = new ArrayAdapter();
         $cache = new DoctrineProvider($pool);

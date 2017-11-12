@@ -27,7 +27,7 @@ class DateCasterTest extends TestCase
     /**
      * @dataProvider provideDateTimes
      */
-    public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp)
+    public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp): void
     {
         $date = new \DateTime($time, new \DateTimeZone($timezone));
 
@@ -43,7 +43,7 @@ EODUMP;
     /**
      * @dataProvider provideDateTimes
      */
-    public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
+    public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos): void
     {
         $stub = new Stub();
         $date = new \DateTime($time, new \DateTimeZone($timezone));
@@ -92,7 +92,7 @@ EODUMP;
     /**
      * @dataProvider provideIntervals
      */
-    public function testDumpInterval($intervalSpec, $ms, $invert, $expected)
+    public function testDumpInterval($intervalSpec, $ms, $invert, $expected): void
     {
         if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
             $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
@@ -112,7 +112,7 @@ EODUMP;
     /**
      * @dataProvider provideIntervals
      */
-    public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected)
+    public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected): void
     {
         if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
             $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
@@ -132,7 +132,7 @@ EODUMP;
     /**
      * @dataProvider provideIntervals
      */
-    public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds)
+    public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds): void
     {
         if ($ms && PHP_VERSION_ID >= 70200 && version_compare(PHP_VERSION, '7.2.0rc3', '<=')) {
             $this->markTestSkipped('Skipped on 7.2 before rc4 because of php bug #75354.');
@@ -207,7 +207,7 @@ EODUMP;
     /**
      * @dataProvider provideTimeZones
      */
-    public function testDumpTimeZone($timezone, $expected)
+    public function testDumpTimeZone($timezone, $expected): void
     {
         $timezone = new \DateTimeZone($timezone);
 
@@ -223,7 +223,7 @@ EODUMP;
     /**
      * @dataProvider provideTimeZones
      */
-    public function testDumpTimeZoneExcludingVerbosity($timezone, $expected)
+    public function testDumpTimeZoneExcludingVerbosity($timezone, $expected): void
     {
         $timezone = new \DateTimeZone($timezone);
 
@@ -239,7 +239,7 @@ EODUMP;
     /**
      * @dataProvider provideTimeZones
      */
-    public function testCastTimeZone($timezone, $xTimezone, $xRegion)
+    public function testCastTimeZone($timezone, $xTimezone, $xRegion): void
     {
         $timezone = new \DateTimeZone($timezone);
         $stub = new Stub();
@@ -300,7 +300,7 @@ EODUMP;
     /**
      * @dataProvider providePeriods
      */
-    public function testDumpPeriod($start, $interval, $end, $options, $expected)
+    public function testDumpPeriod($start, $interval, $end, $options, $expected): void
     {
         $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), is_int($end) ? $end : new \DateTime($end), $options);
 
@@ -316,7 +316,7 @@ EODUMP;
     /**
      * @dataProvider providePeriods
      */
-    public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates)
+    public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates): void
     {
         $p = new \DatePeriod(new \DateTime($start), new \DateInterval($interval), is_int($end) ? $end : new \DateTime($end), $options);
         $stub = new Stub();
@@ -373,7 +373,7 @@ EODUMP;
         );
 
         if (\PHP_VERSION_ID < 70107) {
-            array_walk($periods, function (&$i) { $i[5] = ''; });
+            array_walk($periods, function (&$i): void { $i[5] = ''; });
         }
 
         return $periods;

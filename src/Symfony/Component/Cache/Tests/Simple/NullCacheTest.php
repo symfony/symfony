@@ -24,19 +24,19 @@ class NullCacheTest extends TestCase
         return new NullCache();
     }
 
-    public function testGetItem()
+    public function testGetItem(): void
     {
         $cache = $this->createCachePool();
 
         $this->assertNull($cache->get('key'));
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $this->assertFalse($this->createCachePool()->has('key'));
     }
 
-    public function testGetMultiple()
+    public function testGetMultiple(): void
     {
         $cache = $this->createCachePool();
 
@@ -63,22 +63,22 @@ class NullCacheTest extends TestCase
         $this->assertSame(4, $count);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->assertTrue($this->createCachePool()->clear());
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $this->assertTrue($this->createCachePool()->delete('key'));
     }
 
-    public function testDeleteMultiple()
+    public function testDeleteMultiple(): void
     {
         $this->assertTrue($this->createCachePool()->deleteMultiple(array('key', 'foo', 'bar')));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $cache = $this->createCachePool();
 
@@ -86,7 +86,7 @@ class NullCacheTest extends TestCase
         $this->assertNull($cache->get('key'));
     }
 
-    public function testSetMultiple()
+    public function testSetMultiple(): void
     {
         $cache = $this->createCachePool();
 

@@ -34,19 +34,19 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     /**
      * Loads the container configuration.
      */
-    public function registerContainerConfiguration(LoaderInterface $loader);
+    public function registerContainerConfiguration(LoaderInterface $loader): void;
 
     /**
      * Boots the current kernel.
      */
-    public function boot();
+    public function boot(): void;
 
     /**
      * Shutdowns the kernel.
      *
      * This method is mainly useful when doing functional testing.
      */
-    public function shutdown();
+    public function shutdown(): void;
 
     /**
      * Gets the registered bundle instances.
@@ -64,7 +64,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * @throws \InvalidArgumentException when the bundle is not enabled
      */
-    public function getBundle($name);
+    public function getBundle(string $name): BundleInterface;
 
     /**
      * Returns the file path for a given resource.
@@ -94,68 +94,68 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
      * @throws \RuntimeException         if the name contains invalid/unsafe characters
      */
-    public function locateResource($name, $dir = null, $first = true);
+    public function locateResource(string $name, string $dir = null, bool $first = true);
 
     /**
      * Gets the name of the kernel.
      *
      * @return string The kernel name
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Gets the environment.
      *
      * @return string The current environment
      */
-    public function getEnvironment();
+    public function getEnvironment(): string;
 
     /**
      * Checks if debug mode is enabled.
      *
      * @return bool true if debug mode is enabled, false otherwise
      */
-    public function isDebug();
+    public function isDebug(): bool;
 
     /**
      * Gets the application root dir (path of the project's Kernel class).
      *
      * @return string The Kernel root dir
      */
-    public function getRootDir();
+    public function getRootDir(): string;
 
     /**
      * Gets the current container.
      *
      * @return ContainerInterface A ContainerInterface instance
      */
-    public function getContainer();
+    public function getContainer(): ContainerInterface;
 
     /**
      * Gets the request start time (not available if debug is disabled).
      *
      * @return int The request start timestamp
      */
-    public function getStartTime();
+    public function getStartTime(): int;
 
     /**
      * Gets the cache directory.
      *
      * @return string The cache directory
      */
-    public function getCacheDir();
+    public function getCacheDir(): string;
 
     /**
      * Gets the log directory.
      *
      * @return string The log directory
      */
-    public function getLogDir();
+    public function getLogDir(): string;
 
     /**
      * Gets the charset of the application.
      *
      * @return string The charset
      */
-    public function getCharset();
+    public function getCharset(): string;
 }

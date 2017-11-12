@@ -28,7 +28,7 @@ class LazyChoiceTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('choice_loader', new CallbackChoiceLoader(function () {
             return array(

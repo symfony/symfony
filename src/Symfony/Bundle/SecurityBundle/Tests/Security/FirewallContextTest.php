@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
 class FirewallContextTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $config = new FirewallConfig('main', 'user_checker', 'request_matcher');
         $exceptionListener = $this->getExceptionListenerMock();

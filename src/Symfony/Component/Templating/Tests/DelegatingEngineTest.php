@@ -18,7 +18,7 @@ use Symfony\Component\Templating\EngineInterface;
 
 class DelegatingEngineTest extends TestCase
 {
-    public function testRenderDelegatesToSupportedEngine()
+    public function testRenderDelegatesToSupportedEngine(): void
     {
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', true);
@@ -38,7 +38,7 @@ class DelegatingEngineTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage No engine is able to work with the template "template.php"
      */
-    public function testRenderWithNoSupportedEngine()
+    public function testRenderWithNoSupportedEngine(): void
     {
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', false);
@@ -47,7 +47,7 @@ class DelegatingEngineTest extends TestCase
         $delegatingEngine->render('template.php', array('foo' => 'bar'));
     }
 
-    public function testStreamDelegatesToSupportedEngine()
+    public function testStreamDelegatesToSupportedEngine(): void
     {
         $streamingEngine = $this->getStreamingEngineMock('template.php', true);
         $streamingEngine->expects($this->once())
@@ -65,13 +65,13 @@ class DelegatingEngineTest extends TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage Template "template.php" cannot be streamed as the engine supporting it does not implement StreamingEngineInterface
      */
-    public function testStreamRequiresStreamingEngine()
+    public function testStreamRequiresStreamingEngine(): void
     {
         $delegatingEngine = new DelegatingEngine(array(new TestEngine()));
         $delegatingEngine->stream('template.php', array('foo' => 'bar'));
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $engine = $this->getEngineMock('template.php', true);
         $engine->expects($this->once())
@@ -84,7 +84,7 @@ class DelegatingEngineTest extends TestCase
         $this->assertTrue($delegatingEngine->exists('template.php'));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $engine = $this->getEngineMock('template.php', true);
 
@@ -93,7 +93,7 @@ class DelegatingEngineTest extends TestCase
         $this->assertTrue($delegatingEngine->supports('template.php'));
     }
 
-    public function testSupportsWithNoSupportedEngine()
+    public function testSupportsWithNoSupportedEngine(): void
     {
         $engine = $this->getEngineMock('template.php', false);
 
@@ -102,7 +102,7 @@ class DelegatingEngineTest extends TestCase
         $this->assertFalse($delegatingEngine->supports('template.php'));
     }
 
-    public function testGetExistingEngine()
+    public function testGetExistingEngine(): void
     {
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', true);
@@ -116,7 +116,7 @@ class DelegatingEngineTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage No engine is able to work with the template "template.php"
      */
-    public function testGetInvalidEngine()
+    public function testGetInvalidEngine(): void
     {
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', false);
@@ -156,11 +156,11 @@ interface MyStreamingEngine extends StreamingEngineInterface, EngineInterface
 
 class TestEngine implements EngineInterface
 {
-    public function render($name, array $parameters = array())
+    public function render($name, array $parameters = array()): void
     {
     }
 
-    public function exists($name)
+    public function exists($name): void
     {
     }
 
@@ -169,7 +169,7 @@ class TestEngine implements EngineInterface
         return true;
     }
 
-    public function stream()
+    public function stream(): void
     {
     }
 }

@@ -29,7 +29,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputArgument(InputArgument $argument, array $options = array())
+    protected function describeInputArgument(InputArgument $argument, array $options = array()): void
     {
         $this->writeData($this->getInputArgumentData($argument), $options);
     }
@@ -37,7 +37,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputOption(InputOption $option, array $options = array())
+    protected function describeInputOption(InputOption $option, array $options = array()): void
     {
         $this->writeData($this->getInputOptionData($option), $options);
     }
@@ -45,7 +45,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputDefinition(InputDefinition $definition, array $options = array())
+    protected function describeInputDefinition(InputDefinition $definition, array $options = array()): void
     {
         $this->writeData($this->getInputDefinitionData($definition), $options);
     }
@@ -53,7 +53,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(Command $command, array $options = array()): void
     {
         $this->writeData($this->getCommandData($command), $options);
     }
@@ -61,7 +61,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeApplication(Application $application, array $options = array())
+    protected function describeApplication(Application $application, array $options = array()): void
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace, true);
@@ -100,10 +100,7 @@ class JsonDescriptor extends Descriptor
         $this->write(json_encode($data, isset($options['json_encoding']) ? $options['json_encoding'] : 0));
     }
 
-    /**
-     * @return array
-     */
-    private function getInputArgumentData(InputArgument $argument)
+    private function getInputArgumentData(InputArgument $argument): array
     {
         return array(
             'name' => $argument->getName(),
@@ -114,10 +111,7 @@ class JsonDescriptor extends Descriptor
         );
     }
 
-    /**
-     * @return array
-     */
-    private function getInputOptionData(InputOption $option)
+    private function getInputOptionData(InputOption $option): array
     {
         return array(
             'name' => '--'.$option->getName(),
@@ -130,10 +124,7 @@ class JsonDescriptor extends Descriptor
         );
     }
 
-    /**
-     * @return array
-     */
-    private function getInputDefinitionData(InputDefinition $definition)
+    private function getInputDefinitionData(InputDefinition $definition): array
     {
         $inputArguments = array();
         foreach ($definition->getArguments() as $name => $argument) {
@@ -148,10 +139,7 @@ class JsonDescriptor extends Descriptor
         return array('arguments' => $inputArguments, 'options' => $inputOptions);
     }
 
-    /**
-     * @return array
-     */
-    private function getCommandData(Command $command)
+    private function getCommandData(Command $command): array
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);

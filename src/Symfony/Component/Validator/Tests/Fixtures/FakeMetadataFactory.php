@@ -59,12 +59,12 @@ class FakeMetadataFactory implements MetadataFactoryInterface
         return isset($this->metadatas[$class]) || isset($this->metadatas[$hash]);
     }
 
-    public function addMetadata($metadata)
+    public function addMetadata($metadata): void
     {
         $this->metadatas[$metadata->getClassName()] = $metadata;
     }
 
-    public function addMetadataForValue($value, MetadataInterface $metadata)
+    public function addMetadataForValue($value, MetadataInterface $metadata): void
     {
         $key = is_object($value) ? spl_object_hash($value) : $value;
         $this->metadatas[$key] = $metadata;

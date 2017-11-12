@@ -17,7 +17,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
 
 class TranslationDumperPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->disableOriginalConstructor()->getMock();
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->disableOriginalConstructor()->getMock();
@@ -48,7 +48,7 @@ class TranslationDumperPassTest extends TestCase
         $translationDumperPass->process($container);
     }
 
-    public function testProcessNoDefinitionFound()
+    public function testProcessNoDefinitionFound(): void
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->disableOriginalConstructor()->getMock();
 

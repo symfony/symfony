@@ -39,12 +39,12 @@ class ApcuAdapterTest extends AdapterTestCase
         return new ApcuAdapter(str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
-    public function testUnserializable()
+    public function testUnserializable(): void
     {
         $pool = $this->createCachePool();
 
         $item = $pool->getItem('foo');
-        $item->set(function () {});
+        $item->set(function (): void {});
 
         $this->assertFalse($pool->save($item));
 
@@ -52,7 +52,7 @@ class ApcuAdapterTest extends AdapterTestCase
         $this->assertFalse($item->isHit());
     }
 
-    public function testVersion()
+    public function testVersion(): void
     {
         $namespace = str_replace('\\', '.', get_class($this));
 
@@ -77,7 +77,7 @@ class ApcuAdapterTest extends AdapterTestCase
         $this->assertNull($item->get());
     }
 
-    public function testNamespace()
+    public function testNamespace(): void
     {
         $namespace = str_replace('\\', '.', get_class($this));
 
@@ -102,12 +102,12 @@ class ApcuAdapterTest extends AdapterTestCase
         $this->assertSame('bar', $item->get());
     }
 
-    public function testWithCliSapi()
+    public function testWithCliSapi(): void
     {
         try {
             // disable PHPUnit error handler to mimic a production environment
             $isCalled = false;
-            set_error_handler(function () use (&$isCalled) {
+            set_error_handler(function () use (&$isCalled): void {
                 $isCalled = true;
             });
             $pool = new ApcuAdapter(str_replace('\\', '.', __CLASS__));

@@ -37,7 +37,7 @@ class DoctrineProvider extends CacheProvider implements PruneableInterface, Rese
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         if ($this->pool instanceof ResettableInterface) {
             $this->pool->reset();
@@ -88,7 +88,7 @@ class DoctrineProvider extends CacheProvider implements PruneableInterface, Rese
     /**
      * {@inheritdoc}
      */
-    protected function doFlush()
+    protected function doFlush(): void
     {
         $this->pool->clear();
     }
@@ -96,7 +96,7 @@ class DoctrineProvider extends CacheProvider implements PruneableInterface, Rese
     /**
      * {@inheritdoc}
      */
-    protected function doGetStats()
+    protected function doGetStats(): void
     {
     }
 }

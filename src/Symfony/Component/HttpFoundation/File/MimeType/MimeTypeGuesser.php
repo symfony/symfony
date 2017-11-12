@@ -55,10 +55,8 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
 
     /**
      * Returns the singleton instance.
-     *
-     * @return self
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (null === self::$instance) {
             self::$instance = new self();
@@ -70,7 +68,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     /**
      * Resets the singleton instance.
      */
-    public static function reset()
+    public static function reset(): void
     {
         self::$instance = null;
     }
@@ -94,7 +92,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * When guessing, this guesser is preferred over previously registered ones.
      */
-    public function register(MimeTypeGuesserInterface $guesser)
+    public function register(MimeTypeGuesserInterface $guesser): void
     {
         array_unshift($this->guessers, $guesser);
     }
@@ -115,7 +113,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * @throws FileNotFoundException
      * @throws AccessDeniedException
      */
-    public function guess($path)
+    public function guess(string $path): string
     {
         if (!is_file($path)) {
             throw new FileNotFoundException($path);

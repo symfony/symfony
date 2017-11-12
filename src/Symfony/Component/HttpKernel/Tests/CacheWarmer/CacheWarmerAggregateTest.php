@@ -18,17 +18,17 @@ class CacheWarmerAggregateTest extends TestCase
 {
     protected static $cacheDir;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$cacheDir = tempnam(sys_get_temp_dir(), 'sf2_cache_warmer_dir');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         @unlink(self::$cacheDir);
     }
 
-    public function testInjectWarmersUsingConstructor()
+    public function testInjectWarmersUsingConstructor(): void
     {
         $warmer = $this->getCacheWarmerMock();
         $warmer
@@ -38,7 +38,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(self::$cacheDir);
     }
 
-    public function testWarmupDoesCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsEnabled()
+    public function testWarmupDoesCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsEnabled(): void
     {
         $warmer = $this->getCacheWarmerMock();
         $warmer
@@ -53,7 +53,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(self::$cacheDir);
     }
 
-    public function testWarmupDoesNotCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsNotEnabled()
+    public function testWarmupDoesNotCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsNotEnabled(): void
     {
         $warmer = $this->getCacheWarmerMock();
         $warmer

@@ -20,7 +20,7 @@ use Symfony\Component\Templating\EngineInterface as ComponentEngineInterface;
 
 class TemplatingPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if ($container->hasDefinition('templating')) {
             return;

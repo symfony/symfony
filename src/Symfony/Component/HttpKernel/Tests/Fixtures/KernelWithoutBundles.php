@@ -22,11 +22,11 @@ class KernelWithoutBundles extends Kernel
         return array();
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
 
-    protected function build(ContainerBuilder $container)
+    protected function build(ContainerBuilder $container): void
     {
         $container->setParameter('test_executed', true);
     }

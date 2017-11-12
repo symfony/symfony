@@ -35,7 +35,7 @@ class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4Hori
 
     private $renderer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -100,7 +100,7 @@ class FormExtensionBootstrap4HorizontalLayoutTest extends AbstractBootstrap4Hori
         return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
     }
 
-    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
+    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true): void
     {
         $this->renderer->setTheme($view, $themes, $useDefaultThemes);
     }

@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class FormLoginExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $container
             ->register('localized_form_failure_handler', 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Security\LocalizedFormFailureHandler')

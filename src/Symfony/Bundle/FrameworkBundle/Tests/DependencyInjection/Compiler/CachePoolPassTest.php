@@ -23,12 +23,12 @@ class CachePoolPassTest extends TestCase
 {
     private $cachePoolPass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cachePoolPass = new CachePoolPass();
     }
 
-    public function testNamespaceArgumentIsReplaced()
+    public function testNamespaceArgumentIsReplaced(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -50,7 +50,7 @@ class CachePoolPassTest extends TestCase
         $this->assertSame('D07rhFx97S', $cachePool->getArgument(0));
     }
 
-    public function testNamespaceArgumentIsNotReplacedIfArrayAdapterIsUsed()
+    public function testNamespaceArgumentIsNotReplacedIfArrayAdapterIsUsed(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
@@ -68,7 +68,7 @@ class CachePoolPassTest extends TestCase
         $this->assertCount(0, $container->getDefinition('app.cache_pool')->getArguments());
     }
 
-    public function testArgsAreReplaced()
+    public function testArgsAreReplaced(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -97,7 +97,7 @@ class CachePoolPassTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid "cache.pool" tag for service "app.cache_pool": accepted attributes are
      */
-    public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes()
+    public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

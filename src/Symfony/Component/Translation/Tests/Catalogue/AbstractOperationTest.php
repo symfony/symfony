@@ -17,7 +17,7 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 
 abstract class AbstractOperationTest extends TestCase
 {
-    public function testGetEmptyDomains()
+    public function testGetEmptyDomains(): void
     {
         $this->assertEquals(
             array(),
@@ -28,7 +28,7 @@ abstract class AbstractOperationTest extends TestCase
         );
     }
 
-    public function testGetMergedDomains()
+    public function testGetMergedDomains(): void
     {
         $this->assertEquals(
             array('a', 'b', 'c'),
@@ -39,7 +39,7 @@ abstract class AbstractOperationTest extends TestCase
         );
     }
 
-    public function testGetMessagesFromUnknownDomain()
+    public function testGetMessagesFromUnknownDomain(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
         $this->createOperation(
@@ -48,7 +48,7 @@ abstract class AbstractOperationTest extends TestCase
         )->getMessages('domain');
     }
 
-    public function testGetEmptyMessages()
+    public function testGetEmptyMessages(): void
     {
         $this->assertEquals(
             array(),
@@ -59,7 +59,7 @@ abstract class AbstractOperationTest extends TestCase
         );
     }
 
-    public function testGetEmptyResult()
+    public function testGetEmptyResult(): void
     {
         $this->assertEquals(
             new MessageCatalogue('en'),
@@ -70,5 +70,5 @@ abstract class AbstractOperationTest extends TestCase
         );
     }
 
-    abstract protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target);
+    abstract protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target): void;
 }

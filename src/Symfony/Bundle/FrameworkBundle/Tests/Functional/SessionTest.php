@@ -18,7 +18,7 @@ class SessionTest extends WebTestCase
      *
      * @dataProvider getConfigs
      */
-    public function testWelcome($config, $insulate)
+    public function testWelcome($config, $insulate): void
     {
         $client = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
         if ($insulate) {
@@ -51,7 +51,7 @@ class SessionTest extends WebTestCase
      *
      * @dataProvider getConfigs
      */
-    public function testFlash($config, $insulate)
+    public function testFlash($config, $insulate): void
     {
         $client = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
         if ($insulate) {
@@ -75,7 +75,7 @@ class SessionTest extends WebTestCase
      *
      * @dataProvider getConfigs
      */
-    public function testTwoClients($config, $insulate)
+    public function testTwoClients($config, $insulate): void
     {
         // start first client
         $client1 = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));

@@ -35,7 +35,7 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(

@@ -21,7 +21,7 @@ class DirectoryLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($file, $type = null)
+    public function load($file, $type = null): void
     {
         $file = rtrim($file, '/');
         $path = $this->locator->locate($file);

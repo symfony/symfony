@@ -36,7 +36,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * Clears all parameters.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->parameters = array();
     }
@@ -46,7 +46,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param array $parameters An array of parameters
      */
-    public function add(array $parameters)
+    public function add(array $parameters): void
     {
         foreach ($parameters as $key => $value) {
             $this->set($key, $value);
@@ -109,7 +109,7 @@ class ParameterBag implements ParameterBagInterface
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
      */
-    public function set($name, $value)
+    public function set(string $name, $value): void
     {
         $this->parameters[(string) $name] = $value;
     }
@@ -127,7 +127,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param string $name The parameter name
      */
-    public function remove($name)
+    public function remove(string $name): void
     {
         unset($this->parameters[(string) $name]);
     }
@@ -135,7 +135,7 @@ class ParameterBag implements ParameterBagInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve()
+    public function resolve(): void
     {
         if ($this->resolved) {
             return;
@@ -199,7 +199,7 @@ class ParameterBag implements ParameterBagInterface
      * @throws ParameterCircularReferenceException if a circular reference if detected
      * @throws RuntimeException                    when a given parameter has a type problem
      */
-    public function resolveString($value, array $resolving = array())
+    public function resolveString(string $value, array $resolving = array()): string
     {
         // we do this to deal with non string values (Boolean, integer, ...)
         // as the preg_replace_callback throw an exception when trying

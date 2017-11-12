@@ -119,7 +119,7 @@ class BinaryFileResponse extends Response
      *
      * @return File The file to stream
      */
-    public function getFile()
+    public function getFile(): File
     {
         return $this->file;
     }
@@ -153,7 +153,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function setContentDisposition($disposition, $filename = '', $filenameFallback = '')
+    public function setContentDisposition(string $disposition, string $filename = '', string $filenameFallback = '')
     {
         if ('' === $filename) {
             $filename = $this->file->getFilename();
@@ -317,7 +317,7 @@ class BinaryFileResponse extends Response
      *
      * @throws \LogicException when the content is not null
      */
-    public function setContent($content)
+    public function setContent($content): void
     {
         if (null !== $content) {
             throw new \LogicException('The content cannot be set on a BinaryFileResponse instance.');
@@ -337,7 +337,7 @@ class BinaryFileResponse extends Response
     /**
      * Trust X-Sendfile-Type header.
      */
-    public static function trustXSendfileTypeHeader()
+    public static function trustXSendfileTypeHeader(): void
     {
         self::$trustXSendfileTypeHeader = true;
     }
@@ -346,11 +346,10 @@ class BinaryFileResponse extends Response
      * If this is set to true, the file will be unlinked after the request is send
      * Note: If the X-Sendfile header is used, the deleteFileAfterSend setting will not be used.
      *
-     * @param bool $shouldDelete
      *
      * @return $this
      */
-    public function deleteFileAfterSend($shouldDelete)
+    public function deleteFileAfterSend(bool $shouldDelete)
     {
         $this->deleteFileAfterSend = $shouldDelete;
 

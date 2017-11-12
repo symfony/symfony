@@ -54,7 +54,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @throws \InvalidArgumentException if key is not found
      */
-    public function getArgument($key)
+    public function getArgument(string $key)
     {
         if ($this->hasArgument($key)) {
             return $this->arguments[$key];
@@ -71,7 +71,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @return $this
      */
-    public function setArgument($key, $value)
+    public function setArgument(string $key, $value)
     {
         $this->arguments[$key] = $value;
 
@@ -80,10 +80,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Getter for all arguments.
-     *
-     * @return array
      */
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
@@ -106,10 +104,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      * Has argument.
      *
      * @param string $key Key of arguments array
-     *
-     * @return bool
      */
-    public function hasArgument($key)
+    public function hasArgument(string $key): bool
     {
         return array_key_exists($key, $this->arguments);
     }
@@ -123,7 +119,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @throws \InvalidArgumentException if key does not exist in $this->args
      */
-    public function offsetGet($key)
+    public function offsetGet(string $key)
     {
         return $this->getArgument($key);
     }
@@ -134,7 +130,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      * @param string $key   Array key to set
      * @param mixed  $value Value
      */
-    public function offsetSet($key, $value)
+    public function offsetSet(string $key, $value): void
     {
         $this->setArgument($key, $value);
     }
@@ -144,7 +140,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @param string $key Array key
      */
-    public function offsetUnset($key)
+    public function offsetUnset(string $key): void
     {
         if ($this->hasArgument($key)) {
             unset($this->arguments[$key]);
@@ -155,10 +151,8 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      * ArrayAccess has argument.
      *
      * @param string $key Array key
-     *
-     * @return bool
      */
-    public function offsetExists($key)
+    public function offsetExists(string $key): bool
     {
         return $this->hasArgument($key);
     }
@@ -168,7 +162,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
      *
      * @return \ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->arguments);
     }

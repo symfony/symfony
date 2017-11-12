@@ -26,7 +26,7 @@ class PhpFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): void
     {
         // the container and loader variables are exposed to the included file below
         $container = $this->container;

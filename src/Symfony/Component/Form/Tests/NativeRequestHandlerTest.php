@@ -20,12 +20,12 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 {
     private static $serverBackup;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$serverBackup = $_SERVER;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +38,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -51,12 +51,12 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testRequestShouldBeNull()
+    public function testRequestShouldBeNull(): void
     {
         $this->requestHandler->handleRequest($this->getMockForm('name', 'GET'), 'request');
     }
 
-    public function testMethodOverrideHeaderTakesPrecedenceIfPost()
+    public function testMethodOverrideHeaderTakesPrecedenceIfPost(): void
     {
         $form = $this->getMockForm('param1', 'PUT');
 
@@ -73,7 +73,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         $this->requestHandler->handleRequest($form, $this->request);
     }
 
-    public function testConvertEmptyUploadedFilesToNull()
+    public function testConvertEmptyUploadedFilesToNull(): void
     {
         $form = $this->getMockForm('param1', 'POST', false);
 
@@ -92,7 +92,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         $this->requestHandler->handleRequest($form, $this->request);
     }
 
-    public function testFixBuggyFilesArray()
+    public function testFixBuggyFilesArray(): void
     {
         $form = $this->getMockForm('param1', 'POST', false);
 
@@ -129,7 +129,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         $this->requestHandler->handleRequest($form, $this->request);
     }
 
-    public function testFixBuggyNestedFilesArray()
+    public function testFixBuggyNestedFilesArray(): void
     {
         $form = $this->getMockForm('param1', 'POST');
 
@@ -168,7 +168,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         $this->requestHandler->handleRequest($form, $this->request);
     }
 
-    public function testMethodOverrideHeaderIgnoredIfNotPost()
+    public function testMethodOverrideHeaderIgnoredIfNotPost(): void
     {
         $form = $this->getMockForm('param1', 'POST');
 
@@ -184,7 +184,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         $this->requestHandler->handleRequest($form, $this->request);
     }
 
-    protected function setRequestData($method, $data, $files = array())
+    protected function setRequestData($method, $data, $files = array()): void
     {
         if ('GET' === $method) {
             $_GET = $data;

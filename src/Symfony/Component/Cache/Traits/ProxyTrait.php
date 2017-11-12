@@ -32,7 +32,7 @@ trait ProxyTrait
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         if ($this->pool instanceof ResettableInterface) {
             $this->pool->reset();

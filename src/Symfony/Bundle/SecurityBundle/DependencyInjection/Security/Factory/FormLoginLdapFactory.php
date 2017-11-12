@@ -43,7 +43,7 @@ class FormLoginLdapFactory extends FormLoginFactory
         return $provider;
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         parent::addConfiguration($node);
 

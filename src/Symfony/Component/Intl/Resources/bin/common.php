@@ -13,7 +13,7 @@ define('LINE_WIDTH', 75);
 
 define('LINE', str_repeat('-', LINE_WIDTH)."\n");
 
-function bailout($message)
+function bailout($message): void
 {
     echo wordwrap($message, LINE_WIDTH)." Aborting.\n";
 
@@ -34,14 +34,14 @@ function centered($text)
     return str_repeat(' ', $padding).$text;
 }
 
-function cd($dir)
+function cd($dir): void
 {
     if (false === chdir($dir)) {
         bailout("Could not switch to directory $dir.");
     }
 }
 
-function run($command)
+function run($command): void
 {
     exec($command, $output, $status);
 
@@ -53,7 +53,7 @@ function run($command)
     }
 }
 
-function get_icu_version_from_genrb($genrb)
+function get_icu_version_from_genrb($genrb): void
 {
     exec($genrb.' --version 2>&1', $output, $status);
 
@@ -68,7 +68,7 @@ function get_icu_version_from_genrb($genrb)
     return $matches[1];
 }
 
-set_exception_handler(function (\Throwable $exception) {
+set_exception_handler(function (\Throwable $exception): void {
     echo "\n";
 
     $cause = $exception;

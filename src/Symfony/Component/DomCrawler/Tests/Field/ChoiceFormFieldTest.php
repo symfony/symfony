@@ -15,7 +15,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 class ChoiceFormFieldTest extends FormFieldTestCase
 {
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $node = $this->createNode('textarea', '');
         try {
@@ -34,7 +34,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo'));
         $field = new ChoiceFormField($node);
@@ -52,7 +52,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('select', $field->getType(), '->getType() returns radio for a select');
     }
 
-    public function testIsMultiple()
+    public function testIsMultiple(): void
     {
         $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo'));
         $field = new ChoiceFormField($node);
@@ -80,7 +80,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertTrue($field->isMultiple(), '->isMultiple() returns true for selects with an empty multiple attribute');
     }
 
-    public function testSelects()
+    public function testSelects(): void
     {
         $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
         $field = new ChoiceFormField($node);
@@ -112,7 +112,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
-    public function testSelectWithEmptyBooleanAttribute()
+    public function testSelectWithEmptyBooleanAttribute(): void
     {
         $node = $this->createSelectNode(array('foo' => false, 'bar' => true), array(), '');
         $field = new ChoiceFormField($node);
@@ -120,7 +120,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('bar', $field->getValue());
     }
 
-    public function testSelectIsDisabled()
+    public function testSelectIsDisabled(): void
     {
         $node = $this->createSelectNode(array('foo' => false, 'bar' => true), array('disabled' => 'disabled'));
         $field = new ChoiceFormField($node);
@@ -128,7 +128,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertTrue($field->isDisabled(), '->isDisabled() returns true for selects with a disabled attribute');
     }
 
-    public function testMultipleSelects()
+    public function testMultipleSelects(): void
     {
         $node = $this->createSelectNode(array('foo' => false, 'bar' => false), array('multiple' => 'multiple'));
         $field = new ChoiceFormField($node);
@@ -157,7 +157,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
-    public function testRadioButtons()
+    public function testRadioButtons(): void
     {
         $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo'));
         $field = new ChoiceFormField($node);
@@ -187,7 +187,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
-    public function testRadioButtonsWithEmptyBooleanAttribute()
+    public function testRadioButtonsWithEmptyBooleanAttribute(): void
     {
         $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo'));
         $field = new ChoiceFormField($node);
@@ -198,7 +198,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('bar', $field->getValue(), '->getValue() returns the value attribute of the selected radio button');
     }
 
-    public function testRadioButtonIsDisabled()
+    public function testRadioButtonIsDisabled(): void
     {
         $node = $this->createNode('input', '', array('type' => 'radio', 'name' => 'name', 'value' => 'foo', 'disabled' => 'disabled'));
         $field = new ChoiceFormField($node);
@@ -220,7 +220,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertTrue($field->isDisabled());
     }
 
-    public function testCheckboxes()
+    public function testCheckboxes(): void
     {
         $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name'));
         $field = new ChoiceFormField($node);
@@ -263,7 +263,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
-    public function testCheckboxWithEmptyBooleanAttribute()
+    public function testCheckboxWithEmptyBooleanAttribute(): void
     {
         $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'value' => 'foo', 'checked' => ''));
         $field = new ChoiceFormField($node);
@@ -272,7 +272,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue());
     }
 
-    public function testTick()
+    public function testTick(): void
     {
         $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
         $field = new ChoiceFormField($node);
@@ -290,7 +290,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('on', $field->getValue(), '->tick() ticks checkboxes');
     }
 
-    public function testUntick()
+    public function testUntick(): void
     {
         $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
         $field = new ChoiceFormField($node);
@@ -308,7 +308,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertNull($field->getValue(), '->untick() unticks checkboxes');
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $node = $this->createNode('input', '', array('type' => 'checkbox', 'name' => 'name', 'checked' => 'checked'));
         $field = new ChoiceFormField($node);
@@ -323,7 +323,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
     }
 
-    public function testOptionWithNoValue()
+    public function testOptionWithNoValue(): void
     {
         $node = $this->createSelectNodeWithEmptyOption(array('foo' => false, 'bar' => false));
         $field = new ChoiceFormField($node);
@@ -336,7 +336,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
     }
 
-    public function testDisableValidation()
+    public function testDisableValidation(): void
     {
         $node = $this->createSelectNode(array('foo' => false, 'bar' => false));
         $field = new ChoiceFormField($node);
@@ -351,7 +351,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals(array('foobar'), $field->getValue(), '->disableValidation() allows to set a value which is not in the selected options.');
     }
 
-    public function testSelectWithEmptyValue()
+    public function testSelectWithEmptyValue(): void
     {
         $node = $this->createSelectNodeWithEmptyOption(array('' => true, 'Female' => false, 'Male' => false));
         $field = new ChoiceFormField($node);

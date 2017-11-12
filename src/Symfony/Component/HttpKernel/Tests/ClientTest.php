@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
  */
 class ClientTest extends TestCase
 {
-    public function testDoRequest()
+    public function testDoRequest(): void
     {
         $client = new Client(new TestHttpKernel());
 
@@ -43,7 +43,7 @@ class ClientTest extends TestCase
         $this->assertEquals('http://www.example.com/?parameter='.urlencode('http://google.com'), $client->getRequest()->getUri(), '->doRequest() uses the request handler to make the request');
     }
 
-    public function testGetScript()
+    public function testGetScript(): void
     {
         $client = new TestClient(new TestHttpKernel());
         $client->insulate();
@@ -52,7 +52,7 @@ class ClientTest extends TestCase
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->getScript() returns a script that uses the request handler to make the request');
     }
 
-    public function testFilterResponseConvertsCookies()
+    public function testFilterResponseConvertsCookies(): void
     {
         $client = new Client(new TestHttpKernel());
 
@@ -78,7 +78,7 @@ class ClientTest extends TestCase
         $this->assertEquals($expected, $domResponse->getHeader('Set-Cookie', false));
     }
 
-    public function testFilterResponseSupportsStreamedResponses()
+    public function testFilterResponseSupportsStreamedResponses(): void
     {
         $client = new Client(new TestHttpKernel());
 
@@ -86,7 +86,7 @@ class ClientTest extends TestCase
         $m = $r->getMethod('filterResponse');
         $m->setAccessible(true);
 
-        $response = new StreamedResponse(function () {
+        $response = new StreamedResponse(function (): void {
             echo 'foo';
         });
 
@@ -94,7 +94,7 @@ class ClientTest extends TestCase
         $this->assertEquals('foo', $domResponse->getContent());
     }
 
-    public function testUploadedFile()
+    public function testUploadedFile(): void
     {
         $source = tempnam(sys_get_temp_dir(), 'source');
         $target = sys_get_temp_dir().'/sf.moved.file';
@@ -130,7 +130,7 @@ class ClientTest extends TestCase
         unlink($target);
     }
 
-    public function testUploadedFileWhenNoFileSelected()
+    public function testUploadedFileWhenNoFileSelected(): void
     {
         $kernel = new TestHttpKernel();
         $client = new Client($kernel);
@@ -145,7 +145,7 @@ class ClientTest extends TestCase
         $this->assertNull($files['foo']);
     }
 
-    public function testUploadedFileWhenSizeExceedsUploadMaxFileSize()
+    public function testUploadedFileWhenSizeExceedsUploadMaxFileSize(): void
     {
         $source = tempnam(sys_get_temp_dir(), 'source');
 

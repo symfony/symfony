@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class RedirectResponseTest extends TestCase
 {
-    public function testGenerateMetaRedirect()
+    public function testGenerateMetaRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
 
@@ -29,7 +29,7 @@ class RedirectResponseTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testRedirectResponseConstructorNullUrl()
+    public function testRedirectResponseConstructorNullUrl(): void
     {
         $response = new RedirectResponse(null);
     }
@@ -37,12 +37,12 @@ class RedirectResponseTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testRedirectResponseConstructorWrongStatusCode()
+    public function testRedirectResponseConstructorWrongStatusCode(): void
     {
         $response = new RedirectResponse('foo.bar', 404);
     }
 
-    public function testGenerateLocationHeader()
+    public function testGenerateLocationHeader(): void
     {
         $response = new RedirectResponse('foo.bar');
 
@@ -50,14 +50,14 @@ class RedirectResponseTest extends TestCase
         $this->assertEquals('foo.bar', $response->headers->get('Location'));
     }
 
-    public function testGetTargetUrl()
+    public function testGetTargetUrl(): void
     {
         $response = new RedirectResponse('foo.bar');
 
         $this->assertEquals('foo.bar', $response->getTargetUrl());
     }
 
-    public function testSetTargetUrl()
+    public function testSetTargetUrl(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setTargetUrl('baz.beep');
@@ -68,13 +68,13 @@ class RedirectResponseTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testSetTargetUrlNull()
+    public function testSetTargetUrlNull(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setTargetUrl(null);
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $response = RedirectResponse::create('foo', 301);
 
@@ -82,7 +82,7 @@ class RedirectResponseTest extends TestCase
         $this->assertEquals(301, $response->getStatusCode());
     }
 
-    public function testCacheHeaders()
+    public function testCacheHeaders(): void
     {
         $response = new RedirectResponse('foo.bar', 301);
         $this->assertFalse($response->headers->hasCacheControlDirective('no-cache'));

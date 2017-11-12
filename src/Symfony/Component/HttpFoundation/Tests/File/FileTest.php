@@ -19,7 +19,7 @@ class FileTest extends TestCase
 {
     protected $file;
 
-    public function testGetMimeTypeUsesMimeTypeGuessers()
+    public function testGetMimeTypeUsesMimeTypeGuessers(): void
     {
         $file = new File(__DIR__.'/Fixtures/test.gif');
         $guesser = $this->createMockGuesser($file->getPathname(), 'image/gif');
@@ -29,14 +29,14 @@ class FileTest extends TestCase
         $this->assertEquals('image/gif', $file->getMimeType());
     }
 
-    public function testGuessExtensionWithoutGuesser()
+    public function testGuessExtensionWithoutGuesser(): void
     {
         $file = new File(__DIR__.'/Fixtures/directory/.empty');
 
         $this->assertNull($file->guessExtension());
     }
 
-    public function testGuessExtensionIsBasedOnMimeType()
+    public function testGuessExtensionIsBasedOnMimeType(): void
     {
         $file = new File(__DIR__.'/Fixtures/test');
         $guesser = $this->createMockGuesser($file->getPathname(), 'image/gif');
@@ -49,7 +49,7 @@ class FileTest extends TestCase
     /**
      * @requires extension fileinfo
      */
-    public function testGuessExtensionWithReset()
+    public function testGuessExtensionWithReset(): void
     {
         $file = new File(__DIR__.'/Fixtures/other-file.example');
         $guesser = $this->createMockGuesser($file->getPathname(), 'image/gif');
@@ -62,14 +62,14 @@ class FileTest extends TestCase
         $this->assertNull($file->guessExtension());
     }
 
-    public function testConstructWhenFileNotExists()
+    public function testConstructWhenFileNotExists(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
 
         new File(__DIR__.'/Fixtures/not_here');
     }
 
-    public function testMove()
+    public function testMove(): void
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';
         $targetDir = __DIR__.'/Fixtures/directory';
@@ -89,7 +89,7 @@ class FileTest extends TestCase
         @unlink($targetPath);
     }
 
-    public function testMoveWithNewName()
+    public function testMoveWithNewName(): void
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';
         $targetDir = __DIR__.'/Fixtures/directory';
@@ -123,7 +123,7 @@ class FileTest extends TestCase
     /**
      * @dataProvider getFilenameFixtures
      */
-    public function testMoveWithNonLatinName($filename, $sanitizedFilename)
+    public function testMoveWithNonLatinName($filename, $sanitizedFilename): void
     {
         $path = __DIR__.'/Fixtures/'.$sanitizedFilename;
         $targetDir = __DIR__.'/Fixtures/directory/';
@@ -143,7 +143,7 @@ class FileTest extends TestCase
         @unlink($targetPath);
     }
 
-    public function testMoveToAnUnexistentDirectory()
+    public function testMoveToAnUnexistentDirectory(): void
     {
         $sourcePath = __DIR__.'/Fixtures/test.copy.gif';
         $targetDir = __DIR__.'/Fixtures/directory/sub';

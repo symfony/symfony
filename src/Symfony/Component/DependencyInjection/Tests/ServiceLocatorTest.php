@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ServiceLocatorTest extends TestCase
 {
-    public function testHas()
+    public function testHas(): void
     {
         $locator = new ServiceLocator(array(
             'foo' => function () { return 'bar'; },
@@ -30,7 +30,7 @@ class ServiceLocatorTest extends TestCase
         $this->assertFalse($locator->has('dummy'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $locator = new ServiceLocator(array(
             'foo' => function () { return 'bar'; },
@@ -41,7 +41,7 @@ class ServiceLocatorTest extends TestCase
         $this->assertSame('baz', $locator->get('bar'));
     }
 
-    public function testGetDoesNotMemoize()
+    public function testGetDoesNotMemoize(): void
     {
         $i = 0;
         $locator = new ServiceLocator(array(
@@ -61,7 +61,7 @@ class ServiceLocatorTest extends TestCase
      * @expectedException        \Psr\Container\NotFoundExceptionInterface
      * @expectedExceptionMessage You have requested a non-existent service "dummy". Did you mean one of these: "foo", "bar"?
      */
-    public function testGetThrowsOnUndefinedService()
+    public function testGetThrowsOnUndefinedService(): void
     {
         $locator = new ServiceLocator(array(
             'foo' => function () { return 'bar'; },
@@ -77,7 +77,7 @@ class ServiceLocatorTest extends TestCase
         }
     }
 
-    public function testInvoke()
+    public function testInvoke(): void
     {
         $locator = new ServiceLocator(array(
             'foo' => function () { return 'bar'; },

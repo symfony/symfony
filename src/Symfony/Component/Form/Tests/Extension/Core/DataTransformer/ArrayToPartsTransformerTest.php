@@ -18,7 +18,7 @@ class ArrayToPartsTransformerTest extends TestCase
 {
     private $transformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new ArrayToPartsTransformer(array(
             'first' => array('a', 'b', 'c'),
@@ -26,12 +26,12 @@ class ArrayToPartsTransformerTest extends TestCase
         ));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->transformer = null;
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $input = array(
             'a' => '1',
@@ -58,7 +58,7 @@ class ArrayToPartsTransformerTest extends TestCase
         $this->assertSame($output, $this->transformer->transform($input));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $output = array(
             'first' => null,
@@ -71,12 +71,12 @@ class ArrayToPartsTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testTransformRequiresArray()
+    public function testTransformRequiresArray(): void
     {
         $this->transformer->transform('12345');
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $input = array(
             'first' => array(
@@ -103,7 +103,7 @@ class ArrayToPartsTransformerTest extends TestCase
         $this->assertSame($output, $this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformCompletelyEmpty()
+    public function testReverseTransformCompletelyEmpty(): void
     {
         $input = array(
             'first' => '',
@@ -113,7 +113,7 @@ class ArrayToPartsTransformerTest extends TestCase
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformCompletelyNull()
+    public function testReverseTransformCompletelyNull(): void
     {
         $input = array(
             'first' => null,
@@ -126,7 +126,7 @@ class ArrayToPartsTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformPartiallyNull()
+    public function testReverseTransformPartiallyNull(): void
     {
         $input = array(
             'first' => array(
@@ -143,7 +143,7 @@ class ArrayToPartsTransformerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
-    public function testReverseTransformRequiresArray()
+    public function testReverseTransformRequiresArray(): void
     {
         $this->transformer->reverseTransform('12345');
     }

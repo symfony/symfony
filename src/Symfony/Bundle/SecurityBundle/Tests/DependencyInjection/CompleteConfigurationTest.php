@@ -23,11 +23,11 @@ use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
-    abstract protected function getLoader(ContainerBuilder $container);
+    abstract protected function getLoader(ContainerBuilder $container): void;
 
-    abstract protected function getFileExtension();
+    abstract protected function getFileExtension(): void;
 
-    public function testRolesHierarchy()
+    public function testRolesHierarchy(): void
     {
         $container = $this->getContainer('container1');
         $this->assertEquals(array(
@@ -37,7 +37,7 @@ abstract class CompleteConfigurationTest extends TestCase
         ), $container->getParameter('security.role_hierarchy.roles'));
     }
 
-    public function testUserProviders()
+    public function testUserProviders(): void
     {
         $container = $this->getContainer('container1');
 
@@ -65,7 +65,7 @@ abstract class CompleteConfigurationTest extends TestCase
         ))), $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
 
-    public function testFirewalls()
+    public function testFirewalls(): void
     {
         $container = $this->getContainer('container1');
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
@@ -188,7 +188,7 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertFalse($container->hasAlias('Symfony\Component\Security\Core\User\UserCheckerInterface', 'No user checker alias is registered when custom user checker services are registered'));
     }
 
-    public function testFirewallRequestMatchers()
+    public function testFirewallRequestMatchers(): void
     {
         $container = $this->getContainer('container1');
 
@@ -214,7 +214,7 @@ abstract class CompleteConfigurationTest extends TestCase
         ), $matchers);
     }
 
-    public function testUserCheckerAliasIsRegistered()
+    public function testUserCheckerAliasIsRegistered(): void
     {
         $container = $this->getContainer('no_custom_user_checker');
 
@@ -222,7 +222,7 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertFalse($container->getAlias('Symfony\Component\Security\Core\User\UserCheckerInterface')->isPublic());
     }
 
-    public function testAccess()
+    public function testAccess(): void
     {
         $container = $this->getContainer('container1');
 
@@ -263,7 +263,7 @@ abstract class CompleteConfigurationTest extends TestCase
         }
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $container = $this->getContainer('merge');
 
@@ -273,7 +273,7 @@ abstract class CompleteConfigurationTest extends TestCase
         ), $container->getParameter('security.role_hierarchy.roles'));
     }
 
-    public function testEncoders()
+    public function testEncoders(): void
     {
         $container = $this->getContainer('container1');
 
@@ -312,7 +312,7 @@ abstract class CompleteConfigurationTest extends TestCase
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    public function testArgon2iEncoder()
+    public function testArgon2iEncoder(): void
     {
         if (!Argon2iPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
@@ -324,13 +324,13 @@ abstract class CompleteConfigurationTest extends TestCase
         ))), $this->getContainer('argon2i_encoder')->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    public function testRememberMeThrowExceptionsDefault()
+    public function testRememberMeThrowExceptionsDefault(): void
     {
         $container = $this->getContainer('container1');
         $this->assertTrue($container->getDefinition('security.authentication.listener.rememberme.secure')->getArgument(5));
     }
 
-    public function testRememberMeThrowExceptions()
+    public function testRememberMeThrowExceptions(): void
     {
         $container = $this->getContainer('remember_me_options');
         $service = $container->getDefinition('security.authentication.listener.rememberme.main');
@@ -338,34 +338,34 @@ abstract class CompleteConfigurationTest extends TestCase
         $this->assertFalse($service->getArgument(5));
     }
 
-    public function testUserCheckerConfig()
+    public function testUserCheckerConfig(): void
     {
         $this->assertEquals('app.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.with_user_checker'));
     }
 
-    public function testUserCheckerConfigWithDefaultChecker()
+    public function testUserCheckerConfigWithDefaultChecker(): void
     {
         $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.host'));
     }
 
-    public function testUserCheckerConfigWithNoCheckers()
+    public function testUserCheckerConfigWithNoCheckers(): void
     {
         $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.secure'));
     }
 
-    public function testUserPasswordEncoderCommandIsRegistered()
+    public function testUserPasswordEncoderCommandIsRegistered(): void
     {
         $this->assertTrue($this->getContainer('remember_me_options')->has(UserPasswordEncoderCommand::class));
     }
 
-    public function testDefaultAccessDecisionManagerStrategyIsAffirmative()
+    public function testDefaultAccessDecisionManagerStrategyIsAffirmative(): void
     {
         $container = $this->getContainer('access_decision_manager_default_strategy');
 
         $this->assertSame(AccessDecisionManager::STRATEGY_AFFIRMATIVE, $container->getDefinition('security.access.decision_manager')->getArgument(1), 'Default vote strategy is affirmative');
     }
 
-    public function testCustomAccessDecisionManagerService()
+    public function testCustomAccessDecisionManagerService(): void
     {
         $container = $this->getContainer('access_decision_manager_service');
 
@@ -376,7 +376,7 @@ abstract class CompleteConfigurationTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage "strategy" and "service" cannot be used together.
      */
-    public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime()
+    public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime(): void
     {
         $container = $this->getContainer('access_decision_manager_service_and_strategy');
     }
@@ -385,7 +385,7 @@ abstract class CompleteConfigurationTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Invalid firewall "main": user provider "undefined" not found.
      */
-    public function testFirewallUndefinedUserProvider()
+    public function testFirewallUndefinedUserProvider(): void
     {
         $this->getContainer('firewall_undefined_provider');
     }
@@ -394,18 +394,18 @@ abstract class CompleteConfigurationTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Invalid firewall "main": user provider "undefined" not found.
      */
-    public function testFirewallListenerUndefinedProvider()
+    public function testFirewallListenerUndefinedProvider(): void
     {
         $this->getContainer('listener_undefined_provider');
     }
 
-    public function testFirewallWithUserProvider()
+    public function testFirewallWithUserProvider(): void
     {
         $this->getContainer('firewall_provider');
         $this->addToAssertionCount(1);
     }
 
-    public function testFirewallListenerWithProvider()
+    public function testFirewallListenerWithProvider(): void
     {
         $this->getContainer('listener_provider');
         $this->addToAssertionCount(1);

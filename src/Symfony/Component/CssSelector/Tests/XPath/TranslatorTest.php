@@ -18,13 +18,13 @@ use Symfony\Component\CssSelector\XPath\Translator;
 class TranslatorTest extends TestCase
 {
     /** @dataProvider getXpathLiteralTestData */
-    public function testXpathLiteral($value, $literal)
+    public function testXpathLiteral($value, $literal): void
     {
         $this->assertEquals($literal, Translator::getXpathLiteral($value));
     }
 
     /** @dataProvider getCssToXPathTestData */
-    public function testCssToXPath($css, $xpath)
+    public function testCssToXPath($css, $xpath): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -32,7 +32,7 @@ class TranslatorTest extends TestCase
     }
 
     /** @dataProvider getXmlLangTestData */
-    public function testXmlLang($css, array $elementsId)
+    public function testXmlLang($css, array $elementsId): void
     {
         $translator = new Translator();
         $document = new \SimpleXMLElement(file_get_contents(__DIR__.'/Fixtures/lang.xml'));
@@ -44,7 +44,7 @@ class TranslatorTest extends TestCase
     }
 
     /** @dataProvider getHtmlIdsTestData */
-    public function testHtmlIds($css, array $elementsId)
+    public function testHtmlIds($css, array $elementsId): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -65,7 +65,7 @@ class TranslatorTest extends TestCase
     }
 
     /** @dataProvider getHtmlShakespearTestData */
-    public function testHtmlShakespear($css, $count)
+    public function testHtmlShakespear($css, $count): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));

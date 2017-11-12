@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class PreviewErrorControllerTest extends TestCase
 {
-    public function testForwardRequestToConfiguredController()
+    public function testForwardRequestToConfiguredController(): void
     {
         $request = Request::create('whatever');
         $response = new Response('');

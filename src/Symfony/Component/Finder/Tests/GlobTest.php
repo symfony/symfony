@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Glob;
 
 class GlobTest extends TestCase
 {
-    public function testGlobToRegexDelimiters()
+    public function testGlobToRegexDelimiters(): void
     {
         $this->assertEquals('#^(?=[^\.])\#$#', Glob::toRegex('#'));
         $this->assertEquals('#^\.[^/]*$#', Glob::toRegex('.*'));
@@ -25,7 +25,7 @@ class GlobTest extends TestCase
         $this->assertEquals('/^\.[^/]*$/', Glob::toRegex('.*', true, true, '/'));
     }
 
-    public function testGlobToRegexDoubleStarStrictDots()
+    public function testGlobToRegexDoubleStarStrictDots(): void
     {
         $finder = new Finder();
         $finder->ignoreDotFiles(false);
@@ -42,7 +42,7 @@ class GlobTest extends TestCase
         $this->assertSame(array('one/b/c.neon', 'one/b/d.neon'), $match);
     }
 
-    public function testGlobToRegexDoubleStarNonStrictDots()
+    public function testGlobToRegexDoubleStarNonStrictDots(): void
     {
         $finder = new Finder();
         $finder->ignoreDotFiles(false);
@@ -59,7 +59,7 @@ class GlobTest extends TestCase
         $this->assertSame(array('.dot/b/c.neon', '.dot/b/d.neon', 'one/b/c.neon', 'one/b/d.neon'), $match);
     }
 
-    public function testGlobToRegexDoubleStarWithoutLeadingSlash()
+    public function testGlobToRegexDoubleStarWithoutLeadingSlash(): void
     {
         $finder = new Finder();
         $finder->ignoreDotFiles(false);
@@ -76,7 +76,7 @@ class GlobTest extends TestCase
         $this->assertSame(array('one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'), $match);
     }
 
-    public function testGlobToRegexDoubleStarWithoutLeadingSlashNotStrictLeadingDot()
+    public function testGlobToRegexDoubleStarWithoutLeadingSlashNotStrictLeadingDot(): void
     {
         $finder = new Finder();
         $finder->ignoreDotFiles(false);

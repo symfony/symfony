@@ -26,7 +26,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
     const INTERFACE_B_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityInterfaceB';
     const PARENT_INTERFACE_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParentInterface';
 
-    public function testLoadClassMetadataWithInterface()
+    public function testLoadClassMetadataWithInterface(): void
     {
         $factory = new LazyLoadingMetadataFactory(new TestLoader());
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
@@ -39,7 +39,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $this->assertEquals($constraints, $metadata->getConstraints());
     }
 
-    public function testMergeParentConstraints()
+    public function testMergeParentConstraints(): void
     {
         $factory = new LazyLoadingMetadataFactory(new TestLoader());
         $metadata = $factory->getMetadataFor(self::CLASS_NAME);
@@ -76,7 +76,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $this->assertEquals($constraints, $metadata->getConstraints());
     }
 
-    public function testWriteMetadataToCache()
+    public function testWriteMetadataToCache(): void
     {
         $cache = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock();
         $factory = new LazyLoadingMetadataFactory(new TestLoader(), $cache);
@@ -115,7 +115,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $this->assertEquals($parentClassConstraints, $metadata->getConstraints());
     }
 
-    public function testReadMetadataFromCache()
+    public function testReadMetadataFromCache(): void
     {
         $loader = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
         $cache = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock();
@@ -149,7 +149,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $this->assertEquals($metadata, $factory->getMetadataFor(self::PARENT_CLASS));
     }
 
-    public function testMetadataCacheWithRuntimeConstraint()
+    public function testMetadataCacheWithRuntimeConstraint(): void
     {
         $cache = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock();
         $factory = new LazyLoadingMetadataFactory(new TestLoader(), $cache);
@@ -157,7 +157,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $cache
             ->expects($this->any())
             ->method('write')
-            ->will($this->returnCallback(function ($metadata) { serialize($metadata); }))
+            ->will($this->returnCallback(function ($metadata): void { serialize($metadata); }))
         ;
 
         $cache->expects($this->any())
@@ -165,7 +165,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
             ->will($this->returnValue(false));
 
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
-        $metadata->addConstraint(new Callback(function () {}));
+        $metadata->addConstraint(new Callback(function (): void {}));
 
         $this->assertCount(3, $metadata->getConstraints());
 
@@ -174,7 +174,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $this->assertCount(6, $metadata->getConstraints());
     }
 
-    public function testGroupsFromParent()
+    public function testGroupsFromParent(): void
     {
         $reader = new \Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader();
         $factory = new LazyLoadingMetadataFactory($reader);
@@ -196,7 +196,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
 
 class TestLoader implements LoaderInterface
 {
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new ConstraintA());
     }

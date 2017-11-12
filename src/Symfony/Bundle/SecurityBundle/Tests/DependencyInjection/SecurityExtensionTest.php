@@ -23,7 +23,7 @@ class SecurityExtensionTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage The check_path "/some_area/login_check" for login method "form_login" is not matched by the firewall pattern "/secured_area/.*".
      */
-    public function testInvalidCheckPath()
+    public function testInvalidCheckPath(): void
     {
         $container = $this->getRawContainer();
 
@@ -50,7 +50,7 @@ class SecurityExtensionTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage No authentication listener registered for firewall "some_firewall"
      */
-    public function testFirewallWithoutAuthenticationListener()
+    public function testFirewallWithoutAuthenticationListener(): void
     {
         $container = $this->getRawContainer();
 
@@ -74,7 +74,7 @@ class SecurityExtensionTest extends TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Unable to create definition for "security.user.provider.concrete.my_foo" user provider
      */
-    public function testFirewallWithInvalidUserProvider()
+    public function testFirewallWithInvalidUserProvider(): void
     {
         $container = $this->getRawContainer();
 
@@ -98,7 +98,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testDisableRoleHierarchyVoter()
+    public function testDisableRoleHierarchyVoter(): void
     {
         $container = $this->getRawContainer();
 
@@ -123,7 +123,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
     }
 
-    public function testSwitchUserNotStatelessOnStatelessFirewall()
+    public function testSwitchUserNotStatelessOnStatelessFirewall(): void
     {
         $container = $this->getRawContainer();
 

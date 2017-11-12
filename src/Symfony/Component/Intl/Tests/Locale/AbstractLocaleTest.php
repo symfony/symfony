@@ -20,12 +20,12 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class AbstractLocaleTest extends TestCase
 {
-    public function testSetDefault()
+    public function testSetDefault(): void
     {
         $this->call('setDefault', 'en_GB');
 
         $this->assertSame('en_GB', $this->call('getDefault'));
     }
 
-    abstract protected function call($methodName);
+    abstract protected function call($methodName): void;
 }

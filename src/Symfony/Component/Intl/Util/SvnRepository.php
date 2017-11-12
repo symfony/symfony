@@ -46,7 +46,7 @@ class SvnRepository
      *
      * @throws RuntimeException if an error occurs during the download
      */
-    public static function download($url, $targetDir)
+    public static function download(string $url, string $targetDir)
     {
         exec('which svn', $output, $result);
 
@@ -85,7 +85,7 @@ class SvnRepository
      *
      * @return string The path to the repository
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
@@ -95,7 +95,7 @@ class SvnRepository
      *
      * @return string The URL of the repository
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return (string) $this->getSvnInfo()->entry->url;
     }
@@ -105,7 +105,7 @@ class SvnRepository
      *
      * @return SvnCommit The last commit
      */
-    public function getLastCommit()
+    public function getLastCommit(): SvnCommit
     {
         if (null === $this->lastCommit) {
             $this->lastCommit = new SvnCommit($this->getSvnInfo()->entry->commit);
@@ -121,7 +121,7 @@ class SvnRepository
      *
      * @throws RuntimeException if the "svn info" command failed
      */
-    private function getSvnInfo()
+    private function getSvnInfo(): \SimpleXMLElement
     {
         if (null === $this->svnInfo) {
             exec('svn info --xml '.$this->path, $output, $result);

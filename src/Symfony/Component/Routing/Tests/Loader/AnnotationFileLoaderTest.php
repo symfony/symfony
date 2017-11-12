@@ -20,7 +20,7 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
     protected $loader;
     protected $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,14 +28,14 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader = new AnnotationFileLoader(new FileLocator(), $this->getClassLoader($this->reader));
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $this->reader->expects($this->once())->method('getClassAnnotation');
 
         $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses/FooClass.php');
     }
 
-    public function testLoadTraitWithClassConstant()
+    public function testLoadTraitWithClassConstant(): void
     {
         $this->reader->expects($this->never())->method('getClassAnnotation');
 
@@ -46,12 +46,12 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Did you forgot to add the "<?php" start tag at the beginning of the file?
      */
-    public function testLoadFileWithoutStartTag()
+    public function testLoadFileWithoutStartTag(): void
     {
         $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/NoStartTagClass.php');
     }
 
-    public function testLoadVariadic()
+    public function testLoadVariadic(): void
     {
         $route = new Route(array('path' => '/path/to/{id}'));
         $this->reader->expects($this->once())->method('getClassAnnotation');
@@ -61,7 +61,7 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
         $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/VariadicClass.php');
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $fixture = __DIR__.'/../Fixtures/annotated.php';
 

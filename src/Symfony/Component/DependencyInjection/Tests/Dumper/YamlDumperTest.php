@@ -26,26 +26,26 @@ class YamlDumperTest extends TestCase
 {
     protected static $fixturesPath;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
     }
 
-    public function testDump()
+    public function testDump(): void
     {
         $dumper = new YamlDumper($container = new ContainerBuilder());
 
         $this->assertEqualYamlStructure(file_get_contents(self::$fixturesPath.'/yaml/services1.yml'), $dumper->dump(), '->dump() dumps an empty container as an empty YAML file');
     }
 
-    public function testAddParameters()
+    public function testAddParameters(): void
     {
         $container = include self::$fixturesPath.'/containers/container8.php';
         $dumper = new YamlDumper($container);
         $this->assertEqualYamlStructure(file_get_contents(self::$fixturesPath.'/yaml/services8.yml'), $dumper->dump(), '->dump() dumps parameters');
     }
 
-    public function testAddService()
+    public function testAddService(): void
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new YamlDumper($container);
@@ -62,14 +62,14 @@ class YamlDumperTest extends TestCase
         }
     }
 
-    public function testDumpAutowireData()
+    public function testDumpAutowireData(): void
     {
         $container = include self::$fixturesPath.'/containers/container24.php';
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services24.yml', $dumper->dump());
     }
 
-    public function testDumpLoad()
+    public function testDumpLoad(): void
     {
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -81,7 +81,7 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_dump_load.yml', $dumper->dump());
     }
 
-    public function testInlineServices()
+    public function testInlineServices(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'Class1')
@@ -95,7 +95,7 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services_inline.yml', $dumper->dump());
     }
 
-    private function assertEqualYamlStructure($expected, $yaml, $message = '')
+    private function assertEqualYamlStructure($expected, $yaml, $message = ''): void
     {
         $parser = new Parser();
 

@@ -17,7 +17,7 @@ use Symfony\Component\BrowserKit\Request;
 
 class HistoryTest extends TestCase
 {
-    public function testAdd()
+    public function testAdd(): void
     {
         $history = new History();
         $history->add(new Request('http://www.example1.com/', 'get'));
@@ -35,7 +35,7 @@ class HistoryTest extends TestCase
         $this->assertSame('http://www.example2.com/', $history->current()->getUri(), '->add() adds a request to the history');
     }
 
-    public function testClearIsEmpty()
+    public function testClearIsEmpty(): void
     {
         $history = new History();
         $history->add(new Request('http://www.example.com/', 'get'));
@@ -47,7 +47,7 @@ class HistoryTest extends TestCase
         $this->assertTrue($history->isEmpty(), '->isEmpty() true if the history is empty');
     }
 
-    public function testCurrent()
+    public function testCurrent(): void
     {
         $history = new History();
 
@@ -63,7 +63,7 @@ class HistoryTest extends TestCase
         $this->assertSame('http://www.example.com/', $history->current()->getUri(), '->current() returns the current request in the history');
     }
 
-    public function testBack()
+    public function testBack(): void
     {
         $history = new History();
         $history->add(new Request('http://www.example.com/', 'get'));
@@ -81,7 +81,7 @@ class HistoryTest extends TestCase
         $this->assertSame('http://www.example.com/', $history->current()->getUri(), '->back() returns the previous request in the history');
     }
 
-    public function testForward()
+    public function testForward(): void
     {
         $history = new History();
         $history->add(new Request('http://www.example.com/', 'get'));

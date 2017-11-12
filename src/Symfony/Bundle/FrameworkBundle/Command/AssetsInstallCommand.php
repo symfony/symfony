@@ -50,7 +50,7 @@ class AssetsInstallCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(
@@ -221,7 +221,7 @@ EOT
      *
      * @throws IOException if link can not be created
      */
-    private function symlink(string $originDir, string $targetDir, bool $relative = false)
+    private function symlink(string $originDir, string $targetDir, bool $relative = false): void
     {
         if ($relative) {
             $originDir = $this->filesystem->makePathRelative($originDir, realpath(dirname($targetDir)));

@@ -28,7 +28,7 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInterf
     /**
      * @return \SessionHandlerInterface
      */
-    public function getHandler()
+    public function getHandler(): \SessionHandlerInterface
     {
         return $this->handler;
     }

@@ -32,13 +32,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $this->aliases = array();
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->privates = array();
         parent::reset();
     }
 
-    public function compile()
+    public function compile(): void
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
@@ -61,7 +61,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      *
      * @return \BarCircular
      */
-    protected function getBarService()
+    protected function getBarService(): \BarCircular
     {
         $this->services['bar'] = $instance = new \BarCircular();
 
@@ -75,7 +75,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      *
      * @return \FooCircular
      */
-    protected function getFooService()
+    protected function getFooService(): \FooCircular
     {
         $a = ($this->services['bar'] ?? $this->getBarService());
 
@@ -91,7 +91,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      *
      * @return \FoobarCircular
      */
-    protected function getFoobarService()
+    protected function getFoobarService(): \FoobarCircular
     {
         $a = ($this->services['foo'] ?? $this->getFooService());
 

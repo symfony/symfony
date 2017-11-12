@@ -57,7 +57,7 @@ class NativeSessionTokenStorage implements TokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function setToken($tokenId, $token)
+    public function setToken($tokenId, $token): void
     {
         if (!$this->sessionStarted) {
             $this->startSession();
@@ -102,7 +102,7 @@ class NativeSessionTokenStorage implements TokenStorageInterface
         return $token;
     }
 
-    private function startSession()
+    private function startSession(): void
     {
         if (PHP_SESSION_NONE === session_status()) {
             session_start();

@@ -22,7 +22,7 @@ class TestExtension extends Extension implements PrependExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -31,7 +31,7 @@ class TestExtension extends Extension implements PrependExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         $container->prependExtensionConfig('test', array('custom' => 'foo'));
     }
@@ -44,7 +44,7 @@ class TestExtension extends Extension implements PrependExtensionInterface
         return new Configuration($this->customConfig);
     }
 
-    public function setCustomConfig($customConfig)
+    public function setCustomConfig($customConfig): void
     {
         $this->customConfig = $customConfig;
     }

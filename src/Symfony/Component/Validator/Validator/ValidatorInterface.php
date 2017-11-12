@@ -40,7 +40,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validate($value, $constraints = null, $groups = null);
+    public function validate($value, $constraints = null, $groups = null): ConstraintViolationListInterface;
 
     /**
      * Validates a property of an object against the constraints specified
@@ -55,7 +55,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validateProperty($object, $propertyName, $groups = null);
+    public function validateProperty($object, $propertyName, $groups = null): ConstraintViolationListInterface;
 
     /**
      * Validates a value against the constraints specified for an object's
@@ -72,7 +72,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null);
+    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null): ConstraintViolationListInterface;
 
     /**
      * Starts a new validation context and returns a validator for that context.
@@ -83,7 +83,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *
      * @return ContextualValidatorInterface The validator for the new context
      */
-    public function startContext();
+    public function startContext(): ContextualValidatorInterface;
 
     /**
      * Returns a validator in the given execution context.
@@ -93,5 +93,5 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *
      * @return ContextualValidatorInterface The validator for that context
      */
-    public function inContext(ExecutionContextInterface $context);
+    public function inContext(ExecutionContextInterface $context): ContextualValidatorInterface;
 }

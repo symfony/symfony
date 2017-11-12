@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ServerParamsTest extends TestCase
 {
-    public function testGetContentLengthFromSuperglobals()
+    public function testGetContentLengthFromSuperglobals(): void
     {
         $serverParams = new ServerParams();
         $this->assertNull($serverParams->getContentLength());
@@ -29,7 +29,7 @@ class ServerParamsTest extends TestCase
         unset($_SERVER['CONTENT_LENGTH']);
     }
 
-    public function testGetContentLengthFromRequest()
+    public function testGetContentLengthFromRequest(): void
     {
         $request = Request::create('http://foo', 'GET', array(), array(), array(), array('CONTENT_LENGTH' => 1024));
         $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->setMethods(array('getCurrentRequest'))->getMock();
@@ -40,7 +40,7 @@ class ServerParamsTest extends TestCase
     }
 
     /** @dataProvider getGetPostMaxSizeTestData */
-    public function testGetPostMaxSize($size, $bytes)
+    public function testGetPostMaxSize($size, $bytes): void
     {
         $serverParams = $this->getMockBuilder('Symfony\Component\Form\Extension\Validator\Util\ServerParams')->setMethods(array('getNormalizedIniPostMaxSize'))->getMock();
         $serverParams

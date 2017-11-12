@@ -28,7 +28,7 @@ class CoverageListener extends \PHPUnit_Framework_BaseTestListener
         $this->trait = new CoverageListenerTrait($sutFqcnResolver, $warningOnSutNotFound);
     }
 
-    public function startTest(\PHPUnit_Framework_Test $test)
+    public function startTest(\PHPUnit_Framework_Test $test): void
     {
         $this->trait->startTest($test);
     }

@@ -44,7 +44,7 @@ class JsonFileLoader extends FileLoader
      *
      * @return string Message string
      */
-    private function getJSONErrorMessage($errorCode)
+    private function getJSONErrorMessage(int $errorCode): string
     {
         switch ($errorCode) {
             case JSON_ERROR_DEPTH:

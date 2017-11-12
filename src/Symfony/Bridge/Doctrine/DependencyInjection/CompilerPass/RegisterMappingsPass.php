@@ -135,7 +135,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     /**
      * Register mappings and alias with the metadata drivers.
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$this->enabled($container)) {
             return;
@@ -170,7 +170,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @throws InvalidArgumentException if non of the managerParameters has a
      *                                  non-empty value
      */
-    protected function getChainDriverServiceName(ContainerBuilder $container)
+    protected function getChainDriverServiceName(ContainerBuilder $container): string
     {
         return sprintf($this->driverPattern, $this->getManagerName($container));
     }
@@ -196,7 +196,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @throws InvalidArgumentException if none of the managerParameters has a
      *                                  non-empty value
      */
-    private function getConfigurationServiceName(ContainerBuilder $container)
+    private function getConfigurationServiceName(ContainerBuilder $container): string
     {
         return sprintf($this->configurationPattern, $this->getManagerName($container));
     }
@@ -211,7 +211,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @throws InvalidArgumentException if none of the managerParameters is found in the container
      */
-    private function getManagerName(ContainerBuilder $container)
+    private function getManagerName(ContainerBuilder $container): string
     {
         foreach ($this->managerParameters as $param) {
             if ($container->hasParameter($param)) {
@@ -237,7 +237,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @return bool whether this compiler pass really should register the mappings
      */
-    protected function enabled(ContainerBuilder $container)
+    protected function enabled(ContainerBuilder $container): bool
     {
         return !$this->enabledParameter || $container->hasParameter($this->enabledParameter);
     }

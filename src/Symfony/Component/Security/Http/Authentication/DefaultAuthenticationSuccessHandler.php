@@ -40,7 +40,6 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     );
 
     /**
-     * @param HttpUtils $httpUtils
      * @param array     $options   Options for processing a successful authentication attempt
      */
     public function __construct(HttpUtils $httpUtils, array $options = array())
@@ -62,42 +61,36 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      *
      * @return array An array of options
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
 
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = array_merge($this->defaultOptions, $options);
     }
 
     /**
      * Get the provider key.
-     *
-     * @return string
      */
-    public function getProviderKey()
+    public function getProviderKey(): string
     {
         return $this->providerKey;
     }
 
     /**
      * Set the provider key.
-     *
-     * @param string $providerKey
      */
-    public function setProviderKey($providerKey)
+    public function setProviderKey(string $providerKey): void
     {
         $this->providerKey = $providerKey;
     }
 
     /**
      * Builds the target URL according to the defined options.
-     *
-     * @return string
      */
-    protected function determineTargetUrl(Request $request)
+    protected function determineTargetUrl(Request $request): string
     {
         if ($this->options['always_use_default_target_path']) {
             return $this->options['default_target_path'];

@@ -36,7 +36,7 @@ class TokenStorage implements TokenStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function setToken(TokenInterface $token = null)
+    public function setToken(TokenInterface $token = null): void
     {
         $this->token = $token;
     }

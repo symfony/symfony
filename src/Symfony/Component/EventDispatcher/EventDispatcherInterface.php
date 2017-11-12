@@ -31,7 +31,7 @@ interface EventDispatcherInterface
      *
      * @return Event
      */
-    public function dispatch($eventName, Event $event = null);
+    public function dispatch(string $eventName, Event $event = null): Event;
 
     /**
      * Adds an event listener that listens on the specified events.
@@ -41,7 +41,7 @@ interface EventDispatcherInterface
      * @param int      $priority  The higher this value, the earlier an event
      *                            listener will be triggered in the chain (defaults to 0)
      */
-    public function addListener($eventName, $listener, $priority = 0);
+    public function addListener(string $eventName, callable $listener, int $priority = 0): void;
 
     /**
      * Adds an event subscriber.
@@ -49,7 +49,7 @@ interface EventDispatcherInterface
      * The subscriber is asked for all the events he is
      * interested in and added as a listener for these events.
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber);
+    public function addSubscriber(EventSubscriberInterface $subscriber): void;
 
     /**
      * Removes an event listener from the specified events.
@@ -57,9 +57,9 @@ interface EventDispatcherInterface
      * @param string   $eventName The event to remove a listener from
      * @param callable $listener  The listener to remove
      */
-    public function removeListener($eventName, $listener);
+    public function removeListener(string $eventName, callable $listener): void;
 
-    public function removeSubscriber(EventSubscriberInterface $subscriber);
+    public function removeSubscriber(EventSubscriberInterface $subscriber): void;
 
     /**
      * Gets the listeners of a specific event or all listeners sorted by descending priority.
@@ -68,7 +68,7 @@ interface EventDispatcherInterface
      *
      * @return array The event listeners for the specified event, or all event listeners by event name
      */
-    public function getListeners($eventName = null);
+    public function getListeners(string $eventName = null): array;
 
     /**
      * Gets the listener priority for a specific event.
@@ -80,7 +80,7 @@ interface EventDispatcherInterface
      *
      * @return int|null The event listener priority
      */
-    public function getListenerPriority($eventName, $listener);
+    public function getListenerPriority(string $eventName, callable $listener): ?int;
 
     /**
      * Checks whether an event has any registered listeners.
@@ -89,5 +89,5 @@ interface EventDispatcherInterface
      *
      * @return bool true if the specified event has any listeners, false otherwise
      */
-    public function hasListeners($eventName = null);
+    public function hasListeners(string $eventName = null): bool;
 }

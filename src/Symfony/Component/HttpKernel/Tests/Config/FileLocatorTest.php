@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Config\FileLocator;
 
 class FileLocatorTest extends TestCase
 {
-    public function testLocate()
+    public function testLocate(): void
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel
@@ -34,7 +34,7 @@ class FileLocatorTest extends TestCase
         $locator->locate('/some/path');
     }
 
-    public function testLocateWithGlobalResourcePath()
+    public function testLocateWithGlobalResourcePath(): void
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel

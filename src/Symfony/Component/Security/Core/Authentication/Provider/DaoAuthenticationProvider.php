@@ -42,7 +42,7 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     /**
      * {@inheritdoc}
      */
-    protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token)
+    protected function checkAuthentication(UserInterface $user, UsernamePasswordToken $token): void
     {
         $currentUser = $token->getUser();
         if ($currentUser instanceof UserInterface) {

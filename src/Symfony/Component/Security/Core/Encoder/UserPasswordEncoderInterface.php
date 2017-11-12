@@ -28,7 +28,7 @@ interface UserPasswordEncoderInterface
      *
      * @return string The encoded password
      */
-    public function encodePassword(UserInterface $user, $plainPassword);
+    public function encodePassword(UserInterface $user, string $plainPassword): string;
 
     /**
      * @param UserInterface $user The user
@@ -36,5 +36,5 @@ interface UserPasswordEncoderInterface
      *
      * @return bool true if the password is valid, false otherwise
      */
-    public function isPasswordValid(UserInterface $user, $raw);
+    public function isPasswordValid(UserInterface $user, string $raw): bool;
 }

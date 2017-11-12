@@ -25,7 +25,7 @@ class LdapManagerTest extends LdapTestCase
     /** @var Adapter */
     private $adapter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->adapter->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
@@ -34,7 +34,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapAddAndRemove()
+    public function testLdapAddAndRemove(): void
     {
         $this->executeSearchQuery(1);
 
@@ -57,7 +57,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapAddInvalidEntry()
+    public function testLdapAddInvalidEntry(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(LdapException::class);
         $this->executeSearchQuery(1);
@@ -76,7 +76,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapUpdate()
+    public function testLdapUpdate(): void
     {
         $result = $this->executeSearchQuery(1);
 
@@ -102,7 +102,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapUnboundAdd()
+    public function testLdapUnboundAdd(): void
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
@@ -113,7 +113,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapUnboundRemove()
+    public function testLdapUnboundRemove(): void
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
@@ -124,7 +124,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapUnboundUpdate()
+    public function testLdapUnboundUpdate(): void
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}(NotBoundException::class);
@@ -151,7 +151,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapRename()
+    public function testLdapRename(): void
     {
         $result = $this->executeSearchQuery(1);
 
@@ -172,7 +172,7 @@ class LdapManagerTest extends LdapTestCase
     /**
      * @group functional
      */
-    public function testLdapRenameWithoutRemovingOldRdn()
+    public function testLdapRenameWithoutRemovingOldRdn(): void
     {
         $result = $this->executeSearchQuery(1);
 

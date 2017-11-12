@@ -19,13 +19,13 @@ class BlackHoleMetadataFactoryTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testGetMetadataForThrowsALogicException()
+    public function testGetMetadataForThrowsALogicException(): void
     {
         $metadataFactory = new BlackHoleMetadataFactory();
         $metadataFactory->getMetadataFor('foo');
     }
 
-    public function testHasMetadataForReturnsFalse()
+    public function testHasMetadataForReturnsFalse(): void
     {
         $metadataFactory = new BlackHoleMetadataFactory();
 

@@ -48,7 +48,7 @@ class CacheClearCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(
@@ -70,7 +70,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -113,7 +113,7 @@ EOF
         $io->success(sprintf('Cache for the "%s" environment (debug=%s) was successfully cleared.', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
     }
 
-    private function warmupCache(InputInterface $input, OutputInterface $output, string $realCacheDir, string $oldCacheDir)
+    private function warmupCache(InputInterface $input, OutputInterface $output, string $realCacheDir, string $oldCacheDir): void
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -141,7 +141,7 @@ EOF
         $this->filesystem->rename($warmupDir, $realCacheDir);
     }
 
-    private function warmup(string $warmupDir, string $realCacheDir, bool $enableOptionalWarmers = true)
+    private function warmup(string $warmupDir, string $realCacheDir, bool $enableOptionalWarmers = true): void
     {
         // create a temporary kernel
         $kernel = $this->getApplication()->getKernel();

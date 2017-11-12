@@ -28,7 +28,7 @@ class FixedFilterListener implements EventSubscriberInterface
         ), $mapping);
     }
 
-    public function preSubmit(FormEvent $event)
+    public function preSubmit(FormEvent $event): void
     {
         $data = $event->getData();
 
@@ -37,7 +37,7 @@ class FixedFilterListener implements EventSubscriberInterface
         }
     }
 
-    public function onSubmit(FormEvent $event)
+    public function onSubmit(FormEvent $event): void
     {
         $data = $event->getData();
 
@@ -46,7 +46,7 @@ class FixedFilterListener implements EventSubscriberInterface
         }
     }
 
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event): void
     {
         $data = $event->getData();
 

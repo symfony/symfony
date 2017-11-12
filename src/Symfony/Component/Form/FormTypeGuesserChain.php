@@ -87,7 +87,7 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      *
      * @return Guess|null The guess with the highest confidence
      */
-    private function guess(\Closure $closure)
+    private function guess(\Closure $closure): ?Guess
     {
         $guesses = array();
 

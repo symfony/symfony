@@ -19,19 +19,19 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadata;
  */
 class AttributeMetadataTest extends TestCase
 {
-    public function testInterface()
+    public function testInterface(): void
     {
         $attributeMetadata = new AttributeMetadata('name');
         $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface', $attributeMetadata);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $attributeMetadata = new AttributeMetadata('name');
         $this->assertEquals('name', $attributeMetadata->getName());
     }
 
-    public function testGroups()
+    public function testGroups(): void
     {
         $attributeMetadata = new AttributeMetadata('group');
         $attributeMetadata->addGroup('a');
@@ -41,7 +41,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals(array('a', 'b'), $attributeMetadata->getGroups());
     }
 
-    public function testMaxDepth()
+    public function testMaxDepth(): void
     {
         $attributeMetadata = new AttributeMetadata('name');
         $attributeMetadata->setMaxDepth(69);
@@ -49,7 +49,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals(69, $attributeMetadata->getMaxDepth());
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $attributeMetadata1 = new AttributeMetadata('a1');
         $attributeMetadata1->addGroup('a');
@@ -66,7 +66,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals(2, $attributeMetadata1->getMaxDepth());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $attributeMetadata = new AttributeMetadata('attribute');
         $attributeMetadata->addGroup('a');

@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class RemoveUnusedDefinitionsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -45,7 +45,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('moo'));
     }
 
-    public function testProcessRemovesUnusedDefinitionsRecursively()
+    public function testProcessRemovesUnusedDefinitionsRecursively(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -64,7 +64,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('bar'));
     }
 
-    public function testProcessWorksWithInlinedDefinitions()
+    public function testProcessWorksWithInlinedDefinitions(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -82,7 +82,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('bar'));
     }
 
-    public function testProcessWontRemovePrivateFactory()
+    public function testProcessWontRemovePrivateFactory(): void
     {
         $container = new ContainerBuilder();
 
@@ -107,7 +107,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('foobar'));
     }
 
-    public function testProcessConsiderEnvVariablesAsUsedEvenInPrivateServices()
+    public function testProcessConsiderEnvVariablesAsUsedEvenInPrivateServices(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('env(FOOBAR)', 'test');
@@ -129,7 +129,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertSame(1, $envCounters['FOOBAR']);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new RemoveUnusedDefinitionsPass()));
         $repeatedPass->process($container);

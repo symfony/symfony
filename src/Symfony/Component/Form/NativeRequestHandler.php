@@ -45,7 +45,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handleRequest(FormInterface $form, $request = null)
+    public function handleRequest(FormInterface $form, $request = null): void
     {
         if (null !== $request) {
             throw new UnexpectedTypeException($request, 'null');
@@ -126,7 +126,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @return string The request method
      */
-    private static function getRequestMethod()
+    private static function getRequestMethod(): string
     {
         $method = isset($_SERVER['REQUEST_METHOD'])
             ? strtoupper($_SERVER['REQUEST_METHOD'])
@@ -153,10 +153,8 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * This method is identical to {@link \Symfony\Component\HttpFoundation\FileBag::fixPhpFilesArray}
      * and should be kept as such in order to port fixes quickly and easily.
-     *
-     * @return array
      */
-    private static function fixPhpFilesArray($data)
+    private static function fixPhpFilesArray($data): array
     {
         if (!is_array($data)) {
             return $data;
@@ -194,7 +192,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      *
      * @return array|null Returns the stripped upload data
      */
-    private static function stripEmptyFiles($data)
+    private static function stripEmptyFiles($data): ?array
     {
         if (!is_array($data)) {
             return $data;

@@ -36,7 +36,7 @@ class LogoutUrlHelper extends Helper
      *
      * @return string The logout path
      */
-    public function getLogoutPath($key)
+    public function getLogoutPath(?string $key): string
     {
         return $this->generator->getLogoutPath($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
@@ -48,7 +48,7 @@ class LogoutUrlHelper extends Helper
      *
      * @return string The logout URL
      */
-    public function getLogoutUrl($key)
+    public function getLogoutUrl(?string $key): string
     {
         return $this->generator->getLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }

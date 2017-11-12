@@ -23,7 +23,7 @@ class ResolveClassPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $id => $definition) {
             if ($definition->isSynthetic() || null !== $definition->getClass()) {

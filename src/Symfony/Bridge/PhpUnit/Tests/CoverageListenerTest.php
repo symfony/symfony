@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class CoverageListenerTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test cannot be run on Windows.');

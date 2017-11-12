@@ -69,7 +69,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         return array($authProviderId, $listenerId, $entryPointId);
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $builder = $node->children();
 
@@ -89,7 +89,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         }
     }
 
-    final public function addOption($name, $default = null)
+    final public function addOption($name, $default = null): void
     {
         $this->options[$name] = $default;
     }
@@ -98,14 +98,13 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * Subclasses must return the id of a service which implements the
      * AuthenticationProviderInterface.
      *
-     * @param ContainerBuilder $container
-     * @param string           $id             The unique id of the firewall
-     * @param array            $config         The options array for this listener
-     * @param string           $userProviderId The id of the user provider
+     * @param string $id             The unique id of the firewall
+     * @param array  $config         The options array for this listener
+     * @param string $userProviderId The id of the user provider
      *
      * @return string never null, the id of the authentication provider
      */
-    abstract protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId);
+    abstract protected function createAuthProvider(ContainerBuilder $container, string $id, array $config, string $userProviderId): string;
 
     /**
      * Subclasses must return the id of the abstract listener template.
@@ -119,23 +118,17 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *             abstract="true" />
      *
      * In the above case, this method would return "my.listener.id".
-     *
-     * @return string
      */
-    abstract protected function getListenerId();
+    abstract protected function getListenerId(): string;
 
     /**
      * Subclasses may create an entry point of their as they see fit. The
      * default implementation does not change the default entry point.
      *
-     * @param ContainerBuilder $container
-     * @param string           $id
-     * @param array            $config
-     * @param string           $defaultEntryPointId
      *
      * @return string the entry point id
      */
-    protected function createEntryPoint($container, $id, $config, $defaultEntryPointId)
+    protected function createEntryPoint(ContainerBuilder $container, string $id, array $config, string $defaultEntryPointId): string
     {
         return $defaultEntryPointId;
     }
@@ -146,7 +139,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @return bool Whether a possibly configured RememberMeServices should be set for this listener
      */
-    protected function isRememberMeAware($config)
+    protected function isRememberMeAware($config): bool
     {
         return $config['remember_me'];
     }

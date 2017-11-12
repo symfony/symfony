@@ -22,7 +22,7 @@ class PhpExecutableFinderTest extends TestCase
     /**
      * tests find() with the constant PHP_BINARY.
      */
-    public function testFind()
+    public function testFind(): void
     {
         $f = new PhpExecutableFinder();
 
@@ -36,7 +36,7 @@ class PhpExecutableFinderTest extends TestCase
     /**
      * tests find() with the env var PHP_PATH.
      */
-    public function testFindArguments()
+    public function testFindArguments(): void
     {
         $f = new PhpExecutableFinder();
 

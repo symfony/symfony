@@ -74,7 +74,7 @@ class TestMultipleHttpKernel extends HttpKernel implements ControllerResolverInt
         return $this->called;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->called = false;
     }

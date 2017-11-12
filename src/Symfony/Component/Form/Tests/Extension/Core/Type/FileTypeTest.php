@@ -16,7 +16,7 @@ class FileTypeTest extends BaseTypeTest
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\FileType';
 
     // https://github.com/symfony/symfony/pull/5028
-    public function testSetData()
+    public function testSetData(): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->getForm();
         $data = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
@@ -29,7 +29,7 @@ class FileTypeTest extends BaseTypeTest
         $this->assertSame($data, $form->getData());
     }
 
-    public function testSubmit()
+    public function testSubmit(): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->getForm();
         $data = $this->createUploadedFileMock('abcdef', 'original.jpg', true);
@@ -39,7 +39,7 @@ class FileTypeTest extends BaseTypeTest
         $this->assertSame($data, $form->getData());
     }
 
-    public function testSetDataMultiple()
+    public function testSetDataMultiple(): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -54,7 +54,7 @@ class FileTypeTest extends BaseTypeTest
         $this->assertSame($data, $form->getData());
     }
 
-    public function testSubmitMultiple()
+    public function testSubmitMultiple(): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -73,7 +73,7 @@ class FileTypeTest extends BaseTypeTest
         $this->assertArrayHasKey('multiple', $view->vars['attr']);
     }
 
-    public function testDontPassValueToView()
+    public function testDontPassValueToView(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit(array(
@@ -83,7 +83,7 @@ class FileTypeTest extends BaseTypeTest
         $this->assertEquals('', $form->createView()->vars['value']);
     }
 
-    public function testPassMultipartFalseToView()
+    public function testPassMultipartFalseToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE)
             ->createView();
@@ -91,12 +91,12 @@ class FileTypeTest extends BaseTypeTest
         $this->assertTrue($view->vars['multipart']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullWhenMultiple()
+    public function testSubmitNullWhenMultiple(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,

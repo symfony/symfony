@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class DataCollectorTranslatorTest extends TestCase
 {
-    public function testCollectMessages()
+    public function testCollectMessages(): void
     {
         $collector = $this->createCollector();
         $collector->setFallbackLocales(array('fr', 'ru'));

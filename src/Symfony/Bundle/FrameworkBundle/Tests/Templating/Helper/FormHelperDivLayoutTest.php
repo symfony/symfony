@@ -50,14 +50,14 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         ));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->engine = null;
 
         parent::tearDown();
     }
 
-    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -69,7 +69,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame('<form name="form" method="get">', $html);
     }
 
-    public function testStartTagHasActionAttributeWhenActionIsZero()
+    public function testStartTagHasActionAttributeWhenActionIsZero(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -121,7 +121,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return (string) $this->engine->get('form')->end($view, $vars);
     }
 
-    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
+    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true): void
     {
         $this->engine->get('form')->setTheme($view, $themes, $useDefaultThemes);
     }

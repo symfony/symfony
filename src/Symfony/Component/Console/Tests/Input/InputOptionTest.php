@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class InputOptionTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $option = new InputOption('foo');
         $this->assertEquals('foo', $option->getName(), '__construct() takes a name as its first argument');
@@ -28,12 +28,12 @@ class InputOptionTest extends TestCase
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage Impossible to have an option mode VALUE_IS_ARRAY if the option does not accept a value.
      */
-    public function testArrayModeWithoutValue()
+    public function testArrayModeWithoutValue(): void
     {
         new InputOption('foo', 'f', InputOption::VALUE_IS_ARRAY);
     }
 
-    public function testShortcut()
+    public function testShortcut(): void
     {
         $option = new InputOption('foo', 'f');
         $this->assertEquals('f', $option->getShortcut(), '__construct() can take a shortcut as its second argument');
@@ -45,7 +45,7 @@ class InputOptionTest extends TestCase
         $this->assertNull($option->getShortcut(), '__construct() makes the shortcut null by default');
     }
 
-    public function testModes()
+    public function testModes(): void
     {
         $option = new InputOption('foo', 'f');
         $this->assertFalse($option->acceptValue(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
@@ -77,7 +77,7 @@ class InputOptionTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Option mode "-1" is not valid.
      */
-    public function testInvalidModes()
+    public function testInvalidModes(): void
     {
         new InputOption('foo', 'f', '-1');
     }
@@ -85,7 +85,7 @@ class InputOptionTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testEmptyNameIsInvalid()
+    public function testEmptyNameIsInvalid(): void
     {
         new InputOption('');
     }
@@ -93,7 +93,7 @@ class InputOptionTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testDoubleDashNameIsInvalid()
+    public function testDoubleDashNameIsInvalid(): void
     {
         new InputOption('--');
     }
@@ -101,12 +101,12 @@ class InputOptionTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testSingleDashOptionIsInvalid()
+    public function testSingleDashOptionIsInvalid(): void
     {
         new InputOption('foo', '-');
     }
 
-    public function testIsArray()
+    public function testIsArray(): void
     {
         $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
         $this->assertTrue($option->isArray(), '->isArray() returns true if the option can be an array');
@@ -114,13 +114,13 @@ class InputOptionTest extends TestCase
         $this->assertFalse($option->isArray(), '->isArray() returns false if the option can not be an array');
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $option = new InputOption('foo', 'f', null, 'Some description');
         $this->assertEquals('Some description', $option->getDescription(), '->getDescription() returns the description message');
     }
 
-    public function testGetDefault()
+    public function testGetDefault(): void
     {
         $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', 'default');
         $this->assertEquals('default', $option->getDefault(), '->getDefault() returns the default value');
@@ -138,7 +138,7 @@ class InputOptionTest extends TestCase
         $this->assertFalse($option->getDefault(), '->getDefault() returns false if the option does not take a value');
     }
 
-    public function testSetDefault()
+    public function testSetDefault(): void
     {
         $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED, '', 'default');
         $option->setDefault(null);
@@ -155,7 +155,7 @@ class InputOptionTest extends TestCase
      * @expectedException        \LogicException
      * @expectedExceptionMessage Cannot set a default value when using InputOption::VALUE_NONE mode.
      */
-    public function testDefaultValueWithValueNoneMode()
+    public function testDefaultValueWithValueNoneMode(): void
     {
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
         $option->setDefault('default');
@@ -165,13 +165,13 @@ class InputOptionTest extends TestCase
      * @expectedException        \LogicException
      * @expectedExceptionMessage A default value for an array option must be an array.
      */
-    public function testDefaultValueWithIsArrayMode()
+    public function testDefaultValueWithIsArrayMode(): void
     {
         $option = new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY);
         $option->setDefault('default');
     }
 
-    public function testEquals()
+    public function testEquals(): void
     {
         $option = new InputOption('foo', 'f', null, 'Some description');
         $option2 = new InputOption('foo', 'f', null, 'Alternative description');

@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\Regex;
  */
 class RegexTest extends TestCase
 {
-    public function testConstraintGetDefaultOption()
+    public function testConstraintGetDefaultOption(): void
     {
         $constraint = new Regex('/^[0-9]+$/');
 
@@ -64,7 +64,7 @@ class RegexTest extends TestCase
     /**
      * @dataProvider provideHtmlPatterns
      */
-    public function testGetHtmlPattern($pattern, $htmlPattern, $match = true)
+    public function testGetHtmlPattern($pattern, $htmlPattern, $match = true): void
     {
         $constraint = new Regex(array(
             'pattern' => $pattern,
@@ -75,7 +75,7 @@ class RegexTest extends TestCase
         $this->assertSame($htmlPattern, $constraint->getHtmlPattern());
     }
 
-    public function testGetCustomHtmlPattern()
+    public function testGetCustomHtmlPattern(): void
     {
         $constraint = new Regex(array(
             'pattern' => '((?![0-9]$|[a-z]+).)*',

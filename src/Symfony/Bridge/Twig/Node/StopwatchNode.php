@@ -27,7 +27,7 @@ class StopwatchNode extends Node
         parent::__construct(array('body' => $body, 'name' => $name, 'var' => $var), array(), $lineno, $tag);
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler
             ->addDebugInfo($this)

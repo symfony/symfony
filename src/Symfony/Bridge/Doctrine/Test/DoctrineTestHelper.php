@@ -32,7 +32,7 @@ class DoctrineTestHelper
      *
      * @return EntityManager
      */
-    public static function createTestEntityManager(Configuration $config = null)
+    public static function createTestEntityManager(Configuration $config = null): EntityManager
     {
         if (!extension_loaded('pdo_sqlite')) {
             TestCase::markTestSkipped('Extension pdo_sqlite is required.');
@@ -53,7 +53,7 @@ class DoctrineTestHelper
     /**
      * @return Configuration
      */
-    public static function createTestConfiguration()
+    public static function createTestConfiguration(): Configuration
     {
         $config = new Configuration();
         $config->setEntityNamespaces(array('SymfonyTestsDoctrine' => 'Symfony\Bridge\Doctrine\Tests\Fixtures'));

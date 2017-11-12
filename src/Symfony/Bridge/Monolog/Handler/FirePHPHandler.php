@@ -32,7 +32,7 @@ class FirePHPHandler extends BaseFirePHPHandler
     /**
      * Adds the headers to the response once it's created.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -56,7 +56,7 @@ class FirePHPHandler extends BaseFirePHPHandler
     /**
      * {@inheritdoc}
      */
-    protected function sendHeader($header, $content)
+    protected function sendHeader($header, $content): void
     {
         if (!$this->sendHeaders) {
             return;

@@ -27,14 +27,14 @@ class ArrayDenormalizerTest extends TestCase
      */
     private $serializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')->getMock();
         $this->denormalizer = new ArrayDenormalizer();
         $this->denormalizer->setSerializer($this->serializer);
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $this->serializer->expects($this->at(0))
             ->method('denormalize')
@@ -63,7 +63,7 @@ class ArrayDenormalizerTest extends TestCase
         );
     }
 
-    public function testSupportsValidArray()
+    public function testSupportsValidArray(): void
     {
         $this->serializer->expects($this->once())
             ->method('supportsDenormalization')
@@ -81,7 +81,7 @@ class ArrayDenormalizerTest extends TestCase
         );
     }
 
-    public function testSupportsInvalidArray()
+    public function testSupportsInvalidArray(): void
     {
         $this->serializer->expects($this->any())
             ->method('supportsDenormalization')
@@ -98,7 +98,7 @@ class ArrayDenormalizerTest extends TestCase
         );
     }
 
-    public function testSupportsNoArray()
+    public function testSupportsNoArray(): void
     {
         $this->assertFalse(
             $this->denormalizer->supportsDenormalization(

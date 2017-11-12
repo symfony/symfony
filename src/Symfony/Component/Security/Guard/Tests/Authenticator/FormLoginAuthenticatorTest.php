@@ -32,7 +32,7 @@ class FormLoginAuthenticatorTest extends TestCase
     const DEFAULT_SUCCESS_URL = 'http://defaultsuccess';
     const CUSTOM_SUCCESS_URL = 'http://customsuccess';
 
-    public function testAuthenticationFailureWithoutSession()
+    public function testAuthenticationFailureWithoutSession(): void
     {
         $failureResponse = $this->authenticator->onAuthenticationFailure($this->requestWithoutSession, new AuthenticationException());
 
@@ -40,7 +40,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
     }
 
-    public function testAuthenticationFailureWithSession()
+    public function testAuthenticationFailureWithSession(): void
     {
         $this->requestWithSession->getSession()
             ->expects($this->once())
@@ -52,14 +52,14 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
     }
 
-    public function testRememberMe()
+    public function testRememberMe(): void
     {
         $doSupport = $this->authenticator->supportsRememberMe();
 
         $this->assertTrue($doSupport);
     }
 
-    public function testStartWithoutSession()
+    public function testStartWithoutSession(): void
     {
         $failureResponse = $this->authenticator->start($this->requestWithoutSession, new AuthenticationException());
 
@@ -67,7 +67,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
     }
 
-    public function testStartWithSession()
+    public function testStartWithSession(): void
     {
         $failureResponse = $this->authenticator->start($this->requestWithSession, new AuthenticationException());
 
@@ -75,7 +75,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->assertEquals(self::LOGIN_URL, $failureResponse->getTargetUrl());
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestWithoutSession = new Request(array(), array(), array(), array(), array(), array());
         $this->requestWithSession = new Request(array(), array(), array(), array(), array(), array());
@@ -92,7 +92,7 @@ class FormLoginAuthenticatorTest extends TestCase
         ;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->request = null;
         $this->requestWithSession = null;
@@ -109,16 +109,14 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
         return true;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): void
     {
     }
 
     /**
      * @param mixed $defaultSuccessRedirectUrl
-     *
-     * @return TestFormLoginAuthenticator
      */
-    public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl)
+    public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl): TestFormLoginAuthenticator
     {
         $this->defaultSuccessRedirectUrl = $defaultSuccessRedirectUrl;
 
@@ -127,10 +125,8 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
 
     /**
      * @param mixed $loginUrl
-     *
-     * @return TestFormLoginAuthenticator
      */
-    public function setLoginUrl($loginUrl)
+    public function setLoginUrl($loginUrl): TestFormLoginAuthenticator
     {
         $this->loginUrl = $loginUrl;
 

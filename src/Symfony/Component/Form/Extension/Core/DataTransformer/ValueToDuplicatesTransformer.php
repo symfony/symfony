@@ -33,7 +33,7 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
      *
      * @return array The array
      */
-    public function transform($value)
+    public function transform($value): array
     {
         $result = array();
 

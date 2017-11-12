@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 class FrozenParameterBagTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $parameters = array(
             'foo' => 'foo',
@@ -29,7 +29,7 @@ class FrozenParameterBagTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testClear()
+    public function testClear(): void
     {
         $bag = new FrozenParameterBag(array());
         $bag->clear();
@@ -38,7 +38,7 @@ class FrozenParameterBagTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testSet()
+    public function testSet(): void
     {
         $bag = new FrozenParameterBag(array());
         $bag->set('foo', 'bar');
@@ -47,7 +47,7 @@ class FrozenParameterBagTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testAdd()
+    public function testAdd(): void
     {
         $bag = new FrozenParameterBag(array());
         $bag->add(array());
@@ -56,7 +56,7 @@ class FrozenParameterBagTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testRemove()
+    public function testRemove(): void
     {
         $bag = new FrozenParameterBag(array('foo' => 'bar'));
         $bag->remove('foo');

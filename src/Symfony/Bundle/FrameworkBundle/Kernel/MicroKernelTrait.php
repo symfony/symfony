@@ -32,7 +32,7 @@ trait MicroKernelTrait
      *
      * @param RouteCollectionBuilder $routes
      */
-    abstract protected function configureRoutes(RouteCollectionBuilder $routes);
+    abstract protected function configureRoutes(RouteCollectionBuilder $routes): void;
 
     /**
      * Configures the container.
@@ -54,14 +54,14 @@ trait MicroKernelTrait
      * @param ContainerBuilder $c
      * @param LoaderInterface  $loader
      */
-    abstract protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader);
+    abstract protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void;
 
     /**
      * {@inheritdoc}
      */
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(function (ContainerBuilder $container) use ($loader) {
+        $loader->load(function (ContainerBuilder $container) use ($loader): void {
             $container->loadFromExtension('framework', array(
                 'router' => array(
                     'resource' => 'kernel:loadRoutes',

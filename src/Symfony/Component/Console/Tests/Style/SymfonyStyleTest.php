@@ -27,14 +27,14 @@ class SymfonyStyleTest extends TestCase
     /** @var CommandTester */
     protected $tester;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         putenv('COLUMNS=121');
         $this->command = new Command('sfstyle');
         $this->tester = new CommandTester($this->command);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         putenv('COLUMNS');
         $this->command = null;
@@ -44,7 +44,7 @@ class SymfonyStyleTest extends TestCase
     /**
      * @dataProvider inputCommandToOutputFilesProvider
      */
-    public function testOutputs($inputCommandFilepath, $outputFilepath)
+    public function testOutputs($inputCommandFilepath, $outputFilepath): void
     {
         $code = require $inputCommandFilepath;
         $this->command->setCode($code);
@@ -55,7 +55,7 @@ class SymfonyStyleTest extends TestCase
     /**
      * @dataProvider inputInteractiveCommandToOutputFilesProvider
      */
-    public function testInteractiveOutputs($inputCommandFilepath, $outputFilepath)
+    public function testInteractiveOutputs($inputCommandFilepath, $outputFilepath): void
     {
         $code = require $inputCommandFilepath;
         $this->command->setCode($code);
@@ -77,7 +77,7 @@ class SymfonyStyleTest extends TestCase
         return array_map(null, glob($baseDir.'/command/command_*.php'), glob($baseDir.'/output/output_*.txt'));
     }
 
-    public function testGetErrorStyle()
+    public function testGetErrorStyle(): void
     {
         $input = $this->getMockBuilder(InputInterface::class)->getMock();
 
@@ -102,7 +102,7 @@ class SymfonyStyleTest extends TestCase
         $io->getErrorStyle()->write('');
     }
 
-    public function testGetErrorStyleUsesTheCurrentOutputIfNoErrorOutputIsAvailable()
+    public function testGetErrorStyleUsesTheCurrentOutputIfNoErrorOutputIsAvailable(): void
     {
         $output = $this->getMockBuilder(OutputInterface::class)->getMock();
         $output

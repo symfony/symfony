@@ -37,7 +37,7 @@ trait MemcachedTrait
         return extension_loaded('memcached') && version_compare(phpversion('memcached'), '2.2.0', '>=');
     }
 
-    private function init(\Memcached $client, $namespace, $defaultLifetime)
+    private function init(\Memcached $client, $namespace, $defaultLifetime): void
     {
         if (!static::isSupported()) {
             throw new CacheException('Memcached >= 2.2.0 is required');
@@ -73,7 +73,7 @@ trait MemcachedTrait
      *
      * @throws \ErrorEception When invalid options or servers are provided
      */
-    public static function createConnection($servers, array $options = array())
+    public static function createConnection($servers, array $options = array()): \Memcached
     {
         if (is_string($servers)) {
             $servers = array($servers);
@@ -83,7 +83,7 @@ trait MemcachedTrait
         if (!static::isSupported()) {
             throw new CacheException('Memcached >= 2.2.0 is required');
         }
-        set_error_handler(function ($type, $msg, $file, $line) { throw new \ErrorException($msg, 0, $type, $file, $line); });
+        set_error_handler(function ($type, $msg, $file, $line): void { throw new \ErrorException($msg, 0, $type, $file, $line); });
         try {
             $options += static::$defaultClientOptions;
             $client = new \Memcached($options['persistent_id']);
@@ -261,7 +261,7 @@ trait MemcachedTrait
     /**
      * @return \Memcached
      */
-    private function getClient()
+    private function getClient(): \Memcached
     {
         if ($this->client) {
             return $this->client;

@@ -40,7 +40,7 @@ class PhpGeneratorDumperTest extends TestCase
      */
     private $largeTestTmpFilepath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class PhpGeneratorDumperTest extends TestCase
         @unlink($this->largeTestTmpFilepath);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -63,7 +63,7 @@ class PhpGeneratorDumperTest extends TestCase
         $this->testTmpFilepath = null;
     }
 
-    public function testDumpWithRoutes()
+    public function testDumpWithRoutes(): void
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}'));
         $this->routeCollection->add('Test2', new Route('/testing2'));
@@ -84,7 +84,7 @@ class PhpGeneratorDumperTest extends TestCase
         $this->assertEquals('/app.php/testing2', $relativeUrlWithoutParameter);
     }
 
-    public function testDumpWithTooManyRoutes()
+    public function testDumpWithTooManyRoutes(): void
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}'));
         for ($i = 0; $i < 32769; ++$i) {
@@ -114,7 +114,7 @@ class PhpGeneratorDumperTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testDumpWithoutRoutes()
+    public function testDumpWithoutRoutes(): void
     {
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'WithoutRoutesUrlGenerator')));
         include $this->testTmpFilepath;
@@ -127,7 +127,7 @@ class PhpGeneratorDumperTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Routing\Exception\RouteNotFoundException
      */
-    public function testGenerateNonExistingRoute()
+    public function testGenerateNonExistingRoute(): void
     {
         $this->routeCollection->add('Test', new Route('/test'));
 
@@ -138,7 +138,7 @@ class PhpGeneratorDumperTest extends TestCase
         $url = $projectUrlGenerator->generate('NonExisting', array());
     }
 
-    public function testDumpForRouteWithDefaults()
+    public function testDumpForRouteWithDefaults(): void
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}', array('foo' => 'bar')));
 
@@ -151,7 +151,7 @@ class PhpGeneratorDumperTest extends TestCase
         $this->assertEquals('/testing', $url);
     }
 
-    public function testDumpWithSchemeRequirement()
+    public function testDumpWithSchemeRequirement(): void
     {
         $this->routeCollection->add('Test1', new Route('/testing', array(), array(), array(), '', array('ftp', 'https')));
 

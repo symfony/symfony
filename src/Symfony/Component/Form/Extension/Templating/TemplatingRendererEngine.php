@@ -51,7 +51,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      *
      * @return bool True if the resource could be loaded, false otherwise
      */
-    protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName)
+    protected function loadResourceForBlockName(string $cacheKey, FormView $view, string $blockName): bool
     {
         // Recursively try to find the block in the themes assigned to $view,
         // then of its parent form, then of the parent form of the parent and so on.
@@ -111,7 +111,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      *
      * @return bool True if the resource could be loaded, false otherwise
      */
-    protected function loadResourceFromTheme($cacheKey, $blockName, $theme)
+    protected function loadResourceFromTheme(string $cacheKey, string $blockName, $theme): bool
     {
         if ($this->engine->exists($templateName = $theme.':'.$blockName.'.html.php')) {
             $this->resources[$cacheKey][$blockName] = $templateName;

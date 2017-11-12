@@ -55,7 +55,7 @@ class HttpFoundationExtension extends AbstractExtension
      *
      * @see Request::getUriForPath()
      */
-    public function generateAbsoluteUrl($path)
+    public function generateAbsoluteUrl(string $path): string
     {
         if (false !== strpos($path, '://') || '//' === substr($path, 0, 2)) {
             return $path;
@@ -119,7 +119,7 @@ class HttpFoundationExtension extends AbstractExtension
      *
      * @see Request::getRelativeUriForPath()
      */
-    public function generateRelativePath($path)
+    public function generateRelativePath(string $path): string
     {
         if (false !== strpos($path, '://') || '//' === substr($path, 0, 2)) {
             return $path;
@@ -137,7 +137,7 @@ class HttpFoundationExtension extends AbstractExtension
      *
      * @return string The extension name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'request';
     }

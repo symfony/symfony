@@ -27,10 +27,8 @@ class Entry
 
     /**
      * Returns the entry's DN.
-     *
-     * @return string
      */
-    public function getDn()
+    public function getDn(): string
     {
         return $this->dn;
     }
@@ -39,10 +37,8 @@ class Entry
      * Returns whether an attribute exists.
      *
      * @param $name string The name of the attribute
-     *
-     * @return bool
      */
-    public function hasAttribute($name)
+    public function hasAttribute($name): bool
     {
         return isset($this->attributes[$name]);
     }
@@ -57,38 +53,31 @@ class Entry
      *
      * @return null|array
      */
-    public function getAttribute($name)
+    public function getAttribute($name): ?array
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : null;
     }
 
     /**
      * Returns the complete list of attributes.
-     *
-     * @return array
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
 
     /**
      * Sets a value for the given attribute.
-     *
-     * @param string $name
-     * @param array  $value
      */
-    public function setAttribute($name, array $value)
+    public function setAttribute(string $name, array $value): void
     {
         $this->attributes[$name] = $value;
     }
 
     /**
      * Removes a given attribute.
-     *
-     * @param string $name
      */
-    public function removeAttribute($name)
+    public function removeAttribute(string $name): void
     {
         unset($this->attributes[$name]);
     }

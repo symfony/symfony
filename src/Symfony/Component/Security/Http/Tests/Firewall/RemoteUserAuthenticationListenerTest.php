@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener;
 
 class RemoteUserAuthenticationListenerTest extends TestCase
 {
-    public function testGetPreAuthenticatedData()
+    public function testGetPreAuthenticatedData(): void
     {
         $serverVars = array(
             'REMOTE_USER' => 'TheUser',
@@ -45,7 +45,7 @@ class RemoteUserAuthenticationListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testGetPreAuthenticatedDataNoUser()
+    public function testGetPreAuthenticatedDataNoUser(): void
     {
         $request = new Request(array(), array(), array(), array(), array(), array());
 
@@ -65,7 +65,7 @@ class RemoteUserAuthenticationListenerTest extends TestCase
         $result = $method->invokeArgs($listener, array($request));
     }
 
-    public function testGetPreAuthenticatedDataWithDifferentKeys()
+    public function testGetPreAuthenticatedDataWithDifferentKeys(): void
     {
         $userCredentials = array('TheUser', null);
 

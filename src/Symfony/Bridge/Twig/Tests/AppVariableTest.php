@@ -15,7 +15,7 @@ class AppVariableTest extends TestCase
      */
     protected $appVariable;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->appVariable = new AppVariable();
     }
@@ -23,7 +23,7 @@ class AppVariableTest extends TestCase
     /**
      * @dataProvider debugDataProvider
      */
-    public function testDebug($debugFlag)
+    public function testDebug($debugFlag): void
     {
         $this->appVariable->setDebug($debugFlag);
 
@@ -38,7 +38,7 @@ class AppVariableTest extends TestCase
         );
     }
 
-    public function testEnvironment()
+    public function testEnvironment(): void
     {
         $this->appVariable->setEnvironment('dev');
 
@@ -48,7 +48,7 @@ class AppVariableTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testGetSession()
+    public function testGetSession(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $request->method('getSession')->willReturn($session = new Session());
@@ -58,21 +58,21 @@ class AppVariableTest extends TestCase
         $this->assertEquals($session, $this->appVariable->getSession());
     }
 
-    public function testGetSessionWithNoRequest()
+    public function testGetSessionWithNoRequest(): void
     {
         $this->setRequestStack(null);
 
         $this->assertNull($this->appVariable->getSession());
     }
 
-    public function testGetRequest()
+    public function testGetRequest(): void
     {
         $this->setRequestStack($request = new Request());
 
         $this->assertEquals($request, $this->appVariable->getRequest());
     }
 
-    public function testGetToken()
+    public function testGetToken(): void
     {
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $this->appVariable->setTokenStorage($tokenStorage);
@@ -83,21 +83,21 @@ class AppVariableTest extends TestCase
         $this->assertEquals($token, $this->appVariable->getToken());
     }
 
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $this->setTokenStorage($user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock());
 
         $this->assertEquals($user, $this->appVariable->getUser());
     }
 
-    public function testGetUserWithUsernameAsTokenUser()
+    public function testGetUserWithUsernameAsTokenUser(): void
     {
         $this->setTokenStorage($user = 'username');
 
         $this->assertNull($this->appVariable->getUser());
     }
 
-    public function testGetTokenWithNoToken()
+    public function testGetTokenWithNoToken(): void
     {
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $this->appVariable->setTokenStorage($tokenStorage);
@@ -105,7 +105,7 @@ class AppVariableTest extends TestCase
         $this->assertNull($this->appVariable->getToken());
     }
 
-    public function testGetUserWithNoToken()
+    public function testGetUserWithNoToken(): void
     {
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $this->appVariable->setTokenStorage($tokenStorage);
@@ -116,7 +116,7 @@ class AppVariableTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testEnvironmentNotSet()
+    public function testEnvironmentNotSet(): void
     {
         $this->appVariable->getEnvironment();
     }
@@ -124,7 +124,7 @@ class AppVariableTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testDebugNotSet()
+    public function testDebugNotSet(): void
     {
         $this->appVariable->getDebug();
     }
@@ -132,7 +132,7 @@ class AppVariableTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testGetTokenWithTokenStorageNotSet()
+    public function testGetTokenWithTokenStorageNotSet(): void
     {
         $this->appVariable->getToken();
     }
@@ -140,7 +140,7 @@ class AppVariableTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testGetUserWithTokenStorageNotSet()
+    public function testGetUserWithTokenStorageNotSet(): void
     {
         $this->appVariable->getUser();
     }
@@ -148,7 +148,7 @@ class AppVariableTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testGetRequestWithRequestStackNotSet()
+    public function testGetRequestWithRequestStackNotSet(): void
     {
         $this->appVariable->getRequest();
     }
@@ -156,12 +156,12 @@ class AppVariableTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testGetSessionWithRequestStackNotSet()
+    public function testGetSessionWithRequestStackNotSet(): void
     {
         $this->appVariable->getSession();
     }
 
-    public function testGetFlashesWithNoRequest()
+    public function testGetFlashesWithNoRequest(): void
     {
         $this->setRequestStack(null);
 
@@ -171,7 +171,7 @@ class AppVariableTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testGetFlashesWithNoSessionStarted()
+    public function testGetFlashesWithNoSessionStarted(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $request->method('getSession')->willReturn(new Session());
@@ -184,7 +184,7 @@ class AppVariableTest extends TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testGetFlashes()
+    public function testGetFlashes(): void
     {
         $flashMessages = $this->setFlashMessages();
         $this->assertEquals($flashMessages, $this->appVariable->getFlashes(null));
@@ -237,7 +237,7 @@ class AppVariableTest extends TestCase
         );
     }
 
-    protected function setRequestStack($request)
+    protected function setRequestStack($request): void
     {
         $requestStackMock = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
         $requestStackMock->method('getCurrentRequest')->willReturn($request);
@@ -245,7 +245,7 @@ class AppVariableTest extends TestCase
         $this->appVariable->setRequestStack($requestStackMock);
     }
 
-    protected function setTokenStorage($user)
+    protected function setTokenStorage($user): void
     {
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $this->appVariable->setTokenStorage($tokenStorage);

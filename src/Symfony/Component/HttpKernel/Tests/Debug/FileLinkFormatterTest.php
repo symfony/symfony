@@ -18,14 +18,14 @@ use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 class FileLinkFormatterTest extends TestCase
 {
-    public function testWhenNoFileLinkFormatAndNoRequest()
+    public function testWhenNoFileLinkFormatAndNoRequest(): void
     {
         $sut = new FileLinkFormatter();
 
         $this->assertFalse($sut->format('/kernel/root/src/my/very/best/file.php', 3));
     }
 
-    public function testWhenFileLinkFormatAndNoRequest()
+    public function testWhenFileLinkFormatAndNoRequest(): void
     {
         $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
 
@@ -34,7 +34,7 @@ class FileLinkFormatterTest extends TestCase
         $this->assertSame("debug://open?url=file://$file&line=3", $sut->format($file, 3));
     }
 
-    public function testWhenFileLinkFormatAndRequest()
+    public function testWhenFileLinkFormatAndRequest(): void
     {
         $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
         $baseDir = __DIR__;
@@ -47,7 +47,7 @@ class FileLinkFormatterTest extends TestCase
         $this->assertSame("debug://open?url=file://$file&line=3", $sut->format($file, 3));
     }
 
-    public function testWhenNoFileLinkFormatAndRequest()
+    public function testWhenNoFileLinkFormatAndRequest(): void
     {
         $file = __DIR__.DIRECTORY_SEPARATOR.'file.php';
         $requestStack = new RequestStack();

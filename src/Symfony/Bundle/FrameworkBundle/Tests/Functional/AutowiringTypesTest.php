@@ -21,7 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundle
 
 class AutowiringTypesTest extends WebTestCase
 {
-    public function testAnnotationReaderAutowiring()
+    public function testAnnotationReaderAutowiring(): void
     {
         static::bootKernel(array('root_config' => 'no_annotations_cache.yml', 'environment' => 'no_annotations_cache'));
         $container = static::$kernel->getContainer();
@@ -30,7 +30,7 @@ class AutowiringTypesTest extends WebTestCase
         $this->assertInstanceOf(AnnotationReader::class, $annotationReader);
     }
 
-    public function testCachedAnnotationReaderAutowiring()
+    public function testCachedAnnotationReaderAutowiring(): void
     {
         static::bootKernel();
         $container = static::$kernel->getContainer();
@@ -39,7 +39,7 @@ class AutowiringTypesTest extends WebTestCase
         $this->assertInstanceOf(CachedReader::class, $annotationReader);
     }
 
-    public function testTemplatingAutowiring()
+    public function testTemplatingAutowiring(): void
     {
         static::bootKernel();
         $container = static::$kernel->getContainer();
@@ -49,7 +49,7 @@ class AutowiringTypesTest extends WebTestCase
         $this->assertInstanceOf(ComponentEngineInterface::class, $autowiredServices->getEngine());
     }
 
-    public function testEventDispatcherAutowiring()
+    public function testEventDispatcherAutowiring(): void
     {
         static::bootKernel(array('debug' => false));
         $container = static::$kernel->getContainer();
@@ -64,7 +64,7 @@ class AutowiringTypesTest extends WebTestCase
         $this->assertInstanceOf(TraceableEventDispatcher::class, $autowiredServices->getDispatcher(), 'The debug.event_dispatcher service should be injected if the debug is enabled');
     }
 
-    public function testCacheAutowiring()
+    public function testCacheAutowiring(): void
     {
         static::bootKernel();
         $container = static::$kernel->getContainer();

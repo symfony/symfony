@@ -61,7 +61,7 @@ class ArgvInput extends Input
         parent::__construct($definition);
     }
 
-    protected function setTokens(array $tokens)
+    protected function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;
     }
@@ -69,7 +69,7 @@ class ArgvInput extends Input
     /**
      * {@inheritdoc}
      */
-    protected function parse()
+    protected function parse(): void
     {
         $parseOptions = true;
         $this->parsed = $this->tokens;
@@ -93,7 +93,7 @@ class ArgvInput extends Input
      *
      * @param string $token The current token
      */
-    private function parseShortOption($token)
+    private function parseShortOption(string $token): void
     {
         $name = substr($token, 1);
 
@@ -116,7 +116,7 @@ class ArgvInput extends Input
      *
      * @throws RuntimeException When option given doesn't exist
      */
-    private function parseShortOptionSet($name)
+    private function parseShortOptionSet(string $name): void
     {
         $len = strlen($name);
         for ($i = 0; $i < $len; ++$i) {
@@ -140,7 +140,7 @@ class ArgvInput extends Input
      *
      * @param string $token The current token
      */
-    private function parseLongOption($token)
+    private function parseLongOption(string $token): void
     {
         $name = substr($token, 2);
 
@@ -161,7 +161,7 @@ class ArgvInput extends Input
      *
      * @throws RuntimeException When too many arguments are given
      */
-    private function parseArgument($token)
+    private function parseArgument(string $token): void
     {
         $c = count($this->arguments);
 
@@ -194,7 +194,7 @@ class ArgvInput extends Input
      *
      * @throws RuntimeException When option given doesn't exist
      */
-    private function addShortOption($shortcut, $value)
+    private function addShortOption(string $shortcut, $value): void
     {
         if (!$this->definition->hasShortcut($shortcut)) {
             throw new RuntimeException(sprintf('The "-%s" option does not exist.', $shortcut));
@@ -211,7 +211,7 @@ class ArgvInput extends Input
      *
      * @throws RuntimeException When option given doesn't exist
      */
-    private function addLongOption($name, $value)
+    private function addLongOption(string $name, $value): void
     {
         if (!$this->definition->hasOption($name)) {
             throw new RuntimeException(sprintf('The "--%s" option does not exist.', $name));
@@ -316,10 +316,8 @@ class ArgvInput extends Input
 
     /**
      * Returns a stringified representation of the args passed to the command.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $tokens = array_map(function ($token) {
             if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {

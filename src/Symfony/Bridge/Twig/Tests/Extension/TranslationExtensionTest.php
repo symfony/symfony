@@ -20,7 +20,7 @@ use Twig\Loader\ArrayLoader as TwigArrayLoader;
 
 class TranslationExtensionTest extends TestCase
 {
-    public function testEscaping()
+    public function testEscaping(): void
     {
         $output = $this->getTemplate('{% trans %}Percent: %value%%% (%msg%){% endtrans %}')->render(array('value' => 12, 'msg' => 'approx.'));
 
@@ -30,7 +30,7 @@ class TranslationExtensionTest extends TestCase
     /**
      * @dataProvider getTransTests
      */
-    public function testTrans($template, $expected, array $variables = array())
+    public function testTrans($template, $expected, array $variables = array()): void
     {
         if ($expected != $this->getTemplate($template)->render($variables)) {
             echo $template."\n";
@@ -49,7 +49,7 @@ class TranslationExtensionTest extends TestCase
      * @expectedException        \Twig\Error\SyntaxError
      * @expectedExceptionMessage Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.
      */
-    public function testTransUnknownKeyword()
+    public function testTransUnknownKeyword(): void
     {
         $output = $this->getTemplate("{% trans \n\nfoo %}{% endtrans %}")->render();
     }
@@ -58,7 +58,7 @@ class TranslationExtensionTest extends TestCase
      * @expectedException        \Twig\Error\SyntaxError
      * @expectedExceptionMessage A message inside a trans tag must be a simple text in "index" at line 2.
      */
-    public function testTransComplexBody()
+    public function testTransComplexBody(): void
     {
         $output = $this->getTemplate("{% trans %}\n{{ 1 + 2 }}{% endtrans %}")->render();
     }
@@ -67,7 +67,7 @@ class TranslationExtensionTest extends TestCase
      * @expectedException        \Twig\Error\SyntaxError
      * @expectedExceptionMessage A message inside a transchoice tag must be a simple text in "index" at line 2.
      */
-    public function testTransChoiceComplexBody()
+    public function testTransChoiceComplexBody(): void
     {
         $output = $this->getTemplate("{% transchoice count %}\n{{ 1 + 2 }}{% endtranschoice %}")->render();
     }
@@ -115,7 +115,7 @@ class TranslationExtensionTest extends TestCase
         );
     }
 
-    public function testDefaultTranslationDomain()
+    public function testDefaultTranslationDomain(): void
     {
         $templates = array(
             'index' => '
@@ -149,7 +149,7 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render(array())));
     }
 
-    public function testDefaultTranslationDomainWithNamedArguments()
+    public function testDefaultTranslationDomainWithNamedArguments(): void
     {
         $templates = array(
             'index' => '

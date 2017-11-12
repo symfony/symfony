@@ -11,11 +11,11 @@ class NamedArgumentsDummy
     {
     }
 
-    public function setApiKey($apiKey)
+    public function setApiKey($apiKey): void
     {
     }
 
-    public function setSensitiveClass(CaseSensitiveClass $c)
+    public function setSensitiveClass(CaseSensitiveClass $c): void
     {
     }
 }

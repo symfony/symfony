@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class AnonymousTokenTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $token = new AnonymousToken('foo', 'bar');
         $this->assertTrue($token->isAuthenticated());
@@ -26,19 +26,19 @@ class AnonymousTokenTest extends TestCase
         $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
     }
 
-    public function testGetKey()
+    public function testGetKey(): void
     {
         $token = new AnonymousToken('foo', 'bar');
         $this->assertEquals('foo', $token->getSecret());
     }
 
-    public function testGetCredentials()
+    public function testGetCredentials(): void
     {
         $token = new AnonymousToken('foo', 'bar');
         $this->assertEquals('', $token->getCredentials());
     }
 
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $token = new AnonymousToken('foo', 'bar');
         $this->assertEquals('bar', $token->getUser());

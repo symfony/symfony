@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class MergeExtensionConfigurationPassTest extends TestCase
 {
-    public function testExpressionLanguageProviderForwarding()
+    public function testExpressionLanguageProviderForwarding(): void
     {
         $tmpProviders = array();
 
@@ -39,7 +39,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
             ->will($this->returnValue('foo'));
         $extension->expects($this->once())
             ->method('load')
-            ->will($this->returnCallback(function (array $config, ContainerBuilder $container) use (&$tmpProviders) {
+            ->will($this->returnCallback(function (array $config, ContainerBuilder $container) use (&$tmpProviders): void {
                 $tmpProviders = $container->getExpressionLanguageProviders();
             }));
 
@@ -55,7 +55,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertEquals(array($provider), $tmpProviders);
     }
 
-    public function testExtensionLoadGetAMergeExtensionConfigurationContainerBuilderInstance()
+    public function testExtensionLoadGetAMergeExtensionConfigurationContainerBuilderInstance(): void
     {
         $extension = $this->getMockBuilder(FooExtension::class)->setMethods(array('load'))->getMock();
         $extension->expects($this->once())
@@ -71,7 +71,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testExtensionConfigurationIsTrackedByDefault()
+    public function testExtensionConfigurationIsTrackedByDefault(): void
     {
         $extension = $this->getMockBuilder(FooExtension::class)->setMethods(array('getConfiguration'))->getMock();
         $extension->expects($this->exactly(2))
@@ -88,7 +88,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertContains(new FileResource(__FILE__), $container->getResources(), '', false, false);
     }
 
-    public function testOverriddenEnvsAreMerged()
+    public function testOverriddenEnvsAreMerged(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new FooExtension());
@@ -106,7 +106,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Using a cast in "env(int:FOO)" is incompatible with resolution at compile time in "Symfony\Component\DependencyInjection\Tests\Compiler\BarExtension". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.
      */
-    public function testProcessedEnvsAreIncompatibleWithResolve()
+    public function testProcessedEnvsAreIncompatibleWithResolve(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new BarExtension());
@@ -144,7 +144,7 @@ class FooExtension extends Extension
         return new FooConfiguration();
     }
 
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -158,7 +158,7 @@ class FooExtension extends Extension
 
 class BarExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $container->resolveEnvPlaceholders('%env(int:FOO)%', true);
     }

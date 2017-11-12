@@ -27,7 +27,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      *
      * @return array An array where the first element is the password and the second the salt
      */
-    protected function demergePasswordAndSalt($mergedPasswordSalt)
+    protected function demergePasswordAndSalt(string $mergedPasswordSalt): array
     {
         if (empty($mergedPasswordSalt)) {
             return array('', '');
@@ -55,7 +55,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      *
      * @throws \InvalidArgumentException
      */
-    protected function mergePasswordAndSalt($password, $salt)
+    protected function mergePasswordAndSalt(string $password, string $salt): string
     {
         if (empty($salt)) {
             return $password;
@@ -79,7 +79,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      *
      * @return bool true if the two passwords are the same, false otherwise
      */
-    protected function comparePasswords($password1, $password2)
+    protected function comparePasswords(string $password1, string $password2): bool
     {
         return hash_equals($password1, $password2);
     }
@@ -91,7 +91,7 @@ abstract class BasePasswordEncoder implements PasswordEncoderInterface
      *
      * @return bool true if the password is too long, false otherwise
      */
-    protected function isPasswordTooLong($password)
+    protected function isPasswordTooLong(string $password): bool
     {
         return strlen($password) > static::MAX_PASSWORD_LENGTH;
     }

@@ -51,7 +51,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * {@inheritdoc}
      */
-    public function setDecorated($decorated)
+    public function setDecorated($decorated): void
     {
         parent::setDecorated($decorated);
         $this->stderr->setDecorated($decorated);
@@ -60,7 +60,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * {@inheritdoc}
      */
-    public function setFormatter(OutputFormatterInterface $formatter)
+    public function setFormatter(OutputFormatterInterface $formatter): void
     {
         parent::setFormatter($formatter);
         $this->stderr->setFormatter($formatter);
@@ -69,7 +69,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * {@inheritdoc}
      */
-    public function setVerbosity($level)
+    public function setVerbosity($level): void
     {
         parent::setVerbosity($level);
         $this->stderr->setVerbosity($level);
@@ -86,7 +86,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * {@inheritdoc}
      */
-    public function setErrorOutput(OutputInterface $error)
+    public function setErrorOutput(OutputInterface $error): void
     {
         $this->stderr = $error;
     }
@@ -94,10 +94,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Returns true if current environment supports writing console output to
      * STDOUT.
-     *
-     * @return bool
      */
-    protected function hasStdoutSupport()
+    protected function hasStdoutSupport(): bool
     {
         return false === $this->isRunningOS400();
     }
@@ -105,10 +103,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Returns true if current environment supports writing console output to
      * STDERR.
-     *
-     * @return bool
      */
-    protected function hasStderrSupport()
+    protected function hasStderrSupport(): bool
     {
         return false === $this->isRunningOS400();
     }
@@ -116,10 +112,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     /**
      * Checks if current executing environment is IBM iSeries (OS400), which
      * doesn't properly convert character-encodings between ASCII to EBCDIC.
-     *
-     * @return bool
      */
-    private function isRunningOS400()
+    private function isRunningOS400(): bool
     {
         $checks = array(
             function_exists('php_uname') ? php_uname('s') : '',

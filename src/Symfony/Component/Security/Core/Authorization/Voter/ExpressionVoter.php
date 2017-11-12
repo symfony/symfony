@@ -37,7 +37,7 @@ class ExpressionVoter implements VoterInterface
         $this->roleHierarchy = $roleHierarchy;
     }
 
-    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
     {
         $this->expressionLanguage->registerProvider($provider);
     }

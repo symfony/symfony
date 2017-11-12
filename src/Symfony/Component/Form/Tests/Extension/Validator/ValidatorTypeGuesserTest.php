@@ -49,7 +49,7 @@ class ValidatorTypeGuesserTest extends TestCase
      */
     private $metadataFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadata = new ClassMetadata(self::TEST_CLASS);
         $this->metadataFactory = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface')->getMock();
@@ -74,7 +74,7 @@ class ValidatorTypeGuesserTest extends TestCase
     /**
      * @dataProvider guessRequiredProvider
      */
-    public function testGuessRequired($constraint, $guess)
+    public function testGuessRequired($constraint, $guess): void
     {
         // add distracting constraint
         $this->metadata->addPropertyConstraint(self::TEST_PROPERTY, new Email());
@@ -85,12 +85,12 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertEquals($guess, $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    public function testGuessRequiredReturnsFalseForUnmappedProperties()
+    public function testGuessRequiredReturnsFalseForUnmappedProperties(): void
     {
         $this->assertEquals(new ValueGuess(false, Guess::LOW_CONFIDENCE), $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    public function testGuessMaxLengthForConstraintWithMaxValue()
+    public function testGuessMaxLengthForConstraintWithMaxValue(): void
     {
         $constraint = new Length(array('max' => '2'));
 
@@ -100,7 +100,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertEquals(Guess::HIGH_CONFIDENCE, $result->getConfidence());
     }
 
-    public function testGuessMaxLengthForConstraintWithMinValue()
+    public function testGuessMaxLengthForConstraintWithMinValue(): void
     {
         $constraint = new Length(array('min' => '2'));
 
@@ -121,7 +121,7 @@ class ValidatorTypeGuesserTest extends TestCase
     /**
      * @dataProvider maxLengthTypeProvider
      */
-    public function testGuessMaxLengthForConstraintWithType($type)
+    public function testGuessMaxLengthForConstraintWithType($type): void
     {
         $constraint = new Type($type);
 

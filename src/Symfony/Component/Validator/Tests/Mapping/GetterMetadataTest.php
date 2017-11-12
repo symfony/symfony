@@ -19,14 +19,14 @@ class GetterMetadataTest extends TestCase
 {
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
 
-    public function testInvalidPropertyName()
+    public function testInvalidPropertyName(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ValidatorException');
 
         new GetterMetadata(self::CLASSNAME, 'foobar');
     }
 
-    public function testGetPropertyValueFromPublicGetter()
+    public function testGetPropertyValueFromPublicGetter(): void
     {
         // private getters don't work yet because ReflectionMethod::setAccessible()
         // does not exist yet in a stable PHP release
@@ -37,7 +37,7 @@ class GetterMetadataTest extends TestCase
         $this->assertEquals('foobar from getter', $metadata->getPropertyValue($entity));
     }
 
-    public function testGetPropertyValueFromOverriddenPublicGetter()
+    public function testGetPropertyValueFromOverriddenPublicGetter(): void
     {
         $entity = new Entity();
         $metadata = new GetterMetadata(self::CLASSNAME, 'data');
@@ -45,7 +45,7 @@ class GetterMetadataTest extends TestCase
         $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
     }
 
-    public function testGetPropertyValueFromIsser()
+    public function testGetPropertyValueFromIsser(): void
     {
         $entity = new Entity();
         $metadata = new GetterMetadata(self::CLASSNAME, 'valid', 'isValid');
@@ -53,7 +53,7 @@ class GetterMetadataTest extends TestCase
         $this->assertEquals('valid', $metadata->getPropertyValue($entity));
     }
 
-    public function testGetPropertyValueFromHasser()
+    public function testGetPropertyValueFromHasser(): void
     {
         $entity = new Entity();
         $metadata = new GetterMetadata(self::CLASSNAME, 'permissions');
@@ -65,7 +65,7 @@ class GetterMetadataTest extends TestCase
      * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
      * @expectedExceptionMessage The hasLastName() method does not exist in class Symfony\Component\Validator\Tests\Fixtures\Entity.
      */
-    public function testUndefinedMethodNameThrowsException()
+    public function testUndefinedMethodNameThrowsException(): void
     {
         new GetterMetadata(self::CLASSNAME, 'lastName', 'hasLastName');
     }

@@ -53,7 +53,7 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      *
      * @return \Exception The thrown exception
      */
-    public function getException()
+    public function getException(): \Exception
     {
         return $this->exception;
     }
@@ -65,7 +65,7 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      *
      * @param \Exception $exception The thrown exception
      */
-    public function setException(\Exception $exception)
+    public function setException(\Exception $exception): void
     {
         $this->exception = $exception;
     }
@@ -73,7 +73,7 @@ class GetResponseForExceptionEvent extends GetResponseEvent
     /**
      * Mark the event as allowing a custom response code.
      */
-    public function allowCustomResponseCode()
+    public function allowCustomResponseCode(): void
     {
         $this->allowCustomResponseCode = true;
     }
@@ -83,7 +83,7 @@ class GetResponseForExceptionEvent extends GetResponseEvent
      *
      * @return bool
      */
-    public function isAllowingCustomResponseCode()
+    public function isAllowingCustomResponseCode(): bool
     {
         return $this->allowCustomResponseCode;
     }

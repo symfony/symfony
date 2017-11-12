@@ -23,17 +23,17 @@ interface TraceableEventDispatcherInterface extends EventDispatcherInterface
      *
      * @return array An array of called listeners
      */
-    public function getCalledListeners();
+    public function getCalledListeners(): array;
 
     /**
      * Gets the not called listeners.
      *
      * @return array An array of not called listeners
      */
-    public function getNotCalledListeners();
+    public function getNotCalledListeners(): array;
 
     /**
      * Resets the trace.
      */
-    public function reset();
+    public function reset(): void;
 }

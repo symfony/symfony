@@ -25,7 +25,7 @@ abstract class FormIntegrationTestCase extends TestCase
      */
     protected $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())

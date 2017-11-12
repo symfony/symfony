@@ -40,7 +40,7 @@ class DebugCommand extends Command
         $this->projectDir = $projectDir;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(array(

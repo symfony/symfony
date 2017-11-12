@@ -16,7 +16,7 @@ use Symfony\Bridge\Twig\NodeVisitor\Scope;
 
 class ScopeTest extends TestCase
 {
-    public function testScopeInitiation()
+    public function testScopeInitiation(): void
     {
         $scope = new Scope();
         $scope->enter();

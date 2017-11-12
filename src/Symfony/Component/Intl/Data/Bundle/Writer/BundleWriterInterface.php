@@ -27,5 +27,5 @@ interface BundleWriterInterface
      * @param string $locale The locale to (over-)write
      * @param mixed  $data   The data to write
      */
-    public function write($path, $locale, $data);
+    public function write(string $path, string $locale, $data): void;
 }

@@ -41,7 +41,7 @@ trait RedisTrait
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient
      */
-    public function init($redisClient, $namespace = '', $defaultLifetime = 0)
+    public function init($redisClient, $namespace = '', $defaultLifetime = 0): void
     {
         parent::__construct($namespace, $defaultLifetime);
 
@@ -73,7 +73,7 @@ trait RedisTrait
      *
      * @return \Redis|\Predis\Client According to the "class" option
      */
-    public static function createConnection($dsn, array $options = array())
+    public static function createConnection(string $dsn, array $options = array())
     {
         if (0 !== strpos($dsn, 'redis://')) {
             throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s does not start with "redis://"', $dsn));
@@ -304,7 +304,7 @@ trait RedisTrait
         $ids = array();
 
         if ($this->redis instanceof \Predis\Client && !$this->redis->getConnection() instanceof ClusterInterface) {
-            $results = $this->redis->pipeline(function ($redis) use ($generator, &$ids) {
+            $results = $this->redis->pipeline(function ($redis) use ($generator, &$ids): void {
                 foreach ($generator() as $command => $args) {
                     call_user_func_array(array($redis, $command), $args);
                     $ids[] = $args[0];

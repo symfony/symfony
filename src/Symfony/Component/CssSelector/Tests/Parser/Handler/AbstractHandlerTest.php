@@ -22,7 +22,7 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
 abstract class AbstractHandlerTest extends TestCase
 {
     /** @dataProvider getHandleValueTestData */
-    public function testHandleValue($value, Token $expectedToken, $remainingContent)
+    public function testHandleValue($value, Token $expectedToken, $remainingContent): void
     {
         $reader = new Reader($value);
         $stream = new TokenStream();
@@ -33,7 +33,7 @@ abstract class AbstractHandlerTest extends TestCase
     }
 
     /** @dataProvider getDontHandleValueTestData */
-    public function testDontHandleValue($value)
+    public function testDontHandleValue($value): void
     {
         $reader = new Reader($value);
         $stream = new TokenStream();
@@ -43,13 +43,13 @@ abstract class AbstractHandlerTest extends TestCase
         $this->assertRemainingContent($reader, $value);
     }
 
-    abstract public function getHandleValueTestData();
+    abstract public function getHandleValueTestData(): void;
 
-    abstract public function getDontHandleValueTestData();
+    abstract public function getDontHandleValueTestData(): void;
 
-    abstract protected function generateHandler();
+    abstract protected function generateHandler(): void;
 
-    protected function assertStreamEmpty(TokenStream $stream)
+    protected function assertStreamEmpty(TokenStream $stream): void
     {
         $property = new \ReflectionProperty($stream, 'tokens');
         $property->setAccessible(true);
@@ -57,7 +57,7 @@ abstract class AbstractHandlerTest extends TestCase
         $this->assertEquals(array(), $property->getValue($stream));
     }
 
-    protected function assertRemainingContent(Reader $reader, $remainingContent)
+    protected function assertRemainingContent(Reader $reader, $remainingContent): void
     {
         if ('' === $remainingContent) {
             $this->assertEquals(0, $reader->getRemainingLength());

@@ -35,7 +35,7 @@ interface ContainerInterface extends PsrContainerInterface
      * @param string $id      The service identifier
      * @param object $service The service instance
      */
-    public function set($id, $service);
+    public function set(string $id, $service): void;
 
     /**
      * Gets a service.
@@ -50,7 +50,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @see Reference
      */
-    public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
+    public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE);
 
     /**
      * Returns true if the given service is defined.
@@ -59,7 +59,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @return bool true if the service is defined, false otherwise
      */
-    public function has($id);
+    public function has(string $id): bool;
 
     /**
      * Check for whether or not a service has been initialized.
@@ -68,7 +68,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @return bool true if the service has been initialized, false otherwise
      */
-    public function initialized($id);
+    public function initialized(string $id): bool;
 
     /**
      * Gets a parameter.
@@ -79,7 +79,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
-    public function getParameter($name);
+    public function getParameter(string $name);
 
     /**
      * Checks if a parameter exists.
@@ -88,7 +88,7 @@ interface ContainerInterface extends PsrContainerInterface
      *
      * @return bool The presence of parameter in container
      */
-    public function hasParameter($name);
+    public function hasParameter(string $name): bool;
 
     /**
      * Sets a parameter.
@@ -96,5 +96,5 @@ interface ContainerInterface extends PsrContainerInterface
      * @param string $name  The parameter name
      * @param mixed  $value The parameter value
      */
-    public function setParameter($name, $value);
+    public function setParameter(string $name, $value): void;
 }

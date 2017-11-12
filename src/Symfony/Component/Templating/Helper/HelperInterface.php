@@ -23,19 +23,19 @@ interface HelperInterface
      *
      * @return string The canonical name
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Sets the default charset.
      *
      * @param string $charset The charset
      */
-    public function setCharset($charset);
+    public function setCharset(string $charset): void;
 
     /**
      * Gets the default charset.
      *
      * @return string The default charset
      */
-    public function getCharset();
+    public function getCharset(): string;
 }

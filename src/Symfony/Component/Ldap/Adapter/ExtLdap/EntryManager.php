@@ -46,7 +46,7 @@ class EntryManager implements EntryManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function update(Entry $entry)
+    public function update(Entry $entry): void
     {
         $con = $this->getConnectionResource();
 
@@ -58,7 +58,7 @@ class EntryManager implements EntryManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function remove(Entry $entry)
+    public function remove(Entry $entry): void
     {
         $con = $this->getConnectionResource();
 
@@ -70,7 +70,7 @@ class EntryManager implements EntryManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function rename(Entry $entry, $newRdn, $removeOldRdn = true)
+    public function rename(Entry $entry, $newRdn, $removeOldRdn = true): void
     {
         $con = $this->getConnectionResource();
 

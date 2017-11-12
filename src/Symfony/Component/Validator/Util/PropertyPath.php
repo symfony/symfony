@@ -34,7 +34,7 @@ class PropertyPath
      *
      * @return string The concatenation of the two property paths
      */
-    public static function append($basePath, $subPath)
+    public static function append(string $basePath, string $subPath): string
     {
         if ('' !== (string) $subPath) {
             if ('[' === $subPath[0]) {

@@ -29,7 +29,7 @@ interface ArgumentValueResolverInterface
      *
      * @return bool
      */
-    public function supports(Request $request, ArgumentMetadata $argument);
+    public function supports(Request $request, ArgumentMetadata $argument): bool;
 
     /**
      * Returns the possible value(s).
@@ -39,5 +39,5 @@ interface ArgumentValueResolverInterface
      *
      * @return \Generator
      */
-    public function resolve(Request $request, ArgumentMetadata $argument);
+    public function resolve(Request $request, ArgumentMetadata $argument): \Generator;
 }

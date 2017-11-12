@@ -32,7 +32,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Service "foo" must implement interface "Symfony\Component\DependencyInjection\ServiceSubscriberInterface".
      */
-    public function testInvalidClass()
+    public function testInvalidClass(): void
     {
         $container = new ContainerBuilder();
 
@@ -48,7 +48,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The "container.service_subscriber" tag accepts only the "key" and "id" attributes, "bar" given for service "foo".
      */
-    public function testInvalidAttributes()
+    public function testInvalidAttributes(): void
     {
         $container = new ContainerBuilder();
 
@@ -60,7 +60,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         (new ResolveServiceSubscribersPass())->process($container);
     }
 
-    public function testNoAttributes()
+    public function testNoAttributes(): void
     {
         $container = new ContainerBuilder();
 
@@ -88,7 +88,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
-    public function testWithAttributes()
+    public function testWithAttributes(): void
     {
         $container = new ContainerBuilder();
 
@@ -122,7 +122,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Service key "test" does not exist in the map returned by "Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber::getSubscribedServices()" for service "foo_service".
      */
-    public function testExtraServiceSubscriber()
+    public function testExtraServiceSubscriber(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo_service', TestServiceSubscriber::class)

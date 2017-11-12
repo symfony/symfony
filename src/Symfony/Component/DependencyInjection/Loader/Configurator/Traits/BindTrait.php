@@ -28,7 +28,7 @@ trait BindTrait
      *
      * @return $this
      */
-    final public function bind($nameOrFqcn, $valueOrRef)
+    final public function bind(string $nameOrFqcn, $valueOrRef)
     {
         $valueOrRef = static::processValue($valueOrRef, true);
         if (isset($nameOrFqcn[0]) && '$' !== $nameOrFqcn[0] && !$valueOrRef instanceof Reference) {

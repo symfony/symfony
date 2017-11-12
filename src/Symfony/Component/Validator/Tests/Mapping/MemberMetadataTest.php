@@ -22,7 +22,7 @@ class MemberMetadataTest extends TestCase
 {
     protected $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadata = new TestMemberMetadata(
             'Symfony\Component\Validator\Tests\Fixtures\Entity',
@@ -31,19 +31,19 @@ class MemberMetadataTest extends TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->metadata = null;
     }
 
-    public function testAddConstraintRequiresClassConstraints()
+    public function testAddConstraintRequiresClassConstraints(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new ClassConstraint());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->metadata->addConstraint(new ConstraintA(array('property1' => 'A')));
         $this->metadata->addConstraint(new ConstraintB(array('groups' => 'TestGroup')));
@@ -53,7 +53,7 @@ class MemberMetadataTest extends TestCase
         $this->assertEquals($this->metadata, $metadata);
     }
 
-    public function testSerializeCollectionCascaded()
+    public function testSerializeCollectionCascaded(): void
     {
         $this->metadata->addConstraint(new Valid(array('traverse' => true)));
 
@@ -62,7 +62,7 @@ class MemberMetadataTest extends TestCase
         $this->assertEquals($this->metadata, $metadata);
     }
 
-    public function testSerializeCollectionNotCascaded()
+    public function testSerializeCollectionNotCascaded(): void
     {
         $this->metadata->addConstraint(new Valid(array('traverse' => false)));
 
@@ -74,11 +74,11 @@ class MemberMetadataTest extends TestCase
 
 class TestMemberMetadata extends MemberMetadata
 {
-    public function getPropertyValue($object)
+    public function getPropertyValue($object): void
     {
     }
 
-    protected function newReflectionMember($object)
+    protected function newReflectionMember($object): void
     {
     }
 }

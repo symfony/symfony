@@ -41,7 +41,7 @@ class SubmitButton extends Button implements ClickableInterface
      *
      * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
-    public function submit($submittedData, $clearMissing = true)
+    public function submit(?string $submittedData, bool $clearMissing = true)
     {
         parent::submit($submittedData, $clearMissing);
 

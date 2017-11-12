@@ -30,7 +30,7 @@ class ResolveControllerNameSubscriber implements EventSubscriberInterface
         $this->parser = $parser;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         $controller = $event->getRequest()->attributes->get('_controller');
         if (is_string($controller) && false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {

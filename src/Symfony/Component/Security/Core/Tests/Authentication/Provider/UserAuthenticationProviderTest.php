@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
 class UserAuthenticationProviderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $provider = $this->getProvider();
 
@@ -33,7 +33,7 @@ class UserAuthenticationProviderTest extends TestCase
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
      * @expectedExceptionMessage The token is not supported by this authentication provider.
      */
-    public function testAuthenticateWhenTokenIsNotSupported()
+    public function testAuthenticateWhenTokenIsNotSupported(): void
     {
         $provider = $this->getProvider();
 
@@ -43,7 +43,7 @@ class UserAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
      */
-    public function testAuthenticateWhenUsernameIsNotFound()
+    public function testAuthenticateWhenUsernameIsNotFound(): void
     {
         $provider = $this->getProvider(false, false);
         $provider->expects($this->once())
@@ -57,7 +57,7 @@ class UserAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testAuthenticateWhenUsernameIsNotFoundAndHideIsTrue()
+    public function testAuthenticateWhenUsernameIsNotFoundAndHideIsTrue(): void
     {
         $provider = $this->getProvider(false, true);
         $provider->expects($this->once())
@@ -71,7 +71,7 @@ class UserAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationServiceException
      */
-    public function testAuthenticateWhenProviderDoesNotReturnAnUserInterface()
+    public function testAuthenticateWhenProviderDoesNotReturnAnUserInterface(): void
     {
         $provider = $this->getProvider(false, true);
         $provider->expects($this->once())
@@ -85,7 +85,7 @@ class UserAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
      */
-    public function testAuthenticateWhenPreChecksFails()
+    public function testAuthenticateWhenPreChecksFails(): void
     {
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
@@ -105,7 +105,7 @@ class UserAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
      */
-    public function testAuthenticateWhenPostChecksFails()
+    public function testAuthenticateWhenPostChecksFails(): void
     {
         $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
         $userChecker->expects($this->once())
@@ -126,7 +126,7 @@ class UserAuthenticationProviderTest extends TestCase
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      * @expectedExceptionMessage Bad credentials
      */
-    public function testAuthenticateWhenPostCheckAuthenticationFails()
+    public function testAuthenticateWhenPostCheckAuthenticationFails(): void
     {
         $provider = $this->getProvider();
         $provider->expects($this->once())
@@ -145,7 +145,7 @@ class UserAuthenticationProviderTest extends TestCase
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      * @expectedExceptionMessage Foo
      */
-    public function testAuthenticateWhenPostCheckAuthenticationFailsWithHideFalse()
+    public function testAuthenticateWhenPostCheckAuthenticationFailsWithHideFalse(): void
     {
         $provider = $this->getProvider(false, false);
         $provider->expects($this->once())
@@ -160,7 +160,7 @@ class UserAuthenticationProviderTest extends TestCase
         $provider->authenticate($this->getSupportedToken());
     }
 
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->once())
@@ -194,7 +194,7 @@ class UserAuthenticationProviderTest extends TestCase
         $this->assertEquals(array('foo' => 'bar'), $authToken->getAttributes(), '->authenticate() copies token attributes');
     }
 
-    public function testAuthenticateWithPreservingRoleSwitchUserRole()
+    public function testAuthenticateWithPreservingRoleSwitchUserRole(): void
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->once())

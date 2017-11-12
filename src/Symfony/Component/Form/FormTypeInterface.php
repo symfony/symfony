@@ -29,7 +29,7 @@ interface FormTypeInterface
      * @param FormBuilderInterface $builder The form builder
      * @param array                $options The options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options);
+    public function buildForm(FormBuilderInterface $builder, array $options): void;
 
     /**
      * Builds the form view.
@@ -47,7 +47,7 @@ interface FormTypeInterface
      * @param FormInterface $form    The form
      * @param array         $options The options
      */
-    public function buildView(FormView $view, FormInterface $form, array $options);
+    public function buildView(FormView $view, FormInterface $form, array $options): void;
 
     /**
      * Finishes the form view.
@@ -66,14 +66,14 @@ interface FormTypeInterface
      * @param FormInterface $form    The form
      * @param array         $options The options
      */
-    public function finishView(FormView $view, FormInterface $form, array $options);
+    public function finishView(FormView $view, FormInterface $form, array $options): void;
 
     /**
      * Configures the options for this type.
      *
      * @param OptionsResolver $resolver The resolver for the options
      */
-    public function configureOptions(OptionsResolver $resolver);
+    public function configureOptions(OptionsResolver $resolver): void;
 
     /**
      * Returns the prefix of the template block name for this type.
@@ -83,12 +83,12 @@ interface FormTypeInterface
      *
      * @return string The prefix of the template block name
      */
-    public function getBlockPrefix();
+    public function getBlockPrefix(): string;
 
     /**
      * Returns the name of the parent type.
      *
      * @return string|null The name of the parent type if any, null otherwise
      */
-    public function getParent();
+    public function getParent(): ?string;
 }

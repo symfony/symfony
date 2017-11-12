@@ -29,7 +29,7 @@ class CacheClearCommandTest extends TestCase
     private $fs;
     private $rootDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fs = new Filesystem();
         $this->kernel = new TestAppKernel('test', true);
@@ -38,12 +38,12 @@ class CacheClearCommandTest extends TestCase
         $this->fs->mkdir($this->rootDir);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fs->remove($this->rootDir);
     }
 
-    public function testCacheIsFreshAfterCacheClearedWithWarmup()
+    public function testCacheIsFreshAfterCacheClearedWithWarmup(): void
     {
         $input = new ArrayInput(array('cache:clear'));
         $application = new Application($this->kernel);
@@ -59,7 +59,7 @@ class CacheClearCommandTest extends TestCase
         $configCacheFactory = new ConfigCacheFactory(true);
 
         foreach ($metaFiles as $file) {
-            $configCacheFactory->cache(substr($file, 0, -5), function () use ($file) {
+            $configCacheFactory->cache(substr($file, 0, -5), function () use ($file): void {
                 $this->fail(sprintf('Meta file "%s" is not fresh', (string) $file));
             });
         }

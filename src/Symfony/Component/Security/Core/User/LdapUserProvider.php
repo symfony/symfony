@@ -110,13 +110,8 @@ class LdapUserProvider implements UserProviderInterface
 
     /**
      * Loads a user from an LDAP entry.
-     *
-     * @param string $username
-     * @param Entry  $entry
-     *
-     * @return User
      */
-    protected function loadUser($username, Entry $entry)
+    protected function loadUser(string $username, Entry $entry): User
     {
         $password = null;
 
@@ -131,9 +126,8 @@ class LdapUserProvider implements UserProviderInterface
      * Fetches a required unique attribute value from an LDAP entry.
      *
      * @param null|Entry $entry
-     * @param string     $attribute
      */
-    private function getAttributeValue(Entry $entry, $attribute)
+    private function getAttributeValue(Entry $entry, string $attribute)
     {
         if (!$entry->hasAttribute($attribute)) {
             throw new InvalidArgumentException(sprintf('Missing attribute "%s" for user "%s".', $attribute, $entry->getDn()));

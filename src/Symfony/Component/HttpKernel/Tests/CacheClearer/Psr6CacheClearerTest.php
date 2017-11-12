@@ -17,7 +17,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 class Psr6CacheClearerTest extends TestCase
 {
-    public function testClearPoolsInjectedInConstructor()
+    public function testClearPoolsInjectedInConstructor(): void
     {
         $pool = $this->getMockBuilder(CacheItemPoolInterface::class)->getMock();
         $pool
@@ -27,7 +27,7 @@ class Psr6CacheClearerTest extends TestCase
         (new Psr6CacheClearer(array('pool' => $pool)))->clear('');
     }
 
-    public function testClearPool()
+    public function testClearPool(): void
     {
         $pool = $this->getMockBuilder(CacheItemPoolInterface::class)->getMock();
         $pool
@@ -41,7 +41,7 @@ class Psr6CacheClearerTest extends TestCase
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage Cache pool not found: unknown
      */
-    public function testClearPoolThrowsExceptionOnUnreferencedPool()
+    public function testClearPoolThrowsExceptionOnUnreferencedPool(): void
     {
         (new Psr6CacheClearer())->clearPool('unknown');
     }

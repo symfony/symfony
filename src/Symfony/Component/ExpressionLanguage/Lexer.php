@@ -27,7 +27,7 @@ class Lexer
      *
      * @throws SyntaxError
      */
-    public function tokenize($expression)
+    public function tokenize(string $expression): TokenStream
     {
         $expression = str_replace(array("\r", "\n", "\t", "\v", "\f"), ' ', $expression);
         $cursor = 0;

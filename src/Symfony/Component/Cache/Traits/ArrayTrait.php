@@ -32,7 +32,7 @@ trait ArrayTrait
      *
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }
@@ -72,7 +72,7 @@ trait ArrayTrait
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->clear();
     }

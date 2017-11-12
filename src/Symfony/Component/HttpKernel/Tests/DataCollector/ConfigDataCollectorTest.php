@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ConfigDataCollectorTest extends TestCase
 {
-    public function testCollect()
+    public function testCollect(): void
     {
         $kernel = new KernelForTest('test', true);
         $c = new ConfigDataCollector();
@@ -51,7 +51,7 @@ class KernelForTest extends Kernel
         return 'testkernel';
     }
 
-    public function registerBundles()
+    public function registerBundles(): void
     {
     }
 
@@ -60,7 +60,7 @@ class KernelForTest extends Kernel
         return array();
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
 }

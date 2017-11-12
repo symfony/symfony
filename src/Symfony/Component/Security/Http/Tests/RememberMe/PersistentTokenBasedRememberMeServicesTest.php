@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\Exception\CookieTheftException;
 
 class PersistentTokenBasedRememberMeServicesTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         try {
             random_bytes(1);
@@ -33,14 +33,14 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         }
     }
 
-    public function testAutoLoginReturnsNullWhenNoCookie()
+    public function testAutoLoginReturnsNullWhenNoCookie(): void
     {
         $service = $this->getService(null, array('name' => 'foo'));
 
         $this->assertNull($service->autoLogin(new Request()));
     }
 
-    public function testAutoLoginThrowsExceptionOnInvalidCookie()
+    public function testAutoLoginThrowsExceptionOnInvalidCookie(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
         $request = new Request();
@@ -51,7 +51,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    public function testAutoLoginThrowsExceptionOnNonExistentToken()
+    public function testAutoLoginThrowsExceptionOnNonExistentToken(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
         $request = new Request();
@@ -73,7 +73,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    public function testAutoLoginReturnsNullOnNonExistentUser()
+    public function testAutoLoginReturnsNullOnNonExistentUser(): void
     {
         $userProvider = $this->getProvider();
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600, 'secure' => false, 'httponly' => false));
@@ -98,7 +98,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
-    public function testAutoLoginThrowsExceptionOnStolenCookieAndRemovesItFromThePersistentBackend()
+    public function testAutoLoginThrowsExceptionOnStolenCookieAndRemovesItFromThePersistentBackend(): void
     {
         $userProvider = $this->getProvider();
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true));
@@ -130,7 +130,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
-    public function testAutoLoginDoesNotAcceptAnExpiredCookie()
+    public function testAutoLoginDoesNotAcceptAnExpiredCookie(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
         $request = new Request();
@@ -149,7 +149,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
-    public function testAutoLogin()
+    public function testAutoLogin(): void
     {
         $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user
@@ -187,7 +187,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
     }
 
-    public function testLogout()
+    public function testLogout(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => '/foo', 'domain' => 'foodomain.foo', 'secure' => true, 'httponly' => false));
         $request = new Request();
@@ -214,7 +214,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertFalse($cookie->isHttpOnly());
     }
 
-    public function testLogoutSimplyIgnoresNonSetRequestCookie()
+    public function testLogoutSimplyIgnoresNonSetRequestCookie(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
@@ -236,7 +236,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertNull($cookie->getDomain());
     }
 
-    public function testLogoutSimplyIgnoresInvalidCookie()
+    public function testLogoutSimplyIgnoresInvalidCookie(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
@@ -256,7 +256,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    public function testLoginFail()
+    public function testLoginFail(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
@@ -266,7 +266,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
-    public function testLoginSuccessSetsCookieWhenLoggedInWithNonRememberMeTokenInterfaceImplementation()
+    public function testLoginSuccessSetsCookieWhenLoggedInWithNonRememberMeTokenInterfaceImplementation(): void
     {
         $service = $this->getService(null, array('name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'lifetime' => 3600, 'always_remember_me' => true));
         $request = new Request();

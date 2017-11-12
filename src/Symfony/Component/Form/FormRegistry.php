@@ -103,7 +103,7 @@ class FormRegistry implements FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface The resolved type
      */
-    private function resolveType(FormTypeInterface $type)
+    private function resolveType(FormTypeInterface $type): ResolvedFormTypeInterface
     {
         $typeExtensions = array();
         $parentType = $type->getParent();

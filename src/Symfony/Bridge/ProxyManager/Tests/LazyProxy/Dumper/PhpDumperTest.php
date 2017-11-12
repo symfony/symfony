@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
  */
 class PhpDumperTest extends TestCase
 {
-    public function testDumpContainerWithProxyService()
+    public function testDumpContainerWithProxyService(): void
     {
         $this->assertStringMatchesFormatFile(
             __DIR__.'/../Fixtures/php/lazy_service_structure.txt',
@@ -36,7 +36,7 @@ class PhpDumperTest extends TestCase
     /**
      * Verifies that the generated container retrieves the same proxy instance on multiple subsequent requests.
      */
-    public function testDumpContainerWithProxyServiceWillShareProxies()
+    public function testDumpContainerWithProxyServiceWillShareProxies(): void
     {
         if (!class_exists('LazyServiceProjectServiceContainer', false)) {
             eval('?>'.$this->dumpLazyServiceProjectServiceContainer());

@@ -81,7 +81,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * {@inheritdoc}
      */
-    public function terminate(Request $request, Response $response)
+    public function terminate(Request $request, Response $response): void
     {
         $this->dispatcher->dispatch(KernelEvents::TERMINATE, new PostResponseEvent($this, $request, $response));
     }
@@ -91,7 +91,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @internal
      */
-    public function terminateWithException(\Exception $exception)
+    public function terminateWithException(\Exception $exception): void
     {
         if (!$request = $this->requestStack->getMasterRequest()) {
             throw new \LogicException('Request stack is empty', 0, $exception);
@@ -118,7 +118,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * @throws \LogicException       If one of the listener does not behave as expected
      * @throws NotFoundHttpException When controller cannot be found
      */
-    private function handleRaw(Request $request, int $type = self::MASTER_REQUEST)
+    private function handleRaw(Request $request, int $type = self::MASTER_REQUEST): Response
     {
         $this->requestStack->push($request);
 
@@ -182,7 +182,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @throws \RuntimeException if the passed object is not a Response instance
      */
-    private function filterResponse(Response $response, Request $request, int $type)
+    private function filterResponse(Response $response, Request $request, int $type): Response
     {
         $event = new FilterResponseEvent($this, $request, $type, $response);
 
@@ -200,7 +200,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * operations such as {@link RequestStack::getParentRequest()} can lead to
      * weird results.
      */
-    private function finishRequest(Request $request, int $type)
+    private function finishRequest(Request $request, int $type): void
     {
         $this->dispatcher->dispatch(KernelEvents::FINISH_REQUEST, new FinishRequestEvent($this, $request, $type));
         $this->requestStack->pop();

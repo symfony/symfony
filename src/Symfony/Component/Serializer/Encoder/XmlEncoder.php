@@ -41,7 +41,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param string   $rootNodeName
      * @param int|null $loadOptions  A bit field of LIBXML_* constants
      */
     public function __construct(string $rootNodeName = 'response', int $loadOptions = null)
@@ -165,17 +164,15 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      *
      * @param string $name Root node name
      */
-    public function setRootNodeName($name)
+    public function setRootNodeName(string $name): void
     {
         $this->rootNodeName = $name;
     }
 
     /**
      * Returns the root node name.
-     *
-     * @return string
      */
-    public function getRootNodeName()
+    public function getRootNodeName(): string
     {
         return $this->rootNodeName;
     }
@@ -213,7 +210,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      * @param \DOMNode             $node
      * @param \DOMDocumentFragment $fragment
      */
-    final protected function appendDocumentFragment(\DOMNode $node, $fragment): bool
+    final protected function appendDocumentFragment(\DOMNode $node, \DOMDocumentFragment $fragment): bool
     {
         if ($fragment instanceof \DOMDocumentFragment) {
             $node->appendChild($fragment);

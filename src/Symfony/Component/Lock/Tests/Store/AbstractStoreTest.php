@@ -21,12 +21,9 @@ use Symfony\Component\Lock\StoreInterface;
  */
 abstract class AbstractStoreTest extends TestCase
 {
-    /**
-     * @return StoreInterface;
-     */
-    abstract protected function getStore();
+    abstract protected function getStore(): StoreInterface;
 
-    public function testSave()
+    public function testSave(): void
     {
         $store = $this->getStore();
 
@@ -39,7 +36,7 @@ abstract class AbstractStoreTest extends TestCase
         $this->assertFalse($store->exists($key));
     }
 
-    public function testSaveWithDifferentResources()
+    public function testSaveWithDifferentResources(): void
     {
         $store = $this->getStore();
 
@@ -63,7 +60,7 @@ abstract class AbstractStoreTest extends TestCase
         $this->assertFalse($store->exists($key2));
     }
 
-    public function testSaveWithDifferentKeysOnSameResources()
+    public function testSaveWithDifferentKeysOnSameResources(): void
     {
         $store = $this->getStore();
 
@@ -98,7 +95,7 @@ abstract class AbstractStoreTest extends TestCase
         $this->assertFalse($store->exists($key2));
     }
 
-    public function testSaveTwice()
+    public function testSaveTwice(): void
     {
         $store = $this->getStore();
 

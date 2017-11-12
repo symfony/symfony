@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 
 class InlineServiceDefinitionsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -43,7 +43,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($container->getDefinition('inlinable.service'), $arguments[0]);
     }
 
-    public function testProcessDoesNotInlinesWhenAliasedServiceIsShared()
+    public function testProcessDoesNotInlinesWhenAliasedServiceIsShared(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -63,7 +63,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref, $arguments[0]);
     }
 
-    public function testProcessDoesInlineNonSharedService()
+    public function testProcessDoesInlineNonSharedService(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -92,7 +92,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertNotSame($container->getDefinition('bar'), $arguments[2]);
     }
 
-    public function testProcessInlinesIfMultipleReferencesButAllFromTheSameDefinition()
+    public function testProcessInlinesIfMultipleReferencesButAllFromTheSameDefinition(): void
     {
         $container = new ContainerBuilder();
 
@@ -112,7 +112,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($a, $inlinedArguments[0]);
     }
 
-    public function testProcessInlinesPrivateFactoryReference()
+    public function testProcessInlinesPrivateFactoryReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -135,7 +135,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($b, $inlinedArguments[0]);
     }
 
-    public function testProcessDoesNotInlinePrivateFactoryIfReferencedMultipleTimesWithinTheSameDefinition()
+    public function testProcessDoesNotInlinePrivateFactoryIfReferencedMultipleTimesWithinTheSameDefinition(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -161,7 +161,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref2, $args[1]);
     }
 
-    public function testProcessDoesNotInlineReferenceWhenUsedByInlineFactory()
+    public function testProcessDoesNotInlineReferenceWhenUsedByInlineFactory(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -190,7 +190,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref, $args[0]);
     }
 
-    public function testProcessDoesNotInlineWhenServiceIsPrivateButLazy()
+    public function testProcessDoesNotInlineWhenServiceIsPrivateButLazy(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -210,7 +210,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref, $arguments[0]);
     }
 
-    public function testProcessDoesNotInlineWhenServiceReferencesItself()
+    public function testProcessDoesNotInlineWhenServiceReferencesItself(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -225,7 +225,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref, $calls[0][1][0]);
     }
 
-    public function testProcessDoesNotSetLazyArgumentValuesAfterInlining()
+    public function testProcessDoesNotSetLazyArgumentValuesAfterInlining(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -252,7 +252,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame('inline', (string) $values[0]);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new InlineServiceDefinitionsPass()));
         $repeatedPass->process($container);

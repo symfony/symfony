@@ -57,7 +57,7 @@ class PhpEngine extends BasePhpEngine implements EngineInterface
     /**
      * {@inheritdoc}
      */
-    public function setHelpers(array $helpers)
+    public function setHelpers(array $helpers): void
     {
         $this->helpers = $helpers;
     }

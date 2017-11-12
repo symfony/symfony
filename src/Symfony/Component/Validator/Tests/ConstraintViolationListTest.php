@@ -19,22 +19,22 @@ class ConstraintViolationListTest extends TestCase
 {
     protected $list;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->list = new ConstraintViolationList();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->list = null;
     }
 
-    public function testInit()
+    public function testInit(): void
     {
         $this->assertCount(0, $this->list);
     }
 
-    public function testInitWithViolations()
+    public function testInitWithViolations(): void
     {
         $violation = $this->getViolation('Error');
         $this->list = new ConstraintViolationList(array($violation));
@@ -43,7 +43,7 @@ class ConstraintViolationListTest extends TestCase
         $this->assertSame($violation, $this->list[0]);
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $violation = $this->getViolation('Error');
         $this->list->add($violation);
@@ -52,7 +52,7 @@ class ConstraintViolationListTest extends TestCase
         $this->assertSame($violation, $this->list[0]);
     }
 
-    public function testAddAll()
+    public function testAddAll(): void
     {
         $violations = array(
             10 => $this->getViolation('Error 1'),
@@ -69,7 +69,7 @@ class ConstraintViolationListTest extends TestCase
         $this->assertSame($violations[30], $this->list[2]);
     }
 
-    public function testIterator()
+    public function testIterator(): void
     {
         $violations = array(
             10 => $this->getViolation('Error 1'),
@@ -83,7 +83,7 @@ class ConstraintViolationListTest extends TestCase
         $this->assertSame(array_values($violations), iterator_to_array($this->list));
     }
 
-    public function testArrayAccess()
+    public function testArrayAccess(): void
     {
         $violation = $this->getViolation('Error');
         $this->list[] = $violation;
@@ -101,7 +101,7 @@ class ConstraintViolationListTest extends TestCase
         $this->assertTrue(isset($this->list[10]));
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->list = new ConstraintViolationList(array(
             $this->getViolation('Error 1', 'Root'),
@@ -131,7 +131,7 @@ EOF;
     /**
      * @dataProvider findByCodesProvider
      */
-    public function testFindByCodes($code, $violationsCount)
+    public function testFindByCodes($code, $violationsCount): void
     {
         $violations = array(
             $this->getViolation('Error', null, null, 'code1'),

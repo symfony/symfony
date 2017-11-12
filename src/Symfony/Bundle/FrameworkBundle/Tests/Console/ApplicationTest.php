@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class ApplicationTest extends TestCase
 {
-    public function testBundleInterfaceImplementation()
+    public function testBundleInterfaceImplementation(): void
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
 
@@ -35,7 +35,7 @@ class ApplicationTest extends TestCase
         $application->doRun(new ArrayInput(array('list')), new NullOutput());
     }
 
-    public function testBundleCommandsAreRegistered()
+    public function testBundleCommandsAreRegistered(): void
     {
         $bundle = $this->createBundleMock(array());
 
@@ -48,7 +48,7 @@ class ApplicationTest extends TestCase
         $application->doRun(new ArrayInput(array('list')), new NullOutput());
     }
 
-    public function testBundleCommandsAreRetrievable()
+    public function testBundleCommandsAreRetrievable(): void
     {
         $bundle = $this->createBundleMock(array());
 
@@ -61,7 +61,7 @@ class ApplicationTest extends TestCase
         $application->all();
     }
 
-    public function testBundleSingleCommandIsRetrievable()
+    public function testBundleSingleCommandIsRetrievable(): void
     {
         $command = new Command('example');
 
@@ -74,7 +74,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->get('example'));
     }
 
-    public function testBundleCommandCanBeFound()
+    public function testBundleCommandCanBeFound(): void
     {
         $command = new Command('example');
 
@@ -87,7 +87,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('example'));
     }
 
-    public function testBundleCommandCanBeFoundByAlias()
+    public function testBundleCommandCanBeFoundByAlias(): void
     {
         $command = new Command('example');
         $command->setAliases(array('alias'));
@@ -101,10 +101,10 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('alias'));
     }
 
-    public function testBundleCommandsHaveRightContainer()
+    public function testBundleCommandsHaveRightContainer(): void
     {
         $command = $this->getMockForAbstractClass('Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand', array('foo'), '', true, true, true, array('setContainer'));
-        $command->setCode(function () {});
+        $command->setCode(function (): void {});
         $command->expects($this->exactly(2))->method('setContainer');
 
         $application = new Application($this->getKernel(array(), true));
@@ -120,7 +120,7 @@ class ApplicationTest extends TestCase
         $tester->run(array('command' => 'foo'));
     }
 
-    public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName()
+    public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName(): void
     {
         $command = new Command('example');
 
@@ -135,7 +135,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($newCommand, $application->get('example'));
     }
 
-    public function testRunOnlyWarnsOnUnregistrableCommand()
+    public function testRunOnlyWarnsOnUnregistrableCommand(): void
     {
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
@@ -146,7 +146,7 @@ class ApplicationTest extends TestCase
         $kernel
             ->method('getBundles')
             ->willReturn(array($this->createBundleMock(
-                array((new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); }))
+                array((new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output): void { $output->write('fine'); }))
             )));
         $kernel
             ->method('getContainer')
@@ -216,7 +216,7 @@ class ApplicationTest extends TestCase
         $bundle
             ->expects($this->once())
             ->method('registerCommands')
-            ->will($this->returnCallback(function (Application $application) use ($commands) {
+            ->will($this->returnCallback(function (Application $application) use ($commands): void {
                 $application->addCommands($commands);
             }))
         ;

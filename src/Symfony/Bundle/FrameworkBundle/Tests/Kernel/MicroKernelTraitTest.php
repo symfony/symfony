@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MicroKernelTraitTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $kernel = new ConcreteMicroKernel('test', true);
         $kernel->boot();
@@ -29,7 +29,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertInstanceOf('stdClass', $kernel->getContainer()->get('halloween'));
     }
 
-    public function testAsEventSubscriber()
+    public function testAsEventSubscriber(): void
     {
         $kernel = new ConcreteMicroKernel('test', true);
         $kernel->boot();

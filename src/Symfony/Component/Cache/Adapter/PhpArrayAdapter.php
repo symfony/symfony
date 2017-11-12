@@ -60,10 +60,8 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
      *
      * @param string                 $file         The PHP file were values are cached
      * @param CacheItemPoolInterface $fallbackPool Fallback when opcache is disabled
-     *
-     * @return CacheItemPoolInterface
      */
-    public static function create($file, CacheItemPoolInterface $fallbackPool)
+    public static function create(string $file, CacheItemPoolInterface $fallbackPool): CacheItemPoolInterface
     {
         // Shared memory is available in PHP 7.0+ with OPCache enabled
         if (ini_get('opcache.enable')) {
@@ -263,7 +261,7 @@ class PhpArrayAdapter implements AdapterInterface, PruneableInterface, Resettabl
      *
      * @internal
      */
-    public static function throwOnRequiredClass($class)
+    public static function throwOnRequiredClass($class): void
     {
         $e = new \ReflectionException("Class $class does not exist");
         $trace = $e->getTrace();

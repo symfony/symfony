@@ -25,13 +25,13 @@ class StopwatchEventTest extends TestCase
 {
     const DELTA = 37;
 
-    public function testGetOrigin()
+    public function testGetOrigin(): void
     {
         $event = new StopwatchEvent(12);
         $this->assertEquals(12, $event->getOrigin());
     }
 
-    public function testGetCategory()
+    public function testGetCategory(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $this->assertEquals('default', $event->getCategory());
@@ -40,7 +40,7 @@ class StopwatchEventTest extends TestCase
         $this->assertEquals('cat', $event->getCategory());
     }
 
-    public function testGetPeriods()
+    public function testGetPeriods(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $this->assertEquals(array(), $event->getPeriods());
@@ -58,7 +58,7 @@ class StopwatchEventTest extends TestCase
         $this->assertCount(2, $event->getPeriods());
     }
 
-    public function testLap()
+    public function testLap(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
@@ -67,7 +67,7 @@ class StopwatchEventTest extends TestCase
         $this->assertCount(2, $event->getPeriods());
     }
 
-    public function testDuration()
+    public function testDuration(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
@@ -86,7 +86,7 @@ class StopwatchEventTest extends TestCase
         $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
     }
 
-    public function testDurationBeforeStop()
+    public function testDurationBeforeStop(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
@@ -106,26 +106,26 @@ class StopwatchEventTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testStopWithoutStart()
+    public function testStopWithoutStart(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->stop();
     }
 
-    public function testIsStarted()
+    public function testIsStarted(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $event->start();
         $this->assertTrue($event->isStarted());
     }
 
-    public function testIsNotStarted()
+    public function testIsNotStarted(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $this->assertFalse($event->isStarted());
     }
 
-    public function testEnsureStopped()
+    public function testEnsureStopped(): void
     {
         // this also test overlap between two periods
         $event = new StopwatchEvent(microtime(true) * 1000);
@@ -137,7 +137,7 @@ class StopwatchEventTest extends TestCase
         $this->assertEquals(300, $event->getDuration(), null, self::DELTA);
     }
 
-    public function testStartTime()
+    public function testStartTime(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $this->assertLessThanOrEqual(0.5, $event->getStartTime());
@@ -154,7 +154,7 @@ class StopwatchEventTest extends TestCase
         $this->assertEquals(0, $event->getStartTime(), null, self::DELTA);
     }
 
-    public function testHumanRepresentation()
+    public function testHumanRepresentation(): void
     {
         $event = new StopwatchEvent(microtime(true) * 1000);
         $this->assertEquals('default: 0.00 MiB - 0 ms', (string) $event);

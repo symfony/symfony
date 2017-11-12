@@ -44,14 +44,14 @@ class FormDataExtractorTest extends TestCase
      */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dataExtractor = new FormDataExtractor();
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
     }
 
-    public function testExtractConfiguration()
+    public function testExtractConfiguration(): void
     {
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
@@ -72,7 +72,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractConfiguration($form));
     }
 
-    public function testExtractConfigurationSortsPassedOptions()
+    public function testExtractConfigurationSortsPassedOptions(): void
     {
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
@@ -106,7 +106,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractConfiguration($form));
     }
 
-    public function testExtractConfigurationSortsResolvedOptions()
+    public function testExtractConfigurationSortsResolvedOptions(): void
     {
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
@@ -137,7 +137,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractConfiguration($form));
     }
 
-    public function testExtractConfigurationBuildsIdRecursively()
+    public function testExtractConfigurationBuildsIdRecursively(): void
     {
         $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
         $type->expects($this->any())
@@ -169,7 +169,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractConfiguration($form));
     }
 
-    public function testExtractDefaultData()
+    public function testExtractDefaultData(): void
     {
         $form = $this->createBuilder('name')->getForm();
 
@@ -183,7 +183,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractDefaultData($form));
     }
 
-    public function testExtractDefaultDataStoresModelDataIfDifferent()
+    public function testExtractDefaultDataStoresModelDataIfDifferent(): void
     {
         $form = $this->createBuilder('name')
             ->addModelTransformer(new FixedDataTransformer(array(
@@ -202,7 +202,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractDefaultData($form));
     }
 
-    public function testExtractDefaultDataStoresViewDataIfDifferent()
+    public function testExtractDefaultDataStoresViewDataIfDifferent(): void
     {
         $form = $this->createBuilder('name')
             ->addViewTransformer(new FixedDataTransformer(array(
@@ -221,7 +221,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractDefaultData($form));
     }
 
-    public function testExtractSubmittedData()
+    public function testExtractSubmittedData(): void
     {
         $form = $this->createBuilder('name')->getForm();
 
@@ -236,7 +236,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractSubmittedData($form));
     }
 
-    public function testExtractSubmittedDataStoresModelDataIfDifferent()
+    public function testExtractSubmittedDataStoresModelDataIfDifferent(): void
     {
         $form = $this->createBuilder('name')
             ->addModelTransformer(new FixedDataTransformer(array(
@@ -257,7 +257,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractSubmittedData($form));
     }
 
-    public function testExtractSubmittedDataStoresViewDataIfDifferent()
+    public function testExtractSubmittedDataStoresViewDataIfDifferent(): void
     {
         $form = $this->createBuilder('name')
             ->addViewTransformer(new FixedDataTransformer(array(
@@ -278,7 +278,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractSubmittedData($form));
     }
 
-    public function testExtractSubmittedDataStoresErrors()
+    public function testExtractSubmittedDataStoresErrors(): void
     {
         $form = $this->createBuilder('name')->getForm();
 
@@ -296,7 +296,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractSubmittedData($form));
     }
 
-    public function testExtractSubmittedDataStoresErrorOrigin()
+    public function testExtractSubmittedDataStoresErrorOrigin(): void
     {
         $form = $this->createBuilder('name')->getForm();
 
@@ -317,7 +317,7 @@ class FormDataExtractorTest extends TestCase
         ), $this->dataExtractor->extractSubmittedData($form));
     }
 
-    public function testExtractSubmittedDataStoresErrorCause()
+    public function testExtractSubmittedDataStoresErrorCause(): void
     {
         $form = $this->createBuilder('name')->getForm();
 
@@ -362,12 +362,12 @@ EODUMP
         );
     }
 
-    public function testExtractSubmittedDataRemembersIfNonSynchronized()
+    public function testExtractSubmittedDataRemembersIfNonSynchronized(): void
     {
         $form = $this->createBuilder('name')
             ->addModelTransformer(new CallbackTransformer(
-                function () {},
-                function () {
+                function (): void {},
+                function (): void {
                     throw new TransformationFailedException('Fail!');
                 }
             ))
@@ -385,7 +385,7 @@ EODUMP
         ), $this->dataExtractor->extractSubmittedData($form));
     }
 
-    public function testExtractViewVariables()
+    public function testExtractViewVariables(): void
     {
         $view = new FormView();
 

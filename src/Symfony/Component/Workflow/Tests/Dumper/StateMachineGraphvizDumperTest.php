@@ -13,12 +13,12 @@ class StateMachineGraphvizDumperTest extends TestCase
 
     private $dumper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dumper = new StateMachineGraphvizDumper();
     }
 
-    public function testDumpWithoutMarking()
+    public function testDumpWithoutMarking(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 
@@ -45,7 +45,7 @@ EOGRAPH;
         $this->assertEquals($expected, $dump);
     }
 
-    public function testDumpWithMarking()
+    public function testDumpWithMarking(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
         $marking = new Marking(array('b' => 1));

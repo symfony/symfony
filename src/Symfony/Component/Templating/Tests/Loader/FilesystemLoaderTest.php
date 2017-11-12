@@ -19,12 +19,12 @@ class FilesystemLoaderTest extends TestCase
 {
     protected static $fixturesPath;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $pathPattern = self::$fixturesPath.'/templates/%name%.%engine%';
         $path = self::$fixturesPath.'/templates';
@@ -34,7 +34,7 @@ class FilesystemLoaderTest extends TestCase
         $this->assertEquals(array($pathPattern), $loader->getTemplatePathPatterns(), '__construct() takes an array of paths as its second argument');
     }
 
-    public function testIsAbsolutePath()
+    public function testIsAbsolutePath(): void
     {
         $this->assertTrue(ProjectTemplateLoader2::isAbsolutePath('/foo.xml'), '->isAbsolutePath() returns true if the path is an absolute path');
         $this->assertTrue(ProjectTemplateLoader2::isAbsolutePath('c:\\\\foo.xml'), '->isAbsolutePath() returns true if the path is an absolute path');
@@ -44,7 +44,7 @@ class FilesystemLoaderTest extends TestCase
         $this->assertTrue(ProjectTemplateLoader2::isAbsolutePath('phar://server/foo.xml'), '->isAbsolutePath() returns true if the path is an absolute path');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $pathPattern = self::$fixturesPath.'/templates/%name%';
         $path = self::$fixturesPath.'/templates';

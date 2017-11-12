@@ -67,7 +67,7 @@ abstract class Constraint
      *
      * @throws InvalidArgumentException If the error code does not exist
      */
-    public static function getErrorName($errorCode)
+    public static function getErrorName(string $errorCode): string
     {
         if (!isset(static::$errorNames[$errorCode])) {
             throw new InvalidArgumentException(sprintf(
@@ -177,7 +177,7 @@ abstract class Constraint
      *
      * @throws InvalidOptionsException If an invalid option name is given
      */
-    public function __set($option, $value)
+    public function __set(string $option, $value): void
     {
         if ('groups' === $option) {
             $this->groups = (array) $value;
@@ -203,7 +203,7 @@ abstract class Constraint
      *
      * @internal this method should not be used or overwritten in userland code
      */
-    public function __get($option)
+    public function __get(string $option)
     {
         if ('groups' === $option) {
             $this->groups = array(self::DEFAULT_GROUP);
@@ -216,10 +216,8 @@ abstract class Constraint
 
     /**
      * Adds the given group if this constraint is in the Default group.
-     *
-     * @param string $group
      */
-    public function addImplicitGroupName($group)
+    public function addImplicitGroupName(string $group): void
     {
         if (in_array(self::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
             $this->groups[] = $group;
@@ -244,11 +242,10 @@ abstract class Constraint
      *
      * Override this method if you want to define required options.
      *
-     * @return array
      *
      * @see __construct()
      */
-    public function getRequiredOptions()
+    public function getRequiredOptions(): array
     {
         return array();
     }
@@ -259,10 +256,8 @@ abstract class Constraint
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
      * behaviour.
-     *
-     * @return string
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return get_class($this).'Validator';
     }
@@ -290,7 +285,7 @@ abstract class Constraint
      *           {@link \Serializable} in the future. Please don't use or
      *           overwrite it.
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         // Initialize "groups" option if it is not set
         $this->groups;

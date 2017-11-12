@@ -17,7 +17,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends TestCase
 {
-    public function testDoNoDuplicateDefaultFormResources()
+    public function testDoNoDuplicateDefaultFormResources(): void
     {
         $input = array(
             'form_themes' => array('form_div_layout.html.twig'),

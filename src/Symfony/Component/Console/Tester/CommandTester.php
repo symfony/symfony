@@ -50,7 +50,7 @@ class CommandTester
      *
      * @return int The command exit code
      */
-    public function execute(array $input, array $options = array())
+    public function execute(array $input, array $options = array()): int
     {
         // set the command name automatically if the application requires
         // this argument and no command name was passed
@@ -86,7 +86,7 @@ class CommandTester
      *
      * @return string The display
      */
-    public function getDisplay($normalize = false)
+    public function getDisplay(bool $normalize = false): string
     {
         rewind($this->output->getStream());
 
@@ -104,7 +104,7 @@ class CommandTester
      *
      * @return InputInterface The current input instance
      */
-    public function getInput()
+    public function getInput(): InputInterface
     {
         return $this->input;
     }
@@ -114,7 +114,7 @@ class CommandTester
      *
      * @return OutputInterface The current output instance
      */
-    public function getOutput()
+    public function getOutput(): OutputInterface
     {
         return $this->output;
     }
@@ -124,7 +124,7 @@ class CommandTester
      *
      * @return int The status code
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -134,10 +134,8 @@ class CommandTester
      *
      * @param array $inputs An array of strings representing each input
      *                      passed to the command input stream
-     *
-     * @return CommandTester
      */
-    public function setInputs(array $inputs)
+    public function setInputs(array $inputs): CommandTester
     {
         $this->inputs = $inputs;
 

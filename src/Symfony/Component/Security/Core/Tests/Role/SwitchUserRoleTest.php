@@ -16,14 +16,14 @@ use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
 class SwitchUserRoleTest extends TestCase
 {
-    public function testGetSource()
+    public function testGetSource(): void
     {
         $role = new SwitchUserRole('FOO', $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
 
         $this->assertSame($token, $role->getSource());
     }
 
-    public function testGetRole()
+    public function testGetRole(): void
     {
         $role = new SwitchUserRole('FOO', $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
 

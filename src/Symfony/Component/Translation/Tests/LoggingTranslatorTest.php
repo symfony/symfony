@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class LoggingTranslatorTest extends TestCase
 {
-    public function testTransWithNoTranslationIsLogged()
+    public function testTransWithNoTranslationIsLogged(): void
     {
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->exactly(2))
@@ -32,7 +32,7 @@ class LoggingTranslatorTest extends TestCase
         $loggableTranslator->trans('bar');
     }
 
-    public function testTransChoiceFallbackIsLogged()
+    public function testTransChoiceFallbackIsLogged(): void
     {
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->once())

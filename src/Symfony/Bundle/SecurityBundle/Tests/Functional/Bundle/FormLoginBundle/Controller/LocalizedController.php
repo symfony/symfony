@@ -37,17 +37,17 @@ class LocalizedController implements ContainerAwareInterface
         )));
     }
 
-    public function loginCheckAction()
+    public function loginCheckAction(): void
     {
         throw new \RuntimeException('loginCheckAction() should never be called.');
     }
 
-    public function logoutAction()
+    public function logoutAction(): void
     {
         throw new \RuntimeException('logoutAction() should never be called.');
     }
 
-    public function secureAction()
+    public function secureAction(): void
     {
         throw new \RuntimeException('secureAction() should never be called.');
     }

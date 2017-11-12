@@ -51,7 +51,7 @@ class AssetExtension extends AbstractExtension
      *
      * @return string The public path of the asset
      */
-    public function getAssetUrl($path, $packageName = null)
+    public function getAssetUrl(string $path, string $packageName = null): string
     {
         return $this->packages->getUrl($path, $packageName);
     }
@@ -64,7 +64,7 @@ class AssetExtension extends AbstractExtension
      *
      * @return string The asset version
      */
-    public function getAssetVersion($path, $packageName = null)
+    public function getAssetVersion(string $path, string $packageName = null): string
     {
         return $this->packages->getVersion($path, $packageName);
     }
@@ -74,7 +74,7 @@ class AssetExtension extends AbstractExtension
      *
      * @return string The extension name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'asset';
     }

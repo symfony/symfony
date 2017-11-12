@@ -39,7 +39,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
         return serialize($this->data);
     }
 
-    public function unserialize($data)
+    public function unserialize($data): void
     {
         $this->data = unserialize($data);
     }
@@ -51,10 +51,8 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      * the VarDumper component.
      *
      * @param mixed $var
-     *
-     * @return Data
      */
-    protected function cloneVar($var)
+    protected function cloneVar($var): Data
     {
         if ($var instanceof Data) {
             return $var;

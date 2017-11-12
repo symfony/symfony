@@ -29,5 +29,5 @@ interface AccessDecisionManagerInterface
      *
      * @return bool true if the access is granted, false otherwise
      */
-    public function decide(TokenInterface $token, array $attributes, $object = null);
+    public function decide(TokenInterface $token, array $attributes, $object = null): bool;
 }

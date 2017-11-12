@@ -24,14 +24,14 @@ class TranslatorListenerTest extends TestCase
     private $translator;
     private $requestStack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
         $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
         $this->listener = new TranslatorListener($this->translator, $this->requestStack);
     }
 
-    public function testLocaleIsSetInOnKernelRequest()
+    public function testLocaleIsSetInOnKernelRequest(): void
     {
         $this->translator
             ->expects($this->once())
@@ -42,7 +42,7 @@ class TranslatorListenerTest extends TestCase
         $this->listener->onKernelRequest($event);
     }
 
-    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelRequest()
+    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelRequest(): void
     {
         $this->translator
             ->expects($this->at(0))
@@ -57,7 +57,7 @@ class TranslatorListenerTest extends TestCase
         $this->listener->onKernelRequest($event);
     }
 
-    public function testLocaleIsSetInOnKernelFinishRequestWhenParentRequestExists()
+    public function testLocaleIsSetInOnKernelFinishRequestWhenParentRequestExists(): void
     {
         $this->translator
             ->expects($this->once())
@@ -69,7 +69,7 @@ class TranslatorListenerTest extends TestCase
         $this->listener->onKernelFinishRequest($event);
     }
 
-    public function testLocaleIsNotSetInOnKernelFinishRequestWhenParentRequestDoesNotExist()
+    public function testLocaleIsNotSetInOnKernelFinishRequestWhenParentRequestDoesNotExist(): void
     {
         $this->translator
             ->expects($this->never())
@@ -79,7 +79,7 @@ class TranslatorListenerTest extends TestCase
         $this->listener->onKernelFinishRequest($event);
     }
 
-    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelFinishRequest()
+    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelFinishRequest(): void
     {
         $this->translator
             ->expects($this->at(0))
@@ -108,7 +108,7 @@ class TranslatorListenerTest extends TestCase
         return $request;
     }
 
-    private function setMasterRequest($request)
+    private function setMasterRequest($request): void
     {
         $this->requestStack
             ->expects($this->any())

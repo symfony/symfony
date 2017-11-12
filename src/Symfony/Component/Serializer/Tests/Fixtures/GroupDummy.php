@@ -32,7 +32,7 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
     /**
      * @Groups({"b"})
      */
-    public function setBar($bar)
+    public function setBar($bar): void
     {
         $this->bar = $bar;
     }
@@ -45,7 +45,7 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
         return $this->bar;
     }
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }
@@ -55,7 +55,7 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
         return $this->foo;
     }
 
-    public function setFooBar($fooBar)
+    public function setFooBar($fooBar): void
     {
         $this->fooBar = $fooBar;
     }
@@ -68,7 +68,7 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
         return $this->fooBar;
     }
 
-    public function setSymfony($symfony)
+    public function setSymfony($symfony): void
     {
         $this->symfony = $symfony;
     }

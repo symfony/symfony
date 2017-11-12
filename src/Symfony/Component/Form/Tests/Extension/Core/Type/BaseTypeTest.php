@@ -20,14 +20,14 @@ abstract class BaseTypeTest extends TypeTestCase
 {
     const TESTED_TYPE = '';
 
-    public function testPassDisabledAsOption()
+    public function testPassDisabledAsOption(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, array('disabled' => true));
 
         $this->assertTrue($form->isDisabled());
     }
 
-    public function testPassIdAndNameToView()
+    public function testPassIdAndNameToView(): void
     {
         $view = $this->factory->createNamed('name', $this->getTestedType())
             ->createView();
@@ -37,7 +37,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertEquals('name', $view->vars['full_name']);
     }
 
-    public function testStripLeadingUnderscoresAndDigitsFromId()
+    public function testStripLeadingUnderscoresAndDigitsFromId(): void
     {
         $view = $this->factory->createNamed('_09name', $this->getTestedType())
             ->createView();
@@ -47,7 +47,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertEquals('_09name', $view->vars['full_name']);
     }
 
-    public function testPassIdAndNameToViewWithParent()
+    public function testPassIdAndNameToViewWithParent(): void
     {
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', $this->getTestedType())
@@ -59,7 +59,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertEquals('parent[child]', $view['child']->vars['full_name']);
     }
 
-    public function testPassIdAndNameToViewWithGrandParent()
+    public function testPassIdAndNameToViewWithGrandParent(): void
     {
         $builder = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', FormTypeTest::TESTED_TYPE);
@@ -71,7 +71,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->vars['full_name']);
     }
 
-    public function testPassTranslationDomainToView()
+    public function testPassTranslationDomainToView(): void
     {
         $view = $this->factory->create($this->getTestedType(), null, array(
             'translation_domain' => 'domain',
@@ -81,7 +81,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertSame('domain', $view->vars['translation_domain']);
     }
 
-    public function testInheritTranslationDomainFromParent()
+    public function testInheritTranslationDomainFromParent(): void
     {
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
@@ -94,7 +94,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
-    public function testPreferOwnTranslationDomain()
+    public function testPreferOwnTranslationDomain(): void
     {
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
@@ -109,7 +109,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
-    public function testDefaultTranslationDomain()
+    public function testDefaultTranslationDomain(): void
     {
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', $this->getTestedType())
@@ -119,7 +119,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertNull($view['child']->vars['translation_domain']);
     }
 
-    public function testPassLabelToView()
+    public function testPassLabelToView(): void
     {
         $view = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array('label' => 'My label'))
             ->createView();
@@ -127,7 +127,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertSame('My label', $view->vars['label']);
     }
 
-    public function testPassMultipartFalseToView()
+    public function testPassMultipartFalseToView(): void
     {
         $view = $this->factory->create($this->getTestedType())
             ->createView();
@@ -135,7 +135,7 @@ abstract class BaseTypeTest extends TypeTestCase
         $this->assertFalse($view->vars['multipart']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         $form = $this->factory->create($this->getTestedType());
         $form->submit(null);

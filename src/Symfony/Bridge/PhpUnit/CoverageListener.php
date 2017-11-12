@@ -36,7 +36,7 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
             $this->trait = new CoverageListenerTrait($sutFqcnResolver, $warningOnSutNotFound);
         }
 
-        public function startTest(Test $test)
+        public function startTest(Test $test): void
         {
             $this->trait->startTest($test);
         }

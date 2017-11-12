@@ -52,7 +52,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
      *
      * @return bool True if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         if ($this->isRecursive && isset($this->excludedDirs[$this->getFilename()]) && $this->isDir()) {
             return false;

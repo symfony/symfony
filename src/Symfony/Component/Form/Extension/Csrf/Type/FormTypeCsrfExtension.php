@@ -49,7 +49,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      * @param FormBuilderInterface $builder The form builder
      * @param array                $options The options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$options['csrf_protection']) {
             return;
@@ -75,7 +75,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      * @param FormInterface $form    The form
      * @param array         $options The options
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
             $factory = $form->getConfig()->getFormFactory();
@@ -93,7 +93,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(array(
             'csrf_protection' => $this->defaultEnabled,

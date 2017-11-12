@@ -19,7 +19,7 @@ class AccessListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
+    public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
 
@@ -70,7 +70,7 @@ class AccessListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWhenTheTokenIsNotAuthenticated()
+    public function testHandleWhenTheTokenIsNotAuthenticated(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
 
@@ -141,7 +141,7 @@ class AccessListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWhenThereIsNoAccessMapEntryMatchingTheRequest()
+    public function testHandleWhenThereIsNoAccessMapEntryMatchingTheRequest(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
 
@@ -186,7 +186,7 @@ class AccessListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
      */
-    public function testHandleWhenTheSecurityTokenStorageHasNoToken()
+    public function testHandleWhenTheSecurityTokenStorageHasNoToken(): void
     {
         $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $tokenStorage

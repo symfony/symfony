@@ -48,7 +48,7 @@ class Application extends BaseApplication
      *
      * @return KernelInterface A KernelInterface instance
      */
-    public function getKernel()
+    public function getKernel(): KernelInterface
     {
         return $this->kernel;
     }
@@ -58,7 +58,7 @@ class Application extends BaseApplication
      *
      * @return int 0 if everything went fine, or an error code
      */
-    public function doRun(InputInterface $input, OutputInterface $output)
+    public function doRun(InputInterface $input, OutputInterface $output): int
     {
         $this->kernel->boot();
 
@@ -134,7 +134,7 @@ class Application extends BaseApplication
         return parent::add($command);
     }
 
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         if ($this->commandsRegistered) {
             return;
@@ -178,7 +178,7 @@ class Application extends BaseApplication
         }
     }
 
-    private function renderRegistrationErrors(InputInterface $input, OutputInterface $output)
+    private function renderRegistrationErrors(InputInterface $input, OutputInterface $output): void
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();

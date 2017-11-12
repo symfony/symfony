@@ -106,7 +106,7 @@ class ObjectNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array()): void
     {
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);

@@ -250,7 +250,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * Converts all unresolved children into {@link FormBuilder} instances.
      */
-    private function resolveChildren()
+    private function resolveChildren(): void
     {
         foreach ($this->unresolvedChildren as $name => $info) {
             $this->children[$name] = $this->create($name, $info['type'], $info['options']);

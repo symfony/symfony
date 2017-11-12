@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class AddLinkHeaderListenerTest extends TestCase
 {
-    public function testOnKernelResponse()
+    public function testOnKernelResponse(): void
     {
         $request = new Request(array(), array(), array('_links' => new GenericLinkProvider(array(new Link('preload', '/foo')))));
         $response = new Response('', 200, array('Link' => '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'));
@@ -50,7 +50,7 @@ class AddLinkHeaderListenerTest extends TestCase
         $this->assertEquals($expected, $response->headers->get('Link', null, false));
     }
 
-    public function testSubscribedEvents()
+    public function testSubscribedEvents(): void
     {
         $this->assertEquals(array(KernelEvents::RESPONSE => 'onKernelResponse'), AddLinkHeaderListener::getSubscribedEvents());
     }

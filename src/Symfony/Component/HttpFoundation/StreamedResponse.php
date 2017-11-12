@@ -55,7 +55,7 @@ class StreamedResponse extends Response
      *
      * @return static
      */
-    public static function create($callback = null, $status = 200, $headers = array())
+    public static function create(?callable $callback = null, int $status = 200, array $headers = array())
     {
         return new static($callback, $status, $headers);
     }

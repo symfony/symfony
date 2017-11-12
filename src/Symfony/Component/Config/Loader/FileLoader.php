@@ -38,20 +38,16 @@ abstract class FileLoader extends Loader
 
     /**
      * Sets the current directory.
-     *
-     * @param string $dir
      */
-    public function setCurrentDir($dir)
+    public function setCurrentDir(string $dir): void
     {
         $this->currentDir = $dir;
     }
 
     /**
      * Returns the file locator used by this loader.
-     *
-     * @return FileLocatorInterface
      */
-    public function getLocator()
+    public function getLocator(): FileLocatorInterface
     {
         return $this->locator;
     }

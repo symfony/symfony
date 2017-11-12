@@ -27,7 +27,7 @@ class GuardAuthenticationProviderTest extends TestCase
     private $userChecker;
     private $preAuthenticationToken;
 
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $providerKey = 'my_cool_firewall';
 
@@ -89,7 +89,7 @@ class GuardAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testCheckCredentialsReturningNonTrueFailsAuthentication()
+    public function testCheckCredentialsReturningNonTrueFailsAuthentication(): void
     {
         $providerKey = 'my_uncool_firewall';
 
@@ -122,7 +122,7 @@ class GuardAuthenticationProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationExpiredException
      */
-    public function testGuardWithNoLongerAuthenticatedTriggersLogout()
+    public function testGuardWithNoLongerAuthenticatedTriggersLogout(): void
     {
         $providerKey = 'my_firewall_abc';
 
@@ -136,7 +136,7 @@ class GuardAuthenticationProviderTest extends TestCase
         $actualToken = $provider->authenticate($token);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
         $this->userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
@@ -145,7 +145,7 @@ class GuardAuthenticationProviderTest extends TestCase
             ->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->userProvider = null;
         $this->userChecker = null;

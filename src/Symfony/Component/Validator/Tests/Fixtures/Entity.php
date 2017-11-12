@@ -58,7 +58,7 @@ class Entity extends EntityParent implements EntityInterfaceB
         return $this->internal.' from getter';
     }
 
-    public function setLastName($lastName)
+    public function setLastName($lastName): void
     {
         $this->lastName = $lastName;
     }
@@ -71,7 +71,7 @@ class Entity extends EntityParent implements EntityInterfaceB
         return $this->lastName;
     }
 
-    public function getValid()
+    public function getValid(): void
     {
     }
 
@@ -99,14 +99,14 @@ class Entity extends EntityParent implements EntityInterfaceB
     /**
      * @Assert\Callback(payload="foo")
      */
-    public function validateMe(ExecutionContextInterface $context)
+    public function validateMe(ExecutionContextInterface $context): void
     {
     }
 
     /**
      * @Assert\Callback
      */
-    public static function validateMeStatic($object, ExecutionContextInterface $context)
+    public static function validateMeStatic($object, ExecutionContextInterface $context): void
     {
     }
 
@@ -121,7 +121,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     /**
      * @param mixed $childA
      */
-    public function setChildA($childA)
+    public function setChildA($childA): void
     {
         $this->childA = $childA;
     }
@@ -137,7 +137,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     /**
      * @param mixed $childB
      */
-    public function setChildB($childB)
+    public function setChildB($childB): void
     {
         $this->childB = $childB;
     }

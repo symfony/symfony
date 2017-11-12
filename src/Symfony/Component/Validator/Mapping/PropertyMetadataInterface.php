@@ -34,7 +34,7 @@ interface PropertyMetadataInterface extends MetadataInterface
      *
      * @return string The property name
      */
-    public function getPropertyName();
+    public function getPropertyName(): string;
 
     /**
      * Extracts the value of the property from the given container.

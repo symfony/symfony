@@ -37,7 +37,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -45,7 +45,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function initialize(array &$attributes)
+    public function initialize(array &$attributes): void
     {
         $this->attributes = &$attributes;
     }
@@ -77,7 +77,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function set($name, $value)
+    public function set($name, $value): void
     {
         $this->attributes[$name] = $value;
     }
@@ -93,7 +93,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
     /**
      * {@inheritdoc}
      */
-    public function replace(array $attributes)
+    public function replace(array $attributes): void
     {
         $this->attributes = array();
         foreach ($attributes as $key => $value) {
@@ -131,7 +131,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
      *
      * @return \ArrayIterator An \ArrayIterator instance
      */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->attributes);
     }
@@ -141,7 +141,7 @@ class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Counta
      *
      * @return int The number of attributes
      */
-    public function count()
+    public function count(): int
     {
         return count($this->attributes);
     }

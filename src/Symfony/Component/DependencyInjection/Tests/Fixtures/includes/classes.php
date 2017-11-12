@@ -4,7 +4,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
-function sc_configure($instance)
+function sc_configure($instance): void
 {
     $instance->configure();
 }
@@ -14,7 +14,7 @@ class BarClass
     protected $baz;
     public $foo = 'foo';
 
-    public function setBaz(BazClass $baz)
+    public function setBaz(BazClass $baz): void
     {
         $this->baz = $baz;
     }
@@ -29,12 +29,12 @@ class BazClass
 {
     protected $foo;
 
-    public function setFoo(Foo $foo)
+    public function setFoo(Foo $foo): void
     {
         $this->foo = $foo;
     }
 
-    public function configure($instance)
+    public function configure($instance): void
     {
         $instance->configure();
     }
@@ -44,12 +44,12 @@ class BazClass
         return new self();
     }
 
-    public static function configureStatic($instance)
+    public static function configureStatic($instance): void
     {
         $instance->configure();
     }
 
-    public static function configureStatic1()
+    public static function configureStatic1(): void
     {
     }
 }
@@ -70,7 +70,7 @@ class MethodCallClass
     public $complex;
     private $callPassed = false;
 
-    public function callMe()
+    public function callMe(): void
     {
         $this->callPassed = is_scalar($this->simple) && is_object($this->complex);
     }
@@ -129,7 +129,7 @@ class FooCircular
 
 class BarCircular
 {
-    public function addFoobar(FoobarCircular $foobar)
+    public function addFoobar(FoobarCircular $foobar): void
     {
         $this->foobar = $foobar;
     }

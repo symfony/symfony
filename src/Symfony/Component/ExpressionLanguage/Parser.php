@@ -92,7 +92,7 @@ class Parser
      *
      * @throws SyntaxError
      */
-    public function parse(TokenStream $stream, $names = array())
+    public function parse(TokenStream $stream, array $names = array()): Node\Node
     {
         $this->stream = $stream;
         $this->names = $names;

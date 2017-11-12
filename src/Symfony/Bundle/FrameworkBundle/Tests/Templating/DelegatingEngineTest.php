@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DelegatingEngineTest extends TestCase
 {
-    public function testSupportsRetrievesEngineFromTheContainer()
+    public function testSupportsRetrievesEngineFromTheContainer(): void
     {
         $container = $this->getContainerMock(array(
             'engine.first' => $this->getEngineMock('template.php', false),
@@ -29,7 +29,7 @@ class DelegatingEngineTest extends TestCase
         $this->assertTrue($delegatingEngine->supports('template.php'));
     }
 
-    public function testGetExistingEngine()
+    public function testGetExistingEngine(): void
     {
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', true);
@@ -47,7 +47,7 @@ class DelegatingEngineTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage No engine is able to work with the template "template.php"
      */
-    public function testGetInvalidEngine()
+    public function testGetInvalidEngine(): void
     {
         $firstEngine = $this->getEngineMock('template.php', false);
         $secondEngine = $this->getEngineMock('template.php', false);
@@ -60,7 +60,7 @@ class DelegatingEngineTest extends TestCase
         $delegatingEngine->getEngine('template.php');
     }
 
-    public function testRenderResponseWithFrameworkEngine()
+    public function testRenderResponseWithFrameworkEngine(): void
     {
         $response = new Response();
         $engine = $this->getFrameworkEngineMock('template.php', true);
@@ -75,7 +75,7 @@ class DelegatingEngineTest extends TestCase
         $this->assertSame($response, $delegatingEngine->renderResponse('template.php', array('foo' => 'bar')));
     }
 
-    public function testRenderResponseWithTemplatingEngine()
+    public function testRenderResponseWithTemplatingEngine(): void
     {
         $engine = $this->getEngineMock('template.php', true);
         $container = $this->getContainerMock(array('engine' => $engine));

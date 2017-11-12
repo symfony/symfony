@@ -36,7 +36,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
      */
     private $listener;
 
-    private function createListener(array $options = array(), $success = true, $matchCheckPath = true)
+    private function createListener(array $options = array(), $success = true, $matchCheckPath = true): void
     {
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $httpUtils = $this->getMockBuilder(HttpUtils::class)->getMock();
@@ -63,7 +63,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->listener = new UsernamePasswordJsonAuthenticationListener($tokenStorage, $authenticationManager, $httpUtils, 'providerKey', $authenticationSuccessHandler, $authenticationFailureHandler, $options);
     }
 
-    public function testHandleSuccessIfRequestContentTypeIsJson()
+    public function testHandleSuccessIfRequestContentTypeIsJson(): void
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"username": "dunglas", "password": "foo"}');
@@ -73,7 +73,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->assertEquals('ok', $event->getResponse()->getContent());
     }
 
-    public function testSuccessIfRequestFormatIsJsonLD()
+    public function testSuccessIfRequestFormatIsJsonLD(): void
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "password": "foo"}');
@@ -84,7 +84,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->assertEquals('ok', $event->getResponse()->getContent());
     }
 
-    public function testHandleFailure()
+    public function testHandleFailure(): void
     {
         $this->createListener(array(), false);
         $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"username": "dunglas", "password": "foo"}');
@@ -94,7 +94,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->assertEquals('ko', $event->getResponse()->getContent());
     }
 
-    public function testUsePath()
+    public function testUsePath(): void
     {
         $this->createListener(array('username_path' => 'user.login', 'password_path' => 'user.pwd'));
         $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"user": {"login": "dunglas", "pwd": "foo"}}');
@@ -108,7 +108,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
      * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @expectedExceptionMessage Invalid JSON
      */
-    public function testAttemptAuthenticationNoJson()
+    public function testAttemptAuthenticationNoJson(): void
     {
         $this->createListener();
         $request = new Request();
@@ -122,7 +122,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
      * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @expectedExceptionMessage The key "username" must be provided
      */
-    public function testAttemptAuthenticationNoUsername()
+    public function testAttemptAuthenticationNoUsername(): void
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"usr": "dunglas", "password": "foo"}');
@@ -135,7 +135,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
      * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @expectedExceptionMessage The key "password" must be provided
      */
-    public function testAttemptAuthenticationNoPassword()
+    public function testAttemptAuthenticationNoPassword(): void
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"username": "dunglas", "pass": "foo"}');
@@ -148,7 +148,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
      * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @expectedExceptionMessage The key "username" must be a string.
      */
-    public function testAttemptAuthenticationUsernameNotAString()
+    public function testAttemptAuthenticationUsernameNotAString(): void
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"username": 1, "password": "foo"}');
@@ -161,7 +161,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
      * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @expectedExceptionMessage The key "password" must be a string.
      */
-    public function testAttemptAuthenticationPasswordNotAString()
+    public function testAttemptAuthenticationPasswordNotAString(): void
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"username": "dunglas", "password": 1}');
@@ -170,7 +170,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->listener->handle($event);
     }
 
-    public function testAttemptAuthenticationUsernameTooLong()
+    public function testAttemptAuthenticationUsernameTooLong(): void
     {
         $this->createListener();
         $username = str_repeat('x', Security::MAX_USERNAME_LENGTH + 1);
@@ -181,7 +181,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->assertSame('ko', $event->getResponse()->getContent());
     }
 
-    public function testDoesNotAttemptAuthenticationIfRequestPathDoesNotMatchCheckPath()
+    public function testDoesNotAttemptAuthenticationIfRequestPathDoesNotMatchCheckPath(): void
     {
         $this->createListener(array('check_path' => '/'), true, false);
         $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'));
@@ -192,7 +192,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->assertSame('original', $event->getResponse()->getContent());
     }
 
-    public function testDoesNotAttemptAuthenticationIfRequestContentTypeIsNotJson()
+    public function testDoesNotAttemptAuthenticationIfRequestContentTypeIsNotJson(): void
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "password": "foo"}');
@@ -203,7 +203,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends TestCase
         $this->assertSame('original', $event->getResponse()->getContent());
     }
 
-    public function testAttemptAuthenticationIfRequestPathMatchesCheckPath()
+    public function testAttemptAuthenticationIfRequestPathMatchesCheckPath(): void
     {
         $this->createListener(array('check_path' => '/'));
         $request = new Request(array(), array(), array(), array(), array(), array('HTTP_CONTENT_TYPE' => 'application/json'), '{"username": "dunglas", "password": "foo"}');

@@ -35,7 +35,7 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $parts = array('hour');
         $format = 'H';
@@ -60,7 +60,7 @@ class TimeType extends AbstractType
             // handle seconds ignored by user's browser when with_seconds enabled
             // https://codereview.chromium.org/450533009/
             if ($options['with_seconds']) {
-                $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e) {
+                $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e): void {
                     $data = $e->getData();
                     if ($data && preg_match('/^\d{2}:\d{2}$/', $data)) {
                         $e->setData($data.':00');
@@ -151,7 +151,7 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars = array_replace($view->vars, array(
             'widget' => $options['widget'],
@@ -178,7 +178,7 @@ class TimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $compound = function (Options $options) {
             return 'single_text' !== $options['widget'];

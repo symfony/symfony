@@ -22,7 +22,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
     /**
      * @dataProvider provideObjectsAndLogs
      */
-    public function testDecideLog($expectedLog, $object)
+    public function testDecideLog($expectedLog, $object): void
     {
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
         $adm->decide($this->getMockBuilder(TokenInterface::class)->getMock(), array('ATTRIBUTE_1'), $object);
@@ -43,7 +43,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
         yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $object, 'result' => false)), $object);
     }
 
-    public function testDebugAccessDecisionManagerAliasExistsForBC()
+    public function testDebugAccessDecisionManagerAliasExistsForBC(): void
     {
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
 

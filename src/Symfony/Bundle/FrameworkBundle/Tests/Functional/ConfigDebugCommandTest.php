@@ -23,14 +23,14 @@ class ConfigDebugCommandTest extends WebTestCase
 {
     private $application;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $kernel = static::createKernel(array('test_case' => 'ConfigDump', 'root_config' => 'config.yml'));
         $this->application = new Application($kernel);
         $this->application->doRun(new ArrayInput(array()), new NullOutput());
     }
 
-    public function testDumpBundleName()
+    public function testDumpBundleName(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('name' => 'TestBundle'));
@@ -39,7 +39,7 @@ class ConfigDebugCommandTest extends WebTestCase
         $this->assertContains('custom: foo', $tester->getDisplay());
     }
 
-    public function testDumpBundleOption()
+    public function testDumpBundleOption(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('name' => 'TestBundle', 'path' => 'custom'));
@@ -48,7 +48,7 @@ class ConfigDebugCommandTest extends WebTestCase
         $this->assertContains('foo', $tester->getDisplay());
     }
 
-    public function testParametersValuesAreResolved()
+    public function testParametersValuesAreResolved(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('name' => 'framework'));
@@ -58,7 +58,7 @@ class ConfigDebugCommandTest extends WebTestCase
         $this->assertContains('secret: test', $tester->getDisplay());
     }
 
-    public function testDumpUndefinedBundleOption()
+    public function testDumpUndefinedBundleOption(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(array('name' => 'TestBundle', 'path' => 'foo'));
@@ -66,10 +66,7 @@ class ConfigDebugCommandTest extends WebTestCase
         $this->assertContains('Unable to find configuration for "test.foo"', $tester->getDisplay());
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester()
+    private function createCommandTester(): CommandTester
     {
         $command = $this->application->find('debug:config');
 

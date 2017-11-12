@@ -16,14 +16,14 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
  */
 class ContainerDumpTest extends WebTestCase
 {
-    public function testContainerCompilationInDebug()
+    public function testContainerCompilationInDebug(): void
     {
         $client = $this->createClient(array('test_case' => 'ContainerDump', 'root_config' => 'config.yml'));
 
         $this->assertTrue($client->getContainer()->has('serializer'));
     }
 
-    public function testContainerCompilation()
+    public function testContainerCompilation(): void
     {
         $client = $this->createClient(array('test_case' => 'ContainerDump', 'root_config' => 'config.yml', 'debug' => false));
 

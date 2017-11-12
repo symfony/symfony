@@ -30,7 +30,7 @@ class ProxyDumperTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dumper = new ProxyDumper();
     }
@@ -38,12 +38,12 @@ class ProxyDumperTest extends TestCase
     /**
      * @dataProvider getProxyCandidates
      */
-    public function testIsProxyCandidate(Definition $definition, bool $expected)
+    public function testIsProxyCandidate(Definition $definition, bool $expected): void
     {
         $this->assertSame($expected, $this->dumper->isProxyCandidate($definition));
     }
 
-    public function testGetProxyCode()
+    public function testGetProxyCode(): void
     {
         $definition = new Definition(__CLASS__);
 
@@ -58,7 +58,7 @@ class ProxyDumperTest extends TestCase
         );
     }
 
-    public function testGetProxyFactoryCode()
+    public function testGetProxyFactoryCode(): void
     {
         $definition = new Definition(__CLASS__);
 
@@ -76,17 +76,14 @@ class ProxyDumperTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Missing factory code to construct the service "foo".
      */
-    public function testGetProxyFactoryCodeWithoutCustomMethod()
+    public function testGetProxyFactoryCodeWithoutCustomMethod(): void
     {
         $definition = new Definition(__CLASS__);
         $definition->setLazy(true);
         $this->dumper->getProxyFactoryCode($definition, 'foo');
     }
 
-    /**
-     * @return array
-     */
-    public function getProxyCandidates()
+    public function getProxyCandidates(): array
     {
         $definitions = array(
             array(new Definition(__CLASS__), true),
@@ -96,7 +93,7 @@ class ProxyDumperTest extends TestCase
         );
 
         array_map(
-            function ($definition) {
+            function ($definition): void {
                 $definition[0]->setLazy(true);
             },
             $definitions

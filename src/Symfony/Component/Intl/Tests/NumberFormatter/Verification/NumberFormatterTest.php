@@ -20,19 +20,19 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
  */
 class NumberFormatterTest extends AbstractNumberFormatterTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireFullIntl($this, '55.1');
 
         parent::setUp();
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $this->assertInstanceOf('\NumberFormatter', \NumberFormatter::create('en', \NumberFormatter::DECIMAL));
     }
 
-    public function testGetTextAttribute()
+    public function testGetTextAttribute(): void
     {
         IntlTestHelper::requireFullIntl($this, '57.1');
 

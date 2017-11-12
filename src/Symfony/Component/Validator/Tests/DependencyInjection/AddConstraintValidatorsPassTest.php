@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class AddConstraintValidatorsPassTest extends TestCase
 {
-    public function testThatConstraintValidatorServicesAreProcessed()
+    public function testThatConstraintValidatorServicesAreProcessed(): void
     {
         $container = new ContainerBuilder();
         $validatorFactory = $container->register('validator.validator_factory')
@@ -47,7 +47,7 @@ class AddConstraintValidatorsPassTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The service "my_abstract_constraint_validator" tagged "validator.constraint_validator" must not be abstract.
      */
-    public function testAbstractConstraintValidator()
+    public function testAbstractConstraintValidator(): void
     {
         $container = new ContainerBuilder();
         $validatorFactory = $container->register('validator.validator_factory')
@@ -61,7 +61,7 @@ class AddConstraintValidatorsPassTest extends TestCase
         $addConstraintValidatorsPass->process($container);
     }
 
-    public function testThatCompilerPassIsIgnoredIfThereIsNoConstraintValidatorFactoryDefinition()
+    public function testThatCompilerPassIsIgnoredIfThereIsNoConstraintValidatorFactoryDefinition(): void
     {
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition'))->getMock();

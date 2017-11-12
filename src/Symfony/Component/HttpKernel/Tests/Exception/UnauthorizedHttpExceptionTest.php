@@ -6,13 +6,13 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class UnauthorizedHttpExceptionTest extends HttpExceptionTest
 {
-    public function testHeadersDefault()
+    public function testHeadersDefault(): void
     {
         $exception = new UnauthorizedHttpException('Challenge');
         $this->assertSame(array('WWW-Authenticate' => 'Challenge'), $exception->getHeaders());
     }
 
-    public function testWithHeaderConstruct()
+    public function testWithHeaderConstruct(): void
     {
         $headers = array(
             'Cache-Control' => 'public, s-maxage=1200',
@@ -28,7 +28,7 @@ class UnauthorizedHttpExceptionTest extends HttpExceptionTest
     /**
      * @dataProvider headerDataProvider
      */
-    public function testHeadersSetter($headers)
+    public function testHeadersSetter($headers): void
     {
         $exception = new UnauthorizedHttpException('Challenge');
         $exception->setHeaders($headers);

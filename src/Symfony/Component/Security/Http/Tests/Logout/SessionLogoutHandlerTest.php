@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Logout\SessionLogoutHandler;
 
 class SessionLogoutHandlerTest extends TestCase
 {
-    public function testLogout()
+    public function testLogout(): void
     {
         $handler = new SessionLogoutHandler();
 

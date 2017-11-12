@@ -29,14 +29,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @throws Exception\LogicException            when trying to set a parent for a form with
      *                                             an empty name
      */
-    public function setParent(FormInterface $parent = null);
+    public function setParent(FormInterface $parent = null): self;
 
     /**
      * Returns the parent form.
      *
      * @return self|null The parent form or null if there is none
      */
-    public function getParent();
+    public function getParent(): ?self;
 
     /**
      * Adds or replaces a child to the form.
@@ -51,7 +51,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @throws Exception\LogicException            when trying to add a child to a non-compound form
      * @throws Exception\UnexpectedTypeException   if $child or $type has an unexpected type
      */
-    public function add($child, $type = null, array $options = array());
+    public function add($child, $type = null, array $options = array()): self;
 
     /**
      * Returns the child with the given name.
@@ -62,7 +62,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @throws \OutOfBoundsException if the named child does not exist
      */
-    public function get($name);
+    public function get(string $name): self;
 
     /**
      * Returns whether a child with the given name exists.
@@ -71,7 +71,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return bool
      */
-    public function has($name);
+    public function has(string $name): bool;
 
     /**
      * Removes a child from the form.
@@ -82,7 +82,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
-    public function remove($name);
+    public function remove(string $name);
 
     /**
      * Returns all children in this group.
@@ -101,7 +101,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return FormErrorIterator An iterator over the {@link FormError}
      *                           instances that where added to this form
      */
-    public function getErrors($deep = false, $flatten = true);
+    public function getErrors(bool $deep = false, bool $flatten = true): FormErrorIterator;
 
     /**
      * Updates the form with default data.
@@ -145,35 +145,35 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return array The submitted data which do not belong to a child
      */
-    public function getExtraData();
+    public function getExtraData(): array;
 
     /**
      * Returns the form's configuration.
      *
      * @return FormConfigInterface The configuration
      */
-    public function getConfig();
+    public function getConfig(): FormConfigInterface;
 
     /**
      * Returns whether the form is submitted.
      *
      * @return bool true if the form is submitted, false otherwise
      */
-    public function isSubmitted();
+    public function isSubmitted(): bool;
 
     /**
      * Returns the name by which the form is identified in forms.
      *
      * @return string The name of the form
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Returns the property path that the form is mapped to.
      *
      * @return \Symfony\Component\PropertyAccess\PropertyPathInterface|null The property path
      */
-    public function getPropertyPath();
+    public function getPropertyPath(): ?\Symfony\Component\PropertyAccess\PropertyPathInterface;
 
     /**
      * Adds an error to this form.
@@ -191,7 +191,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return bool
      */
-    public function isValid();
+    public function isValid(): bool;
 
     /**
      * Returns whether the form is required to be filled out.
@@ -202,7 +202,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return bool
      */
-    public function isRequired();
+    public function isRequired(): bool;
 
     /**
      * Returns whether this form is disabled.
@@ -215,14 +215,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return bool
      */
-    public function isDisabled();
+    public function isDisabled(): bool;
 
     /**
      * Returns whether the form is empty.
      *
      * @return bool
      */
-    public function isEmpty();
+    public function isEmpty(): bool;
 
     /**
      * Returns whether the data in the different formats is synchronized.
@@ -232,14 +232,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return bool
      */
-    public function isSynchronized();
+    public function isSynchronized(): bool;
 
     /**
      * Returns the data transformation failure, if any.
      *
      * @return TransformationFailedException|null The transformation failure
      */
-    public function getTransformationFailure();
+    public function getTransformationFailure(): ?TransformationFailedException;
 
     /**
      * Initializes the form tree.
@@ -282,19 +282,19 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return self The root of the tree
      */
-    public function getRoot();
+    public function getRoot(): self;
 
     /**
      * Returns whether the field is the root of the form tree.
      *
      * @return bool
      */
-    public function isRoot();
+    public function isRoot(): bool;
 
     /**
      * Creates a view.
      *
      * @return FormView The view
      */
-    public function createView(FormView $parent = null);
+    public function createView(FormView $parent = null): FormView;
 }

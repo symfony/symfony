@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class AbstractPreAuthenticatedListenerTest extends TestCase
 {
-    public function testHandleWithValidValues()
+    public function testHandleWithValidValues(): void
     {
         $userCredentials = array('TheUser', 'TheCredentials');
 
@@ -67,7 +67,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWhenAuthenticationFails()
+    public function testHandleWhenAuthenticationFails(): void
     {
         $userCredentials = array('TheUser', 'TheCredentials');
 
@@ -113,7 +113,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWhenAuthenticationFailsWithDifferentToken()
+    public function testHandleWhenAuthenticationFailsWithDifferentToken(): void
     {
         $userCredentials = array('TheUser', 'TheCredentials');
 
@@ -161,7 +161,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWithASimilarAuthenticatedToken()
+    public function testHandleWithASimilarAuthenticatedToken(): void
     {
         $userCredentials = array('TheUser', 'TheCredentials');
 
@@ -202,7 +202,7 @@ class AbstractPreAuthenticatedListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWithAnInvalidSimilarToken()
+    public function testHandleWithAnInvalidSimilarToken(): void
     {
         $userCredentials = array('TheUser', 'TheCredentials');
 

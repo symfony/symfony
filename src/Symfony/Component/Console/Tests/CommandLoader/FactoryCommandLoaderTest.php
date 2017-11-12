@@ -17,7 +17,7 @@ use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 
 class FactoryCommandLoaderTest extends TestCase
 {
-    public function testHas()
+    public function testHas(): void
     {
         $loader = new FactoryCommandLoader(array(
             'foo' => function () { return new Command('foo'); },
@@ -29,7 +29,7 @@ class FactoryCommandLoaderTest extends TestCase
         $this->assertFalse($loader->has('baz'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $loader = new FactoryCommandLoader(array(
             'foo' => function () { return new Command('foo'); },
@@ -43,12 +43,12 @@ class FactoryCommandLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Console\Exception\CommandNotFoundException
      */
-    public function testGetUnknownCommandThrows()
+    public function testGetUnknownCommandThrows(): void
     {
         (new FactoryCommandLoader(array()))->get('unknown');
     }
 
-    public function testGetCommandNames()
+    public function testGetCommandNames(): void
     {
         $loader = new FactoryCommandLoader(array(
             'foo' => function () { return new Command('foo'); },

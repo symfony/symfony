@@ -23,7 +23,7 @@ class AllTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testRejectNonConstraints()
+    public function testRejectNonConstraints(): void
     {
         new All(array(
             'foo',
@@ -33,7 +33,7 @@ class AllTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testRejectValidConstraint()
+    public function testRejectValidConstraint(): void
     {
         new All(array(
             new Valid(),

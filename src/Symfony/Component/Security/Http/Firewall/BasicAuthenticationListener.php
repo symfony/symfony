@@ -50,7 +50,7 @@ class BasicAuthenticationListener implements ListenerInterface
     /**
      * Handles basic authentication.
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 

@@ -38,17 +38,15 @@ class RequestHelper extends Helper
      *
      * @see Request::get()
      */
-    public function getParameter($key, $default = null)
+    public function getParameter(string $key, string $default = null)
     {
         return $this->getRequest()->get($key, $default);
     }
 
     /**
      * Returns the locale.
-     *
-     * @return string
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->getRequest()->getLocale();
     }

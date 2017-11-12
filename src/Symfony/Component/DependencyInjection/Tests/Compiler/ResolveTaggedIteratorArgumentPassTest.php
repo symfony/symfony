@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResolveTaggedIteratorArgumentPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('a', 'stdClass')->addTag('foo');

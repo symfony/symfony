@@ -40,7 +40,7 @@ class Response
      *
      * @return string The response with headers and content
      */
-    public function __toString()
+    public function __toString(): string
     {
         $headers = '';
         foreach ($this->headers as $name => $value) {
@@ -64,7 +64,7 @@ class Response
      *
      * @return string The built header line
      */
-    protected function buildHeader($name, $value)
+    protected function buildHeader(string $name, string $value): string
     {
         return sprintf("%s: %s\n", $name, $value);
     }
@@ -74,7 +74,7 @@ class Response
      *
      * @return string The response content
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -84,7 +84,7 @@ class Response
      *
      * @return int The response status code
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -94,7 +94,7 @@ class Response
      *
      * @return array The response headers
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
@@ -107,7 +107,7 @@ class Response
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
      */
-    public function getHeader($header, $first = true)
+    public function getHeader(string $header, bool $first = true)
     {
         $normalizedHeader = str_replace('-', '_', strtolower($header));
         foreach ($this->headers as $key => $value) {

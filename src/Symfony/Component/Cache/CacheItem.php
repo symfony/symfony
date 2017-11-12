@@ -133,10 +133,8 @@ final class CacheItem implements CacheItemInterface
 
     /**
      * Returns the list of tags bound to the value coming from the pool storage if any.
-     *
-     * @return array
      */
-    public function getPreviousTags()
+    public function getPreviousTags(): array
     {
         return $this->prevTags;
     }
@@ -146,11 +144,10 @@ final class CacheItem implements CacheItemInterface
      *
      * @param string $key The key to validate
      *
-     * @return string
      *
      * @throws InvalidArgumentException When $key is not valid
      */
-    public static function validateKey($key)
+    public static function validateKey(string $key): string
     {
         if (!is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', is_object($key) ? get_class($key) : gettype($key)));
@@ -170,7 +167,7 @@ final class CacheItem implements CacheItemInterface
      *
      * @internal
      */
-    public static function log(LoggerInterface $logger = null, $message, $context = array())
+    public static function log(LoggerInterface $logger = null, $message, $context = array()): void
     {
         if ($logger) {
             $logger->warning($message, $context);

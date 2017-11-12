@@ -31,7 +31,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $parameters = $container->getParameterBag()->all();
         $definitions = $container->getDefinitions();
@@ -96,7 +96,7 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
         $this->mergeEnvPlaceholders($parameterBag);
     }
 
-    public function freezeAfterProcessing(Extension $extension, ContainerBuilder $container)
+    public function freezeAfterProcessing(Extension $extension, ContainerBuilder $container): void
     {
         if (!$config = $extension->getProcessedConfigs()) {
             // Extension::processConfiguration() wasn't called, we cannot know how configs were merged
@@ -145,7 +145,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
     /**
      * {@inheritdoc}
      */
-    public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
+    public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): void
     {
         throw new LogicException(sprintf('You cannot add compiler pass "%s" from extension "%s". Compiler passes must be registered before the container is compiled.', get_class($pass), $this->extensionClass));
     }
@@ -153,7 +153,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
     /**
      * {@inheritdoc}
      */
-    public function registerExtension(ExtensionInterface $extension)
+    public function registerExtension(ExtensionInterface $extension): void
     {
         throw new LogicException(sprintf('You cannot register extension "%s" from "%s". Extensions must be registered before the container is compiled.', get_class($extension), $this->extensionClass));
     }
@@ -161,7 +161,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
     /**
      * {@inheritdoc}
      */
-    public function compile(bool $resolveEnvPlaceholders = false)
+    public function compile(bool $resolveEnvPlaceholders = false): void
     {
         throw new LogicException(sprintf('Cannot compile the container in extension "%s".', $this->extensionClass));
     }

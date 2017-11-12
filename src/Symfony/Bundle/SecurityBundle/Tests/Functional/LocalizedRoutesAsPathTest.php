@@ -16,7 +16,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
     /**
      * @dataProvider getLocales
      */
-    public function testLoginLogoutProcedure($locale)
+    public function testLoginLogoutProcedure($locale): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml'));
 
@@ -37,7 +37,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
     /**
      * @dataProvider getLocales
      */
-    public function testLoginFailureWithLocalizedFailurePath($locale)
+    public function testLoginFailureWithLocalizedFailurePath($locale): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_form_failure_handler.yml'));
 
@@ -53,7 +53,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
     /**
      * @dataProvider getLocales
      */
-    public function testAccessRestrictedResource($locale)
+    public function testAccessRestrictedResource($locale): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml'));
 
@@ -64,7 +64,7 @@ class LocalizedRoutesAsPathTest extends WebTestCase
     /**
      * @dataProvider getLocales
      */
-    public function testAccessRestrictedResourceWithForward($locale)
+    public function testAccessRestrictedResourceWithForward($locale): void
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes_with_forward.yml'));
 

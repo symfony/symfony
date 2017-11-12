@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Dependency
 
 class TestBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

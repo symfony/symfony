@@ -19,7 +19,7 @@ class IntervalTest extends TestCase
     /**
      * @dataProvider getTests
      */
-    public function testTest($expected, $number, $interval)
+    public function testTest($expected, $number, $interval): void
     {
         $this->assertEquals($expected, Interval::test($number, $interval));
     }
@@ -27,7 +27,7 @@ class IntervalTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
-    public function testTestException()
+    public function testTestException(): void
     {
         Interval::test(1, 'foobar');
     }

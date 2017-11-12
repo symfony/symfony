@@ -22,95 +22,95 @@ class ValidatorBuilderTest extends TestCase
      */
     protected $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new ValidatorBuilder();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->builder = null;
     }
 
-    public function testAddObjectInitializer()
+    public function testAddObjectInitializer(): void
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(
             $this->getMockBuilder('Symfony\Component\Validator\ObjectInitializerInterface')->getMock()
         ));
     }
 
-    public function testAddObjectInitializers()
+    public function testAddObjectInitializers(): void
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializers(array()));
     }
 
-    public function testAddXmlMapping()
+    public function testAddXmlMapping(): void
     {
         $this->assertSame($this->builder, $this->builder->addXmlMapping('mapping'));
     }
 
-    public function testAddXmlMappings()
+    public function testAddXmlMappings(): void
     {
         $this->assertSame($this->builder, $this->builder->addXmlMappings(array()));
     }
 
-    public function testAddYamlMapping()
+    public function testAddYamlMapping(): void
     {
         $this->assertSame($this->builder, $this->builder->addYamlMapping('mapping'));
     }
 
-    public function testAddYamlMappings()
+    public function testAddYamlMappings(): void
     {
         $this->assertSame($this->builder, $this->builder->addYamlMappings(array()));
     }
 
-    public function testAddMethodMapping()
+    public function testAddMethodMapping(): void
     {
         $this->assertSame($this->builder, $this->builder->addMethodMapping('mapping'));
     }
 
-    public function testAddMethodMappings()
+    public function testAddMethodMappings(): void
     {
         $this->assertSame($this->builder, $this->builder->addMethodMappings(array()));
     }
 
-    public function testEnableAnnotationMapping()
+    public function testEnableAnnotationMapping(): void
     {
         $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
     }
 
-    public function testDisableAnnotationMapping()
+    public function testDisableAnnotationMapping(): void
     {
         $this->assertSame($this->builder, $this->builder->disableAnnotationMapping());
     }
 
-    public function testSetMetadataCache()
+    public function testSetMetadataCache(): void
     {
         $this->assertSame($this->builder, $this->builder->setMetadataCache(
             $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock())
         );
     }
 
-    public function testSetConstraintValidatorFactory()
+    public function testSetConstraintValidatorFactory(): void
     {
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
             $this->getMockBuilder('Symfony\Component\Validator\ConstraintValidatorFactoryInterface')->getMock())
         );
     }
 
-    public function testSetTranslator()
+    public function testSetTranslator(): void
     {
         $this->assertSame($this->builder, $this->builder->setTranslator(
             $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock())
         );
     }
 
-    public function testSetTranslationDomain()
+    public function testSetTranslationDomain(): void
     {
         $this->assertSame($this->builder, $this->builder->setTranslationDomain('TRANS_DOMAIN'));
     }
 
-    public function testGetValidator()
+    public function testGetValidator(): void
     {
         $this->assertInstanceOf('Symfony\Component\Validator\Validator\RecursiveValidator', $this->builder->getValidator());
     }

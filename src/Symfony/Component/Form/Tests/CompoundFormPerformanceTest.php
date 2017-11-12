@@ -23,7 +23,7 @@ class CompoundFormPerformanceTest extends FormPerformanceTestCase
      *
      * @group benchmark
      */
-    public function testArrayBasedForm()
+    public function testArrayBasedForm(): void
     {
         $this->setMaxRunningTime(1);
 

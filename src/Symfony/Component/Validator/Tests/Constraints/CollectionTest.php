@@ -26,7 +26,7 @@ class CollectionTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testRejectInvalidFieldsOption()
+    public function testRejectInvalidFieldsOption(): void
     {
         new Collection(array(
             'fields' => 'foo',
@@ -36,7 +36,7 @@ class CollectionTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testRejectNonConstraints()
+    public function testRejectNonConstraints(): void
     {
         new Collection(array(
             'foo' => 'bar',
@@ -46,7 +46,7 @@ class CollectionTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testRejectValidConstraint()
+    public function testRejectValidConstraint(): void
     {
         new Collection(array(
             'foo' => new Valid(),
@@ -56,7 +56,7 @@ class CollectionTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testRejectValidConstraintWithinOptional()
+    public function testRejectValidConstraintWithinOptional(): void
     {
         new Collection(array(
             'foo' => new Optional(new Valid()),
@@ -66,14 +66,14 @@ class CollectionTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testRejectValidConstraintWithinRequired()
+    public function testRejectValidConstraintWithinRequired(): void
     {
         new Collection(array(
             'foo' => new Required(new Valid()),
         ));
     }
 
-    public function testAcceptOptionalConstraintAsOneElementArray()
+    public function testAcceptOptionalConstraintAsOneElementArray(): void
     {
         $collection1 = new Collection(array(
             'fields' => array(
@@ -92,7 +92,7 @@ class CollectionTest extends TestCase
         $this->assertEquals($collection1, $collection2);
     }
 
-    public function testAcceptRequiredConstraintAsOneElementArray()
+    public function testAcceptRequiredConstraintAsOneElementArray(): void
     {
         $collection1 = new Collection(array(
             'fields' => array(

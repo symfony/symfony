@@ -56,13 +56,8 @@ class ChainEncoder implements ContextAwareEncoderInterface
 
     /**
      * Checks whether the normalization is needed for the given format.
-     *
-     * @param string $format
-     * @param array  $context
-     *
-     * @return bool
      */
-    public function needsNormalization($format, array $context = array())
+    public function needsNormalization(string $format, array $context = array()): bool
     {
         $encoder = $this->getEncoder($format, $context);
 

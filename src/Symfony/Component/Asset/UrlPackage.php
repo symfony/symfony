@@ -95,11 +95,10 @@ class UrlPackage extends Package
     /**
      * Returns the base URL for a path.
      *
-     * @param string $path
      *
      * @return string The base URL
      */
-    public function getBaseUrl($path)
+    public function getBaseUrl(string $path): string
     {
         if (1 === count($this->baseUrls)) {
             return $this->baseUrls[0];
@@ -114,11 +113,10 @@ class UrlPackage extends Package
      * Override this method to change the default distribution strategy.
      * This method should always return the same base URL index for a given path.
      *
-     * @param string $path
      *
      * @return int The base URL index for the given path
      */
-    protected function chooseBaseUrl($path)
+    protected function chooseBaseUrl(string $path): int
     {
         return (int) fmod(hexdec(substr(hash('sha256', $path), 0, 10)), count($this->baseUrls));
     }

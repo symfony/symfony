@@ -23,14 +23,14 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
         return new CurrencyValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Currency());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Currency());
 
@@ -40,7 +40,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Currency());
     }
@@ -48,7 +48,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidCurrencies
      */
-    public function testValidCurrencies($currency)
+    public function testValidCurrencies($currency): void
     {
         $this->validator->validate($currency, new Currency());
 
@@ -58,7 +58,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidCurrencies
      **/
-    public function testValidCurrenciesWithCountrySpecificLocale($currency)
+    public function testValidCurrenciesWithCountrySpecificLocale($currency): void
     {
         IntlTestHelper::requireFullIntl($this, false);
 
@@ -83,7 +83,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidCurrencies
      */
-    public function testInvalidCurrencies($currency)
+    public function testInvalidCurrencies($currency): void
     {
         $constraint = new Currency(array(
             'message' => 'myMessage',

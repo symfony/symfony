@@ -46,5 +46,5 @@ interface NormalizerInterface
      *
      * @return bool
      */
-    public function supportsNormalization($data, $format = null);
+    public function supportsNormalization($data, $format = null): bool;
 }

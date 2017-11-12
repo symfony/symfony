@@ -38,7 +38,7 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): void
     {
         if (null === $this->twig) {
             $this->twig = $this->container->get('twig');

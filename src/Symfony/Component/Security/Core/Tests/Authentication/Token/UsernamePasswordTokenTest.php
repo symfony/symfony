@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class UsernamePasswordTokenTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $this->assertFalse($token->isAuthenticated());
@@ -31,27 +31,27 @@ class UsernamePasswordTokenTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testSetAuthenticatedToTrue()
+    public function testSetAuthenticatedToTrue(): void
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $token->setAuthenticated(true);
     }
 
-    public function testSetAuthenticatedToFalse()
+    public function testSetAuthenticatedToFalse(): void
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $token->setAuthenticated(false);
         $this->assertFalse($token->isAuthenticated());
     }
 
-    public function testEraseCredentials()
+    public function testEraseCredentials(): void
     {
         $token = new UsernamePasswordToken('foo', 'bar', 'key');
         $token->eraseCredentials();
         $this->assertEquals('', $token->getCredentials());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $token = new UsernamePasswordToken('foo', '', 'foo', array('A', 'B'));
         $this->assertEquals('UsernamePasswordToken(user="foo", authenticated=true, roles="A, B")', (string) $token);

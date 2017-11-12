@@ -30,17 +30,15 @@ class Reference
     /**
      * @return string The service identifier
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }
 
     /**
      * Returns the behavior to be used when the service does not exist.
-     *
-     * @return int
      */
-    public function getInvalidBehavior()
+    public function getInvalidBehavior(): int
     {
         return $this->invalidBehavior;
     }

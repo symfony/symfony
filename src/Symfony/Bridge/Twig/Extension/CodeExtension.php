@@ -82,10 +82,8 @@ class CodeExtension extends AbstractExtension
      * Formats an array as a string.
      *
      * @param array $args The argument array
-     *
-     * @return string
      */
-    public function formatArgs($args)
+    public function formatArgs(array $args): string
     {
         $result = array();
         foreach ($args as $key => $item) {
@@ -115,10 +113,8 @@ class CodeExtension extends AbstractExtension
      * Formats an array as a string.
      *
      * @param array $args The argument array
-     *
-     * @return string
      */
-    public function formatArgsAsText($args)
+    public function formatArgsAsText(array $args): string
     {
         return strip_tags($this->formatArgs($args));
     }
@@ -132,7 +128,7 @@ class CodeExtension extends AbstractExtension
      *
      * @return string An HTML string
      */
-    public function fileExcerpt($file, $line, $srcContext = 3)
+    public function fileExcerpt(string $file, int $line, int $srcContext = 3): string
     {
         if (is_readable($file)) {
             // highlight_file could throw warnings
@@ -165,10 +161,8 @@ class CodeExtension extends AbstractExtension
      * @param string $file An absolute file path
      * @param int    $line The line number
      * @param string $text Use this text for the link rather than the file path
-     *
-     * @return string
      */
-    public function formatFile($file, $line, $text = null)
+    public function formatFile(string $file, int $line, string $text = null): string
     {
         $file = trim($file);
 
@@ -198,7 +192,7 @@ class CodeExtension extends AbstractExtension
      *
      * @return string|false A link or false
      */
-    public function getFileLink($file, $line)
+    public function getFileLink(string $file, int $line)
     {
         if ($fmt = $this->fileLinkFormat) {
             return is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);

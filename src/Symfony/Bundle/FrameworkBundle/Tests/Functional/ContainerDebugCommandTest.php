@@ -19,7 +19,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 class ContainerDebugCommandTest extends WebTestCase
 {
-    public function testDumpContainerIfNotExists()
+    public function testDumpContainerIfNotExists(): void
     {
         static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
 
@@ -34,7 +34,7 @@ class ContainerDebugCommandTest extends WebTestCase
         $this->assertFileExists(static::$kernel->getContainer()->getParameter('debug.container.dump'));
     }
 
-    public function testNoDebug()
+    public function testNoDebug(): void
     {
         static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => false));
 
@@ -47,7 +47,7 @@ class ContainerDebugCommandTest extends WebTestCase
         $this->assertContains('public', $tester->getDisplay());
     }
 
-    public function testPrivateAlias()
+    public function testPrivateAlias(): void
     {
         static::bootKernel(array('test_case' => 'ContainerDebug', 'root_config' => 'config.yml'));
 

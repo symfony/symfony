@@ -64,7 +64,7 @@ class UuidValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (null === $value || '' === $value) {
             return;
@@ -89,7 +89,7 @@ class UuidValidator extends ConstraintValidator
         $this->validateLoose($value, $constraint);
     }
 
-    private function validateLoose($value, Uuid $constraint)
+    private function validateLoose($value, Uuid $constraint): void
     {
         // Error priority:
         // 1. ERROR_INVALID_CHARACTERS
@@ -160,7 +160,7 @@ class UuidValidator extends ConstraintValidator
         }
     }
 
-    private function validateStrict($value, Uuid $constraint)
+    private function validateStrict($value, Uuid $constraint): void
     {
         // Error priority:
         // 1. ERROR_INVALID_CHARACTERS

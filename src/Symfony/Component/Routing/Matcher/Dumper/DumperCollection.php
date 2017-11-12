@@ -50,7 +50,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @param DumperRoute|DumperCollection The route or collection
      */
-    public function add($child)
+    public function add($child): void
     {
         if ($child instanceof self) {
             $child->setParent($this);
@@ -63,7 +63,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @param array $children The children
      */
-    public function setAll(array $children)
+    public function setAll(array $children): void
     {
         foreach ($children as $child) {
             if ($child instanceof self) {
@@ -88,7 +88,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @return self The root collection
      */
-    public function getRoot()
+    public function getRoot(): self
     {
         return (null !== $this->parent) ? $this->parent->getRoot() : $this;
     }
@@ -98,7 +98,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @return self|null The parent collection or null if the collection has no parent
      */
-    protected function getParent()
+    protected function getParent(): ?self
     {
         return $this->parent;
     }
@@ -106,7 +106,7 @@ class DumperCollection implements \IteratorAggregate
     /**
      * Sets the parent collection.
      */
-    protected function setParent(DumperCollection $parent)
+    protected function setParent(DumperCollection $parent): void
     {
         $this->parent = $parent;
     }
@@ -118,7 +118,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @return bool true if the attribute is defined, false otherwise
      */
-    public function hasAttribute($name)
+    public function hasAttribute(string $name): bool
     {
         return array_key_exists($name, $this->attributes);
     }
@@ -131,7 +131,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @return mixed The attribute value
      */
-    public function getAttribute($name, $default = null)
+    public function getAttribute(string $name, $default = null)
     {
         return $this->hasAttribute($name) ? $this->attributes[$name] : $default;
     }
@@ -142,7 +142,7 @@ class DumperCollection implements \IteratorAggregate
      * @param string $name  The attribute name
      * @param mixed  $value The attribute value
      */
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, $value): void
     {
         $this->attributes[$name] = $value;
     }
@@ -152,7 +152,7 @@ class DumperCollection implements \IteratorAggregate
      *
      * @param array $attributes The attributes
      */
-    public function setAttributes($attributes)
+    public function setAttributes(array $attributes): void
     {
         $this->attributes = $attributes;
     }

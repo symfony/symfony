@@ -30,9 +30,8 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     private $excludeRegexp;
 
     /**
-     * @param Reader                 $annotationReader
-     * @param string                 $phpArrayFile     The PHP file where annotations are cached
-     * @param CacheItemPoolInterface $fallbackPool     The pool where runtime-discovered annotations are cached
+     * @param string                 $phpArrayFile The PHP file where annotations are cached
+     * @param CacheItemPoolInterface $fallbackPool The pool where runtime-discovered annotations are cached
      */
     public function __construct(Reader $annotationReader, string $phpArrayFile, CacheItemPoolInterface $fallbackPool, string $excludeRegexp = null)
     {
@@ -78,7 +77,7 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
         return true;
     }
 
-    private function readAllComponents(Reader $reader, $class)
+    private function readAllComponents(Reader $reader, $class): void
     {
         $reflectionClass = new \ReflectionClass($class);
         $reader->getClassAnnotations($reflectionClass);

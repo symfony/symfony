@@ -49,7 +49,7 @@ class FragmentHandler
     /**
      * Adds a renderer.
      */
-    public function addRenderer(FragmentRendererInterface $renderer)
+    public function addRenderer(FragmentRendererInterface $renderer): void
     {
         $this->renderers[$renderer->getName()] = $renderer;
     }
@@ -70,7 +70,7 @@ class FragmentHandler
      * @throws \InvalidArgumentException when the renderer does not exist
      * @throws \LogicException           when no master request is being handled
      */
-    public function render($uri, $renderer = 'inline', array $options = array())
+    public function render($uri, $renderer = 'inline', array $options = array()): ?string
     {
         if (!isset($options['ignore_errors'])) {
             $options['ignore_errors'] = !$this->debug;
@@ -97,7 +97,7 @@ class FragmentHandler
      *
      * @throws \RuntimeException when the Response is not successful
      */
-    protected function deliver(Response $response)
+    protected function deliver(Response $response): ?string
     {
         if (!$response->isSuccessful()) {
             throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $this->requestStack->getCurrentRequest()->getUri(), $response->getStatusCode()));

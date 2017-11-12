@@ -18,7 +18,7 @@ namespace Symfony\Component\Lock\Tests\Store;
  */
 class RedisArrayStoreTest extends AbstractRedisStoreTest
 {
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         if (!class_exists('RedisArray')) {
             self::markTestSkipped('The RedisArray class is required.');

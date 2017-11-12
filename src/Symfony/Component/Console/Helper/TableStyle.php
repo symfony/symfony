@@ -35,11 +35,10 @@ class TableStyle
     /**
      * Sets padding character, used for cell padding.
      *
-     * @param string $paddingChar
      *
      * @return $this
      */
-    public function setPaddingChar($paddingChar)
+    public function setPaddingChar(string $paddingChar)
     {
         if (!$paddingChar) {
             throw new LogicException('The padding char must not be empty');
@@ -52,10 +51,8 @@ class TableStyle
 
     /**
      * Gets padding character, used for cell padding.
-     *
-     * @return string
      */
-    public function getPaddingChar()
+    public function getPaddingChar(): string
     {
         return $this->paddingChar;
     }
@@ -63,11 +60,10 @@ class TableStyle
     /**
      * Sets horizontal border character.
      *
-     * @param string $horizontalBorderChar
      *
      * @return $this
      */
-    public function setHorizontalBorderChar($horizontalBorderChar)
+    public function setHorizontalBorderChar(string $horizontalBorderChar)
     {
         $this->horizontalBorderChar = $horizontalBorderChar;
 
@@ -76,10 +72,8 @@ class TableStyle
 
     /**
      * Gets horizontal border character.
-     *
-     * @return string
      */
-    public function getHorizontalBorderChar()
+    public function getHorizontalBorderChar(): string
     {
         return $this->horizontalBorderChar;
     }
@@ -87,11 +81,10 @@ class TableStyle
     /**
      * Sets vertical border character.
      *
-     * @param string $verticalBorderChar
      *
      * @return $this
      */
-    public function setVerticalBorderChar($verticalBorderChar)
+    public function setVerticalBorderChar(string $verticalBorderChar)
     {
         $this->verticalBorderChar = $verticalBorderChar;
 
@@ -100,10 +93,8 @@ class TableStyle
 
     /**
      * Gets vertical border character.
-     *
-     * @return string
      */
-    public function getVerticalBorderChar()
+    public function getVerticalBorderChar(): string
     {
         return $this->verticalBorderChar;
     }
@@ -111,11 +102,10 @@ class TableStyle
     /**
      * Sets crossing character.
      *
-     * @param string $crossingChar
      *
      * @return $this
      */
-    public function setCrossingChar($crossingChar)
+    public function setCrossingChar(string $crossingChar)
     {
         $this->crossingChar = $crossingChar;
 
@@ -127,7 +117,7 @@ class TableStyle
      *
      * @return string $crossingChar
      */
-    public function getCrossingChar()
+    public function getCrossingChar(): string
     {
         return $this->crossingChar;
     }
@@ -135,11 +125,10 @@ class TableStyle
     /**
      * Sets header cell format.
      *
-     * @param string $cellHeaderFormat
      *
      * @return $this
      */
-    public function setCellHeaderFormat($cellHeaderFormat)
+    public function setCellHeaderFormat(string $cellHeaderFormat)
     {
         $this->cellHeaderFormat = $cellHeaderFormat;
 
@@ -148,10 +137,8 @@ class TableStyle
 
     /**
      * Gets header cell format.
-     *
-     * @return string
      */
-    public function getCellHeaderFormat()
+    public function getCellHeaderFormat(): string
     {
         return $this->cellHeaderFormat;
     }
@@ -159,11 +146,10 @@ class TableStyle
     /**
      * Sets row cell format.
      *
-     * @param string $cellRowFormat
      *
      * @return $this
      */
-    public function setCellRowFormat($cellRowFormat)
+    public function setCellRowFormat(string $cellRowFormat)
     {
         $this->cellRowFormat = $cellRowFormat;
 
@@ -172,10 +158,8 @@ class TableStyle
 
     /**
      * Gets row cell format.
-     *
-     * @return string
      */
-    public function getCellRowFormat()
+    public function getCellRowFormat(): string
     {
         return $this->cellRowFormat;
     }
@@ -183,11 +167,10 @@ class TableStyle
     /**
      * Sets row cell content format.
      *
-     * @param string $cellRowContentFormat
      *
      * @return $this
      */
-    public function setCellRowContentFormat($cellRowContentFormat)
+    public function setCellRowContentFormat(string $cellRowContentFormat)
     {
         $this->cellRowContentFormat = $cellRowContentFormat;
 
@@ -196,10 +179,8 @@ class TableStyle
 
     /**
      * Gets row cell content format.
-     *
-     * @return string
      */
-    public function getCellRowContentFormat()
+    public function getCellRowContentFormat(): string
     {
         return $this->cellRowContentFormat;
     }
@@ -207,11 +188,10 @@ class TableStyle
     /**
      * Sets table border format.
      *
-     * @param string $borderFormat
      *
      * @return $this
      */
-    public function setBorderFormat($borderFormat)
+    public function setBorderFormat(string $borderFormat)
     {
         $this->borderFormat = $borderFormat;
 
@@ -220,10 +200,8 @@ class TableStyle
 
     /**
      * Gets table border format.
-     *
-     * @return string
      */
-    public function getBorderFormat()
+    public function getBorderFormat(): string
     {
         return $this->borderFormat;
     }
@@ -235,7 +213,7 @@ class TableStyle
      *
      * @return $this
      */
-    public function setPadType($padType)
+    public function setPadType(int $padType)
     {
         if (!in_array($padType, array(STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH), true)) {
             throw new InvalidArgumentException('Invalid padding type. Expected one of (STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH).');
@@ -248,10 +226,8 @@ class TableStyle
 
     /**
      * Gets cell padding type.
-     *
-     * @return int
      */
-    public function getPadType()
+    public function getPadType(): int
     {
         return $this->padType;
     }

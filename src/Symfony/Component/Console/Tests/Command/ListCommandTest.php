@@ -17,7 +17,7 @@ use Symfony\Component\Console\Application;
 
 class ListCommandTest extends TestCase
 {
-    public function testExecuteListsCommands()
+    public function testExecuteListsCommands(): void
     {
         $application = new Application();
         $commandTester = new CommandTester($command = $application->get('list'));
@@ -26,7 +26,7 @@ class ListCommandTest extends TestCase
         $this->assertRegExp('/help\s{2,}Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
     }
 
-    public function testExecuteListsCommandsWithXmlOption()
+    public function testExecuteListsCommandsWithXmlOption(): void
     {
         $application = new Application();
         $commandTester = new CommandTester($command = $application->get('list'));
@@ -34,7 +34,7 @@ class ListCommandTest extends TestCase
         $this->assertRegExp('/<command id="list" name="list" hidden="0">/', $commandTester->getDisplay(), '->execute() returns a list of available commands in XML if --xml is passed');
     }
 
-    public function testExecuteListsCommandsWithRawOption()
+    public function testExecuteListsCommandsWithRawOption(): void
     {
         $application = new Application();
         $commandTester = new CommandTester($command = $application->get('list'));
@@ -48,7 +48,7 @@ EOF;
         $this->assertEquals($output, $commandTester->getDisplay(true));
     }
 
-    public function testExecuteListsCommandsWithNamespaceArgument()
+    public function testExecuteListsCommandsWithNamespaceArgument(): void
     {
         require_once realpath(__DIR__.'/../Fixtures/FooCommand.php');
         $application = new Application();
@@ -63,7 +63,7 @@ EOF;
         $this->assertEquals($output, $commandTester->getDisplay(true));
     }
 
-    public function testExecuteListsCommandsOrder()
+    public function testExecuteListsCommandsOrder(): void
     {
         require_once realpath(__DIR__.'/../Fixtures/Foo6Command.php');
         $application = new Application();
@@ -95,7 +95,7 @@ EOF;
         $this->assertEquals($output, trim($commandTester->getDisplay(true)));
     }
 
-    public function testExecuteListsCommandsOrderRaw()
+    public function testExecuteListsCommandsOrderRaw(): void
     {
         require_once realpath(__DIR__.'/../Fixtures/Foo6Command.php');
         $application = new Application();

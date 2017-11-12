@@ -17,7 +17,7 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\ContainerAwareFixture;
 
 class ContainerAwareLoaderTest extends TestCase
 {
-    public function testShouldSetContainerOnContainerAwareFixture()
+    public function testShouldSetContainerOnContainerAwareFixture(): void
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $loader = new ContainerAwareLoader($container);

@@ -62,27 +62,23 @@ abstract class Client
      *
      * @param bool $followRedirect Whether to follow redirects
      */
-    public function followRedirects($followRedirect = true)
+    public function followRedirects(bool $followRedirect = true): void
     {
         $this->followRedirects = (bool) $followRedirect;
     }
 
     /**
      * Returns whether client automatically follows redirects or not.
-     *
-     * @return bool
      */
-    public function isFollowingRedirects()
+    public function isFollowingRedirects(): bool
     {
         return $this->followRedirects;
     }
 
     /**
      * Sets the maximum number of requests that crawler can follow.
-     *
-     * @param int $maxRedirects
      */
-    public function setMaxRedirects($maxRedirects)
+    public function setMaxRedirects(int $maxRedirects): void
     {
         $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
         $this->followRedirects = -1 != $this->maxRedirects;
@@ -90,10 +86,8 @@ abstract class Client
 
     /**
      * Returns the maximum number of requests that crawler can follow.
-     *
-     * @return int
      */
-    public function getMaxRedirects()
+    public function getMaxRedirects(): int
     {
         return $this->maxRedirects;
     }
@@ -105,7 +99,7 @@ abstract class Client
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
      */
-    public function insulate($insulated = true)
+    public function insulate(bool $insulated = true): void
     {
         if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
             throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
@@ -119,7 +113,7 @@ abstract class Client
      *
      * @param array $server An array of server parameters
      */
-    public function setServerParameters(array $server)
+    public function setServerParameters(array $server): void
     {
         $this->server = array_merge(array(
             'HTTP_USER_AGENT' => 'Symfony BrowserKit',
@@ -132,7 +126,7 @@ abstract class Client
      * @param string $key   A key of the parameter
      * @param string $value A value of the parameter
      */
-    public function setServerParameter($key, $value)
+    public function setServerParameter(string $key, string $value): void
     {
         $this->server[$key] = $value;
     }
@@ -145,7 +139,7 @@ abstract class Client
      *
      * @return string A value of the parameter
      */
-    public function getServerParameter($key, $default = '')
+    public function getServerParameter(string $key, string $default = ''): string
     {
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
@@ -155,7 +149,7 @@ abstract class Client
      *
      * @return History A History instance
      */
-    public function getHistory()
+    public function getHistory(): History
     {
         return $this->history;
     }
@@ -165,7 +159,7 @@ abstract class Client
      *
      * @return CookieJar A CookieJar instance
      */
-    public function getCookieJar()
+    public function getCookieJar(): CookieJar
     {
         return $this->cookieJar;
     }
@@ -175,7 +169,7 @@ abstract class Client
      *
      * @return Crawler|null A Crawler instance
      */
-    public function getCrawler()
+    public function getCrawler(): ?Crawler
     {
         return $this->crawler;
     }
@@ -185,7 +179,7 @@ abstract class Client
      *
      * @return Response|null A BrowserKit Response instance
      */
-    public function getInternalResponse()
+    public function getInternalResponse(): ?Response
     {
         return $this->internalResponse;
     }
@@ -210,7 +204,7 @@ abstract class Client
      *
      * @return Request|null A BrowserKit Request instance
      */
-    public function getInternalRequest()
+    public function getInternalRequest(): ?Request
     {
         return $this->internalRequest;
     }
@@ -232,10 +226,8 @@ abstract class Client
 
     /**
      * Clicks on a given link.
-     *
-     * @return Crawler
      */
-    public function click(Link $link)
+    public function click(Link $link): Crawler
     {
         if ($link instanceof Form) {
             return $this->submit($link);
@@ -249,10 +241,8 @@ abstract class Client
      *
      * @param Form  $form   A Form instance
      * @param array $values An array of form field values
-     *
-     * @return Crawler
      */
-    public function submit(Form $form, array $values = array())
+    public function submit(Form $form, array $values = array()): Crawler
     {
         $form->setValues($values);
 
@@ -269,10 +259,8 @@ abstract class Client
      * @param array  $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
      * @param string $content       The raw body data
      * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
-     *
-     * @return Crawler
      */
-    public function request(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true)
+    public function request(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true): Crawler
     {
         if ($this->isMainRequest) {
             $this->redirectCount = 0;
@@ -384,7 +372,7 @@ abstract class Client
      *
      * @throws \LogicException When this abstract class is not implemented
      */
-    protected function getScript($request)
+    protected function getScript($request): void
     {
         throw new \LogicException('To insulate requests, you need to override the getScript() method.');
     }
@@ -408,7 +396,7 @@ abstract class Client
      *
      * @return Response An BrowserKit Response instance
      */
-    protected function filterResponse($response)
+    protected function filterResponse($response): Response
     {
         return $response;
     }
@@ -424,7 +412,7 @@ abstract class Client
      *
      * @return Crawler|null
      */
-    protected function createCrawlerFromContent($uri, $content, $type)
+    protected function createCrawlerFromContent(string $uri, string $content, string $type)
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
             return;
@@ -438,10 +426,8 @@ abstract class Client
 
     /**
      * Goes back in the browser history.
-     *
-     * @return Crawler
      */
-    public function back()
+    public function back(): Crawler
     {
         do {
             $request = $this->history->back();
@@ -452,10 +438,8 @@ abstract class Client
 
     /**
      * Goes forward in the browser history.
-     *
-     * @return Crawler
      */
-    public function forward()
+    public function forward(): Crawler
     {
         do {
             $request = $this->history->forward();
@@ -466,10 +450,8 @@ abstract class Client
 
     /**
      * Reloads the current browser.
-     *
-     * @return Crawler
      */
-    public function reload()
+    public function reload(): Crawler
     {
         return $this->requestFromRequest($this->history->current(), false);
     }
@@ -477,11 +459,10 @@ abstract class Client
     /**
      * Follow redirects?
      *
-     * @return Crawler
      *
      * @throws \LogicException If request was not a redirect
      */
-    public function followRedirect()
+    public function followRedirect(): Crawler
     {
         if (empty($this->redirect)) {
             throw new \LogicException('The request was not redirected.');
@@ -530,7 +511,7 @@ abstract class Client
      *
      * It flushes history and all cookies.
      */
-    public function restart()
+    public function restart(): void
     {
         $this->cookieJar->clear();
         $this->history->clear();
@@ -543,7 +524,7 @@ abstract class Client
      *
      * @return string An absolute URI
      */
-    protected function getAbsoluteUri($uri)
+    protected function getAbsoluteUri(string $uri): string
     {
         // already absolute?
         if (0 === strpos($uri, 'http://') || 0 === strpos($uri, 'https://')) {
@@ -587,10 +568,8 @@ abstract class Client
      *
      * @param Request $request       A Request instance
      * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
-     *
-     * @return Crawler
      */
-    protected function requestFromRequest(Request $request, $changeHistory = true)
+    protected function requestFromRequest(Request $request, bool $changeHistory = true): Crawler
     {
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }

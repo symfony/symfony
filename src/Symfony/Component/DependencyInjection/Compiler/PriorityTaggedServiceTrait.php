@@ -36,7 +36,7 @@ trait PriorityTaggedServiceTrait
      *
      * @return Reference[]
      */
-    private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
+    private function findAndSortTaggedServices(string $tagName, ContainerBuilder $container)
     {
         $services = array();
 

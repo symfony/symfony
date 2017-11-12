@@ -19,7 +19,7 @@ class ApacheRequestTest extends TestCase
     /**
      * @dataProvider provideServerVars
      */
-    public function testUriMethods($server, $expectedRequestUri, $expectedBaseUrl, $expectedPathInfo)
+    public function testUriMethods($server, $expectedRequestUri, $expectedBaseUrl, $expectedPathInfo): void
     {
         $request = new ApacheRequest();
         $request->server->replace($server);

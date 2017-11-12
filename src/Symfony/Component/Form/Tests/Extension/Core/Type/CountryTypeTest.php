@@ -18,14 +18,14 @@ class CountryTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CountryType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
     }
 
-    public function testCountriesAreSelectable()
+    public function testCountriesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -38,7 +38,7 @@ class CountryTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('MY', 'MY', 'Malaysia'), $choices, '', false, false);
     }
 
-    public function testUnknownCountryIsNotIncluded()
+    public function testUnknownCountryIsNotIncluded(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE, 'country')
             ->createView()->vars['choices'];
@@ -52,7 +52,7 @@ class CountryTypeTest extends BaseTypeTest
         $this->assertNotContains('ZZ', $countryCodes);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }

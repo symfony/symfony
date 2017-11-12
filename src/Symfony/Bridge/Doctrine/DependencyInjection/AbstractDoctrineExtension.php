@@ -40,7 +40,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @throws \InvalidArgumentException
      */
-    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
+    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container): void
     {
         if ($objectManager['auto_mapping']) {
             // automatically register bundle mappings
@@ -101,11 +101,8 @@ abstract class AbstractDoctrineExtension extends Extension
      * Register the alias for this mapping driver.
      *
      * Aliases can be used in the Query languages of all the Doctrine object managers to simplify writing tasks.
-     *
-     * @param array  $mappingConfig
-     * @param string $mappingName
      */
-    protected function setMappingDriverAlias($mappingConfig, $mappingName)
+    protected function setMappingDriverAlias(array $mappingConfig, string $mappingName): void
     {
         if (isset($mappingConfig['alias'])) {
             $this->aliasMap[$mappingConfig['alias']] = $mappingConfig['prefix'];
@@ -117,12 +114,10 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register the mapping driver configuration for later use with the object managers metadata driver chain.
      *
-     * @param array  $mappingConfig
-     * @param string $mappingName
      *
      * @throws \InvalidArgumentException
      */
-    protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
+    protected function setMappingDriverConfig(array $mappingConfig, string $mappingName): void
     {
         $mappingDirectory = $mappingConfig['dir'];
         if (!is_dir($mappingDirectory)) {
@@ -172,10 +167,9 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
-     * @param array            $objectManager
-     * @param ContainerBuilder $container     A ContainerBuilder instance
+     * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
+    protected function registerMappingDrivers(array $objectManager, ContainerBuilder $container): void
     {
         // configure metadata driver for each bundle based on the type of mapping files found
         if ($container->hasDefinition($this->getObjectManagerElementName($objectManager['name'].'_metadata_driver'))) {
@@ -225,12 +219,10 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Assertion if the specified mapping information is valid.
      *
-     * @param array  $mappingConfig
-     * @param string $objectManagerName
      *
      * @throws \InvalidArgumentException
      */
-    protected function assertValidMappingConfiguration(array $mappingConfig, $objectManagerName)
+    protected function assertValidMappingConfiguration(array $mappingConfig, string $objectManagerName): void
     {
         if (!$mappingConfig['type'] || !$mappingConfig['dir'] || !$mappingConfig['prefix']) {
             throw new \InvalidArgumentException(sprintf('Mapping definitions for Doctrine manager "%s" require at least the "type", "dir" and "prefix" options.', $objectManagerName));
@@ -257,7 +249,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @return string|null A metadata driver short name, if one can be detected
      */
-    protected function detectMetadataDriver($dir, ContainerBuilder $container)
+    protected function detectMetadataDriver(string $dir, ContainerBuilder $container): ?string
     {
         $configPath = $this->getMappingResourceConfigDirectory();
         $extension = $this->getMappingResourceExtension();
@@ -288,11 +280,10 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @param array            $objectManager A configured object manager
      * @param ContainerBuilder $container     A ContainerBuilder instance
-     * @param string           $cacheName
      *
      * @throws \InvalidArgumentException in case of unknown driver type
      */
-    protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
+    protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, string $cacheName): void
     {
         $this->loadCacheDriver($cacheName, $objectManager['name'], $objectManager[$cacheName.'_driver'], $container);
     }
@@ -305,11 +296,9 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param array            $cacheDriver       The cache driver mapping
      * @param ContainerBuilder $container         The ContainerBuilder instance
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
      */
-    protected function loadCacheDriver($cacheName, $objectManagerName, array $cacheDriver, ContainerBuilder $container)
+    protected function loadCacheDriver(string $cacheName, string $objectManagerName, array $cacheDriver, ContainerBuilder $container): string
     {
         $cacheDriverServiceId = $this->getObjectManagerElementName($objectManagerName.'_'.$cacheName);
 
@@ -401,7 +390,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @return array The modified version of $managerConfigs
      */
-    protected function fixManagersAutoMappings(array $managerConfigs, array $bundles)
+    protected function fixManagersAutoMappings(array $managerConfigs, array $bundles): array
     {
         if ($autoMappedManager = $this->validateAutoMapping($managerConfigs)) {
             foreach (array_keys($bundles) as $bundle) {
@@ -425,35 +414,25 @@ abstract class AbstractDoctrineExtension extends Extension
      * Prefixes the relative dependency injection container path with the object manager prefix.
      *
      * @example $name is 'entity_manager' then the result would be 'doctrine.orm.entity_manager'
-     *
-     * @param string $name
-     *
-     * @return string
      */
-    abstract protected function getObjectManagerElementName($name);
+    abstract protected function getObjectManagerElementName(string $name): string;
 
     /**
      * Noun that describes the mapped objects such as Entity or Document.
      *
      * Will be used for autodetection of persistent objects directory.
-     *
-     * @return string
      */
-    abstract protected function getMappingObjectDefaultName();
+    abstract protected function getMappingObjectDefaultName(): string;
 
     /**
      * Relative path from the bundle root to the directory where mapping files reside.
-     *
-     * @return string
      */
-    abstract protected function getMappingResourceConfigDirectory();
+    abstract protected function getMappingResourceConfigDirectory(): string;
 
     /**
      * Extension used by the mapping files.
-     *
-     * @return string
      */
-    abstract protected function getMappingResourceExtension();
+    abstract protected function getMappingResourceExtension(): string;
 
     /**
      * Search for a manager that is declared as 'auto_mapping' = true.
@@ -462,7 +441,7 @@ abstract class AbstractDoctrineExtension extends Extension
      *
      * @throws \LogicException
      */
-    private function validateAutoMapping(array $managerConfigs)
+    private function validateAutoMapping(array $managerConfigs): ?string
     {
         $autoMappedManager = null;
         foreach ($managerConfigs as $name => $manager) {

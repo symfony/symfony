@@ -25,7 +25,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatCurrencyWithDecimalStyleProvider
      */
-    public function testFormatCurrencyWithDecimalStyle($value, $currency, $expected)
+    public function testFormatCurrencyWithDecimalStyle($value, $currency, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $this->assertEquals($expected, $formatter->formatCurrency($value, $currency));
@@ -55,7 +55,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatCurrencyWithCurrencyStyleProvider
      */
-    public function testFormatCurrencyWithCurrencyStyle($value, $currency, $expected)
+    public function testFormatCurrencyWithCurrencyStyle($value, $currency, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals($expected, $formatter->formatCurrency($value, $currency));
@@ -81,7 +81,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatCurrencyWithCurrencyStyleCostaRicanColonsRoundingProvider
      */
-    public function testFormatCurrencyWithCurrencyStyleCostaRicanColonsRounding($value, $currency, $symbol, $expected)
+    public function testFormatCurrencyWithCurrencyStyleCostaRicanColonsRounding($value, $currency, $symbol, $expected): void
     {
         IntlTestHelper::requireIntl($this, '58.1');
 
@@ -101,7 +101,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatCurrencyWithCurrencyStyleBrazilianRealRoundingProvider
      */
-    public function testFormatCurrencyWithCurrencyStyleBrazilianRealRounding($value, $currency, $symbol, $expected)
+    public function testFormatCurrencyWithCurrencyStyleBrazilianRealRounding($value, $currency, $symbol, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
@@ -128,7 +128,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatCurrencyWithCurrencyStyleSwissRoundingProvider
      */
-    public function testFormatCurrencyWithCurrencyStyleSwissRounding($value, $currency, $symbol, $expected)
+    public function testFormatCurrencyWithCurrencyStyleSwissRounding($value, $currency, $symbol, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals(sprintf($expected, $symbol), $formatter->formatCurrency($value, $currency));
@@ -156,7 +156,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         );
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $errorCode = IntlGlobals::U_ZERO_ERROR;
         $errorMessage = 'U_ZERO_ERROR';
@@ -172,7 +172,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         $this->assertFalse($this->isIntlFailure($formatter->getErrorCode()));
     }
 
-    public function testFormatWithCurrencyStyle()
+    public function testFormatWithCurrencyStyle(): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
         $this->assertEquals('¤1.00', $formatter->format(1));
@@ -181,7 +181,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatTypeInt32Provider
      */
-    public function testFormatTypeInt32($formatter, $value, $expected, $message = '')
+    public function testFormatTypeInt32($formatter, $value, $expected, $message = ''): void
     {
         $formattedValue = $formatter->format($value, NumberFormatter::TYPE_INT32);
         $this->assertEquals($expected, $formattedValue, $message);
@@ -204,7 +204,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatTypeInt32WithCurrencyStyleProvider
      */
-    public function testFormatTypeInt32WithCurrencyStyle($formatter, $value, $expected, $message = '')
+    public function testFormatTypeInt32WithCurrencyStyle($formatter, $value, $expected, $message = ''): void
     {
         $formattedValue = $formatter->format($value, NumberFormatter::TYPE_INT32);
         $this->assertEquals($expected, $formattedValue, $message);
@@ -229,7 +229,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
      *
      * @dataProvider formatTypeInt64Provider
      */
-    public function testFormatTypeInt64($formatter, $value, $expected)
+    public function testFormatTypeInt64($formatter, $value, $expected): void
     {
         $formattedValue = $formatter->format($value, NumberFormatter::TYPE_INT64);
         $this->assertEquals($expected, $formattedValue);
@@ -250,7 +250,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatTypeInt64WithCurrencyStyleProvider
      */
-    public function testFormatTypeInt64WithCurrencyStyle($formatter, $value, $expected)
+    public function testFormatTypeInt64WithCurrencyStyle($formatter, $value, $expected): void
     {
         $formattedValue = $formatter->format($value, NumberFormatter::TYPE_INT64);
         $this->assertEquals($expected, $formattedValue);
@@ -271,7 +271,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatTypeDoubleProvider
      */
-    public function testFormatTypeDouble($formatter, $value, $expected)
+    public function testFormatTypeDouble($formatter, $value, $expected): void
     {
         $formattedValue = $formatter->format($value, NumberFormatter::TYPE_DOUBLE);
         $this->assertEquals($expected, $formattedValue);
@@ -290,7 +290,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatTypeDoubleWithCurrencyStyleProvider
      */
-    public function testFormatTypeDoubleWithCurrencyStyle($formatter, $value, $expected)
+    public function testFormatTypeDoubleWithCurrencyStyle($formatter, $value, $expected): void
     {
         $formattedValue = $formatter->format($value, NumberFormatter::TYPE_DOUBLE);
         $this->assertEquals($expected, $formattedValue);
@@ -309,7 +309,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatTypeCurrencyProvider
      */
-    public function testFormatTypeCurrency($formatter, $value)
+    public function testFormatTypeCurrency($formatter, $value): void
     {
         $exceptionCode = 'PHPUnit\Framework\Error\Warning';
 
@@ -325,7 +325,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatTypeCurrencyProvider
      */
-    public function testFormatTypeCurrencyReturn($formatter, $value)
+    public function testFormatTypeCurrencyReturn($formatter, $value): void
     {
         $this->assertFalse(@$formatter->format($value, NumberFormatter::TYPE_CURRENCY));
     }
@@ -344,7 +344,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatFractionDigitsProvider
      */
-    public function testFormatFractionDigits($value, $expected, $fractionDigits = null, $expectedFractionDigits = 1)
+    public function testFormatFractionDigits($value, $expected, $fractionDigits = null, $expectedFractionDigits = 1): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
 
@@ -377,7 +377,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatGroupingUsedProvider
      */
-    public function testFormatGroupingUsed($value, $expected, $groupingUsed = null, $expectedGroupingUsed = 1)
+    public function testFormatGroupingUsed($value, $expected, $groupingUsed = null, $expectedGroupingUsed = 1): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
 
@@ -410,7 +410,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatRoundingModeRoundHalfUpProvider
      */
-    public function testFormatRoundingModeHalfUp($value, $expected)
+    public function testFormatRoundingModeHalfUp($value, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
@@ -434,7 +434,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatRoundingModeRoundHalfDownProvider
      */
-    public function testFormatRoundingModeHalfDown($value, $expected)
+    public function testFormatRoundingModeHalfDown($value, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
@@ -457,7 +457,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatRoundingModeRoundHalfEvenProvider
      */
-    public function testFormatRoundingModeHalfEven($value, $expected)
+    public function testFormatRoundingModeHalfEven($value, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
@@ -480,7 +480,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatRoundingModeRoundCeilingProvider
      */
-    public function testFormatRoundingModeCeiling($value, $expected)
+    public function testFormatRoundingModeCeiling($value, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
@@ -504,7 +504,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatRoundingModeRoundFloorProvider
      */
-    public function testFormatRoundingModeFloor($value, $expected)
+    public function testFormatRoundingModeFloor($value, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
@@ -528,7 +528,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatRoundingModeRoundDownProvider
      */
-    public function testFormatRoundingModeDown($value, $expected)
+    public function testFormatRoundingModeDown($value, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
@@ -552,7 +552,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider formatRoundingModeRoundUpProvider
      */
-    public function testFormatRoundingModeUp($value, $expected)
+    public function testFormatRoundingModeUp($value, $expected): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
@@ -573,13 +573,13 @@ abstract class AbstractNumberFormatterTest extends TestCase
         );
     }
 
-    public function testGetLocale()
+    public function testGetLocale(): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $this->assertEquals('en', $formatter->getLocale());
     }
 
-    public function testGetSymbol()
+    public function testGetSymbol(): void
     {
         $decimalFormatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $currencyFormatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
@@ -594,7 +594,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         }
     }
 
-    public function testGetTextAttribute()
+    public function testGetTextAttribute(): void
     {
         $decimalFormatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $currencyFormatter = $this->getNumberFormatter('en', NumberFormatter::CURRENCY);
@@ -612,7 +612,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParse($value, $expected, $message, $expectedPosition, $groupingUsed = true)
+    public function testParse($value, $expected, $message, $expectedPosition, $groupingUsed = true): void
     {
         $position = 0;
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
@@ -650,7 +650,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         );
     }
 
-    public function testParseTypeDefault()
+    public function testParseTypeDefault(): void
     {
         $exceptionCode = 'PHPUnit\Framework\Error\Warning';
 
@@ -667,7 +667,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider parseTypeInt32Provider
      */
-    public function testParseTypeInt32($value, $expected, $message = '')
+    public function testParseTypeInt32($value, $expected, $message = ''): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $parsedValue = $formatter->parse($value, NumberFormatter::TYPE_INT32);
@@ -687,7 +687,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         );
     }
 
-    public function testParseTypeInt64With32BitIntegerInPhp32Bit()
+    public function testParseTypeInt64With32BitIntegerInPhp32Bit(): void
     {
         IntlTestHelper::require32Bit($this);
 
@@ -702,7 +702,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         $this->assertEquals(-2147483648, $parsedValue);
     }
 
-    public function testParseTypeInt64With32BitIntegerInPhp64Bit()
+    public function testParseTypeInt64With32BitIntegerInPhp64Bit(): void
     {
         IntlTestHelper::require64Bit($this);
 
@@ -720,7 +720,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * If PHP is compiled in 32bit mode, the returned value for a 64bit integer are float numbers.
      */
-    public function testParseTypeInt64With64BitIntegerInPhp32Bit()
+    public function testParseTypeInt64With64BitIntegerInPhp32Bit(): void
     {
         IntlTestHelper::require32Bit($this);
 
@@ -739,7 +739,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * If PHP is compiled in 64bit mode, the returned value for a 64bit integer are 32bit integer numbers.
      */
-    public function testParseTypeInt64With64BitIntegerInPhp64Bit()
+    public function testParseTypeInt64With64BitIntegerInPhp64Bit(): void
     {
         IntlTestHelper::require64Bit($this);
 
@@ -759,7 +759,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
     /**
      * @dataProvider parseTypeDoubleProvider
      */
-    public function testParseTypeDouble($value, $expectedValue)
+    public function testParseTypeDouble($value, $expectedValue): void
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $parsedValue = $formatter->parse($value, NumberFormatter::TYPE_DOUBLE);
@@ -776,7 +776,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         );
     }
 
-    public function testParseTypeCurrency()
+    public function testParseTypeCurrency(): void
     {
         $exceptionCode = 'PHPUnit\Framework\Error\Warning';
 
@@ -790,7 +790,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
         $formatter->parse('1', NumberFormatter::TYPE_CURRENCY);
     }
 
-    public function testParseWithNotNullPositionValue()
+    public function testParseWithNotNullPositionValue(): void
     {
         $position = 1;
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
@@ -799,28 +799,16 @@ abstract class AbstractNumberFormatterTest extends TestCase
     }
 
     /**
-     * @param string $locale
      * @param null   $style
      * @param null   $pattern
      *
      * @return \NumberFormatter
      */
-    abstract protected function getNumberFormatter($locale = 'en', $style = null, $pattern = null);
+    abstract protected function getNumberFormatter(string $locale = 'en', $style = null, $pattern = null): \NumberFormatter;
 
-    /**
-     * @return string
-     */
-    abstract protected function getIntlErrorMessage();
+    abstract protected function getIntlErrorMessage(): string;
 
-    /**
-     * @return int
-     */
-    abstract protected function getIntlErrorCode();
+    abstract protected function getIntlErrorCode(): int;
 
-    /**
-     * @param int $errorCode
-     *
-     * @return bool
-     */
-    abstract protected function isIntlFailure($errorCode);
+    abstract protected function isIntlFailure(int $errorCode): bool;
 }

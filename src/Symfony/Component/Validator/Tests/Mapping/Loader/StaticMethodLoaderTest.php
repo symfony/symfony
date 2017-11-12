@@ -20,17 +20,17 @@ class StaticMethodLoaderTest extends TestCase
 {
     private $errorLevel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->errorLevel = error_reporting();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         error_reporting($this->errorLevel);
     }
 
-    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    public function testLoadClassMetadataReturnsTrueIfSuccessful(): void
     {
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderEntity');
@@ -38,7 +38,7 @@ class StaticMethodLoaderTest extends TestCase
         $this->assertTrue($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
+    public function testLoadClassMetadataReturnsFalseIfNotSuccessful(): void
     {
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata('\stdClass');
@@ -46,7 +46,7 @@ class StaticMethodLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadata()
+    public function testLoadClassMetadata(): void
     {
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderEntity');
@@ -56,7 +56,7 @@ class StaticMethodLoaderTest extends TestCase
         $this->assertEquals(StaticLoaderEntity::$invokedWith, $metadata);
     }
 
-    public function testLoadClassMetadataDoesNotRepeatLoadWithParentClasses()
+    public function testLoadClassMetadataDoesNotRepeatLoadWithParentClasses(): void
     {
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderDocument');
@@ -69,7 +69,7 @@ class StaticMethodLoaderTest extends TestCase
         $this->assertCount(1, $metadata->getConstraints());
     }
 
-    public function testLoadClassMetadataIgnoresInterfaces()
+    public function testLoadClassMetadataIgnoresInterfaces(): void
     {
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(__NAMESPACE__.'\StaticLoaderInterface');
@@ -79,7 +79,7 @@ class StaticMethodLoaderTest extends TestCase
         $this->assertCount(0, $metadata->getConstraints());
     }
 
-    public function testLoadClassMetadataInAbstractClasses()
+    public function testLoadClassMetadataInAbstractClasses(): void
     {
         $loader = new StaticMethodLoader('loadMetadata');
         $metadata = new ClassMetadata(__NAMESPACE__.'\AbstractStaticLoader');
@@ -89,7 +89,7 @@ class StaticMethodLoaderTest extends TestCase
         $this->assertCount(1, $metadata->getConstraints());
     }
 
-    public function testLoadClassMetadataIgnoresAbstractMethods()
+    public function testLoadClassMetadataIgnoresAbstractMethods(): void
     {
         // Disable error reporting, as AbstractStaticMethodLoader produces a
         // strict standards error
@@ -106,12 +106,12 @@ class StaticMethodLoaderTest extends TestCase
 
 interface StaticLoaderInterface
 {
-    public static function loadMetadata(ClassMetadata $metadata);
+    public static function loadMetadata(ClassMetadata $metadata): void;
 }
 
 abstract class AbstractStaticLoader
 {
-    public static function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new ConstraintA());
     }
@@ -121,7 +121,7 @@ class StaticLoaderEntity
 {
     public static $invokedWith = null;
 
-    public static function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         self::$invokedWith = $metadata;
     }
@@ -133,7 +133,7 @@ class StaticLoaderDocument extends BaseStaticLoaderDocument
 
 class BaseStaticLoaderDocument
 {
-    public static function loadMetadata(ClassMetadata $metadata)
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new ConstraintA());
     }

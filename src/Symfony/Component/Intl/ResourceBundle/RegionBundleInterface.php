@@ -27,7 +27,7 @@ interface RegionBundleInterface extends ResourceBundleInterface
      *
      * @return string|null The name of the country or NULL if not found
      */
-    public function getCountryName($country, $displayLocale = null);
+    public function getCountryName(string $country, string $displayLocale = null): ?string;
 
     /**
      * Returns the names of all known countries.
@@ -37,5 +37,5 @@ interface RegionBundleInterface extends ResourceBundleInterface
      *
      * @return string[] A list of country names indexed by country codes
      */
-    public function getCountryNames($displayLocale = null);
+    public function getCountryNames(string $displayLocale = null);
 }

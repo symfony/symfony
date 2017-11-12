@@ -30,7 +30,7 @@ class ScalarNode extends VariableNode
     /**
      * {@inheritdoc}
      */
-    protected function validateType($value)
+    protected function validateType($value): void
     {
         if (!is_scalar($value) && null !== $value) {
             $ex = new InvalidTypeException(sprintf(

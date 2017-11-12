@@ -86,7 +86,7 @@ class JsonResponse extends Response
      *
      * @throws \InvalidArgumentException When the callback name is not valid
      */
-    public function setCallback($callback = null)
+    public function setCallback(?string $callback = null)
     {
         if (null !== $callback) {
             // partially taken from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
@@ -115,13 +115,12 @@ class JsonResponse extends Response
     /**
      * Sets a raw string containing a JSON document to be sent.
      *
-     * @param string $json
      *
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function setJson($json)
+    public function setJson(string $json)
     {
         $this->data = $json;
 
@@ -157,10 +156,8 @@ class JsonResponse extends Response
 
     /**
      * Returns options used while encoding data to JSON.
-     *
-     * @return int
      */
-    public function getEncodingOptions()
+    public function getEncodingOptions(): int
     {
         return $this->encodingOptions;
     }
@@ -168,11 +165,10 @@ class JsonResponse extends Response
     /**
      * Sets options used while encoding data to JSON.
      *
-     * @param int $encodingOptions
      *
      * @return $this
      */
-    public function setEncodingOptions($encodingOptions)
+    public function setEncodingOptions(int $encodingOptions)
     {
         $this->encodingOptions = (int) $encodingOptions;
 

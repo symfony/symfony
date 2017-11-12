@@ -22,7 +22,7 @@ use Symfony\Component\Lock\StoreInterface;
  */
 class FactoryTest extends TestCase
 {
-    public function testCreateLock()
+    public function testCreateLock(): void
     {
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
         $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();

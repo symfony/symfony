@@ -25,5 +25,5 @@ interface DefinitionValidatorInterface
      *
      * @throws InvalidDefinitionException on invalid definition
      */
-    public function validate(Definition $definition, $name);
+    public function validate(Definition $definition, string $name): void;
 }

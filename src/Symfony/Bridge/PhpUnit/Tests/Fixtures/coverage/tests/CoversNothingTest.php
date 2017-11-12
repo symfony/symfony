@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 class CoversNothingTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $this->assertTrue(true);
     }

@@ -21,7 +21,7 @@ class PhpMatcherDumperTest extends TestCase
     /**
      * @expectedException \LogicException
      */
-    public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
+    public function testDumpWhenSchemeIsUsedWithoutAProperDumper(): void
     {
         $collection = new RouteCollection();
         $collection->add('secure', new Route(
@@ -39,7 +39,7 @@ class PhpMatcherDumperTest extends TestCase
     /**
      * @dataProvider getRouteCollections
      */
-    public function testDump(RouteCollection $collection, $fixture, $options = array())
+    public function testDump(RouteCollection $collection, $fixture, $options = array()): void
     {
         $basePath = __DIR__.'/../../Fixtures/dumper/';
 

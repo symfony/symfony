@@ -17,19 +17,19 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 
 class ClosureLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new ClosureLoader(new ContainerBuilder());
 
-        $this->assertTrue($loader->supports(function ($container) {}), '->supports() returns true if the resource is loadable');
+        $this->assertTrue($loader->supports(function ($container): void {}), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new ClosureLoader($container = new ContainerBuilder());
 
-        $loader->load(function ($container) {
+        $loader->load(function ($container): void {
             $container->setParameter('foo', 'foo');
         });
 

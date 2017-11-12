@@ -25,14 +25,14 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         return new UuidValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Uuid());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Uuid());
 
@@ -42,7 +42,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsUuidConstraintCompatibleType()
+    public function testExpectsUuidConstraintCompatibleType(): void
     {
         $constraint = $this->getMockForAbstractClass('Symfony\\Component\\Validator\\Constraint');
 
@@ -52,7 +52,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Uuid());
     }
@@ -60,7 +60,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidStrictUuids
      */
-    public function testValidStrictUuids($uuid, $versions = null)
+    public function testValidStrictUuids($uuid, $versions = null): void
     {
         $constraint = new Uuid();
 
@@ -88,7 +88,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidStrictUuids
      */
-    public function testInvalidStrictUuids($uuid, $code, $versions = null)
+    public function testInvalidStrictUuids($uuid, $code, $versions = null): void
     {
         $constraint = new Uuid(array(
             'message' => 'testMessage',
@@ -155,7 +155,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidNonStrictUuids
      */
-    public function testValidNonStrictUuids($uuid)
+    public function testValidNonStrictUuids($uuid): void
     {
         $constraint = new Uuid(array(
             'strict' => false,
@@ -186,7 +186,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidNonStrictUuids
      */
-    public function testInvalidNonStrictUuids($uuid, $code)
+    public function testInvalidNonStrictUuids($uuid, $code): void
     {
         $constraint = new Uuid(array(
             'strict' => false,

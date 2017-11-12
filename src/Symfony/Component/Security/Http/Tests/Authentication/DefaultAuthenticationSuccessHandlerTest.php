@@ -21,7 +21,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
     /**
      * @dataProvider getRequestRedirections
      */
-    public function testRequestRedirections(Request $request, $options, $redirectedUrl)
+    public function testRequestRedirections(Request $request, $options, $redirectedUrl): void
     {
         $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
         $urlGenerator->expects($this->any())->method('generate')->will($this->returnValue('http://localhost/login'));

@@ -17,13 +17,13 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 class OutputFormatterTest extends TestCase
 {
-    public function testEmptyTag()
+    public function testEmptyTag(): void
     {
         $formatter = new OutputFormatter(true);
         $this->assertEquals('foo<>bar', $formatter->format('foo<>bar'));
     }
 
-    public function testLGCharEscaping()
+    public function testLGCharEscaping(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -40,7 +40,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testBundledStyles()
+    public function testBundledStyles(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -67,7 +67,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testNestedStyles()
+    public function testNestedStyles(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -77,7 +77,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testAdjacentStyles()
+    public function testAdjacentStyles(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -87,7 +87,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testStyleMatchingNotGreedy()
+    public function testStyleMatchingNotGreedy(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -97,7 +97,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testStyleEscaping()
+    public function testStyleEscaping(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -112,7 +112,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testDeepNestedStyles()
+    public function testDeepNestedStyles(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -122,7 +122,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testNewStyle()
+    public function testNewStyle(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -138,7 +138,7 @@ class OutputFormatterTest extends TestCase
         $this->assertEquals("\033[34;47msome \033[39;49m\033[34;47mcustom\033[39;49m\033[34;47m msg\033[39;49m", $formatter->format('<test>some <b>custom</b> msg</test>'));
     }
 
-    public function testRedefineStyle()
+    public function testRedefineStyle(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -148,7 +148,7 @@ class OutputFormatterTest extends TestCase
         $this->assertEquals("\033[34;47msome custom msg\033[39;49m", $formatter->format('<info>some custom msg</info>'));
     }
 
-    public function testInlineStyle()
+    public function testInlineStyle(): void
     {
         $formatter = new OutputFormatter(true);
 
@@ -157,13 +157,12 @@ class OutputFormatterTest extends TestCase
     }
 
     /**
-     * @param string      $tag
      * @param string|null $expected
      * @param string|null $input
      *
      * @dataProvider provideInlineStyleOptionsCases
      */
-    public function testInlineStyleOptions($tag, $expected = null, $input = null)
+    public function testInlineStyleOptions(string $tag, ?string $expected = null, ?string $input = null): void
     {
         $styleString = substr($tag, 1, -1);
         $formatter = new OutputFormatter(true);
@@ -206,21 +205,21 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testNonStyleTag()
+    public function testNonStyleTag(): void
     {
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals("\033[32msome \033[39m\033[32m<tag>\033[39m\033[32m \033[39m\033[32m<setting=value>\033[39m\033[32m styled \033[39m\033[32m<p>\033[39m\033[32msingle-char tag\033[39m\033[32m</p>\033[39m", $formatter->format('<info>some <tag> <setting=value> styled <p>single-char tag</p></info>'));
     }
 
-    public function testFormatLongString()
+    public function testFormatLongString(): void
     {
         $formatter = new OutputFormatter(true);
         $long = str_repeat('\\', 14000);
         $this->assertEquals("\033[37;41msome error\033[39;49m".$long, $formatter->format('<error>some error</error>'.$long));
     }
 
-    public function testFormatToStringObject()
+    public function testFormatToStringObject(): void
     {
         $formatter = new OutputFormatter(false);
         $this->assertEquals(
@@ -228,7 +227,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testNotDecoratedFormatter()
+    public function testNotDecoratedFormatter(): void
     {
         $formatter = new OutputFormatter(false);
 
@@ -272,7 +271,7 @@ class OutputFormatterTest extends TestCase
         );
     }
 
-    public function testContentWithLineBreaks()
+    public function testContentWithLineBreaks(): void
     {
         $formatter = new OutputFormatter(true);
 

@@ -24,7 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
  */
 class RedirectControllerTest extends TestCase
 {
-    public function testEmptyRoute()
+    public function testEmptyRoute(): void
     {
         $request = new Request();
         $controller = new RedirectController();
@@ -47,7 +47,7 @@ class RedirectControllerTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testRoute($permanent, $ignoreAttributes, $expectedCode, $expectedAttributes)
+    public function testRoute($permanent, $ignoreAttributes, $expectedCode, $expectedAttributes): void
     {
         $request = new Request();
 
@@ -92,7 +92,7 @@ class RedirectControllerTest extends TestCase
         );
     }
 
-    public function testEmptyPath()
+    public function testEmptyPath(): void
     {
         $request = new Request();
         $controller = new RedirectController();
@@ -112,7 +112,7 @@ class RedirectControllerTest extends TestCase
         }
     }
 
-    public function testFullURL()
+    public function testFullURL(): void
     {
         $request = new Request();
         $controller = new RedirectController();
@@ -122,7 +122,7 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals(302, $returnResponse->getStatusCode());
     }
 
-    public function testUrlRedirectDefaultPorts()
+    public function testUrlRedirectDefaultPorts(): void
     {
         $host = 'www.example.com';
         $baseUrl = '/base';
@@ -177,7 +177,7 @@ class RedirectControllerTest extends TestCase
     /**
      * @dataProvider urlRedirectProvider
      */
-    public function testUrlRedirect($scheme, $httpPort, $httpsPort, $requestScheme, $requestPort, $expectedPort)
+    public function testUrlRedirect($scheme, $httpPort, $httpsPort, $requestScheme, $requestPort, $expectedPort): void
     {
         $host = 'www.example.com';
         $baseUrl = '/base';
@@ -205,7 +205,7 @@ class RedirectControllerTest extends TestCase
     /**
      * @dataProvider pathQueryParamsProvider
      */
-    public function testPathQueryParams($expectedUrl, $path, $queryString)
+    public function testPathQueryParams($expectedUrl, $path, $queryString): void
     {
         $scheme = 'http';
         $host = 'www.example.com';
@@ -252,7 +252,7 @@ class RedirectControllerTest extends TestCase
         return new RedirectController(null, $httpPort, $httpsPort);
     }
 
-    public function assertRedirectUrl(Response $returnResponse, $expectedUrl)
+    public function assertRedirectUrl(Response $returnResponse, $expectedUrl): void
     {
         $this->assertTrue($returnResponse->isRedirect($expectedUrl), "Expected: $expectedUrl\nGot:      ".$returnResponse->headers->get('Location'));
     }

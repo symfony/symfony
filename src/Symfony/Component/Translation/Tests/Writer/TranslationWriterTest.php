@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
 
 class TranslationWriterTest extends TestCase
 {
-    public function testWrite()
+    public function testWrite(): void
     {
         $dumper = $this->getMockBuilder('Symfony\Component\Translation\Dumper\DumperInterface')->getMock();
         $dumper
@@ -30,7 +30,7 @@ class TranslationWriterTest extends TestCase
         $writer->write(new MessageCatalogue('en'), 'test');
     }
 
-    public function testDisableBackup()
+    public function testDisableBackup(): void
     {
         $nonBackupDumper = new NonBackupDumper();
         $backupDumper = new BackupDumper();
@@ -46,7 +46,7 @@ class TranslationWriterTest extends TestCase
 
 class NonBackupDumper implements DumperInterface
 {
-    public function dump(MessageCatalogue $messages, $options = array())
+    public function dump(MessageCatalogue $messages, $options = array()): void
     {
     }
 }
@@ -55,11 +55,11 @@ class BackupDumper implements DumperInterface
 {
     public $backup = true;
 
-    public function dump(MessageCatalogue $messages, $options = array())
+    public function dump(MessageCatalogue $messages, $options = array()): void
     {
     }
 
-    public function setBackup($backup)
+    public function setBackup($backup): void
     {
         $this->backup = $backup;
     }

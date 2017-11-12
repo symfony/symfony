@@ -16,14 +16,14 @@ use Symfony\Component\Asset\Context\NullContext;
 
 class NullContextTest extends TestCase
 {
-    public function testGetBasePath()
+    public function testGetBasePath(): void
     {
         $nullContext = new NullContext();
 
         $this->assertEmpty($nullContext->getBasePath());
     }
 
-    public function testIsSecure()
+    public function testIsSecure(): void
     {
         $nullContext = new NullContext();
 

@@ -53,13 +53,11 @@ final class ConnectionOptions
      * Fetches an option's corresponding constant value from an option name.
      * The option name can either be in snake or camel case.
      *
-     * @param string $name
      *
-     * @return int
      *
      * @throws LdapException
      */
-    public static function getOption($name)
+    public static function getOption(string $name): int
     {
         // Convert
         $constantName = self::getOptionName($name);

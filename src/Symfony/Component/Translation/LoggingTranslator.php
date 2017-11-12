@@ -28,7 +28,6 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
 
     /**
      * @param TranslatorInterface $translator The translator must implement TranslatorBagInterface
-     * @param LoggerInterface     $logger
      */
     public function __construct(TranslatorInterface $translator, LoggerInterface $logger)
     {
@@ -65,7 +64,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function setLocale($locale)
+    public function setLocale($locale): void
     {
         $this->translator->setLocale($locale);
     }
@@ -91,7 +90,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
      *
      * @return array $locales The fallback locales
      */
-    public function getFallbackLocales()
+    public function getFallbackLocales(): array
     {
         if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {
             return $this->translator->getFallbackLocales();
@@ -111,11 +110,10 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
     /**
      * Logs for missing translations.
      *
-     * @param string      $id
      * @param string|null $domain
      * @param string|null $locale
      */
-    private function log($id, $domain, $locale)
+    private function log(string $id, ?string $domain, ?string $locale): void
     {
         if (null === $domain) {
             $domain = 'messages';

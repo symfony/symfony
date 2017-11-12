@@ -20,7 +20,7 @@ class PathPackageTest extends TestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testGetUrl($basePath, $format, $path, $expected)
+    public function testGetUrl($basePath, $format, $path, $expected): void
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format));
         $this->assertEquals($expected, $package->getUrl($path));
@@ -51,7 +51,7 @@ class PathPackageTest extends TestCase
     /**
      * @dataProvider getContextConfigs
      */
-    public function testGetUrlWithContext($basePathRequest, $basePath, $format, $path, $expected)
+    public function testGetUrlWithContext($basePathRequest, $basePath, $format, $path, $expected): void
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format), $this->getContext($basePathRequest));
 
@@ -75,7 +75,7 @@ class PathPackageTest extends TestCase
         );
     }
 
-    public function testVersionStrategyGivesAbsoluteURL()
+    public function testVersionStrategyGivesAbsoluteURL(): void
     {
         $versionStrategy = $this->getMockBuilder('Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface')->getMock();
         $versionStrategy->expects($this->any())

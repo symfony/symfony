@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 
 class TrimListenerTest extends TestCase
 {
-    public function testTrim()
+    public function testTrim(): void
     {
         $data = ' Foo! ';
         $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
@@ -29,7 +29,7 @@ class TrimListenerTest extends TestCase
         $this->assertEquals('Foo!', $event->getData());
     }
 
-    public function testTrimSkipNonStrings()
+    public function testTrimSkipNonStrings(): void
     {
         $data = 1234;
         $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();

@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 class AbstractObjectNormalizerTest extends TestCase
 {
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $normalizer = new AbstractObjectNormalizerDummy();
         $normalizedData = $normalizer->denormalize(array('foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'), __NAMESPACE__.'\Dummy');
@@ -29,7 +29,7 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('baz', $normalizedData->baz);
     }
 
-    public function testInstantiateObjectDenormalizer()
+    public function testInstantiateObjectDenormalizer(): void
     {
         $data = array('foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz');
         $class = __NAMESPACE__.'\Dummy';
@@ -44,7 +44,7 @@ class AbstractObjectNormalizerTest extends TestCase
      * @expectedException \Symfony\Component\Serializer\Exception\ExtraAttributesException
      * @expectedExceptionMessage Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).
      */
-    public function testDenormalizeWithExtraAttributes()
+    public function testDenormalizeWithExtraAttributes(): void
     {
         $normalizer = new AbstractObjectNormalizerDummy();
         $normalizer->denormalize(
@@ -59,7 +59,7 @@ class AbstractObjectNormalizerTest extends TestCase
      * @expectedException \Symfony\Component\Serializer\Exception\ExtraAttributesException
      * @expectedExceptionMessage Extra attributes are not allowed ("fooFoo", "fooBar" are unknown).
      */
-    public function testDenormalizeWithExtraAttributesAndNoGroupsWithMetadataFactory()
+    public function testDenormalizeWithExtraAttributesAndNoGroupsWithMetadataFactory(): void
     {
         $normalizer = new AbstractObjectNormalizerWithMetadata();
         $normalizer->denormalize(
@@ -73,15 +73,15 @@ class AbstractObjectNormalizerTest extends TestCase
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
 {
-    protected function extractAttributes($object, $format = null, array $context = array())
+    protected function extractAttributes($object, $format = null, array $context = array()): void
     {
     }
 
-    protected function getAttributeValue($object, $attribute, $format = null, array $context = array())
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = array()): void
     {
     }
 
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array()): void
     {
         $object->$attribute = $value;
     }
@@ -111,15 +111,15 @@ class AbstractObjectNormalizerWithMetadata extends AbstractObjectNormalizer
         parent::__construct(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())));
     }
 
-    protected function extractAttributes($object, $format = null, array $context = array())
+    protected function extractAttributes($object, $format = null, array $context = array()): void
     {
     }
 
-    protected function getAttributeValue($object, $attribute, $format = null, array $context = array())
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = array()): void
     {
     }
 
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array()): void
     {
         $object->$attribute = $value;
     }

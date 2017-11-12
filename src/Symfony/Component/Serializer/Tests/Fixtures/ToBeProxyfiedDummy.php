@@ -18,7 +18,7 @@ class ToBeProxyfiedDummy
 {
     private $foo;
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }

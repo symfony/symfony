@@ -35,10 +35,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class DebugHandlersListenerTest extends TestCase
 {
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
-        $userHandler = function () {};
+        $userHandler = function (): void {};
         $listener = new DebugHandlersListener($userHandler, $logger);
         $xHandler = new ExceptionHandler();
         $eHandler = new ErrorHandler();
@@ -66,7 +66,7 @@ class DebugHandlersListenerTest extends TestCase
         $this->assertSame(array($logger, LogLevel::INFO), $loggers[E_DEPRECATED]);
     }
 
-    public function testConfigureForHttpKernelWithNoTerminateWithException()
+    public function testConfigureForHttpKernelWithNoTerminateWithException(): void
     {
         $listener = new DebugHandlersListener(null);
         $eHandler = new ErrorHandler();
@@ -91,7 +91,7 @@ class DebugHandlersListenerTest extends TestCase
         $this->assertNull($h);
     }
 
-    public function testConsoleEvent()
+    public function testConsoleEvent(): void
     {
         $dispatcher = new EventDispatcher();
         $listener = new DebugHandlersListener(null);

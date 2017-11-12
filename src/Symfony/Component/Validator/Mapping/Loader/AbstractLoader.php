@@ -47,7 +47,7 @@ abstract class AbstractLoader implements LoaderInterface
      * @param string $alias     The alias
      * @param string $namespace The PHP namespace
      */
-    protected function addNamespaceAlias($alias, $namespace)
+    protected function addNamespaceAlias(string $alias, string $namespace): void
     {
         $this->namespaces[$alias] = $namespace;
     }
@@ -63,11 +63,10 @@ abstract class AbstractLoader implements LoaderInterface
      *                        {@link addNamespaceAlias()}.
      * @param mixed  $options The constraint options
      *
-     * @return Constraint
      *
      * @throws MappingException If the namespace prefix is undefined
      */
-    protected function newConstraint($name, $options = null)
+    protected function newConstraint(string $name, $options = null): Constraint
     {
         if (false !== strpos($name, '\\') && class_exists($name)) {
             $className = (string) $name;

@@ -69,7 +69,7 @@ class ClockMock
         return sprintf("%0.6f %d\n", self::$now - (int) self::$now, (int) self::$now);
     }
 
-    public static function register($class)
+    public static function register($class): void
     {
         $self = get_called_class();
 

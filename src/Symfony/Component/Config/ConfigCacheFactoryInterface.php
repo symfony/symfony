@@ -28,5 +28,5 @@ interface ConfigCacheFactoryInterface
      *
      * @return ConfigCacheInterface $configCache The cache instance
      */
-    public function cache($file, $callable);
+    public function cache(string $file, callable $callable): ConfigCacheInterface;
 }

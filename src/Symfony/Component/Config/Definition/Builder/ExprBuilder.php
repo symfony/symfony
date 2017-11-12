@@ -90,10 +90,8 @@ class ExprBuilder
 
     /**
      * Tests if the value is empty.
-     *
-     * @return ExprBuilder
      */
-    public function ifEmpty()
+    public function ifEmpty(): ExprBuilder
     {
         $this->ifPart = function ($v) { return empty($v); };
 
@@ -178,15 +176,14 @@ class ExprBuilder
      *
      * if you want to add the value of the node in your message just use a %s placeholder.
      *
-     * @param string $message
      *
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function thenInvalid($message)
+    public function thenInvalid(string $message)
     {
-        $this->thenPart = function ($v) use ($message) {throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
+        $this->thenPart = function ($v) use ($message): void {throw new \InvalidArgumentException(sprintf($message, json_encode($v))); };
 
         return $this;
     }
@@ -200,7 +197,7 @@ class ExprBuilder
      */
     public function thenUnset()
     {
-        $this->thenPart = function ($v) { throw new UnsetKeyException('Unsetting key'); };
+        $this->thenPart = function ($v): void { throw new UnsetKeyException('Unsetting key'); };
 
         return $this;
     }
@@ -228,10 +225,8 @@ class ExprBuilder
      * Builds the expressions.
      *
      * @param ExprBuilder[] $expressions An array of ExprBuilder instances to build
-     *
-     * @return array
      */
-    public static function buildExpressions(array $expressions)
+    public static function buildExpressions(array $expressions): array
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof self) {

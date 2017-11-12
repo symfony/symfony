@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -38,7 +38,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
-    public function testProcessThrowsExceptionOnInvalidReference()
+    public function testProcessThrowsExceptionOnInvalidReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -53,7 +53,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
-    public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition()
+    public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition(): void
     {
         $container = new ContainerBuilder();
 
@@ -72,7 +72,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid ignore-on-uninitialized reference found in service
      */
-    public function testProcessThrowsExceptionOnNonSharedUninitializedReference()
+    public function testProcessThrowsExceptionOnNonSharedUninitializedReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -89,7 +89,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessDefinitionWithBindings()
+    public function testProcessDefinitionWithBindings(): void
     {
         $container = new ContainerBuilder();
 
@@ -103,7 +103,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    private function process(ContainerBuilder $container)
+    private function process(ContainerBuilder $container): void
     {
         $pass = new CheckExceptionOnInvalidReferenceBehaviorPass();
         $pass->process($container);

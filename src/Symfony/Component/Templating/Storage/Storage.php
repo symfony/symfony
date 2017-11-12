@@ -33,7 +33,7 @@ abstract class Storage
      *
      * @return string The template name
      */
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->template;
     }
@@ -43,5 +43,5 @@ abstract class Storage
      *
      * @return string The template content
      */
-    abstract public function getContent();
+    abstract public function getContent(): string;
 }

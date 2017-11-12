@@ -96,7 +96,7 @@ class XmlFileLoader extends FileLoader
      *
      * @throws MappingException
      */
-    private function parseFile($file)
+    private function parseFile(string $file): \SimpleXMLElement
     {
         try {
             $dom = XmlUtils::loadFile($file, __DIR__.'/schema/dic/serializer-mapping/serializer-mapping-1.0.xsd');

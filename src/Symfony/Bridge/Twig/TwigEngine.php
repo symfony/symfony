@@ -56,7 +56,7 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
      *
      * @throws Error if something went wrong like a thrown exception while rendering the template
      */
-    public function stream($name, array $parameters = array())
+    public function stream($name, array $parameters = array()): void
     {
         $this->load($name)->display($parameters);
     }
@@ -111,11 +111,10 @@ class TwigEngine implements EngineInterface, StreamingEngineInterface
      * @param string|TemplateReferenceInterface|Template $name A template name or an instance of
      *                                                         TemplateReferenceInterface or Template
      *
-     * @return Template
      *
      * @throws \InvalidArgumentException if the template does not exist
      */
-    protected function load($name)
+    protected function load($name): Template
     {
         if ($name instanceof Template) {
             return $name;

@@ -34,10 +34,7 @@ class ChainUserProvider implements UserProviderInterface
         $this->providers = $providers;
     }
 
-    /**
-     * @return array
-     */
-    public function getProviders()
+    public function getProviders(): array
     {
         if ($this->providers instanceof \Traversable) {
             return iterator_to_array($this->providers);

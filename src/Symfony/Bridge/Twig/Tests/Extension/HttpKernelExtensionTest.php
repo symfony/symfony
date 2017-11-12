@@ -25,14 +25,14 @@ class HttpKernelExtensionTest extends TestCase
     /**
      * @expectedException \Twig\Error\RuntimeError
      */
-    public function testFragmentWithError()
+    public function testFragmentWithError(): void
     {
         $renderer = $this->getFragmentHandler($this->throwException(new \Exception('foo')));
 
         $this->renderTemplate($renderer);
     }
 
-    public function testRenderFragment()
+    public function testRenderFragment(): void
     {
         $renderer = $this->getFragmentHandler($this->returnValue(new Response('html')));
 
@@ -41,7 +41,7 @@ class HttpKernelExtensionTest extends TestCase
         $this->assertEquals('html', $response);
     }
 
-    public function testUnknownFragmentRenderer()
+    public function testUnknownFragmentRenderer(): void
     {
         $context = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
             ->disableOriginalConstructor()

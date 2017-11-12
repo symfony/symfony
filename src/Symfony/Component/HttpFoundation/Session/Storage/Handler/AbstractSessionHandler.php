@@ -39,27 +39,11 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
         return true;
     }
 
-    /**
-     * @param string $sessionId
-     *
-     * @return string
-     */
-    abstract protected function doRead($sessionId);
+    abstract protected function doRead(string $sessionId): string;
 
-    /**
-     * @param string $sessionId
-     * @param string $data
-     *
-     * @return bool
-     */
-    abstract protected function doWrite($sessionId, $data);
+    abstract protected function doWrite(string $sessionId, string $data): bool;
 
-    /**
-     * @param string $sessionId
-     *
-     * @return bool
-     */
-    abstract protected function doDestroy($sessionId);
+    abstract protected function doDestroy(string $sessionId): bool;
 
     /**
      * {@inheritdoc}

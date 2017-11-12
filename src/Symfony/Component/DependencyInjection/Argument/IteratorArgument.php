@@ -34,7 +34,7 @@ class IteratorArgument implements ArgumentInterface
     /**
      * @return array The values to lazily iterate over
      */
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }
@@ -42,7 +42,7 @@ class IteratorArgument implements ArgumentInterface
     /**
      * @param Reference[] $values The service references to lazily iterate over
      */
-    public function setValues(array $values)
+    public function setValues(array $values): void
     {
         foreach ($values as $k => $v) {
             if (null !== $v && !$v instanceof Reference) {

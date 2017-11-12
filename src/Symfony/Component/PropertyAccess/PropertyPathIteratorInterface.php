@@ -22,7 +22,7 @@ interface PropertyPathIteratorInterface extends \Iterator, \SeekableIterator
      *
      * @return bool
      */
-    public function isIndex();
+    public function isIndex(): bool;
 
     /**
      * Returns whether the current element in the property path is a property
@@ -30,5 +30,5 @@ interface PropertyPathIteratorInterface extends \Iterator, \SeekableIterator
      *
      * @return bool
      */
-    public function isProperty();
+    public function isProperty(): bool;
 }

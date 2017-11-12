@@ -26,5 +26,5 @@ interface TranslationReaderInterface
      * @param string           $directory
      * @param MessageCatalogue $catalogue
      */
-    public function read($directory, MessageCatalogue $catalogue);
+    public function read(string $directory, MessageCatalogue $catalogue): void;
 }

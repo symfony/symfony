@@ -16,31 +16,31 @@ use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
 
 class PasswordEncoder extends BasePasswordEncoder
 {
-    public function encodePassword($raw, $salt)
+    public function encodePassword($raw, $salt): void
     {
     }
 
-    public function isPasswordValid($encoded, $raw, $salt)
+    public function isPasswordValid($encoded, $raw, $salt): void
     {
     }
 }
 
 class BasePasswordEncoderTest extends TestCase
 {
-    public function testComparePassword()
+    public function testComparePassword(): void
     {
         $this->assertTrue($this->invokeComparePasswords('password', 'password'));
         $this->assertFalse($this->invokeComparePasswords('password', 'foo'));
     }
 
-    public function testDemergePasswordAndSalt()
+    public function testDemergePasswordAndSalt(): void
     {
         $this->assertEquals(array('password', 'salt'), $this->invokeDemergePasswordAndSalt('password{salt}'));
         $this->assertEquals(array('password', ''), $this->invokeDemergePasswordAndSalt('password'));
         $this->assertEquals(array('', ''), $this->invokeDemergePasswordAndSalt(''));
     }
 
-    public function testMergePasswordAndSalt()
+    public function testMergePasswordAndSalt(): void
     {
         $this->assertEquals('password{salt}', $this->invokeMergePasswordAndSalt('password', 'salt'));
         $this->assertEquals('password', $this->invokeMergePasswordAndSalt('password', ''));
@@ -49,12 +49,12 @@ class BasePasswordEncoderTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testMergePasswordAndSaltWithException()
+    public function testMergePasswordAndSaltWithException(): void
     {
         $this->invokeMergePasswordAndSalt('password', '{foo}');
     }
 
-    public function testIsPasswordTooLong()
+    public function testIsPasswordTooLong(): void
     {
         $this->assertTrue($this->invokeIsPasswordTooLong(str_repeat('a', 10000)));
         $this->assertFalse($this->invokeIsPasswordTooLong(str_repeat('a', 10)));

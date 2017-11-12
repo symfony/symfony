@@ -16,21 +16,21 @@ use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 
 class JsonManifestVersionStrategyTest extends TestCase
 {
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $strategy = $this->createStrategy('manifest-valid.json');
 
         $this->assertEquals('main.123abc.js', $strategy->getVersion('main.js'));
     }
 
-    public function testApplyVersion()
+    public function testApplyVersion(): void
     {
         $strategy = $this->createStrategy('manifest-valid.json');
 
         $this->assertEquals('css/styles.555def.css', $strategy->getVersion('css/styles.css'));
     }
 
-    public function testApplyVersionWhenKeyDoesNotExistInManifest()
+    public function testApplyVersionWhenKeyDoesNotExistInManifest(): void
     {
         $strategy = $this->createStrategy('manifest-valid.json');
 
@@ -40,7 +40,7 @@ class JsonManifestVersionStrategyTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testMissingManifestFileThrowsException()
+    public function testMissingManifestFileThrowsException(): void
     {
         $strategy = $this->createStrategy('non-existent-file.json');
         $strategy->getVersion('main.js');
@@ -50,7 +50,7 @@ class JsonManifestVersionStrategyTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Error parsing JSON
      */
-    public function testManifestFileWithBadJSONThrowsException()
+    public function testManifestFileWithBadJSONThrowsException(): void
     {
         $strategy = $this->createStrategy('manifest-invalid.json');
         $strategy->getVersion('main.js');

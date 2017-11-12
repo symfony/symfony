@@ -50,7 +50,7 @@ class WindowsPipes extends AbstractPipes
             $tmpCheck = false;
             $tmpDir = sys_get_temp_dir();
             $lastError = 'unknown reason';
-            set_error_handler(function ($type, $msg) use (&$lastError) { $lastError = $msg; });
+            set_error_handler(function ($type, $msg) use (&$lastError): void { $lastError = $msg; });
             for ($i = 0;; ++$i) {
                 foreach ($pipes as $pipe => $name) {
                     $file = sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
@@ -172,7 +172,7 @@ class WindowsPipes extends AbstractPipes
     /**
      * {@inheritdoc}
      */
-    public function close()
+    public function close(): void
     {
         parent::close();
         foreach ($this->fileHandles as $handle) {
@@ -184,7 +184,7 @@ class WindowsPipes extends AbstractPipes
     /**
      * Removes temporary files.
      */
-    private function removeFiles()
+    private function removeFiles(): void
     {
         foreach ($this->files as $filename) {
             if (file_exists($filename)) {

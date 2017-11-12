@@ -105,7 +105,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function refresh()
+    public function refresh(): void
     {
         if (!$this->ttl) {
             throw new InvalidArgumentException('You have to define an expiration duration.');
@@ -142,7 +142,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function release()
+    public function release(): void
     {
         $this->store->delete($this->key);
         $this->dirty = false;

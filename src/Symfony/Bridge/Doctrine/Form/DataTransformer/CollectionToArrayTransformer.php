@@ -54,7 +54,7 @@ class CollectionToArrayTransformer implements DataTransformerInterface
      *
      * @return Collection A collection of entities
      */
-    public function reverseTransform($array)
+    public function reverseTransform($array): Collection
     {
         if ('' === $array || null === $array) {
             $array = array();

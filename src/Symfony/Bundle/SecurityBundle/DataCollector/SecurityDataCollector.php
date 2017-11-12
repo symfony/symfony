@@ -56,7 +56,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         if (null === $this->tokenStorage) {
             $this->data = array(
@@ -189,12 +189,12 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->data = array();
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data = $this->cloneVar($this->data);
     }
@@ -204,7 +204,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return bool true if security is enabled, false otherwise
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->data['enabled'];
     }
@@ -214,7 +214,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return string The user
      */
-    public function getUser()
+    public function getUser(): string
     {
         return $this->data['user'];
     }
@@ -224,7 +224,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return array The roles
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->data['roles'];
     }
@@ -234,7 +234,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return array The inherited roles
      */
-    public function getInheritedRoles()
+    public function getInheritedRoles(): array
     {
         return $this->data['inherited_roles'];
     }
@@ -245,7 +245,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return bool true if the profile was contains inherited role information
      */
-    public function supportsRoleHierarchy()
+    public function supportsRoleHierarchy(): bool
     {
         return $this->data['supports_role_hierarchy'];
     }
@@ -255,7 +255,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return bool true if the user is authenticated, false otherwise
      */
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
         return $this->data['authenticated'];
     }
@@ -280,17 +280,15 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return string The token
      */
-    public function getTokenClass()
+    public function getTokenClass(): string
     {
         return $this->data['token_class'];
     }
 
     /**
      * Get the full security token class as Data object.
-     *
-     * @return Data
      */
-    public function getToken()
+    public function getToken(): Data
     {
         return $this->data['token'];
     }
@@ -300,7 +298,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
      *
      * @return string The logout URL
      */
-    public function getLogoutUrl()
+    public function getLogoutUrl(): string
     {
         return $this->data['logout_url'];
     }
@@ -317,30 +315,24 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
     /**
      * Returns the strategy configured for the security voters.
-     *
-     * @return string
      */
-    public function getVoterStrategy()
+    public function getVoterStrategy(): string
     {
         return $this->data['voter_strategy'];
     }
 
     /**
      * Returns the log of the security decisions made by the access decision manager.
-     *
-     * @return array
      */
-    public function getAccessDecisionLog()
+    public function getAccessDecisionLog(): array
     {
         return $this->data['access_decision_log'];
     }
 
     /**
      * Returns the configuration of the current firewall context.
-     *
-     * @return array
      */
-    public function getFirewall()
+    public function getFirewall(): array
     {
         return $this->data['firewall'];
     }

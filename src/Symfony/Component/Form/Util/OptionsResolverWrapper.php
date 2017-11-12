@@ -79,7 +79,7 @@ class OptionsResolverWrapper extends OptionsResolver
         return $this;
     }
 
-    public function resolve(array $options = array())
+    public function resolve(array $options = array()): void
     {
         throw new AccessException('Resolve options is not supported.');
     }

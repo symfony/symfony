@@ -29,12 +29,12 @@ interface ClassMetadataInterface
      *
      * @return string The name of the backing class
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Adds an {@link AttributeMetadataInterface}.
      */
-    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata);
+    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata): void;
 
     /**
      * Gets the list of {@link AttributeMetadataInterface}.
@@ -46,12 +46,12 @@ interface ClassMetadataInterface
     /**
      * Merges a {@link ClassMetadataInterface} in the current one.
      */
-    public function merge(ClassMetadataInterface $classMetadata);
+    public function merge(ClassMetadataInterface $classMetadata): void;
 
     /**
      * Returns a {@link \ReflectionClass} instance for this class.
      *
      * @return \ReflectionClass
      */
-    public function getReflectionClass();
+    public function getReflectionClass(): \ReflectionClass;
 }

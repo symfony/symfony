@@ -22,14 +22,14 @@ class LuhnValidatorTest extends ConstraintValidatorTestCase
         return new LuhnValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Luhn());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Luhn());
 
@@ -39,7 +39,7 @@ class LuhnValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidNumbers
      */
-    public function testValidNumbers($number)
+    public function testValidNumbers($number): void
     {
         $this->validator->validate($number, new Luhn());
 
@@ -73,7 +73,7 @@ class LuhnValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidNumbers
      */
-    public function testInvalidNumbers($number, $code)
+    public function testInvalidNumbers($number, $code): void
     {
         $constraint = new Luhn(array(
             'message' => 'myMessage',
@@ -102,7 +102,7 @@ class LuhnValidatorTest extends ConstraintValidatorTestCase
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      * @dataProvider getInvalidTypes
      */
-    public function testInvalidTypes($number)
+    public function testInvalidTypes($number): void
     {
         $constraint = new Luhn();
 

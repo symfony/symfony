@@ -20,12 +20,12 @@ class JsonDecodeTest extends TestCase
     /** @var \Symfony\Component\Serializer\Encoder\JsonDecode */
     private $decode;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->decode = new JsonDecode();
     }
 
-    public function testSupportsDecoding()
+    public function testSupportsDecoding(): void
     {
         $this->assertTrue($this->decode->supportsDecoding(JsonEncoder::FORMAT));
         $this->assertFalse($this->decode->supportsDecoding('foobar'));
@@ -34,7 +34,7 @@ class JsonDecodeTest extends TestCase
     /**
      * @dataProvider decodeProvider
      */
-    public function testDecode($toDecode, $expected, $context)
+    public function testDecode($toDecode, $expected, $context): void
     {
         $this->assertEquals(
             $expected,
@@ -59,7 +59,7 @@ class JsonDecodeTest extends TestCase
      * @dataProvider decodeProviderException
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
-    public function testDecodeWithException($value)
+    public function testDecodeWithException($value): void
     {
         $this->decode->decode($value, JsonEncoder::FORMAT);
     }

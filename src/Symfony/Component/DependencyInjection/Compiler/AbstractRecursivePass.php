@@ -31,7 +31,7 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->container = $container;
 
@@ -81,14 +81,11 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @param Definition $definition
-     * @param bool       $required
-     *
      * @return \ReflectionFunctionAbstract|null
      *
      * @throws RuntimeException
      */
-    protected function getConstructor(Definition $definition, $required)
+    protected function getConstructor(Definition $definition, bool $required): ?\ReflectionFunctionAbstract
     {
         if (is_string($factory = $definition->getFactory())) {
             if (!function_exists($factory)) {
@@ -133,14 +130,11 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
     }
 
     /**
-     * @param Definition $definition
-     * @param string     $method
-     *
      * @throws RuntimeException
      *
      * @return \ReflectionFunctionAbstract
      */
-    protected function getReflectionMethod(Definition $definition, $method)
+    protected function getReflectionMethod(Definition $definition, string $method): \ReflectionFunctionAbstract
     {
         if ('__construct' === $method) {
             return $this->getConstructor($definition, true);

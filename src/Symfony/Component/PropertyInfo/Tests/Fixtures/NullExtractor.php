@@ -26,7 +26,7 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     /**
      * {@inheritdoc}
      */
-    public function getShortDescription($class, $property, array $context = array())
+    public function getShortDescription($class, $property, array $context = array()): void
     {
         $this->assertIsString($class);
         $this->assertIsString($property);
@@ -35,7 +35,7 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     /**
      * {@inheritdoc}
      */
-    public function getLongDescription($class, $property, array $context = array())
+    public function getLongDescription($class, $property, array $context = array()): void
     {
         $this->assertIsString($class);
         $this->assertIsString($property);
@@ -44,7 +44,7 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     /**
      * {@inheritdoc}
      */
-    public function getTypes($class, $property, array $context = array())
+    public function getTypes($class, $property, array $context = array()): void
     {
         $this->assertIsString($class);
         $this->assertIsString($property);
@@ -53,7 +53,7 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     /**
      * {@inheritdoc}
      */
-    public function isReadable($class, $property, array $context = array())
+    public function isReadable($class, $property, array $context = array()): void
     {
         $this->assertIsString($class);
         $this->assertIsString($property);
@@ -62,7 +62,7 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     /**
      * {@inheritdoc}
      */
-    public function isWritable($class, $property, array $context = array())
+    public function isWritable($class, $property, array $context = array()): void
     {
         $this->assertIsString($class);
         $this->assertIsString($property);
@@ -71,12 +71,12 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = array())
+    public function getProperties($class, array $context = array()): void
     {
         $this->assertIsString($class);
     }
 
-    private function assertIsString($string)
+    private function assertIsString($string): void
     {
         if (!is_string($string)) {
             throw new \InvalidArgumentException(sprintf('"%s" expects strings, given "%s".', __CLASS__, gettype($string)));

@@ -48,7 +48,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
      */
-    public function transform($value)
+    public function transform(\DateInterval $value): string
     {
         if (null === $value) {
             return '';
@@ -70,7 +70,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      * @throws UnexpectedTypeException       if the given value is not a string
      * @throws TransformationFailedException if the date interval could not be parsed
      */
-    public function reverseTransform($value)
+    public function reverseTransform(string $value)
     {
         if (null === $value) {
             return;

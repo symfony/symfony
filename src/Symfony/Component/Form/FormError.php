@@ -58,30 +58,24 @@ class FormError implements \Serializable
 
     /**
      * Returns the error message.
-     *
-     * @return string
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
     /**
      * Returns the error message template.
-     *
-     * @return string
      */
-    public function getMessageTemplate()
+    public function getMessageTemplate(): string
     {
         return $this->messageTemplate;
     }
 
     /**
      * Returns the parameters to be inserted in the message template.
-     *
-     * @return array
      */
-    public function getMessageParameters()
+    public function getMessageParameters(): array
     {
         return $this->messageParameters;
     }
@@ -91,7 +85,7 @@ class FormError implements \Serializable
      *
      * @return int|null
      */
-    public function getMessagePluralization()
+    public function getMessagePluralization(): ?int
     {
         return $this->messagePluralization;
     }
@@ -115,7 +109,7 @@ class FormError implements \Serializable
      *
      * @throws BadMethodCallException If the method is called more than once
      */
-    public function setOrigin(FormInterface $origin)
+    public function setOrigin(FormInterface $origin): void
     {
         if (null !== $this->origin) {
             throw new BadMethodCallException('setOrigin() must only be called once.');
@@ -129,7 +123,7 @@ class FormError implements \Serializable
      *
      * @return FormInterface The form that caused this error
      */
-    public function getOrigin()
+    public function getOrigin(): FormInterface
     {
         return $this->origin;
     }
@@ -139,7 +133,7 @@ class FormError implements \Serializable
      *
      * @return string The serialized error
      */
-    public function serialize()
+    public function serialize(): string
     {
         return serialize(array(
             $this->message,
@@ -155,7 +149,7 @@ class FormError implements \Serializable
      *
      * @param string $serialized The serialized error
      */
-    public function unserialize($serialized)
+    public function unserialize(string $serialized): void
     {
         list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized, array('allowed_classes' => false));
     }

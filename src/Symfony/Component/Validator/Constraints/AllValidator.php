@@ -23,7 +23,7 @@ class AllValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof All) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\All');

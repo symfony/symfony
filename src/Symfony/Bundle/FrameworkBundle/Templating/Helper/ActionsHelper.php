@@ -39,7 +39,7 @@ class ActionsHelper extends Helper
      *
      * @see FragmentHandler::render()
      */
-    public function render($uri, array $options = array())
+    public function render(string $uri, array $options = array()): string
     {
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);

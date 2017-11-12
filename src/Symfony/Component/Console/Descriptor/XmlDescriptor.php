@@ -29,7 +29,7 @@ class XmlDescriptor extends Descriptor
     /**
      * @return \DOMDocument
      */
-    public function getInputDefinitionDocument(InputDefinition $definition)
+    public function getInputDefinitionDocument(InputDefinition $definition): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($definitionXML = $dom->createElement('definition'));
@@ -50,7 +50,7 @@ class XmlDescriptor extends Descriptor
     /**
      * @return \DOMDocument
      */
-    public function getCommandDocument(Command $command)
+    public function getCommandDocument(Command $command): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($commandXML = $dom->createElement('command'));
@@ -81,12 +81,11 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param Application $application
      * @param string|null $namespace
      *
      * @return \DOMDocument
      */
-    public function getApplicationDocument(Application $application, $namespace = null)
+    public function getApplicationDocument(Application $application, ?string $namespace = null): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($rootXml = $dom->createElement('symfony'));
@@ -130,7 +129,7 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputArgument(InputArgument $argument, array $options = array())
+    protected function describeInputArgument(InputArgument $argument, array $options = array()): void
     {
         $this->writeDocument($this->getInputArgumentDocument($argument));
     }
@@ -138,7 +137,7 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputOption(InputOption $option, array $options = array())
+    protected function describeInputOption(InputOption $option, array $options = array()): void
     {
         $this->writeDocument($this->getInputOptionDocument($option));
     }
@@ -146,7 +145,7 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeInputDefinition(InputDefinition $definition, array $options = array())
+    protected function describeInputDefinition(InputDefinition $definition, array $options = array()): void
     {
         $this->writeDocument($this->getInputDefinitionDocument($definition));
     }
@@ -154,7 +153,7 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(Command $command, array $options = array()): void
     {
         $this->writeDocument($this->getCommandDocument($command));
     }
@@ -162,7 +161,7 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeApplication(Application $application, array $options = array())
+    protected function describeApplication(Application $application, array $options = array()): void
     {
         $this->writeDocument($this->getApplicationDocument($application, isset($options['namespace']) ? $options['namespace'] : null));
     }
@@ -170,7 +169,7 @@ class XmlDescriptor extends Descriptor
     /**
      * Appends document children to parent node.
      */
-    private function appendDocument(\DOMNode $parentNode, \DOMNode $importedParent)
+    private function appendDocument(\DOMNode $parentNode, \DOMNode $importedParent): void
     {
         foreach ($importedParent->childNodes as $childNode) {
             $parentNode->appendChild($parentNode->ownerDocument->importNode($childNode, true));

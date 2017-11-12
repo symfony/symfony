@@ -44,7 +44,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
      */
     protected $serverParams;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
@@ -58,7 +58,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         return new FormValidator($this->serverParams);
     }
 
-    public function testValidate()
+    public function testValidate(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $options = array('validation_groups' => array('group1', 'group2'));
@@ -73,7 +73,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateConstraints()
+    public function testValidateConstraints(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $constraint1 = new NotNull(array('groups' => array('group1', 'group2')));
@@ -99,7 +99,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateChildIfValidConstraint()
+    public function testValidateChildIfValidConstraint(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -123,7 +123,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontValidateIfParentWithoutValidConstraint()
+    public function testDontValidateIfParentWithoutValidConstraint(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -144,7 +144,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testMissingConstraintIndex()
+    public function testMissingConstraintIndex(): void
     {
         $object = new \stdClass();
         $form = new FormBuilder('name', '\stdClass', $this->dispatcher, $this->factory);
@@ -157,7 +157,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateConstraintsOptionEvenIfNoValidConstraint()
+    public function testValidateConstraintsOptionEvenIfNoValidConstraint(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $constraint1 = new NotNull(array('groups' => array('group1', 'group2')));
@@ -184,7 +184,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontValidateIfNoValidationGroups()
+    public function testDontValidateIfNoValidationGroups(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -203,7 +203,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontValidateConstraintsIfNoValidationGroups()
+    public function testDontValidateConstraintsIfNoValidationGroups(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $constraint1 = $this->getMockBuilder('Symfony\Component\Validator\Constraint')->getMock();
@@ -227,7 +227,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontValidateIfNotSynchronized()
+    public function testDontValidateIfNotSynchronized(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -241,7 +241,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 function ($data) { return $data; },
-                function () { throw new TransformationFailedException(); }
+                function (): void { throw new TransformationFailedException(); }
             ))
             ->getForm();
 
@@ -261,7 +261,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testAddInvalidErrorEvenIfNoValidationGroups()
+    public function testAddInvalidErrorEvenIfNoValidationGroups(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -276,7 +276,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                     function ($data) { return $data; },
-                    function () { throw new TransformationFailedException(); }
+                    function (): void { throw new TransformationFailedException(); }
                 ))
             ->getForm();
 
@@ -296,7 +296,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testDontValidateConstraintsIfNotSynchronized()
+    public function testDontValidateConstraintsIfNotSynchronized(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $constraint1 = $this->getMockBuilder('Symfony\Component\Validator\Constraint')->getMock();
@@ -311,7 +311,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 function ($data) { return $data; },
-                function () { throw new TransformationFailedException(); }
+                function (): void { throw new TransformationFailedException(); }
             ))
             ->getForm();
 
@@ -331,13 +331,13 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     }
 
     // https://github.com/symfony/symfony/issues/4359
-    public function testDontMarkInvalidIfAnyChildIsNotSynchronized()
+    public function testDontMarkInvalidIfAnyChildIsNotSynchronized(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
         $failingTransformer = new CallbackTransformer(
             function ($data) { return $data; },
-            function () { throw new TransformationFailedException(); }
+            function (): void { throw new TransformationFailedException(); }
         );
 
         $form = $this->getBuilder('name', '\stdClass')
@@ -361,7 +361,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testHandleGroupSequenceValidationGroups()
+    public function testHandleGroupSequenceValidationGroups(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $options = array('validation_groups' => new GroupSequence(array('group1', 'group2')));
@@ -377,7 +377,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testHandleCallbackValidationGroups()
+    public function testHandleCallbackValidationGroups(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $options = array('validation_groups' => array($this, 'getValidationGroups'));
@@ -392,7 +392,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontExecuteFunctionNames()
+    public function testDontExecuteFunctionNames(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $options = array('validation_groups' => 'header');
@@ -407,7 +407,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testHandleClosureValidationGroups()
+    public function testHandleClosureValidationGroups(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $options = array('validation_groups' => function (FormInterface $form) {
@@ -424,7 +424,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testUseValidationGroupOfClickedButton()
+    public function testUseValidationGroupOfClickedButton(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -451,7 +451,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontUseValidationGroupOfUnclickedButton()
+    public function testDontUseValidationGroupOfUnclickedButton(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -478,7 +478,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testUseInheritedValidationGroup()
+    public function testUseInheritedValidationGroup(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -500,7 +500,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testUseInheritedCallbackValidationGroup()
+    public function testUseInheritedCallbackValidationGroup(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -522,7 +522,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testUseInheritedClosureValidationGroup()
+    public function testUseInheritedClosureValidationGroup(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -548,7 +548,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testAppendPropertyPath()
+    public function testAppendPropertyPath(): void
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $form = $this->getBuilder('name', '\stdClass')
@@ -562,7 +562,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontWalkScalars()
+    public function testDontWalkScalars(): void
     {
         $form = $this->getBuilder()
             ->setData('scalar')
@@ -575,7 +575,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testViolationIfExtraData()
+    public function testViolationIfExtraData(): void
     {
         $form = $this->getBuilder('parent', null, array('extra_fields_message' => 'Extra!'))
             ->setCompound(true)
@@ -596,7 +596,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testNoViolationIfAllowExtraData()
+    public function testNoViolationIfAllowExtraData(): void
     {
         $context = $this->getMockExecutionContext();
 
@@ -669,7 +669,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getDataMapper()
+    private function getDataMapper(): \PHPUnit_Framework_MockObject_MockObject
     {
         return $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
     }

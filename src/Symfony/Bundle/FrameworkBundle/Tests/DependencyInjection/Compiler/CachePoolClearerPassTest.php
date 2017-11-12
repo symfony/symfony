@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
 class CachePoolClearerPassTest extends TestCase
 {
-    public function testPoolRefsAreWeak()
+    public function testPoolRefsAreWeak(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

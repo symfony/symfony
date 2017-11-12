@@ -23,7 +23,7 @@ class FileStorage extends Storage
      *
      * @return string The template content
      */
-    public function getContent()
+    public function getContent(): string
     {
         return file_get_contents($this->template);
     }

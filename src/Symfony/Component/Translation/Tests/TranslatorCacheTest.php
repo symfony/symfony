@@ -22,18 +22,18 @@ class TranslatorCacheTest extends TestCase
 {
     protected $tmpDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tmpDir = sys_get_temp_dir().'/sf2_translation';
         $this->deleteTmpDir();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->deleteTmpDir();
     }
 
-    protected function deleteTmpDir()
+    protected function deleteTmpDir(): void
     {
         if (!file_exists($dir = $this->tmpDir)) {
             return;
@@ -56,7 +56,7 @@ class TranslatorCacheTest extends TestCase
     /**
      * @dataProvider runForDebugAndProduction
      */
-    public function testThatACacheIsUsed($debug)
+    public function testThatACacheIsUsed($debug): void
     {
         $locale = 'any_locale';
         $format = 'some_format';
@@ -75,7 +75,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertEquals('OK', $translator->trans($msgid), '-> caching does not work in '.($debug ? 'debug' : 'production'));
     }
 
-    public function testCatalogueIsReloadedWhenResourcesAreNoLongerFresh()
+    public function testCatalogueIsReloadedWhenResourcesAreNoLongerFresh(): void
     {
         /*
          * The testThatACacheIsUsed() test showed that we don't need the loader as long as the cache
@@ -119,7 +119,7 @@ class TranslatorCacheTest extends TestCase
     /**
      * @dataProvider runForDebugAndProduction
      */
-    public function testDifferentTranslatorsForSameLocaleDoNotOverwriteEachOthersCache($debug)
+    public function testDifferentTranslatorsForSameLocaleDoNotOverwriteEachOthersCache($debug): void
     {
         /*
          * Similar to the previous test. After we used the second translator, make
@@ -149,7 +149,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertEquals('OK', $translator->trans($msgid), '-> the cache was overwritten by another translator instance in '.($debug ? 'debug' : 'production'));
     }
 
-    public function testGeneratedCacheFilesAreOnlyBelongRequestedLocales()
+    public function testGeneratedCacheFilesAreOnlyBelongRequestedLocales(): void
     {
         $translator = new Translator('a', null, $this->tmpDir);
         $translator->setFallbackLocales(array('b'));
@@ -160,7 +160,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertCount(1, $cachedFiles);
     }
 
-    public function testDifferentCacheFilesAreUsedForDifferentSetsOfFallbackLocales()
+    public function testDifferentCacheFilesAreUsedForDifferentSetsOfFallbackLocales(): void
     {
         /*
          * Because the cache file contains a catalogue including all of its fallback
@@ -190,7 +190,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
     }
 
-    public function testPrimaryAndFallbackCataloguesContainTheSameMessagesRegardlessOfCaching()
+    public function testPrimaryAndFallbackCataloguesContainTheSameMessagesRegardlessOfCaching(): void
     {
         /*
          * As a safeguard against potential BC breaks, make sure that primary and fallback
@@ -238,7 +238,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertTrue($fallback->defines('foo'));
     }
 
-    public function testRefreshCacheWhenResourcesAreNoLongerFresh()
+    public function testRefreshCacheWhenResourcesAreNoLongerFresh(): void
     {
         $resource = $this->getMockBuilder('Symfony\Component\Config\Resource\SelfCheckingResourceInterface')->getMock();
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
@@ -279,10 +279,7 @@ class TranslatorCacheTest extends TestCase
         return array(array(true), array(false));
     }
 
-    /**
-     * @return LoaderInterface
-     */
-    private function createFailingLoader()
+    private function createFailingLoader(): LoaderInterface
     {
         $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $loader
@@ -300,7 +297,7 @@ class StaleResource implements SelfCheckingResourceInterface
         return false;
     }
 
-    public function getResource()
+    public function getResource(): void
     {
     }
 

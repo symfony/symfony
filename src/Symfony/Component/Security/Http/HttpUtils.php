@@ -54,7 +54,7 @@ class HttpUtils
      *
      * @return RedirectResponse A RedirectResponse instance
      */
-    public function createRedirectResponse(Request $request, $path, $status = 302)
+    public function createRedirectResponse(Request $request, string $path, int $status = 302): RedirectResponse
     {
         return new RedirectResponse($this->generateUri($request, $path), $status);
     }
@@ -67,7 +67,7 @@ class HttpUtils
      *
      * @return Request A Request instance
      */
-    public function createRequest(Request $request, $path)
+    public function createRequest(Request $request, string $path): Request
     {
         $newRequest = Request::create($this->generateUri($request, $path), 'get', array(), $request->cookies->all(), array(), $request->server->all());
         if ($request->hasSession()) {
@@ -95,7 +95,7 @@ class HttpUtils
      *
      * @return bool true if the path is the same as the one from the Request, false otherwise
      */
-    public function checkRequestPath(Request $request, $path)
+    public function checkRequestPath(Request $request, string $path): bool
     {
         if ('/' !== $path[0]) {
             try {
@@ -127,7 +127,7 @@ class HttpUtils
      *
      * @throws \LogicException
      */
-    public function generateUri($request, $path)
+    public function generateUri(Request $request, string $path): string
     {
         if (0 === strpos($path, 'http') || !$path) {
             return $path;

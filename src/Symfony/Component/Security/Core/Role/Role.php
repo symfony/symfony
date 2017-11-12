@@ -27,10 +27,8 @@ class Role
 
     /**
      * Returns a string representation of the role.
-     *
-     * @return string
      */
-    public function getRole()
+    public function getRole(): string
     {
         return $this->role;
     }

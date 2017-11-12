@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RouterMatchCommandTest extends TestCase
 {
-    public function testWithMatchPath()
+    public function testWithMatchPath(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('path_info' => '/foo', 'foo'), array('decorated' => false));
@@ -32,7 +32,7 @@ class RouterMatchCommandTest extends TestCase
         $this->assertContains('Route Name   | foo', $tester->getDisplay());
     }
 
-    public function testWithNotMatchPath()
+    public function testWithNotMatchPath(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('path_info' => '/test', 'foo'), array('decorated' => false));
@@ -41,10 +41,7 @@ class RouterMatchCommandTest extends TestCase
         $this->assertContains('None of the routes match the path "/test"', $tester->getDisplay());
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester()
+    private function createCommandTester(): CommandTester
     {
         $application = new Application($this->getKernel());
         $application->add(new RouterMatchCommand($this->getRouter()));

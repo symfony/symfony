@@ -47,7 +47,7 @@ interface ValidatorBuilderInterface
      *
      * @return $this
      */
-    public function addXmlMapping($path);
+    public function addXmlMapping(string $path);
 
     /**
      * Adds a list of XML constraint mapping files to the validator.
@@ -65,7 +65,7 @@ interface ValidatorBuilderInterface
      *
      * @return $this
      */
-    public function addYamlMapping($path);
+    public function addYamlMapping(string $path);
 
     /**
      * Adds a list of YAML constraint mappings file to the validator.
@@ -83,7 +83,7 @@ interface ValidatorBuilderInterface
      *
      * @return $this
      */
-    public function addMethodMapping($methodName);
+    public function addMethodMapping(string $methodName);
 
     /**
      * Enables constraint mapping using the given static methods.
@@ -147,12 +147,12 @@ interface ValidatorBuilderInterface
      *
      * @return $this
      */
-    public function setTranslationDomain($translationDomain);
+    public function setTranslationDomain(string $translationDomain);
 
     /**
      * Builds and returns a new validator object.
      *
      * @return ValidatorInterface The built validator
      */
-    public function getValidator();
+    public function getValidator(): ValidatorInterface;
 }

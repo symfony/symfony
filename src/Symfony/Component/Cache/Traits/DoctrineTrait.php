@@ -23,7 +23,7 @@ trait DoctrineTrait
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         parent::reset();
         $this->provider->setNamespace($this->provider->getNamespace());

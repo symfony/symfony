@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  */
 class CamelCaseToSnakeCaseNameConverterTest extends TestCase
 {
-    public function testInterface()
+    public function testInterface(): void
     {
         $attributeMetadata = new CamelCaseToSnakeCaseNameConverter();
         $this->assertInstanceOf('Symfony\Component\Serializer\NameConverter\NameConverterInterface', $attributeMetadata);
@@ -28,7 +28,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
     /**
      * @dataProvider attributeProvider
      */
-    public function testNormalize($underscored, $camelCased, $useLowerCamelCase)
+    public function testNormalize($underscored, $camelCased, $useLowerCamelCase): void
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, $useLowerCamelCase);
         $this->assertEquals($nameConverter->normalize($camelCased), $underscored);
@@ -37,7 +37,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
     /**
      * @dataProvider attributeProvider
      */
-    public function testDenormalize($underscored, $camelCased, $useLowerCamelCase)
+    public function testDenormalize($underscored, $camelCased, $useLowerCamelCase): void
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, $useLowerCamelCase);
         $this->assertEquals($nameConverter->denormalize($underscored), $camelCased);

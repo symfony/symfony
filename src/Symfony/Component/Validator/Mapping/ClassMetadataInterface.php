@@ -46,7 +46,7 @@ interface ClassMetadataInterface extends MetadataInterface
      *
      * @see \Symfony\Component\Validator\Constraints\GroupSequence
      */
-    public function hasGroupSequence();
+    public function hasGroupSequence(): bool;
 
     /**
      * Returns the group sequence that overrides the "Default" group for this
@@ -56,7 +56,7 @@ interface ClassMetadataInterface extends MetadataInterface
      *
      * @see \Symfony\Component\Validator\Constraints\GroupSequence
      */
-    public function getGroupSequence();
+    public function getGroupSequence(): ?\Symfony\Component\Validator\Constraints\GroupSequence;
 
     /**
      * Returns whether the "Default" group is overridden by a dynamic group
@@ -72,7 +72,7 @@ interface ClassMetadataInterface extends MetadataInterface
      *
      * @see \Symfony\Component\Validator\GroupSequenceProviderInterface
      */
-    public function isGroupSequenceProvider();
+    public function isGroupSequenceProvider(): bool;
 
     /**
      * Check if there's any metadata attached to the given named property.
@@ -81,7 +81,7 @@ interface ClassMetadataInterface extends MetadataInterface
      *
      * @return bool
      */
-    public function hasPropertyMetadata($property);
+    public function hasPropertyMetadata(string $property): bool;
 
     /**
      * Returns all metadata instances for the given named property.
@@ -94,12 +94,12 @@ interface ClassMetadataInterface extends MetadataInterface
      * @return PropertyMetadataInterface[] A list of metadata instances. Empty if
      *                                     no metadata exists for the property.
      */
-    public function getPropertyMetadata($property);
+    public function getPropertyMetadata(string $property);
 
     /**
      * Returns the name of the backing PHP class.
      *
      * @return string The name of the backing class
      */
-    public function getClassName();
+    public function getClassName(): string;
 }

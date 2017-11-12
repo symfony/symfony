@@ -21,7 +21,7 @@ class FormFactoryBuilderTest extends TestCase
     private $guesser;
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $factory = new \ReflectionClass('Symfony\Component\Form\FormFactory');
         $this->registry = $factory->getProperty('registry');
@@ -31,7 +31,7 @@ class FormFactoryBuilderTest extends TestCase
         $this->type = new FooType();
     }
 
-    public function testAddType()
+    public function testAddType(): void
     {
         $factoryBuilder = new FormFactoryBuilder();
         $factoryBuilder->addType($this->type);
@@ -45,7 +45,7 @@ class FormFactoryBuilderTest extends TestCase
         $this->assertNull($extensions[0]->getTypeGuesser());
     }
 
-    public function testAddTypeGuesser()
+    public function testAddTypeGuesser(): void
     {
         $factoryBuilder = new FormFactoryBuilder();
         $factoryBuilder->addTypeGuesser($this->guesser);

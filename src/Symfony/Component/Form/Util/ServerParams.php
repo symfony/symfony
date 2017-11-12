@@ -27,10 +27,8 @@ class ServerParams
 
     /**
      * Returns true if the POST max size has been exceeded in the request.
-     *
-     * @return bool
      */
-    public function hasPostMaxSizeBeenExceeded()
+    public function hasPostMaxSizeBeenExceeded(): bool
     {
         $contentLength = $this->getContentLength();
         $maxContentLength = $this->getPostMaxSize();
@@ -75,10 +73,8 @@ class ServerParams
 
     /**
      * Returns the normalized "post_max_size" ini setting.
-     *
-     * @return string
      */
-    public function getNormalizedIniPostMaxSize()
+    public function getNormalizedIniPostMaxSize(): string
     {
         return strtoupper(trim(ini_get('post_max_size')));
     }

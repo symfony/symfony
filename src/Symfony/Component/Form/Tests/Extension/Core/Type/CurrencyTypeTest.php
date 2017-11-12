@@ -18,14 +18,14 @@ class CurrencyTypeTest extends BaseTypeTest
 {
     const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CurrencyType';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
     }
 
-    public function testCurrenciesAreSelectable()
+    public function testCurrenciesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -35,7 +35,7 @@ class CurrencyTypeTest extends BaseTypeTest
         $this->assertContains(new ChoiceView('SIT', 'SIT', 'Slovenian Tolar'), $choices, '', false, false);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }

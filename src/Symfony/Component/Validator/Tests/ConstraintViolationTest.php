@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 class ConstraintViolationTest extends TestCase
 {
-    public function testToStringHandlesArrays()
+    public function testToStringHandlesArrays(): void
     {
         $violation = new ConstraintViolation(
             'Array',
@@ -35,7 +35,7 @@ EOF;
         $this->assertSame($expected, (string) $violation);
     }
 
-    public function testToStringHandlesArrayRoots()
+    public function testToStringHandlesArrayRoots(): void
     {
         $violation = new ConstraintViolation(
             '42 cannot be used here',

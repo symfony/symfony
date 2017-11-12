@@ -52,7 +52,7 @@ class ProfilerController
      *
      * @throws NotFoundHttpException
      */
-    public function homeAction()
+    public function homeAction(): RedirectResponse
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -73,7 +73,7 @@ class ProfilerController
      *
      * @throws NotFoundHttpException
      */
-    public function panelAction(Request $request, $token)
+    public function panelAction(Request $request, string $token): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -123,7 +123,7 @@ class ProfilerController
      *
      * @throws NotFoundHttpException
      */
-    public function toolbarAction(Request $request, $token)
+    public function toolbarAction(Request $request, string $token): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -170,7 +170,7 @@ class ProfilerController
      *
      * @throws NotFoundHttpException
      */
-    public function searchBarAction(Request $request)
+    public function searchBarAction(Request $request): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -229,7 +229,7 @@ class ProfilerController
      *
      * @throws NotFoundHttpException
      */
-    public function searchResultsAction(Request $request, $token)
+    public function searchResultsAction(Request $request, string $token): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -274,7 +274,7 @@ class ProfilerController
      *
      * @throws NotFoundHttpException
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -327,7 +327,7 @@ class ProfilerController
      *
      * @throws NotFoundHttpException
      */
-    public function phpinfoAction()
+    public function phpinfoAction(): Response
     {
         if (null === $this->profiler) {
             throw new NotFoundHttpException('The profiler must be enabled.');
@@ -353,7 +353,7 @@ class ProfilerController
      *
      * @throws NotFoundHttpException
      */
-    public function openAction(Request $request)
+    public function openAction(Request $request): Response
     {
         if (null === $this->baseDir) {
             throw new NotFoundHttpException('The base dir should be set.');
@@ -384,7 +384,7 @@ class ProfilerController
      *
      * @return TemplateManager The Template Manager
      */
-    protected function getTemplateManager()
+    protected function getTemplateManager(): TemplateManager
     {
         if (null === $this->templateManager) {
             $this->templateManager = new TemplateManager($this->profiler, $this->twig, $this->templates);

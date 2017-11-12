@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Length;
 
 class EntityStaticCarTurbo extends EntityStaticCar
 {
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('wheels', new Length(array('max' => 99)));
     }

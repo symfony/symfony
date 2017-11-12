@@ -47,7 +47,7 @@ interface PropertyAccessorInterface
      * @throws Exception\AccessException          If a property/index does not exist or is not public
      * @throws Exception\UnexpectedTypeException  If a value within the path is neither object nor array
      */
-    public function setValue(&$objectOrArray, $propertyPath, $value);
+    public function setValue(&$objectOrArray, $propertyPath, $value): void;
 
     /**
      * Returns the value at the end of the property path of the object graph.
@@ -95,7 +95,7 @@ interface PropertyAccessorInterface
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */
-    public function isWritable($objectOrArray, $propertyPath);
+    public function isWritable($objectOrArray, $propertyPath): bool;
 
     /**
      * Returns whether a property path can be read from an object graph.
@@ -110,5 +110,5 @@ interface PropertyAccessorInterface
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      */
-    public function isReadable($objectOrArray, $propertyPath);
+    public function isReadable($objectOrArray, $propertyPath): bool;
 }

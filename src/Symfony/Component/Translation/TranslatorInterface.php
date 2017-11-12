@@ -32,7 +32,7 @@ interface TranslatorInterface
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    public function trans($id, array $parameters = array(), $domain = null, $locale = null);
+    public function trans(string $id, array $parameters = array(), ?string $domain = null, ?string $locale = null): string;
 
     /**
      * Translates the given choice message by choosing a translation according to a number.
@@ -47,7 +47,7 @@ interface TranslatorInterface
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null);
+    public function transChoice(string $id, int $number, array $parameters = array(), ?string $domain = null, ?string $locale = null): string;
 
     /**
      * Sets the current locale.
@@ -56,12 +56,12 @@ interface TranslatorInterface
      *
      * @throws InvalidArgumentException If the locale contains invalid characters
      */
-    public function setLocale($locale);
+    public function setLocale(string $locale): void;
 
     /**
      * Returns the current locale.
      *
      * @return string The locale
      */
-    public function getLocale();
+    public function getLocale(): string;
 }

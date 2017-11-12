@@ -19,17 +19,17 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 trait VarDumperTestTrait
 {
-    public function assertDumpEquals($dump, $data, $filter = 0, $message = '')
+    public function assertDumpEquals($dump, $data, $filter = 0, $message = ''): void
     {
         $this->assertSame(rtrim($dump), $this->getDump($data, null, $filter), $message);
     }
 
-    public function assertDumpMatchesFormat($dump, $data, $filter = 0, $message = '')
+    public function assertDumpMatchesFormat($dump, $data, $filter = 0, $message = ''): void
     {
         $this->assertStringMatchesFormat(rtrim($dump), $this->getDump($data, null, $filter), $message);
     }
 
-    protected function getDump($data, $key = null, $filter = 0)
+    protected function getDump($data, $key = null, $filter = 0): void
     {
         $flags = getenv('DUMP_LIGHT_ARRAY') ? CliDumper::DUMP_LIGHT_ARRAY : 0;
         $flags |= getenv('DUMP_STRING_LENGTH') ? CliDumper::DUMP_STRING_LENGTH : 0;

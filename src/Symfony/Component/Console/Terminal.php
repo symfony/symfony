@@ -18,10 +18,8 @@ class Terminal
 
     /**
      * Gets the terminal width.
-     *
-     * @return int
      */
-    public function getWidth()
+    public function getWidth(): int
     {
         $width = getenv('COLUMNS');
         if (false !== $width) {
@@ -37,10 +35,8 @@ class Terminal
 
     /**
      * Gets the terminal height.
-     *
-     * @return int
      */
-    public function getHeight()
+    public function getHeight(): int
     {
         $height = getenv('LINES');
         if (false !== $height) {
@@ -54,7 +50,7 @@ class Terminal
         return self::$height ?: 50;
     }
 
-    private static function initDimensions()
+    private static function initDimensions(): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             if (preg_match('/^(\d+)x(\d+)(?: \((\d+)x(\d+)\))?$/', trim(getenv('ANSICON')), $matches)) {

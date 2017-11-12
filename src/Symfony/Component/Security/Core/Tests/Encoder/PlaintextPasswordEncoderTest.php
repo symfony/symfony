@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 
 class PlaintextPasswordEncoderTest extends TestCase
 {
-    public function testIsPasswordValid()
+    public function testIsPasswordValid(): void
     {
         $encoder = new PlaintextPasswordEncoder();
 
@@ -31,7 +31,7 @@ class PlaintextPasswordEncoderTest extends TestCase
         $this->assertTrue($encoder->isPasswordValid('FOO', 'foo', ''));
     }
 
-    public function testEncodePassword()
+    public function testEncodePassword(): void
     {
         $encoder = new PlaintextPasswordEncoder();
 
@@ -41,14 +41,14 @@ class PlaintextPasswordEncoderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testEncodePasswordLength()
+    public function testEncodePasswordLength(): void
     {
         $encoder = new PlaintextPasswordEncoder();
 
         $encoder->encodePassword(str_repeat('a', 5000), 'salt');
     }
 
-    public function testCheckPasswordLength()
+    public function testCheckPasswordLength(): void
     {
         $encoder = new PlaintextPasswordEncoder();
 

@@ -23,7 +23,7 @@ class StubbedTranslator
 
     }
 
-    public function addResource($format, $resource, $locale, $domain = null)
+    public function addResource($format, $resource, $locale, $domain = null): void
     {
     }
 }

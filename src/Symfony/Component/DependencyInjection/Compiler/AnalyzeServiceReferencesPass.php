@@ -48,7 +48,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
     /**
      * {@inheritdoc}
      */
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    public function setRepeatedPass(RepeatedPass $repeatedPass): void
     {
         $this->repeatedPass = $repeatedPass;
     }
@@ -56,7 +56,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
     /**
      * Processes a ContainerBuilder object to populate the service reference graph.
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->container = $container;
         $this->graph = $container->getCompiler()->getServiceReferenceGraph();

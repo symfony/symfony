@@ -37,7 +37,7 @@ class RoutingExtension extends AbstractExtension
      *
      * @return array An array of functions
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return array(
             new TwigFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
@@ -45,26 +45,12 @@ class RoutingExtension extends AbstractExtension
         );
     }
 
-    /**
-     * @param string $name
-     * @param array  $parameters
-     * @param bool   $relative
-     *
-     * @return string
-     */
-    public function getPath($name, $parameters = array(), $relative = false)
+    public function getPath(string $name, array $parameters = array(), bool $relative = false): string
     {
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
-    /**
-     * @param string $name
-     * @param array  $parameters
-     * @param bool   $schemeRelative
-     *
-     * @return string
-     */
-    public function getUrl($name, $parameters = array(), $schemeRelative = false)
+    public function getUrl(string $name, array $parameters = array(), bool $schemeRelative = false): string
     {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
     }
@@ -93,7 +79,7 @@ class RoutingExtension extends AbstractExtension
      *
      * @final since version 3.4
      */
-    public function isUrlGenerationSafe(Node $argsNode)
+    public function isUrlGenerationSafe(Node $argsNode): array
     {
         // support named arguments
         $paramsNode = $argsNode->hasNode('parameters') ? $argsNode->getNode('parameters') : (

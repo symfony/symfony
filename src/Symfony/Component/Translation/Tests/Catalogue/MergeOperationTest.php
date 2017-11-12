@@ -17,7 +17,7 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 
 class MergeOperationTest extends AbstractOperationTest
 {
-    public function testGetMessagesFromSingleDomain()
+    public function testGetMessagesFromSingleDomain(): void
     {
         $operation = $this->createOperation(
             new MessageCatalogue('en', array('messages' => array('a' => 'old_a', 'b' => 'old_b'))),
@@ -40,7 +40,7 @@ class MergeOperationTest extends AbstractOperationTest
         );
     }
 
-    public function testGetResultFromSingleDomain()
+    public function testGetResultFromSingleDomain(): void
     {
         $this->assertEquals(
             new MessageCatalogue('en', array(
@@ -53,7 +53,7 @@ class MergeOperationTest extends AbstractOperationTest
         );
     }
 
-    public function testGetResultWithMetadata()
+    public function testGetResultWithMetadata(): void
     {
         $leftCatalogue = new MessageCatalogue('en', array('messages' => array('a' => 'old_a', 'b' => 'old_b')));
         $leftCatalogue->setMetadata('a', 'foo', 'messages');

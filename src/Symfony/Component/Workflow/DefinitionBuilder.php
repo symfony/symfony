@@ -36,10 +36,7 @@ class DefinitionBuilder
         $this->addTransitions($transitions);
     }
 
-    /**
-     * @return Definition
-     */
-    public function build()
+    public function build(): Definition
     {
         return new Definition($this->places, $this->transitions, $this->initialPlace);
     }
@@ -59,11 +56,9 @@ class DefinitionBuilder
     }
 
     /**
-     * @param string $place
-     *
      * @return $this
      */
-    public function setInitialPlace($place)
+    public function setInitialPlace(string $place)
     {
         $this->initialPlace = $place;
 
@@ -71,11 +66,9 @@ class DefinitionBuilder
     }
 
     /**
-     * @param string $place
-     *
      * @return $this
      */
-    public function addPlace($place)
+    public function addPlace(string $place)
     {
         if (!preg_match('{^[\w\d_-]+$}', $place)) {
             throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $place));

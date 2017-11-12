@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 
 class DataTransformerChainTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer1 = $this->getMockBuilder('Symfony\Component\Form\DataTransformerInterface')->getMock();
         $transformer1->expects($this->once())
@@ -34,7 +34,7 @@ class DataTransformerChainTest extends TestCase
         $this->assertEquals('baz', $chain->transform('foo'));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $transformer2 = $this->getMockBuilder('Symfony\Component\Form\DataTransformerInterface')->getMock();
         $transformer2->expects($this->once())

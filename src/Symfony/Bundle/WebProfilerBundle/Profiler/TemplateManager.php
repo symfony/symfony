@@ -42,14 +42,12 @@ class TemplateManager
     /**
      * Gets the template name for a given panel.
      *
-     * @param Profile $profile
-     * @param string  $panel
      *
      * @return mixed
      *
      * @throws NotFoundHttpException
      */
-    public function getName(Profile $profile, $panel)
+    public function getName(Profile $profile, string $panel)
     {
         $templates = $this->getNames($profile);
 
@@ -63,11 +61,10 @@ class TemplateManager
     /**
      * Gets template names of templates that are present in the viewed profile.
      *
-     * @return array
      *
      * @throws \UnexpectedValueException
      */
-    public function getNames(Profile $profile)
+    public function getNames(Profile $profile): array
     {
         $templates = array();
 

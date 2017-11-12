@@ -20,7 +20,7 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class AutowireRequiredMethodsPassTest extends TestCase
 {
-    public function testSetterInjection()
+    public function testSetterInjection(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -53,7 +53,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertEquals(array(), $methodCalls[1][1]);
     }
 
-    public function testExplicitMethodInjection()
+    public function testExplicitMethodInjection(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);

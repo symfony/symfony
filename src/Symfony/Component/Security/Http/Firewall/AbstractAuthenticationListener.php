@@ -97,7 +97,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     /**
      * Sets the RememberMeServices implementation to use.
      */
-    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
+    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices): void
     {
         $this->rememberMeServices = $rememberMeServices;
     }
@@ -108,7 +108,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * @throws \RuntimeException
      * @throws SessionUnavailableException
      */
-    final public function handle(GetResponseEvent $event)
+    final public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -151,10 +151,8 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
      * The default implementation only processes requests to a specific path,
      * but a subclass could change this to only authenticate requests where a
      * certain parameters is present.
-     *
-     * @return bool
      */
-    protected function requiresAuthentication(Request $request)
+    protected function requiresAuthentication(Request $request): bool
     {
         return $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
     }

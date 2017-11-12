@@ -90,7 +90,7 @@ class PhpDumper extends Dumper
     /**
      * Sets the dumper to be used when dumping proxies in the generated container.
      */
-    public function setProxyDumper(ProxyDumper $proxyDumper)
+    public function setProxyDumper(ProxyDumper $proxyDumper): void
     {
         $this->proxyDumper = $proxyDumper;
     }
@@ -328,7 +328,7 @@ EOTXT
         return $code;
     }
 
-    private function collectLineage($class, array &$lineage)
+    private function collectLineage($class, array &$lineage): void
     {
         if (isset($lineage[$class])) {
             return;
@@ -1255,7 +1255,7 @@ EOF;
         return implode(' && ', $conditions);
     }
 
-    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior, bool $isPreInstantiation)
+    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior, bool $isPreInstantiation): void
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -1591,7 +1591,7 @@ EOF;
     /**
      * Initializes the method names map to avoid conflicts with the Container methods.
      */
-    private function initializeMethodNamesMap(string $class)
+    private function initializeMethodNamesMap(string $class): void
     {
         $this->serviceIdToMethodNameMap = array();
         $this->usedMethodNames = array();

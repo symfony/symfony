@@ -17,7 +17,7 @@ use Symfony\Component\Config\FileLocator;
 
 class YamlFrameworkExtensionTest extends FrameworkExtensionTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
+    protected function loadFromFile(ContainerBuilder $container, $file): void
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
         $loader->load($file.'.yml');

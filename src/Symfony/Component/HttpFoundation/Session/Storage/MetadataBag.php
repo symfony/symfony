@@ -66,7 +66,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function initialize(array &$array)
+    public function initialize(array &$array): void
     {
         $this->meta = &$array;
 
@@ -84,10 +84,8 @@ class MetadataBag implements SessionBagInterface
 
     /**
      * Gets the lifetime that the session cookie was set with.
-     *
-     * @return int
      */
-    public function getLifetime()
+    public function getLifetime(): int
     {
         return $this->meta[self::LIFETIME];
     }
@@ -100,7 +98,7 @@ class MetadataBag implements SessionBagInterface
      *                      to expire with browser session. Time is in seconds, and is
      *                      not a Unix timestamp.
      */
-    public function stampNew($lifetime = null)
+    public function stampNew(int $lifetime = null): void
     {
         $this->stampCreated($lifetime);
     }
@@ -118,7 +116,7 @@ class MetadataBag implements SessionBagInterface
      *
      * @return int Unix timestamp
      */
-    public function getCreated()
+    public function getCreated(): int
     {
         return $this->meta[self::CREATED];
     }
@@ -128,7 +126,7 @@ class MetadataBag implements SessionBagInterface
      *
      * @return int Unix timestamp
      */
-    public function getLastUsed()
+    public function getLastUsed(): int
     {
         return $this->lastUsed;
     }
@@ -136,7 +134,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         // nothing to do
     }
@@ -151,15 +149,13 @@ class MetadataBag implements SessionBagInterface
 
     /**
      * Sets name.
-     *
-     * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    private function stampCreated($lifetime = null)
+    private function stampCreated($lifetime = null): void
     {
         $timeStamp = time();
         $this->meta[self::CREATED] = $this->meta[self::UPDATED] = $this->lastUsed = $timeStamp;

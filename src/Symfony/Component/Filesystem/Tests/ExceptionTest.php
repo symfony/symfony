@@ -20,26 +20,26 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
  */
 class ExceptionTest extends TestCase
 {
-    public function testGetPath()
+    public function testGetPath(): void
     {
         $e = new IOException('', 0, null, '/foo');
         $this->assertEquals('/foo', $e->getPath(), 'The pass should be returned.');
     }
 
-    public function testGeneratedMessage()
+    public function testGeneratedMessage(): void
     {
         $e = new FileNotFoundException(null, 0, null, '/foo');
         $this->assertEquals('/foo', $e->getPath());
         $this->assertEquals('File "/foo" could not be found.', $e->getMessage(), 'A message should be generated.');
     }
 
-    public function testGeneratedMessageWithoutPath()
+    public function testGeneratedMessageWithoutPath(): void
     {
         $e = new FileNotFoundException();
         $this->assertEquals('File could not be found.', $e->getMessage(), 'A message should be generated.');
     }
 
-    public function testCustomMessage()
+    public function testCustomMessage(): void
     {
         $e = new FileNotFoundException('bar', 0, null, '/foo');
         $this->assertEquals('bar', $e->getMessage(), 'A custom message should be possible still.');

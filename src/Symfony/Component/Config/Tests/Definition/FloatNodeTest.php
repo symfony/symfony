@@ -19,7 +19,7 @@ class FloatNodeTest extends TestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testNormalize($value)
+    public function testNormalize($value): void
     {
         $node = new FloatNode('test');
         $this->assertSame($value, $node->normalize($value));
@@ -27,10 +27,8 @@ class FloatNodeTest extends TestCase
 
     /**
      * @dataProvider getValidValues
-     *
-     * @param int $value
      */
-    public function testValidNonEmptyValues($value)
+    public function testValidNonEmptyValues(int $value): void
     {
         $node = new FloatNode('test');
         $node->setAllowEmptyValue(false);
@@ -56,7 +54,7 @@ class FloatNodeTest extends TestCase
      * @dataProvider getInvalidValues
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
      */
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues($value): void
     {
         $node = new FloatNode('test');
         $node->normalize($value);

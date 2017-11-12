@@ -17,7 +17,7 @@ use Symfony\Component\Cache\PruneableInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,7 +26,7 @@ abstract class AdapterTestCase extends CachePoolTest
         }
     }
 
-    public function testDefaultLifeTime()
+    public function testDefaultLifeTime(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -47,7 +47,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertFalse($item->isHit());
     }
 
-    public function testExpiration()
+    public function testExpiration(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -67,7 +67,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertSame('v2', $item->get());
     }
 
-    public function testNotUnserializable()
+    public function testNotUnserializable(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -90,7 +90,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertFalse($item->isHit());
     }
 
-    public function testPrune()
+    public function testPrune(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -103,7 +103,7 @@ abstract class AdapterTestCase extends CachePoolTest
         /** @var PruneableInterface|CacheItemPoolInterface $cache */
         $cache = $this->createCachePool();
 
-        $doSet = function ($name, $value, \DateInterval $expiresAfter = null) use ($cache) {
+        $doSet = function ($name, $value, \DateInterval $expiresAfter = null) use ($cache): void {
             $item = $cache->getItem($name);
             $item->set($value);
 
@@ -164,7 +164,7 @@ class NotUnserializable implements \Serializable
         return serialize(123);
     }
 
-    public function unserialize($ser)
+    public function unserialize($ser): void
     {
         throw new \Exception(__CLASS__);
     }

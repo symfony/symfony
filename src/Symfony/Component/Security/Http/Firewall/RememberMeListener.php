@@ -52,7 +52,7 @@ class RememberMeListener implements ListenerInterface
     /**
      * Handles remember-me cookie based authentication.
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         if (null !== $this->tokenStorage->getToken()) {
             return;

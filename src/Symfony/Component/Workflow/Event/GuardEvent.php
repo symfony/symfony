@@ -24,7 +24,7 @@ class GuardEvent extends Event
         return $this->blocked;
     }
 
-    public function setBlocked($blocked)
+    public function setBlocked($blocked): void
     {
         $this->blocked = (bool) $blocked;
     }

@@ -21,7 +21,7 @@ class PackageTest extends TestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testGetUrl($version, $format, $path, $expected)
+    public function testGetUrl($version, $format, $path, $expected): void
     {
         $package = new Package($version ? new StaticVersionStrategy($version, $format) : new EmptyVersionStrategy());
         $this->assertEquals($expected, $package->getUrl($path));
@@ -47,7 +47,7 @@ class PackageTest extends TestCase
         );
     }
 
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $package = new Package(new StaticVersionStrategy('v1'));
         $this->assertEquals('v1', $package->getVersion('/foo'));

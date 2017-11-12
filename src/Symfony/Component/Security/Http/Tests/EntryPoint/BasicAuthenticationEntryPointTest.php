@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class BasicAuthenticationEntryPointTest extends TestCase
 {
-    public function testStart()
+    public function testStart(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
 
@@ -30,7 +30,7 @@ class BasicAuthenticationEntryPointTest extends TestCase
         $this->assertEquals(401, $response->getStatusCode());
     }
 
-    public function testStartWithoutAuthException()
+    public function testStartWithoutAuthException(): void
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
 

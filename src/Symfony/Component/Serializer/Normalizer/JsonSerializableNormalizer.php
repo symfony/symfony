@@ -60,7 +60,7 @@ class JsonSerializableNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = array()): void
     {
         throw new LogicException(sprintf('Cannot denormalize with "%s".', \JsonSerializable::class));
     }

@@ -19,7 +19,7 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($size, $expected)
+    public function testAccept($size, $expected): void
     {
         $files = self::$files;
         $files[] = self::toAbsolute('doesnotexist');

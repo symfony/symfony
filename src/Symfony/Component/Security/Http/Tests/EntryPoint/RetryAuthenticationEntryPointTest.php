@@ -20,7 +20,7 @@ class RetryAuthenticationEntryPointTest extends TestCase
     /**
      * @dataProvider dataForStart
      */
-    public function testStart($httpPort, $httpsPort, $request, $expectedUrl)
+    public function testStart($httpPort, $httpsPort, $request, $expectedUrl): void
     {
         $entryPoint = new RetryAuthenticationEntryPoint($httpPort, $httpsPort);
         $response = $entryPoint->start($request);

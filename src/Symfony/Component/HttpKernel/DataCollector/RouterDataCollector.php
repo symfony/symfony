@@ -36,7 +36,7 @@ class RouterDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         if ($response instanceof RedirectResponse) {
             $this->data['redirect'] = true;
@@ -50,7 +50,7 @@ class RouterDataCollector extends DataCollector
         unset($this->controllers[$request]);
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->controllers = new \SplObjectStorage();
 
@@ -69,7 +69,7 @@ class RouterDataCollector extends DataCollector
     /**
      * Remembers the controller associated to each request.
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event): void
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }
@@ -77,7 +77,7 @@ class RouterDataCollector extends DataCollector
     /**
      * @return bool Whether this request will result in a redirect
      */
-    public function getRedirect()
+    public function getRedirect(): bool
     {
         return $this->data['redirect'];
     }
@@ -85,7 +85,7 @@ class RouterDataCollector extends DataCollector
     /**
      * @return string|null The target URL
      */
-    public function getTargetUrl()
+    public function getTargetUrl(): ?string
     {
         return $this->data['url'];
     }
@@ -93,7 +93,7 @@ class RouterDataCollector extends DataCollector
     /**
      * @return string|null The target route
      */
-    public function getTargetRoute()
+    public function getTargetRoute(): ?string
     {
         return $this->data['route'];
     }

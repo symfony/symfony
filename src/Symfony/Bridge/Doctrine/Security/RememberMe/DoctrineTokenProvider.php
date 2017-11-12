@@ -66,7 +66,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteTokenBySeries($series)
+    public function deleteTokenBySeries($series): void
     {
         $sql = 'DELETE FROM rememberme_token WHERE series=:series';
         $paramValues = array('series' => $series);
@@ -77,7 +77,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function updateToken($series, $tokenValue, \DateTime $lastUsed)
+    public function updateToken($series, $tokenValue, \DateTime $lastUsed): void
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed'
             .' WHERE series=:series';
@@ -100,7 +100,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function createNewToken(PersistentTokenInterface $token)
+    public function createNewToken(PersistentTokenInterface $token): void
     {
         $sql = 'INSERT INTO rememberme_token'
             .' (class, username, series, value, lastUsed)'

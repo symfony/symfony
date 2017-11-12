@@ -28,7 +28,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 abstract class AbstractTestSessionListener implements EventSubscriberInterface
 {
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -51,7 +51,7 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
      * Checks if session was initialized and saves if current request is master
      * Runs on 'kernel.response' in test environment.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -78,5 +78,5 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
      *
      * @return SessionInterface|null A SessionInterface instance or null if no session is available
      */
-    abstract protected function getSession();
+    abstract protected function getSession(): ?SessionInterface;
 }

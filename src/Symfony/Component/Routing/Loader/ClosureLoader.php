@@ -31,7 +31,7 @@ class ClosureLoader extends Loader
      *
      * @return RouteCollection A RouteCollection instance
      */
-    public function load($closure, $type = null)
+    public function load(\Closure $closure, ?string $type = null): RouteCollection
     {
         return $closure();
     }

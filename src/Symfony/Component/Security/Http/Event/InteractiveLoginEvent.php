@@ -34,7 +34,7 @@ class InteractiveLoginEvent extends Event
      *
      * @return Request A Request instance
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -44,7 +44,7 @@ class InteractiveLoginEvent extends Event
      *
      * @return TokenInterface A TokenInterface instance
      */
-    public function getAuthenticationToken()
+    public function getAuthenticationToken(): TokenInterface
     {
         return $this->authenticationToken;
     }

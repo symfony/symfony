@@ -28,7 +28,7 @@ class Parameter
     /**
      * @return string The parameter key
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }

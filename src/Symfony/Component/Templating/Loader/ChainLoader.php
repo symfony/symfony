@@ -36,7 +36,7 @@ class ChainLoader extends Loader
     /**
      * Adds a loader instance.
      */
-    public function addLoader(LoaderInterface $loader)
+    public function addLoader(LoaderInterface $loader): void
     {
         $this->loaders[] = $loader;
     }
@@ -62,10 +62,8 @@ class ChainLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      * @param int                        $time     The last modification time of the cached template (timestamp)
-     *
-     * @return bool
      */
-    public function isFresh(TemplateReferenceInterface $template, $time)
+    public function isFresh(TemplateReferenceInterface $template, int $time): bool
     {
         foreach ($this->loaders as $loader) {
             return $loader->isFresh($template, $time);

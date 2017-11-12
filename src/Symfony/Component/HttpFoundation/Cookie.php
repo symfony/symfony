@@ -34,12 +34,10 @@ class Cookie
     /**
      * Creates cookie from raw header string.
      *
-     * @param string $cookie
-     * @param bool   $decode
      *
      * @return static
      */
-    public static function fromString($cookie, $decode = false)
+    public static function fromString(string $cookie, bool $decode = false)
     {
         $data = array(
             'expires' => 0,
@@ -140,7 +138,7 @@ class Cookie
      *
      * @return string The cookie
      */
-    public function __toString()
+    public function __toString(): string
     {
         $str = ($this->isRaw() ? $this->getName() : urlencode($this->getName())).'=';
 
@@ -179,10 +177,8 @@ class Cookie
 
     /**
      * Gets the name of the cookie.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -192,7 +188,7 @@ class Cookie
      *
      * @return string|null
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
@@ -202,77 +198,63 @@ class Cookie
      *
      * @return string|null
      */
-    public function getDomain()
+    public function getDomain(): ?string
     {
         return $this->domain;
     }
 
     /**
      * Gets the time the cookie expires.
-     *
-     * @return int
      */
-    public function getExpiresTime()
+    public function getExpiresTime(): int
     {
         return $this->expire;
     }
 
     /**
      * Gets the max-age attribute.
-     *
-     * @return int
      */
-    public function getMaxAge()
+    public function getMaxAge(): int
     {
         return 0 !== $this->expire ? $this->expire - time() : 0;
     }
 
     /**
      * Gets the path on the server in which the cookie will be available on.
-     *
-     * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
     /**
      * Checks whether the cookie should only be transmitted over a secure HTTPS connection from the client.
-     *
-     * @return bool
      */
-    public function isSecure()
+    public function isSecure(): bool
     {
         return $this->secure;
     }
 
     /**
      * Checks whether the cookie will be made accessible only through the HTTP protocol.
-     *
-     * @return bool
      */
-    public function isHttpOnly()
+    public function isHttpOnly(): bool
     {
         return $this->httpOnly;
     }
 
     /**
      * Whether this cookie is about to be cleared.
-     *
-     * @return bool
      */
-    public function isCleared()
+    public function isCleared(): bool
     {
         return $this->expire < time();
     }
 
     /**
      * Checks if the cookie value should be sent with no url encoding.
-     *
-     * @return bool
      */
-    public function isRaw()
+    public function isRaw(): bool
     {
         return $this->raw;
     }
@@ -282,7 +264,7 @@ class Cookie
      *
      * @return string|null
      */
-    public function getSameSite()
+    public function getSameSite(): ?string
     {
         return $this->sameSite;
     }

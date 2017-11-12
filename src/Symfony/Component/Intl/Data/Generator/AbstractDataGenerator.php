@@ -35,7 +35,7 @@ abstract class AbstractDataGenerator
         $this->dirName = $dirName;
     }
 
-    public function generateData(GeneratorConfig $config)
+    public function generateData(GeneratorConfig $config): void
     {
         $filesystem = new Filesystem();
         $localeScanner = new LocaleScanner();
@@ -90,44 +90,26 @@ abstract class AbstractDataGenerator
     }
 
     /**
-     * @param LocaleScanner $scanner
-     * @param string        $sourceDir
-     *
      * @return string[]
      */
-    abstract protected function scanLocales(LocaleScanner $scanner, $sourceDir);
+    abstract protected function scanLocales(LocaleScanner $scanner, string $sourceDir);
+
+    abstract protected function compileTemporaryBundles(GenrbCompiler $compiler, string $sourceDir, string $tempDir): void;
+
+    abstract protected function preGenerate(): void;
 
     /**
-     * @param GenrbCompiler $compiler
-     * @param string        $sourceDir
-     * @param string        $tempDir
-     */
-    abstract protected function compileTemporaryBundles(GenrbCompiler $compiler, $sourceDir, $tempDir);
-
-    abstract protected function preGenerate();
-
-    /**
-     * @param BundleReaderInterface $reader
-     * @param string                $tempDir
-     * @param string                $displayLocale
-     *
      * @return array|null
      */
-    abstract protected function generateDataForLocale(BundleReaderInterface $reader, $tempDir, $displayLocale);
+    abstract protected function generateDataForLocale(BundleReaderInterface $reader, string $tempDir, string $displayLocale): ?array;
 
     /**
-     * @param BundleReaderInterface $reader
-     * @param string                $tempDir
-     *
      * @return array|null
      */
-    abstract protected function generateDataForRoot(BundleReaderInterface $reader, $tempDir);
+    abstract protected function generateDataForRoot(BundleReaderInterface $reader, string $tempDir): ?array;
 
     /**
-     * @param BundleReaderInterface $reader
-     * @param string                $tempDir
-     *
      * @return array|null
      */
-    abstract protected function generateDataForMeta(BundleReaderInterface $reader, $tempDir);
+    abstract protected function generateDataForMeta(BundleReaderInterface $reader, string $tempDir): ?array;
 }

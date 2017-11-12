@@ -158,7 +158,7 @@ class InflectorTest extends TestCase
     /**
      * @dataProvider singularizeProvider
      */
-    public function testSingularize($plural, $singular)
+    public function testSingularize($plural, $singular): void
     {
         $single = Inflector::singularize($plural);
         if (is_string($singular) && is_array($single)) {

@@ -29,7 +29,7 @@ class AccessMap implements AccessMapInterface
      * @param array                   $attributes     An array of attributes to pass to the access decision manager (like roles)
      * @param string|null             $channel        The channel to enforce (http, https, or null)
      */
-    public function add(RequestMatcherInterface $requestMatcher, array $attributes = array(), $channel = null)
+    public function add(RequestMatcherInterface $requestMatcher, array $attributes = array(), ?string $channel = null): void
     {
         $this->map[] = array($requestMatcher, $attributes, $channel);
     }

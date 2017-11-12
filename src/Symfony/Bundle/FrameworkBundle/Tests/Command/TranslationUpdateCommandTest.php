@@ -23,7 +23,7 @@ class TranslationUpdateCommandTest extends TestCase
     private $fs;
     private $translationDir;
 
-    public function testDumpMessagesAndClean()
+    public function testDumpMessagesAndClean(): void
     {
         $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo')));
         $tester->execute(array('command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true));
@@ -31,7 +31,7 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
-    public function testDumpTwoMessagesAndClean()
+    public function testDumpTwoMessagesAndClean(): void
     {
         $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo', 'bar' => 'bar')));
         $tester->execute(array('command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true));
@@ -40,7 +40,7 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/2 messages were successfully extracted/', $tester->getDisplay());
     }
 
-    public function testDumpMessagesForSpecificDomain()
+    public function testDumpMessagesForSpecificDomain(): void
     {
         $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo'), 'mydomain' => array('bar' => 'bar')));
         $tester->execute(array('command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--domain' => 'mydomain'));
@@ -48,21 +48,21 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
-    public function testWriteMessages()
+    public function testWriteMessages(): void
     {
         $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo')));
         $tester->execute(array('command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--force' => true));
         $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
-    public function testWriteMessagesForSpecificDomain()
+    public function testWriteMessagesForSpecificDomain(): void
     {
         $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo'), 'mydomain' => array('bar' => 'bar')));
         $tester->execute(array('command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--force' => true, '--domain' => 'mydomain'));
         $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fs = new Filesystem();
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
@@ -70,15 +70,12 @@ class TranslationUpdateCommandTest extends TestCase
         $this->fs->mkdir($this->translationDir.'/Resources/views');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->fs->remove($this->translationDir);
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester($extractedMessages = array(), $loadedMessages = array(), HttpKernel\KernelInterface $kernel = null)
+    private function createCommandTester($extractedMessages = array(), $loadedMessages = array(), HttpKernel\KernelInterface $kernel = null): CommandTester
     {
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
@@ -94,7 +91,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->expects($this->any())
             ->method('extract')
             ->will(
-                $this->returnCallback(function ($path, $catalogue) use ($extractedMessages) {
+                $this->returnCallback(function ($path, $catalogue) use ($extractedMessages): void {
                     foreach ($extractedMessages as $domain => $messages) {
                         $catalogue->add($messages, $domain);
                     }
@@ -106,7 +103,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->expects($this->any())
             ->method('read')
             ->will(
-                $this->returnCallback(function ($path, $catalogue) use ($loadedMessages) {
+                $this->returnCallback(function ($path, $catalogue) use ($loadedMessages): void {
                     $catalogue->add($loadedMessages);
                 })
             );

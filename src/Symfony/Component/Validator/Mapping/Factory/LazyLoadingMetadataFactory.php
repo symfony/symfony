@@ -115,7 +115,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
         return $this->loadedClasses[$class] = $metadata;
     }
 
-    private function mergeConstraints(ClassMetadata $metadata)
+    private function mergeConstraints(ClassMetadata $metadata): void
     {
         // Include constraints from the parent class
         if ($parent = $metadata->getReflectionClass()->getParentClass()) {

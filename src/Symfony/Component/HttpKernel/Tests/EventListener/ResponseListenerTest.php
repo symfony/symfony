@@ -26,7 +26,7 @@ class ResponseListenerTest extends TestCase
 
     private $kernel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
         $listener = new ResponseListener('UTF-8');
@@ -35,13 +35,13 @@ class ResponseListenerTest extends TestCase
         $this->kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dispatcher = null;
         $this->kernel = null;
     }
 
-    public function testFilterDoesNothingForSubRequests()
+    public function testFilterDoesNothingForSubRequests(): void
     {
         $response = new Response('foo');
 
@@ -51,7 +51,7 @@ class ResponseListenerTest extends TestCase
         $this->assertEquals('', $event->getResponse()->headers->get('content-type'));
     }
 
-    public function testFilterSetsNonDefaultCharsetIfNotOverridden()
+    public function testFilterSetsNonDefaultCharsetIfNotOverridden(): void
     {
         $listener = new ResponseListener('ISO-8859-15');
         $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'), 1);
@@ -64,7 +64,7 @@ class ResponseListenerTest extends TestCase
         $this->assertEquals('ISO-8859-15', $response->getCharset());
     }
 
-    public function testFilterDoesNothingIfCharsetIsOverridden()
+    public function testFilterDoesNothingIfCharsetIsOverridden(): void
     {
         $listener = new ResponseListener('ISO-8859-15');
         $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'), 1);
@@ -78,7 +78,7 @@ class ResponseListenerTest extends TestCase
         $this->assertEquals('ISO-8859-1', $response->getCharset());
     }
 
-    public function testFiltersSetsNonDefaultCharsetIfNotOverriddenOnNonTextContentType()
+    public function testFiltersSetsNonDefaultCharsetIfNotOverriddenOnNonTextContentType(): void
     {
         $listener = new ResponseListener('ISO-8859-15');
         $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'), 1);

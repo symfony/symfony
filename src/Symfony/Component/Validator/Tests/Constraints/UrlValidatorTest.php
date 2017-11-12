@@ -26,21 +26,21 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         return new UrlValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Url());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Url());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringFromObjectIsValid()
+    public function testEmptyStringFromObjectIsValid(): void
     {
         $this->validator->validate(new EmailProvider(), new Url());
 
@@ -50,7 +50,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Url());
     }
@@ -58,7 +58,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidUrls
      */
-    public function testValidUrls($url)
+    public function testValidUrls($url): void
     {
         $this->validator->validate($url, new Url());
 
@@ -133,7 +133,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidUrls
      */
-    public function testInvalidUrls($url)
+    public function testInvalidUrls($url): void
     {
         $constraint = new Url(array(
             'message' => 'myMessage',
@@ -177,7 +177,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidCustomUrls
      */
-    public function testCustomProtocolIsValid($url)
+    public function testCustomProtocolIsValid($url): void
     {
         $constraint = new Url(array(
             'protocols' => array('ftp', 'file', 'git'),
@@ -201,7 +201,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      * @dataProvider getCheckDns
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      */
-    public function testCheckDns($violation)
+    public function testCheckDns($violation): void
     {
         DnsMock::withMockedHosts(array('example.com' => array(array('type' => $violation ? '' : 'A'))));
 
@@ -231,7 +231,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      * @dataProvider getCheckDnsTypes
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      */
-    public function testCheckDnsByType($type)
+    public function testCheckDnsByType($type): void
     {
         DnsMock::withMockedHosts(array('example.com' => array(array('type' => $type))));
 
@@ -267,7 +267,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      * @expectedException \Symfony\Component\Validator\Exception\InvalidOptionsException
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      */
-    public function testCheckDnsWithInvalidType()
+    public function testCheckDnsWithInvalidType(): void
     {
         DnsMock::withMockedHosts(array('example.com' => array(array('type' => 'A'))));
 

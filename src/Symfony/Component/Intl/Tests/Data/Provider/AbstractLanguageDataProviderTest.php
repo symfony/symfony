@@ -832,7 +832,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
      */
     protected $dataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -842,9 +842,9 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         );
     }
 
-    abstract protected function getDataDirectory();
+    abstract protected function getDataDirectory(): void;
 
-    public function testGetLanguages()
+    public function testGetLanguages(): void
     {
         $this->assertEquals(static::$languages, $this->dataProvider->getLanguages());
     }
@@ -852,7 +852,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetNames($displayLocale)
+    public function testGetNames($displayLocale): void
     {
         $languages = array_keys($this->dataProvider->getNames($displayLocale));
 
@@ -862,7 +862,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         $this->assertEmpty(array_diff($languages, static::$languages));
     }
 
-    public function testGetNamesDefaultLocale()
+    public function testGetNamesDefaultLocale(): void
     {
         Locale::setDefault('de_AT');
 
@@ -875,7 +875,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocaleAliases
      */
-    public function testGetNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale): void
     {
         // Can't use assertSame(), because some aliases contain scripts with
         // different collation (=order of output) than their aliased locale
@@ -889,7 +889,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLocales
      */
-    public function testGetName($displayLocale)
+    public function testGetName($displayLocale): void
     {
         $names = $this->dataProvider->getNames($displayLocale);
 
@@ -898,7 +898,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         }
     }
 
-    public function testGetNameDefaultLocale()
+    public function testGetNameDefaultLocale(): void
     {
         Locale::setDefault('de_AT');
 
@@ -920,7 +920,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
     /**
      * @dataProvider provideLanguagesWithAlpha3Equivalent
      */
-    public function testGetAlpha3Code($language)
+    public function testGetAlpha3Code($language): void
     {
         $this->assertSame(static::$alpha2ToAlpha3[$language], $this->dataProvider->getAlpha3Code($language));
     }
@@ -937,7 +937,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
      * @dataProvider provideLanguagesWithoutAlpha3Equivalent
      * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
-    public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($currency)
+    public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($currency): void
     {
         $this->dataProvider->getAlpha3Code($currency);
     }

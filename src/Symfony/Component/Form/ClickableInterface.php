@@ -23,5 +23,5 @@ interface ClickableInterface
      *
      * @return bool Whether this element was clicked
      */
-    public function isClicked();
+    public function isClicked(): bool;
 }

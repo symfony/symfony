@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Logout\CookieClearingLogoutHandler;
 
 class CookieClearingLogoutHandlerTest extends TestCase
 {
-    public function testLogout()
+    public function testLogout(): void
     {
         $request = new Request();
         $response = new Response();

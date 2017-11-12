@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class IniFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new IniFileLoader();
         $resource = __DIR__.'/../fixtures/resources.ini';
@@ -28,7 +28,7 @@ class IniFileLoaderTest extends TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
-    public function testLoadDoesNothingIfEmpty()
+    public function testLoadDoesNothingIfEmpty(): void
     {
         $loader = new IniFileLoader();
         $resource = __DIR__.'/../fixtures/empty.ini';
@@ -42,7 +42,7 @@ class IniFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $loader = new IniFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.ini';

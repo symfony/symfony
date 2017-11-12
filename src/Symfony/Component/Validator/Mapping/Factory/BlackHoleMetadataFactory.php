@@ -25,7 +25,7 @@ class BlackHoleMetadataFactory implements MetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getMetadataFor($value)
+    public function getMetadataFor($value): void
     {
         throw new \LogicException('This class does not support metadata.');
     }

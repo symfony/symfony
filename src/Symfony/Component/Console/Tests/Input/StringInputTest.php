@@ -21,7 +21,7 @@ class StringInputTest extends TestCase
     /**
      * @dataProvider getTokenizeData
      */
-    public function testTokenize($input, $tokens, $message)
+    public function testTokenize($input, $tokens, $message): void
     {
         $input = new StringInput($input);
         $r = new \ReflectionClass('Symfony\Component\Console\Input\ArgvInput');
@@ -30,7 +30,7 @@ class StringInputTest extends TestCase
         $this->assertEquals($tokens, $p->getValue($input), $message);
     }
 
-    public function testInputOptionWithGivenString()
+    public function testInputOptionWithGivenString(): void
     {
         $definition = new InputDefinition(
             array(new InputOption('foo', null, InputOption::VALUE_REQUIRED))
@@ -73,7 +73,7 @@ class StringInputTest extends TestCase
         );
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $input = new StringInput('-f foo');
         $this->assertEquals('-f foo', (string) $input);

@@ -24,7 +24,7 @@ class IniFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): void
     {
         $path = $this->locator->locate($resource);
 

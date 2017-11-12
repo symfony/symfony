@@ -19,7 +19,7 @@ class BirthdayType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('years', range(date('Y') - 120, date('Y')));
 

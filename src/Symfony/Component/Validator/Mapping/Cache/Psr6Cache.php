@@ -53,7 +53,7 @@ class Psr6Cache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function write(ClassMetadata $metadata)
+    public function write(ClassMetadata $metadata): void
     {
         $item = $this->cacheItemPool->getItem($this->escapeClassName($metadata->getClassName()));
         $item->set($metadata);

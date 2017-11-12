@@ -35,7 +35,7 @@ class CasterTest extends TestCase
     /**
      * @dataProvider provideFilter
      */
-    public function testFilter($filter, $expectedDiff, $listedProperties = null)
+    public function testFilter($filter, $expectedDiff, $listedProperties = null): void
     {
         if (null === $listedProperties) {
             $filteredArray = Caster::filter($this->referenceArray, $filter);
@@ -151,7 +151,7 @@ class CasterTest extends TestCase
         );
     }
 
-    public function testAnonymousClass()
+    public function testAnonymousClass(): void
     {
         $c = eval('return new class extends stdClass { private $foo = "foo"; };');
 

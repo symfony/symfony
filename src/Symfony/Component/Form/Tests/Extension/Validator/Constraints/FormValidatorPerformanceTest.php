@@ -32,7 +32,7 @@ class FormValidatorPerformanceTest extends FormPerformanceTestCase
      *
      * @group benchmark
      */
-    public function testValidationPerformance()
+    public function testValidationPerformance(): void
     {
         $this->setMaxRunningTime(1);
 

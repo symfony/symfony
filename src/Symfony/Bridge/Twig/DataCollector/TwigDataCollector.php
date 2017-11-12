@@ -40,14 +40,14 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->profile->reset();
         $this->computed = null;
@@ -57,7 +57,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data['profile'] = serialize($this->profile);
         $this->data['template_paths'] = array();
@@ -66,7 +66,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
             return;
         }
 
-        $templateFinder = function (Profile $profile) use (&$templateFinder) {
+        $templateFinder = function (Profile $profile) use (&$templateFinder): void {
             if ($profile->isTemplate()) {
                 try {
                     $template = $this->twig->load($name = $profile->getName());

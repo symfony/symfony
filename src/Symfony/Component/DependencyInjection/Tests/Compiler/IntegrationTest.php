@@ -32,7 +32,7 @@ class IntegrationTest extends TestCase
      *   * A -> C
      *   * B -> C
      */
-    public function testProcessRemovesAndInlinesRecursively()
+    public function testProcessRemovesAndInlinesRecursively(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -63,7 +63,7 @@ class IntegrationTest extends TestCase
         $this->assertFalse($container->hasDefinition('c'));
     }
 
-    public function testProcessInlinesReferencesToAliases()
+    public function testProcessInlinesReferencesToAliases(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -90,7 +90,7 @@ class IntegrationTest extends TestCase
         $this->assertFalse($container->hasDefinition('c'));
     }
 
-    public function testProcessInlinesWhenThereAreMultipleReferencesButFromTheSameDefinition()
+    public function testProcessInlinesWhenThereAreMultipleReferencesButFromTheSameDefinition(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -123,7 +123,7 @@ class IntegrationTest extends TestCase
     /**
      * @dataProvider getYamlCompileTests
      */
-    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ContainerBuilder $mainContainer = null)
+    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ContainerBuilder $mainContainer = null): void
     {
         // allow a container to be passed in, which might have autoconfigure settings
         $container = $mainContainer ? $mainContainer : new ContainerBuilder();
@@ -216,12 +216,12 @@ class IntegrationTestStub extends IntegrationTestStubParent
 
 class IntegrationTestStubParent
 {
-    public function enableSummer($enable)
+    public function enableSummer($enable): void
     {
         // methods used in calls - added here to prevent errors for not existing
     }
 
-    public function setSunshine($type)
+    public function setSunshine($type): void
     {
     }
 }

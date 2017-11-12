@@ -14,7 +14,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
  */
 class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 {
-    public function testAskChoice()
+    public function testAskChoice(): void
     {
         $questionHelper = new SymfonyQuestionHelper();
 
@@ -74,7 +74,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertOutputContains('What is your favorite superhero? [Superman, Batman]', $output);
     }
 
-    public function testAskReturnsNullIfValidatorAllowsIt()
+    public function testAskReturnsNullIfValidatorAllowsIt(): void
     {
         $questionHelper = new SymfonyQuestionHelper();
         $question = new Question('What is your favorite superhero?');
@@ -83,7 +83,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertNull($questionHelper->ask($input, $this->createOutputInterface(), $question));
     }
 
-    public function testAskEscapeDefaultValue()
+    public function testAskEscapeDefaultValue(): void
     {
         $helper = new SymfonyQuestionHelper();
         $input = $this->createStreamableInputInterfaceMock($this->getInputStream('\\'));
@@ -92,7 +92,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertOutputContains('Can I have a backslash? [\]', $output);
     }
 
-    public function testAskEscapeAndFormatLabel()
+    public function testAskEscapeAndFormatLabel(): void
     {
         $helper = new SymfonyQuestionHelper();
         $input = $this->createStreamableInputInterfaceMock($this->getInputStream('Foo\\Bar'));
@@ -101,7 +101,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertOutputContains('Do you want to use Foo\\Bar or Foo\\Baz\\? [Foo\\Baz]:', $output);
     }
 
-    public function testLabelTrailingBackslash()
+    public function testLabelTrailingBackslash(): void
     {
         $helper = new SymfonyQuestionHelper();
         $input = $this->createStreamableInputInterfaceMock($this->getInputStream('sure'));
@@ -114,7 +114,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
      * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
      * @expectedExceptionMessage Aborted
      */
-    public function testAskThrowsExceptionOnMissingInput()
+    public function testAskThrowsExceptionOnMissingInput(): void
     {
         $dialog = new SymfonyQuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -147,7 +147,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         return $mock;
     }
 
-    private function assertOutputContains($expected, StreamOutput $output)
+    private function assertOutputContains($expected, StreamOutput $output): void
     {
         rewind($output->getStream());
         $stream = stream_get_contents($output->getStream());

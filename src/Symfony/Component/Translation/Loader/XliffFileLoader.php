@@ -48,7 +48,7 @@ class XliffFileLoader implements LoaderInterface
         return $catalogue;
     }
 
-    private function extract($resource, MessageCatalogue $catalogue, $domain)
+    private function extract($resource, MessageCatalogue $catalogue, $domain): void
     {
         try {
             $dom = XmlUtils::loadFile($resource);
@@ -75,7 +75,7 @@ class XliffFileLoader implements LoaderInterface
      * @param MessageCatalogue $catalogue Catalogue where we'll collect messages and metadata
      * @param string           $domain    The domain
      */
-    private function extractXliff1(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain)
+    private function extractXliff1(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain): void
     {
         $xml = simplexml_import_dom($dom);
         $encoding = strtoupper($dom->encoding);
@@ -115,7 +115,7 @@ class XliffFileLoader implements LoaderInterface
         }
     }
 
-    private function extractXliff2(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain)
+    private function extractXliff2(\DOMDocument $dom, MessageCatalogue $catalogue, string $domain): void
     {
         $xml = simplexml_import_dom($dom);
         $encoding = strtoupper($dom->encoding);
@@ -173,7 +173,7 @@ class XliffFileLoader implements LoaderInterface
      *
      * @throws InvalidResourceException
      */
-    private function validateSchema(string $file, \DOMDocument $dom, string $schema)
+    private function validateSchema(string $file, \DOMDocument $dom, string $schema): void
     {
         $internalErrors = libxml_use_internal_errors(true);
 

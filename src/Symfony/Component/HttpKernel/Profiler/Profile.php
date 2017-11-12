@@ -53,7 +53,7 @@ class Profile
      *
      * @param string $token The token
      */
-    public function setToken($token)
+    public function setToken(string $token): void
     {
         $this->token = $token;
     }
@@ -63,7 +63,7 @@ class Profile
      *
      * @return string The token
      */
-    public function getToken()
+    public function getToken(): string
     {
         return $this->token;
     }
@@ -71,17 +71,15 @@ class Profile
     /**
      * Sets the parent token.
      */
-    public function setParent(Profile $parent)
+    public function setParent(Profile $parent): void
     {
         $this->parent = $parent;
     }
 
     /**
      * Returns the parent profile.
-     *
-     * @return self
      */
-    public function getParent()
+    public function getParent(): self
     {
         return $this->parent;
     }
@@ -91,7 +89,7 @@ class Profile
      *
      * @return null|string The parent token
      */
-    public function getParentToken()
+    public function getParentToken(): ?string
     {
         return $this->parent ? $this->parent->getToken() : null;
     }
@@ -101,17 +99,15 @@ class Profile
      *
      * @return string The IP
      */
-    public function getIp()
+    public function getIp(): string
     {
         return $this->ip;
     }
 
     /**
      * Sets the IP.
-     *
-     * @param string $ip
      */
-    public function setIp($ip)
+    public function setIp(string $ip): void
     {
         $this->ip = $ip;
     }
@@ -121,12 +117,12 @@ class Profile
      *
      * @return string The request method
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
-    public function setMethod($method)
+    public function setMethod($method): void
     {
         $this->method = $method;
     }
@@ -136,12 +132,12 @@ class Profile
      *
      * @return string The URL
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
 
-    public function setUrl($url)
+    public function setUrl($url): void
     {
         $this->url = $url;
     }
@@ -151,7 +147,7 @@ class Profile
      *
      * @return int The time
      */
-    public function getTime()
+    public function getTime(): int
     {
         if (null === $this->time) {
             return 0;
@@ -163,23 +159,17 @@ class Profile
     /**
      * @param int $time The time
      */
-    public function setTime($time)
+    public function setTime(int $time): void
     {
         $this->time = $time;
     }
 
-    /**
-     * @param int $statusCode
-     */
-    public function setStatusCode($statusCode)
+    public function setStatusCode(int $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
 
-    /**
-     * @return int
-     */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->statusCode;
     }
@@ -199,7 +189,7 @@ class Profile
      *
      * @param Profile[] $children
      */
-    public function setChildren(array $children)
+    public function setChildren(array $children): void
     {
         $this->children = array();
         foreach ($children as $child) {
@@ -210,7 +200,7 @@ class Profile
     /**
      * Adds the child token.
      */
-    public function addChild(Profile $child)
+    public function addChild(Profile $child): void
     {
         $this->children[] = $child;
         $child->setParent($this);
@@ -225,7 +215,7 @@ class Profile
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */
-    public function getCollector($name)
+    public function getCollector(string $name): DataCollectorInterface
     {
         if (!isset($this->collectors[$name])) {
             throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
@@ -249,7 +239,7 @@ class Profile
      *
      * @param DataCollectorInterface[] $collectors
      */
-    public function setCollectors(array $collectors)
+    public function setCollectors(array $collectors): void
     {
         $this->collectors = array();
         foreach ($collectors as $collector) {
@@ -260,7 +250,7 @@ class Profile
     /**
      * Adds a Collector.
      */
-    public function addCollector(DataCollectorInterface $collector)
+    public function addCollector(DataCollectorInterface $collector): void
     {
         $this->collectors[$collector->getName()] = $collector;
     }
@@ -269,10 +259,8 @@ class Profile
      * Returns true if a Collector for the given name exists.
      *
      * @param string $name A collector name
-     *
-     * @return bool
      */
-    public function hasCollector($name)
+    public function hasCollector(string $name): bool
     {
         return isset($this->collectors[$name]);
     }

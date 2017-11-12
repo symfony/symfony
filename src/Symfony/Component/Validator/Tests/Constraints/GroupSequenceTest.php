@@ -19,14 +19,14 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  */
 class GroupSequenceTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $sequence = new GroupSequence(array('Group 1', 'Group 2'));
 
         $this->assertSame(array('Group 1', 'Group 2'), $sequence->groups);
     }
 
-    public function testCreateDoctrineStyle()
+    public function testCreateDoctrineStyle(): void
     {
         $sequence = new GroupSequence(array('value' => array('Group 1', 'Group 2')));
 

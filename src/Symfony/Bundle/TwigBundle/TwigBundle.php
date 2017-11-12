@@ -28,7 +28,7 @@ use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
  */
 class TwigBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -39,7 +39,7 @@ class TwigBundle extends Bundle
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
-    public function registerCommands(Application $application)
+    public function registerCommands(Application $application): void
     {
         // noop
     }

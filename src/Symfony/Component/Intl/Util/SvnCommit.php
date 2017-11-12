@@ -35,7 +35,7 @@ class SvnCommit
      *
      * @return string The revision of the commit
      */
-    public function getRevision()
+    public function getRevision(): string
     {
         return (string) $this->svnInfo['revision'];
     }
@@ -45,7 +45,7 @@ class SvnCommit
      *
      * @return string The author name
      */
-    public function getAuthor()
+    public function getAuthor(): string
     {
         return (string) $this->svnInfo->author;
     }
@@ -55,7 +55,7 @@ class SvnCommit
      *
      * @return string The commit date
      */
-    public function getDate()
+    public function getDate(): string
     {
         return (string) $this->svnInfo->date;
     }

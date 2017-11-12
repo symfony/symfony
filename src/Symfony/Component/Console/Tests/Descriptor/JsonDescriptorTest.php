@@ -26,7 +26,7 @@ class JsonDescriptorTest extends AbstractDescriptorTest
         return 'json';
     }
 
-    protected function assertDescription($expectedDescription, $describedObject, array $options = array())
+    protected function assertDescription($expectedDescription, $describedObject, array $options = array()): void
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $this->getDescriptor()->describe($output, $describedObject, $options + array('raw_output' => true));

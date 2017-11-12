@@ -68,18 +68,13 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Returns the parameter that is used for checking whether remember-me
      * services have been requested.
-     *
-     * @return string
      */
-    public function getRememberMeParameter()
+    public function getRememberMeParameter(): string
     {
         return $this->options['remember_me_parameter'];
     }
 
-    /**
-     * @return string
-     */
-    public function getSecret()
+    public function getSecret(): string
     {
         return $this->secret;
     }
@@ -149,7 +144,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Implementation for LogoutHandlerInterface. Deletes the cookie.
      */
-    public function logout(Request $request, Response $response, TokenInterface $token)
+    public function logout(Request $request, Response $response, TokenInterface $token): void
     {
         $this->cancelCookie($request);
     }
@@ -158,7 +153,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Implementation for RememberMeServicesInterface. Deletes the cookie when
      * an attempted authentication fails.
      */
-    final public function loginFail(Request $request, \Exception $exception = null)
+    final public function loginFail(Request $request, \Exception $exception = null): void
     {
         $this->cancelCookie($request);
         $this->onLoginFail($request, $exception);
@@ -168,7 +163,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * Implementation for RememberMeServicesInterface. This is called when an
      * authentication is successful.
      */
-    final public function loginSuccess(Request $request, Response $response, TokenInterface $token)
+    final public function loginSuccess(Request $request, Response $response, TokenInterface $token): void
     {
         // Make sure any old remember-me cookies are cancelled
         $this->cancelCookie($request);
@@ -205,12 +200,10 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Subclasses should validate the cookie and do any additional processing
      * that is required. This is called from autoLogin().
-     *
-     * @return UserInterface
      */
-    abstract protected function processAutoLoginCookie(array $cookieParts, Request $request);
+    abstract protected function processAutoLoginCookie(array $cookieParts, Request $request): UserInterface;
 
-    protected function onLoginFail(Request $request, \Exception $exception = null)
+    protected function onLoginFail(Request $request, \Exception $exception = null): void
     {
     }
 
@@ -219,7 +212,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
      * requested remember-me capabilities. The implementation usually sets a
      * cookie and possibly stores a persistent record of it.
      */
-    abstract protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token);
+    abstract protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token): void;
 
     final protected function getUserProvider($class)
     {
@@ -234,12 +227,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
 
     /**
      * Decodes the raw cookie value.
-     *
-     * @param string $rawCookie
-     *
-     * @return array
      */
-    protected function decodeCookie($rawCookie)
+    protected function decodeCookie(string $rawCookie): array
     {
         return explode(self::COOKIE_DELIMITER, base64_decode($rawCookie));
     }
@@ -247,11 +236,10 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Encodes the cookie parts.
      *
-     * @return string
      *
      * @throws \InvalidArgumentException When $cookieParts contain the cookie delimiter. Extending class should either remove or escape it.
      */
-    protected function encodeCookie(array $cookieParts)
+    protected function encodeCookie(array $cookieParts): string
     {
         foreach ($cookieParts as $cookiePart) {
             if (false !== strpos($cookiePart, self::COOKIE_DELIMITER)) {
@@ -265,7 +253,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     /**
      * Deletes the remember-me cookie.
      */
-    protected function cancelCookie(Request $request)
+    protected function cancelCookie(Request $request): void
     {
         if (null !== $this->logger) {
             $this->logger->debug('Clearing remember-me cookie.', array('name' => $this->options['name']));
@@ -276,10 +264,8 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
 
     /**
      * Checks whether remember-me capabilities were requested.
-     *
-     * @return bool
      */
-    protected function isRememberMeRequested(Request $request)
+    protected function isRememberMeRequested(Request $request): bool
     {
         if (true === $this->options['always_remember_me']) {
             return true;

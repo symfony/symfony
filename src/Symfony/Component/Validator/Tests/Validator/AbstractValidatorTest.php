@@ -47,7 +47,7 @@ abstract class AbstractValidatorTest extends TestCase
      */
     public $referenceMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataFactory = new FakeMetadataFactory();
         $this->metadata = new ClassMetadata(self::ENTITY_CLASS);
@@ -56,22 +56,22 @@ abstract class AbstractValidatorTest extends TestCase
         $this->metadataFactory->addMetadata($this->referenceMetadata);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->metadataFactory = null;
         $this->metadata = null;
         $this->referenceMetadata = null;
     }
 
-    abstract protected function validate($value, $constraints = null, $groups = null);
+    abstract protected function validate($value, $constraints = null, $groups = null): void;
 
-    abstract protected function validateProperty($object, $propertyName, $groups = null);
+    abstract protected function validateProperty($object, $propertyName, $groups = null): void;
 
-    abstract protected function validatePropertyValue($object, $propertyName, $value, $groups = null);
+    abstract protected function validatePropertyValue($object, $propertyName, $value, $groups = null): void;
 
-    public function testValidate()
+    public function testValidate(): void
     {
-        $callback = function ($value, ExecutionContextInterface $context) {
+        $callback = function ($value, ExecutionContextInterface $context): void {
             $this->assertNull($context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('', $context->getPropertyPath());
@@ -102,11 +102,11 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testClassConstraint()
+    public function testClassConstraint(): void
     {
         $entity = new Entity();
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('', $context->getPropertyPath());
@@ -138,12 +138,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testPropertyConstraint()
+    public function testPropertyConstraint(): void
     {
         $entity = new Entity();
         $entity->firstName = 'Bernhard';
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
 
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
@@ -177,12 +177,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testGetterConstraint()
+    public function testGetterConstraint(): void
     {
         $entity = new Entity();
         $entity->setLastName('Schussek');
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('lastName');
 
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
@@ -216,12 +216,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testArray()
+    public function testArray(): void
     {
         $entity = new Entity();
         $array = array('key' => $entity);
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $array) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $array): void {
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('[key]', $context->getPropertyPath());
@@ -253,12 +253,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testRecursiveArray()
+    public function testRecursiveArray(): void
     {
         $entity = new Entity();
         $array = array(2 => array('key' => $entity));
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $array) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $array): void {
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('[2][key]', $context->getPropertyPath());
@@ -290,12 +290,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testTraversable()
+    public function testTraversable(): void
     {
         $entity = new Entity();
         $traversable = new \ArrayIterator(array('key' => $entity));
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $traversable) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $traversable): void {
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('[key]', $context->getPropertyPath());
@@ -327,14 +327,14 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testRecursiveTraversable()
+    public function testRecursiveTraversable(): void
     {
         $entity = new Entity();
         $traversable = new \ArrayIterator(array(
             2 => new \ArrayIterator(array('key' => $entity)),
         ));
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $traversable) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $traversable): void {
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('[2][key]', $context->getPropertyPath());
@@ -366,12 +366,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testReferenceClassConstraint()
+    public function testReferenceClassConstraint(): void
     {
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('reference', $context->getPropertyPath());
@@ -404,13 +404,13 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testReferencePropertyConstraint()
+    public function testReferencePropertyConstraint(): void
     {
         $entity = new Entity();
         $entity->reference = new Reference();
         $entity->reference->value = 'Foobar';
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $propertyMetadatas = $this->referenceMetadata->getPropertyMetadata('value');
 
             $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
@@ -445,13 +445,13 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testReferenceGetterConstraint()
+    public function testReferenceGetterConstraint(): void
     {
         $entity = new Entity();
         $entity->reference = new Reference();
         $entity->reference->setPrivateValue('Bamboo');
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $propertyMetadatas = $this->referenceMetadata->getPropertyMetadata('privateValue');
 
             $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
@@ -486,7 +486,7 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testsIgnoreNullReference()
+    public function testsIgnoreNullReference(): void
     {
         $entity = new Entity();
         $entity->reference = null;
@@ -502,7 +502,7 @@ abstract class AbstractValidatorTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\NoSuchMetadataException
      */
-    public function testFailOnScalarReferences()
+    public function testFailOnScalarReferences(): void
     {
         $entity = new Entity();
         $entity->reference = 'string';
@@ -512,12 +512,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->validate($entity);
     }
 
-    public function testArrayReference()
+    public function testArrayReference(): void
     {
         $entity = new Entity();
         $entity->reference = array('key' => new Reference());
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('reference[key]', $context->getPropertyPath());
@@ -551,12 +551,12 @@ abstract class AbstractValidatorTest extends TestCase
     }
 
     // https://github.com/symfony/symfony/issues/6246
-    public function testRecursiveArrayReference()
+    public function testRecursiveArrayReference(): void
     {
         $entity = new Entity();
         $entity->reference = array(2 => array('key' => new Reference()));
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('reference[2][key]', $context->getPropertyPath());
@@ -589,12 +589,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testArrayTraversalCannotBeDisabled()
+    public function testArrayTraversalCannotBeDisabled(): void
     {
         $entity = new Entity();
         $entity->reference = array('key' => new Reference());
 
-        $callback = function ($value, ExecutionContextInterface $context) {
+        $callback = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
 
@@ -609,12 +609,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(1, $violations);
     }
 
-    public function testRecursiveArrayTraversalCannotBeDisabled()
+    public function testRecursiveArrayTraversalCannotBeDisabled(): void
     {
         $entity = new Entity();
         $entity->reference = array(2 => array('key' => new Reference()));
 
-        $callback = function ($value, ExecutionContextInterface $context) {
+        $callback = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
 
@@ -629,7 +629,7 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(1, $violations);
     }
 
-    public function testIgnoreScalarsDuringArrayTraversal()
+    public function testIgnoreScalarsDuringArrayTraversal(): void
     {
         $entity = new Entity();
         $entity->reference = array('string', 1234);
@@ -642,7 +642,7 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    public function testIgnoreNullDuringArrayTraversal()
+    public function testIgnoreNullDuringArrayTraversal(): void
     {
         $entity = new Entity();
         $entity->reference = array(null);
@@ -655,12 +655,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    public function testTraversableReference()
+    public function testTraversableReference(): void
     {
         $entity = new Entity();
         $entity->reference = new \ArrayIterator(array('key' => new Reference()));
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('reference[key]', $context->getPropertyPath());
@@ -693,12 +693,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testDisableTraversableTraversal()
+    public function testDisableTraversableTraversal(): void
     {
         $entity = new Entity();
         $entity->reference = new \ArrayIterator(array('key' => new Reference()));
 
-        $callback = function ($value, ExecutionContextInterface $context) {
+        $callback = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
 
@@ -717,7 +717,7 @@ abstract class AbstractValidatorTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\NoSuchMetadataException
      */
-    public function testMetadataMustExistIfTraversalIsDisabled()
+    public function testMetadataMustExistIfTraversalIsDisabled(): void
     {
         $entity = new Entity();
         $entity->reference = new \ArrayIterator();
@@ -729,14 +729,14 @@ abstract class AbstractValidatorTest extends TestCase
         $this->validate($entity);
     }
 
-    public function testEnableRecursiveTraversableTraversal()
+    public function testEnableRecursiveTraversableTraversal(): void
     {
         $entity = new Entity();
         $entity->reference = new \ArrayIterator(array(
             2 => new \ArrayIterator(array('key' => new Reference())),
         ));
 
-        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
             $this->assertNull($context->getPropertyName());
             $this->assertSame('reference[2][key]', $context->getPropertyPath());
@@ -771,13 +771,13 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testValidateProperty()
+    public function testValidateProperty(): void
     {
         $entity = new Entity();
         $entity->firstName = 'Bernhard';
         $entity->setLastName('Schussek');
 
-        $callback1 = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
 
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
@@ -792,7 +792,7 @@ abstract class AbstractValidatorTest extends TestCase
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
 
-        $callback2 = function ($value, ExecutionContextInterface $context) {
+        $callback2 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Other violation');
         };
 
@@ -822,7 +822,7 @@ abstract class AbstractValidatorTest extends TestCase
     /**
      * https://github.com/symfony/symfony/issues/11604.
      */
-    public function testValidatePropertyWithoutConstraints()
+    public function testValidatePropertyWithoutConstraints(): void
     {
         $entity = new Entity();
         $violations = $this->validateProperty($entity, 'lastName');
@@ -830,12 +830,12 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(0, $violations, '->validateProperty() returns no violations if no constraints have been configured for the property being validated');
     }
 
-    public function testValidatePropertyValue()
+    public function testValidatePropertyValue(): void
     {
         $entity = new Entity();
         $entity->setLastName('Schussek');
 
-        $callback1 = function ($value, ExecutionContextInterface $context) use ($entity) {
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($entity): void {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
 
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
@@ -850,7 +850,7 @@ abstract class AbstractValidatorTest extends TestCase
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
 
-        $callback2 = function ($value, ExecutionContextInterface $context) {
+        $callback2 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Other violation');
         };
 
@@ -882,9 +882,9 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
-    public function testValidatePropertyValueWithClassName()
+    public function testValidatePropertyValueWithClassName(): void
     {
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context): void {
             $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
 
             $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
@@ -899,7 +899,7 @@ abstract class AbstractValidatorTest extends TestCase
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
 
-        $callback2 = function ($value, ExecutionContextInterface $context) {
+        $callback2 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Other violation');
         };
 
@@ -934,7 +934,7 @@ abstract class AbstractValidatorTest extends TestCase
     /**
      * https://github.com/symfony/symfony/issues/11604.
      */
-    public function testValidatePropertyValueWithoutConstraints()
+    public function testValidatePropertyValueWithoutConstraints(): void
     {
         $entity = new Entity();
         $violations = $this->validatePropertyValue($entity, 'lastName', 'foo');
@@ -942,13 +942,13 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(0, $violations, '->validatePropertyValue() returns no violations if no constraints have been configured for the property being validated');
     }
 
-    public function testValidateObjectOnlyOncePerGroup()
+    public function testValidateObjectOnlyOncePerGroup(): void
     {
         $entity = new Entity();
         $entity->reference = new Reference();
         $entity->reference2 = $entity->reference;
 
-        $callback = function ($value, ExecutionContextInterface $context) {
+        $callback = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Message');
         };
 
@@ -962,13 +962,13 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(1, $violations);
     }
 
-    public function testValidateDifferentObjectsSeparately()
+    public function testValidateDifferentObjectsSeparately(): void
     {
         $entity = new Entity();
         $entity->reference = new Reference();
         $entity->reference2 = new Reference();
 
-        $callback = function ($value, ExecutionContextInterface $context) {
+        $callback = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Message');
         };
 
@@ -982,11 +982,11 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(2, $violations);
     }
 
-    public function testValidateSingleGroup()
+    public function testValidateSingleGroup(): void
     {
         $entity = new Entity();
 
-        $callback = function ($value, ExecutionContextInterface $context) {
+        $callback = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Message');
         };
 
@@ -1005,11 +1005,11 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(1, $violations);
     }
 
-    public function testValidateMultipleGroups()
+    public function testValidateMultipleGroups(): void
     {
         $entity = new Entity();
 
-        $callback = function ($value, ExecutionContextInterface $context) {
+        $callback = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Message');
         };
 
@@ -1028,19 +1028,19 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertCount(2, $violations);
     }
 
-    public function testReplaceDefaultGroupByGroupSequenceObject()
+    public function testReplaceDefaultGroupByGroupSequenceObject(): void
     {
         $entity = new Entity();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in Group 2');
         };
-        $callback2 = function ($value, ExecutionContextInterface $context) {
+        $callback2 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in Group 3');
         };
 
         $this->metadata->addConstraint(new Callback(array(
-            'callback' => function () {},
+            'callback' => function (): void {},
             'groups' => 'Group 1',
         )));
         $this->metadata->addConstraint(new Callback(array(
@@ -1062,19 +1062,19 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertSame('Violation in Group 2', $violations[0]->getMessage());
     }
 
-    public function testReplaceDefaultGroupByGroupSequenceArray()
+    public function testReplaceDefaultGroupByGroupSequenceArray(): void
     {
         $entity = new Entity();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in Group 2');
         };
-        $callback2 = function ($value, ExecutionContextInterface $context) {
+        $callback2 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in Group 3');
         };
 
         $this->metadata->addConstraint(new Callback(array(
-            'callback' => function () {},
+            'callback' => function (): void {},
             'groups' => 'Group 1',
         )));
         $this->metadata->addConstraint(new Callback(array(
@@ -1096,15 +1096,15 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertSame('Violation in Group 2', $violations[0]->getMessage());
     }
 
-    public function testPropagateDefaultGroupToReferenceWhenReplacingDefaultGroup()
+    public function testPropagateDefaultGroupToReferenceWhenReplacingDefaultGroup(): void
     {
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in Default group');
         };
-        $callback2 = function ($value, ExecutionContextInterface $context) {
+        $callback2 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in group sequence');
         };
 
@@ -1128,14 +1128,14 @@ abstract class AbstractValidatorTest extends TestCase
         $this->assertSame('Violation in Default group', $violations[0]->getMessage());
     }
 
-    public function testValidateCustomGroupWhenDefaultGroupWasReplaced()
+    public function testValidateCustomGroupWhenDefaultGroupWasReplaced(): void
     {
         $entity = new Entity();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in other group');
         };
-        $callback2 = function ($value, ExecutionContextInterface $context) {
+        $callback2 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in group sequence');
         };
 
@@ -1161,20 +1161,20 @@ abstract class AbstractValidatorTest extends TestCase
     /**
      * @dataProvider getTestReplaceDefaultGroup
      */
-    public function testReplaceDefaultGroup($sequence, array $assertViolations)
+    public function testReplaceDefaultGroup($sequence, array $assertViolations): void
     {
         $entity = new GroupSequenceProviderEntity($sequence);
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in Group 2');
         };
-        $callback2 = function ($value, ExecutionContextInterface $context) {
+        $callback2 = function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('Violation in Group 3');
         };
 
         $metadata = new ClassMetadata(get_class($entity));
         $metadata->addConstraint(new Callback(array(
-            'callback' => function () {},
+            'callback' => function (): void {},
             'groups' => 'Group 1',
         )));
         $metadata->addConstraint(new Callback(array(

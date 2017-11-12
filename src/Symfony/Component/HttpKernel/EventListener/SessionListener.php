@@ -29,7 +29,7 @@ class SessionListener extends AbstractSessionListener
         $this->container = $container;
     }
 
-    protected function getSession()
+    protected function getSession(): void
     {
         if (!$this->container->has('session')) {
             return;

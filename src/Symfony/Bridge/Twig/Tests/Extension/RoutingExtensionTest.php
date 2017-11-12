@@ -22,7 +22,7 @@ class RoutingExtensionTest extends TestCase
     /**
      * @dataProvider getEscapingTemplates
      */
-    public function testEscaping($template, $mustBeEscaped)
+    public function testEscaping($template, $mustBeEscaped): void
     {
         $twig = new Environment($this->getMockBuilder('Twig\Loader\LoaderInterface')->getMock(), array('debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0));
         $twig->addExtension(new RoutingExtension($this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock()));

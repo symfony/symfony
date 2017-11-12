@@ -40,7 +40,7 @@ class XmlDumper extends Dumper
      *
      * @return string An xml string representing of the service container
      */
-    public function dump(array $options = array())
+    public function dump(array $options = array()): string
     {
         $this->document = new \DOMDocument('1.0', 'utf-8');
         $this->document->formatOutput = true;
@@ -59,7 +59,7 @@ class XmlDumper extends Dumper
         return $this->container->resolveEnvPlaceholders($xml);
     }
 
-    private function addParameters(\DOMElement $parent)
+    private function addParameters(\DOMElement $parent): void
     {
         $data = $this->container->getParameterBag()->all();
         if (!$data) {
@@ -75,7 +75,7 @@ class XmlDumper extends Dumper
         $this->convertParameters($data, 'parameter', $parameters);
     }
 
-    private function addMethodCalls(array $methodcalls, \DOMElement $parent)
+    private function addMethodCalls(array $methodcalls, \DOMElement $parent): void
     {
         foreach ($methodcalls as $methodcall) {
             $call = $this->document->createElement('call');
@@ -90,11 +90,9 @@ class XmlDumper extends Dumper
     /**
      * Adds a service.
      *
-     * @param Definition  $definition
-     * @param string      $id
      * @param \DOMElement $parent
      */
-    private function addService($definition, $id, \DOMElement $parent)
+    private function addService(Definition $definition, string $id, \DOMElement $parent): void
     {
         $service = $this->document->createElement('service');
         if (null !== $id) {
@@ -214,11 +212,9 @@ class XmlDumper extends Dumper
     /**
      * Adds a service alias.
      *
-     * @param string      $alias
-     * @param Alias       $id
      * @param \DOMElement $parent
      */
-    private function addServiceAlias($alias, Alias $id, \DOMElement $parent)
+    private function addServiceAlias(string $alias, Alias $id, \DOMElement $parent): void
     {
         $service = $this->document->createElement('service');
         $service->setAttribute('id', $alias);
@@ -229,7 +225,7 @@ class XmlDumper extends Dumper
         $parent->appendChild($service);
     }
 
-    private function addServices(\DOMElement $parent)
+    private function addServices(\DOMElement $parent): void
     {
         $definitions = $this->container->getDefinitions();
         if (!$definitions) {
@@ -254,12 +250,9 @@ class XmlDumper extends Dumper
     /**
      * Converts parameters.
      *
-     * @param array       $parameters
-     * @param string      $type
      * @param \DOMElement $parent
-     * @param string      $keyAttribute
      */
-    private function convertParameters(array $parameters, $type, \DOMElement $parent, $keyAttribute = 'key')
+    private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key'): void
     {
         $withKeys = array_keys($parameters) !== range(0, count($parameters) - 1);
         foreach ($parameters as $key => $value) {
@@ -311,10 +304,8 @@ class XmlDumper extends Dumper
 
     /**
      * Escapes arguments.
-     *
-     * @return array
      */
-    private function escape(array $arguments)
+    private function escape(array $arguments): array
     {
         $args = array();
         foreach ($arguments as $k => $v) {
@@ -335,11 +326,10 @@ class XmlDumper extends Dumper
      *
      * @param mixed $value Value to convert
      *
-     * @return string
      *
      * @throws RuntimeException When trying to dump object or resource
      */
-    public static function phpToXml($value)
+    public static function phpToXml($value): string
     {
         switch (true) {
             case null === $value:

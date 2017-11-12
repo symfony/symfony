@@ -24,12 +24,12 @@ class JsonBundleReaderTest extends TestCase
      */
     private $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reader = new JsonBundleReader();
     }
 
-    public function testReadReturnsArray()
+    public function testReadReturnsArray(): void
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/json', 'en');
 
@@ -41,7 +41,7 @@ class JsonBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
      */
-    public function testReadFailsIfNonExistingLocale()
+    public function testReadFailsIfNonExistingLocale(): void
     {
         $this->reader->read(__DIR__.'/Fixtures/json', 'foo');
     }
@@ -49,7 +49,7 @@ class JsonBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
      */
-    public function testReadFailsIfNonExistingDirectory()
+    public function testReadFailsIfNonExistingDirectory(): void
     {
         $this->reader->read(__DIR__.'/foo', 'en');
     }
@@ -57,7 +57,7 @@ class JsonBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
      */
-    public function testReadFailsIfNotAFile()
+    public function testReadFailsIfNotAFile(): void
     {
         $this->reader->read(__DIR__.'/Fixtures/NotAFile', 'en');
     }
@@ -65,7 +65,7 @@ class JsonBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
      */
-    public function testReadFailsIfInvalidJson()
+    public function testReadFailsIfInvalidJson(): void
     {
         $this->reader->read(__DIR__.'/Fixtures/json', 'en_Invalid');
     }

@@ -7,11 +7,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class CustomContainer extends Container
 {
-    public function getBarService()
+    public function getBarService(): void
     {
     }
 
-    public function getFoobarService()
+    public function getFoobarService(): void
     {
     }
 }

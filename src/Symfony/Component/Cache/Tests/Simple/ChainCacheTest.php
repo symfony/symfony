@@ -31,7 +31,7 @@ class ChainCacheTest extends CacheTestCase
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage At least one cache must be specified.
      */
-    public function testEmptyCachesException()
+    public function testEmptyCachesException(): void
     {
         new ChainCache(array());
     }
@@ -40,12 +40,12 @@ class ChainCacheTest extends CacheTestCase
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage The class "stdClass" does not implement
      */
-    public function testInvalidCacheException()
+    public function testInvalidCacheException(): void
     {
         new ChainCache(array(new \stdClass()));
     }
 
-    public function testPrune()
+    public function testPrune(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);

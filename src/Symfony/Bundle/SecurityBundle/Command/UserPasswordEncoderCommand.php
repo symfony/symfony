@@ -47,7 +47,7 @@ class UserPasswordEncoderCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Encodes a password.')

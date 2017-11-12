@@ -29,7 +29,7 @@ class HelpCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->ignoreValidationErrors();
 
@@ -56,7 +56,7 @@ EOF
         ;
     }
 
-    public function setCommand(Command $command)
+    public function setCommand(Command $command): void
     {
         $this->command = $command;
     }
@@ -64,7 +64,7 @@ EOF
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         if (null === $this->command) {
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));

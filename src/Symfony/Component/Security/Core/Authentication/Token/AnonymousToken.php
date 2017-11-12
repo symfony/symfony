@@ -46,10 +46,8 @@ class AnonymousToken extends AbstractToken
 
     /**
      * Returns the secret.
-     *
-     * @return string
      */
-    public function getSecret()
+    public function getSecret(): string
     {
         return $this->secret;
     }
@@ -65,7 +63,7 @@ class AnonymousToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->secret, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);

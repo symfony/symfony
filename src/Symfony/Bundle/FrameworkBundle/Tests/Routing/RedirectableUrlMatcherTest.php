@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RedirectableUrlMatcherTest extends TestCase
 {
-    public function testRedirectWhenNoSlash()
+    public function testRedirectWhenNoSlash(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
@@ -39,7 +39,7 @@ class RedirectableUrlMatcherTest extends TestCase
         );
     }
 
-    public function testSchemeRedirect()
+    public function testSchemeRedirect(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));

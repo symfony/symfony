@@ -22,7 +22,7 @@ abstract class AbstractCacheTest extends TestCase
      */
     protected $cache;
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $meta = $this->getMockBuilder(ClassMetadata::class)
             ->disableOriginalConstructor()
@@ -42,7 +42,7 @@ abstract class AbstractCacheTest extends TestCase
         );
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $meta = $this->getMockBuilder(ClassMetadata::class)
             ->disableOriginalConstructor()
@@ -59,7 +59,7 @@ abstract class AbstractCacheTest extends TestCase
         $this->assertTrue($this->cache->has('Foo\\Bar'), 'has() returns true when the is an entry');
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $meta = $this->getMockBuilder(ClassMetadata::class)
             ->disableOriginalConstructor()

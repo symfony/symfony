@@ -24,7 +24,7 @@ class AddSecurityVotersPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
      * @expectedExceptionMessage No security voters found. You need to tag at least one with "security.voter".
      */
-    public function testNoVoters()
+    public function testNoVoters(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -36,7 +36,7 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass->process($container);
     }
 
-    public function testThatSecurityVotersAreProcessedInPriorityOrder()
+    public function testThatSecurityVotersAreProcessedInPriorityOrder(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -73,7 +73,7 @@ class AddSecurityVotersPassTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
      * @expectedExceptionMessage stdClass must implement the Symfony\Component\Security\Core\Authorization\Voter\VoterInterface when used as a voter.
      */
-    public function testVoterMissingInterface()
+    public function testVoterMissingInterface(): void
     {
         $container = new ContainerBuilder();
         $container

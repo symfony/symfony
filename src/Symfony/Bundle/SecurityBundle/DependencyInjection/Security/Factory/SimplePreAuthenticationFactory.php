@@ -31,7 +31,7 @@ class SimplePreAuthenticationFactory implements SecurityFactoryInterface
         return 'simple-preauth';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->children()

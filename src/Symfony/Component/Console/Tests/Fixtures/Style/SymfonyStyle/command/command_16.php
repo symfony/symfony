@@ -5,7 +5,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 // ensure that block() output is properly formatted (even padding lines)
-return function (InputInterface $input, OutputInterface $output) {
+return function (InputInterface $input, OutputInterface $output): void {
     $output->setDecorated(true);
     $output = new SymfonyStyle($input, $output);
     $output->success(

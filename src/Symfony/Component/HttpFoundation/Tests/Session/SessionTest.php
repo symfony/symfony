@@ -36,33 +36,33 @@ class SessionTest extends TestCase
      */
     protected $session;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->storage = new MockArraySessionStorage();
         $this->session = new Session($this->storage, new AttributeBag(), new FlashBag());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->storage = null;
         $this->session = null;
     }
 
-    public function testStart()
+    public function testStart(): void
     {
         $this->assertEquals('', $this->session->getId());
         $this->assertTrue($this->session->start());
         $this->assertNotEquals('', $this->session->getId());
     }
 
-    public function testIsStarted()
+    public function testIsStarted(): void
     {
         $this->assertFalse($this->session->isStarted());
         $this->session->start();
         $this->assertTrue($this->session->isStarted());
     }
 
-    public function testSetId()
+    public function testSetId(): void
     {
         $this->assertEquals('', $this->session->getId());
         $this->session->setId('0123456789abcdef');
@@ -70,7 +70,7 @@ class SessionTest extends TestCase
         $this->assertEquals('0123456789abcdef', $this->session->getId());
     }
 
-    public function testSetName()
+    public function testSetName(): void
     {
         $this->assertEquals('MOCKSESSID', $this->session->getName());
         $this->session->setName('session.test.com');
@@ -78,7 +78,7 @@ class SessionTest extends TestCase
         $this->assertEquals('session.test.com', $this->session->getName());
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         // tests defaults
         $this->assertNull($this->session->get('foo'));
@@ -88,7 +88,7 @@ class SessionTest extends TestCase
     /**
      * @dataProvider setProvider
      */
-    public function testSet($key, $value)
+    public function testSet($key, $value): void
     {
         $this->session->set($key, $value);
         $this->assertEquals($value, $this->session->get($key));
@@ -97,14 +97,14 @@ class SessionTest extends TestCase
     /**
      * @dataProvider setProvider
      */
-    public function testHas($key, $value)
+    public function testHas($key, $value): void
     {
         $this->session->set($key, $value);
         $this->assertTrue($this->session->has($key));
         $this->assertFalse($this->session->has($key.'non_value'));
     }
 
-    public function testReplace()
+    public function testReplace(): void
     {
         $this->session->replace(array('happiness' => 'be good', 'symfony' => 'awesome'));
         $this->assertEquals(array('happiness' => 'be good', 'symfony' => 'awesome'), $this->session->all());
@@ -115,7 +115,7 @@ class SessionTest extends TestCase
     /**
      * @dataProvider setProvider
      */
-    public function testAll($key, $value, $result)
+    public function testAll($key, $value, $result): void
     {
         $this->session->set($key, $value);
         $this->assertEquals($result, $this->session->all());
@@ -124,7 +124,7 @@ class SessionTest extends TestCase
     /**
      * @dataProvider setProvider
      */
-    public function testClear($key, $value)
+    public function testClear($key, $value): void
     {
         $this->session->set('hi', 'fabien');
         $this->session->set($key, $value);
@@ -144,7 +144,7 @@ class SessionTest extends TestCase
     /**
      * @dataProvider setProvider
      */
-    public function testRemove($key, $value)
+    public function testRemove($key, $value): void
     {
         $this->session->set('hi.world', 'have a nice day');
         $this->session->set($key, $value);
@@ -152,28 +152,28 @@ class SessionTest extends TestCase
         $this->assertEquals(array('hi.world' => 'have a nice day'), $this->session->all());
     }
 
-    public function testInvalidate()
+    public function testInvalidate(): void
     {
         $this->session->set('invalidate', 123);
         $this->session->invalidate();
         $this->assertEquals(array(), $this->session->all());
     }
 
-    public function testMigrate()
+    public function testMigrate(): void
     {
         $this->session->set('migrate', 321);
         $this->session->migrate();
         $this->assertEquals(321, $this->session->get('migrate'));
     }
 
-    public function testMigrateDestroy()
+    public function testMigrateDestroy(): void
     {
         $this->session->set('migrate', 333);
         $this->session->migrate(true);
         $this->assertEquals(333, $this->session->get('migrate'));
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $this->session->start();
         $this->session->save();
@@ -181,19 +181,19 @@ class SessionTest extends TestCase
         $this->assertFalse($this->session->isStarted());
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertEquals('', $this->session->getId());
         $this->session->start();
         $this->assertNotEquals('', $this->session->getId());
     }
 
-    public function testGetFlashBag()
+    public function testGetFlashBag(): void
     {
         $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\Session\\Flash\\FlashBagInterface', $this->session->getFlashBag());
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $attributes = array('hello' => 'world', 'symfony' => 'rocks');
         foreach ($attributes as $key => $val) {
@@ -209,7 +209,7 @@ class SessionTest extends TestCase
         $this->assertEquals(count($attributes), $i);
     }
 
-    public function testGetCount()
+    public function testGetCount(): void
     {
         $this->session->set('hello', 'world');
         $this->session->set('symfony', 'rocks');
@@ -217,7 +217,7 @@ class SessionTest extends TestCase
         $this->assertCount(2, $this->session);
     }
 
-    public function testGetMeta()
+    public function testGetMeta(): void
     {
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\MetadataBag', $this->session->getMetadataBag());
     }

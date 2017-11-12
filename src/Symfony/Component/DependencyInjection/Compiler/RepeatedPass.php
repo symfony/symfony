@@ -49,7 +49,7 @@ class RepeatedPass implements CompilerPassInterface
     /**
      * Process the repeatable passes that run more than once.
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         do {
             $this->repeat = false;
@@ -62,7 +62,7 @@ class RepeatedPass implements CompilerPassInterface
     /**
      * Sets if the pass should repeat.
      */
-    public function setRepeat()
+    public function setRepeat(): void
     {
         $this->repeat = true;
     }

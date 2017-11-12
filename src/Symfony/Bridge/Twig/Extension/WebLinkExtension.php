@@ -55,7 +55,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The relation URI
      */
-    public function link($uri, $rel, array $attributes = array())
+    public function link(string $uri, string $rel, array $attributes = array()): string
     {
         if (!$request = $this->requestStack->getMasterRequest()) {
             return $uri;
@@ -80,7 +80,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function preload($uri, array $attributes = array())
+    public function preload(string $uri, array $attributes = array()): string
     {
         return $this->link($uri, 'preload', $attributes);
     }
@@ -93,7 +93,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function dnsPrefetch($uri, array $attributes = array())
+    public function dnsPrefetch(string $uri, array $attributes = array()): string
     {
         return $this->link($uri, 'dns-prefetch', $attributes);
     }
@@ -106,7 +106,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function preconnect($uri, array $attributes = array())
+    public function preconnect(string $uri, array $attributes = array()): string
     {
         return $this->link($uri, 'preconnect', $attributes);
     }
@@ -119,7 +119,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function prefetch($uri, array $attributes = array())
+    public function prefetch(string $uri, array $attributes = array()): string
     {
         return $this->link($uri, 'prefetch', $attributes);
     }
@@ -132,7 +132,7 @@ class WebLinkExtension extends AbstractExtension
      *
      * @return string The path of the asset
      */
-    public function prerender($uri, array $attributes = array())
+    public function prerender(string $uri, array $attributes = array()): string
     {
         return $this->link($uri, 'prerender', $attributes);
     }

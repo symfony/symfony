@@ -26,28 +26,28 @@ interface NodeInterface
      *
      * @return string The name of the node
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Returns the path of the node.
      *
      * @return string The node path
      */
-    public function getPath();
+    public function getPath(): string;
 
     /**
      * Returns true when the node is required.
      *
      * @return bool If the node is required
      */
-    public function isRequired();
+    public function isRequired(): bool;
 
     /**
      * Returns true when the node has a default value.
      *
      * @return bool If the node has a default value
      */
-    public function hasDefaultValue();
+    public function hasDefaultValue(): bool;
 
     /**
      * Returns the default value of the node.

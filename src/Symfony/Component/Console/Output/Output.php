@@ -47,7 +47,7 @@ abstract class Output implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function setFormatter(OutputFormatterInterface $formatter)
+    public function setFormatter(OutputFormatterInterface $formatter): void
     {
         $this->formatter = $formatter;
     }
@@ -63,7 +63,7 @@ abstract class Output implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function setDecorated($decorated)
+    public function setDecorated($decorated): void
     {
         $this->formatter->setDecorated($decorated);
     }
@@ -79,7 +79,7 @@ abstract class Output implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function setVerbosity($level)
+    public function setVerbosity($level): void
     {
         $this->verbosity = (int) $level;
     }
@@ -127,7 +127,7 @@ abstract class Output implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function writeln($messages, $options = self::OUTPUT_NORMAL)
+    public function writeln($messages, $options = self::OUTPUT_NORMAL): void
     {
         $this->write($messages, true, $options);
     }
@@ -135,7 +135,7 @@ abstract class Output implements OutputInterface
     /**
      * {@inheritdoc}
      */
-    public function write($messages, $newline = false, $options = self::OUTPUT_NORMAL)
+    public function write($messages, $newline = false, $options = self::OUTPUT_NORMAL): void
     {
         $messages = (array) $messages;
 
@@ -171,5 +171,5 @@ abstract class Output implements OutputInterface
      * @param string $message A message to write to the output
      * @param bool   $newline Whether to add a newline or not
      */
-    abstract protected function doWrite($message, $newline);
+    abstract protected function doWrite(string $message, bool $newline): void;
 }

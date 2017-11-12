@@ -49,7 +49,7 @@ class WorkflowExtension extends AbstractExtension
      *
      * @return bool true if the transition is enabled
      */
-    public function canTransition($subject, $transitionName, $name = null)
+    public function canTransition($subject, $transitionName, $name = null): bool
     {
         return $this->workflowRegistry->get($subject, $name)->can($subject, $transitionName);
     }
@@ -76,7 +76,7 @@ class WorkflowExtension extends AbstractExtension
      *
      * @return bool true if the transition is enabled
      */
-    public function hasMarkedPlace($subject, $placeName, $name = null)
+    public function hasMarkedPlace($subject, $placeName, $name = null): bool
     {
         return $this->workflowRegistry->get($subject, $name)->getMarking($subject)->has($placeName);
     }

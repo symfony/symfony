@@ -17,7 +17,7 @@ use Symfony\Component\Cache\Traits\RedisProxy;
 
 class RedisAdapterTest extends AbstractRedisAdapterTest
 {
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         parent::setupBeforeClass();
         self::$redis = AbstractAdapter::createConnection('redis://'.getenv('REDIS_HOST'), array('lazy' => true));
@@ -31,7 +31,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
         return $adapter;
     }
 
-    public function testCreateConnection()
+    public function testCreateConnection(): void
     {
         $redisHost = getenv('REDIS_HOST');
 
@@ -58,7 +58,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Redis connection failed
      */
-    public function testFailedCreateConnection($dsn)
+    public function testFailedCreateConnection($dsn): void
     {
         RedisAdapter::createConnection($dsn);
     }
@@ -77,7 +77,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
      * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid Redis DSN
      */
-    public function testInvalidCreateConnection($dsn)
+    public function testInvalidCreateConnection($dsn): void
     {
         RedisAdapter::createConnection($dsn);
     }

@@ -16,7 +16,7 @@ use Symfony\Component\Templating\Storage\Storage;
 
 class StorageTest extends TestCase
 {
-    public function testMagicToString()
+    public function testMagicToString(): void
     {
         $storage = new TestStorage('foo');
         $this->assertEquals('foo', (string) $storage, '__toString() returns the template name');
@@ -25,7 +25,7 @@ class StorageTest extends TestCase
 
 class TestStorage extends Storage
 {
-    public function getContent()
+    public function getContent(): void
     {
     }
 }

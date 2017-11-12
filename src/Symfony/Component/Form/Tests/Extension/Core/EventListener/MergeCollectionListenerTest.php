@@ -21,21 +21,21 @@ abstract class MergeCollectionListenerTest extends TestCase
     protected $factory;
     protected $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $this->form = $this->getForm('axes');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dispatcher = null;
         $this->factory = null;
         $this->form = null;
     }
 
-    abstract protected function getBuilder($name = 'name');
+    abstract protected function getBuilder($name = 'name'): void;
 
     protected function getForm($name = 'name', $propertyPath = null)
     {
@@ -67,12 +67,12 @@ abstract class MergeCollectionListenerTest extends TestCase
         );
     }
 
-    abstract protected function getData(array $data);
+    abstract protected function getData(array $data): void;
 
     /**
      * @dataProvider getBooleanMatrix1
      */
-    public function testAddExtraEntriesIfAllowAdd($allowDelete)
+    public function testAddExtraEntriesIfAllowAdd($allowDelete): void
     {
         $originalData = $this->getData(array(1 => 'second'));
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
@@ -96,7 +96,7 @@ abstract class MergeCollectionListenerTest extends TestCase
     /**
      * @dataProvider getBooleanMatrix1
      */
-    public function testAddExtraEntriesIfAllowAddDontOverwriteExistingIndices($allowDelete)
+    public function testAddExtraEntriesIfAllowAddDontOverwriteExistingIndices($allowDelete): void
     {
         $originalData = $this->getData(array(1 => 'first'));
         $newData = $this->getData(array(0 => 'first', 1 => 'second'));
@@ -120,7 +120,7 @@ abstract class MergeCollectionListenerTest extends TestCase
     /**
      * @dataProvider getBooleanMatrix1
      */
-    public function testDoNothingIfNotAllowAdd($allowDelete)
+    public function testDoNothingIfNotAllowAdd($allowDelete): void
     {
         $originalDataArray = array(1 => 'second');
         $originalData = $this->getData($originalDataArray);
@@ -145,7 +145,7 @@ abstract class MergeCollectionListenerTest extends TestCase
     /**
      * @dataProvider getBooleanMatrix1
      */
-    public function testRemoveMissingEntriesIfAllowDelete($allowAdd)
+    public function testRemoveMissingEntriesIfAllowDelete($allowAdd): void
     {
         $originalData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
         $newData = $this->getData(array(1 => 'second'));
@@ -169,7 +169,7 @@ abstract class MergeCollectionListenerTest extends TestCase
     /**
      * @dataProvider getBooleanMatrix1
      */
-    public function testDoNothingIfNotAllowDelete($allowAdd)
+    public function testDoNothingIfNotAllowDelete($allowAdd): void
     {
         $originalDataArray = array(0 => 'first', 1 => 'second', 2 => 'third');
         $originalData = $this->getData($originalDataArray);
@@ -195,7 +195,7 @@ abstract class MergeCollectionListenerTest extends TestCase
      * @dataProvider getBooleanMatrix2
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testRequireArrayOrTraversable($allowAdd, $allowDelete)
+    public function testRequireArrayOrTraversable($allowAdd, $allowDelete): void
     {
         $newData = 'no array or traversable';
         $event = new FormEvent($this->form, $newData);
@@ -203,7 +203,7 @@ abstract class MergeCollectionListenerTest extends TestCase
         $listener->onSubmit($event);
     }
 
-    public function testDealWithNullData()
+    public function testDealWithNullData(): void
     {
         $originalData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
         $newData = null;
@@ -221,7 +221,7 @@ abstract class MergeCollectionListenerTest extends TestCase
     /**
      * @dataProvider getBooleanMatrix1
      */
-    public function testDealWithNullOriginalDataIfAllowAdd($allowDelete)
+    public function testDealWithNullOriginalDataIfAllowAdd($allowDelete): void
     {
         $originalData = null;
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));
@@ -239,7 +239,7 @@ abstract class MergeCollectionListenerTest extends TestCase
     /**
      * @dataProvider getBooleanMatrix1
      */
-    public function testDontDealWithNullOriginalDataIfNotAllowAdd($allowDelete)
+    public function testDontDealWithNullOriginalDataIfNotAllowAdd($allowDelete): void
     {
         $originalData = null;
         $newData = $this->getData(array(0 => 'first', 1 => 'second', 2 => 'third'));

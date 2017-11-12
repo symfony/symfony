@@ -29,7 +29,7 @@ class GenericEventTest extends TestCase
     /**
      * Prepares the environment before running a test.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class GenericEventTest extends TestCase
     /**
      * Cleans up the environment after running a test.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->subject = null;
         $this->event = null;
@@ -48,7 +48,7 @@ class GenericEventTest extends TestCase
         parent::tearDown();
     }
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertEquals($this->event, new GenericEvent($this->subject, array('name' => 'Event')));
     }
@@ -56,27 +56,27 @@ class GenericEventTest extends TestCase
     /**
      * Tests Event->getArgs().
      */
-    public function testGetArguments()
+    public function testGetArguments(): void
     {
         // test getting all
         $this->assertSame(array('name' => 'Event'), $this->event->getArguments());
     }
 
-    public function testSetArguments()
+    public function testSetArguments(): void
     {
         $result = $this->event->setArguments(array('foo' => 'bar'));
         $this->assertAttributeSame(array('foo' => 'bar'), 'arguments', $this->event);
         $this->assertSame($this->event, $result);
     }
 
-    public function testSetArgument()
+    public function testSetArgument(): void
     {
         $result = $this->event->setArgument('foo2', 'bar2');
         $this->assertAttributeSame(array('name' => 'Event', 'foo2' => 'bar2'), 'arguments', $this->event);
         $this->assertEquals($this->event, $result);
     }
 
-    public function testGetArgument()
+    public function testGetArgument(): void
     {
         // test getting key
         $this->assertEquals('Event', $this->event->getArgument('name'));
@@ -85,12 +85,12 @@ class GenericEventTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testGetArgException()
+    public function testGetArgException(): void
     {
         $this->event->getArgument('nameNotExist');
     }
 
-    public function testOffsetGet()
+    public function testOffsetGet(): void
     {
         // test getting key
         $this->assertEquals('Event', $this->event['name']);
@@ -100,36 +100,36 @@ class GenericEventTest extends TestCase
         $this->assertFalse($this->event['nameNotExist']);
     }
 
-    public function testOffsetSet()
+    public function testOffsetSet(): void
     {
         $this->event['foo2'] = 'bar2';
         $this->assertAttributeSame(array('name' => 'Event', 'foo2' => 'bar2'), 'arguments', $this->event);
     }
 
-    public function testOffsetUnset()
+    public function testOffsetUnset(): void
     {
         unset($this->event['name']);
         $this->assertAttributeSame(array(), 'arguments', $this->event);
     }
 
-    public function testOffsetIsset()
+    public function testOffsetIsset(): void
     {
         $this->assertTrue(isset($this->event['name']));
         $this->assertFalse(isset($this->event['nameNotExist']));
     }
 
-    public function testHasArgument()
+    public function testHasArgument(): void
     {
         $this->assertTrue($this->event->hasArgument('name'));
         $this->assertFalse($this->event->hasArgument('nameNotExist'));
     }
 
-    public function testGetSubject()
+    public function testGetSubject(): void
     {
         $this->assertSame($this->subject, $this->event->getSubject());
     }
 
-    public function testHasIterator()
+    public function testHasIterator(): void
     {
         $data = array();
         foreach ($this->event as $key => $value) {

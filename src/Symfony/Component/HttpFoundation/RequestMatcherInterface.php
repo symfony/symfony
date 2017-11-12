@@ -23,5 +23,5 @@ interface RequestMatcherInterface
      *
      * @return bool true if the request matches, false otherwise
      */
-    public function matches(Request $request);
+    public function matches(Request $request): bool;
 }

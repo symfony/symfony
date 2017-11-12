@@ -24,33 +24,33 @@ interface PersistentTokenInterface
      *
      * @return string
      */
-    public function getClass();
+    public function getClass(): string;
 
     /**
      * Returns the username.
      *
      * @return string
      */
-    public function getUsername();
+    public function getUsername(): string;
 
     /**
      * Returns the series.
      *
      * @return string
      */
-    public function getSeries();
+    public function getSeries(): string;
 
     /**
      * Returns the token value.
      *
      * @return string
      */
-    public function getTokenValue();
+    public function getTokenValue(): string;
 
     /**
      * Returns the time the token was last used.
      *
      * @return \DateTime
      */
-    public function getLastUsed();
+    public function getLastUsed(): \DateTime;
 }

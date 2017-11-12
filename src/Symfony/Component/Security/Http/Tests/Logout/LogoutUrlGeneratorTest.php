@@ -30,7 +30,7 @@ class LogoutUrlGeneratorTest extends TestCase
     /** @var LogoutUrlGenerator */
     private $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
         $request = $this->getMockBuilder(Request::class)->getMock();
@@ -40,7 +40,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->generator = new LogoutUrlGenerator($requestStack, null, $this->tokenStorage);
     }
 
-    public function testGetLogoutPath()
+    public function testGetLogoutPath(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null);
 
@@ -51,14 +51,14 @@ class LogoutUrlGeneratorTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No LogoutListener found for firewall key "unregistered_key".
      */
-    public function testGetLogoutPathWithoutLogoutListenerRegisteredForKeyThrowsException()
+    public function testGetLogoutPathWithoutLogoutListenerRegisteredForKeyThrowsException(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null, null);
 
         $this->generator->getLogoutPath('unregistered_key');
     }
 
-    public function testGuessFromToken()
+    public function testGuessFromToken(): void
     {
         $this->tokenStorage->setToken(new UsernamePasswordToken('user', 'password', 'secured_area'));
         $this->generator->registerListener('secured_area', '/logout', null, null);
@@ -70,14 +70,14 @@ class LogoutUrlGeneratorTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Unable to generate a logout url for an anonymous token.
      */
-    public function testGuessFromAnonymousTokenThrowsException()
+    public function testGuessFromAnonymousTokenThrowsException(): void
     {
         $this->tokenStorage->setToken(new AnonymousToken('default', 'anon.'));
 
         $this->generator->getLogoutPath();
     }
 
-    public function testGuessFromCurrentFirewallKey()
+    public function testGuessFromCurrentFirewallKey(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null);
         $this->generator->setCurrentFirewall('secured_area');
@@ -85,7 +85,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    public function testGuessFromCurrentFirewallContext()
+    public function testGuessFromCurrentFirewallContext(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null, null, 'secured');
         $this->generator->setCurrentFirewall('admin', 'secured');
@@ -93,7 +93,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    public function testGuessFromTokenWithoutProviderKeyFallbacksToCurrentFirewall()
+    public function testGuessFromTokenWithoutProviderKeyFallbacksToCurrentFirewall(): void
     {
         $this->tokenStorage->setToken($this->getMockBuilder(TokenInterface::class)->getMock());
         $this->generator->registerListener('secured_area', '/logout', null, null);
@@ -106,7 +106,7 @@ class LogoutUrlGeneratorTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Unable to find the current firewall LogoutListener, please provide the provider key manually
      */
-    public function testUnableToGuessThrowsException()
+    public function testUnableToGuessThrowsException(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null);
 

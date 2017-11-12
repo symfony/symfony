@@ -55,7 +55,7 @@ class GraphvizDumper extends Dumper
      *
      * @return string The dot representation of the service container
      */
-    public function dump(array $options = array())
+    public function dump(array $options = array()): string
     {
         foreach (array('graph', 'node', 'edge', 'node.instance', 'node.definition', 'node.missing') as $key) {
             if (isset($options[$key])) {

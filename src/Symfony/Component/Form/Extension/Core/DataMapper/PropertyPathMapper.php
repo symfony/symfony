@@ -33,7 +33,7 @@ class PropertyPathMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapDataToForms($data, $forms)
+    public function mapDataToForms($data, $forms): void
     {
         $empty = null === $data || array() === $data;
 
@@ -56,7 +56,7 @@ class PropertyPathMapper implements DataMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapFormsToData($forms, &$data)
+    public function mapFormsToData($forms, &$data): void
     {
         if (null === $data) {
             return;

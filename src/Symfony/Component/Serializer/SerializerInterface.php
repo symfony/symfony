@@ -27,7 +27,7 @@ interface SerializerInterface
      *
      * @return string
      */
-    public function serialize($data, $format, array $context = array());
+    public function serialize($data, $format, array $context = array()): string;
 
     /**
      * Deserializes data into the given type.

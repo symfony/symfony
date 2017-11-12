@@ -30,7 +30,7 @@ class MemcachedSessionHandlerTest extends TestCase
 
     protected $memcached;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,24 +45,24 @@ class MemcachedSessionHandlerTest extends TestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->memcached = null;
         $this->storage = null;
         parent::tearDown();
     }
 
-    public function testOpenSession()
+    public function testOpenSession(): void
     {
         $this->assertTrue($this->storage->open('', ''));
     }
 
-    public function testCloseSession()
+    public function testCloseSession(): void
     {
         $this->assertTrue($this->storage->close());
     }
 
-    public function testReadSession()
+    public function testReadSession(): void
     {
         $this->memcached
             ->expects($this->once())
@@ -73,7 +73,7 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertEquals('', $this->storage->read('id'));
     }
 
-    public function testWriteSession()
+    public function testWriteSession(): void
     {
         $this->memcached
             ->expects($this->once())
@@ -85,7 +85,7 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertTrue($this->storage->write('id', 'data'));
     }
 
-    public function testDestroySession()
+    public function testDestroySession(): void
     {
         $this->memcached
             ->expects($this->once())
@@ -97,7 +97,7 @@ class MemcachedSessionHandlerTest extends TestCase
         $this->assertTrue($this->storage->destroy('id'));
     }
 
-    public function testGcSession()
+    public function testGcSession(): void
     {
         $this->assertTrue($this->storage->gc(123));
     }
@@ -105,7 +105,7 @@ class MemcachedSessionHandlerTest extends TestCase
     /**
      * @dataProvider getOptionFixtures
      */
-    public function testSupportedOptions($options, $supported)
+    public function testSupportedOptions($options, $supported): void
     {
         try {
             new MemcachedSessionHandler($this->memcached, $options);
@@ -125,7 +125,7 @@ class MemcachedSessionHandlerTest extends TestCase
         );
     }
 
-    public function testGetConnection()
+    public function testGetConnection(): void
     {
         $method = new \ReflectionMethod($this->storage, 'getMemcached');
         $method->setAccessible(true);

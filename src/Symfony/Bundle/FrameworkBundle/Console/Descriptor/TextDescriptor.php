@@ -34,7 +34,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeRouteCollection(RouteCollection $routes, array $options = array())
+    protected function describeRouteCollection(RouteCollection $routes, array $options = array()): void
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
 
@@ -78,7 +78,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeRoute(Route $route, array $options = array())
+    protected function describeRoute(Route $route, array $options = array()): void
     {
         $tableHeaders = array('Property', 'Value');
         $tableRows = array(
@@ -106,7 +106,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = array()): void
     {
         $tableHeaders = array('Parameter', 'Value');
 
@@ -122,7 +122,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = array()): void
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
 
@@ -141,7 +141,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
+    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -165,7 +165,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = array()): void
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
         $showTag = isset($options['tag']) ? $options['tag'] : null;
@@ -257,7 +257,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerDefinition(Definition $definition, array $options = array())
+    protected function describeContainerDefinition(Definition $definition, array $options = array()): void
     {
         if (isset($options['id'])) {
             $options['output']->title(sprintf('Information for Service "<info>%s</info>"', $options['id']));
@@ -368,7 +368,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerParameter($parameter, array $options = array())
+    protected function describeContainerParameter($parameter, array $options = array()): void
     {
         $options['output']->table(
             array('Parameter', 'Value'),
@@ -381,7 +381,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array())
+    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array()): void
     {
         $event = array_key_exists('event', $options) ? $options['event'] : null;
 
@@ -408,12 +408,12 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeCallable($callable, array $options = array())
+    protected function describeCallable($callable, array $options = array()): void
     {
         $this->writeText($this->formatCallable($callable), $options);
     }
 
-    private function renderEventListenerTable(EventDispatcherInterface $eventDispatcher, $event, array $eventListeners, SymfonyStyle $io)
+    private function renderEventListenerTable(EventDispatcherInterface $eventDispatcher, $event, array $eventListeners, SymfonyStyle $io): void
     {
         $tableHeaders = array('Order', 'Callable', 'Priority');
         $tableRows = array();
@@ -467,7 +467,7 @@ class TextDescriptor extends Descriptor
         throw new \InvalidArgumentException('Callable is not describable.');
     }
 
-    private function writeText(string $content, array $options = array())
+    private function writeText(string $content, array $options = array()): void
     {
         $this->write(
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,

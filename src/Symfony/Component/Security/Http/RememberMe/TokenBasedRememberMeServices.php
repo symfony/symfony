@@ -67,7 +67,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     /**
      * {@inheritdoc}
      */
-    protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
+    protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token): void
     {
         $user = $token->getUser();
         $expires = time() + $this->options['lifetime'];
@@ -96,7 +96,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      *
      * @return string
      */
-    protected function generateCookieValue($class, $username, $expires, $password)
+    protected function generateCookieValue(string $class, string $username, int $expires, string $password): string
     {
         // $username is encoded because it might contain COOKIE_DELIMITER,
         // we assume other values don't
@@ -118,7 +118,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
      *
      * @return string
      */
-    protected function generateCookieHash($class, $username, $expires, $password)
+    protected function generateCookieHash(string $class, string $username, int $expires, string $password): string
     {
         return hash_hmac('sha256', $class.$username.$expires.$password, $this->getSecret());
     }

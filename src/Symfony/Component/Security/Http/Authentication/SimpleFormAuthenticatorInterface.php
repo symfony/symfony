@@ -19,5 +19,5 @@ use Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface;
  */
 interface SimpleFormAuthenticatorInterface extends SimpleAuthenticatorInterface
 {
-    public function createToken(Request $request, $username, $password, $providerKey);
+    public function createToken(Request $request, $username, $password, $providerKey): void;
 }

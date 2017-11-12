@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouterDebugCommandTest extends TestCase
 {
-    public function testDebugAllRoutes()
+    public function testDebugAllRoutes(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('name' => null), array('decorated' => false));
@@ -30,7 +30,7 @@ class RouterDebugCommandTest extends TestCase
         $this->assertContains('Name   Method   Scheme   Host   Path', $tester->getDisplay());
     }
 
-    public function testDebugSingleRoute()
+    public function testDebugSingleRoute(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(array('name' => 'foo'), array('decorated' => false));
@@ -42,15 +42,12 @@ class RouterDebugCommandTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testDebugInvalidRoute()
+    public function testDebugInvalidRoute(): void
     {
         $this->createCommandTester()->execute(array('name' => 'test'));
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester()
+    private function createCommandTester(): CommandTester
     {
         $application = new Application($this->getKernel());
         $application->add(new RouterDebugCommand($this->getRouter()));

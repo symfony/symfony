@@ -294,7 +294,7 @@ class ReflectionCaster
         return $a;
     }
 
-    private static function addExtra(&$a, \Reflector $c)
+    private static function addExtra(&$a, \Reflector $c): void
     {
         $x = isset($a[Caster::PREFIX_VIRTUAL.'extra']) ? $a[Caster::PREFIX_VIRTUAL.'extra']->value : array();
 
@@ -310,7 +310,7 @@ class ReflectionCaster
         }
     }
 
-    private static function addMap(&$a, \Reflector $c, $map, $prefix = Caster::PREFIX_VIRTUAL)
+    private static function addMap(&$a, \Reflector $c, $map, $prefix = Caster::PREFIX_VIRTUAL): void
     {
         foreach ($map as $k => $m) {
             if (method_exists($c, $m) && false !== ($m = $c->$m()) && null !== $m) {

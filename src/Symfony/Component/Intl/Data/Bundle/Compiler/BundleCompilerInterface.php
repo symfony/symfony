@@ -27,5 +27,5 @@ interface BundleCompilerInterface
      * @param string $sourcePath
      * @param string $targetDir
      */
-    public function compile($sourcePath, $targetDir);
+    public function compile(string $sourcePath, string $targetDir): void;
 }

@@ -25,12 +25,12 @@ class IntlBundleReaderTest extends TestCase
      */
     private $reader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reader = new IntlBundleReader();
     }
 
-    public function testReadReturnsArrayAccess()
+    public function testReadReturnsArrayAccess(): void
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro');
 
@@ -39,7 +39,7 @@ class IntlBundleReaderTest extends TestCase
         $this->assertFalse(isset($data['ExistsNot']));
     }
 
-    public function testReadFollowsAlias()
+    public function testReadFollowsAlias(): void
     {
         // "alias" = "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'alias');
@@ -49,7 +49,7 @@ class IntlBundleReaderTest extends TestCase
         $this->assertFalse(isset($data['ExistsNot']));
     }
 
-    public function testReadDoesNotFollowFallback()
+    public function testReadDoesNotFollowFallback(): void
     {
         // "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro_MD');
@@ -61,7 +61,7 @@ class IntlBundleReaderTest extends TestCase
         $this->assertFalse(isset($data['ExistsNot']));
     }
 
-    public function testReadDoesNotFollowFallbackAlias()
+    public function testReadDoesNotFollowFallbackAlias(): void
     {
         // "mo" = "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'mo');
@@ -76,7 +76,7 @@ class IntlBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
      */
-    public function testReadFailsIfNonExistingLocale()
+    public function testReadFailsIfNonExistingLocale(): void
     {
         $this->reader->read(__DIR__.'/Fixtures/res', 'foo');
     }
@@ -84,7 +84,7 @@ class IntlBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
      */
-    public function testReadFailsIfNonExistingFallbackLocale()
+    public function testReadFailsIfNonExistingFallbackLocale(): void
     {
         $this->reader->read(__DIR__.'/Fixtures/res', 'ro_AT');
     }
@@ -92,7 +92,7 @@ class IntlBundleReaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
      */
-    public function testReadFailsIfNonExistingDirectory()
+    public function testReadFailsIfNonExistingDirectory(): void
     {
         $this->reader->read(__DIR__.'/foo', 'ro');
     }

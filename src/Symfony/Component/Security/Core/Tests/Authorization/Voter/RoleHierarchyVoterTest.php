@@ -20,7 +20,7 @@ class RoleHierarchyVoterTest extends RoleVoterTest
     /**
      * @dataProvider getVoteTests
      */
-    public function testVote($roles, $attributes, $expected)
+    public function testVote($roles, $attributes, $expected): void
     {
         $voter = new RoleHierarchyVoter(new RoleHierarchy(array('ROLE_FOO' => array('ROLE_FOOBAR'))));
 
@@ -37,7 +37,7 @@ class RoleHierarchyVoterTest extends RoleVoterTest
     /**
      * @dataProvider getVoteWithEmptyHierarchyTests
      */
-    public function testVoteWithEmptyHierarchy($roles, $attributes, $expected)
+    public function testVoteWithEmptyHierarchy($roles, $attributes, $expected): void
     {
         $voter = new RoleHierarchyVoter(new RoleHierarchy(array()));
 

@@ -24,5 +24,5 @@ interface SupportStrategyInterface
      *
      * @return bool
      */
-    public function supports(Workflow $workflow, $subject);
+    public function supports(Workflow $workflow, $subject): bool;
 }

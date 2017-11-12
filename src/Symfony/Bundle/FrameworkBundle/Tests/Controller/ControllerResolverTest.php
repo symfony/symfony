@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTes
 
 class ControllerResolverTest extends ContainerControllerResolverTest
 {
-    public function testGetControllerOnContainerAware()
+    public function testGetControllerOnContainerAware(): void
     {
         $resolver = $this->createControllerResolver();
         $request = Request::create('/');
@@ -36,7 +36,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame('testAction', $controller[1]);
     }
 
-    public function testGetControllerOnContainerAwareInvokable()
+    public function testGetControllerOnContainerAwareInvokable(): void
     {
         $resolver = $this->createControllerResolver();
         $request = Request::create('/');
@@ -48,7 +48,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller->getContainer());
     }
 
-    public function testGetControllerWithBundleNotation()
+    public function testGetControllerWithBundleNotation(): void
     {
         $shortName = 'FooBundle:Default:test';
         $parser = $this->createMockParser();
@@ -69,7 +69,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame('testAction', $controller[1]);
     }
 
-    public function testContainerAwareControllerGetsContainerWhenNotSet()
+    public function testContainerAwareControllerGetsContainerWhenNotSet(): void
     {
         class_exists(AbstractControllerTest::class);
 
@@ -87,7 +87,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($container, $controller->getContainer());
     }
 
-    public function testAbstractControllerGetsContainerWhenNotSet()
+    public function testAbstractControllerGetsContainerWhenNotSet(): void
     {
         class_exists(AbstractControllerTest::class);
 
@@ -105,7 +105,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($container, $controller->setContainer($container));
     }
 
-    public function testAbstractControllerServiceWithFcqnIdGetsContainerWhenNotSet()
+    public function testAbstractControllerServiceWithFcqnIdGetsContainerWhenNotSet(): void
     {
         class_exists(AbstractControllerTest::class);
 
@@ -123,7 +123,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($container, $controller->getContainer());
     }
 
-    public function testAbstractControllerGetsNoContainerWhenSet()
+    public function testAbstractControllerGetsNoContainerWhenSet(): void
     {
         class_exists(AbstractControllerTest::class);
 
@@ -143,7 +143,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($controllerContainer, $controller->setContainer($container));
     }
 
-    public function testAbstractControllerServiceWithFcqnIdGetsNoContainerWhenSet()
+    public function testAbstractControllerServiceWithFcqnIdGetsNoContainerWhenSet(): void
     {
         class_exists(AbstractControllerTest::class);
 
@@ -191,7 +191,7 @@ class ContainerAwareController implements ContainerAwareInterface
 {
     private $container;
 
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
@@ -201,11 +201,11 @@ class ContainerAwareController implements ContainerAwareInterface
         return $this->container;
     }
 
-    public function testAction()
+    public function testAction(): void
     {
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
     }
 }
@@ -217,7 +217,7 @@ class DummyController extends AbstractController
         return $this->container;
     }
 
-    public function fooAction()
+    public function fooAction(): void
     {
     }
 }

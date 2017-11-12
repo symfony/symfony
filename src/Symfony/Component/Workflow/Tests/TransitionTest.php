@@ -11,12 +11,12 @@ class TransitionTest extends TestCase
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
      * @expectedExceptionMessage The transition "foo.bar" contains invalid characters.
      */
-    public function testValidateName()
+    public function testValidateName(): void
     {
         $transition = new Transition('foo.bar', 'a', 'b');
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $transition = new Transition('name', 'a', 'b');
 

@@ -30,11 +30,10 @@ class TransTokenParser extends AbstractTokenParser
     /**
      * Parses a token and returns a node.
      *
-     * @return Node
      *
      * @throws SyntaxError
      */
-    public function parse(Token $token)
+    public function parse(Token $token): Node
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
@@ -87,7 +86,7 @@ class TransTokenParser extends AbstractTokenParser
      *
      * @return string The tag name
      */
-    public function getTag()
+    public function getTag(): string
     {
         return 'trans';
     }

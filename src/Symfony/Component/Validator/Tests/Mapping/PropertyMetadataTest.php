@@ -20,14 +20,14 @@ class PropertyMetadataTest extends TestCase
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
 
-    public function testInvalidPropertyName()
+    public function testInvalidPropertyName(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ValidatorException');
 
         new PropertyMetadata(self::CLASSNAME, 'foobar');
     }
 
-    public function testGetPropertyValueFromPrivateProperty()
+    public function testGetPropertyValueFromPrivateProperty(): void
     {
         $entity = new Entity('foobar');
         $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
@@ -35,7 +35,7 @@ class PropertyMetadataTest extends TestCase
         $this->assertEquals('foobar', $metadata->getPropertyValue($entity));
     }
 
-    public function testGetPropertyValueFromOverriddenPrivateProperty()
+    public function testGetPropertyValueFromOverriddenPrivateProperty(): void
     {
         $entity = new Entity('foobar');
         $metadata = new PropertyMetadata(self::PARENTCLASS, 'data');
@@ -44,7 +44,7 @@ class PropertyMetadataTest extends TestCase
         $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
     }
 
-    public function testGetPropertyValueFromRemovedProperty()
+    public function testGetPropertyValueFromRemovedProperty(): void
     {
         $entity = new Entity('foobar');
         $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');

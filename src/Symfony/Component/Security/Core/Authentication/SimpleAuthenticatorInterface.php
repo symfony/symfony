@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  */
 interface SimpleAuthenticatorInterface
 {
-    public function authenticateToken(TokenInterface $token, UserProviderInterface $userProvider, $providerKey);
+    public function authenticateToken(TokenInterface $token, UserProviderInterface $userProvider, $providerKey): void;
 
-    public function supportsToken(TokenInterface $token, $providerKey);
+    public function supportsToken(TokenInterface $token, $providerKey): void;
 }

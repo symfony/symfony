@@ -18,7 +18,7 @@ namespace Symfony\Component\Form\Tests;
  */
 abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4LayoutTest
 {
-    public function testLabelOnForm()
+    public function testLabelOnForm(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType');
         $view = $form->createView();
@@ -33,7 +33,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         );
     }
 
-    public function testLabelDoesNotRenderFieldAttributes()
+    public function testLabelDoesNotRenderFieldAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, array(
@@ -50,7 +50,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         );
     }
 
-    public function testLabelWithCustomAttributesPassedDirectly()
+    public function testLabelWithCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, array(
@@ -67,7 +67,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         );
     }
 
-    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), 'Custom label', array(
@@ -85,7 +85,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         );
     }
 
-    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
             'label' => 'Custom label',
@@ -105,7 +105,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         );
     }
 
-    public function testLegendOnExpandedType()
+    public function testLegendOnExpandedType(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
             'label' => 'Custom label',
@@ -124,7 +124,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         );
     }
 
-    public function testStartTag()
+    public function testStartTag(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -136,7 +136,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
     }
 
-    public function testStartTagWithOverriddenVars()
+    public function testStartTagWithOverriddenVars(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'put',
@@ -151,7 +151,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $this->assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
     }
 
-    public function testStartTagForMultipartForm()
+    public function testStartTagForMultipartForm(): void
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
                 'method' => 'get',
@@ -165,7 +165,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
     }
 
-    public function testStartTagWithExtraAttributes()
+    public function testStartTagWithExtraAttributes(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -179,7 +179,7 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
     }
 
-    public function testCheckboxRow()
+    public function testCheckboxRow(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
         $view = $form->createView();

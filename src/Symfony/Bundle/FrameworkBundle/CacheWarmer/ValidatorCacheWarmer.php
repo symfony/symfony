@@ -33,9 +33,8 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
     private $validatorBuilder;
 
     /**
-     * @param ValidatorBuilderInterface $validatorBuilder
-     * @param string                    $phpArrayFile     The PHP file where metadata are cached
-     * @param CacheItemPoolInterface    $fallbackPool     The pool where runtime-discovered metadata are cached
+     * @param string                 $phpArrayFile The PHP file where metadata are cached
+     * @param CacheItemPoolInterface $fallbackPool The pool where runtime-discovered metadata are cached
      */
     public function __construct(ValidatorBuilderInterface $validatorBuilder, string $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {
@@ -72,7 +71,7 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
         return true;
     }
 
-    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values)
+    protected function warmUpPhpArrayAdapter(PhpArrayAdapter $phpArrayAdapter, array $values): void
     {
         // make sure we don't cache null values
         parent::warmUpPhpArrayAdapter($phpArrayAdapter, array_filter($values));

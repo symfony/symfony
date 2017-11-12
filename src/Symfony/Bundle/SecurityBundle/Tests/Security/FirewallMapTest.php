@@ -25,7 +25,7 @@ class FirewallMapTest extends TestCase
 {
     const ATTRIBUTE_FIREWALL_CONTEXT = '_firewall_context';
 
-    public function testGetListenersWithEmptyMap()
+    public function testGetListenersWithEmptyMap(): void
     {
         $request = new Request();
 
@@ -40,7 +40,7 @@ class FirewallMapTest extends TestCase
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
     }
 
-    public function testGetListenersWithInvalidParameter()
+    public function testGetListenersWithInvalidParameter(): void
     {
         $request = new Request();
         $request->attributes->set(self::ATTRIBUTE_FIREWALL_CONTEXT, 'foo');
@@ -56,7 +56,7 @@ class FirewallMapTest extends TestCase
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
     }
 
-    public function testGetListeners()
+    public function testGetListeners(): void
     {
         $request = new Request();
 

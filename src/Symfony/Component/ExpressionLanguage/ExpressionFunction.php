@@ -67,13 +67,12 @@ class ExpressionFunction
      * @param string      $phpFunctionName        The PHP function name
      * @param string|null $expressionFunctionName The expression function name (default: same than the PHP function name)
      *
-     * @return self
      *
      * @throws \InvalidArgumentException if given PHP function name does not exist
      * @throws \InvalidArgumentException if given PHP function name is in namespace
      *                                   and expression function name is not defined
      */
-    public static function fromPhp($phpFunctionName, $expressionFunctionName = null)
+    public static function fromPhp(string $phpFunctionName, ?string $expressionFunctionName = null): self
     {
         $phpFunctionName = ltrim($phpFunctionName, '\\');
         if (!function_exists($phpFunctionName)) {

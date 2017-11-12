@@ -22,21 +22,21 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
         return new TimeValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Time());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Time());
 
         $this->assertNoViolation();
     }
 
-    public function testDateTimeClassIsValid()
+    public function testDateTimeClassIsValid(): void
     {
         $this->validator->validate(new \DateTime(), new Time());
 
@@ -46,7 +46,7 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Time());
     }
@@ -54,7 +54,7 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidTimes
      */
-    public function testValidTimes($time)
+    public function testValidTimes($time): void
     {
         $this->validator->validate($time, new Time());
 
@@ -73,7 +73,7 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidTimes
      */
-    public function testInvalidTimes($time, $code)
+    public function testInvalidTimes($time, $code): void
     {
         $constraint = new Time(array(
             'message' => 'myMessage',
@@ -100,7 +100,7 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function testDateTimeImmutableIsValid()
+    public function testDateTimeImmutableIsValid(): void
     {
         $this->validator->validate(new \DateTimeImmutable(), new Time());
 

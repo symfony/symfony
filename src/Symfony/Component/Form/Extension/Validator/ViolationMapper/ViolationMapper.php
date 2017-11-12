@@ -32,7 +32,7 @@ class ViolationMapper implements ViolationMapperInterface
     /**
      * {@inheritdoc}
      */
-    public function mapViolation(ConstraintViolation $violation, FormInterface $form, $allowNonSynchronized = false)
+    public function mapViolation(ConstraintViolation $violation, FormInterface $form, $allowNonSynchronized = false): void
     {
         $this->allowNonSynchronized = $allowNonSynchronized;
 
@@ -146,7 +146,7 @@ class ViolationMapper implements ViolationMapperInterface
      *
      * @return null|FormInterface The found match or null
      */
-    private function matchChild(FormInterface $form, PropertyPathIteratorInterface $it)
+    private function matchChild(FormInterface $form, PropertyPathIteratorInterface $it): ?FormInterface
     {
         $target = null;
         $chunk = '';
@@ -217,7 +217,7 @@ class ViolationMapper implements ViolationMapperInterface
      *
      * @return RelativePath The reconstructed path
      */
-    private function reconstructPath(ViolationPath $violationPath, FormInterface $origin)
+    private function reconstructPath(ViolationPath $violationPath, FormInterface $origin): RelativePath
     {
         $propertyPathBuilder = new PropertyPathBuilder($violationPath);
         $it = $violationPath->getIterator();
@@ -271,7 +271,7 @@ class ViolationMapper implements ViolationMapperInterface
     /**
      * @return bool
      */
-    private function acceptsErrors(FormInterface $form)
+    private function acceptsErrors(FormInterface $form): bool
     {
         // Ignore non-submitted forms. This happens, for example, in PATCH
         // requests.

@@ -13,7 +13,7 @@ class RegisterMappingsPassTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessageould Could not find the manager name parameter in the container. Tried the following parameter names: "manager.param.one", "manager.param.two"
      */
-    public function testNoDriverParmeterException()
+    public function testNoDriverParmeterException(): void
     {
         $container = $this->createBuilder(array(
         ));
@@ -23,7 +23,7 @@ class RegisterMappingsPassTest extends TestCase
         ));
     }
 
-    private function process(ContainerBuilder $container, array $managerParamNames)
+    private function process(ContainerBuilder $container, array $managerParamNames): void
     {
         $pass = new ConcreteMappingsPass(
             new Definition('\stdClass'),

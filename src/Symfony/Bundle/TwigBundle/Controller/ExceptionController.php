@@ -32,8 +32,7 @@ class ExceptionController
     protected $debug;
 
     /**
-     * @param Environment $twig
-     * @param bool        $debug Show error (false) or exception (true) pages by default
+     * @param bool $debug Show error (false) or exception (true) pages by default
      */
     public function __construct(Environment $twig, bool $debug)
     {
@@ -48,11 +47,10 @@ class ExceptionController
      * the exception page (when true). If it is not present, the "debug" value passed into the constructor will
      * be used.
      *
-     * @return Response
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
+    public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null): Response
     {
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
         $showException = $request->attributes->get('showException', $this->debug); // As opposed to an additional parameter, this maintains BC
@@ -71,12 +69,7 @@ class ExceptionController
         ), 200, array('Content-Type' => $request->getMimeType($request->getRequestFormat()) ?: 'text/html'));
     }
 
-    /**
-     * @param int $startObLevel
-     *
-     * @return string
-     */
-    protected function getAndCleanOutputBuffering($startObLevel)
+    protected function getAndCleanOutputBuffering(int $startObLevel): string
     {
         if (ob_get_level() <= $startObLevel) {
             return '';
@@ -88,14 +81,9 @@ class ExceptionController
     }
 
     /**
-     * @param Request $request
-     * @param string  $format
-     * @param int     $code          An HTTP response status code
-     * @param bool    $showException
-     *
-     * @return string
+     * @param int    $code          An HTTP response status code
      */
-    protected function findTemplate(Request $request, $format, $code, $showException)
+    protected function findTemplate(Request $request, string $format, int $code, bool $showException): string
     {
         $name = $showException ? 'exception' : 'error';
         if ($showException && 'html' == $format) {

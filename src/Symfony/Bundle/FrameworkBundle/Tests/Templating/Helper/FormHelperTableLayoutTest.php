@@ -27,7 +27,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
      */
     protected $engine;
 
-    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -39,7 +39,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         $this->assertSame('<form name="form" method="get">', $html);
     }
 
-    public function testStartTagHasActionAttributeWhenActionIsZero()
+    public function testStartTagHasActionAttributeWhenActionIsZero(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, array(
             'method' => 'get',
@@ -75,7 +75,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         ));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->engine = null;
 
@@ -122,7 +122,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         return (string) $this->engine->get('form')->end($view, $vars);
     }
 
-    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true)
+    protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true): void
     {
         $this->engine->get('form')->setTheme($view, $themes, $useDefaultThemes);
     }

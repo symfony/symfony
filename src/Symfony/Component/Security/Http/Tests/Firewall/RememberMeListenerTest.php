@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class RememberMeListenerTest extends TestCase
 {
-    public function testOnCoreSecurityDoesNotTryToPopulateNonEmptyTokenStorage()
+    public function testOnCoreSecurityDoesNotTryToPopulateNonEmptyTokenStorage(): void
     {
         list($listener, $tokenStorage) = $this->getListener();
 
@@ -37,7 +37,7 @@ class RememberMeListenerTest extends TestCase
         $this->assertNull($listener->handle($this->getGetResponseEvent()));
     }
 
-    public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
+    public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet(): void
     {
         list($listener, $tokenStorage, $service) = $this->getListener();
 
@@ -63,7 +63,7 @@ class RememberMeListenerTest extends TestCase
         $this->assertNull($listener->handle($event));
     }
 
-    public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
+    public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation(): void
     {
         list($listener, $tokenStorage, $service, $manager) = $this->getListener();
         $request = new Request();
@@ -107,7 +107,7 @@ class RememberMeListenerTest extends TestCase
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
      * @expectedExceptionMessage Authentication failed.
      */
-    public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
+    public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation(): void
     {
         list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, false);
 
@@ -145,7 +145,7 @@ class RememberMeListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testOnCoreSecurity()
+    public function testOnCoreSecurity(): void
     {
         list($listener, $tokenStorage, $service, $manager) = $this->getListener();
 
@@ -184,7 +184,7 @@ class RememberMeListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testSessionStrategy()
+    public function testSessionStrategy(): void
     {
         list($listener, $tokenStorage, $service, $manager, , $dispatcher, $sessionStrategy) = $this->getListener(false, true, true);
 
@@ -249,7 +249,7 @@ class RememberMeListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testSessionIsMigratedByDefault()
+    public function testSessionIsMigratedByDefault(): void
     {
         list($listener, $tokenStorage, $service, $manager, , $dispatcher, $sessionStrategy) = $this->getListener(false, true, false);
 
@@ -312,7 +312,7 @@ class RememberMeListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testOnCoreSecurityInteractiveLoginEventIsDispatchedIfDispatcherIsPresent()
+    public function testOnCoreSecurityInteractiveLoginEventIsDispatchedIfDispatcherIsPresent(): void
     {
         list($listener, $tokenStorage, $service, $manager, , $dispatcher) = $this->getListener(true);
 

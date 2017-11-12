@@ -22,14 +22,14 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         return new BicValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Bic());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Bic());
 
@@ -39,7 +39,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidBics
      */
-    public function testValidBics($bic)
+    public function testValidBics($bic): void
     {
         $this->validator->validate($bic, new Bic());
 
@@ -62,7 +62,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidBics
      */
-    public function testInvalidBics($bic, $code)
+    public function testInvalidBics($bic, $code): void
     {
         $constraint = new Bic(array(
             'message' => 'myMessage',

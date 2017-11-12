@@ -22,42 +22,42 @@ class MimeTypeTest extends TestCase
 {
     protected $path;
 
-    public function testGuessImageWithoutExtension()
+    public function testGuessImageWithoutExtension(): void
     {
         $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test'));
     }
 
-    public function testGuessImageWithDirectory()
+    public function testGuessImageWithDirectory(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
 
         MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/directory');
     }
 
-    public function testGuessImageWithFileBinaryMimeTypeGuesser()
+    public function testGuessImageWithFileBinaryMimeTypeGuesser(): void
     {
         $guesser = MimeTypeGuesser::getInstance();
         $guesser->register(new FileBinaryMimeTypeGuesser());
         $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test'));
     }
 
-    public function testGuessImageWithKnownExtension()
+    public function testGuessImageWithKnownExtension(): void
     {
         $this->assertEquals('image/gif', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/test.gif'));
     }
 
-    public function testGuessFileWithUnknownExtension()
+    public function testGuessFileWithUnknownExtension(): void
     {
         $this->assertEquals('application/octet-stream', MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/.unknownextension'));
     }
 
-    public function testGuessWithIncorrectPath()
+    public function testGuessWithIncorrectPath(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
         MimeTypeGuesser::getInstance()->guess(__DIR__.'/../Fixtures/not_here');
     }
 
-    public function testGuessWithNonReadablePath()
+    public function testGuessWithNonReadablePath(): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Can not verify chmod operations on Windows');
@@ -79,7 +79,7 @@ class MimeTypeTest extends TestCase
         }
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         $path = __DIR__.'/../Fixtures/to_delete';
         if (file_exists($path)) {

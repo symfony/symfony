@@ -24,23 +24,23 @@ class PhpEngineTest extends TestCase
 {
     protected $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new ProjectTemplateLoader();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->loader = null;
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->assertEquals($this->loader, $engine->getLoader(), '__construct() takes a loader instance as its second first argument');
     }
 
-    public function testOffsetGet()
+    public function testOffsetGet(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $engine->set($helper = new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('bar'), 'foo');
@@ -55,7 +55,7 @@ class PhpEngineTest extends TestCase
         }
     }
 
-    public function testGetSetHas()
+    public function testGetSetHas(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $foo = new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('foo');
@@ -80,7 +80,7 @@ class PhpEngineTest extends TestCase
         $this->assertFalse($engine->has('foobar'), '->has() returns false if the helper does not exist');
     }
 
-    public function testUnsetHelper()
+    public function testUnsetHelper(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $foo = new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('foo');
@@ -91,7 +91,7 @@ class PhpEngineTest extends TestCase
         unset($engine['foo']);
     }
 
-    public function testExtendRender()
+    public function testExtendRender(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(), array(new SlotsHelper()));
         try {
@@ -116,7 +116,7 @@ class PhpEngineTest extends TestCase
         $this->assertEquals('bar-foo-', $engine->render('foo.php', array('foo' => 'foo', 'bar' => 'bar')), '->render() supports render() calls in templates');
     }
 
-    public function testRenderParameter()
+    public function testRenderParameter(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->loader->setTemplate('foo.php', '<?php echo $template . $parameters ?>');
@@ -127,7 +127,7 @@ class PhpEngineTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @dataProvider forbiddenParameterNames
      */
-    public function testRenderForbiddenParameter($name)
+    public function testRenderForbiddenParameter($name): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->loader->setTemplate('foo.php', 'bar');
@@ -142,7 +142,7 @@ class PhpEngineTest extends TestCase
         );
     }
 
-    public function testEscape()
+    public function testEscape(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->assertEquals('&lt;br /&gt;', $engine->escape('<br />'), '->escape() escapes strings');
@@ -150,7 +150,7 @@ class PhpEngineTest extends TestCase
         $this->assertEquals($foo, $engine->escape($foo), '->escape() does nothing on non strings');
     }
 
-    public function testGetSetCharset()
+    public function testGetSetCharset(): void
     {
         $helper = new SlotsHelper();
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array($helper));
@@ -162,7 +162,7 @@ class PhpEngineTest extends TestCase
         $this->assertEquals('ISO-8859-1', $helper->getCharset(), 'EngineInterface::setCharset() changes the default charset of helper');
     }
 
-    public function testGlobalVariables()
+    public function testGlobalVariables(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $engine->addGlobal('global_variable', 'lorem ipsum');
@@ -172,7 +172,7 @@ class PhpEngineTest extends TestCase
         ), $engine->getGlobals());
     }
 
-    public function testGlobalsGetPassedToTemplate()
+    public function testGlobalsGetPassedToTemplate(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $engine->addGlobal('global', 'global variable');
@@ -184,7 +184,7 @@ class PhpEngineTest extends TestCase
         $this->assertEquals($engine->render('global.php', array('global' => 'overwritten')), 'overwritten');
     }
 
-    public function testGetLoader()
+    public function testGetLoader(): void
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
 
@@ -204,7 +204,7 @@ class ProjectTemplateLoader extends Loader
 {
     public $templates = array();
 
-    public function setTemplate($name, $content)
+    public function setTemplate($name, $content): void
     {
         $template = new TemplateReference($name, 'php');
         $this->templates[$template->getLogicalName()] = $content;

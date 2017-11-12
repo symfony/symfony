@@ -33,7 +33,7 @@ final class Ldap implements LdapInterface
     /**
      * {@inheritdoc}
      */
-    public function bind($dn = null, $password = null)
+    public function bind($dn = null, $password = null): void
     {
         $this->adapter->getConnection()->bind($dn, $password);
     }
@@ -70,7 +70,7 @@ final class Ldap implements LdapInterface
      *
      * @return static
      */
-    public static function create($adapter, array $config = array()): Ldap
+    public static function create(string $adapter, array $config = array()): Ldap
     {
         if (!isset(self::$adapterMap[$adapter])) {
             throw new DriverNotFoundException(sprintf(

@@ -30,7 +30,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeRouteCollection(RouteCollection $routes, array $options = array())
+    protected function describeRouteCollection(RouteCollection $routes, array $options = array()): void
     {
         $first = true;
         foreach ($routes->all() as $name => $route) {
@@ -47,7 +47,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeRoute(Route $route, array $options = array())
+    protected function describeRoute(Route $route, array $options = array()): void
     {
         $output = '- Path: '.$route->getPath()
             ."\n".'- Path Regex: '.$route->compile()->getRegex()
@@ -69,7 +69,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
+    protected function describeContainerParameters(ParameterBag $parameters, array $options = array()): void
     {
         $this->write("Container parameters\n====================\n");
         foreach ($this->sortParameters($parameters) as $key => $value) {
@@ -80,7 +80,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerTags(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerTags(ContainerBuilder $builder, array $options = array()): void
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
         $this->write("Container tags\n==============");
@@ -97,7 +97,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
+    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null): void
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -117,7 +117,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerServices(ContainerBuilder $builder, array $options = array())
+    protected function describeContainerServices(ContainerBuilder $builder, array $options = array()): void
     {
         $showPrivate = isset($options['show_private']) && $options['show_private'];
 
@@ -179,7 +179,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerDefinition(Definition $definition, array $options = array())
+    protected function describeContainerDefinition(Definition $definition, array $options = array()): void
     {
         $output = '- Class: `'.$definition->getClass().'`'
             ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
@@ -258,7 +258,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerParameter($parameter, array $options = array())
+    protected function describeContainerParameter($parameter, array $options = array()): void
     {
         $this->write(isset($options['parameter']) ? sprintf("%s\n%s\n\n%s", $options['parameter'], str_repeat('=', strlen($options['parameter'])), $this->formatParameter($parameter)) : $parameter);
     }
@@ -266,7 +266,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array())
+    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array()): void
     {
         $event = array_key_exists('event', $options) ? $options['event'] : null;
 
@@ -360,10 +360,7 @@ class MarkdownDescriptor extends Descriptor
         throw new \InvalidArgumentException('Callable is not describable.');
     }
 
-    /**
-     * @return string
-     */
-    private function formatRouterConfig(array $array)
+    private function formatRouterConfig(array $array): string
     {
         if (!$array) {
             return 'NONE';

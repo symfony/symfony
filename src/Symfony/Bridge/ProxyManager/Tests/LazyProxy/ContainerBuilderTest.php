@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ContainerBuilderTest extends TestCase
 {
-    public function testCreateProxyServiceWithRuntimeInstantiator()
+    public function testCreateProxyServiceWithRuntimeInstantiator(): void
     {
         $builder = new ContainerBuilder();
 

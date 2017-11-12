@@ -26,10 +26,7 @@ class AccessDeniedException extends \RuntimeException
         parent::__construct($message, 403, $previous);
     }
 
-    /**
-     * @return array
-     */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -37,7 +34,7 @@ class AccessDeniedException extends \RuntimeException
     /**
      * @param array|string $attributes
      */
-    public function setAttributes($attributes)
+    public function setAttributes($attributes): void
     {
         $this->attributes = (array) $attributes;
     }
@@ -53,7 +50,7 @@ class AccessDeniedException extends \RuntimeException
     /**
      * @param mixed $subject
      */
-    public function setSubject($subject)
+    public function setSubject($subject): void
     {
         $this->subject = $subject;
     }

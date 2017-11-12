@@ -23,7 +23,7 @@ class TimezoneType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ('datetimezone' === $options['input']) {
             $builder->addModelTransformer(new DateTimeZoneToStringTransformer($options['multiple']));
@@ -33,7 +33,7 @@ class TimezoneType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(array(
             'choice_loader' => function (Options $options) {

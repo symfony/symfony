@@ -26,9 +26,9 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         return new CollectionValidator();
     }
 
-    abstract protected function prepareTestData(array $contents);
+    abstract protected function prepareTestData(array $contents): void;
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Collection(array('fields' => array(
             'foo' => new Range(array('min' => 4)),
@@ -37,7 +37,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testFieldsAsDefaultOption()
+    public function testFieldsAsDefaultOption(): void
     {
         $constraint = new Range(array('min' => 4));
 
@@ -55,14 +55,14 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testThrowsExceptionIfNotTraversable()
+    public function testThrowsExceptionIfNotTraversable(): void
     {
         $this->validator->validate('foobar', new Collection(array('fields' => array(
             'foo' => new Range(array('min' => 4)),
         ))));
     }
 
-    public function testWalkSingleConstraint()
+    public function testWalkSingleConstraint(): void
     {
         $constraint = new Range(array('min' => 4));
 
@@ -89,7 +89,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testWalkMultipleConstraints()
+    public function testWalkMultipleConstraints(): void
     {
         $constraints = array(
             new Range(array('min' => 4)),
@@ -119,7 +119,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExtraFieldsDisallowed()
+    public function testExtraFieldsDisallowed(): void
     {
         $constraint = new Range(array('min' => 4));
 
@@ -146,7 +146,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
     }
 
     // bug fix
-    public function testNullNotConsideredExtraField()
+    public function testNullNotConsideredExtraField(): void
     {
         $data = $this->prepareTestData(array(
             'foo' => null,
@@ -165,7 +165,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExtraFieldsAllowed()
+    public function testExtraFieldsAllowed(): void
     {
         $data = $this->prepareTestData(array(
             'foo' => 5,
@@ -186,7 +186,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testMissingFieldsDisallowed()
+    public function testMissingFieldsDisallowed(): void
     {
         $data = $this->prepareTestData(array());
 
@@ -207,7 +207,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testMissingFieldsAllowed()
+    public function testMissingFieldsAllowed(): void
     {
         $data = $this->prepareTestData(array());
 
@@ -223,7 +223,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testOptionalFieldPresent()
+    public function testOptionalFieldPresent(): void
     {
         $data = $this->prepareTestData(array(
             'foo' => null,
@@ -236,7 +236,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testOptionalFieldNotPresent()
+    public function testOptionalFieldNotPresent(): void
     {
         $data = $this->prepareTestData(array());
 
@@ -247,7 +247,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testOptionalFieldSingleConstraint()
+    public function testOptionalFieldSingleConstraint(): void
     {
         $array = array(
             'foo' => 5,
@@ -266,7 +266,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testOptionalFieldMultipleConstraints()
+    public function testOptionalFieldMultipleConstraints(): void
     {
         $array = array(
             'foo' => 5,
@@ -288,7 +288,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testRequiredFieldPresent()
+    public function testRequiredFieldPresent(): void
     {
         $data = $this->prepareTestData(array(
             'foo' => null,
@@ -301,7 +301,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testRequiredFieldNotPresent()
+    public function testRequiredFieldNotPresent(): void
     {
         $data = $this->prepareTestData(array());
 
@@ -320,7 +320,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testRequiredFieldSingleConstraint()
+    public function testRequiredFieldSingleConstraint(): void
     {
         $array = array(
             'foo' => 5,
@@ -339,7 +339,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testRequiredFieldMultipleConstraints()
+    public function testRequiredFieldMultipleConstraints(): void
     {
         $array = array(
             'foo' => 5,
@@ -361,7 +361,7 @@ abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testObjectShouldBeLeftUnchanged()
+    public function testObjectShouldBeLeftUnchanged(): void
     {
         $value = new \ArrayObject(array(
             'foo' => 3,

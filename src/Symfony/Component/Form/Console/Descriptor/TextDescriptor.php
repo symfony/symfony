@@ -25,7 +25,7 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 class TextDescriptor extends Descriptor
 {
-    protected function describeDefaults(array $options)
+    protected function describeDefaults(array $options): void
     {
         $this->output->section('Built-in form types (Symfony\Component\Form\Extension\Core\Type)');
         $shortClassNames = array_map(function ($fqcn) { return array_slice(explode('\\', $fqcn), -1)[0]; }, $options['core_types']);
@@ -43,7 +43,7 @@ class TextDescriptor extends Descriptor
         $this->output->listing($options['guessers']);
     }
 
-    protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array())
+    protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array()): void
     {
         $this->collectOptions($resolvedFormType);
 
@@ -96,7 +96,7 @@ class TextDescriptor extends Descriptor
         }
     }
 
-    protected function describeOption(OptionsResolver $optionsResolver, array $options)
+    protected function describeOption(OptionsResolver $optionsResolver, array $options): void
     {
         $definition = $this->getOptionDefinition($optionsResolver, $options['option']);
 

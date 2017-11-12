@@ -27,7 +27,7 @@ class RedirectableUrlMatcher extends BaseMatcher
      *
      * @return array An array of parameters
      */
-    public function redirect($path, $route, $scheme = null)
+    public function redirect(string $path, string $route, string $scheme = null): array
     {
         return array(
             '_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction',

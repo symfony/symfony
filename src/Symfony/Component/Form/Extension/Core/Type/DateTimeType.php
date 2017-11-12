@@ -66,7 +66,7 @@ class DateTimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $parts = array('year', 'month', 'day', 'hour');
         $dateParts = array('year', 'month', 'day');
@@ -183,7 +183,7 @@ class DateTimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['widget'] = $options['widget'];
 
@@ -199,7 +199,7 @@ class DateTimeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $compound = function (Options $options) {
             return 'single_text' !== $options['widget'];

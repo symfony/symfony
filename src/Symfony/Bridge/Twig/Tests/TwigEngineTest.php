@@ -19,14 +19,14 @@ use Twig\Loader\ArrayLoader;
 
 class TwigEngineTest extends TestCase
 {
-    public function testExistsWithTemplateInstances()
+    public function testExistsWithTemplateInstances(): void
     {
         $engine = $this->getTwig();
 
         $this->assertTrue($engine->exists($this->getMockForAbstractClass('Twig\Template', array(), '', false)));
     }
 
-    public function testExistsWithNonExistentTemplates()
+    public function testExistsWithNonExistentTemplates(): void
     {
         $engine = $this->getTwig();
 
@@ -34,7 +34,7 @@ class TwigEngineTest extends TestCase
         $this->assertFalse($engine->exists(new TemplateReference('foorbar')));
     }
 
-    public function testExistsWithTemplateWithSyntaxErrors()
+    public function testExistsWithTemplateWithSyntaxErrors(): void
     {
         $engine = $this->getTwig();
 
@@ -42,7 +42,7 @@ class TwigEngineTest extends TestCase
         $this->assertTrue($engine->exists(new TemplateReference('error')));
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $engine = $this->getTwig();
 
@@ -50,7 +50,7 @@ class TwigEngineTest extends TestCase
         $this->assertTrue($engine->exists(new TemplateReference('index')));
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $engine = $this->getTwig();
 
@@ -61,7 +61,7 @@ class TwigEngineTest extends TestCase
     /**
      * @expectedException \Twig\Error\SyntaxError
      */
-    public function testRenderWithError()
+    public function testRenderWithError(): void
     {
         $engine = $this->getTwig();
 

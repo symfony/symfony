@@ -40,7 +40,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         try {
             parent::process($container);
@@ -119,11 +119,8 @@ class AutowirePass extends AbstractRecursivePass
 
     /**
      * @param \ReflectionClass $reflectionClass
-     * @param array            $methodCalls
-     *
-     * @return array
      */
-    private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls)
+    private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls): array
     {
         foreach ($methodCalls as $i => $call) {
             list($method, $arguments) = $call;
@@ -223,7 +220,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * @return TypedReference|null A reference to the service matching the given type, if any
      */
-    private function getAutowiredReference(TypedReference $reference, $deprecationMessage)
+    private function getAutowiredReference(TypedReference $reference, $deprecationMessage): ?TypedReference
     {
         $this->lastFailure = null;
         $type = $reference->getType();
@@ -252,7 +249,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Populates the list of available types.
      */
-    private function populateAvailableTypes()
+    private function populateAvailableTypes(): void
     {
         $this->types = array();
 
@@ -264,7 +261,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Populates the list of available types for a given definition.
      */
-    private function populateAvailableType(string $id, Definition $definition)
+    private function populateAvailableType(string $id, Definition $definition): void
     {
         // Never use abstract services
         if ($definition->isAbstract()) {
@@ -287,7 +284,7 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Associates a type and a service id if applicable.
      */
-    private function set(string $type, string $id)
+    private function set(string $type, string $id): void
     {
         // is this already a type/class that is known to match multiple services?
         if (isset($this->ambiguousServiceTypes[$type])) {

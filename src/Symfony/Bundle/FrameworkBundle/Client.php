@@ -44,17 +44,15 @@ class Client extends BaseClient
      *
      * @return ContainerInterface|null Returns null when the Kernel has been shutdown or not started yet
      */
-    public function getContainer()
+    public function getContainer(): ?ContainerInterface
     {
         return $this->kernel->getContainer();
     }
 
     /**
      * Returns the kernel.
-     *
-     * @return KernelInterface
      */
-    public function getKernel()
+    public function getKernel(): KernelInterface
     {
         return $this->kernel;
     }
@@ -78,7 +76,7 @@ class Client extends BaseClient
      *
      * If the profiler is not enabled, the call to this method does nothing.
      */
-    public function enableProfiler()
+    public function enableProfiler(): void
     {
         if ($this->kernel->getContainer()->has('profiler')) {
             $this->profiler = true;
@@ -91,7 +89,7 @@ class Client extends BaseClient
      * By default, the Client reboots the Kernel for each request. This method
      * allows to keep the same kernel across requests.
      */
-    public function disableReboot()
+    public function disableReboot(): void
     {
         $this->reboot = false;
     }
@@ -99,7 +97,7 @@ class Client extends BaseClient
     /**
      * Enables kernel reboot between requests.
      */
-    public function enableReboot()
+    public function enableReboot(): void
     {
         $this->reboot = true;
     }
@@ -159,7 +157,7 @@ class Client extends BaseClient
      *
      * @return string The script content
      */
-    protected function getScript($request)
+    protected function getScript(Request $request): string
     {
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));

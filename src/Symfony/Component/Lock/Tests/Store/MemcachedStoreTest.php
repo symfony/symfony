@@ -22,7 +22,7 @@ class MemcachedStoreTest extends AbstractStoreTest
 {
     use ExpiringStoreTestTrait;
 
-    public static function setupBeforeClass()
+    public static function setupBeforeClass(): void
     {
         $memcached = new \Memcached();
         $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);
@@ -50,7 +50,7 @@ class MemcachedStoreTest extends AbstractStoreTest
         return new MemcachedStore($memcached);
     }
 
-    public function testAbortAfterExpiration()
+    public function testAbortAfterExpiration(): void
     {
         $this->markTestSkipped('Memcached expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }

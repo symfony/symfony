@@ -63,10 +63,8 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
 
     /**
      * Returns the provider (firewall) key.
-     *
-     * @return string
      */
-    public function getProviderKey()
+    public function getProviderKey(): string
     {
         return $this->providerKey;
     }
@@ -82,7 +80,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->providerKey, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);

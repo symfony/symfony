@@ -36,10 +36,8 @@ class PostResponseEvent extends KernelEvent
 
     /**
      * Returns the response for which this event was thrown.
-     *
-     * @return Response
      */
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->response;
     }

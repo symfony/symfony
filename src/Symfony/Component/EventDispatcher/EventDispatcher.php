@@ -120,7 +120,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function addListener($eventName, $listener, $priority = 0)
+    public function addListener($eventName, $listener, $priority = 0): void
     {
         $this->listeners[$eventName][$priority][] = $listener;
         unset($this->sorted[$eventName]);
@@ -129,7 +129,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function removeListener($eventName, $listener)
+    public function removeListener($eventName, $listener): void
     {
         if (empty($this->listeners[$eventName])) {
             return;
@@ -162,7 +162,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function addSubscriber(EventSubscriberInterface $subscriber)
+    public function addSubscriber(EventSubscriberInterface $subscriber): void
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (is_string($params)) {
@@ -180,7 +180,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function removeSubscriber(EventSubscriberInterface $subscriber)
+    public function removeSubscriber(EventSubscriberInterface $subscriber): void
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (is_array($params) && is_array($params[0])) {
@@ -203,7 +203,7 @@ class EventDispatcher implements EventDispatcherInterface
      * @param string     $eventName The name of the event to dispatch
      * @param Event      $event     The event object to pass to the event handlers/listeners
      */
-    protected function doDispatch($listeners, $eventName, Event $event)
+    protected function doDispatch($listeners, $eventName, Event $event): void
     {
         foreach ($listeners as $listener) {
             if ($event->isPropagationStopped()) {
@@ -218,7 +218,7 @@ class EventDispatcher implements EventDispatcherInterface
      *
      * @param string $eventName The name of the event
      */
-    private function sortListeners($eventName)
+    private function sortListeners(string $eventName): void
     {
         krsort($this->listeners[$eventName]);
         $this->sorted[$eventName] = array();

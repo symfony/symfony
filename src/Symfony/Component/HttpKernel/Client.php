@@ -53,7 +53,7 @@ class Client extends BaseClient
      *
      * @param bool $catchExceptions Whether to catch exceptions
      */
-    public function catchExceptions($catchExceptions)
+    public function catchExceptions(bool $catchExceptions): void
     {
         $this->catchExceptions = $catchExceptions;
     }
@@ -63,7 +63,7 @@ class Client extends BaseClient
      *
      * @return Response A Response instance
      */
-    protected function doRequest($request)
+    protected function doRequest($request): Response
     {
         $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $this->catchExceptions);
 
@@ -76,10 +76,8 @@ class Client extends BaseClient
 
     /**
      * Returns the script to execute when the request must be insulated.
-     *
-     * @return string
      */
-    protected function getScript($request)
+    protected function getScript($request): string
     {
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));
@@ -132,7 +130,7 @@ EOF;
      *
      * @return Request A Request instance
      */
-    protected function filterRequest(DomRequest $request)
+    protected function filterRequest(DomRequest $request): Request
     {
         $httpRequest = Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $request->getServer(), $request->getContent());
 
@@ -156,7 +154,7 @@ EOF;
      *
      * @return array An array with all uploaded files marked as already moved
      */
-    protected function filterFiles(array $files)
+    protected function filterFiles(array $files): array
     {
         $filtered = array();
         foreach ($files as $key => $value) {
@@ -193,7 +191,7 @@ EOF;
      *
      * @return DomResponse A DomResponse instance
      */
-    protected function filterResponse($response)
+    protected function filterResponse($response): DomResponse
     {
         // this is needed to support StreamedResponse
         ob_start();

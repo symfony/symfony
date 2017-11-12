@@ -24,7 +24,7 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         if (!$this->matchRegexps && !$this->noMatchRegexps) {
             return true;
@@ -51,7 +51,7 @@ class FilecontentFilterIterator extends MultiplePcreFilterIterator
      *
      * @return string regexp corresponding to a given string or regexp
      */
-    protected function toRegex($str)
+    protected function toRegex(string $str): string
     {
         return $this->isRegex($str) ? $str : '/'.preg_quote($str, '/').'/';
     }

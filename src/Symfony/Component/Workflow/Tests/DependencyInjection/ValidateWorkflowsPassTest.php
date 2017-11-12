@@ -10,7 +10,7 @@ use Symfony\Component\Workflow\Transition;
 
 class ValidateWorkflowsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = $this->getMockBuilder(ContainerBuilder::class)->getMock();
         $container

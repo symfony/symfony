@@ -49,7 +49,7 @@ class PreAuthenticatedToken extends AbstractToken
      *
      * @return string The provider key
      */
-    public function getProviderKey()
+    public function getProviderKey(): string
     {
         return $this->providerKey;
     }
@@ -65,7 +65,7 @@ class PreAuthenticatedToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         parent::eraseCredentials();
 
@@ -83,7 +83,7 @@ class PreAuthenticatedToken extends AbstractToken
     /**
      * {@inheritdoc}
      */
-    public function unserialize($str)
+    public function unserialize($str): void
     {
         list($this->credentials, $this->providerKey, $parentStr) = unserialize($str);
         parent::unserialize($parentStr);

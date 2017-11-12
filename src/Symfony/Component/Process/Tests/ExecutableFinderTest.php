@@ -21,7 +21,7 @@ class ExecutableFinderTest extends TestCase
 {
     private $path;
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->path) {
             // Restore path if it was changed.
@@ -29,13 +29,13 @@ class ExecutableFinderTest extends TestCase
         }
     }
 
-    private function setPath($path)
+    private function setPath($path): void
     {
         $this->path = getenv('PATH');
         putenv('PATH='.$path);
     }
 
-    public function testFind()
+    public function testFind(): void
     {
         if (ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
@@ -49,7 +49,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(PHP_BINARY, $result);
     }
 
-    public function testFindWithDefault()
+    public function testFindWithDefault(): void
     {
         if (ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
@@ -65,7 +65,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testFindWithExtraDirs()
+    public function testFindWithExtraDirs(): void
     {
         if (ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
@@ -81,7 +81,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(PHP_BINARY, $result);
     }
 
-    public function testFindWithOpenBaseDir()
+    public function testFindWithOpenBaseDir(): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Cannot run test on windows');
@@ -99,7 +99,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(PHP_BINARY, $result);
     }
 
-    public function testFindProcessInOpenBasedir()
+    public function testFindProcessInOpenBasedir(): void
     {
         if (ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
@@ -117,7 +117,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(PHP_BINARY, $result);
     }
 
-    private function assertSamePath($expected, $tested)
+    private function assertSamePath($expected, $tested): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->assertEquals(strtolower($expected), strtolower($tested));

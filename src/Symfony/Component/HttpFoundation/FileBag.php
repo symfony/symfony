@@ -34,7 +34,7 @@ class FileBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function replace(array $files = array())
+    public function replace(array $files = array()): void
     {
         $this->parameters = array();
         $this->add($files);
@@ -43,7 +43,7 @@ class FileBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function set($key, $value)
+    public function set($key, $value): void
     {
         if (!is_array($value) && !$value instanceof UploadedFile) {
             throw new \InvalidArgumentException('An uploaded file must be an array or an instance of UploadedFile.');
@@ -55,7 +55,7 @@ class FileBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function add(array $files = array())
+    public function add(array $files = array()): void
     {
         foreach ($files as $key => $file) {
             $this->set($key, $file);
@@ -108,10 +108,8 @@ class FileBag extends ParameterBag
      *
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
-     *
-     * @return array
      */
-    protected function fixPhpFilesArray($data)
+    protected function fixPhpFilesArray($data): array
     {
         if (!is_array($data)) {
             return $data;

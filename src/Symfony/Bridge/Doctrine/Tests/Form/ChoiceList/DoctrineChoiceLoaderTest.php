@@ -65,7 +65,7 @@ class DoctrineChoiceLoaderTest extends TestCase
      */
     private $obj3;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
         $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')->getMock();
@@ -90,7 +90,7 @@ class DoctrineChoiceLoaderTest extends TestCase
             ->willReturn(new ClassMetadata($this->class));
     }
 
-    public function testLoadChoiceList()
+    public function testLoadChoiceList(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -99,7 +99,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         );
 
         $choices = array($this->obj1, $this->obj2, $this->obj3);
-        $value = function () {};
+        $value = function (): void {};
         $choiceList = new ArrayChoiceList($choices, $value);
 
         $this->repository->expects($this->once())
@@ -113,7 +113,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertEquals($choiceList, $loader->loadChoiceList($value));
     }
 
-    public function testLoadChoiceListUsesObjectLoaderIfAvailable()
+    public function testLoadChoiceListUsesObjectLoaderIfAvailable(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -139,7 +139,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame($loaded, $loader->loadChoiceList());
     }
 
-    public function testLoadValuesForChoices()
+    public function testLoadValuesForChoices(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -160,7 +160,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame(array('1', '2'), $loader->loadValuesForChoices(array($this->obj2, $this->obj3)));
     }
 
-    public function testLoadValuesForChoicesDoesNotLoadIfEmptyChoices()
+    public function testLoadValuesForChoicesDoesNotLoadIfEmptyChoices(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -174,7 +174,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame(array(), $loader->loadValuesForChoices(array()));
     }
 
-    public function testLoadValuesForChoicesDoesNotLoadIfSingleIntId()
+    public function testLoadValuesForChoicesDoesNotLoadIfSingleIntId(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -197,7 +197,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame(array('2'), $loader->loadValuesForChoices(array($this->obj2)));
     }
 
-    public function testLoadValuesForChoicesLoadsIfSingleIntIdAndValueGiven()
+    public function testLoadValuesForChoicesLoadsIfSingleIntIdAndValueGiven(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -222,7 +222,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         ));
     }
 
-    public function testLoadValuesForChoicesDoesNotLoadIfValueIsIdReader()
+    public function testLoadValuesForChoicesDoesNotLoadIfValueIsIdReader(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -250,7 +250,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         ));
     }
 
-    public function testLoadChoicesForValues()
+    public function testLoadChoicesForValues(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -271,7 +271,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame(array($this->obj2, $this->obj3), $loader->loadChoicesForValues(array('1', '2')));
     }
 
-    public function testLoadChoicesForValuesDoesNotLoadIfEmptyValues()
+    public function testLoadChoicesForValuesDoesNotLoadIfEmptyValues(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -285,7 +285,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         $this->assertSame(array(), $loader->loadChoicesForValues(array()));
     }
 
-    public function testLoadChoicesForValuesLoadsOnlyChoicesIfSingleIntId()
+    public function testLoadChoicesForValuesLoadsOnlyChoicesIfSingleIntId(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -325,7 +325,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         ));
     }
 
-    public function testLoadChoicesForValuesLoadsAllIfSingleIntIdAndValueGiven()
+    public function testLoadChoicesForValuesLoadsAllIfSingleIntIdAndValueGiven(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,
@@ -350,7 +350,7 @@ class DoctrineChoiceLoaderTest extends TestCase
         ));
     }
 
-    public function testLoadChoicesForValuesLoadsOnlyChoicesIfValueIsIdReader()
+    public function testLoadChoicesForValuesLoadsOnlyChoicesIfValueIsIdReader(): void
     {
         $loader = new DoctrineChoiceLoader(
             $this->om,

@@ -46,7 +46,6 @@ class ContextListener implements ListenerInterface
     private $logoutOnUserChange = true;
 
     /**
-     * @param TokenStorageInterface                     $tokenStorage
      * @param iterable|UserProviderInterface[]          $userProviders
      */
     public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
@@ -65,10 +64,8 @@ class ContextListener implements ListenerInterface
 
     /**
      * Enables deauthentication during refreshUser when the user has changed.
-     *
-     * @param bool $logoutOnUserChange
      */
-    public function setLogoutOnUserChange($logoutOnUserChange)
+    public function setLogoutOnUserChange(bool $logoutOnUserChange): void
     {
         // no-op, method to be deprecated in 4.1
     }
@@ -76,7 +73,7 @@ class ContextListener implements ListenerInterface
     /**
      * Reads the Security Token from the session.
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         if (!$this->registered && null !== $this->dispatcher && $event->isMasterRequest()) {
             $this->dispatcher->addListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
@@ -117,7 +114,7 @@ class ContextListener implements ListenerInterface
     /**
      * Writes the security token into the session.
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -153,7 +150,7 @@ class ContextListener implements ListenerInterface
      *
      * @throws \RuntimeException
      */
-    protected function refreshUser(TokenInterface $token)
+    protected function refreshUser(TokenInterface $token): ?TokenInterface
     {
         $user = $token->getUser();
         if (!$user instanceof UserInterface) {

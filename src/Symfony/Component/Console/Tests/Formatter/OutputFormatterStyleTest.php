@@ -16,7 +16,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 class OutputFormatterStyleTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $style = new OutputFormatterStyle('green', 'black', array('bold', 'underscore'));
         $this->assertEquals("\033[32;40;1;4mfoo\033[39;49;22;24m", $style->apply('foo'));
@@ -28,7 +28,7 @@ class OutputFormatterStyleTest extends TestCase
         $this->assertEquals("\033[47mfoo\033[49m", $style->apply('foo'));
     }
 
-    public function testForeground()
+    public function testForeground(): void
     {
         $style = new OutputFormatterStyle();
 
@@ -45,7 +45,7 @@ class OutputFormatterStyleTest extends TestCase
         $style->setForeground('undefined-color');
     }
 
-    public function testBackground()
+    public function testBackground(): void
     {
         $style = new OutputFormatterStyle();
 
@@ -62,7 +62,7 @@ class OutputFormatterStyleTest extends TestCase
         $style->setBackground('undefined-color');
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $style = new OutputFormatterStyle();
 

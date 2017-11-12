@@ -34,7 +34,7 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
         $this->argumentValueResolverTag = $argumentValueResolverTag;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition($this->argumentResolverService)) {
             return;

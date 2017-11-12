@@ -32,7 +32,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $removeExtraKeys = true;
     protected $normalizeKeys = true;
 
-    public function setNormalizeKeys($normalizeKeys)
+    public function setNormalizeKeys($normalizeKeys): void
     {
         $this->normalizeKeys = (bool) $normalizeKeys;
     }
@@ -50,7 +50,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array The value with normalized keys
      */
-    protected function preNormalize($value)
+    protected function preNormalize($value): array
     {
         if (!$this->normalizeKeys || !is_array($value)) {
             return $value;
@@ -74,7 +74,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array The children
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }
@@ -84,7 +84,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param array $remappings An array of the form array(array(string, string))
      */
-    public function setXmlRemappings(array $remappings)
+    public function setXmlRemappings(array $remappings): void
     {
         $this->xmlRemappings = $remappings;
     }
@@ -94,7 +94,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array $remappings an array of the form array(array(string, string))
      */
-    public function getXmlRemappings()
+    public function getXmlRemappings(): array
     {
         return $this->xmlRemappings;
     }
@@ -102,40 +102,32 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Sets whether to add default values for this array if it has not been
      * defined in any of the configuration files.
-     *
-     * @param bool $boolean
      */
-    public function setAddIfNotSet($boolean)
+    public function setAddIfNotSet(bool $boolean): void
     {
         $this->addIfNotSet = (bool) $boolean;
     }
 
     /**
      * Sets whether false is allowed as value indicating that the array should be unset.
-     *
-     * @param bool $allow
      */
-    public function setAllowFalse($allow)
+    public function setAllowFalse(bool $allow): void
     {
         $this->allowFalse = (bool) $allow;
     }
 
     /**
      * Sets whether new keys can be defined in subsequent configurations.
-     *
-     * @param bool $allow
      */
-    public function setAllowNewKeys($allow)
+    public function setAllowNewKeys(bool $allow): void
     {
         $this->allowNewKeys = (bool) $allow;
     }
 
     /**
      * Sets if deep merging should occur.
-     *
-     * @param bool $boolean
      */
-    public function setPerformDeepMerging($boolean)
+    public function setPerformDeepMerging(bool $boolean): void
     {
         $this->performDeepMerging = (bool) $boolean;
     }
@@ -146,7 +138,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @param bool $boolean To allow extra keys
      * @param bool $remove  To remove extra keys
      */
-    public function setIgnoreExtraKeys($boolean, $remove = true)
+    public function setIgnoreExtraKeys(bool $boolean, bool $remove = true): void
     {
         $this->ignoreExtraKeys = (bool) $boolean;
         $this->removeExtraKeys = $this->ignoreExtraKeys && $remove;
@@ -157,17 +149,15 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @param string $name The node's name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
     /**
      * Checks if the node has a default value.
-     *
-     * @return bool
      */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return $this->addIfNotSet;
     }
@@ -179,7 +169,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @throws \RuntimeException if the node has no default value
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): array
     {
         if (!$this->hasDefaultValue()) {
             throw new \RuntimeException(sprintf('The node at path "%s" has no default value.', $this->getPath()));
@@ -201,7 +191,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * @throws \InvalidArgumentException when the child node has no name
      * @throws \InvalidArgumentException when the child node's name is not unique
      */
-    public function addChild(NodeInterface $node)
+    public function addChild(NodeInterface $node): void
     {
         $name = $node->getName();
         if (!strlen($name)) {
@@ -269,7 +259,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @throws InvalidTypeException
      */
-    protected function validateType($value)
+    protected function validateType($value): void
     {
         if (!is_array($value) && (!$this->allowFalse || false !== $value)) {
             $ex = new InvalidTypeException(sprintf(
@@ -332,7 +322,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      *
      * @return array The remapped values
      */
-    protected function remapXml($value)
+    protected function remapXml(array $value): array
     {
         foreach ($this->xmlRemappings as list($singular, $plural)) {
             if (!isset($value[$singular])) {

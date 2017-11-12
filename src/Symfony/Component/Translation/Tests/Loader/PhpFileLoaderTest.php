@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class PhpFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new PhpFileLoader();
         $resource = __DIR__.'/../fixtures/resources.php';
@@ -31,7 +31,7 @@ class PhpFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $loader = new PhpFileLoader();
         $resource = __DIR__.'/../fixtures/non-existing.php';
@@ -41,7 +41,7 @@ class PhpFileLoaderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
-    public function testLoadThrowsAnExceptionIfFileNotLocal()
+    public function testLoadThrowsAnExceptionIfFileNotLocal(): void
     {
         $loader = new PhpFileLoader();
         $resource = 'http://example.com/resources.php';

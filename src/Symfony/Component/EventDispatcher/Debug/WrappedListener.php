@@ -95,7 +95,7 @@ class WrappedListener
         );
     }
 
-    public function __invoke(Event $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function __invoke(Event $event, $eventName, EventDispatcherInterface $dispatcher): void
     {
         $this->called = true;
 

@@ -24,17 +24,15 @@ class ExecutableFinder
     /**
      * Replaces default suffixes of executable.
      */
-    public function setSuffixes(array $suffixes)
+    public function setSuffixes(array $suffixes): void
     {
         $this->suffixes = $suffixes;
     }
 
     /**
      * Adds new possible suffix to check for executable.
-     *
-     * @param string $suffix
      */
-    public function addSuffix($suffix)
+    public function addSuffix(string $suffix): void
     {
         $this->suffixes[] = $suffix;
     }
@@ -48,7 +46,7 @@ class ExecutableFinder
      *
      * @return string The executable path or default value
      */
-    public function find($name, $default = null, array $extraDirs = array())
+    public function find(string $name, string $default = null, array $extraDirs = array()): string
     {
         if (ini_get('open_basedir')) {
             $searchPath = explode(PATH_SEPARATOR, ini_get('open_basedir'));

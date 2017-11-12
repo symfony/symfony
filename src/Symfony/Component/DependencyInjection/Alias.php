@@ -26,10 +26,8 @@ class Alias
 
     /**
      * Checks if this DI Alias should be public or not.
-     *
-     * @return bool
      */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->public;
     }
@@ -41,7 +39,7 @@ class Alias
      *
      * @return $this
      */
-    public function setPublic($boolean)
+    public function setPublic(bool $boolean)
     {
         $this->public = (bool) $boolean;
         $this->private = false;
@@ -57,11 +55,10 @@ class Alias
      * but triggers a deprecation notice when accessed from the container,
      * so that the alias can be made really private in 4.0.
      *
-     * @param bool $boolean
      *
      * @return $this
      */
-    public function setPrivate($boolean)
+    public function setPrivate(bool $boolean)
     {
         $this->private = (bool) $boolean;
 
@@ -70,10 +67,8 @@ class Alias
 
     /**
      * Whether this alias is private.
-     *
-     * @return bool
      */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return $this->private;
     }
@@ -83,7 +78,7 @@ class Alias
      *
      * @return string The alias id
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }

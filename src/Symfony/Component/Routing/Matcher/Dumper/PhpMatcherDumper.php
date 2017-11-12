@@ -44,7 +44,7 @@ class PhpMatcherDumper extends MatcherDumper
      *
      * @return string A PHP class representing the matcher class
      */
-    public function dump(array $options = array())
+    public function dump(array $options = array()): string
     {
         $options = array_replace(array(
             'class' => 'ProjectUrlMatcher',
@@ -79,7 +79,7 @@ class {$options['class']} extends {$options['base_class']}
 EOF;
     }
 
-    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider): void
     {
         $this->expressionLanguageProviders[] = $provider;
     }
@@ -91,7 +91,7 @@ EOF;
      *
      * @return string Match method as PHP code
      */
-    private function generateMatchMethod($supportsRedirections)
+    private function generateMatchMethod(bool $supportsRedirections): string
     {
         $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections), "\n");
 
@@ -126,7 +126,7 @@ EOF;
      *
      * @return string PHP code
      */
-    private function compileRoutes(RouteCollection $routes, $supportsRedirections)
+    private function compileRoutes(RouteCollection $routes, bool $supportsRedirections): string
     {
         $fetchedHost = false;
         $groups = $this->groupRoutesByHostRegex($routes);
@@ -187,7 +187,7 @@ EOF;
      *
      * @return string PHP code
      */
-    private function compileStaticPrefixRoutes(StaticPrefixCollection $collection, $supportsRedirections, $ifOrElseIf = 'if')
+    private function compileStaticPrefixRoutes(StaticPrefixCollection $collection, bool $supportsRedirections, string $ifOrElseIf = 'if'): string
     {
         $code = '';
         $prefix = $collection->getPrefix();
@@ -229,7 +229,7 @@ EOF;
      *
      * @throws \LogicException
      */
-    private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
+    private function compileRoute(Route $route, string $name, bool $supportsRedirections, ?string $parentPrefix = null): string
     {
         $code = '';
         $compiledRoute = $route->compile();
@@ -407,7 +407,7 @@ EOF;
      *
      * @return DumperCollection A collection with routes grouped by host regex in sub-collections
      */
-    private function groupRoutesByHostRegex(RouteCollection $routes)
+    private function groupRoutesByHostRegex(RouteCollection $routes): DumperCollection
     {
         $groups = new DumperCollection();
         $currentGroup = new DumperCollection();

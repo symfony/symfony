@@ -168,22 +168,22 @@ class ObjectsProvider
 
 class CallableClass
 {
-    public function __invoke()
+    public function __invoke(): void
     {
     }
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
-    public function method()
+    public function method(): void
     {
     }
 }
 
 class ExtendedCallableClass extends CallableClass
 {
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 }

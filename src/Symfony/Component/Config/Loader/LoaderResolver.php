@@ -50,7 +50,7 @@ class LoaderResolver implements LoaderResolverInterface
         return false;
     }
 
-    public function addLoader(LoaderInterface $loader)
+    public function addLoader(LoaderInterface $loader): void
     {
         $this->loaders[] = $loader;
         $loader->setResolver($this);

@@ -64,7 +64,7 @@ abstract class Guess
      *
      * @return self|null
      */
-    public static function getBestGuess(array $guesses)
+    public static function getBestGuess(array $guesses): ?self
     {
         $result = null;
         $maxConfidence = -1;
@@ -100,7 +100,7 @@ abstract class Guess
      * @return int One of the constants VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE,
      *             MEDIUM_CONFIDENCE and LOW_CONFIDENCE
      */
-    public function getConfidence()
+    public function getConfidence(): int
     {
         return $this->confidence;
     }

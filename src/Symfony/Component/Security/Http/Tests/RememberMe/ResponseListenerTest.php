@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ResponseListenerTest extends TestCase
 {
-    public function testRememberMeCookieIsSentWithResponse()
+    public function testRememberMeCookieIsSentWithResponse(): void
     {
         $cookie = new Cookie('rememberme');
 
@@ -37,7 +37,7 @@ class ResponseListenerTest extends TestCase
         $listener->onKernelResponse($this->getEvent($request, $response));
     }
 
-    public function testRememberMeCookieIsNotSendWithResponseForSubRequests()
+    public function testRememberMeCookieIsNotSendWithResponseForSubRequests(): void
     {
         $cookie = new Cookie('rememberme');
 
@@ -52,7 +52,7 @@ class ResponseListenerTest extends TestCase
         $listener->onKernelResponse($this->getEvent($request, $response, HttpKernelInterface::SUB_REQUEST));
     }
 
-    public function testRememberMeCookieIsNotSendWithResponse()
+    public function testRememberMeCookieIsNotSendWithResponse(): void
     {
         $request = $this->getRequest();
 
@@ -63,7 +63,7 @@ class ResponseListenerTest extends TestCase
         $listener->onKernelResponse($this->getEvent($request, $response));
     }
 
-    public function testItSubscribesToTheOnKernelResponseEvent()
+    public function testItSubscribesToTheOnKernelResponseEvent(): void
     {
         $listener = new ResponseListener();
 

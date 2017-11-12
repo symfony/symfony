@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager
 
 class BasicAuthenticationListenerTest extends TestCase
 {
-    public function testHandleWithValidUsernameAndPasswordServerParameters()
+    public function testHandleWithValidUsernameAndPasswordServerParameters(): void
     {
         $request = new Request(array(), array(), array(), array(), array(), array(
             'PHP_AUTH_USER' => 'TheUsername',
@@ -67,7 +67,7 @@ class BasicAuthenticationListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWhenAuthenticationFails()
+    public function testHandleWhenAuthenticationFails(): void
     {
         $request = new Request(array(), array(), array(), array(), array(), array(
             'PHP_AUTH_USER' => 'TheUsername',
@@ -119,7 +119,7 @@ class BasicAuthenticationListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWithNoUsernameServerParameter()
+    public function testHandleWithNoUsernameServerParameter(): void
     {
         $request = new Request();
 
@@ -146,7 +146,7 @@ class BasicAuthenticationListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    public function testHandleWithASimilarAuthenticatedToken()
+    public function testHandleWithASimilarAuthenticatedToken(): void
     {
         $request = new Request(array(), array(), array(), array(), array(), array('PHP_AUTH_USER' => 'TheUsername'));
 
@@ -186,7 +186,7 @@ class BasicAuthenticationListenerTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage $providerKey must not be empty
      */
-    public function testItRequiresProviderKey()
+    public function testItRequiresProviderKey(): void
     {
         new BasicAuthenticationListener(
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock(),
@@ -196,7 +196,7 @@ class BasicAuthenticationListenerTest extends TestCase
         );
     }
 
-    public function testHandleWithADifferentAuthenticatedToken()
+    public function testHandleWithADifferentAuthenticatedToken(): void
     {
         $request = new Request(array(), array(), array(), array(), array(), array(
             'PHP_AUTH_USER' => 'TheUsername',

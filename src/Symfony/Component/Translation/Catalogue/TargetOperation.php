@@ -26,7 +26,7 @@ class TargetOperation extends AbstractOperation
     /**
      * {@inheritdoc}
      */
-    protected function processDomain($domain)
+    protected function processDomain($domain): void
     {
         $this->messages[$domain] = array(
             'all' => array(),

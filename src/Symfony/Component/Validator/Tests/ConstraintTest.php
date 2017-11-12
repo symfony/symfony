@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithValueAsDefault;
 
 class ConstraintTest extends TestCase
 {
-    public function testSetProperties()
+    public function testSetProperties(): void
     {
         $constraint = new ConstraintA(array(
             'property1' => 'foo',
@@ -33,7 +33,7 @@ class ConstraintTest extends TestCase
         $this->assertEquals('bar', $constraint->property2);
     }
 
-    public function testSetNotExistingPropertyThrowsException()
+    public function testSetNotExistingPropertyThrowsException(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
@@ -42,7 +42,7 @@ class ConstraintTest extends TestCase
         ));
     }
 
-    public function testMagicPropertiesAreNotAllowed()
+    public function testMagicPropertiesAreNotAllowed(): void
     {
         $constraint = new ConstraintA();
 
@@ -51,7 +51,7 @@ class ConstraintTest extends TestCase
         $constraint->foo = 'bar';
     }
 
-    public function testInvalidAndRequiredOptionsPassed()
+    public function testInvalidAndRequiredOptionsPassed(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\InvalidOptionsException');
 
@@ -61,21 +61,21 @@ class ConstraintTest extends TestCase
         ));
     }
 
-    public function testSetDefaultProperty()
+    public function testSetDefaultProperty(): void
     {
         $constraint = new ConstraintA('foo');
 
         $this->assertEquals('foo', $constraint->property2);
     }
 
-    public function testSetDefaultPropertyDoctrineStyle()
+    public function testSetDefaultPropertyDoctrineStyle(): void
     {
         $constraint = new ConstraintA(array('value' => 'foo'));
 
         $this->assertEquals('foo', $constraint->property2);
     }
 
-    public function testSetDefaultPropertyDoctrineStylePlusOtherProperty()
+    public function testSetDefaultPropertyDoctrineStylePlusOtherProperty(): void
     {
         $constraint = new ConstraintA(array('value' => 'foo', 'property1' => 'bar'));
 
@@ -83,7 +83,7 @@ class ConstraintTest extends TestCase
         $this->assertEquals('bar', $constraint->property1);
     }
 
-    public function testSetDefaultPropertyDoctrineStyleWhenDefaultPropertyIsNamedValue()
+    public function testSetDefaultPropertyDoctrineStyleWhenDefaultPropertyIsNamedValue(): void
     {
         $constraint = new ConstraintWithValueAsDefault(array('value' => 'foo'));
 
@@ -91,7 +91,7 @@ class ConstraintTest extends TestCase
         $this->assertNull($constraint->property);
     }
 
-    public function testDontSetDefaultPropertyIfValuePropertyExists()
+    public function testDontSetDefaultPropertyIfValuePropertyExists(): void
     {
         $constraint = new ConstraintWithValue(array('value' => 'foo'));
 
@@ -99,69 +99,69 @@ class ConstraintTest extends TestCase
         $this->assertNull($constraint->property);
     }
 
-    public function testSetUndefinedDefaultProperty()
+    public function testSetUndefinedDefaultProperty(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         new ConstraintB('foo');
     }
 
-    public function testRequiredOptionsMustBeDefined()
+    public function testRequiredOptionsMustBeDefined(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\Validator\Exception\MissingOptionsException');
 
         new ConstraintC();
     }
 
-    public function testRequiredOptionsPassed()
+    public function testRequiredOptionsPassed(): void
     {
         $constraint = new ConstraintC(array('option1' => 'default'));
 
         $this->assertSame('default', $constraint->option1);
     }
 
-    public function testGroupsAreConvertedToArray()
+    public function testGroupsAreConvertedToArray(): void
     {
         $constraint = new ConstraintA(array('groups' => 'Foo'));
 
         $this->assertEquals(array('Foo'), $constraint->groups);
     }
 
-    public function testAddDefaultGroupAddsGroup()
+    public function testAddDefaultGroupAddsGroup(): void
     {
         $constraint = new ConstraintA(array('groups' => 'Default'));
         $constraint->addImplicitGroupName('Foo');
         $this->assertEquals(array('Default', 'Foo'), $constraint->groups);
     }
 
-    public function testAllowsSettingZeroRequiredPropertyValue()
+    public function testAllowsSettingZeroRequiredPropertyValue(): void
     {
         $constraint = new ConstraintA(0);
         $this->assertEquals(0, $constraint->property2);
     }
 
-    public function testCanCreateConstraintWithNoDefaultOptionAndEmptyArray()
+    public function testCanCreateConstraintWithNoDefaultOptionAndEmptyArray(): void
     {
         $constraint = new ConstraintB(array());
 
         $this->assertSame(array(Constraint::PROPERTY_CONSTRAINT, Constraint::CLASS_CONSTRAINT), $constraint->getTargets());
     }
 
-    public function testGetTargetsCanBeString()
+    public function testGetTargetsCanBeString(): void
     {
         $constraint = new ClassConstraint();
 
         $this->assertEquals('class', $constraint->getTargets());
     }
 
-    public function testGetTargetsCanBeArray()
+    public function testGetTargetsCanBeArray(): void
     {
         $constraint = new ConstraintA();
 
         $this->assertEquals(array('property', 'class'), $constraint->getTargets());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $constraint = new ConstraintA(array(
             'property1' => 'foo',
@@ -173,7 +173,7 @@ class ConstraintTest extends TestCase
         $this->assertEquals($constraint, $restoredConstraint);
     }
 
-    public function testSerializeInitializesGroupsOptionToDefault()
+    public function testSerializeInitializesGroupsOptionToDefault(): void
     {
         $constraint = new ConstraintA(array(
             'property1' => 'foo',
@@ -191,7 +191,7 @@ class ConstraintTest extends TestCase
         $this->assertEquals($expected, $constraint);
     }
 
-    public function testSerializeKeepsCustomGroups()
+    public function testSerializeKeepsCustomGroups(): void
     {
         $constraint = new ConstraintA(array(
             'property1' => 'foo',
@@ -207,12 +207,12 @@ class ConstraintTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\InvalidArgumentException
      */
-    public function testGetErrorNameForUnknownCode()
+    public function testGetErrorNameForUnknownCode(): void
     {
         Constraint::getErrorName(1);
     }
 
-    public function testOptionsAsDefaultOption()
+    public function testOptionsAsDefaultOption(): void
     {
         $constraint = new ConstraintA($options = array('value1'));
 
@@ -227,12 +227,12 @@ class ConstraintTest extends TestCase
      * @expectedException \Symfony\Component\Validator\Exception\InvalidOptionsException
      * @expectedExceptionMessage The options "0", "5" do not exist
      */
-    public function testInvalidOptions()
+    public function testInvalidOptions(): void
     {
         new ConstraintA(array('property2' => 'foo', 'bar', 5 => 'baz'));
     }
 
-    public function testOptionsWithInvalidInternalPointer()
+    public function testOptionsWithInvalidInternalPointer(): void
     {
         $options = array('property1' => 'foo');
         next($options);

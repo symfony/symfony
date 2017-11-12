@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidatorDataCollectorTest extends TestCase
 {
-    public function testCollectsValidatorCalls()
+    public function testCollectsValidatorCalls(): void
     {
         $originalValidator = $this->createMock(ValidatorInterface::class);
         $validator = new TraceableValidator($originalValidator);
@@ -50,7 +50,7 @@ class ValidatorDataCollectorTest extends TestCase
         $this->assertCount(2, $call['violations']);
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $originalValidator = $this->createMock(ValidatorInterface::class);
         $validator = new TraceableValidator($originalValidator);

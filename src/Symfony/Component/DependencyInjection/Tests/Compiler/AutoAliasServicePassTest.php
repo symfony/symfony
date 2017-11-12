@@ -20,7 +20,7 @@ class AutoAliasServicePassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
      */
-    public function testProcessWithMissingParameter()
+    public function testProcessWithMissingParameter(): void
     {
         $container = new ContainerBuilder();
 
@@ -34,7 +34,7 @@ class AutoAliasServicePassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
-    public function testProcessWithMissingFormat()
+    public function testProcessWithMissingFormat(): void
     {
         $container = new ContainerBuilder();
 
@@ -46,7 +46,7 @@ class AutoAliasServicePassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testProcessWithNonExistingAlias()
+    public function testProcessWithNonExistingAlias(): void
     {
         $container = new ContainerBuilder();
 
@@ -60,7 +60,7 @@ class AutoAliasServicePassTest extends TestCase
         $this->assertEquals('Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassDefault', $container->getDefinition('example')->getClass());
     }
 
-    public function testProcessWithExistingAlias()
+    public function testProcessWithExistingAlias(): void
     {
         $container = new ContainerBuilder();
 
@@ -78,7 +78,7 @@ class AutoAliasServicePassTest extends TestCase
         $this->assertSame('Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMysql', $container->getDefinition('mysql.example')->getClass());
     }
 
-    public function testProcessWithManualAlias()
+    public function testProcessWithManualAlias(): void
     {
         $container = new ContainerBuilder();
 

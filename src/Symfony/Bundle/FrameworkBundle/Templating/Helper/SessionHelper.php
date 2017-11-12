@@ -37,7 +37,7 @@ class SessionHelper extends Helper
      *
      * @return mixed
      */
-    public function get($name, $default = null)
+    public function get(string $name, $default = null)
     {
         return $this->getSession()->get($name, $default);
     }

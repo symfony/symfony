@@ -70,7 +70,7 @@ class DebugClassLoader
      *
      * @return callable The wrapped class loader
      */
-    public function getClassLoader()
+    public function getClassLoader(): callable
     {
         return $this->classLoader;
     }
@@ -78,7 +78,7 @@ class DebugClassLoader
     /**
      * Wraps all autoloaders.
      */
-    public static function enable()
+    public static function enable(): void
     {
         // Ensures we don't hit https://bugs.php.net/42098
         class_exists('Symfony\Component\Debug\ErrorHandler');
@@ -104,7 +104,7 @@ class DebugClassLoader
     /**
      * Disables the wrapping.
      */
-    public static function disable()
+    public static function disable(): void
     {
         if (!is_array($functions = spl_autoload_functions())) {
             return;
@@ -132,7 +132,7 @@ class DebugClassLoader
      *
      * @throws \RuntimeException
      */
-    public function loadClass($class)
+    public function loadClass(string $class): ?bool
     {
         $e = error_reporting(error_reporting() | E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR);
 
@@ -361,12 +361,11 @@ class DebugClassLoader
     /**
      * `class_implements` includes interfaces from the parents so we have to manually exclude them.
      *
-     * @param string       $class
      * @param string|false $parent
      *
      * @return string[]
      */
-    private function getOwnInterfaces($class, $parent)
+    private function getOwnInterfaces(string $class, $parent)
     {
         $ownInterfaces = class_implements($class, false);
 

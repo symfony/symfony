@@ -19,13 +19,13 @@ class EnvPlaceholderParameterBagTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
-    public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters()
+    public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(%foo%)');
     }
 
-    public function testMergeWillNotDuplicateIdenticalParameters()
+    public function testMergeWillNotDuplicateIdenticalParameters(): void
     {
         $envVariableName = 'DB_HOST';
         $parameter = sprintf('env(%s)', $envVariableName);
@@ -46,7 +46,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertContains($envVariableName, $placeholder);
     }
 
-    public function testMergeWhereFirstBagIsEmptyWillWork()
+    public function testMergeWhereFirstBagIsEmptyWillWork(): void
     {
         $envVariableName = 'DB_HOST';
         $parameter = sprintf('env(%s)', $envVariableName);
@@ -69,7 +69,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertContains($envVariableName, $placeholder);
     }
 
-    public function testMergeWherePlaceholderOnlyExistsInSecond()
+    public function testMergeWherePlaceholderOnlyExistsInSecond(): void
     {
         $uniqueEnvName = 'DB_HOST';
         $commonEnvName = 'DB_USER';
@@ -93,7 +93,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertCount(1, $merged[$commonEnvName]);
     }
 
-    public function testMergeWithDifferentIdentifiersForPlaceholders()
+    public function testMergeWithDifferentIdentifiersForPlaceholders(): void
     {
         $envName = 'DB_USER';
         $paramName = sprintf('env(%s)', $envName);
@@ -111,7 +111,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertCount(2, $merged[$envName]);
     }
 
-    public function testResolveEnvCastsIntToString()
+    public function testResolveEnvCastsIntToString(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(INT_VAR)');
@@ -120,7 +120,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertSame('2', $bag->all()['env(INT_VAR)']);
     }
 
-    public function testResolveEnvAllowsNull()
+    public function testResolveEnvAllowsNull(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(NULL_VAR)');
@@ -133,7 +133,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage The default value of env parameter "ARRAY_VAR" must be scalar or null, array given.
      */
-    public function testResolveThrowsOnBadDefaultValue()
+    public function testResolveThrowsOnBadDefaultValue(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(ARRAY_VAR)');
@@ -141,7 +141,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->resolve();
     }
 
-    public function testGetEnvAllowsNull()
+    public function testGetEnvAllowsNull(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(NULL_VAR)', null);
@@ -155,7 +155,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage The default value of an env() parameter must be scalar or null, but "array" given to "env(ARRAY_VAR)".
      */
-    public function testGetThrowsOnBadDefaultValue()
+    public function testGetThrowsOnBadDefaultValue(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(ARRAY_VAR)', array());

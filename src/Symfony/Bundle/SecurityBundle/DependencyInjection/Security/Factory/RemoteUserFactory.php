@@ -52,7 +52,7 @@ class RemoteUserFactory implements SecurityFactoryInterface
         return 'remote-user';
     }
 
-    public function addConfiguration(NodeDefinition $node)
+    public function addConfiguration(NodeDefinition $node): void
     {
         $node
             ->children()

@@ -25,7 +25,7 @@ use Symfony\Component\Console\Question\Question;
  */
 class QuestionHelperTest extends AbstractQuestionHelperTest
 {
-    public function testAskChoice()
+    public function testAskChoice(): void
     {
         $questionHelper = new QuestionHelper();
 
@@ -85,7 +85,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAsk()
+    public function testAsk(): void
     {
         $dialog = new QuestionHelper();
 
@@ -101,7 +101,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
     }
 
-    public function testAskWithAutocomplete()
+    public function testAskWithAutocomplete(): void
     {
         if (!$this->hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -134,7 +134,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAskWithAutocompleteWithNonSequentialKeys()
+    public function testAskWithAutocompleteWithNonSequentialKeys(): void
     {
         if (!$this->hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -153,7 +153,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals('AsseticBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAutocompleteWithTrailingBackslash()
+    public function testAutocompleteWithTrailingBackslash(): void
     {
         if (!$this->hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -192,7 +192,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertEquals($expectedCompletion, $importantActualOutput);
     }
 
-    public function testAskHiddenResponse()
+    public function testAskHiddenResponse(): void
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test is not supported on Windows');
@@ -209,7 +209,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     /**
      * @dataProvider getAskConfirmationData
      */
-    public function testAskConfirmation($question, $expected, $default = true)
+    public function testAskConfirmation($question, $expected, $default = true): void
     {
         $dialog = new QuestionHelper();
 
@@ -230,7 +230,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         );
     }
 
-    public function testAskConfirmationWithCustomTrueAnswer()
+    public function testAskConfirmationWithCustomTrueAnswer(): void
     {
         $dialog = new QuestionHelper();
 
@@ -241,7 +241,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $this->assertTrue($dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAskAndValidate()
+    public function testAskAndValidate(): void
     {
         $dialog = new QuestionHelper();
         $helperSet = new HelperSet(array(new FormatterHelper()));
@@ -275,7 +275,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     /**
      * @dataProvider simpleAnswerProvider
      */
-    public function testSelectChoiceFromSimpleChoices($providedAnswer, $expectedValue)
+    public function testSelectChoiceFromSimpleChoices($providedAnswer, $expectedValue): void
     {
         $possibleChoices = array(
             'My environment 1',
@@ -309,7 +309,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     /**
      * @dataProvider specialCharacterInMultipleChoice
      */
-    public function testSpecialCharacterChoiceFromMultipleChoiceList($providedAnswer, $expectedValue)
+    public function testSpecialCharacterChoiceFromMultipleChoiceList($providedAnswer, $expectedValue): void
     {
         $possibleChoices = array(
             '.',
@@ -340,7 +340,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     /**
      * @dataProvider mixedKeysChoiceListAnswerProvider
      */
-    public function testChoiceFromChoicelistWithMixedKeys($providedAnswer, $expectedValue)
+    public function testChoiceFromChoicelistWithMixedKeys($providedAnswer, $expectedValue): void
     {
         $possibleChoices = array(
             '0' => 'No environment',
@@ -375,7 +375,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     /**
      * @dataProvider answerProvider
      */
-    public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue)
+    public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue): void
     {
         $possibleChoices = array(
             'env_1' => 'My environment 1',
@@ -398,7 +398,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
      * @expectedException        \InvalidArgumentException
      * @expectedExceptionMessage The provided answer is ambiguous. Value should be one of env_2 or env_3.
      */
-    public function testAmbiguousChoiceFromChoicelist()
+    public function testAmbiguousChoiceFromChoicelist(): void
     {
         $possibleChoices = array(
             'env_1' => 'My first environment',
@@ -426,7 +426,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         );
     }
 
-    public function testNoInteraction()
+    public function testNoInteraction(): void
     {
         $dialog = new QuestionHelper();
         $question = new Question('Do you have a job?', 'not yet');
@@ -436,7 +436,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     /**
      * @requires function mb_strwidth
      */
-    public function testChoiceOutputFormattingQuestionForUtf8Keys()
+    public function testChoiceOutputFormattingQuestionForUtf8Keys(): void
     {
         $question = 'Lorem ipsum?';
         $possibleChoices = array(
@@ -467,7 +467,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
      * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
      * @expectedExceptionMessage Aborted
      */
-    public function testAskThrowsExceptionOnMissingInput()
+    public function testAskThrowsExceptionOnMissingInput(): void
     {
         $dialog = new QuestionHelper();
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
@@ -477,12 +477,12 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
      * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
      * @expectedExceptionMessage Aborted
      */
-    public function testAskThrowsExceptionOnMissingInputWithValidator()
+    public function testAskThrowsExceptionOnMissingInputWithValidator(): void
     {
         $dialog = new QuestionHelper();
 
         $question = new Question('What\'s your name?');
-        $question->setValidator(function () {
+        $question->setValidator(function (): void {
             if (!$value) {
                 throw new \Exception('A value is required.');
             }
@@ -495,7 +495,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
      * @expectedException \LogicException
      * @expectedExceptionMessage Choice question must have at least 1 choice available.
      */
-    public function testEmptyChoices()
+    public function testEmptyChoices(): void
     {
         new ChoiceQuestion('Question', array(), 'irrelevant');
     }

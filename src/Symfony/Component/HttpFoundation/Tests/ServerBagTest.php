@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\ServerBag;
  */
 class ServerBagTest extends TestCase
 {
-    public function testShouldExtractHeadersFromServerArray()
+    public function testShouldExtractHeadersFromServerArray(): void
     {
         $server = array(
             'SOME_SERVER_VARIABLE' => 'value',
@@ -46,7 +46,7 @@ class ServerBagTest extends TestCase
         ), $bag->getHeaders());
     }
 
-    public function testHttpPasswordIsOptional()
+    public function testHttpPasswordIsOptional(): void
     {
         $bag = new ServerBag(array('PHP_AUTH_USER' => 'foo'));
 
@@ -57,7 +57,7 @@ class ServerBagTest extends TestCase
         ), $bag->getHeaders());
     }
 
-    public function testHttpBasicAuthWithPhpCgi()
+    public function testHttpBasicAuthWithPhpCgi(): void
     {
         $bag = new ServerBag(array('HTTP_AUTHORIZATION' => 'Basic '.base64_encode('foo:bar')));
 
@@ -68,7 +68,7 @@ class ServerBagTest extends TestCase
         ), $bag->getHeaders());
     }
 
-    public function testHttpBasicAuthWithPhpCgiBogus()
+    public function testHttpBasicAuthWithPhpCgiBogus(): void
     {
         $bag = new ServerBag(array('HTTP_AUTHORIZATION' => 'Basic_'.base64_encode('foo:bar')));
 
@@ -78,7 +78,7 @@ class ServerBagTest extends TestCase
         $this->assertFalse(isset($headers['PHP_AUTH_PW']));
     }
 
-    public function testHttpBasicAuthWithPhpCgiRedirect()
+    public function testHttpBasicAuthWithPhpCgiRedirect(): void
     {
         $bag = new ServerBag(array('REDIRECT_HTTP_AUTHORIZATION' => 'Basic '.base64_encode('username:pass:word')));
 
@@ -89,7 +89,7 @@ class ServerBagTest extends TestCase
         ), $bag->getHeaders());
     }
 
-    public function testHttpBasicAuthWithPhpCgiEmptyPassword()
+    public function testHttpBasicAuthWithPhpCgiEmptyPassword(): void
     {
         $bag = new ServerBag(array('HTTP_AUTHORIZATION' => 'Basic '.base64_encode('foo:')));
 
@@ -100,7 +100,7 @@ class ServerBagTest extends TestCase
         ), $bag->getHeaders());
     }
 
-    public function testHttpDigestAuthWithPhpCgi()
+    public function testHttpDigestAuthWithPhpCgi(): void
     {
         $digest = 'Digest username="foo", realm="acme", nonce="'.md5('secret').'", uri="/protected, qop="auth"';
         $bag = new ServerBag(array('HTTP_AUTHORIZATION' => $digest));
@@ -111,7 +111,7 @@ class ServerBagTest extends TestCase
         ), $bag->getHeaders());
     }
 
-    public function testHttpDigestAuthWithPhpCgiBogus()
+    public function testHttpDigestAuthWithPhpCgiBogus(): void
     {
         $digest = 'Digest_username="foo", realm="acme", nonce="'.md5('secret').'", uri="/protected, qop="auth"';
         $bag = new ServerBag(array('HTTP_AUTHORIZATION' => $digest));
@@ -122,7 +122,7 @@ class ServerBagTest extends TestCase
         $this->assertFalse(isset($headers['PHP_AUTH_PW']));
     }
 
-    public function testHttpDigestAuthWithPhpCgiRedirect()
+    public function testHttpDigestAuthWithPhpCgiRedirect(): void
     {
         $digest = 'Digest username="foo", realm="acme", nonce="'.md5('secret').'", uri="/protected, qop="auth"';
         $bag = new ServerBag(array('REDIRECT_HTTP_AUTHORIZATION' => $digest));
@@ -133,7 +133,7 @@ class ServerBagTest extends TestCase
         ), $bag->getHeaders());
     }
 
-    public function testOAuthBearerAuth()
+    public function testOAuthBearerAuth(): void
     {
         $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
         $bag = new ServerBag(array('HTTP_AUTHORIZATION' => $headerContent));
@@ -143,7 +143,7 @@ class ServerBagTest extends TestCase
         ), $bag->getHeaders());
     }
 
-    public function testOAuthBearerAuthWithRedirect()
+    public function testOAuthBearerAuthWithRedirect(): void
     {
         $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
         $bag = new ServerBag(array('REDIRECT_HTTP_AUTHORIZATION' => $headerContent));
@@ -156,7 +156,7 @@ class ServerBagTest extends TestCase
     /**
      * @see https://github.com/symfony/symfony/issues/17345
      */
-    public function testItDoesNotOverwriteTheAuthorizationHeaderIfItIsAlreadySet()
+    public function testItDoesNotOverwriteTheAuthorizationHeaderIfItIsAlreadySet(): void
     {
         $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
         $bag = new ServerBag(array('PHP_AUTH_USER' => 'foo', 'HTTP_AUTHORIZATION' => $headerContent));

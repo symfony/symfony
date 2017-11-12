@@ -20,12 +20,12 @@ class ContainerAwareFixture implements FixtureInterface, ContainerAwareInterface
 {
     public $container;
 
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
     }
 }

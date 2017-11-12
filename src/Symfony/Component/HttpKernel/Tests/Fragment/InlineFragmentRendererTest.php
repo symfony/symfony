@@ -23,21 +23,21 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class InlineFragmentRendererTest extends TestCase
 {
-    public function testRender()
+    public function testRender(): void
     {
         $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));
 
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
-    public function testRenderWithControllerReference()
+    public function testRenderWithControllerReference(): void
     {
         $strategy = new InlineFragmentRenderer($this->getKernel($this->returnValue(new Response('foo'))));
 
         $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
     }
 
-    public function testRenderWithObjectsAsAttributes()
+    public function testRenderWithObjectsAsAttributes(): void
     {
         $object = new \stdClass();
 
@@ -51,7 +51,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertSame('foo', $strategy->render(new ControllerReference('main_controller', array('object' => $object), array()), Request::create('/'))->getContent());
     }
 
-    public function testRenderWithTrustedHeaderDisabled()
+    public function testRenderWithTrustedHeaderDisabled(): void
     {
         Request::setTrustedProxies(array(), 0);
 
@@ -64,7 +64,7 @@ class InlineFragmentRendererTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testRenderExceptionNoIgnoreErrors()
+    public function testRenderExceptionNoIgnoreErrors(): void
     {
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher->expects($this->never())->method('dispatch');
@@ -74,7 +74,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
-    public function testRenderExceptionIgnoreErrors()
+    public function testRenderExceptionIgnoreErrors(): void
     {
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher->expects($this->once())->method('dispatch')->with(KernelEvents::EXCEPTION);
@@ -84,7 +84,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEmpty($strategy->render('/', Request::create('/'), array('ignore_errors' => true))->getContent());
     }
 
-    public function testRenderExceptionIgnoreErrorsWithAlt()
+    public function testRenderExceptionIgnoreErrorsWithAlt(): void
     {
         $strategy = new InlineFragmentRenderer($this->getKernel($this->onConsecutiveCalls(
             $this->throwException(new \RuntimeException('foo')),
@@ -106,13 +106,13 @@ class InlineFragmentRendererTest extends TestCase
         return $kernel;
     }
 
-    public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
+    public function testExceptionInSubRequestsDoesNotMangleOutputBuffers(): void
     {
         $controllerResolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface')->getMock();
         $controllerResolver
             ->expects($this->once())
             ->method('getController')
-            ->will($this->returnValue(function () {
+            ->will($this->returnValue(function (): void {
                 ob_start();
                 echo 'bar';
                 throw new \RuntimeException();
@@ -139,7 +139,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEquals('Foo', ob_get_clean());
     }
 
-    public function testESIHeaderIsKeptInSubrequest()
+    public function testESIHeaderIsKeptInSubrequest(): void
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
@@ -156,7 +156,7 @@ class InlineFragmentRendererTest extends TestCase
         $strategy->render('/', $request);
     }
 
-    public function testESIHeaderIsKeptInSubrequestWithTrustedHeaderDisabled()
+    public function testESIHeaderIsKeptInSubrequestWithTrustedHeaderDisabled(): void
     {
         Request::setTrustedProxies(array(), 0);
 
@@ -165,7 +165,7 @@ class InlineFragmentRendererTest extends TestCase
         Request::setTrustedProxies(array(), -1);
     }
 
-    public function testHeadersPossiblyResultingIn304AreNotAssignedToSubrequest()
+    public function testHeadersPossiblyResultingIn304AreNotAssignedToSubrequest(): void
     {
         $expectedSubRequest = Request::create('/');
         if (Request::HEADER_X_FORWARDED_FOR & Request::getTrustedHeaderSet()) {

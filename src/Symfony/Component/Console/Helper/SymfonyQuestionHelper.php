@@ -28,7 +28,7 @@ class SymfonyQuestionHelper extends QuestionHelper
     /**
      * {@inheritdoc}
      */
-    protected function writePrompt(OutputInterface $output, Question $question)
+    protected function writePrompt(OutputInterface $output, Question $question): void
     {
         $text = OutputFormatter::escapeTrailingBackslash($question->getQuestion());
         $default = $question->getDefault();
@@ -82,7 +82,7 @@ class SymfonyQuestionHelper extends QuestionHelper
     /**
      * {@inheritdoc}
      */
-    protected function writeError(OutputInterface $output, \Exception $error)
+    protected function writeError(OutputInterface $output, \Exception $error): void
     {
         if ($output instanceof SymfonyStyle) {
             $output->newLine();

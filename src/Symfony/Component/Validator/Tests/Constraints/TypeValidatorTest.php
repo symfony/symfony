@@ -24,7 +24,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         return new TypeValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $constraint = new Type(array('type' => 'integer'));
 
@@ -33,7 +33,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testEmptyIsValidIfString()
+    public function testEmptyIsValidIfString(): void
     {
         $constraint = new Type(array('type' => 'string'));
 
@@ -42,7 +42,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testEmptyIsInvalidIfNoString()
+    public function testEmptyIsInvalidIfNoString(): void
     {
         $constraint = new Type(array(
             'type' => 'integer',
@@ -61,7 +61,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidValues
      */
-    public function testValidValues($value, $type)
+    public function testValidValues($value, $type): void
     {
         $constraint = new Type(array('type' => $type));
 
@@ -110,7 +110,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value, $type, $valueAsString)
+    public function testInvalidValues($value, $type, $valueAsString): void
     {
         $constraint = new Type(array(
             'type' => $type,
@@ -172,7 +172,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         return static::$file;
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         if (static::$file) {
             fclose(static::$file);

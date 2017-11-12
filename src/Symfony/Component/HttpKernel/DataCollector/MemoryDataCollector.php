@@ -29,7 +29,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         $this->updateMemoryUsage();
     }
@@ -37,7 +37,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->data = array(
             'memory' => 0,
@@ -48,7 +48,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->updateMemoryUsage();
     }
@@ -58,7 +58,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return int The memory
      */
-    public function getMemory()
+    public function getMemory(): int
     {
         return $this->data['memory'];
     }
@@ -68,7 +68,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return int The memory limit
      */
-    public function getMemoryLimit()
+    public function getMemoryLimit(): int
     {
         return $this->data['memory_limit'];
     }
@@ -76,7 +76,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Updates the memory usage data.
      */
-    public function updateMemoryUsage()
+    public function updateMemoryUsage(): void
     {
         $this->data['memory'] = memory_get_peak_usage(true);
     }

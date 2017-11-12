@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LazyLoadingFragmentHandlerTest extends TestCase
 {
-    public function testRender()
+    public function testRender(): void
     {
         $renderer = $this->getMockBuilder('Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface')->getMock();
         $renderer->expects($this->once())->method('getName')->will($this->returnValue('foo'));

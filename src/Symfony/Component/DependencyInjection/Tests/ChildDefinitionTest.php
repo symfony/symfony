@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 
 class ChildDefinitionTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -27,7 +27,7 @@ class ChildDefinitionTest extends TestCase
     /**
      * @dataProvider getPropertyTests
      */
-    public function testSetProperty($property, $changeKey)
+    public function testSetProperty($property, $changeKey): void
     {
         $def = new ChildDefinition('foo');
 
@@ -50,7 +50,7 @@ class ChildDefinitionTest extends TestCase
         );
     }
 
-    public function testSetPublic()
+    public function testSetPublic(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -60,7 +60,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(array('public' => true), $def->getChanges());
     }
 
-    public function testSetLazy()
+    public function testSetLazy(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -70,7 +70,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(array('lazy' => true), $def->getChanges());
     }
 
-    public function testSetAutowired()
+    public function testSetAutowired(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -80,7 +80,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(array('autowired' => true), $def->getChanges());
     }
 
-    public function testSetArgument()
+    public function testSetArgument(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -92,14 +92,14 @@ class ChildDefinitionTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testReplaceArgumentShouldRequireIntegerIndex()
+    public function testReplaceArgumentShouldRequireIntegerIndex(): void
     {
         $def = new ChildDefinition('foo');
 
         $def->replaceArgument('0', 'foo');
     }
 
-    public function testReplaceArgument()
+    public function testReplaceArgument(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -121,7 +121,7 @@ class ChildDefinitionTest extends TestCase
     /**
      * @expectedException \OutOfBoundsException
      */
-    public function testGetArgumentShouldCheckBounds()
+    public function testGetArgumentShouldCheckBounds(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -134,7 +134,7 @@ class ChildDefinitionTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
      */
-    public function testCannotCallSetAutoconfigured()
+    public function testCannotCallSetAutoconfigured(): void
     {
         $def = new ChildDefinition('foo');
         $def->setAutoconfigured(true);
@@ -143,7 +143,7 @@ class ChildDefinitionTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\BadMethodCallException
      */
-    public function testCannotCallSetInstanceofConditionals()
+    public function testCannotCallSetInstanceofConditionals(): void
     {
         $def = new ChildDefinition('foo');
         $def->setInstanceofConditionals(array('Foo' => new ChildDefinition('')));

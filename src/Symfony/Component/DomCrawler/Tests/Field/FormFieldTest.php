@@ -15,7 +15,7 @@ use Symfony\Component\DomCrawler\Field\InputFormField;
 
 class FormFieldTest extends FormFieldTestCase
 {
-    public function testGetName()
+    public function testGetName(): void
     {
         $node = $this->createNode('input', '', array('type' => 'text', 'name' => 'name', 'value' => 'value'));
         $field = new InputFormField($node);
@@ -23,7 +23,7 @@ class FormFieldTest extends FormFieldTestCase
         $this->assertEquals('name', $field->getName(), '->getName() returns the name of the field');
     }
 
-    public function testGetSetHasValue()
+    public function testGetSetHasValue(): void
     {
         $node = $this->createNode('input', '', array('type' => 'text', 'name' => 'name', 'value' => 'value'));
         $field = new InputFormField($node);
@@ -36,7 +36,7 @@ class FormFieldTest extends FormFieldTestCase
         $this->assertTrue($field->hasValue(), '->hasValue() always returns true');
     }
 
-    public function testLabelReturnsNullIfNoneIsDefined()
+    public function testLabelReturnsNullIfNoneIsDefined(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><form><input type="text" id="foo" name="foo" value="foo" /><input type="submit" /></form></html>');
@@ -45,7 +45,7 @@ class FormFieldTest extends FormFieldTestCase
         $this->assertNull($field->getLabel(), '->getLabel() returns null if no label is defined');
     }
 
-    public function testLabelIsAssignedByForAttribute()
+    public function testLabelIsAssignedByForAttribute(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><form>
@@ -58,7 +58,7 @@ class FormFieldTest extends FormFieldTestCase
         $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
     }
 
-    public function testLabelIsAssignedByParentingRelation()
+    public function testLabelIsAssignedByParentingRelation(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><form>

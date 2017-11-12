@@ -19,7 +19,7 @@ interface AInterface
 
 class A implements AInterface
 {
-    public static function create(Foo $foo)
+    public static function create(Foo $foo): void
     {
     }
 }
@@ -207,7 +207,7 @@ class ClassForResource
     {
     }
 
-    public function setBar(Bar $bar)
+    public function setBar(Bar $bar): void
     {
     }
 }
@@ -227,7 +227,7 @@ class SetterInjectionCollision
     /**
      * @required
      */
-    public function setMultipleInstancesForOneArg(CollisionInterface $collision)
+    public function setMultipleInstancesForOneArg(CollisionInterface $collision): void
     {
         // The CollisionInterface cannot be autowired - there are multiple
 
@@ -240,31 +240,31 @@ class SetterInjection extends SetterInjectionParent
     /**
      * @required
      */
-    public function setFoo(Foo $foo)
+    public function setFoo(Foo $foo): void
     {
         // should be called
     }
 
     /** @inheritdoc*/ // <- brackets are missing on purpose
-    public function setDependencies(Foo $foo, A $a)
+    public function setDependencies(Foo $foo, A $a): void
     {
         // should be called
     }
 
     /** {@inheritdoc} */
-    public function setWithCallsConfigured(A $a)
+    public function setWithCallsConfigured(A $a): void
     {
         // this method has a calls configured on it
     }
 
-    public function notASetter(A $a)
+    public function notASetter(A $a): void
     {
         // should be called only when explicitly specified
     }
 
     /**
      * @required*/
-    public function setChildMethodWithoutDocBlock(A $a)
+    public function setChildMethodWithoutDocBlock(A $a): void
     {
     }
 }
@@ -272,55 +272,55 @@ class SetterInjection extends SetterInjectionParent
 class SetterInjectionParent
 {
     /** @required*/
-    public function setDependencies(Foo $foo, A $a)
+    public function setDependencies(Foo $foo, A $a): void
     {
         // should be called
     }
 
-    public function notASetter(A $a)
+    public function notASetter(A $a): void
     {
         // @required should be ignored when the child does not add @inheritdoc
     }
 
     /**	@required <tab> prefix is on purpose */
-    public function setWithCallsConfigured(A $a)
+    public function setWithCallsConfigured(A $a): void
     {
     }
 
     /** @required */
-    public function setChildMethodWithoutDocBlock(A $a)
+    public function setChildMethodWithoutDocBlock(A $a): void
     {
     }
 }
 
 class NotWireable
 {
-    public function setNotAutowireable(NotARealClass $n)
+    public function setNotAutowireable(NotARealClass $n): void
     {
     }
 
-    public function setBar()
+    public function setBar(): void
     {
     }
 
-    public function setOptionalNotAutowireable(NotARealClass $n = null)
+    public function setOptionalNotAutowireable(NotARealClass $n = null): void
     {
     }
 
-    public function setDifferentNamespace(\stdClass $n)
+    public function setDifferentNamespace(\stdClass $n): void
     {
     }
 
-    public function setOptionalNoTypeHint($foo = null)
+    public function setOptionalNoTypeHint($foo = null): void
     {
     }
 
-    public function setOptionalArgNoAutowireable($other = 'default_val')
+    public function setOptionalArgNoAutowireable($other = 'default_val'): void
     {
     }
 
     /** @required */
-    protected function setProtectedMethod(A $a)
+    protected function setProtectedMethod(A $a): void
     {
     }
 }
@@ -337,7 +337,7 @@ class ScalarSetter
     /**
      * @required
      */
-    public function setDefaultLocale($defaultLocale)
+    public function setDefaultLocale($defaultLocale): void
     {
     }
 }

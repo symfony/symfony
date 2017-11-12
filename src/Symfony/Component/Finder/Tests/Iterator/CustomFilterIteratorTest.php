@@ -18,7 +18,7 @@ class CustomFilterIteratorTest extends IteratorTestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testWithInvalidFilter()
+    public function testWithInvalidFilter(): void
     {
         new CustomFilterIterator(new Iterator(), array('foo'));
     }
@@ -26,7 +26,7 @@ class CustomFilterIteratorTest extends IteratorTestCase
     /**
      * @dataProvider getAcceptData
      */
-    public function testAccept($filters, $expected)
+    public function testAccept($filters, $expected): void
     {
         $inner = new Iterator(array('test.php', 'test.py', 'foo.php'));
 

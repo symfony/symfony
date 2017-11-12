@@ -47,7 +47,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @return array An array of headers
      */
-    public function allPreserveCase()
+    public function allPreserveCase(): array
     {
         $headers = array();
         foreach ($this->all() as $name => $value) {
@@ -70,7 +70,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function replace(array $headers = array())
+    public function replace(array $headers = array()): void
     {
         $this->headerNames = array();
 
@@ -101,7 +101,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function set($key, $values, $replace = true)
+    public function set($key, $values, $replace = true): void
     {
         $uniqueKey = str_replace('_', '-', strtolower($key));
 
@@ -133,7 +133,7 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * {@inheritdoc}
      */
-    public function remove($key)
+    public function remove($key): void
     {
         $uniqueKey = str_replace('_', '-', strtolower($key));
         unset($this->headerNames[$uniqueKey]);
@@ -171,7 +171,7 @@ class ResponseHeaderBag extends HeaderBag
         return array_key_exists($key, $this->computedCacheControl) ? $this->computedCacheControl[$key] : null;
     }
 
-    public function setCookie(Cookie $cookie)
+    public function setCookie(Cookie $cookie): void
     {
         $this->cookies[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;
         $this->headerNames['set-cookie'] = 'Set-Cookie';
@@ -179,12 +179,8 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Removes a cookie from the array, but does not unset it in the browser.
-     *
-     * @param string $name
-     * @param string $path
-     * @param string $domain
      */
-    public function removeCookie($name, $path = '/', $domain = null)
+    public function removeCookie(string $name, string $path = '/', string $domain = null): void
     {
         if (null === $path) {
             $path = '/';
@@ -208,13 +204,11 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * Returns an array with all cookies.
      *
-     * @param string $format
      *
-     * @return array
      *
      * @throws \InvalidArgumentException When the $format is invalid
      */
-    public function getCookies($format = self::COOKIES_FLAT)
+    public function getCookies(string $format = self::COOKIES_FLAT): array
     {
         if (!in_array($format, array(self::COOKIES_FLAT, self::COOKIES_ARRAY))) {
             throw new \InvalidArgumentException(sprintf('Format "%s" invalid (%s).', $format, implode(', ', array(self::COOKIES_FLAT, self::COOKIES_ARRAY))));
@@ -238,14 +232,8 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * Clears a cookie in the browser.
-     *
-     * @param string $name
-     * @param string $path
-     * @param string $domain
-     * @param bool   $secure
-     * @param bool   $httpOnly
      */
-    public function clearCookie($name, $path = '/', $domain = null, $secure = false, $httpOnly = true)
+    public function clearCookie(string $name, string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true): void
     {
         $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly));
     }
@@ -265,7 +253,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @see RFC 6266
      */
-    public function makeDisposition($disposition, $filename, $filenameFallback = '')
+    public function makeDisposition(string $disposition, string $filename, string $filenameFallback = ''): string
     {
         if (!in_array($disposition, array(self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE))) {
             throw new \InvalidArgumentException(sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
@@ -304,10 +292,8 @@ class ResponseHeaderBag extends HeaderBag
      *
      * This considers several other headers and calculates or modifies the
      * cache-control header to a sensible, conservative value.
-     *
-     * @return string
      */
-    protected function computeCacheControlValue()
+    protected function computeCacheControlValue(): string
     {
         if (!$this->cacheControl && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
             return 'no-cache, private';
@@ -331,7 +317,7 @@ class ResponseHeaderBag extends HeaderBag
         return $header;
     }
 
-    private function initDate()
+    private function initDate(): void
     {
         $now = \DateTime::createFromFormat('U', time());
         $now->setTimezone(new \DateTimeZone('UTC'));

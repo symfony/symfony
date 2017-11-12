@@ -22,21 +22,21 @@ class IsTrueValidatorTest extends ConstraintValidatorTestCase
         return new IsTrueValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new IsTrue());
 
         $this->assertNoViolation();
     }
 
-    public function testTrueIsValid()
+    public function testTrueIsValid(): void
     {
         $this->validator->validate(true, new IsTrue());
 
         $this->assertNoViolation();
     }
 
-    public function testFalseIsInvalid()
+    public function testFalseIsInvalid(): void
     {
         $constraint = new IsTrue(array(
             'message' => 'myMessage',

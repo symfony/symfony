@@ -25,7 +25,7 @@ class TransDefaultDomainNode extends Node
         parent::__construct(array('expr' => $expr), array(), $lineno, $tag);
     }
 
-    public function compile(Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         // noop as this node is just a marker for TranslationDefaultDomainNodeVisitor
     }

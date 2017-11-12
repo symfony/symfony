@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class PassConfigTest extends TestCase
 {
-    public function testPassOrdering()
+    public function testPassOrdering(): void
     {
         $config = new PassConfig();
         $config->setBeforeOptimizationPasses(array());

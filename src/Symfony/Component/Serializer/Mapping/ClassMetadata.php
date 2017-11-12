@@ -55,7 +55,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata)
+    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata): void
     {
         $this->attributesMetadata[$attributeMetadata->getName()] = $attributeMetadata;
     }
@@ -71,7 +71,7 @@ class ClassMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function merge(ClassMetadataInterface $classMetadata)
+    public function merge(ClassMetadataInterface $classMetadata): void
     {
         foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
             if (isset($this->attributesMetadata[$attributeMetadata->getName()])) {

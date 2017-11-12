@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FirewallMapTest extends TestCase
 {
-    public function testGetListeners()
+    public function testGetListeners(): void
     {
         $map = new FirewallMap();
 
@@ -59,7 +59,7 @@ class FirewallMapTest extends TestCase
         $this->assertEquals($theException, $exception);
     }
 
-    public function testGetListenersWithAnEntryHavingNoRequestMatcher()
+    public function testGetListenersWithAnEntryHavingNoRequestMatcher(): void
     {
         $map = new FirewallMap();
 
@@ -94,7 +94,7 @@ class FirewallMapTest extends TestCase
         $this->assertEquals($theException, $exception);
     }
 
-    public function testGetListenersWithNoMatchingEntry()
+    public function testGetListenersWithNoMatchingEntry(): void
     {
         $map = new FirewallMap();
 

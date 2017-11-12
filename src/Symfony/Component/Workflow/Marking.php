@@ -30,12 +30,12 @@ class Marking
         }
     }
 
-    public function mark($place)
+    public function mark($place): void
     {
         $this->places[$place] = 1;
     }
 
-    public function unmark($place)
+    public function unmark($place): void
     {
         unset($this->places[$place]);
     }

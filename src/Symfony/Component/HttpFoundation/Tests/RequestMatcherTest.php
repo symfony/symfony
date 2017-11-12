@@ -20,7 +20,7 @@ class RequestMatcherTest extends TestCase
     /**
      * @dataProvider getMethodData
      */
-    public function testMethod($requestMethod, $matcherMethod, $isMatch)
+    public function testMethod($requestMethod, $matcherMethod, $isMatch): void
     {
         $matcher = new RequestMatcher();
         $matcher->matchMethod($matcherMethod);
@@ -44,7 +44,7 @@ class RequestMatcherTest extends TestCase
         );
     }
 
-    public function testScheme()
+    public function testScheme(): void
     {
         $httpRequest = $request = $request = Request::create('');
         $httpsRequest = $request = $request = Request::create('', 'get', array(), array(), array(), array('HTTPS' => 'on'));
@@ -66,7 +66,7 @@ class RequestMatcherTest extends TestCase
     /**
      * @dataProvider getHostData
      */
-    public function testHost($pattern, $isMatch)
+    public function testHost($pattern, $isMatch): void
     {
         $matcher = new RequestMatcher();
         $request = Request::create('', 'get', array(), array(), array(), array('HTTP_HOST' => 'foo.example.com'));
@@ -92,7 +92,7 @@ class RequestMatcherTest extends TestCase
         );
     }
 
-    public function testPath()
+    public function testPath(): void
     {
         $matcher = new RequestMatcher();
 
@@ -111,7 +111,7 @@ class RequestMatcherTest extends TestCase
         $this->assertFalse($matcher->matches($request));
     }
 
-    public function testPathWithLocaleIsNotSupported()
+    public function testPathWithLocaleIsNotSupported(): void
     {
         $matcher = new RequestMatcher();
         $request = Request::create('/en/login');
@@ -121,7 +121,7 @@ class RequestMatcherTest extends TestCase
         $this->assertFalse($matcher->matches($request));
     }
 
-    public function testPathWithEncodedCharacters()
+    public function testPathWithEncodedCharacters(): void
     {
         $matcher = new RequestMatcher();
         $request = Request::create('/admin/fo%20o');
@@ -129,7 +129,7 @@ class RequestMatcherTest extends TestCase
         $this->assertTrue($matcher->matches($request));
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $matcher = new RequestMatcher();
 

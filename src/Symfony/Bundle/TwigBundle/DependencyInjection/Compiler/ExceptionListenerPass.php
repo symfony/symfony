@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class ExceptionListenerPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (false === $container->hasDefinition('twig')) {
             return;

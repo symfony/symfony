@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveChildDefinitionsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('parent', 'foo')->setArguments(array('moo', 'b'))->setProperty('foo', 'moo');
@@ -37,7 +37,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
     }
 
-    public function testProcessAppendsMethodCallsAlways()
+    public function testProcessAppendsMethodCallsAlways(): void
     {
         $container = new ContainerBuilder();
 
@@ -60,7 +60,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         ), $def->getMethodCalls());
     }
 
-    public function testProcessDoesNotCopyAbstract()
+    public function testProcessDoesNotCopyAbstract(): void
     {
         $container = new ContainerBuilder();
 
@@ -79,7 +79,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertFalse($def->isAbstract());
     }
 
-    public function testProcessDoesNotCopyShared()
+    public function testProcessDoesNotCopyShared(): void
     {
         $container = new ContainerBuilder();
 
@@ -98,7 +98,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertTrue($def->isShared());
     }
 
-    public function testProcessDoesNotCopyTags()
+    public function testProcessDoesNotCopyTags(): void
     {
         $container = new ContainerBuilder();
 
@@ -117,7 +117,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertEquals(array(), $def->getTags());
     }
 
-    public function testProcessDoesNotCopyDecoratedService()
+    public function testProcessDoesNotCopyDecoratedService(): void
     {
         $container = new ContainerBuilder();
 
@@ -136,7 +136,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertNull($def->getDecoratedService());
     }
 
-    public function testProcessDoesNotDropShared()
+    public function testProcessDoesNotDropShared(): void
     {
         $container = new ContainerBuilder();
 
@@ -155,7 +155,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertFalse($def->isShared());
     }
 
-    public function testProcessHandlesMultipleInheritance()
+    public function testProcessHandlesMultipleInheritance(): void
     {
         $container = new ContainerBuilder();
 
@@ -181,7 +181,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertEquals('foo', $def->getClass());
     }
 
-    public function testSetLazyOnServiceHasParent()
+    public function testSetLazyOnServiceHasParent(): void
     {
         $container = new ContainerBuilder();
 
@@ -196,7 +196,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertTrue($container->getDefinition('child1')->isLazy());
     }
 
-    public function testSetLazyOnServiceIsParent()
+    public function testSetLazyOnServiceIsParent(): void
     {
         $container = new ContainerBuilder();
 
@@ -211,7 +211,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertTrue($container->getDefinition('child1')->isLazy());
     }
 
-    public function testSetAutowiredOnServiceHasParent()
+    public function testSetAutowiredOnServiceHasParent(): void
     {
         $container = new ContainerBuilder();
 
@@ -228,7 +228,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertFalse($container->getDefinition('child1')->isAutowired());
     }
 
-    public function testSetAutowiredOnServiceIsParent()
+    public function testSetAutowiredOnServiceIsParent(): void
     {
         $container = new ContainerBuilder();
 
@@ -243,7 +243,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertTrue($container->getDefinition('child1')->isAutowired());
     }
 
-    public function testDeepDefinitionsResolving()
+    public function testDeepDefinitionsResolving(): void
     {
         $container = new ContainerBuilder();
 
@@ -279,7 +279,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertSame('parentClass', $methodCalls[0][1][0]->getClass());
     }
 
-    public function testSetDecoratedServiceOnServiceHasParent()
+    public function testSetDecoratedServiceOnServiceHasParent(): void
     {
         $container = new ContainerBuilder();
 
@@ -294,7 +294,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertEquals(array('foo', 'foo_inner', 5), $container->getDefinition('child1')->getDecoratedService());
     }
 
-    public function testDecoratedServiceCopiesDeprecatedStatusFromParent()
+    public function testDecoratedServiceCopiesDeprecatedStatusFromParent(): void
     {
         $container = new ContainerBuilder();
         $container->register('deprecated_parent')
@@ -308,7 +308,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertTrue($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
-    public function testDecoratedServiceCanOverwriteDeprecatedParentStatus()
+    public function testDecoratedServiceCanOverwriteDeprecatedParentStatus(): void
     {
         $container = new ContainerBuilder();
         $container->register('deprecated_parent')
@@ -324,7 +324,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
-    public function testProcessResolvesAliases()
+    public function testProcessResolvesAliases(): void
     {
         $container = new ContainerBuilder();
 
@@ -338,7 +338,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertSame('ParentClass', $def->getClass());
     }
 
-    public function testProcessSetsArguments()
+    public function testProcessSetsArguments(): void
     {
         $container = new ContainerBuilder();
 
@@ -355,7 +355,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertSame(array(2, 1, 'foo' => 3), $def->getArguments());
     }
 
-    public function testSetAutoconfiguredOnServiceIsParent()
+    public function testSetAutoconfiguredOnServiceIsParent(): void
     {
         $container = new ContainerBuilder();
 
@@ -370,7 +370,7 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertFalse($container->getDefinition('child1')->isAutoconfigured());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new ResolveChildDefinitionsPass();
         $pass->process($container);

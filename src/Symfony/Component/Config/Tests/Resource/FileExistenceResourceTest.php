@@ -20,31 +20,31 @@ class FileExistenceResourceTest extends TestCase
     protected $file;
     protected $time;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->file = realpath(sys_get_temp_dir()).'/tmp.xml';
         $this->time = time();
         $this->resource = new FileExistenceResource($this->file);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists($this->file)) {
             unlink($this->file);
         }
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame($this->file, (string) $this->resource);
     }
 
-    public function testGetResource()
+    public function testGetResource(): void
     {
         $this->assertSame($this->file, $this->resource->getResource(), '->getResource() returns the path to the resource');
     }
 
-    public function testIsFreshWithExistingResource()
+    public function testIsFreshWithExistingResource(): void
     {
         touch($this->file, $this->time);
         $serialized = serialize(new FileExistenceResource($this->file));
@@ -57,7 +57,7 @@ class FileExistenceResourceTest extends TestCase
         $this->assertFalse($resource->isFresh($this->time), '->isFresh() returns false if the resource has been deleted');
     }
 
-    public function testIsFreshWithAbsentResource()
+    public function testIsFreshWithAbsentResource(): void
     {
         $serialized = serialize(new FileExistenceResource($this->file));
 

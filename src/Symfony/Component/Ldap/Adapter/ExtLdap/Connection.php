@@ -44,7 +44,7 @@ class Connection extends AbstractConnection
     /**
      * {@inheritdoc}
      */
-    public function bind($dn = null, $password = null)
+    public function bind($dn = null, $password = null): void
     {
         if (!$this->connection) {
             $this->connect();
@@ -69,7 +69,7 @@ class Connection extends AbstractConnection
         return $this->connection;
     }
 
-    public function setOption($name, $value)
+    public function setOption($name, $value): void
     {
         if (!@ldap_set_option($this->connection, ConnectionOptions::getOption($name), $value)) {
             throw new LdapException(sprintf('Could not set value "%s" for option "%s".', $value, $name));
@@ -85,7 +85,7 @@ class Connection extends AbstractConnection
         return $ret;
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
@@ -121,7 +121,7 @@ class Connection extends AbstractConnection
         });
     }
 
-    private function connect()
+    private function connect(): void
     {
         if ($this->connection) {
             return;
@@ -142,7 +142,7 @@ class Connection extends AbstractConnection
         }
     }
 
-    private function disconnect()
+    private function disconnect(): void
     {
         if ($this->connection && is_resource($this->connection)) {
             ldap_close($this->connection);

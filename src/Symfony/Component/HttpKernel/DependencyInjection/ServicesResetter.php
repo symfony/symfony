@@ -30,7 +30,7 @@ class ServicesResetter
         $this->resetMethods = $resetMethods;
     }
 
-    public function reset()
+    public function reset(): void
     {
         foreach ($this->resettableServices as $id => $service) {
             $service->{$this->resetMethods[$id]}();

@@ -19,7 +19,7 @@ class TemplateTest extends TestCase
     /**
      * @dataProvider getTemplateToPathProvider
      */
-    public function testGetPathForTemplate($template, $path)
+    public function testGetPathForTemplate($template, $path): void
     {
         $this->assertSame($template->getPath(), $path);
     }

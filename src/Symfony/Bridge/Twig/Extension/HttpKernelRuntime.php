@@ -38,7 +38,7 @@ class HttpKernelRuntime
      *
      * @see FragmentHandler::render()
      */
-    public function renderFragment($uri, $options = array())
+    public function renderFragment($uri, $options = array()): string
     {
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);
@@ -57,7 +57,7 @@ class HttpKernelRuntime
      *
      * @see FragmentHandler::render()
      */
-    public function renderFragmentStrategy($strategy, $uri, $options = array())
+    public function renderFragmentStrategy(string $strategy, $uri, $options = array()): string
     {
         return $this->handler->render($uri, $strategy, $options);
     }

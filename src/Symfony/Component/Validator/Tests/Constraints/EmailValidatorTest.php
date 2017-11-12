@@ -26,14 +26,14 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         return new EmailValidator(false);
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Email());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Email());
 
@@ -43,7 +43,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->validator->validate(new \stdClass(), new Email());
     }
@@ -51,7 +51,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidEmails
      */
-    public function testValidEmails($email)
+    public function testValidEmails($email): void
     {
         $this->validator->validate($email, new Email());
 
@@ -70,7 +70,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidEmails
      */
-    public function testInvalidEmails($email)
+    public function testInvalidEmails($email): void
     {
         $constraint = new Email(array(
             'message' => 'myMessage',
@@ -94,7 +94,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function testStrict()
+    public function testStrict(): void
     {
         $constraint = new Email(array('strict' => true));
 
@@ -106,7 +106,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getInvalidEmailsForStrictChecks
      */
-    public function testStrictWithInvalidEmails($email)
+    public function testStrictWithInvalidEmails($email): void
     {
         $constraint = new Email(array(
             'message' => 'myMessage',
@@ -182,7 +182,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
      * @dataProvider getDnsChecks
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      */
-    public function testDnsChecks($type, $violation)
+    public function testDnsChecks($type, $violation): void
     {
         DnsMock::withMockedHosts(array('example.com' => array(array('type' => $violation ? false : $type))));
 
@@ -218,7 +218,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     /**
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      */
-    public function testHostnameIsProperlyParsed()
+    public function testHostnameIsProperlyParsed(): void
     {
         DnsMock::withMockedHosts(array('baz.com' => array(array('type' => 'MX'))));
 
@@ -233,7 +233,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider provideCheckTypes
      */
-    public function testEmptyHostIsNotValid($checkType, $violation)
+    public function testEmptyHostIsNotValid($checkType, $violation): void
     {
         $this->validator->validate(
             'foo@bar.fr@',

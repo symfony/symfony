@@ -37,7 +37,7 @@ class DnsMock
      *
      * @param array $hosts Mocked hosts as keys, arrays of DNS records as returned by dns_get_record() as values
      */
-    public static function withMockedHosts(array $hosts)
+    public static function withMockedHosts(array $hosts): void
     {
         self::$hosts = $hosts;
     }
@@ -161,7 +161,7 @@ class DnsMock
         return $records;
     }
 
-    public static function register($class)
+    public static function register($class): void
     {
         $self = get_called_class();
 

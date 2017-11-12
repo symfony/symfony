@@ -30,7 +30,7 @@ class YamlLintCommandTest extends TestCase
 {
     private $files;
 
-    public function testLintCorrectFile()
+    public function testLintCorrectFile(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('foo: bar');
@@ -44,7 +44,7 @@ class YamlLintCommandTest extends TestCase
         $this->assertContains('OK', trim($tester->getDisplay()));
     }
 
-    public function testLintIncorrectFile()
+    public function testLintIncorrectFile(): void
     {
         $incorrectContent = '
 foo:
@@ -61,7 +61,7 @@ bar';
     /**
      * @expectedException \RuntimeException
      */
-    public function testLintFileNotReadable()
+    public function testLintFileNotReadable(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
@@ -70,7 +70,7 @@ bar';
         $tester->execute(array('filename' => $filename), array('decorated' => false));
     }
 
-    public function testGetHelp()
+    public function testGetHelp(): void
     {
         $command = new YamlLintCommand();
         $expected = <<<EOF
@@ -99,7 +99,7 @@ EOF;
         $this->assertEquals($expected, $command->getHelp());
     }
 
-    public function testLintFilesFromBundleDirectory()
+    public function testLintFilesFromBundleDirectory(): void
     {
         $tester = $this->createCommandTester($this->getKernelAwareApplicationMock());
         $tester->execute(
@@ -114,7 +114,7 @@ EOF;
     /**
      * @return string Path to the new file
      */
-    private function createFile($content)
+    private function createFile($content): string
     {
         $filename = tempnam(sys_get_temp_dir().'/yml-lint-test', 'sf-');
         file_put_contents($filename, $content);
@@ -124,10 +124,7 @@ EOF;
         return $filename;
     }
 
-    /**
-     * @return CommandTester
-     */
-    private function createCommandTester($application = null)
+    private function createCommandTester($application = null): CommandTester
     {
         if (!$application) {
             $application = new BaseApplication();
@@ -183,13 +180,13 @@ EOF;
         return $application;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         @mkdir(sys_get_temp_dir().'/yml-lint-test');
         $this->files = array();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->files as $file) {
             if (file_exists($file)) {

@@ -47,7 +47,7 @@ class DataCollectorListener implements EventSubscriberInterface
     /**
      * Listener for the {@link FormEvents::POST_SET_DATA} event.
      */
-    public function postSetData(FormEvent $event)
+    public function postSetData(FormEvent $event): void
     {
         if ($event->getForm()->isRoot()) {
             // Collect basic information about each form
@@ -61,7 +61,7 @@ class DataCollectorListener implements EventSubscriberInterface
     /**
      * Listener for the {@link FormEvents::POST_SUBMIT} event.
      */
-    public function postSubmit(FormEvent $event)
+    public function postSubmit(FormEvent $event): void
     {
         if ($event->getForm()->isRoot()) {
             // Collect the submitted data of each form

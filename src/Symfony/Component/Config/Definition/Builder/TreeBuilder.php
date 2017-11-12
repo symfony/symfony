@@ -34,7 +34,7 @@ class TreeBuilder implements NodeParentInterface
      *
      * @throws \RuntimeException When the node type is not supported
      */
-    public function root($name, $type = 'array', NodeBuilder $builder = null)
+    public function root(string $name, string $type = 'array', NodeBuilder $builder = null)
     {
         $builder = $builder ?: new NodeBuilder();
 
@@ -44,11 +44,10 @@ class TreeBuilder implements NodeParentInterface
     /**
      * Builds the tree.
      *
-     * @return NodeInterface
      *
      * @throws \RuntimeException
      */
-    public function buildTree()
+    public function buildTree(): NodeInterface
     {
         if (null === $this->root) {
             throw new \RuntimeException('The configuration tree has no root node.');

@@ -24,7 +24,7 @@ class ExpressionLanguageTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testIsAuthenticated($token, $expression, $result, array $roles = array())
+    public function testIsAuthenticated($token, $expression, $result, array $roles = array()): void
     {
         $anonymousTokenClass = 'Symfony\\Component\\Security\\Core\\Authentication\\Token\\AnonymousToken';
         $rememberMeTokenClass = 'Symfony\\Component\\Security\\Core\\Authentication\\Token\\RememberMeToken';

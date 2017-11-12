@@ -22,7 +22,7 @@ class ProfilerControllerTest extends TestCase
     /**
      * @dataProvider getEmptyTokenCases
      */
-    public function testEmptyToken($token)
+    public function testEmptyToken($token): void
     {
         $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
@@ -49,7 +49,7 @@ class ProfilerControllerTest extends TestCase
     /**
      * @dataProvider provideCspVariants
      */
-    public function testReturns404onTokenNotFound($withCsp)
+    public function testReturns404onTokenNotFound($withCsp): void
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $profiler = $this
@@ -79,7 +79,7 @@ class ProfilerControllerTest extends TestCase
     /**
      * @dataProvider provideCspVariants
      */
-    public function testSearchResult($withCsp)
+    public function testSearchResult($withCsp): void
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
         $profiler = $this

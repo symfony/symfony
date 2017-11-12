@@ -32,7 +32,7 @@ interface EntryManagerInterface
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function add(Entry $entry);
+    public function add(Entry $entry): void;
 
     /**
      * Updates an entry from the Ldap server.
@@ -42,7 +42,7 @@ interface EntryManagerInterface
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function update(Entry $entry);
+    public function update(Entry $entry): void;
 
     /**
      * Renames an entry on the Ldap server.
@@ -51,7 +51,7 @@ interface EntryManagerInterface
      * @param string $newRdn
      * @param bool   $removeOldRdn
      */
-    public function rename(Entry $entry, $newRdn, $removeOldRdn = true);
+    public function rename(Entry $entry, string $newRdn, bool $removeOldRdn = true): void;
 
     /**
      * Removes an entry from the Ldap server.
@@ -61,5 +61,5 @@ interface EntryManagerInterface
      * @throws NotBoundException
      * @throws LdapException
      */
-    public function remove(Entry $entry);
+    public function remove(Entry $entry): void;
 }

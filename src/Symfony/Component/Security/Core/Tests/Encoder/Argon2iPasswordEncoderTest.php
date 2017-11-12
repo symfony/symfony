@@ -21,14 +21,14 @@ class Argon2iPasswordEncoderTest extends TestCase
 {
     const PASSWORD = 'password';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!Argon2iPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
         }
     }
 
-    public function testValidation()
+    public function testValidation(): void
     {
         $encoder = new Argon2iPasswordEncoder();
         $result = $encoder->encodePassword(self::PASSWORD, null);
@@ -39,13 +39,13 @@ class Argon2iPasswordEncoderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
      */
-    public function testEncodePasswordLength()
+    public function testEncodePasswordLength(): void
     {
         $encoder = new Argon2iPasswordEncoder();
         $encoder->encodePassword(str_repeat('a', 4097), 'salt');
     }
 
-    public function testCheckPasswordLength()
+    public function testCheckPasswordLength(): void
     {
         $encoder = new Argon2iPasswordEncoder();
         $result = $encoder->encodePassword(str_repeat('a', 4096), null);
@@ -53,7 +53,7 @@ class Argon2iPasswordEncoderTest extends TestCase
         $this->assertTrue($encoder->isPasswordValid($result, str_repeat('a', 4096), null));
     }
 
-    public function testUserProvidedSaltIsNotUsed()
+    public function testUserProvidedSaltIsNotUsed(): void
     {
         $encoder = new Argon2iPasswordEncoder();
         $result = $encoder->encodePassword(self::PASSWORD, 'salt');

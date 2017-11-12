@@ -33,13 +33,13 @@ class MockFileSessionStorageTest extends TestCase
      */
     protected $storage;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->sessionDir = sys_get_temp_dir().'/sf2test';
         $this->storage = $this->getStorage();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->sessionDir = null;
         $this->storage = null;
@@ -49,7 +49,7 @@ class MockFileSessionStorageTest extends TestCase
         }
     }
 
-    public function testStart()
+    public function testStart(): void
     {
         $this->assertEquals('', $this->storage->getId());
         $this->assertTrue($this->storage->start());
@@ -59,7 +59,7 @@ class MockFileSessionStorageTest extends TestCase
         $this->assertEquals($id, $this->storage->getId());
     }
 
-    public function testRegenerate()
+    public function testRegenerate(): void
     {
         $this->storage->start();
         $this->storage->getBag('attributes')->set('regenerate', 1234);
@@ -69,14 +69,14 @@ class MockFileSessionStorageTest extends TestCase
         $this->assertEquals(1234, $this->storage->getBag('attributes')->get('regenerate'));
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertEquals('', $this->storage->getId());
         $this->storage->start();
         $this->assertNotEquals('', $this->storage->getId());
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $this->storage->start();
         $id = $this->storage->getId();
@@ -94,7 +94,7 @@ class MockFileSessionStorageTest extends TestCase
         $this->assertEquals(array('test'), $storage->getBag('flashes')->peek('newkey'));
     }
 
-    public function testMultipleInstances()
+    public function testMultipleInstances(): void
     {
         $storage1 = $this->getStorage();
         $storage1->start();
@@ -110,7 +110,7 @@ class MockFileSessionStorageTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testSaveWithoutStart()
+    public function testSaveWithoutStart(): void
     {
         $storage1 = $this->getStorage();
         $storage1->save();

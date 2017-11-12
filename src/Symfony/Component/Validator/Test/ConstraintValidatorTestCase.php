@@ -48,7 +48,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
     protected $constraint;
     protected $defaultTimezone;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->group = 'MyGroup';
         $this->metadata = null;
@@ -70,12 +70,12 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->setDefaultTimezone('UTC');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->restoreDefaultTimezone();
     }
 
-    protected function setDefaultTimezone($defaultTimezone)
+    protected function setDefaultTimezone($defaultTimezone): void
     {
         // Make sure this method can not be called twice before calling
         // also restoreDefaultTimezone()
@@ -85,7 +85,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         }
     }
 
-    protected function restoreDefaultTimezone()
+    protected function restoreDefaultTimezone(): void
     {
         if (null !== $this->defaultTimezone) {
             date_default_timezone_set($this->defaultTimezone);
@@ -112,13 +112,13 @@ abstract class ConstraintValidatorTestCase extends TestCase
         return $context;
     }
 
-    protected function setGroup($group)
+    protected function setGroup($group): void
     {
         $this->group = $group;
         $this->context->setGroup($group);
     }
 
-    protected function setObject($object)
+    protected function setObject($object): void
     {
         $this->object = $object;
         $this->metadata = is_object($object)
@@ -128,7 +128,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
     }
 
-    protected function setProperty($object, $property)
+    protected function setProperty($object, $property): void
     {
         $this->object = $object;
         $this->metadata = is_object($object)
@@ -138,26 +138,26 @@ abstract class ConstraintValidatorTestCase extends TestCase
         $this->context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
     }
 
-    protected function setValue($value)
+    protected function setValue($value): void
     {
         $this->value = $value;
         $this->context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
     }
 
-    protected function setRoot($root)
+    protected function setRoot($root): void
     {
         $this->root = $root;
         $this->context = $this->createContext();
         $this->validator->initialize($this->context);
     }
 
-    protected function setPropertyPath($propertyPath)
+    protected function setPropertyPath($propertyPath): void
     {
         $this->propertyPath = $propertyPath;
         $this->context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
     }
 
-    protected function expectNoValidate()
+    protected function expectNoValidate(): void
     {
         $validator = $this->context->getValidator()->inContext($this->context);
         $validator->expects($this->never())
@@ -166,7 +166,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
             ->method('validate');
     }
 
-    protected function expectValidateAt($i, $propertyPath, $value, $group)
+    protected function expectValidateAt($i, $propertyPath, $value, $group): void
     {
         $validator = $this->context->getValidator()->inContext($this->context);
         $validator->expects($this->at(2 * $i))
@@ -178,7 +178,7 @@ abstract class ConstraintValidatorTestCase extends TestCase
             ->with($value, $this->logicalOr(null, array(), $this->isInstanceOf('\Symfony\Component\Validator\Constraints\Valid')), $group);
     }
 
-    protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)
+    protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null): void
     {
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
         $contextualValidator->expects($this->at(2 * $i))
@@ -190,22 +190,17 @@ abstract class ConstraintValidatorTestCase extends TestCase
             ->with($value, $constraints, $group);
     }
 
-    protected function assertNoViolation()
+    protected function assertNoViolation(): void
     {
         $this->assertSame(0, $violationsCount = count($this->context->getViolations()), sprintf('0 violation expected. Got %u.', $violationsCount));
     }
 
-    /**
-     * @param $message
-     *
-     * @return ConstraintViolationAssertion
-     */
-    protected function buildViolation($message)
+    protected function buildViolation($message): ConstraintViolationAssertion
     {
         return new ConstraintViolationAssertion($this->context, $message, $this->constraint);
     }
 
-    abstract protected function createValidator();
+    abstract protected function createValidator(): void;
 }
 
 /**
@@ -305,7 +300,7 @@ class ConstraintViolationAssertion
         return new self($this->context, $message, $this->constraint, $assertions);
     }
 
-    public function assertRaised()
+    public function assertRaised(): void
     {
         $expected = array();
         foreach ($this->assertions as $assertion) {

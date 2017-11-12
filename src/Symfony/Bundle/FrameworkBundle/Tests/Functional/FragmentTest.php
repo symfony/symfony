@@ -16,7 +16,7 @@ class FragmentTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
-    public function testFragment($insulate)
+    public function testFragment($insulate): void
     {
         $client = $this->createClient(array('test_case' => 'Fragment', 'root_config' => 'config.yml'));
         if ($insulate) {

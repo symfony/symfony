@@ -19,7 +19,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
  */
 class IcuResFileLoaderTest extends LocalizedTestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         // resource is build using genrb command
         $loader = new IcuResFileLoader();
@@ -34,7 +34,7 @@ class IcuResFileLoaderTest extends LocalizedTestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
      */
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $loader = new IcuResFileLoader();
         $loader->load(__DIR__.'/../fixtures/non-existing.txt', 'en', 'domain1');
@@ -43,7 +43,7 @@ class IcuResFileLoaderTest extends LocalizedTestCase
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */
-    public function testLoadInvalidResource()
+    public function testLoadInvalidResource(): void
     {
         $loader = new IcuResFileLoader();
         $loader->load(__DIR__.'/../fixtures/resourcebundle/corrupted', 'en', 'domain1');

@@ -27,7 +27,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
     }
 
-    public function globalListenerDisabled()
+    public function globalListenerDisabled(): void
     {
         $this->trait->globalListenerDisabled();
     }

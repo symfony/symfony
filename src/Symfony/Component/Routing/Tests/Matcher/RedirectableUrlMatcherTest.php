@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RedirectableUrlMatcherTest extends TestCase
 {
-    public function testRedirectWhenNoSlash()
+    public function testRedirectWhenNoSlash(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
@@ -31,7 +31,7 @@ class RedirectableUrlMatcherTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
-    public function testRedirectWhenNoSlashForNonSafeMethod()
+    public function testRedirectWhenNoSlashForNonSafeMethod(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
@@ -42,7 +42,7 @@ class RedirectableUrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
-    public function testSchemeRedirectRedirectsToFirstScheme()
+    public function testSchemeRedirectRedirectsToFirstScheme(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('FTP', 'HTTPS')));
@@ -57,7 +57,7 @@ class RedirectableUrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
-    public function testNoSchemaRedirectIfOnOfMultipleSchemesMatches()
+    public function testNoSchemaRedirectIfOnOfMultipleSchemesMatches(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https', 'http')));
@@ -69,7 +69,7 @@ class RedirectableUrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
-    public function testSchemeRedirectWithParams()
+    public function testSchemeRedirectWithParams(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{bar}', array(), array(), array(), '', array('https')));
@@ -84,7 +84,7 @@ class RedirectableUrlMatcherTest extends TestCase
         $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'), $matcher->match('/foo/baz'));
     }
 
-    public function testSlashRedirectWithParams()
+    public function testSlashRedirectWithParams(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{bar}/'));

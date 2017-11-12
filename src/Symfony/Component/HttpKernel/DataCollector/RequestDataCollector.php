@@ -34,7 +34,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = array();
@@ -148,12 +148,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $this->data['identifier'] = $this->data['route'] ?: (is_array($this->data['controller']) ? $this->data['controller']['class'].'::'.$this->data['controller']['method'].'()' : $this->data['controller']);
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         $this->data = $this->cloneVar($this->data);
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = array();
         $this->controllers = new \SplObjectStorage();
@@ -261,7 +261,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      *
      * @return string The route
      */
-    public function getRoute()
+    public function getRoute(): string
     {
         return $this->data['route'];
     }
@@ -278,7 +278,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      *
      * @return array The parameters
      */
-    public function getRouteParams()
+    public function getRouteParams(): array
     {
         return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params']->getValue() : array();
     }
@@ -305,12 +305,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return isset($this->data['redirect']) ? $this->data['redirect'] : false;
     }
 
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event): void
     {
         $this->controllers[$event->getRequest()] = $event->getController();
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(FilterResponseEvent $event): void
     {
         if (!$event->isMasterRequest() || !$event->getRequest()->hasSession()) {
             return;

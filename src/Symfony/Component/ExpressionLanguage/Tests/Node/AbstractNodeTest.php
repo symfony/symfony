@@ -19,32 +19,32 @@ abstract class AbstractNodeTest extends TestCase
     /**
      * @dataProvider getEvaluateData
      */
-    public function testEvaluate($expected, $node, $variables = array(), $functions = array())
+    public function testEvaluate($expected, $node, $variables = array(), $functions = array()): void
     {
         $this->assertSame($expected, $node->evaluate($functions, $variables));
     }
 
-    abstract public function getEvaluateData();
+    abstract public function getEvaluateData(): void;
 
     /**
      * @dataProvider getCompileData
      */
-    public function testCompile($expected, $node, $functions = array())
+    public function testCompile($expected, $node, $functions = array()): void
     {
         $compiler = new Compiler($functions);
         $node->compile($compiler);
         $this->assertSame($expected, $compiler->getSource());
     }
 
-    abstract public function getCompileData();
+    abstract public function getCompileData(): void;
 
     /**
      * @dataProvider getDumpData
      */
-    public function testDump($expected, $node)
+    public function testDump($expected, $node): void
     {
         $this->assertSame($expected, $node->dump());
     }
 
-    abstract public function getDumpData();
+    abstract public function getDumpData(): void;
 }

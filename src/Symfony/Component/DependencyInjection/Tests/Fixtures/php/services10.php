@@ -32,13 +32,13 @@ class ProjectServiceContainer extends Container
         $this->aliases = array();
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->privates = array();
         parent::reset();
     }
 
-    public function compile()
+    public function compile(): void
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
@@ -61,7 +61,7 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass
      */
-    protected function getTestService()
+    protected function getTestService(): \stdClass
     {
         return $this->services['test'] = new \stdClass(array('only dot' => '.', 'concatenation as value' => '.\'\'.', 'concatenation from the start value' => '\'\'.', '.' => 'dot as a key', '.\'\'.' => 'concatenation as a key', '\'\'.' => 'concatenation from the start key', 'optimize concatenation' => 'string1-string2', 'optimize concatenation with empty string' => 'string1string2', 'optimize concatenation from the start' => 'start', 'optimize concatenation at the end' => 'end', 'new line' => 'string with '."\n".'new line'));
     }
@@ -87,7 +87,7 @@ class ProjectServiceContainer extends Container
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
-    public function setParameter($name, $value)
+    public function setParameter($name, $value): void
     {
         throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
@@ -117,7 +117,7 @@ class ProjectServiceContainer extends Container
      *
      * @throws InvalidArgumentException When the dynamic parameter does not exist
      */
-    private function getDynamicParameter($name)
+    private function getDynamicParameter(string $name)
     {
         throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
@@ -127,7 +127,7 @@ class ProjectServiceContainer extends Container
      *
      * @return array An array of the default parameters
      */
-    protected function getDefaultParameters()
+    protected function getDefaultParameters(): array
     {
         return array(
             'empty_value' => '',

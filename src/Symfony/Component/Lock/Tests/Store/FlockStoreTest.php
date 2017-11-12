@@ -33,7 +33,7 @@ class FlockStoreTest extends AbstractStoreTest
      * @expectedException \Symfony\Component\Lock\Exception\InvalidArgumentException
      * @expectedExceptionMessage The directory "/a/b/c/d/e" is not writable.
      */
-    public function testConstructWhenRepositoryDoesNotExist()
+    public function testConstructWhenRepositoryDoesNotExist(): void
     {
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
@@ -46,7 +46,7 @@ class FlockStoreTest extends AbstractStoreTest
      * @expectedException \Symfony\Component\Lock\Exception\InvalidArgumentException
      * @expectedExceptionMessage The directory "/" is not writable.
      */
-    public function testConstructWhenRepositoryIsNotWriteable()
+    public function testConstructWhenRepositoryIsNotWriteable(): void
     {
         if (!getenv('USER') || 'root' === getenv('USER')) {
             $this->markTestSkipped('This test will fail if run under superuser');
@@ -55,7 +55,7 @@ class FlockStoreTest extends AbstractStoreTest
         new FlockStore('/');
     }
 
-    public function testSaveSanitizeName()
+    public function testSaveSanitizeName(): void
     {
         $store = $this->getStore();
 

@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvi
 
 class InMemoryTokenProviderTest extends TestCase
 {
-    public function testCreateNewToken()
+    public function testCreateNewToken(): void
     {
         $provider = new InMemoryTokenProvider();
 
@@ -30,13 +30,13 @@ class InMemoryTokenProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\TokenNotFoundException
      */
-    public function testLoadTokenBySeriesThrowsNotFoundException()
+    public function testLoadTokenBySeriesThrowsNotFoundException(): void
     {
         $provider = new InMemoryTokenProvider();
         $provider->loadTokenBySeries('foo');
     }
 
-    public function testUpdateToken()
+    public function testUpdateToken(): void
     {
         $provider = new InMemoryTokenProvider();
 
@@ -52,7 +52,7 @@ class InMemoryTokenProviderTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\TokenNotFoundException
      */
-    public function testDeleteToken()
+    public function testDeleteToken(): void
     {
         $provider = new InMemoryTokenProvider();
 

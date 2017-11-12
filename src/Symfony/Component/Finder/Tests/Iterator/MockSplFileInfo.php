@@ -80,17 +80,17 @@ class MockSplFileInfo extends \SplFileInfo
         return $this->contents;
     }
 
-    public function setContents($contents)
+    public function setContents($contents): void
     {
         $this->contents = $contents;
     }
 
-    public function setMode($mode)
+    public function setMode($mode): void
     {
         $this->mode = $mode;
     }
 
-    public function setType($type)
+    public function setType($type): void
     {
         if (is_string($type)) {
             switch ($type) {
@@ -110,12 +110,12 @@ class MockSplFileInfo extends \SplFileInfo
         }
     }
 
-    public function setRelativePath($relativePath)
+    public function setRelativePath($relativePath): void
     {
         $this->relativePath = $relativePath;
     }
 
-    public function setRelativePathname($relativePathname)
+    public function setRelativePathname($relativePathname): void
     {
         $this->relativePathname = $relativePathname;
     }

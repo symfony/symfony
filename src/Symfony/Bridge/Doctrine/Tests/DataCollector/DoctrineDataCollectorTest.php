@@ -19,21 +19,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DoctrineDataCollectorTest extends TestCase
 {
-    public function testCollectConnections()
+    public function testCollectConnections(): void
     {
         $c = $this->createCollector(array());
         $c->collect(new Request(), new Response());
         $this->assertEquals(array('default' => 'doctrine.dbal.default_connection'), $c->getConnections());
     }
 
-    public function testCollectManagers()
+    public function testCollectManagers(): void
     {
         $c = $this->createCollector(array());
         $c->collect(new Request(), new Response());
         $this->assertEquals(array('default' => 'doctrine.orm.default_entity_manager'), $c->getManagers());
     }
 
-    public function testCollectQueryCount()
+    public function testCollectQueryCount(): void
     {
         $c = $this->createCollector(array());
         $c->collect(new Request(), new Response());
@@ -47,7 +47,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertEquals(1, $c->getQueryCount());
     }
 
-    public function testCollectTime()
+    public function testCollectTime(): void
     {
         $c = $this->createCollector(array());
         $c->collect(new Request(), new Response());
@@ -72,7 +72,7 @@ class DoctrineDataCollectorTest extends TestCase
     /**
      * @dataProvider paramProvider
      */
-    public function testCollectQueries($param, $types, $expected, $explainable)
+    public function testCollectQueries($param, $types, $expected, $explainable): void
     {
         $queries = array(
             array('sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => array($param), 'types' => $types, 'executionMS' => 1),
@@ -85,7 +85,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertEquals($explainable, $collectedQueries['default'][0]['explainable']);
     }
 
-    public function testCollectQueryWithNoParams()
+    public function testCollectQueryWithNoParams(): void
     {
         $queries = array(
             array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
@@ -101,7 +101,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertTrue($collectedQueries['default'][1]['explainable']);
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $queries = array(
             array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
@@ -118,7 +118,7 @@ class DoctrineDataCollectorTest extends TestCase
     /**
      * @dataProvider paramProvider
      */
-    public function testSerialization($param, $types, $expected, $explainable)
+    public function testSerialization($param, $types, $expected, $explainable): void
     {
         $queries = array(
             array('sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => array($param), 'types' => $types, 'executionMS' => 1),

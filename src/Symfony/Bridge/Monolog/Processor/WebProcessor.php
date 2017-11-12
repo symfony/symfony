@@ -27,7 +27,7 @@ class WebProcessor extends BaseWebProcessor
         parent::__construct(array(), $extraFields);
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(GetResponseEvent $event): void
     {
         if ($event->isMasterRequest()) {
             $this->serverData = $event->getRequest()->server->all();

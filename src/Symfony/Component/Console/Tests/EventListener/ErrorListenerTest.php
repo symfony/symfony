@@ -26,7 +26,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ErrorListenerTest extends TestCase
 {
-    public function testOnConsoleError()
+    public function testOnConsoleError(): void
     {
         $error = new \TypeError('An error occurred');
 
@@ -41,7 +41,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleError(new ConsoleErrorEvent(new ArgvInput(array('console.php', 'test:run', '--foo=baz', 'buzz')), $this->getOutput(), $error, new Command('test:run')));
     }
 
-    public function testOnConsoleErrorWithNoCommandAndNoInputString()
+    public function testOnConsoleErrorWithNoCommandAndNoInputString(): void
     {
         $error = new \RuntimeException('An error occurred');
 
@@ -56,7 +56,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleError(new ConsoleErrorEvent(new NonStringInput(), $this->getOutput(), $error));
     }
 
-    public function testOnConsoleTerminateForNonZeroExitCodeWritesToLog()
+    public function testOnConsoleTerminateForNonZeroExitCodeWritesToLog(): void
     {
         $logger = $this->getLogger();
         $logger
@@ -69,7 +69,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleTerminate($this->getConsoleTerminateEvent(new ArgvInput(array('console.php', 'test:run')), 255));
     }
 
-    public function testOnConsoleTerminateForZeroExitCodeDoesNotWriteToLog()
+    public function testOnConsoleTerminateForZeroExitCodeDoesNotWriteToLog(): void
     {
         $logger = $this->getLogger();
         $logger
@@ -81,7 +81,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleTerminate($this->getConsoleTerminateEvent(new ArgvInput(array('console.php', 'test:run')), 0));
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             array(
@@ -92,7 +92,7 @@ class ErrorListenerTest extends TestCase
         );
     }
 
-    public function testAllKindsOfInputCanBeLogged()
+    public function testAllKindsOfInputCanBeLogged(): void
     {
         $logger = $this->getLogger();
         $logger
@@ -107,7 +107,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleTerminate($this->getConsoleTerminateEvent(new StringInput('test:run --foo=bar'), 255));
     }
 
-    public function testCommandNameIsDisplayedForNonStringableInput()
+    public function testCommandNameIsDisplayedForNonStringableInput(): void
     {
         $logger = $this->getLogger();
         $logger
@@ -138,19 +138,19 @@ class ErrorListenerTest extends TestCase
 
 class NonStringInput extends Input
 {
-    public function getFirstArgument()
+    public function getFirstArgument(): void
     {
     }
 
-    public function hasParameterOption($values, $onlyParams = false)
+    public function hasParameterOption($values, $onlyParams = false): void
     {
     }
 
-    public function getParameterOption($values, $default = false, $onlyParams = false)
+    public function getParameterOption($values, $default = false, $onlyParams = false): void
     {
     }
 
-    public function parse()
+    public function parse(): void
     {
     }
 }

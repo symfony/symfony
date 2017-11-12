@@ -40,13 +40,13 @@ class TestSessionListenerTest extends TestCase
      */
     private $session;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\AbstractTestSessionListener');
         $this->session = $this->getSession();
     }
 
-    public function testShouldSaveMasterRequestSession()
+    public function testShouldSaveMasterRequestSession(): void
     {
         $this->sessionHasBeenStarted();
         $this->sessionMustBeSaved();
@@ -54,14 +54,14 @@ class TestSessionListenerTest extends TestCase
         $this->filterResponse(new Request());
     }
 
-    public function testShouldNotSaveSubRequestSession()
+    public function testShouldNotSaveSubRequestSession(): void
     {
         $this->sessionMustNotBeSaved();
 
         $this->filterResponse(new Request(), HttpKernelInterface::SUB_REQUEST);
     }
 
-    public function testDoesNotDeleteCookieIfUsingSessionLifetime()
+    public function testDoesNotDeleteCookieIfUsingSessionLifetime(): void
     {
         $this->sessionHasBeenStarted();
 
@@ -73,7 +73,7 @@ class TestSessionListenerTest extends TestCase
         $this->assertEquals(0, reset($cookies)->getExpiresTime());
     }
 
-    public function testUnstartedSessionIsNotSave()
+    public function testUnstartedSessionIsNotSave(): void
     {
         $this->sessionHasNotBeenStarted();
         $this->sessionMustNotBeSaved();
@@ -81,7 +81,7 @@ class TestSessionListenerTest extends TestCase
         $this->filterResponse(new Request());
     }
 
-    public function testDoesNotImplementServiceSubscriberInterface()
+    public function testDoesNotImplementServiceSubscriberInterface(): void
     {
         $this->assertTrue(interface_exists(ServiceSubscriberInterface::class));
         $this->assertTrue(class_exists(SessionListener::class));
@@ -104,26 +104,26 @@ class TestSessionListenerTest extends TestCase
         return $response;
     }
 
-    private function sessionMustNotBeSaved()
+    private function sessionMustNotBeSaved(): void
     {
         $this->session->expects($this->never())
             ->method('save');
     }
 
-    private function sessionMustBeSaved()
+    private function sessionMustBeSaved(): void
     {
         $this->session->expects($this->once())
             ->method('save');
     }
 
-    private function sessionHasBeenStarted()
+    private function sessionHasBeenStarted(): void
     {
         $this->session->expects($this->once())
             ->method('isStarted')
             ->will($this->returnValue(true));
     }
 
-    private function sessionHasNotBeenStarted()
+    private function sessionHasNotBeenStarted(): void
     {
         $this->session->expects($this->once())
             ->method('isStarted')

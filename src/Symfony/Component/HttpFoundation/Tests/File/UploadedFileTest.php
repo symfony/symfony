@@ -16,14 +16,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadedFileTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!ini_get('file_uploads')) {
             $this->markTestSkipped('file_uploads is disabled in php.ini');
         }
     }
 
-    public function testConstructWhenFileNotExists()
+    public function testConstructWhenFileNotExists(): void
     {
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
 
@@ -34,7 +34,7 @@ class UploadedFileTest extends TestCase
         );
     }
 
-    public function testFileUploadsWithNoMimeType()
+    public function testFileUploadsWithNoMimeType(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -51,7 +51,7 @@ class UploadedFileTest extends TestCase
         }
     }
 
-    public function testFileUploadsWithUnknownMimeType()
+    public function testFileUploadsWithUnknownMimeType(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/.unknownextension',
@@ -64,7 +64,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
     }
 
-    public function testGuessClientExtension()
+    public function testGuessClientExtension(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -77,7 +77,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('gif', $file->guessClientExtension());
     }
 
-    public function testGuessClientExtensionWithIncorrectMimeType()
+    public function testGuessClientExtensionWithIncorrectMimeType(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -90,7 +90,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('jpeg', $file->guessClientExtension());
     }
 
-    public function testErrorIsOkByDefault()
+    public function testErrorIsOkByDefault(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -103,7 +103,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals(UPLOAD_ERR_OK, $file->getError());
     }
 
-    public function testGetClientOriginalName()
+    public function testGetClientOriginalName(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -116,7 +116,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('original.gif', $file->getClientOriginalName());
     }
 
-    public function testGetClientOriginalExtension()
+    public function testGetClientOriginalExtension(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -132,7 +132,7 @@ class UploadedFileTest extends TestCase
     /**
      * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileException
      */
-    public function testMoveLocalFileIsNotAllowed()
+    public function testMoveLocalFileIsNotAllowed(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -145,7 +145,7 @@ class UploadedFileTest extends TestCase
         $movedFile = $file->move(__DIR__.'/Fixtures/directory');
     }
 
-    public function testMoveLocalFileIsAllowedInTestMode()
+    public function testMoveLocalFileIsAllowedInTestMode(): void
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';
         $targetDir = __DIR__.'/Fixtures/directory';
@@ -172,7 +172,7 @@ class UploadedFileTest extends TestCase
         @unlink($targetPath);
     }
 
-    public function testGetClientOriginalNameSanitizeFilename()
+    public function testGetClientOriginalNameSanitizeFilename(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -185,7 +185,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('original.gif', $file->getClientOriginalName());
     }
 
-    public function testGetSize()
+    public function testGetSize(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -206,7 +206,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
     }
 
-    public function testGetExtension()
+    public function testGetExtension(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -217,7 +217,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('gif', $file->getExtension());
     }
 
-    public function testIsValid()
+    public function testIsValid(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -234,7 +234,7 @@ class UploadedFileTest extends TestCase
     /**
      * @dataProvider uploadedFileErrorProvider
      */
-    public function testIsInvalidOnUploadError($error)
+    public function testIsInvalidOnUploadError($error): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -258,7 +258,7 @@ class UploadedFileTest extends TestCase
         );
     }
 
-    public function testIsInvalidIfNotHttpUpload()
+    public function testIsInvalidIfNotHttpUpload(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',

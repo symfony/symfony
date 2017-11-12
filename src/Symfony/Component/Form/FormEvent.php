@@ -29,10 +29,8 @@ class FormEvent extends Event
 
     /**
      * Returns the form at the source of the event.
-     *
-     * @return FormInterface
      */
-    public function getForm()
+    public function getForm(): FormInterface
     {
         return $this->form;
     }
@@ -52,7 +50,7 @@ class FormEvent extends Event
      *
      * @param mixed $data
      */
-    public function setData($data)
+    public function setData($data): void
     {
         $this->data = $data;
     }

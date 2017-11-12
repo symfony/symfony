@@ -58,7 +58,7 @@ class EntityTypeTest extends BaseTypeTest
      */
     private $emRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emRegistry = $this->createRegistryMock('default', $this->em);
@@ -88,7 +88,7 @@ class EntityTypeTest extends BaseTypeTest
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -103,7 +103,7 @@ class EntityTypeTest extends BaseTypeTest
         ));
     }
 
-    protected function persist(array $entities)
+    protected function persist(array $entities): void
     {
         foreach ($entities as $entity) {
             $this->em->persist($entity);
@@ -117,7 +117,7 @@ class EntityTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      */
-    public function testClassOptionIsRequired()
+    public function testClassOptionIsRequired(): void
     {
         $this->factory->createNamed('name', static::TESTED_TYPE);
     }
@@ -125,14 +125,14 @@ class EntityTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
-    public function testInvalidClassOption()
+    public function testInvalidClassOption(): void
     {
         $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'class' => 'foo',
         ));
     }
 
-    public function testSetDataToUninitializedEntityWithNonRequired()
+    public function testSetDataToUninitializedEntityWithNonRequired(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -149,7 +149,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
-    public function testSetDataToUninitializedEntityWithNonRequiredToString()
+    public function testSetDataToUninitializedEntityWithNonRequiredToString(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -166,7 +166,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $view->vars['choices']);
     }
 
-    public function testSetDataToUninitializedEntityWithNonRequiredQueryBuilder()
+    public function testSetDataToUninitializedEntityWithNonRequiredQueryBuilder(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -189,7 +189,7 @@ class EntityTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
+    public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure(): void
     {
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -201,7 +201,7 @@ class EntityTypeTest extends BaseTypeTest
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
-    public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
+    public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder(): void
     {
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -214,7 +214,7 @@ class EntityTypeTest extends BaseTypeTest
         $field->submit('2');
     }
 
-    public function testConfigureQueryBuilderWithClosureReturningNullUseDefault()
+    public function testConfigureQueryBuilderWithClosureReturningNullUseDefault(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -224,7 +224,7 @@ class EntityTypeTest extends BaseTypeTest
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => function () {
+            'query_builder' => function (): void {
                 return;
             },
         ));
@@ -232,7 +232,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
-    public function testSetDataSingleNull()
+    public function testSetDataSingleNull(): void
     {
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'multiple' => false,
@@ -245,7 +245,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('', $field->getViewData());
     }
 
-    public function testSetDataMultipleExpandedNull()
+    public function testSetDataMultipleExpandedNull(): void
     {
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -259,7 +259,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array(), $field->getViewData());
     }
 
-    public function testSetDataMultipleNonExpandedNull()
+    public function testSetDataMultipleNonExpandedNull(): void
     {
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'multiple' => true,
@@ -273,7 +273,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array(), $field->getViewData());
     }
 
-    public function testSubmitSingleNonExpandedSingleIdentifier()
+    public function testSubmitSingleNonExpandedSingleIdentifier(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -295,7 +295,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('2', $field->getViewData());
     }
 
-    public function testSubmitSingleNonExpandedSingleAssocIdentifier()
+    public function testSubmitSingleNonExpandedSingleAssocIdentifier(): void
     {
         $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');
         $innerEntity2 = new SingleIntIdNoToStringEntity(2, 'InBar');
@@ -320,7 +320,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('2', $field->getViewData());
     }
 
-    public function testSubmitSingleNonExpandedCompositeIdentifier()
+    public function testSubmitSingleNonExpandedCompositeIdentifier(): void
     {
         $entity1 = new CompositeIntIdEntity(10, 20, 'Foo');
         $entity2 = new CompositeIntIdEntity(30, 40, 'Bar');
@@ -343,7 +343,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('1', $field->getViewData());
     }
 
-    public function testSubmitMultipleNonExpandedSingleIdentifier()
+    public function testSubmitMultipleNonExpandedSingleIdentifier(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -368,7 +368,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array('1', '3'), $field->getViewData());
     }
 
-    public function testSubmitMultipleNonExpandedSingleAssocIdentifier()
+    public function testSubmitMultipleNonExpandedSingleAssocIdentifier(): void
     {
         $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');
         $innerEntity2 = new SingleIntIdNoToStringEntity(2, 'InBar');
@@ -397,7 +397,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array('1', '3'), $field->getViewData());
     }
 
-    public function testSubmitMultipleNonExpandedSingleIdentifierForExistingData()
+    public function testSubmitMultipleNonExpandedSingleIdentifierForExistingData(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -428,7 +428,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array('1', '3'), $field->getViewData());
     }
 
-    public function testSubmitMultipleNonExpandedCompositeIdentifier()
+    public function testSubmitMultipleNonExpandedCompositeIdentifier(): void
     {
         $entity1 = new CompositeIntIdEntity(10, 20, 'Foo');
         $entity2 = new CompositeIntIdEntity(30, 40, 'Bar');
@@ -454,7 +454,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array('0', '2'), $field->getViewData());
     }
 
-    public function testSubmitMultipleNonExpandedCompositeIdentifierExistingData()
+    public function testSubmitMultipleNonExpandedCompositeIdentifierExistingData(): void
     {
         $entity1 = new CompositeIntIdEntity(10, 20, 'Foo');
         $entity2 = new CompositeIntIdEntity(30, 40, 'Bar');
@@ -485,7 +485,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array('0', '2'), $field->getViewData());
     }
 
-    public function testSubmitSingleExpanded()
+    public function testSubmitSingleExpanded(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -510,7 +510,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('2', $field['2']->getViewData());
     }
 
-    public function testSubmitMultipleExpanded()
+    public function testSubmitMultipleExpanded(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -540,7 +540,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('3', $field['3']->getViewData());
     }
 
-    public function testSubmitMultipleExpandedWithNegativeIntegerId()
+    public function testSubmitMultipleExpandedWithNegativeIntegerId(): void
     {
         $entity1 = new SingleIntIdEntity(-1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -565,7 +565,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertFalse($field['2']->getData());
     }
 
-    public function testSubmitSingleNonExpandedStringCastableIdentifier()
+    public function testSubmitSingleNonExpandedStringCastableIdentifier(): void
     {
         $entity1 = new SingleStringCastableIdEntity(1, 'Foo');
         $entity2 = new SingleStringCastableIdEntity(2, 'Bar');
@@ -587,7 +587,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('2', $field->getViewData());
     }
 
-    public function testSubmitSingleStringCastableIdentifierExpanded()
+    public function testSubmitSingleStringCastableIdentifierExpanded(): void
     {
         $entity1 = new SingleStringCastableIdEntity(1, 'Foo');
         $entity2 = new SingleStringCastableIdEntity(2, 'Bar');
@@ -612,7 +612,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('2', $field['1']->getViewData());
     }
 
-    public function testSubmitMultipleNonExpandedStringCastableIdentifierForExistingData()
+    public function testSubmitMultipleNonExpandedStringCastableIdentifierForExistingData(): void
     {
         $entity1 = new SingleStringCastableIdEntity(1, 'Foo');
         $entity2 = new SingleStringCastableIdEntity(2, 'Bar');
@@ -643,7 +643,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array('1', '3'), $field->getViewData());
     }
 
-    public function testSubmitMultipleNonExpandedStringCastableIdentifier()
+    public function testSubmitMultipleNonExpandedStringCastableIdentifier(): void
     {
         $entity1 = new SingleStringCastableIdEntity(1, 'Foo');
         $entity2 = new SingleStringCastableIdEntity(2, 'Bar');
@@ -668,7 +668,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array('1', '3'), $field->getViewData());
     }
 
-    public function testSubmitMultipleStringCastableIdentifierExpanded()
+    public function testSubmitMultipleStringCastableIdentifierExpanded(): void
     {
         $entity1 = new SingleStringCastableIdEntity(1, 'Foo');
         $entity2 = new SingleStringCastableIdEntity(2, 'Bar');
@@ -698,7 +698,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('3', $field['2']->getViewData());
     }
 
-    public function testOverrideChoices()
+    public function testOverrideChoices(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -722,7 +722,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('2', $field->getViewData());
     }
 
-    public function testOverrideChoicesValues()
+    public function testOverrideChoicesValues(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -744,7 +744,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('Bar', $field->getViewData());
     }
 
-    public function testOverrideChoicesValuesWithCallable()
+    public function testOverrideChoicesValuesWithCallable(): void
     {
         $entity1 = new GroupableEntity(1, 'Foo', 'BazGroup');
         $entity2 = new GroupableEntity(2, 'Bar', 'BooGroup');
@@ -775,7 +775,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('BooGroup/Bar', $field->getViewData());
     }
 
-    public function testChoicesForValuesOptimization()
+    public function testChoicesForValuesOptimization(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -799,7 +799,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNotContains((string) $entity2, $managedEntitiesNames);
     }
 
-    public function testGroupByChoices()
+    public function testGroupByChoices(): void
     {
         $item1 = new GroupableEntity(1, 'Foo', 'Group1');
         $item2 = new GroupableEntity(2, 'Bar', 'Group1');
@@ -831,7 +831,7 @@ class EntityTypeTest extends BaseTypeTest
         ), $field->createView()->vars['choices']);
     }
 
-    public function testPreferredChoices()
+    public function testPreferredChoices(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -850,7 +850,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo')), $field->createView()->vars['choices']);
     }
 
-    public function testOverrideChoicesWithPreferredChoices()
+    public function testOverrideChoicesWithPreferredChoices(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -870,7 +870,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals(array(2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
-    public function testDisallowChoicesThatAreNotIncludedChoicesSingleIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedChoicesSingleIdentifier(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -891,7 +891,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncludedChoicesSingleAssocIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedChoicesSingleAssocIdentifier(): void
     {
         $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');
         $innerEntity2 = new SingleIntIdNoToStringEntity(2, 'InBar');
@@ -914,7 +914,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncludedChoicesCompositeIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedChoicesCompositeIdentifier(): void
     {
         $entity1 = new CompositeIntIdEntity(10, 20, 'Foo');
         $entity2 = new CompositeIntIdEntity(30, 40, 'Bar');
@@ -935,7 +935,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncludedQueryBuilderSingleIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedQueryBuilderSingleIdentifier(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -959,7 +959,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncludedQueryBuilderSingleAssocIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedQueryBuilderSingleAssocIdentifier(): void
     {
         $innerEntity1 = new SingleIntIdNoToStringEntity(1, 'InFoo');
         $innerEntity2 = new SingleIntIdNoToStringEntity(2, 'InBar');
@@ -987,7 +987,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncludedQueryBuilderAsClosureSingleIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedQueryBuilderAsClosureSingleIdentifier(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -1011,7 +1011,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($field->getData());
     }
 
-    public function testDisallowChoicesThatAreNotIncludedQueryBuilderAsClosureCompositeIdentifier()
+    public function testDisallowChoicesThatAreNotIncludedQueryBuilderAsClosureCompositeIdentifier(): void
     {
         $entity1 = new CompositeIntIdEntity(10, 20, 'Foo');
         $entity2 = new CompositeIntIdEntity(30, 40, 'Bar');
@@ -1035,7 +1035,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($field->getData());
     }
 
-    public function testSubmitSingleStringIdentifier()
+    public function testSubmitSingleStringIdentifier(): void
     {
         $entity1 = new SingleStringIdEntity('foo', 'Foo');
 
@@ -1056,7 +1056,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('foo', $field->getViewData());
     }
 
-    public function testSubmitCompositeStringIdentifier()
+    public function testSubmitCompositeStringIdentifier(): void
     {
         $entity1 = new CompositeStringIdEntity('foo1', 'foo2', 'Foo');
 
@@ -1078,7 +1078,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('0', $field->getViewData());
     }
 
-    public function testGetManagerForClassIfNoEm()
+    public function testGetManagerForClassIfNoEm(): void
     {
         $this->emRegistry->expects($this->never())
             ->method('getManager');
@@ -1095,7 +1095,7 @@ class EntityTypeTest extends BaseTypeTest
         ));
     }
 
-    public function testExplicitEm()
+    public function testExplicitEm(): void
     {
         $this->emRegistry->expects($this->never())
             ->method('getManager');
@@ -1110,7 +1110,7 @@ class EntityTypeTest extends BaseTypeTest
         ));
     }
 
-    public function testLoaderCaching()
+    public function testLoaderCaching(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -1173,7 +1173,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame($choiceLoader1, $choiceLoader3);
     }
 
-    public function testLoaderCachingWithParameters()
+    public function testLoaderCachingWithParameters(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -1247,7 +1247,7 @@ class EntityTypeTest extends BaseTypeTest
         return $registry;
     }
 
-    public function testPassDisabledAsOption()
+    public function testPassDisabledAsOption(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -1258,7 +1258,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertTrue($form->isDisabled());
     }
 
-    public function testPassIdAndNameToView()
+    public function testPassIdAndNameToView(): void
     {
         $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -1271,7 +1271,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals('name', $view->vars['full_name']);
     }
 
-    public function testStripLeadingUnderscoresAndDigitsFromId()
+    public function testStripLeadingUnderscoresAndDigitsFromId(): void
     {
         $view = $this->factory->createNamed('_09name', static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -1284,7 +1284,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals('_09name', $view->vars['full_name']);
     }
 
-    public function testPassIdAndNameToViewWithParent()
+    public function testPassIdAndNameToViewWithParent(): void
     {
         $view = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', static::TESTED_TYPE, array(
@@ -1299,7 +1299,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals('parent[child]', $view['child']->vars['full_name']);
     }
 
-    public function testPassIdAndNameToViewWithGrandParent()
+    public function testPassIdAndNameToViewWithGrandParent(): void
     {
         $builder = $this->factory->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
             ->add('child', FormTypeTest::TESTED_TYPE);
@@ -1314,7 +1314,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals('parent[child][grand_child]', $view['child']['grand_child']->vars['full_name']);
     }
 
-    public function testPassTranslationDomainToView()
+    public function testPassTranslationDomainToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -1326,7 +1326,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('domain', $view->vars['translation_domain']);
     }
 
-    public function testInheritTranslationDomainFromParent()
+    public function testInheritTranslationDomainFromParent(): void
     {
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
@@ -1342,7 +1342,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
-    public function testPreferOwnTranslationDomain()
+    public function testPreferOwnTranslationDomain(): void
     {
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
@@ -1359,7 +1359,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertEquals('domain', $view['child']->vars['translation_domain']);
     }
 
-    public function testDefaultTranslationDomain()
+    public function testDefaultTranslationDomain(): void
     {
         $view = $this->factory
             ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE)
@@ -1373,7 +1373,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertNull($view['child']->vars['translation_domain']);
     }
 
-    public function testPassLabelToView()
+    public function testPassLabelToView(): void
     {
         $view = $this->factory->createNamed('__test___field', static::TESTED_TYPE, null, array(
             'label' => 'My label',
@@ -1385,7 +1385,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('My label', $view->vars['label']);
     }
 
-    public function testPassMultipartFalseToView()
+    public function testPassMultipartFalseToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -1396,7 +1396,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertFalse($view->vars['multipart']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -1409,7 +1409,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('', $form->getViewData(), 'View data is always a string');
     }
 
-    public function testSubmitNullExpanded()
+    public function testSubmitNullExpanded(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -1423,7 +1423,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame('', $form->getViewData(), 'View data is always a string');
     }
 
-    public function testSubmitNullMultiple()
+    public function testSubmitNullMultiple(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -1439,7 +1439,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
 
-    public function testSubmitNullExpandedMultiple()
+    public function testSubmitNullExpandedMultiple(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'em' => 'default',
@@ -1456,7 +1456,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
 
-    public function testSetDataEmptyArraySubmitNullMultiple()
+    public function testSetDataEmptyArraySubmitNullMultiple(): void
     {
         $emptyArray = array();
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -1472,7 +1472,7 @@ class EntityTypeTest extends BaseTypeTest
         $this->assertSame(array(), $form->getViewData(), 'View data is always an array');
     }
 
-    public function testSetDataNonEmptyArraySubmitNullMultiple()
+    public function testSetDataNonEmptyArraySubmitNullMultiple(): void
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $this->persist(array($entity1));

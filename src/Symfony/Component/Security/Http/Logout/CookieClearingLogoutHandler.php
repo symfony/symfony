@@ -35,7 +35,7 @@ class CookieClearingLogoutHandler implements LogoutHandlerInterface
     /**
      * Implementation for the LogoutHandlerInterface. Deletes all requested cookies.
      */
-    public function logout(Request $request, Response $response, TokenInterface $token)
+    public function logout(Request $request, Response $response, TokenInterface $token): void
     {
         foreach ($this->cookies as $cookieName => $cookieData) {
             $response->headers->clearCookie($cookieName, $cookieData['path'], $cookieData['domain']);

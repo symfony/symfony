@@ -26,7 +26,7 @@ interface StrategyInterface
      *
      * @return bool
      */
-    public function isMet($numberOfSuccess, $numberOfItems);
+    public function isMet(int $numberOfSuccess, int $numberOfItems): bool;
 
     /**
      * Returns whether or not the quorum *could* be met.
@@ -39,5 +39,5 @@ interface StrategyInterface
      *
      * @return bool
      */
-    public function canBeMet($numberOfFailure, $numberOfItems);
+    public function canBeMet(int $numberOfFailure, int $numberOfItems): bool;
 }

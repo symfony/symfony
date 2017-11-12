@@ -85,10 +85,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Set circular reference limit.
      *
      * @param int $circularReferenceLimit Limit of iterations for the same object
-     *
-     * @return self
      */
-    public function setCircularReferenceLimit($circularReferenceLimit)
+    public function setCircularReferenceLimit(int $circularReferenceLimit): self
     {
         $this->circularReferenceLimit = $circularReferenceLimit;
 
@@ -99,10 +97,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Set circular reference handler.
      *
      * @param callable $circularReferenceHandler
-     *
-     * @return self
      */
-    public function setCircularReferenceHandler(callable $circularReferenceHandler)
+    public function setCircularReferenceHandler(callable $circularReferenceHandler): self
     {
         $this->circularReferenceHandler = $circularReferenceHandler;
 
@@ -114,11 +110,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @param callable[] $callbacks Help normalize the result
      *
-     * @return self
      *
      * @throws InvalidArgumentException if a non-callable callback is set
      */
-    public function setCallbacks(array $callbacks)
+    public function setCallbacks(array $callbacks): self
     {
         foreach ($callbacks as $attribute => $callback) {
             if (!is_callable($callback)) {
@@ -135,10 +130,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
     /**
      * Set ignored attributes for normalization and denormalization.
-     *
-     * @return self
      */
-    public function setIgnoredAttributes(array $ignoredAttributes)
+    public function setIgnoredAttributes(array $ignoredAttributes): self
     {
         $this->ignoredAttributes = $ignoredAttributes;
 
@@ -151,11 +144,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @param object $object
      * @param array  $context
      *
-     * @return bool
      *
      * @throws CircularReferenceException
      */
-    protected function isCircularReference($object, &$context)
+    protected function isCircularReference($object, &$context): bool
     {
         $objectHash = spl_object_hash($object);
 
@@ -199,7 +191,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Gets attributes to normalize using groups.
      *
      * @param string|object $classOrObject
-     * @param array         $context
      * @param bool          $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
      * @return string[]|AttributeMetadataInterface[]|bool
@@ -238,11 +229,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @param object|string $classOrObject
      * @param string        $attribute
      * @param string|null   $format
-     * @param array         $context
-     *
-     * @return bool
      */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array()): bool
     {
         if (in_array($attribute, $this->ignoredAttributes)) {
             return false;
@@ -265,10 +253,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * the denormalization process.
      *
      * @param object|array $data
-     *
-     * @return array
      */
-    protected function prepareForDenormalization($data)
+    protected function prepareForDenormalization($data): array
     {
         return (array) $data;
     }
@@ -277,15 +263,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Returns the method to use to construct an object. This method must be either
      * the object constructor or static.
      *
-     * @param array            $data
-     * @param string           $class
-     * @param array            $context
      * @param \ReflectionClass $reflectionClass
      * @param array|bool       $allowedAttributes
      *
      * @return \ReflectionMethod|null
      */
-    protected function getConstructor(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    protected function getConstructor(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes): ?\ReflectionMethod
     {
         return $reflectionClass->getConstructor();
     }
@@ -298,9 +281,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * is removed from the context before being returned to avoid side effects
      * when recursively normalizing an object graph.
      *
-     * @param array            $data
-     * @param string           $class
-     * @param array            $context
      * @param \ReflectionClass $reflectionClass
      * @param array|bool       $allowedAttributes
      * @param string|null      $format
@@ -309,7 +289,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @throws RuntimeException
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
+    protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
         if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
             unset($context[static::OBJECT_TO_POPULATE]);
@@ -377,14 +357,9 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     }
 
     /**
-     * @param array  $parentContext
-     * @param string $attribute
-     *
-     * @return array
-     *
      * @internal
      */
-    protected function createChildContext(array $parentContext, $attribute)
+    protected function createChildContext(array $parentContext, string $attribute): array
     {
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];

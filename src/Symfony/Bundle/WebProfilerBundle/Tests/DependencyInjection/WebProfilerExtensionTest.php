@@ -28,7 +28,7 @@ class WebProfilerExtensionTest extends TestCase
      */
     private $container;
 
-    public static function assertSaneContainer(Container $container, $message = '', $knownPrivates = array())
+    public static function assertSaneContainer(Container $container, $message = '', $knownPrivates = array()): void
     {
         $errors = array();
         foreach ($container->getServiceIds() as $id) {
@@ -45,7 +45,7 @@ class WebProfilerExtensionTest extends TestCase
         self::assertEquals(array(), $errors, $message);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -72,7 +72,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->addCompilerPass(new RegisterListenersPass());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -83,7 +83,7 @@ class WebProfilerExtensionTest extends TestCase
     /**
      * @dataProvider getDebugModes
      */
-    public function testDefaultConfig($debug)
+    public function testDefaultConfig($debug): void
     {
         $this->container->setParameter('kernel.debug', $debug);
 
@@ -98,7 +98,7 @@ class WebProfilerExtensionTest extends TestCase
     /**
      * @dataProvider getDebugModes
      */
-    public function testToolbarConfig($toolbarEnabled, $interceptRedirects, $listenerInjected, $listenerEnabled)
+    public function testToolbarConfig($toolbarEnabled, $interceptRedirects, $listenerInjected, $listenerEnabled): void
     {
         $extension = new WebProfilerExtension();
         $extension->load(array(array('toolbar' => $toolbarEnabled, 'intercept_redirects' => $interceptRedirects)), $this->container);

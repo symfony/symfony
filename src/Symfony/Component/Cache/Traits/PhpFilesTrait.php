@@ -36,7 +36,7 @@ trait PhpFilesTrait
     /**
      * @return bool
      */
-    public function prune()
+    public function prune(): bool
     {
         $time = time();
         $pruned = true;

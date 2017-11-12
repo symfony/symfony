@@ -49,7 +49,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     /**
      * @return string The file path to the resource
      */
-    public function getResource()
+    public function getResource(): string
     {
         return $this->resource;
     }
@@ -109,7 +109,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
         list($this->resource, $this->exists) = unserialize($serialized);
     }
@@ -117,7 +117,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     /**
      * @throws \ReflectionException When $class is not found and is required
      */
-    private static function throwOnRequiredClass($class)
+    private static function throwOnRequiredClass($class): void
     {
         if (self::$autoloadedClass === $class) {
             return;

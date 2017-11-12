@@ -27,7 +27,7 @@ class Author
         $this->lastName = $lastName;
     }
 
-    public function setLastName($lastName)
+    public function setLastName($lastName): void
     {
         $this->lastName = $lastName;
     }
@@ -42,7 +42,7 @@ class Author
         return 'foobar';
     }
 
-    public function setAustralian($australian)
+    public function setAustralian($australian): void
     {
         $this->australian = $australian;
     }
@@ -52,7 +52,7 @@ class Author
         return $this->australian;
     }
 
-    public function setReadPermissions($bool)
+    public function setReadPermissions($bool): void
     {
         $this->readPermissions = $bool;
     }
@@ -67,11 +67,11 @@ class Author
         return true;
     }
 
-    public function getPrivateSetter()
+    public function getPrivateSetter(): void
     {
     }
 
-    private function setPrivateSetter($data)
+    private function setPrivateSetter($data): void
     {
     }
 }

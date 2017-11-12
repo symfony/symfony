@@ -23,7 +23,7 @@ class MaxDepthTest extends TestCase
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
      * @expectedExceptionMessage Parameter of annotation "Symfony\Component\Serializer\Annotation\MaxDepth" should be set.
      */
-    public function testNotSetMaxDepthParameter()
+    public function testNotSetMaxDepthParameter(): void
     {
         new MaxDepth(array());
     }
@@ -44,12 +44,12 @@ class MaxDepthTest extends TestCase
      * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
      * @expectedExceptionMessage Parameter of annotation "Symfony\Component\Serializer\Annotation\MaxDepth" must be a positive integer.
      */
-    public function testNotAnIntMaxDepthParameter($value)
+    public function testNotAnIntMaxDepthParameter($value): void
     {
         new MaxDepth(array('value' => $value));
     }
 
-    public function testMaxDepthParameters()
+    public function testMaxDepthParameters(): void
     {
         $maxDepth = new MaxDepth(array('value' => 3));
         $this->assertEquals(3, $maxDepth->getMaxDepth());

@@ -17,7 +17,7 @@ use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
 
 class YamlReferenceDumperTest extends TestCase
 {
-    public function testDumper()
+    public function testDumper(): void
     {
         $configuration = new ExampleConfiguration();
 
@@ -72,7 +72,7 @@ EOL
     /**
      * @dataProvider provideDumpAtPath
      */
-    public function testDumpAtPath($path, $expected)
+    public function testDumpAtPath($path, $expected): void
     {
         $configuration = new ExampleConfiguration();
 

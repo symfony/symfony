@@ -52,7 +52,7 @@ class ExceptionHandler
      *
      * @return static
      */
-    public static function register($debug = true, $charset = null, $fileLinkFormat = null)
+    public static function register(bool $debug = true, ?string $charset = null, ?string $fileLinkFormat = null)
     {
         $handler = new static($debug, $charset, $fileLinkFormat);
 
@@ -72,7 +72,7 @@ class ExceptionHandler
      *
      * @return callable|null The previous exception handler if any
      */
-    public function setHandler(callable $handler = null)
+    public function setHandler(callable $handler = null): ?callable
     {
         $old = $this->handler;
         $this->handler = $handler;
@@ -87,7 +87,7 @@ class ExceptionHandler
      *
      * @return string The previous file link format
      */
-    public function setFileLinkFormat($fileLinkFormat)
+    public function setFileLinkFormat($fileLinkFormat): string
     {
         $old = $this->fileLinkFormat;
         $this->fileLinkFormat = $fileLinkFormat;
@@ -103,7 +103,7 @@ class ExceptionHandler
      * The latter takes precedence and any output from the former is cancelled,
      * if and only if nothing bad happens in this handling path.
      */
-    public function handle(\Exception $exception)
+    public function handle(\Exception $exception): void
     {
         if (null === $this->handler || $exception instanceof OutOfMemoryException) {
             $this->sendPhpResponse($exception);
@@ -160,7 +160,7 @@ class ExceptionHandler
      *
      * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
      */
-    public function sendPhpResponse($exception)
+    public function sendPhpResponse($exception): void
     {
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
@@ -184,7 +184,7 @@ class ExceptionHandler
      *
      * @return string The HTML content as a string
      */
-    public function getHtml($exception)
+    public function getHtml($exception): string
     {
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);
@@ -198,7 +198,7 @@ class ExceptionHandler
      *
      * @return string The content as a string
      */
-    public function getContent(FlattenException $exception)
+    public function getContent(FlattenException $exception): string
     {
         switch ($exception->getStatusCode()) {
             case 404:
@@ -276,7 +276,7 @@ EOF;
      *
      * @return string The stylesheet as a string
      */
-    public function getStylesheet(FlattenException $exception)
+    public function getStylesheet(FlattenException $exception): string
     {
         return <<<'EOF'
             body { background-color: #F9F9F9; color: #222; font: 14px/1.4 Helvetica, Arial, sans-serif; margin: 0; padding-bottom: 45px; }
@@ -368,10 +368,8 @@ EOF;
      * Formats an array as a string.
      *
      * @param array $args The argument array
-     *
-     * @return string
      */
-    private function formatArgs(array $args)
+    private function formatArgs(array $args): string
     {
         $result = array();
         foreach ($args as $key => $item) {

@@ -19,17 +19,17 @@ use Doctrine\ORM\Version;
 
 class ORMQueryBuilderLoaderTest extends TestCase
 {
-    public function testIdentifierTypeIsStringArray()
+    public function testIdentifierTypeIsStringArray(): void
     {
         $this->checkIdentifierType('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity', Connection::PARAM_STR_ARRAY);
     }
 
-    public function testIdentifierTypeIsIntegerArray()
+    public function testIdentifierTypeIsIntegerArray(): void
     {
         $this->checkIdentifierType('Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity', Connection::PARAM_INT_ARRAY);
     }
 
-    protected function checkIdentifierType($classname, $expectedType)
+    protected function checkIdentifierType($classname, $expectedType): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -58,7 +58,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader->getEntitiesByIds('id', array(1, 2));
     }
 
-    public function testFilterNonIntegerValues()
+    public function testFilterNonIntegerValues(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -90,7 +90,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     /**
      * @dataProvider provideGuidEntityClasses
      */
-    public function testFilterEmptyUuids($entityClass)
+    public function testFilterEmptyUuids($entityClass): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -119,7 +119,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader->getEntitiesByIds('id', array('71c5fd46-3f16-4abb-bad7-90ac1e654a2d', '', 'b98e8e11-2897-44df-ad24-d2627eb7f499'));
     }
 
-    public function testEmbeddedIdentifierName()
+    public function testEmbeddedIdentifierName(): void
     {
         if (Version::compare('2.5.0') > 0) {
             $this->markTestSkipped('Applicable only for Doctrine >= 2.5.0');

@@ -40,7 +40,7 @@ final class WrappedListener implements ListenerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         $startTime = microtime(true);
         $this->listener->handle($event);

@@ -27,7 +27,7 @@ class CurrencyValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof Currency) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Currency');

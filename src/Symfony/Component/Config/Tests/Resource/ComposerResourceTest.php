@@ -17,7 +17,7 @@ use Symfony\Component\Config\Resource\ComposerResource;
 
 class ComposerResourceTest extends TestCase
 {
-    public function testGetVendor()
+    public function testGetVendor(): void
     {
         $res = new ComposerResource();
 
@@ -34,7 +34,7 @@ class ComposerResourceTest extends TestCase
         $this->assertTrue($found);
     }
 
-    public function testSerializeUnserialize()
+    public function testSerializeUnserialize(): void
     {
         $res = new ComposerResource();
         $ser = unserialize(serialize($res));

@@ -150,7 +150,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function addFlash(string $type, string $message)
+    protected function addFlash(string $type, string $message): void
     {
         if (!$this->container->has('session')) {
             throw new \LogicException('You can not use the addFlash method if sessions are disabled.');
@@ -183,7 +183,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function denyAccessUnlessGranted($attributes, $subject = null, string $message = 'Access Denied.')
+    protected function denyAccessUnlessGranted($attributes, $subject = null, string $message = 'Access Denied.'): void
     {
         if (!$this->isGranted($attributes, $subject)) {
             $exception = $this->createAccessDeniedException($message);
@@ -246,13 +246,13 @@ trait ControllerTrait
         if ($this->container->has('templating')) {
             $templating = $this->container->get('templating');
 
-            $callback = function () use ($templating, $view, $parameters) {
+            $callback = function () use ($templating, $view, $parameters): void {
                 $templating->stream($view, $parameters);
             };
         } elseif ($this->container->has('twig')) {
             $twig = $this->container->get('twig');
 
-            $callback = function () use ($twig, $view, $parameters) {
+            $callback = function () use ($twig, $view, $parameters): void {
                 $twig->display($view, $parameters);
             };
         } else {

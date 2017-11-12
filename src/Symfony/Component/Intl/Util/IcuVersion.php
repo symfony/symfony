@@ -53,7 +53,7 @@ class IcuVersion
      *
      * @see normalize()
      */
-    public static function compare($version1, $version2, $operator, $precision = null)
+    public static function compare(string $version1, string $version2, string $operator, ?int $precision = null): bool
     {
         $version1 = self::normalize($version1, $precision);
         $version2 = self::normalize($version2, $precision);
@@ -87,7 +87,7 @@ class IcuVersion
      * @return string|null the normalized ICU version or NULL if it couldn't be
      *                     normalized
      */
-    public static function normalize($version, $precision)
+    public static function normalize(string $version, ?int $precision): ?string
     {
         $version = preg_replace('/^(\d)\.(\d)/', '$1$2', $version);
 

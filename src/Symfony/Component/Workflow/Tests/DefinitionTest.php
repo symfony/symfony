@@ -8,7 +8,7 @@ use Symfony\Component\Workflow\Transition;
 
 class DefinitionTest extends TestCase
 {
-    public function testAddPlaces()
+    public function testAddPlaces(): void
     {
         $places = range('a', 'e');
         $definition = new Definition($places, array());
@@ -21,13 +21,13 @@ class DefinitionTest extends TestCase
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
      */
-    public function testAddPlacesInvalidArgument()
+    public function testAddPlacesInvalidArgument(): void
     {
         $places = array('a"', 'e"');
         $definition = new Definition($places, array());
     }
 
-    public function testSetInitialPlace()
+    public function testSetInitialPlace(): void
     {
         $places = range('a', 'e');
         $definition = new Definition($places, array(), $places[3]);
@@ -39,12 +39,12 @@ class DefinitionTest extends TestCase
      * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Place "d" cannot be the initial place as it does not exist.
      */
-    public function testSetInitialPlaceAndPlaceIsNotDefined()
+    public function testSetInitialPlaceAndPlaceIsNotDefined(): void
     {
         $definition = new Definition(array(), array(), 'd');
     }
 
-    public function testAddTransition()
+    public function testAddTransition(): void
     {
         $places = range('a', 'b');
 
@@ -59,7 +59,7 @@ class DefinitionTest extends TestCase
      * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Place "c" referenced in transition "name" does not exist.
      */
-    public function testAddTransitionAndFromPlaceIsNotDefined()
+    public function testAddTransitionAndFromPlaceIsNotDefined(): void
     {
         $places = range('a', 'b');
 
@@ -70,7 +70,7 @@ class DefinitionTest extends TestCase
      * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Place "c" referenced in transition "name" does not exist.
      */
-    public function testAddTransitionAndToPlaceIsNotDefined()
+    public function testAddTransitionAndToPlaceIsNotDefined(): void
     {
         $places = range('a', 'b');
 

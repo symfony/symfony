@@ -28,7 +28,7 @@ class RequestDataCollector extends BaseRequestCollector implements EventSubscrib
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         parent::collect($request, $response, $exception);
 
@@ -56,7 +56,7 @@ class RequestDataCollector extends BaseRequestCollector implements EventSubscrib
         return isset($this->data['forward']) ? $this->data['forward'] : false;
     }
 
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event): void
     {
         $this->controllers[$event->getRequest()] = $event->getController();
 

@@ -34,10 +34,10 @@ abstract class AbstractIntlGlobalsTest extends TestCase
     /**
      * @dataProvider errorNameProvider
      */
-    public function testGetErrorName($errorCode, $errorName)
+    public function testGetErrorName($errorCode, $errorName): void
     {
         $this->assertSame($errorName, $this->getIntlErrorName($errorCode));
     }
 
-    abstract protected function getIntlErrorName($errorCode);
+    abstract protected function getIntlErrorName($errorCode): void;
 }

@@ -30,7 +30,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 
     private $cacheDir;
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         if ($event->getException() instanceof Danger) {
             $event->setResponse(Response::create('It\'s dangerous to go alone. Take this ⚔'));
@@ -42,7 +42,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         return new Response('halloween');
     }
 
-    public function dangerousAction()
+    public function dangerousAction(): void
     {
         throw new Danger();
     }
@@ -70,13 +70,13 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         $fs->remove($this->cacheDir);
     }
 
-    protected function configureRoutes(RouteCollectionBuilder $routes)
+    protected function configureRoutes(RouteCollectionBuilder $routes): void
     {
         $routes->add('/', 'kernel:halloweenAction');
         $routes->add('/danger', 'kernel:dangerousAction');
     }
 
-    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
+    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->register('logger', NullLogger::class);
         $c->loadFromExtension('framework', array(

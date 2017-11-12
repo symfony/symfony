@@ -286,7 +286,7 @@ class ExceptionCaster
         return $a;
     }
 
-    private static function traceUnshift(&$trace, $class, $file, $line)
+    private static function traceUnshift(&$trace, $class, $file, $line): void
     {
         if (isset($trace[0]['file'], $trace[0]['line']) && $trace[0]['file'] === $file && $trace[0]['line'] === $line) {
             return;

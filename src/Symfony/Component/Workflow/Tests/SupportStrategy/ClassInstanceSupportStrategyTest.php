@@ -8,14 +8,14 @@ use Symfony\Component\Workflow\Workflow;
 
 class ClassInstanceSupportStrategyTest extends TestCase
 {
-    public function testSupportsIfClassInstance()
+    public function testSupportsIfClassInstance(): void
     {
         $strategy = new ClassInstanceSupportStrategy('Symfony\Component\Workflow\Tests\SupportStrategy\Subject1');
 
         $this->assertTrue($strategy->supports($this->createWorkflow(), new Subject1()));
     }
 
-    public function testSupportsIfNotClassInstance()
+    public function testSupportsIfNotClassInstance(): void
     {
         $strategy = new ClassInstanceSupportStrategy('Symfony\Component\Workflow\Tests\SupportStrategy\Subject2');
 

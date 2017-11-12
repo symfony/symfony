@@ -36,7 +36,7 @@ class Compiler
      *
      * @return PassConfig The PassConfig instance
      */
-    public function getPassConfig()
+    public function getPassConfig(): PassConfig
     {
         return $this->passConfig;
     }
@@ -46,7 +46,7 @@ class Compiler
      *
      * @return ServiceReferenceGraph The ServiceReferenceGraph instance
      */
-    public function getServiceReferenceGraph()
+    public function getServiceReferenceGraph(): ServiceReferenceGraph
     {
         return $this->serviceReferenceGraph;
     }
@@ -58,7 +58,7 @@ class Compiler
      * @param string                $type     The type of the pass
      * @param int                   $priority Used to sort the passes
      */
-    public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
+    public function addPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): void
     {
         $this->passConfig->addPass($pass, $type, $priority);
     }
@@ -66,7 +66,7 @@ class Compiler
     /**
      * @final
      */
-    public function log(CompilerPassInterface $pass, string $message)
+    public function log(CompilerPassInterface $pass, string $message): void
     {
         if (false !== strpos($message, "\n")) {
             $message = str_replace("\n", "\n".get_class($pass).': ', trim($message));
@@ -80,7 +80,7 @@ class Compiler
      *
      * @return array Log array
      */
-    public function getLog()
+    public function getLog(): array
     {
         return $this->log;
     }
@@ -88,7 +88,7 @@ class Compiler
     /**
      * Run the Compiler and process all Passes.
      */
-    public function compile(ContainerBuilder $container)
+    public function compile(ContainerBuilder $container): void
     {
         try {
             foreach ($this->passConfig->getPasses() as $pass) {

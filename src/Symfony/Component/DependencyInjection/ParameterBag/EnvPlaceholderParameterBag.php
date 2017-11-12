@@ -70,7 +70,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
     /**
      * Merges the env placeholders of another EnvPlaceholderParameterBag.
      */
-    public function mergeEnvPlaceholders(self $bag)
+    public function mergeEnvPlaceholders(self $bag): void
     {
         if ($newPlaceholders = $bag->getEnvPlaceholders()) {
             $this->envPlaceholders += $newPlaceholders;
@@ -84,7 +84,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
     /**
      * Maps env prefixes to their corresponding PHP types.
      */
-    public function setProvidedTypes(array $providedTypes)
+    public function setProvidedTypes(array $providedTypes): void
     {
         $this->providedTypes = $providedTypes;
     }
@@ -102,7 +102,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
     /**
      * {@inheritdoc}
      */
-    public function resolve()
+    public function resolve(): void
     {
         if ($this->resolved) {
             return;

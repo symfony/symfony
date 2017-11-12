@@ -58,7 +58,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /** @var CombinedStore */
     private $store;
 
-    public function setup()
+    public function setup(): void
     {
         $this->strategy = $this->getMockBuilder(StrategyInterface::class)->getMock();
         $this->store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -70,7 +70,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /**
      * @expectedException \Symfony\Component\Lock\Exception\LockConflictedException
      */
-    public function testSaveThrowsExceptionOnFailure()
+    public function testSaveThrowsExceptionOnFailure(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -97,7 +97,7 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->store->save($key);
     }
 
-    public function testSaveCleanupOnFailure()
+    public function testSaveCleanupOnFailure(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -135,7 +135,7 @@ class CombinedStoreTest extends AbstractStoreTest
         }
     }
 
-    public function testSaveAbortWhenStrategyCantBeMet()
+    public function testSaveAbortWhenStrategyCantBeMet(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -167,7 +167,7 @@ class CombinedStoreTest extends AbstractStoreTest
     /**
      * @expectedException \Symfony\Component\Lock\Exception\LockConflictedException
      */
-    public function testputOffExpirationThrowsExceptionOnFailure()
+    public function testputOffExpirationThrowsExceptionOnFailure(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);
@@ -195,7 +195,7 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->store->putOffExpiration($key, $ttl);
     }
 
-    public function testputOffExpirationCleanupOnFailure()
+    public function testputOffExpirationCleanupOnFailure(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);
@@ -234,7 +234,7 @@ class CombinedStoreTest extends AbstractStoreTest
         }
     }
 
-    public function testputOffExpirationAbortWhenStrategyCantBeMet()
+    public function testputOffExpirationAbortWhenStrategyCantBeMet(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
         $ttl = random_int(1, 10);
@@ -264,7 +264,7 @@ class CombinedStoreTest extends AbstractStoreTest
         }
     }
 
-    public function testPutOffExpirationIgnoreNonExpiringStorage()
+    public function testPutOffExpirationIgnoreNonExpiringStorage(): void
     {
         $store1 = $this->getMockBuilder(StoreInterface::class)->getMock();
         $store2 = $this->getMockBuilder(StoreInterface::class)->getMock();
@@ -287,7 +287,7 @@ class CombinedStoreTest extends AbstractStoreTest
         $store->putOffExpiration($key, $ttl);
     }
 
-    public function testExistsDontAskToEveryBody()
+    public function testExistsDontAskToEveryBody(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -312,7 +312,7 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->assertTrue($this->store->exists($key));
     }
 
-    public function testExistsAbortWhenStrategyCantBeMet()
+    public function testExistsAbortWhenStrategyCantBeMet(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
 
@@ -337,7 +337,7 @@ class CombinedStoreTest extends AbstractStoreTest
         $this->assertFalse($this->store->exists($key));
     }
 
-    public function testDeleteDontStopOnFailure()
+    public function testDeleteDontStopOnFailure(): void
     {
         $key = new Key(uniqid(__METHOD__, true));
 

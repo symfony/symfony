@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Tests\Fixtures\CustomXmlFileLoader;
 
 class XmlFileLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new XmlFileLoader($this->getMockBuilder('Symfony\Component\Config\FileLocator')->getMock());
 
@@ -29,7 +29,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertFalse($loader->supports('foo.xml', 'foo'), '->supports() checks the resource type if specified');
     }
 
-    public function testLoadWithRoute()
+    public function testLoadWithRoute(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('validpattern.xml');
@@ -46,7 +46,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
     }
 
-    public function testLoadWithNamespacePrefix()
+    public function testLoadWithNamespacePrefix(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('namespaceprefix.xml');
@@ -64,7 +64,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame(1, $route->getDefault('page'));
     }
 
-    public function testLoadWithImport()
+    public function testLoadWithImport(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('validresource.xml');
@@ -87,7 +87,7 @@ class XmlFileLoaderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles
      */
-    public function testLoadThrowsExceptionWithInvalidFile($filePath)
+    public function testLoadThrowsExceptionWithInvalidFile($filePath): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $loader->load($filePath);
@@ -97,7 +97,7 @@ class XmlFileLoaderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles
      */
-    public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath)
+    public function testLoadThrowsExceptionWithInvalidFileEvenWithoutSchemaValidation($filePath): void
     {
         $loader = new CustomXmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $loader->load($filePath);
@@ -112,13 +112,13 @@ class XmlFileLoaderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Document types are not allowed.
      */
-    public function testDocTypeIsNotAllowed()
+    public function testDocTypeIsNotAllowed(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $loader->load('withdoctype.xml');
     }
 
-    public function testNullValues()
+    public function testNullValues(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('null_values.xml');
@@ -132,7 +132,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals('bar', $route->getDefault('baz'));
     }
 
-    public function testScalarDataTypeDefaults()
+    public function testScalarDataTypeDefaults(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('scalar_defaults.xml');
@@ -155,7 +155,7 @@ class XmlFileLoaderTest extends TestCase
         );
     }
 
-    public function testListDefaults()
+    public function testListDefaults(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('list_defaults.xml');
@@ -170,7 +170,7 @@ class XmlFileLoaderTest extends TestCase
         );
     }
 
-    public function testListInListDefaults()
+    public function testListInListDefaults(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('list_in_list_defaults.xml');
@@ -185,7 +185,7 @@ class XmlFileLoaderTest extends TestCase
         );
     }
 
-    public function testListInMapDefaults()
+    public function testListInMapDefaults(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('list_in_map_defaults.xml');
@@ -200,7 +200,7 @@ class XmlFileLoaderTest extends TestCase
         );
     }
 
-    public function testMapDefaults()
+    public function testMapDefaults(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('map_defaults.xml');
@@ -220,7 +220,7 @@ class XmlFileLoaderTest extends TestCase
         );
     }
 
-    public function testMapInListDefaults()
+    public function testMapInListDefaults(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('map_in_list_defaults.xml');
@@ -240,7 +240,7 @@ class XmlFileLoaderTest extends TestCase
         );
     }
 
-    public function testMapInMapDefaults()
+    public function testMapInMapDefaults(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('map_in_map_defaults.xml');
@@ -260,7 +260,7 @@ class XmlFileLoaderTest extends TestCase
         );
     }
 
-    public function testNullValuesInList()
+    public function testNullValuesInList(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('list_null_values.xml');
@@ -269,7 +269,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame(array(null, null, null, null, null, null), $route->getDefault('list'));
     }
 
-    public function testNullValuesInMap()
+    public function testNullValuesInMap(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $routeCollection = $loader->load('map_null_values.xml');
@@ -288,7 +288,7 @@ class XmlFileLoaderTest extends TestCase
         );
     }
 
-    public function testLoadRouteWithControllerAttribute()
+    public function testLoadRouteWithControllerAttribute(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
         $routeCollection = $loader->load('routing.xml');
@@ -298,7 +298,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Homepage:show', $route->getDefault('_controller'));
     }
 
-    public function testLoadRouteWithoutControllerAttribute()
+    public function testLoadRouteWithoutControllerAttribute(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
         $routeCollection = $loader->load('routing.xml');
@@ -308,7 +308,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertNull($route->getDefault('_controller'));
     }
 
-    public function testLoadRouteWithControllerSetInDefaults()
+    public function testLoadRouteWithControllerSetInDefaults(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
         $routeCollection = $loader->load('routing.xml');
@@ -322,7 +322,7 @@ class XmlFileLoaderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for "app_blog"/
      */
-    public function testOverrideControllerInDefaults()
+    public function testOverrideControllerInDefaults(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
         $loader->load('override_defaults.xml');
@@ -331,7 +331,7 @@ class XmlFileLoaderTest extends TestCase
     /**
      * @dataProvider provideFilesImportingRoutesWithControllers
      */
-    public function testImportRouteWithController($file)
+    public function testImportRouteWithController($file): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
         $routeCollection = $loader->load($file);
@@ -356,7 +356,7 @@ class XmlFileLoaderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both the "controller" attribute and the defaults key "_controller" for the "import" tag/
      */
-    public function testImportWithOverriddenController()
+    public function testImportWithOverriddenController(): void
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
         $loader->load('import_override_defaults.xml');

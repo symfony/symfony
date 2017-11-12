@@ -25,10 +25,10 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['multiple']) {
-            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
                 $form = $event->getForm();
                 $data = $event->getData();
 
@@ -46,7 +46,7 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         if ($options['multiple']) {
             $view->vars['full_name'] .= '[]';
@@ -62,7 +62,7 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['multipart'] = true;
     }
@@ -70,7 +70,7 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $dataClass = function (Options $options) {
             return $options['multiple'] ? null : 'Symfony\Component\HttpFoundation\File\File';

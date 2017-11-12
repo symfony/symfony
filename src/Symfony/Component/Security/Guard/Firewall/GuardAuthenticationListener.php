@@ -47,7 +47,7 @@ class GuardAuthenticationListener implements ListenerInterface
      * @param iterable|AuthenticatorInterface[] $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      * @param LoggerInterface                   $logger                A LoggerInterface instance
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, $guardAuthenticators, LoggerInterface $logger = null)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, iterable $guardAuthenticators, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -63,7 +63,7 @@ class GuardAuthenticationListener implements ListenerInterface
     /**
      * Iterates over each authenticator to see if each wants to authenticate the request.
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         if (null !== $this->logger) {
             $context = array('firewall_key' => $this->providerKey);
@@ -92,7 +92,7 @@ class GuardAuthenticationListener implements ListenerInterface
         }
     }
 
-    private function executeGuardAuthenticator($uniqueGuardKey, AuthenticatorInterface $guardAuthenticator, GetResponseEvent $event)
+    private function executeGuardAuthenticator($uniqueGuardKey, AuthenticatorInterface $guardAuthenticator, GetResponseEvent $event): void
     {
         $request = $event->getRequest();
         try {
@@ -165,7 +165,7 @@ class GuardAuthenticationListener implements ListenerInterface
     /**
      * Should be called if this listener will support remember me.
      */
-    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
+    public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices): void
     {
         $this->rememberMeServices = $rememberMeServices;
     }
@@ -174,7 +174,7 @@ class GuardAuthenticationListener implements ListenerInterface
      * Checks to see if remember me is supported in the authenticator and
      * on the firewall. If it is, the RememberMeServicesInterface is notified.
      */
-    private function triggerRememberMe(AuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
+    private function triggerRememberMe(AuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null): void
     {
         if (null === $this->rememberMeServices) {
             if (null !== $this->logger) {

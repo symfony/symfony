@@ -35,7 +35,7 @@ abstract class AbstractDoctrineExtension extends Extension
     protected $drivers = array();
 
     /**
-     * @param array            $objectManager A configured object manager
+     * @param array $objectManager A configured object manager
      *
      * @throws \InvalidArgumentException
      */
@@ -170,7 +170,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
-     * @param array            $objectManager
+     * @param array $objectManager
      */
     protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
     {
@@ -248,7 +248,7 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Detects what metadata driver to use for the supplied directory.
      *
-     * @param string           $dir       A directory path
+     * @param string $dir A directory path
      *
      * @return string|null A metadata driver short name, if one can be detected
      */
@@ -281,8 +281,8 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Loads a configured object manager metadata, query or result cache driver.
      *
-     * @param array            $objectManager A configured object manager
-     * @param string           $cacheName
+     * @param array  $objectManager A configured object manager
+     * @param string $cacheName
      *
      * @throws \InvalidArgumentException in case of unknown driver type
      */

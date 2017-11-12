@@ -353,7 +353,7 @@ abstract class Client
             unlink($deprecationsFile);
             foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
                 if ($deprecation[0]) {
-                    trigger_error($deprecation[1], E_USER_DEPRECATED);
+                    @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 } else {
                     @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 }
@@ -584,7 +584,7 @@ abstract class Client
     /**
      * Makes a request from a Request object directly.
      *
-     * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param bool $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
      */

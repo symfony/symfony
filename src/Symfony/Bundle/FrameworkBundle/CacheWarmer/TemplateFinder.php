@@ -30,7 +30,7 @@ class TemplateFinder implements TemplateFinderInterface
     private $templates;
 
     /**
-     * @param string                      $rootDir The directory where global templates can be stored
+     * @param string $rootDir The directory where global templates can be stored
      */
     public function __construct(KernelInterface $kernel, TemplateNameParserInterface $parser, string $rootDir)
     {

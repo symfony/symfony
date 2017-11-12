@@ -212,7 +212,7 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param string           $serviceId
+     * @param string $serviceId
      *
      * @return mixed
      */
@@ -232,7 +232,7 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param bool             $showPrivate
+     * @param bool $showPrivate
      *
      * @return array
      */

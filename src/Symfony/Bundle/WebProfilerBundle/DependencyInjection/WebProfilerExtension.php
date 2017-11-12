@@ -34,7 +34,7 @@ class WebProfilerExtension extends Extension
     /**
      * Loads the web profiler configuration.
      *
-     * @param array            $configs   An array of configuration settings
+     * @param array $configs An array of configuration settings
      */
     public function load(array $configs, ContainerBuilder $container)
     {

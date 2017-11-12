@@ -114,7 +114,7 @@ class QuestionHelper extends Helper
                 $ret = trim($ret);
             }
         } else {
-            $ret = trim($this->autocomplete($output, $question, $inputStream));
+            $ret = trim($this->autocomplete($output, $question, $inputStream, is_array($autocomplete) ? $autocomplete : iterator_to_array($autocomplete, false)));
         }
 
         $ret = strlen($ret) > 0 ? $ret : $question->getDefault();
@@ -171,9 +171,8 @@ class QuestionHelper extends Helper
      * @param Question        $question
      * @param resource        $inputStream
      */
-    private function autocomplete(OutputInterface $output, Question $question, $inputStream): string
+    private function autocomplete(OutputInterface $output, Question $question, $inputStream, array $autocomplete): string
     {
-        $autocomplete = $question->getAutocompleterValues();
         $ret = '';
 
         $i = 0;

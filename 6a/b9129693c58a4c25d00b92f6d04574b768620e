@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-10T18:19:53Z
+
+the composer.json file of the Twig bridge needs to be updated also, "conflicts" section
+`        "symfony/form": "<3.4-beta4|~4.0,<4.0-beta4",`

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-11T22:21:28Z
+
+to further clarify; im spotting `array|\Traversable` API in master; probably to be intended as `iterable` type. Which we do favor.. no? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-11T22:28:05Z
+
+`iterable` didn't exist when we added `array|\Traversable`
+but we're not (I'm not at least)  going to change all of them for the fun of it...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-12T16:26:18Z
+
+Could be merged in 3.4, but not in 2.7 anyway.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-12T16:42:27Z
+
+Hm, why not? Safe change to me. Without involving php71 feats, this is indeed about changing the implementation from iterators to iterables; enabling removal of ArrayObject inits.
+
+Done on 2.7 to avoid merge conflicts and not have `toIterator(): iterable` behavior :angel:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-12T16:50:52Z
+
+That's not a bug fix, so it does not qualify for 2.7. We've been doing too many such changes in lower branches in the recent history. But that was a mistake.

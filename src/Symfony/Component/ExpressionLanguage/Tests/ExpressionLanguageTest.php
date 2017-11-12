@@ -178,6 +178,14 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame('($a + $B)', $result);
     }
 
+    public function testStrictEquality()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expression = '123 === a';
+        $result = $expressionLanguage->compile($expression, array('a'));
+        $this->assertSame('(123 === $a)', $result);
+    }
+
     public function testCachingWithDifferentNamesOrder()
     {
         $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();

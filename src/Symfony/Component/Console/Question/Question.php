@@ -140,10 +140,8 @@ class Question
             $values = $this->isAssoc($values) ? array_merge(array_keys($values), array_values($values)) : array_values($values);
         }
 
-        if (null !== $values && !is_array($values)) {
-            if (!$values instanceof \Traversable || !$values instanceof \Countable) {
-                throw new InvalidArgumentException('Autocompleter values can be either an array, `null` or an object implementing both `Countable` and `Traversable` interfaces.');
-            }
+        if (null !== $values && !is_array($values) && !$values instanceof \Traversable) {
+            throw new InvalidArgumentException('Autocompleter values can be either an array, `null` or a `Traversable` object.');
         }
 
         if ($this->hidden) {

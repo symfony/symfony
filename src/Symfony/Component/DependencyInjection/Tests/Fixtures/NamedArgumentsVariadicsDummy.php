@@ -8,6 +8,5 @@ class NamedArgumentsVariadicsDummy
 {
     public function __construct(...$variadics)
     {
-
     }
 }

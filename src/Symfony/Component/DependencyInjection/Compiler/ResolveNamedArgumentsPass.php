@@ -90,7 +90,10 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
 
             $lastResolvedArgument = \end($resolvedArguments);
 
-            if (\is_array($lastResolvedArgument) && !empty($lastResolvedArgument)) {
+            if (\is_array($lastResolvedArgument) &&
+                !empty($lastResolvedArgument) &&
+                method_exists('ReflectionParameter', 'isVariadic')
+            ) {
                 try {
                     $reflection = $this->getReflectionMethod($value, $method);
                     $parameters = $reflection->getParameters();

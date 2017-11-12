@@ -195,7 +195,6 @@ class XmlFileLoader extends FileLoader
      *
      * @param \DOMElement $service
      * @param string      $file
-     * @param array       $defaults
      *
      * @return Definition|null
      */

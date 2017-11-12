@@ -1664,7 +1664,7 @@ class Request
         return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
     }
 
-    /*
+    /**
      * The following methods are derived from code of the Zend Framework (1.10dev - 2010-01-24)
      *
      * Code subject to the new BSD license (http://framework.zend.com/license/new-bsd).
@@ -1873,7 +1873,7 @@ class Request
         }
     }
 
-    /*
+    /**
      * Returns the prefix as encoded in the string when the string starts with
      * the given prefix, false otherwise.
      *

@@ -24,7 +24,6 @@ class Transition
     private $tos;
 
     /**
-     * @param string          $name
      * @param string|string[] $froms
      * @param string|string[] $tos
      */

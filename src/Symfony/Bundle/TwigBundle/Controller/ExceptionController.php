@@ -32,7 +32,6 @@ class ExceptionController
     protected $debug;
 
     /**
-     * @param Environment $twig
      * @param bool        $debug Show error (false) or exception (true) pages by default
      */
     public function __construct(Environment $twig, bool $debug)
@@ -88,7 +87,6 @@ class ExceptionController
     }
 
     /**
-     * @param Request $request
      * @param string  $format
      * @param int     $code          An HTTP response status code
      * @param bool    $showException

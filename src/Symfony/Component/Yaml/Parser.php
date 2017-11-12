@@ -109,8 +109,6 @@ class Parser
 
     /**
      * @internal
-     *
-     * @return int
      */
     public function getLastLineNumberBeforeDeprecation(): int
     {
@@ -614,8 +612,6 @@ class Parser
 
     /**
      * Moves the parser to the next line.
-     *
-     * @return bool
      */
     private function moveToNextLine(): bool
     {
@@ -630,8 +626,6 @@ class Parser
 
     /**
      * Moves the parser to the previous line.
-     *
-     * @return bool
      */
     private function moveToPreviousLine(): bool
     {
@@ -975,8 +969,6 @@ class Parser
 
     /**
      * Tests whether or not the current line is the header of a block scalar.
-     *
-     * @return bool
      */
     private function isBlockScalarHeader(): bool
     {

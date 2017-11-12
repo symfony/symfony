@@ -43,7 +43,6 @@ class PhpEngine implements EngineInterface, \ArrayAccess
     private $evalParameters;
 
     /**
-     * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      * @param LoaderInterface             $loader  A loader instance
      * @param HelperInterface[]           $helpers An array of helper instances
      */

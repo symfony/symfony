@@ -247,7 +247,6 @@ abstract class Client
     /**
      * Submits a form.
      *
-     * @param Form  $form   A Form instance
      * @param array $values An array of form field values
      *
      * @return Crawler
@@ -585,7 +584,6 @@ abstract class Client
     /**
      * Makes a request from a Request object directly.
      *
-     * @param Request $request       A Request instance
      * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler

@@ -100,7 +100,6 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses a route and adds it to the RouteCollection.
      *
-     * @param RouteCollection $collection A RouteCollection instance
      * @param string          $name       Route name
      * @param array           $config     Route definition
      * @param string          $path       Full path of the YAML file being processed
@@ -127,7 +126,6 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses an import and adds the routes in the resource to the RouteCollection.
      *
-     * @param RouteCollection $collection A RouteCollection instance
      * @param array           $config     Route definition
      * @param string          $path       Full path of the YAML file being processed
      * @param string          $file       Loaded file name

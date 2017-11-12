@@ -35,7 +35,6 @@ class UniqueEntityValidator extends ConstraintValidator
 
     /**
      * @param object     $entity
-     * @param Constraint $constraint
      *
      * @throws UnexpectedTypeException
      * @throws ConstraintDefinitionException

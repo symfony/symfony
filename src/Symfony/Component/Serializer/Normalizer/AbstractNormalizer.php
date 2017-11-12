@@ -199,7 +199,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Gets attributes to normalize using groups.
      *
      * @param string|object $classOrObject
-     * @param array         $context
      * @param bool          $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
      * @return string[]|AttributeMetadataInterface[]|bool
@@ -238,7 +237,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @param object|string $classOrObject
      * @param string        $attribute
      * @param string|null   $format
-     * @param array         $context
      *
      * @return bool
      */
@@ -277,9 +275,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * Returns the method to use to construct an object. This method must be either
      * the object constructor or static.
      *
-     * @param array            $data
      * @param string           $class
-     * @param array            $context
      * @param \ReflectionClass $reflectionClass
      * @param array|bool       $allowedAttributes
      *
@@ -298,9 +294,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * is removed from the context before being returned to avoid side effects
      * when recursively normalizing an object graph.
      *
-     * @param array            $data
      * @param string           $class
-     * @param array            $context
      * @param \ReflectionClass $reflectionClass
      * @param array|bool       $allowedAttributes
      * @param string|null      $format
@@ -377,7 +371,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     }
 
     /**
-     * @param array  $parentContext
      * @param string $attribute
      *
      * @return array

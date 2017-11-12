@@ -98,7 +98,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      * Adds a Loader.
      *
      * @param string          $format The name of the loader (@see addResource())
-     * @param LoaderInterface $loader A LoaderInterface instance
      */
     public function addLoader($format, LoaderInterface $loader)
     {

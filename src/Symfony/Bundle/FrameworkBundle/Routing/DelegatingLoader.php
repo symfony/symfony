@@ -29,10 +29,6 @@ class DelegatingLoader extends BaseDelegatingLoader
     protected $parser;
     private $loading = false;
 
-    /**
-     * @param ControllerNameParser    $parser   A ControllerNameParser instance
-     * @param LoaderResolverInterface $resolver A LoaderResolverInterface instance
-     */
     public function __construct(ControllerNameParser $parser, LoaderResolverInterface $resolver)
     {
         $this->parser = $parser;

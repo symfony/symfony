@@ -104,7 +104,7 @@ class FormBuilderTest extends TestCase
         $this->assertArrayHasKey('foo', $children);
     }
 
-    /*
+    /**
      * https://github.com/symfony/symfony/issues/4693
      */
     public function testMaintainOrderOfLazyAndExplicitChildren()

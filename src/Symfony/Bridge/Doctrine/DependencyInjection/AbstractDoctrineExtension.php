@@ -36,7 +36,6 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * @param array            $objectManager A configured object manager
-     * @param ContainerBuilder $container     A ContainerBuilder instance
      *
      * @throws \InvalidArgumentException
      */
@@ -117,7 +116,6 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Register the mapping driver configuration for later use with the object managers metadata driver chain.
      *
-     * @param array  $mappingConfig
      * @param string $mappingName
      *
      * @throws \InvalidArgumentException
@@ -173,7 +171,6 @@ abstract class AbstractDoctrineExtension extends Extension
      * Register all the collected mapping information with the object manager by registering the appropriate mapping drivers.
      *
      * @param array            $objectManager
-     * @param ContainerBuilder $container     A ContainerBuilder instance
      */
     protected function registerMappingDrivers($objectManager, ContainerBuilder $container)
     {
@@ -225,7 +222,6 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Assertion if the specified mapping information is valid.
      *
-     * @param array  $mappingConfig
      * @param string $objectManagerName
      *
      * @throws \InvalidArgumentException
@@ -253,7 +249,6 @@ abstract class AbstractDoctrineExtension extends Extension
      * Detects what metadata driver to use for the supplied directory.
      *
      * @param string           $dir       A directory path
-     * @param ContainerBuilder $container A ContainerBuilder instance
      *
      * @return string|null A metadata driver short name, if one can be detected
      */
@@ -287,7 +282,6 @@ abstract class AbstractDoctrineExtension extends Extension
      * Loads a configured object manager metadata, query or result cache driver.
      *
      * @param array            $objectManager A configured object manager
-     * @param ContainerBuilder $container     A ContainerBuilder instance
      * @param string           $cacheName
      *
      * @throws \InvalidArgumentException in case of unknown driver type

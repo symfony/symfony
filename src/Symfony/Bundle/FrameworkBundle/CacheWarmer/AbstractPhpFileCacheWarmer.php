@@ -84,7 +84,6 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 
     /**
      * @param string       $cacheDir
-     * @param ArrayAdapter $arrayAdapter
      *
      * @return bool false if there is nothing to warm-up
      */

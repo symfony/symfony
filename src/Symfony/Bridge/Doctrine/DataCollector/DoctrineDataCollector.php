@@ -45,7 +45,6 @@ class DoctrineDataCollector extends DataCollector
      * Adds the stack logger for a connection.
      *
      * @param string     $name
-     * @param DebugStack $logger
      */
     public function addLogger($name, DebugStack $logger)
     {

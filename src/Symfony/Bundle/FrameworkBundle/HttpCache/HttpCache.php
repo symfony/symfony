@@ -29,7 +29,6 @@ abstract class HttpCache extends BaseHttpCache
     protected $kernel;
 
     /**
-     * @param HttpKernelInterface $kernel   An HttpKernelInterface instance
      * @param string              $cacheDir The cache directory (default used if null)
      */
     public function __construct(HttpKernelInterface $kernel, string $cacheDir = null)
@@ -43,7 +42,6 @@ abstract class HttpCache extends BaseHttpCache
     /**
      * Forwards the Request to the backend and returns the Response.
      *
-     * @param Request  $request A Request instance
      * @param bool     $raw     Whether to catch exceptions or not
      * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
      *

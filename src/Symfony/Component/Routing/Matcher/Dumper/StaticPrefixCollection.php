@@ -56,7 +56,6 @@ class StaticPrefixCollection
     /**
      * Adds a route to a group.
      *
-     * @param string $prefix
      * @param mixed  $route
      */
     public function addRoute(string $prefix, $route)
@@ -103,7 +102,6 @@ class StaticPrefixCollection
      * Tries to combine a route with another route or group.
      *
      * @param StaticPrefixCollection|array $item
-     * @param string                       $prefix
      * @param mixed                        $route
      *
      * @return null|StaticPrefixCollection

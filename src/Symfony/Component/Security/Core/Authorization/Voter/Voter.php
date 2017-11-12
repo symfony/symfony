@@ -62,7 +62,6 @@ abstract class Voter implements VoterInterface
      *
      * @param string         $attribute
      * @param mixed          $subject
-     * @param TokenInterface $token
      *
      * @return bool
      */

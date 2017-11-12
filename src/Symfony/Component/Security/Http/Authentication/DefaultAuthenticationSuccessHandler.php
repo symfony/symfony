@@ -40,7 +40,6 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     );
 
     /**
-     * @param HttpUtils $httpUtils
      * @param array     $options   Options for processing a successful authentication attempt
      */
     public function __construct(HttpUtils $httpUtils, array $options = array())

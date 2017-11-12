@@ -55,7 +55,6 @@ class Translator extends BaseTranslator implements WarmableInterface
      *
      * @param ContainerInterface        $container     A ContainerInterface instance
      * @param MessageFormatterInterface $formatter     The message formatter
-     * @param string                    $defaultLocale
      * @param array                     $loaderIds     An array of loader Ids
      * @param array                     $options       An array of options
      *

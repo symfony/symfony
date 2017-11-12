@@ -924,9 +924,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     }
 
     /**
-     * @param $locale
-     * @param $datetype
-     * @param $timetype
      * @param null $timezone
      * @param int  $calendar
      * @param null $pattern

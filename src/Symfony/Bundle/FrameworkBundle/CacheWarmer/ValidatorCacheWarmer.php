@@ -33,7 +33,6 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
     private $validatorBuilder;
 
     /**
-     * @param ValidatorBuilderInterface $validatorBuilder
      * @param string                    $phpArrayFile     The PHP file where metadata are cached
      * @param CacheItemPoolInterface    $fallbackPool     The pool where runtime-discovered metadata are cached
      */

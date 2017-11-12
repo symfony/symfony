@@ -70,7 +70,6 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     }
 
     /**
-     * @param ContainerBuilder $container
      * @param Reference[]      $refMap
      *
      * @return Reference

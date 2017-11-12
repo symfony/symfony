@@ -34,7 +34,6 @@ class ProgressIndicator
     private static $formats;
 
     /**
-     * @param OutputInterface $output
      * @param string|null     $format                  Indicator format
      * @param int             $indicatorChangeInterval Change interval in milliseconds
      * @param array|null      $indicatorValues         Animated indicator characters
@@ -77,8 +76,6 @@ class ProgressIndicator
 
     /**
      * Starts the indicator output.
-     *
-     * @param $message
      */
     public function start($message)
     {
@@ -122,8 +119,6 @@ class ProgressIndicator
 
     /**
      * Finish the indicator with message.
-     *
-     * @param $message
      */
     public function finish($message)
     {

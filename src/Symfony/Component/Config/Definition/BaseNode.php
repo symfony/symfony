@@ -299,7 +299,6 @@ abstract class BaseNode implements NodeInterface
     /**
      * Normalizes the value before any other normalization is applied.
      *
-     * @param $value
      *
      * @return $value The normalized array value
      */

@@ -30,7 +30,6 @@ class AnnotationsCacheWarmer extends AbstractPhpFileCacheWarmer
     private $excludeRegexp;
 
     /**
-     * @param Reader                 $annotationReader
      * @param string                 $phpArrayFile     The PHP file where annotations are cached
      * @param CacheItemPoolInterface $fallbackPool     The pool where runtime-discovered annotations are cached
      */

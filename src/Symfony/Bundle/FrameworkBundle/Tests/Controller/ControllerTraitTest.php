@@ -98,8 +98,6 @@ abstract class ControllerTraitTest extends TestCase
     }
 
     /**
-     * @param $token
-     *
      * @return Container
      */
     private function getContainerWithTokenStorage($token = null)

@@ -98,7 +98,6 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * Subclasses must return the id of a service which implements the
      * AuthenticationProviderInterface.
      *
-     * @param ContainerBuilder $container
      * @param string           $id             The unique id of the firewall
      * @param array            $config         The options array for this listener
      * @param string           $userProviderId The id of the user provider

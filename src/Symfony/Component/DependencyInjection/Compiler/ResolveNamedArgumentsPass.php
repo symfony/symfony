@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -78,6 +79,25 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
 
                 if (!$typeFound) {
                     throw new InvalidArgumentException(sprintf('Invalid service "%s": method "%s()" has no argument type-hinted as "%s". Check your service definition.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method, $key));
+                }
+            }
+
+            $lastResolvedArgument = \end($resolvedArguments);
+
+            if (\is_array($lastResolvedArgument) && !empty($lastResolvedArgument)) {
+                try {
+                    $reflection = $this->getReflectionMethod($value, $method);
+                    $parameters = $reflection->getParameters();
+                    $lastParam = \end($parameters);
+
+                    if ($lastParam->isVariadic()) {
+                        \array_pop($resolvedArguments);
+
+                        foreach ($lastResolvedArgument as $argument) {
+                            $resolvedArguments[] = $argument;
+                        }
+                    }
+                } catch (RuntimeException $runtimeException) {
                 }
             }
 

@@ -198,6 +198,7 @@ class MultipleArgumentsOptionalScalarNotReallyOptional
     }
 }
 
+/*
  * Classes used for testing createResourceForClass
  */
 class ClassForResource

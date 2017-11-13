@@ -395,10 +395,6 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException('Must be instance of AbstractProxy or NativeSessionHandler; implement \SessionHandlerInterface; or be null.');
         }
 
-        if (headers_sent($file, $line)) {
-            throw new \RuntimeException(sprintf('Failed to set the session handler because headers have already been sent by "%s" at line %d.', $file, $line));
-        }
-
         // Wrap $saveHandler in proxy and prevent double wrapping of proxy
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);

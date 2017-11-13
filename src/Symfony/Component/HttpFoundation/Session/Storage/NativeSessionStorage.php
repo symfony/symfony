@@ -102,12 +102,6 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
-        $this->setMetadataBag($metaBag);
-
-        if (\PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE === session_status()) {
-            return;
-        }
-
         $options += array(
             // disable by default because it's managed by HeaderBag (if used)
             'cache_limiter' => '',
@@ -120,6 +114,7 @@ class NativeSessionStorage implements SessionStorageInterface
             register_shutdown_function('session_write_close');
         }
 
+        $this->setMetadataBag($metaBag);
         $this->setOptions($options);
         $this->setSaveHandler($handler);
     }
@@ -292,7 +287,7 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException(sprintf('The SessionBagInterface %s is not registered.', $name));
         }
 
-        if ($this->saveHandler->isActive() && !$this->started) {
+        if (!$this->started && $this->saveHandler->isActive()) {
             $this->loadSession();
         } elseif (!$this->started) {
             $this->start();
@@ -340,7 +335,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function setOptions(array $options)
     {
-        if (headers_sent()) {
+        if (headers_sent() || (\PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE === session_status())) {
             return;
         }
 
@@ -395,10 +390,6 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException('Must be instance of AbstractProxy or NativeSessionHandler; implement \SessionHandlerInterface; or be null.');
         }
 
-        if (headers_sent($file, $line)) {
-            throw new \RuntimeException(sprintf('Failed to set the session handler because headers have already been sent by "%s" at line %d.', $file, $line));
-        }
-
         // Wrap $saveHandler in proxy and prevent double wrapping of proxy
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);
@@ -407,6 +398,10 @@ class NativeSessionStorage implements SessionStorageInterface
                 new SessionHandlerProxy(new \SessionHandler()) : new NativeProxy();
         }
         $this->saveHandler = $saveHandler;
+
+        if (headers_sent() || (\PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE === session_status())) {
+            return;
+        }
 
         if ($this->saveHandler instanceof \SessionHandlerInterface) {
             if (\PHP_VERSION_ID >= 50400) {

@@ -103,8 +103,9 @@ class NativeSessionStorage implements SessionStorageInterface
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
         $this->setMetadataBag($metaBag);
+        $this->setSaveHandler($handler);
 
-        if (\PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE === session_status()) {
+        if (!$this->canUpdatePhpSession()) {
             return;
         }
 
@@ -121,7 +122,6 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         $this->setOptions($options);
-        $this->setSaveHandler($handler);
     }
 
     /**
@@ -408,7 +408,7 @@ class NativeSessionStorage implements SessionStorageInterface
         }
         $this->saveHandler = $saveHandler;
 
-        if ($this->saveHandler instanceof \SessionHandlerInterface) {
+        if ($this->saveHandler instanceof \SessionHandlerInterface && $this->canUpdatePhpSession()) {
             if (\PHP_VERSION_ID >= 50400) {
                 session_set_save_handler($this->saveHandler, false);
             } else {
@@ -448,5 +448,15 @@ class NativeSessionStorage implements SessionStorageInterface
 
         $this->started = true;
         $this->closed = false;
+    }
+
+    /**
+     * Return true if we can update PHP's session.
+     *
+     * @return bool
+     */
+    private function canUpdatePhpSession()
+    {
+        return \PHP_VERSION_ID <= 50400 || \PHP_SESSION_ACTIVE !== session_status();
     }
 }

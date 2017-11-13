@@ -48,6 +48,6 @@ TEMPLATE;
         $data = preg_replace('/  /', '    ', $data);
         $data = sprintf($template, $data);
 
-        file_put_contents($path.'/'.$locale.'.php', $data);
+        file_put_contents($path.'/'.$locale.'.php', $data, LOCK_EX);
     }
 }

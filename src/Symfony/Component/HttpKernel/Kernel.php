@@ -415,7 +415,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
         }
 
-        file_put_contents(($this->warmupDir ?: $this->getCacheDir()).'/classes.map', sprintf('<?php return %s;', var_export($classes, true)));
+        file_put_contents(($this->warmupDir ?: $this->getCacheDir()).'/classes.map', sprintf('<?php return %s;', var_export($classes, true)), LOCK_EX);
     }
 
     /**
@@ -423,7 +423,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function setAnnotatedClassCache(array $annotatedClasses)
     {
-        file_put_contents(($this->warmupDir ?: $this->getCacheDir()).'/annotations.map', sprintf('<?php return %s;', var_export($annotatedClasses, true)));
+        file_put_contents(($this->warmupDir ?: $this->getCacheDir()).'/annotations.map', sprintf('<?php return %s;', var_export($annotatedClasses, true)), LOCK_EX);
     }
 
     /**

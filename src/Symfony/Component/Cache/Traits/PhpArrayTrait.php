@@ -102,7 +102,7 @@ EOF;
 
         $tmpFile = uniqid($this->file, true);
 
-        file_put_contents($tmpFile, $dump);
+        file_put_contents($tmpFile, $dump, LOCK_EX);
         @chmod($tmpFile, 0666 & ~umask());
         unset($serialized, $unserialized, $value, $dump);
 

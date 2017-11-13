@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-13T17:01:58Z
+
+See #24947 and #24946. They've been given a 👍  in issues on top of that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-13T17:31:35Z
+
+@sroze yes but I prefer this approach, as it's more conservative: the diff with pre-7.2-concerns is much lighter, thus easier to validate.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-13T17:36:13Z
+
+@nicolas-grekas I don't mind either tbh so... 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-13T17:36:23Z
+
+I borrowed your test case.
+No need for the private method, that's diff boilerplate to me, and will be reduced to one instruction on 3.3.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-13T17:37:25Z
+
+> will be reduced to one instruction on master.
+
+Could you clarify this one?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-13T17:38:09Z
+
+from `\PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE === session_status()`
+to `\PHP_SESSION_ACTIVE === session_status()`
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-13T17:38:24Z
+
+Hehe, true 👍

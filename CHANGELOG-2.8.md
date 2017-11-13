@@ -7,6 +7,11 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.30 (2017-11-13)
+
+ * bug #24952 [HttpFoundation] Fix session-related BC break (nicolas-grekas, sroze)
+ * bug #24929 [Console] Fix traversable autocomplete values (ro0NL)
+
 * 2.8.29 (2017-11-10)
 
  * bug #24888 [FrameworkBundle] Specifically inject the debug dispatcher in the collector (ogizanagi)

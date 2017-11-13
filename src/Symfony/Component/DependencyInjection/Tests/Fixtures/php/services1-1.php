@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  *
  * @final since Symfony 3.3
  */
-class Container extends AbstractContainer
+class Container extends \Symfony\Component\DependencyInjection\Dump\AbstractContainer
 {
     private $parameters;
     private $targetDirs = array();

@@ -126,7 +126,12 @@ class PhpDumper extends Dumper
         $this->asFiles = $options['as_files'];
         $this->hotPathTag = $options['hot_path_tag'];
         $this->inlineRequires = $this->container->hasParameter($options['inline_class_loader_parameter']) && $this->container->getParameter($options['inline_class_loader_parameter']);
-        $this->initializeMethodNamesMap($options['base_class']);
+
+        if (0 !== strpos($baseClass = $options['base_class'], '\\') && 'Container' !== $baseClass) {
+            $baseClass = sprintf('%s\%s', $options['namespace'] ? '\\'.$options['namespace'] : '', $baseClass);
+        }
+
+        $this->initializeMethodNamesMap('Container' === $baseClass ? Container::class : $baseClass);
 
         $this->docStar = $options['debug'] ? '*' : '';
 
@@ -156,7 +161,7 @@ class PhpDumper extends Dumper
         }
 
         $code =
-            $this->startClass($options['class'], $options['base_class']).
+            $this->startClass($options['class'], $baseClass).
             $this->addServices().
             $this->addDefaultParametersMethod().
             $this->endClass()

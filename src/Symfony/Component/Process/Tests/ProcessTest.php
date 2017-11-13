@@ -1263,13 +1263,9 @@ class ProcessTest extends TestCase
 
     public function testSimpleInputStream()
     {
-        if (\PHP_VERSION_ID === 70200 && \PHP_EXTRA_VERSION === 'RC6') {
-            $this->markTestSkipped('See bug #75515 in PHP 7.2RC6.');
-        }
-
         $input = new InputStream();
 
-        $process = $this->getProcessForCode('echo \'ping\'; stream_copy_to_stream(STDIN, STDOUT);');
+        $process = $this->getProcessForCode('echo \'ping\'; echo fread(STDIN, 4); echo fread(STDIN, 4);');
         $process->setInput($input);
 
         $process->start(function ($type, $data) use ($input) {

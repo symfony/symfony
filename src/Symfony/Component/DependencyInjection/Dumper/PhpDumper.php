@@ -112,7 +112,11 @@ class PhpDumper extends Dumper
             'debug' => true,
         ), $options);
 
-        $this->initializeMethodNamesMap($options['base_class']);
+        if (0 !== strpos($baseClass = $options['base_class'], '\\') && 'Container' !== $baseClass) {
+            $baseClass = sprintf('%s\%s', $options['namespace'] ? '\\'.$options['namespace'] : '', $baseClass);
+        }
+
+        $this->initializeMethodNamesMap('Container' === $baseClass ? Container::class : $baseClass);
 
         $this->docStar = $options['debug'] ? '*' : '';
 
@@ -141,7 +145,7 @@ class PhpDumper extends Dumper
             }
         }
 
-        $code = $this->startClass($options['class'], $options['base_class'], $options['namespace']);
+        $code = $this->startClass($options['class'], $baseClass, $options['namespace']);
 
         if ($this->container->isCompiled()) {
             $code .= $this->addFrozenConstructor();

@@ -296,4 +296,19 @@ class NativeSessionStorageTest extends TestCase
         // Assert no exception has been thrown by `getStorage()`
         $this->addToAssertionCount(1);
     }
+
+    /**
+     * @requires PHP 5.4
+     */
+    public function testGetBagsOnceSessionStartedIsIgnored()
+    {
+        session_start();
+        $bag = new AttributeBag();
+        $bag->setName('flashes');
+
+        $storage = $this->getStorage();
+        $storage->registerBag($bag);
+
+        $this->assertEquals($storage->getBag('flashes'), $bag);
+    }
 }

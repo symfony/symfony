@@ -39,7 +39,6 @@ use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -120,13 +119,8 @@ class Application
         $this->configureIO($input, $output);
 
         try {
-            $e = null;
             $exitCode = $this->doRun($input, $output);
-        } catch (\Exception $e) {
         } catch (\Throwable $e) {
-        }
-
-        if (null !== $e) {
             if (!$this->catchExceptions || !$e instanceof \Exception) {
                 throw $e;
             }
@@ -201,11 +195,12 @@ class Application
             if (null !== $this->dispatcher) {
                 $event = new ConsoleErrorEvent($input, $output, $e);
                 $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
-                $e = $event->getError();
 
                 if (0 === $event->getExitCode()) {
                     return 0;
                 }
+
+                $e = $event->getError();
             }
 
             throw $e;
@@ -849,7 +844,6 @@ class Application
         }
 
         $event = new ConsoleCommandEvent($command, $input, $output);
-        $e = null;
 
         try {
             $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
@@ -862,10 +856,9 @@ class Application
         } catch (\Throwable $e) {
             $event = new ConsoleErrorEvent($input, $output, $e, $command);
             $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
-            $e = $event->getError();
 
             if (0 !== $exitCode = $event->getExitCode()) {
-                throw $e;
+                throw $event->getError();
             }
         } finally {
             $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);

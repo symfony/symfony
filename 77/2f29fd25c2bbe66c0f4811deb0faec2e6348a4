@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by kbond at 2017-11-13T18:08:23Z
+
+This works when I have a custom container base class but it broke the container without a custom base class:
+
+```php
+class ApplicationDevDebugProjectContainer extends \Container
+```
+
+`Container` should not have the `\`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-13T18:11:30Z
+
+@kbond thanks, should be fixed.

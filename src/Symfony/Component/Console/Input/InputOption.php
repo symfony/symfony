@@ -113,7 +113,7 @@ class InputOption
      */
     public function acceptValue()
     {
-        return $this->isValueRequired() || $this->isValueOptional();
+        return $this->isValueRequired() || $this->isValueOptional() || $this->isArray();
     }
 
     /**

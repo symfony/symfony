@@ -55,7 +55,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                 if (isset($key[0]) && '$' === $key[0]) {
                     foreach ($parameters as $j => $p) {
                         if ($key === '$'.$p->name) {
-                            if ($p->isVariadic() && \is_array($argument)) {
+                            if (\PHP_VERSION_ID >= 50600 && $p->isVariadic() && \is_array($argument)) {
                                 foreach ($argument as $variadicArgument) {
                                     $resolvedArguments[$j++] = $variadicArgument;
                                 }
@@ -84,28 +84,6 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
 
                 if (!$typeFound) {
                     throw new InvalidArgumentException(sprintf('Invalid service "%s": method "%s()" has no argument type-hinted as "%s". Check your service definition.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method, $key));
-                }
-            }
-
-            $lastResolvedArgument = \end($resolvedArguments);
-
-            if (\is_array($lastResolvedArgument) &&
-                !empty($lastResolvedArgument) &&
-                method_exists('ReflectionParameter', 'isVariadic')
-            ) {
-                try {
-                    $reflection = $this->getReflectionMethod($value, $method);
-                    $parameters = $reflection->getParameters();
-                    $lastParam = \end($parameters);
-
-                    if ($lastParam->isVariadic()) {
-                        \array_pop($resolvedArguments);
-
-                        foreach ($lastResolvedArgument as $argument) {
-                            $resolvedArguments[] = $argument;
-                        }
-                    }
-                } catch (RuntimeException $runtimeException) {
                 }
             }
 

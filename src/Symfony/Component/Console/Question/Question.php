@@ -114,7 +114,7 @@ class Question
     /**
      * Gets values for the autocompleter.
      *
-     * @return null|array|\Traversable
+     * @return null|iterable
      */
     public function getAutocompleterValues()
     {
@@ -124,7 +124,7 @@ class Question
     /**
      * Sets values for the autocompleter.
      *
-     * @param null|array|\Traversable $values
+     * @param null|iterable $values
      *
      * @return $this
      *

@@ -195,11 +195,11 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes a "table" node.
      *
-     * @param resource           $file        The file handle to write to
-     * @param array|\Traversable $value       The value of the node
-     * @param int                $indentation The number of levels to indent
-     * @param bool               $fallback    Whether the table should be merged
-     *                                        with the fallback locale
+     * @param resource $file        The file handle to write to
+     * @param iterable $value       The value of the node
+     * @param int      $indentation The number of levels to indent
+     * @param bool     $fallback    Whether the table should be merged
+     *                              with the fallback locale
      *
      * @throws UnexpectedTypeException when $value is not an array and not a
      *                                 \Traversable instance

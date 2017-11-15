@@ -147,11 +147,13 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         if (1 === count($result)) {
-            if ($constraint->forUpdate) {
+            $match = $result instanceof \Iterator ? $result->current() : current($result);
+
+            if ($entity === $match) {
                 return;
             }
 
-            if ($entity === ($result instanceof \Iterator ? $result->current() : current($result))) {
+            if ($entity instanceof EntityDto && $entity->isForEntity($match)) {
                 return;
             }
         }

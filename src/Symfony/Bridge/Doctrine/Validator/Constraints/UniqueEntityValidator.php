@@ -154,8 +154,17 @@ class UniqueEntityValidator extends ConstraintValidator
                 return;
             }
 
-            if ($object instanceof EntityDto && $object->isForEntity($match)) {
-                return;
+            $method = $constraint->isEntityToUpdateMethod;
+            if (null !== $method) {
+                if (!method_exists($object, $method)) {
+                    throw new ConstraintDefinitionException(sprintf('Method "%s" does not exist in class %s', $method, $objectClass));
+                }
+
+                $reflMethod = new \ReflectionMethod($object, $method);
+
+                if ($reflMethod->isStatic() ? $reflMethod->invoke(null, $object, $match) : $reflMethod->invoke($object, $match)) {
+                    return;
+                }
             }
         }
 

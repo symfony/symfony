@@ -37,12 +37,13 @@ class LoggerAwarePass implements CompilerPassInterface
         $reference = new Reference('logger');
 
         foreach ($container->getDefinitions() as $definition) {
-            if (!class_exists($definition->getClass()) || !$definition->isAutoconfigured()) {
+            $class = $definition->getClass();
+            if (!class_exists($class) || !$definition->isAutoconfigured() || $definition->hasMethodCall('setLogger')) {
                 continue;
             }
 
-            $refl = new \ReflectionClass($definition->getClass());
-            if ($refl->implementsInterface(LoggerAwareInterface::class) && !$definition->hasMethodCall('setLogger')) {
+            $refl = $container->getReflectionClass($class);
+            if ($refl->implementsInterface(LoggerAwareInterface::class)) {
                 $definition->addMethodCall('setLogger', array($reference));
             }
         }

@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggerAwarePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Unit tests for App\DependencyInjection\Compiler\LoggerAwarePass
+ * Unit tests for Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggerAwarePass.
  *
  * @author Gary PEGEOT <garypegeot@gmail.com>
  */

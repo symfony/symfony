@@ -37,7 +37,7 @@ class LoggerAwarePass implements CompilerPassInterface
         $reference = new Reference('logger');
 
         foreach ($container->getDefinitions() as $definition) {
-            if (!class_exists($definition->getClass())) {
+            if (!class_exists($definition->getClass()) || !$definition->isAutoconfigured()) {
                 continue;
             }
 

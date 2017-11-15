@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Unit tests for App\DependencyInjection\Compiler\LoggerAwarePass
  *
- * @author Gary PEGEOT <g.pegeot@highco-data.fr>
+ * @author Gary PEGEOT <garypegeot@gmail.com>
  */
 class LoggerAwarePassTest extends TestCase
 {

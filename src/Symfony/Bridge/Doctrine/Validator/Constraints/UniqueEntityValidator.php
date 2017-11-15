@@ -34,13 +34,13 @@ class UniqueEntityValidator extends ConstraintValidator
     }
 
     /**
-     * @param object     $entity
+     * @param object     $object
      * @param Constraint $constraint
      *
      * @throws UnexpectedTypeException
      * @throws ConstraintDefinitionException
      */
-    public function validate($entity, Constraint $constraint)
+    public function validate($object, Constraint $constraint)
     {
         if (!$constraint instanceof UniqueEntity) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\UniqueEntity');
@@ -60,11 +60,12 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new ConstraintDefinitionException('At least one field has to be specified.');
         }
 
-        if (null === $entity) {
+        if (null === $object) {
             return;
         }
 
-        $entityClass = $constraint->entityClass ?: get_class($entity);
+        $objectClass = get_class($object);
+        $entityClass = $constraint->entityClass ?: $objectClass;
 
         if ($constraint->em) {
             $em = $this->registry->getManager($constraint->em);
@@ -76,7 +77,7 @@ class UniqueEntityValidator extends ConstraintValidator
             $em = $this->registry->getManagerForClass($entityClass);
 
             if (!$em) {
-                throw new ConstraintDefinitionException(sprintf('Unable to find the object manager associated with an entity of class "%s".', get_class($entity)));
+                throw new ConstraintDefinitionException(sprintf('Unable to find the object manager associated with an entity of class "%s".', $objectClass));
             }
         }
 
@@ -85,16 +86,16 @@ class UniqueEntityValidator extends ConstraintValidator
         $criteria = array();
         $hasNullValue = false;
 
-        foreach ($fields as $formField => $entityField) {
+        foreach ($fields as $objectField => $entityField) {
             if (!$class->hasField($entityField) && !$class->hasAssociation($entityField)) {
                 throw new ConstraintDefinitionException(sprintf('The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.', $entityField));
             }
 
-            $field = new \ReflectionProperty($entityClass, is_int($formField) ? $entityField : $formField);
+            $field = new \ReflectionProperty($objectClass, is_int($objectField) ? $entityField : $objectField);
             if (!$field->isPublic()) {
                 $field->setAccessible(true);
             }
-            $fieldValue = $field->getValue($entity);
+            $fieldValue = $field->getValue($object);
 
             if (null === $fieldValue) {
                 $hasNullValue = true;
@@ -149,11 +150,11 @@ class UniqueEntityValidator extends ConstraintValidator
         if (1 === count($result)) {
             $match = $result instanceof \Iterator ? $result->current() : current($result);
 
-            if ($entity === $match) {
+            if ($object === $match) {
                 return;
             }
 
-            if ($entity instanceof EntityDto && $entity->isForEntity($match)) {
+            if ($object instanceof EntityDto && $object->isForEntity($match)) {
                 return;
             }
         }

@@ -64,6 +64,8 @@ class UniqueEntityValidator extends ConstraintValidator
             return;
         }
 
+        $entityClass = $constraint->entityClass ?: get_class($entity);
+
         if ($constraint->em) {
             $em = $this->registry->getManager($constraint->em);
 
@@ -71,25 +73,28 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException(sprintf('Object manager "%s" does not exist.', $constraint->em));
             }
         } else {
-            $em = $this->registry->getManagerForClass(get_class($entity));
+            $em = $this->registry->getManagerForClass($entityClass);
 
             if (!$em) {
                 throw new ConstraintDefinitionException(sprintf('Unable to find the object manager associated with an entity of class "%s".', get_class($entity)));
             }
         }
 
-        $class = $em->getClassMetadata(get_class($entity));
-        /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
+        $class = $em->getClassMetadata($entityClass);
 
         $criteria = array();
         $hasNullValue = false;
 
-        foreach ($fields as $fieldName) {
-            if (!$class->hasField($fieldName) && !$class->hasAssociation($fieldName)) {
-                throw new ConstraintDefinitionException(sprintf('The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.', $fieldName));
+        foreach ($fields as $formField => $entityField) {
+            if (!$class->hasField($entityField) && !$class->hasAssociation($entityField)) {
+                throw new ConstraintDefinitionException(sprintf('The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.', $entityField));
             }
 
-            $fieldValue = $class->reflFields[$fieldName]->getValue($entity);
+            $field = new \ReflectionProperty($entityClass, is_int($formField) ? $entityField : $formField);
+            if (!$field->isPublic()) {
+                $field->setAccessible(true);
+            }
+            $fieldValue = $field->getValue($entity);
 
             if (null === $fieldValue) {
                 $hasNullValue = true;
@@ -99,14 +104,14 @@ class UniqueEntityValidator extends ConstraintValidator
                 continue;
             }
 
-            $criteria[$fieldName] = $fieldValue;
+            $criteria[$entityField] = $fieldValue;
 
-            if (null !== $criteria[$fieldName] && $class->hasAssociation($fieldName)) {
+            if (null !== $criteria[$entityField] && $class->hasAssociation($entityField)) {
                 /* Ensure the Proxy is initialized before using reflection to
                  * read its identifiers. This is necessary because the wrapped
                  * getter methods in the Proxy are being bypassed.
                  */
-                $em->initializeObject($criteria[$fieldName]);
+                $em->initializeObject($criteria[$entityField]);
             }
         }
 
@@ -121,22 +126,7 @@ class UniqueEntityValidator extends ConstraintValidator
             return;
         }
 
-        if (null !== $constraint->entityClass) {
-            /* Retrieve repository from given entity name.
-             * We ensure the retrieved repository can handle the entity
-             * by checking the entity is the same, or subclass of the supported entity.
-             */
-            $repository = $em->getRepository($constraint->entityClass);
-            $supportedClass = $repository->getClassName();
-
-            if (!$entity instanceof $supportedClass) {
-                throw new ConstraintDefinitionException(sprintf('The "%s" entity repository does not support the "%s" entity. The entity should be an instance of or extend "%s".', $constraint->entityClass, $class->getName(), $supportedClass));
-            }
-        } else {
-            $repository = $em->getRepository(get_class($entity));
-        }
-
-        $result = $repository->{$constraint->repositoryMethod}($criteria);
+        $result = $em->getRepository($entityClass)->{$constraint->repositoryMethod}($criteria);
 
         if ($result instanceof \IteratorAggregate) {
             $result = $result->getIterator();
@@ -152,12 +142,18 @@ class UniqueEntityValidator extends ConstraintValidator
             reset($result);
         }
 
-        /* If no entity matched the query criteria or a single entity matched,
-         * which is the same as the entity being validated, the criteria is
-         * unique.
-         */
-        if (0 === count($result) || (1 === count($result) && $entity === ($result instanceof \Iterator ? $result->current() : current($result)))) {
+        if (0 === count($result)) {
             return;
+        }
+
+        if (1 === count($result)) {
+            if ($constraint->forUpdate) {
+                return;
+            }
+
+            if ($entity === ($result instanceof \Iterator ? $result->current() : current($result))) {
+                return;
+            }
         }
 
         $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];

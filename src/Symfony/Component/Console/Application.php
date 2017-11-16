@@ -390,9 +390,9 @@ class Application
      *
      * If a Command is not enabled it will not be added.
      *
-     * @param Command[] $commands An array of commands
+     * @param Command[] $commands An array or iterator of commands
      */
-    public function addCommands(array $commands)
+    public function addCommands(iterable $commands)
     {
         foreach ($commands as $command) {
             $this->add($command);

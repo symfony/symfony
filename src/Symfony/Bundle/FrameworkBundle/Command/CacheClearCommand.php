@@ -111,6 +111,9 @@ EOF
         $io->comment(sprintf('Clearing the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
         $this->cacheClearer->clear($realCacheDir);
 
+        // The current event dispatcher is stale, let's not use it anymore
+        $this->getApplication()->setDispatcher(new EventDispatcher());
+
         if ($input->getOption('no-warmup')) {
             $this->filesystem->rename($realCacheDir, $oldCacheDir);
         } else {
@@ -128,9 +131,6 @@ EOF
         }
 
         $this->filesystem->remove($oldCacheDir);
-
-        // The current event dispatcher is stale, let's not use it anymore
-        $this->getApplication()->setDispatcher(new EventDispatcher());
 
         if ($output->isVerbose()) {
             $io->comment('Finished');

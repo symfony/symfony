@@ -7,6 +7,13 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.38 (2017-11-16)
+
+ * security #24995 Validate redirect targets using the session cookie domain (nicolas-grekas)
+ * security #24994 Prevent bundle readers from breaking out of paths (xabbuh)
+ * security #24993 Ensure that submitted data are uploaded files (xabbuh)
+ * security #24992 Namespace generated CSRF tokens depending of the current scheme (dunglas)
+
 * 2.7.37 (2017-11-13)
 
  * bug #24952 [HttpFoundation] Fix session-related BC break (nicolas-grekas, sroze)

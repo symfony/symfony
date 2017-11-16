@@ -41,10 +41,10 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
      * Creates a new CSRF provider using PHP's native session storage.
      *
      * @param null|string|RequestStack|callable $namespace
-     *   * null: generates a namespace using $_SERVER['HTTPS']
-     *   * string: uses the given string
-     *   * RequestStack: generates a namespace using the current master request
-     *   * callable: uses the result of this callable (must return a string)
+     *                                                     * null: generates a namespace using $_SERVER['HTTPS']
+     *                                                     * string: uses the given string
+     *                                                     * RequestStack: generates a namespace using the current master request
+     *                                                     * callable: uses the result of this callable (must return a string)
      *
      * @param TokenGeneratorInterface|null $generator The token generator
      * @param TokenStorageInterface|null   $storage   The storage for storing

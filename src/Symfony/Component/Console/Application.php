@@ -120,15 +120,13 @@ class Application
         try {
             $e = null;
             $exitCode = $this->doRun($input, $output);
-        } catch (\Exception $x) {
-            $e = $x;
-        } catch (\Throwable $x) {
-            $e = new FatalThrowableError($x);
+        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
 
         if (null !== $e) {
-            if (!$this->catchExceptions || !$x instanceof \Exception) {
-                throw $x;
+            if (!$this->catchExceptions || !$e instanceof \Exception) {
+                throw $e;
             }
 
             if ($output instanceof ConsoleOutputInterface) {

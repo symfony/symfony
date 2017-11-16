@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\Form\Util\ServerParams;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -28,9 +29,6 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
     private $serverParams;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(ServerParams $serverParams = null)
     {
         $this->serverParams = $serverParams ?: new ServerParams();
@@ -108,5 +106,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         }
 
         $form->submit($data, 'PATCH' !== $method);
+    }
+
+    public function isFileUpload($data)
+    {
+        return $data instanceof File;
     }
 }

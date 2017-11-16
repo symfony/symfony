@@ -18,6 +18,7 @@
         <service id="security.csrf.token_manager" class="Symfony\Component\Security\Csrf\CsrfTokenManager" public="true">
             <argument type="service" id="security.csrf.token_generator" />
             <argument type="service" id="security.csrf.token_storage" />
+            <argument type="service" id="request_stack" on-invalid="ignore" />
         </service>
         <service id="Symfony\Component\Security\Csrf\CsrfTokenManagerInterface" alias="security.csrf.token_manager" />
     </services>

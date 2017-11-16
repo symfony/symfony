@@ -48,6 +48,11 @@ CHANGELOG
  * moved data trimming logic of TrimListener into StringUtil
  * [BC BREAK] When registering a type extension through the DI extension, the tag alias has to match the actual extended type.
 
+2.7.38
+------
+
+ * [BC BREAK] the `isFileUpload()` method was added to the `RequestHandlerInterface`
+
 2.7.0
 -----
 

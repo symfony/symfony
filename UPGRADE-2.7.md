@@ -39,6 +39,8 @@ Router
 Form
 ----
 
+ * the `isFileUpload()` method was added to the `RequestHandlerInterface`
+
  * In form types and extension overriding the "setDefaultOptions" of the
    AbstractType or AbstractTypeExtension has been deprecated in favor of
    overriding the new "configureOptions" method.

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-15T09:46:38Z
+
+~Not sure why fabbot complains about the PR header~ 🤔 It looks like fabbot do not support copy/pasted tables :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-15T10:28:22Z
+
+AppVeyor's issue is unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-15T11:20:45Z
+
+@sroze could you please squash the PR so that there are only two commits: mine and yours?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-15T11:30:10Z
+
+@nicolas-grekas done

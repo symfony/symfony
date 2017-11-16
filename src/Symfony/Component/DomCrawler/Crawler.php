@@ -1110,7 +1110,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * @throws \InvalidArgumentException
      */
-    private function discoverNamespace(\DOMXPath $domxpath, string $prefix): string
+    private function discoverNamespace(\DOMXPath $domxpath, string $prefix): ?string
     {
         if (isset($this->namespaces[$prefix])) {
             return $this->namespaces[$prefix];
@@ -1122,6 +1122,8 @@ class Crawler implements \Countable, \IteratorAggregate
         if ($node = $namespaces->item(0)) {
             return $node->nodeValue;
         }
+
+        return null;
     }
 
     private function findNamespacePrefixes(string $xpath): array

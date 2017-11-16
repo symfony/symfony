@@ -61,4 +61,12 @@ class PhpBundleReaderTest extends TestCase
     {
         $this->reader->read(__DIR__.'/Fixtures/NotAFile', 'en');
     }
+
+    /**
+     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
+     */
+    public function testReaderDoesNotBreakOutOfGivenPath()
+    {
+        $this->reader->read(__DIR__.'/Fixtures/php', '../invalid_directory/en');
+    }
 }

@@ -33,9 +33,6 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             if ($definition->getArguments()) {
                 throw new InvalidArgumentException(sprintf('Autoconfigured instanceof for type "%s" defines arguments but these are not supported and should be removed.', $interface));
             }
-            if ($definition->getMethodCalls()) {
-                throw new InvalidArgumentException(sprintf('Autoconfigured instanceof for type "%s" defines method calls but these are not supported and should be removed.', $interface));
-            }
         }
 
         foreach ($container->getDefinitions() as $id => $definition) {
@@ -63,7 +60,10 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 
         $definition->setInstanceofConditionals(array());
         $parent = $shared = null;
-        $instanceofTags = array();
+        $instanceof = array(
+            'calls' => array(),
+            'tags' => array(),
+        );
 
         foreach ($conditionals as $interface => $instanceofDefs) {
             if ($interface !== $class && (!$container->getReflectionClass($class, false))) {
@@ -77,11 +77,13 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
             foreach ($instanceofDefs as $key => $instanceofDef) {
                 /** @var ChildDefinition $instanceofDef */
                 $instanceofDef = clone $instanceofDef;
-                $instanceofDef->setAbstract(true)->setParent($parent ?: 'abstract.instanceof.'.$id);
-                $parent = 'instanceof.'.$interface.'.'.$key.'.'.$id;
+                $instanceofDef->setAbstract(true)->setParent($parent ?: "abstract.instanceof.$id");
+                $parent = "instanceof.$interface.$key.$id";
                 $container->setDefinition($parent, $instanceofDef);
-                $instanceofTags[] = $instanceofDef->getTags();
+                $instanceof['tags'][] = $instanceofDef->getTags();
+                $instanceof['calls'][] = $instanceofDef->getMethodCalls();
                 $instanceofDef->setTags(array());
+                $instanceofDef->setMethodCalls(array());
 
                 if (isset($instanceofDef->getChanges()['shared'])) {
                     $shared = $instanceofDef->isShared();
@@ -91,13 +93,14 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 
         if ($parent) {
             $bindings = $definition->getBindings();
-            $abstract = $container->setDefinition('abstract.instanceof.'.$id, $definition);
+            $abstract = $container->setDefinition("abstract.instanceof.$id", $definition);
 
             // cast Definition to ChildDefinition
             $definition->setBindings(array());
             $definition = serialize($definition);
             $definition = substr_replace($definition, '53', 2, 2);
             $definition = substr_replace($definition, 'Child', 44, 0);
+            /** @var ChildDefinition $definition */
             $definition = unserialize($definition);
             $definition->setParent($parent);
 
@@ -105,14 +108,22 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 $definition->setShared($shared);
             }
 
-            $i = count($instanceofTags);
+            $i = count($instanceof['tags']);
             while (0 <= --$i) {
-                foreach ($instanceofTags[$i] as $k => $v) {
+                foreach ($instanceof['tags'][$i] as $k => $v) {
                     foreach ($v as $v) {
                         if ($definition->hasTag($k) && in_array($v, $definition->getTag($k))) {
                             continue;
                         }
                         $definition->addTag($k, $v);
+                    }
+                }
+            }
+
+            foreach ($instanceof['calls'] as $calls) {
+                foreach ($calls as $call) {
+                    if (!$definition->hasMethodCall($call[0])) {
+                        $definition->addMethodCall($call[0], $call[1]);
                     }
                 }
             }

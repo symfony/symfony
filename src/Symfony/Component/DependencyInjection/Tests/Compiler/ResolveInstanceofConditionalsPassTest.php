@@ -60,7 +60,6 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveChildDefinitionsPass())->process($container);
 
         $expected = array(
-            array('foo', array('bar')),
             array('foo', array('foo')),
         );
 
@@ -200,16 +199,47 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Autoconfigured instanceof for type "PHPUnit\Framework\TestCase" defines method calls but these are not supported and should be removed.
+     * Test that autoconfigured calls are handled gracefully.
      */
-    public function testProcessThrowsExceptionForAutoconfiguredCalls()
+    public function testProcessForAutoconfiguredCalls()
     {
         $container = new ContainerBuilder();
         $container->registerForAutoconfiguration(parent::class)
-            ->addMethodCall('setFoo');
+            ->addMethodCall('setLogger');
+
+        $def = $container->register('foo', \get_class($this->createMock(self::class)))
+            ->setAutoconfigured(true);
+        $this->assertFalse($def->hasMethodCall('setLogger'), 'Definition shouldn\'t have method call yet.');
 
         (new ResolveInstanceofConditionalsPass())->process($container);
+        $def = $container->findDefinition('foo');
+        $this->assertTrue($def->hasMethodCall('setLogger'), 'Definition should have "setLogger" method call.');
+    }
+
+    /**
+     * Test that explicit calls are kept intact.
+     */
+    public function testProcessDoesNotOverrideCalls()
+    {
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(parent::class)
+            ->addMethodCall('setLogger', array('bar.logger'))
+            ->addMethodCall('setBar', array('bar'));
+
+        $container->register('foo', \get_class($this->createMock(self::class)))
+            ->addMethodCall('setLogger', array('foo.logger'))
+            ->setAutoconfigured(true);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $def = $container->findDefinition('foo');
+        $this->assertEquals(
+            array(
+                array('setLogger', array('foo.logger')),
+                array('setBar', array('bar')),
+            ),
+            $def->getMethodCalls()
+        );
     }
 
     /**

@@ -148,9 +148,9 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         if (1 === count($result)) {
-            $match = $result instanceof \Iterator ? $result->current() : current($result);
+            $entity = $result instanceof \Iterator ? $result->current() : current($result);
 
-            if ($object === $match) {
+            if ($object === $entity) {
                 return;
             }
 
@@ -160,9 +160,7 @@ class UniqueEntityValidator extends ConstraintValidator
                     throw new ConstraintDefinitionException(sprintf('Method "%s" does not exist in class %s', $method, $objectClass));
                 }
 
-                $reflMethod = new \ReflectionMethod($object, $method);
-
-                if ($reflMethod->isStatic() ? $reflMethod->invoke(null, $object, $match) : $reflMethod->invoke($object, $match)) {
+                if (call_user_func([$object, $method], $entity)) {
                     return;
                 }
             }

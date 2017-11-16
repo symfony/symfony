@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.3.9",
         "ext-xml": "*",
-        "symfony/security": "~2.7",
+        "symfony/security": "~2.7.38|~2.8.31",
         "symfony/security-acl": "~2.7",
         "symfony/http-kernel": "~2.7"
     },
@@ -26,7 +26,7 @@
         "symfony/browser-kit": "~2.7",
         "symfony/console": "~2.7",
         "symfony/css-selector": "^2.7",
-        "symfony/dependency-injection": "^2.7",
+        "symfony/dependency-injection": "^2.7.1",
         "symfony/dom-crawler": "^2.7",
         "symfony/form": "~2.7.15|^2.8.8",
         "symfony/framework-bundle": "~2.7.25|^2.8.18",

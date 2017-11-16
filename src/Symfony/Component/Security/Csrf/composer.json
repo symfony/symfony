@@ -20,7 +20,10 @@
         "symfony/security-core": "~2.4"
     },
     "require-dev": {
-        "symfony/http-foundation": "~2.1"
+        "symfony/http-foundation": "~2.7"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<2.7.38|~2.8,<2.8.31"
     },
     "suggest": {
         "symfony/http-foundation": "For using the class SessionTokenStorage."

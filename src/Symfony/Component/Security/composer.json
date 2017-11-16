@@ -19,7 +19,7 @@
         "php": ">=5.3.9",
         "paragonie/random_compat": "~1.0",
         "symfony/event-dispatcher": "~2.2",
-        "symfony/http-foundation": "~2.1",
+        "symfony/http-foundation": "~2.7",
         "symfony/http-kernel": "~2.4"
     },
     "replace": {
@@ -38,6 +38,9 @@
         "psr/log": "~1.0",
         "ircmaxell/password-compat": "~1.0",
         "symfony/expression-language": "~2.6"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<2.7.38|~2.8,<2.8.31"
     },
     "suggest": {
         "symfony/class-loader": "For using the ACL generateSql script",

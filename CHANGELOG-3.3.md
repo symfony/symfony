@@ -7,6 +7,13 @@ in 3.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.3.0...v3.3.1
 
+* 3.3.13 (2017-11-16)
+
+ * security #24995 Validate redirect targets using the session cookie domain (nicolas-grekas)
+ * security #24994 Prevent bundle readers from breaking out of paths (xabbuh)
+ * security #24993 Ensure that submitted data are uploaded files (xabbuh)
+ * security #24992 Namespace generated CSRF tokens depending of the current scheme (dunglas)
+
 * 3.3.12 (2017-11-13)
 
  * bug #24954 [DI] Fix dumping with custom base class (nicolas-grekas)

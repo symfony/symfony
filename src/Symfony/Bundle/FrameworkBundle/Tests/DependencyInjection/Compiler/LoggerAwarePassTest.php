@@ -32,14 +32,14 @@ class LoggerAwarePassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('logger', LoggerInterface::class);
 
-        $definition = $container->register('foo', get_class($this->createMock(LoggerAwareInterface::class)));
-        $definition->setAutoconfigured(true);
+        $definition = $container->register('foo', get_class($this->createMock(LoggerAwareInterface::class)))
+            ->addTag('logger.aware');
 
         $container->register('bar', 'stdClass');
-        $container->register('not.autowired', LoggerInterface::class)->setAutoconfigured(false);
+        $container->register('not.autowired', LoggerInterface::class);
         $this->assertFalse(
             $definition->hasMethodCall('setLogger'),
-            'Service should not have "setLogger" method call before Pass execution.'
+            'Service should not have "setLogger" method call yet.'
         );
 
         (new LoggerAwarePass())->process($container);

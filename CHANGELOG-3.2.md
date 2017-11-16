@@ -7,6 +7,13 @@ in 3.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.2.0...v3.2.1
 
+* 3.2.14 (2017-11-16)
+
+ * security #24995 Validate redirect targets using the session cookie domain (nicolas-grekas)
+ * security #24994 Prevent bundle readers from breaking out of paths (xabbuh)
+ * security #24993 Ensure that submitted data are uploaded files (xabbuh)
+ * security #24992 Namespace generated CSRF tokens depending of the current scheme (dunglas)
+
 * 3.2.13 (2017-08-01)
 
  * bug #22244 [Console] Fix passing options with defaultCommand (Jakub Sacha)

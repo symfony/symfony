@@ -38,7 +38,8 @@
         "symfony/console": "~3.4|~4.0",
         "symfony/var-dumper": "~3.4|~4.0",
         "symfony/expression-language": "~3.4|~4.0",
-        "symfony/web-link": "~3.4|~4.0"
+        "symfony/web-link": "~3.4|~4.0",
+        "symfony/validator": "~3.4|~4.0"
     },
     "conflict": {
         "symfony/form": "<3.4",

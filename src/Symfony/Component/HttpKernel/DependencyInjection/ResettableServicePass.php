@@ -53,6 +53,7 @@ class ResettableServicePass implements CompilerPassInterface
         }
 
         if (empty($services)) {
+            $container->removeAlias('services_resetter');
             $container->removeDefinition('services_resetter');
 
             return;

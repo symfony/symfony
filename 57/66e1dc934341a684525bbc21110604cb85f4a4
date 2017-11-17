@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-10-29T00:32:35Z
+
+Should I move the string splitting logic to the `AbstractConfigurator::processValue`?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-29T07:47:46Z
+
+See `YamlFileLoader::parseCallable`; we need to support `configurator` as well i guess. Also account for `::` before splitting by `:` (see `setFactory`).
+
+Im not sure why we dont do this directly in `Definition::setFactory` & co; right now XML is missing this feature as well. (e.g. `function="service:method"`).
+
+Otherwise perhaps go with `static::processValue(static::processCallable())` or so.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-01T17:55:41Z
+
+I know I suggested this one, but I've mixed feelings about it :)
+What about throwing instead? Providing a single way to reference services would make teaching easier.
+The message should suggest to use `[ref('foo'), 'bar']` when `foo:bar` is provided.
+WDYT?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-01T18:12:49Z
+
+I'd also prefer the exception suggested by @nicolas-grekas instead of this.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-11-01T19:48:23Z
+
+You know, I would also agree :)
+When trying to implement it I realized that it looks unnatural.
+`[ref(), '']` definitely makes much more sense.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-12T16:00:34Z
+
+@vudaltsov let's throw here then instead?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-11-16T22:15:23Z
+
+@nicolas-grekas, done
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-11-17T09:54:41Z
+
+@nicolas-grekas, squashed, reworded and rebased

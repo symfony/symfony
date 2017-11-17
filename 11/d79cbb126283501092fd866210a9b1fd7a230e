@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-15T11:25:36Z
+
+@weltling could you please update the PR description and change the licence to MIT?
+
+---------------------------------------------------------------------------
+
+by weltling at 2017-11-15T11:27:55Z
+
+@nicolas-grekas done, fine with MIT here, too. That's probably why the check was failing :)
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-15T11:28:57Z
+
+@weltling for sure, all green now, thanks!

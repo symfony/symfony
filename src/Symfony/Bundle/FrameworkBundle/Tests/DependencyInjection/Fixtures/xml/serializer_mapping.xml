@@ -8,9 +8,9 @@
         <framework:annotations enabled="true" />
         <framework:serializer enable-annotations="true">
             <framework:mapping>
-                <framework:path>%kernel.root_dir%/Fixtures/TestBundle/Resources/config/serializer_mapping/files</framework:path>
-                <framework:path>%kernel.root_dir%/Fixtures/TestBundle/Resources/config/serializer_mapping/serialization.yml</framework:path>
-                <framework:path>%kernel.root_dir%/Fixtures/TestBundle/Resources/config/serializer_mapping/serialization.yaml</framework:path>
+                <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/serializer_mapping/files</framework:path>
+                <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/serializer_mapping/serialization.yml</framework:path>
+                <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/serializer_mapping/serialization.yaml</framework:path>
             </framework:mapping>
         </framework:serializer>
     </framework:config>

@@ -6,7 +6,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
                         http://symfony.com/schema/dic/twig http://symfony.com/schema/dic/twig/twig-1.0.xsd">
 
-    <twig:config auto-reload="true" autoescape="true" base-template-class="stdClass" cache="/tmp" charset="ISO-8859-1" debug="true" strict-variables="true" default-path="%kernel.root_dir%/templates">
+    <twig:config auto-reload="true" autoescape="true" base-template-class="stdClass" cache="/tmp" charset="ISO-8859-1" debug="true" strict-variables="true" default-path="%kernel.project_dir%/Fixtures/templates">
         <twig:form-theme>MyBundle::form.html.twig</twig:form-theme>
         <twig:global key="foo" id="bar" type="service" />
         <twig:global key="baz">@@qux</twig:global>

@@ -21,7 +21,7 @@ $container->loadFromExtension('framework', array(
         'enabled' => false,
     ),
     'router' => array(
-        'resource' => '%kernel.root_dir%/config/routing.xml',
+        'resource' => '%kernel.project_dir%/config/routing.xml',
         'type' => 'xml',
     ),
     'session' => array(
@@ -54,7 +54,7 @@ $container->loadFromExtension('framework', array(
     'translator' => array(
         'enabled' => true,
         'fallback' => 'fr',
-        'paths' => array('%kernel.root_dir%/Fixtures/translations'),
+        'paths' => array('%kernel.project_dir%/Fixtures/translations'),
     ),
     'validation' => array(
         'enabled' => true,

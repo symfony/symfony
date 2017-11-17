@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
@@ -1269,6 +1270,30 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $this->assertSame('bar', $container->get('foo')->foo);
+    }
+
+    public function testArgumentsHaveHigherPriorityThanBindings()
+    {
+        $container = new ContainerBuilder();
+        $container->register('class.via.bindings', CaseSensitiveClass::class)->setArguments(array(
+            'via-bindings',
+        ));
+        $container->register('class.via.argument', CaseSensitiveClass::class)->setArguments(array(
+            'via-argument',
+        ));
+        $container->register('foo', SimilarArgumentsDummy::class)->setPublic(true)->setBindings(array(
+            CaseSensitiveClass::class => new Reference('class.via.bindings'),
+            '$token' => '1234',
+        ))->setArguments(array(
+            '$class1' => new Reference('class.via.argument'),
+        ));
+
+        $this->assertSame(array('service_container', 'class.via.bindings', 'class.via.argument', 'foo', 'Psr\Container\ContainerInterface', 'Symfony\Component\DependencyInjection\ContainerInterface'), $container->getServiceIds());
+
+        $container->compile();
+
+        $this->assertSame('via-argument', $container->get('foo')->class1->identifier);
+        $this->assertSame('via-bindings', $container->get('foo')->class2->identifier);
     }
 }
 

@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-class CaseSensitiveClass
+class SimilarArgumentsDummy
 {
-    public $identifier;
+    public $class1;
+    public $class2;
 
-    public function __construct($identifier = null)
+    public function __construct(CaseSensitiveClass $class1, string $token, CaseSensitiveClass $class2)
     {
-        $this->identifier = $identifier;
+        $this->class1 = $class1;
+        $this->class2 = $class2;
     }
 }

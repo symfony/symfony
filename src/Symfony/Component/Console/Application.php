@@ -113,11 +113,10 @@ class Application
             $e = null;
             $exitCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
-        } catch (\Throwable $e) {
         }
 
         if (null !== $e) {
-            if (!$this->catchExceptions || !$e instanceof \Exception) {
+            if (!$this->catchExceptions) {
                 throw $e;
             }
 

@@ -60,10 +60,8 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 
         $definition->setInstanceofConditionals(array());
         $parent = $shared = null;
-        $instanceof = array(
-            'calls' => array(),
-            'tags' => array(),
-        );
+        $instanceofTags = array();
+        $instanceofCalls = array();
 
         foreach ($conditionals as $interface => $instanceofDefs) {
             if ($interface !== $class && (!$container->getReflectionClass($class, false))) {
@@ -80,8 +78,8 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 $instanceofDef->setAbstract(true)->setParent($parent ?: "abstract.instanceof.$id");
                 $parent = "instanceof.$interface.$key.$id";
                 $container->setDefinition($parent, $instanceofDef);
-                $instanceof['tags'][] = $instanceofDef->getTags();
-                $instanceof['calls'][] = $instanceofDef->getMethodCalls();
+                $instanceofTags[] = $instanceofDef->getTags();
+                $instanceofCalls[] = $instanceofDef->getMethodCalls();
                 $instanceofDef->setTags(array());
                 $instanceofDef->setMethodCalls(array());
 
@@ -108,9 +106,9 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 $definition->setShared($shared);
             }
 
-            $i = count($instanceof['tags']);
+            $i = count($instanceofTags);
             while (0 <= --$i) {
-                foreach ($instanceof['tags'][$i] as $k => $v) {
+                foreach ($instanceofTags[$i] as $k => $v) {
                     foreach ($v as $v) {
                         if ($definition->hasTag($k) && in_array($v, $definition->getTag($k))) {
                             continue;
@@ -120,7 +118,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 }
             }
 
-            foreach ($instanceof['calls'] as $calls) {
+            foreach ($instanceofCalls as $calls) {
                 foreach ($calls as $call) {
                     if (!$definition->hasMethodCall($call[0])) {
                         $definition->addMethodCall($call[0], $call[1]);

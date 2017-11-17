@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-16T21:35:27Z
+
+thank you so much @sroze
+would be great to have another test tat ensures that the named arg wins when doing something like
+`$definition->setArguments(array(CaseSensitiveClass::class => new Reference('foo'), '$class1' => ...);`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-16T21:48:39Z
+
+do you think you coud also include the patch on PassConfig on # #24978, and add a test in ContainerBuilderTest that ensures that named arguments win over bindings?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-16T23:08:51Z
+
+@nicolas-grekas good point, I've added the test proving the named vs the typed. But I think the priority of the passes should be in another PR, will issue another tomorrow.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-17T08:43:40Z
+
+@nicolas-grekas actually needed this new test fixture class so added the test here as well. It turns out that we don't need the pass order change.

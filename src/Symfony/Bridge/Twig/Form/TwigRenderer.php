@@ -11,11 +11,11 @@
 
 namespace Symfony\Bridge\Twig\Form;
 
-@trigger_error(sprintf('The %s class is deprecated since version 3.4 and will be removed in 4.0. Use %s instead.', TwigRenderer::class, FormRenderer::class), E_USER_DEPRECATED);
-
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Twig\Environment;
+
+@trigger_error(sprintf('The %s class is deprecated since version 3.4 and will be removed in 4.0. Use %s instead.', TwigRenderer::class, FormRenderer::class), E_USER_DEPRECATED);
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2017-11-17T15:49:42Z
+
+Works as well. People might just be tempted to introduce catching throwables again as they might think it's missing accidentally. But I guess we have a test for this..

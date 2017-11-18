@@ -120,9 +120,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
 
             foreach ($instanceofCalls as $calls) {
                 foreach ($calls as $call) {
-                    if (!$definition->hasMethodCall($call[0])) {
-                        $definition->addMethodCall($call[0], $call[1]);
-                    }
+                    $definition->addMethodCall($call[0], $call[1]);
                 }
             }
 

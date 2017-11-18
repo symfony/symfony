@@ -19,7 +19,8 @@ services:
             - { name: from_defaults }
         # calls from instanceof are kept, but this comes later
         calls:
-            # first call is from instanceof
             - [enableSummer, [true]]
             #
             - [setSunshine, [warm]]
+            # Call from instanceof
+            - [setSunshine, [bright]]

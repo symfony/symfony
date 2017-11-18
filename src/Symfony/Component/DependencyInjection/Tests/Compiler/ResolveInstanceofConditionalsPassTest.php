@@ -61,6 +61,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
 
         $expected = array(
             array('foo', array('foo')),
+            array('foo', array('bar')),
         );
 
         $this->assertSame($expected, $container->getDefinition('parent')->getMethodCalls());
@@ -213,32 +214,6 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveInstanceofConditionalsPass())->process($container);
         $def = $container->findDefinition('foo');
         $this->assertTrue($def->hasMethodCall('setLogger'), 'Definition should have "setLogger" method call.');
-    }
-
-    /**
-     * Test that explicit calls are kept intact.
-     */
-    public function testProcessDoesNotOverrideCalls()
-    {
-        $container = new ContainerBuilder();
-        $container->registerForAutoconfiguration(parent::class)
-            ->addMethodCall('setLogger', array('bar.logger'))
-            ->addMethodCall('setBar', array('bar'));
-
-        $container->register('foo', \get_class($this->createMock(self::class)))
-            ->addMethodCall('setLogger', array('foo.logger'))
-            ->setAutoconfigured(true);
-
-        (new ResolveInstanceofConditionalsPass())->process($container);
-
-        $def = $container->findDefinition('foo');
-        $this->assertEquals(
-            array(
-                array('setLogger', array('foo.logger')),
-                array('setBar', array('bar')),
-            ),
-            $def->getMethodCalls()
-        );
     }
 
     /**

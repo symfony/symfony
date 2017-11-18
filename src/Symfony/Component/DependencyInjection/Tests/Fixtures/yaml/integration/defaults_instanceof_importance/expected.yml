@@ -20,7 +20,6 @@ services:
         # calls from instanceof are kept, but this comes later
         calls:
             - [enableSummer, [true]]
-            #
             - [setSunshine, [warm]]
             # Call from instanceof
             - [setSunshine, [bright]]

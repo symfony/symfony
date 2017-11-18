@@ -8,6 +8,8 @@ CHANGELOG
  * decoupled from `symfony/translation` by using `Symfony\Contracts\Translation\TranslatorInterface`
  * deprecated `ValidatorBuilderInterface`
  * made `ValidatorBuilder` final
+ * marked `format` the default option in `DateTime` constraint
+ * deprecated validating instances of `\DateTimeInterface` in `DateTimeValidator`, `DateValidator` and `TimeValidator`.
 
 4.1.0
 -----

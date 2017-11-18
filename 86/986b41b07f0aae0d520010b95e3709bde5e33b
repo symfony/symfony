@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-15T11:22:48Z
+
+is for 2.7
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-15T11:39:45Z
+
+> Iterable is a pseudo-type introduced in PHP 7.1.
+
+Technically `iterable` is meaningless in 2.7 (php5.3), but im not sure you're being pragmatic? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-15T11:49:03Z
+
+docblocks have no PHP version constraints
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-16T12:40:15Z
+
+Done. `Symfony\Component\Cache\Traits\AbstractTrait::doFetch` left for 3.3

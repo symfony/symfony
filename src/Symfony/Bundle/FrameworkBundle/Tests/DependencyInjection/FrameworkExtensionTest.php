@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
-use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
@@ -314,7 +313,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('workflows_enabled');
 
         $this->assertTrue($container->has(Registry::class));
-        $this->assertTrue($container->hasDefinition(WorkflowDumpCommand::class));
+        $this->assertTrue($container->hasDefinition('console.command.workflow_dump'));
     }
 
     public function testRouter()

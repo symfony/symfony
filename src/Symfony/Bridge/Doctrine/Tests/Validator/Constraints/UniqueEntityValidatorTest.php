@@ -664,23 +664,6 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @expectedExceptionMessage The "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity" entity repository does not support the "Symfony\Bridge\Doctrine\Tests\Fixtures\Person" entity. The entity should be an instance of or extend "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity".
-     */
-    public function testInvalidateRepositoryForInheritance()
-    {
-        $constraint = new UniqueEntity(array(
-            'message' => 'myMessage',
-            'fields' => array('name'),
-            'em' => self::EM_NAME,
-            'entityClass' => 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity',
-        ));
-
-        $entity = new Person(1, 'Foo');
-        $this->validator->validate($entity, $constraint);
-    }
-
     public function testValidateUniquenessWithCompositeObjectNoToStringIdEntity()
     {
         $constraint = new UniqueEntity(array(

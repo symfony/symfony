@@ -30,6 +30,7 @@ class UniqueEntity extends Constraint
     public $em = null;
     public $entityClass = null;
     public $repositoryMethod = 'findBy';
+    public $isEntityToUpdateMethod = null;
     public $fields = array();
     public $errorPath = null;
     public $ignoreNull = true;

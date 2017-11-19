@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebServerBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bundle\WebServerBundle\DependencyInjection\WebServerExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -26,6 +27,6 @@ class WebServerExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('web_server.command.server_start'));
         $this->assertTrue($container->hasDefinition('web_server.command.server_stop'));
         $this->assertTrue($container->hasDefinition('web_server.command.server_status'));
-        $this->assertTrue($container->hasDefinition('web_server.command.server_log'));
+        $this->assertSame(class_exists(ConsoleFormatter::class), $container->hasDefinition('web_server.command.server_log'));
     }
 }

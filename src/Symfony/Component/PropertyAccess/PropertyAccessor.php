@@ -76,6 +76,11 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * @internal
      */
+    const ACCESS_ADDER_WITH_KEY = 6;
+
+    /**
+     * @internal
+     */
     const ACCESS_REMOVER = 5;
 
     /**
@@ -624,7 +629,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]} = $value;
         } elseif (self::ACCESS_TYPE_ADDER_AND_REMOVER === $access[self::ACCESS_TYPE]) {
-            $this->writeCollection($zval, $property, $value, $access[self::ACCESS_ADDER], $access[self::ACCESS_REMOVER]);
+            $this->writeCollection($zval, $property, $value, $access[self::ACCESS_ADDER], $access[self::ACCESS_REMOVER], $access[self::ACCESS_ADDER_WITH_KEY]);
         } elseif (!$access[self::ACCESS_HAS_PROPERTY] && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly
             // exclude $access[self::ACCESS_HAS_PROPERTY], otherwise if
@@ -645,13 +650,14 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Adjusts a collection-valued property by calling add*() and remove*() methods.
      *
-     * @param array              $zval         The array containing the object to write to
-     * @param string             $property     The property to write
-     * @param array|\Traversable $collection   The collection to write
-     * @param string             $addMethod    The add*() method
-     * @param string             $removeMethod The remove*() method
+     * @param array              $zval               The array containing the object to write to
+     * @param string             $property           The property to write
+     * @param array|\Traversable $collection         The collection to write
+     * @param string             $addMethod          The add*() method
+     * @param string             $removeMethod       The remove*() method
+     * @param bool               $secondKeyParameter If the add*() method has a second parameter for specifying array key
      */
-    private function writeCollection($zval, $property, $collection, $addMethod, $removeMethod)
+    private function writeCollection($zval, $property, $collection, $addMethod, $removeMethod, $secondKeyParameter)
     {
         // At this point the add and remove methods have been found
         $previousValue = $this->readProperty($zval, $property);
@@ -674,8 +680,10 @@ class PropertyAccessor implements PropertyAccessorInterface
             $previousValue = false;
         }
 
-        foreach ($collection as $item) {
-            if (!$previousValue || !in_array($item, $previousValue, true)) {
+        foreach ($collection as $key => $item) {
+            if ($secondKeyParameter) {
+                $zval[self::VALUE]->{$addMethod}($item, $key);
+            } elseif (!$previousValue || !in_array($item, $previousValue, true)) {
                 $zval[self::VALUE]->{$addMethod}($item);
             }
         }
@@ -719,6 +727,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_ADDER_AND_REMOVER;
                 $access[self::ACCESS_ADDER] = $methods[0];
                 $access[self::ACCESS_REMOVER] = $methods[1];
+                $access[self::ACCESS_ADDER_WITH_KEY] = $methods[2];
             }
         }
 
@@ -817,7 +826,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param \ReflectionClass $reflClass The reflection class for the given object
      * @param array            $singulars The singular form of the property name or null
      *
-     * @return array|null An array containing the adder and remover when found, null otherwise
+     * @return array|null An array containing the adder, remover when found and info about second key parameter, null otherwise
      */
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
     {
@@ -825,11 +834,13 @@ class PropertyAccessor implements PropertyAccessorInterface
             $addMethod = 'add'.$singular;
             $removeMethod = 'remove'.$singular;
 
-            $addMethodFound = $this->isMethodAccessible($reflClass, $addMethod, 1);
+            $addMethodFound = $this->isMethodAccessible($reflClass, $addMethod, 1, $addReflector);
             $removeMethodFound = $this->isMethodAccessible($reflClass, $removeMethod, 1);
 
             if ($addMethodFound && $removeMethodFound) {
-                return array($addMethod, $removeMethod);
+                $secondKeyParameter = $addReflector->getNumberOfParameters() > 1 && 'key' === $addReflector->getParameters()[1]->name;
+
+                return array($addMethod, $removeMethod, $secondKeyParameter);
             }
         }
     }
@@ -843,7 +854,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return bool Whether the method is public and has $parameters required parameters
      */
-    private function isMethodAccessible(\ReflectionClass $class, $methodName, $parameters)
+    private function isMethodAccessible(\ReflectionClass $class, $methodName, $parameters, \ReflectionMethod &$method = null)
     {
         if ($class->hasMethod($methodName)) {
             $method = $class->getMethod($methodName);

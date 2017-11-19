@@ -164,6 +164,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $definition = $container->register(NamedArgumentsVariadicsDummy::class, NamedArgumentsVariadicsDummy::class);
         $definition->setArguments(
             array(
+                '$class' => new \stdClass,
                 '$variadics' => array(
                     new Reference('foo'),
                     new Reference('bar'),
@@ -177,9 +178,10 @@ class ResolveNamedArgumentsPassTest extends TestCase
 
         $this->assertEquals(
             array(
-                0 => new Reference('foo'),
-                1 => new Reference('bar'),
-                2 => new Reference('baz'),
+                0 => new \stdClass(),
+                1 => new Reference('foo'),
+                2 => new Reference('bar'),
+                3 => new Reference('baz'),
             ),
             $definition->getArguments()
         );

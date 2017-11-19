@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-19T17:28:42Z
+
+Adding the type hints actually breaks the signature of constructor, when "null" is provided.
+Since the docblcks are not authoritative, we should accept as bug fix these kind of changes, and we may then deprecate passing `null` in `4.*`. Would be smoother to our user base (similar changes have already been merged.)

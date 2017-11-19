@@ -83,8 +83,8 @@ class Filesystem
     /**
      * Creates a directory recursively.
      *
-     * @param string|array|\Traversable $dirs The directory path
-     * @param int                       $mode The directory mode
+     * @param string|iterable $dirs The directory path
+     * @param int             $mode The directory mode
      *
      * @throws IOException On any directory creation failure
      */
@@ -111,7 +111,7 @@ class Filesystem
     /**
      * Checks the existence of files or directories.
      *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
+     * @param string|iterable $files A filename, an array of files, or a \Traversable instance to check
      *
      * @return bool true if the file exists, false otherwise
      */
@@ -135,9 +135,9 @@ class Filesystem
     /**
      * Sets access and modification time of file.
      *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
-     * @param int                       $time  The touch time as a Unix timestamp
-     * @param int                       $atime The access time as a Unix timestamp
+     * @param string|iterable $files A filename, an array of files, or a \Traversable instance to create
+     * @param int             $time  The touch time as a Unix timestamp
+     * @param int             $atime The access time as a Unix timestamp
      *
      * @throws IOException When touch fails
      */
@@ -154,7 +154,7 @@ class Filesystem
     /**
      * Removes files or directories.
      *
-     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to remove
+     * @param string|iterable $files A filename, an array of files, or a \Traversable instance to remove
      *
      * @throws IOException When removal fails
      */
@@ -190,10 +190,10 @@ class Filesystem
     /**
      * Change mode for an array of files or directories.
      *
-     * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change mode
-     * @param int                       $mode      The new mode (octal)
-     * @param int                       $umask     The mode mask (octal)
-     * @param bool                      $recursive Whether change the mod recursively or not
+     * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change mode
+     * @param int             $mode      The new mode (octal)
+     * @param int             $umask     The mode mask (octal)
+     * @param bool            $recursive Whether change the mod recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -212,9 +212,9 @@ class Filesystem
     /**
      * Change the owner of an array of files or directories.
      *
-     * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change owner
-     * @param string                    $user      The new owner user name
-     * @param bool                      $recursive Whether change the owner recursively or not
+     * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change owner
+     * @param string          $user      The new owner user name
+     * @param bool            $recursive Whether change the owner recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -239,9 +239,9 @@ class Filesystem
     /**
      * Change the group of an array of files or directories.
      *
-     * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change group
-     * @param string                    $group     The group name
-     * @param bool                      $recursive Whether change the group recursively or not
+     * @param string|iterable $files     A filename, an array of files, or a \Traversable instance to change group
+     * @param string          $group     The group name
+     * @param bool            $recursive Whether change the group recursively or not
      *
      * @throws IOException When the change fail
      */

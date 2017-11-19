@@ -645,11 +645,11 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Adjusts a collection-valued property by calling add*() and remove*() methods.
      *
-     * @param array              $zval         The array containing the object to write to
-     * @param string             $property     The property to write
-     * @param array|\Traversable $collection   The collection to write
-     * @param string             $addMethod    The add*() method
-     * @param string             $removeMethod The remove*() method
+     * @param array    $zval         The array containing the object to write to
+     * @param string   $property     The property to write
+     * @param iterable $collection   The collection to write
+     * @param string   $addMethod    The add*() method
+     * @param string   $removeMethod The remove*() method
      */
     private function writeCollection($zval, $property, $collection, $addMethod, $removeMethod)
     {

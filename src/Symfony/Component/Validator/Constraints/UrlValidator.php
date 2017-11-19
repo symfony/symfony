@@ -24,7 +24,7 @@ class UrlValidator extends ConstraintValidator
             (%s)://                                 # protocol
             (([\.\pL\pN-]+:)?([\.\pL\pN-]+)@)?      # basic auth
             (
-                ([\pL\pN\pS-\.])+(\.?([\pL\pN]|xn\-\-[\pL\pN-]+)+\.?) # a domain name
+                ([\pL\pN\pS\-\.])+(\.?([\pL\pN]|xn\-\-[\pL\pN-]+)+\.?) # a domain name
                     |                                                 # or
                 \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}                    # an IP address
                     |                                                 # or

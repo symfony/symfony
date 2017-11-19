@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-19T11:29:00Z
+
+in fact, the issue looks related to lazy command loading given `ServerLogCommand::isEnabled` is called :thinking:
+
+looking at `Application::get` we call `add($lazyLoadedCommand)`, but `add()` itself doesnt register if it's a disabled command, yet `get()` happily returns $lazyLoadedCommand anyway. Causing `server:log` also to look available in `bin/console list`.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-11-19T13:00:44Z
+
+See #25030
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-19T14:41:41Z
+
+I think I prefer your approach @chalasr 👍

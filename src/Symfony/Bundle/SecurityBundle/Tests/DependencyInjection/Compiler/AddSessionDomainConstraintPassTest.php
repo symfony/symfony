@@ -126,7 +126,8 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $ext = new SecurityExtension();
         $ext->load($config, $container);
 
-        (new AddSessionDomainConstraintPass())->process($container);
+        $pass = new AddSessionDomainConstraintPass();
+        $pass->process($container);
 
         return $container;
     }

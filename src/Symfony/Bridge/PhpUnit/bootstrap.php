@@ -12,6 +12,9 @@
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
+// Replace the native phpunit Blacklist, it's a broken artifact from the past
+require_once __DIR__.'/Blacklist.php';
+
 // Detect if we need to serialize deprecations to a file.
 if ($file = getenv('SYMFONY_DEPRECATIONS_SERIALIZE')) {
     DeprecationErrorHandler::collectDeprecations($file);

@@ -1473,6 +1473,30 @@ class ApplicationTest extends TestCase
         $this->assertSame(array('lazy:alias', 'lazy:alias2'), $command->getAliases());
     }
 
+    /**
+     * @expectedException \Symfony\Component\Console\Exception\CommandNotFoundException
+     */
+    public function testGetDisabledLazyCommand()
+    {
+        $application = new Application();
+        $application->setCommandLoader(new FactoryCommandLoader(array('disabled' => function () { return new DisabledCommand(); })));
+        $application->get('disabled');
+    }
+
+    public function testHasReturnsFalseForDisabledLazyCommand()
+    {
+        $application = new Application();
+        $application->setCommandLoader(new FactoryCommandLoader(array('disabled' => function () { return new DisabledCommand(); })));
+        $this->assertFalse($application->has('disabled'));
+    }
+
+    public function testAllExcludesDisabledLazyCommand()
+    {
+        $application = new Application();
+        $application->setCommandLoader(new FactoryCommandLoader(array('disabled' => function () { return new DisabledCommand(); })));
+        $this->assertArrayNotHasKey('disabled', $application->all());
+    }
+
     protected function getDispatcher($skipCommand = false)
     {
         $dispatcher = new EventDispatcher();
@@ -1570,5 +1594,13 @@ class LazyCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('lazy-command called');
+    }
+}
+
+class DisabledCommand extends Command
+{
+    public function isEnabled()
+    {
+        return false;
     }
 }

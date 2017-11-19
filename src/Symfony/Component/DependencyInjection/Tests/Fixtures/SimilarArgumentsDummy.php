@@ -16,7 +16,7 @@ class SimilarArgumentsDummy
     public $class1;
     public $class2;
 
-    public function __construct(CaseSensitiveClass $class1, string $token, CaseSensitiveClass $class2)
+    public function __construct(CaseSensitiveClass $class1, $token, CaseSensitiveClass $class2)
     {
         $this->class1 = $class1;
         $this->class2 = $class2;

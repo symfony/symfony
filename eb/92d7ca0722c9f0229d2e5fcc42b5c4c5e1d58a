@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-18T12:28:42Z
+
+Don't merge yet there are many more occurences.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-18T12:31:34Z
+
+Files I need to check:
+
+- [x] `src/Symfony/Component/Config/DependencyInjection/ConfigCachePass.php`
+- [x] `src/Symfony/Component/Console/Event/ConsoleExceptionEvent.php`
+- [x] `src/Symfony/Component/Process/ProcessBuilder.php`
+- [x] `src/Symfony/Component/Security/Core/Exception/NonceExpiredException.php`
+- [x] `src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MemcacheSessionHandler.php`
+- [x] `src/Symfony/Component/HttpFoundation/Session/Storage/Handler/WriteCheckSessionHandler.php`
+- [x] `src/Symfony/Bridge/Doctrine/HttpFoundation/DbalSessionHandler.php`
+- [x] `src/Symfony/Bridge/Doctrine/HttpFoundation/DbalSessionHandlerSchema.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/CompilerDebugDumpPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/FormPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TranslationExtractorPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/PropertyInfoPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TranslatorPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddConsoleCommandPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/TranslationDumperPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddCacheClearerPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/AddCacheWarmerPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/SerializerPass.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/EventListener/TestSessionListener.php`
+- [x] `src/Symfony/Bundle/FrameworkBundle/Translation/PhpStringTokenParser.php`
+- [x] `src/Symfony/Bundle/TwigBundle/ContainerAwareRuntimeLoader.php`
+- [x] `src/Symfony/Bundle/TwigBundle/Command/DebugCommand.php`
+- [x] `src/Symfony/Bundle/SecurityBundle/Command/SetAclCommand.php`
+- [x] `src/Symfony/Bundle/SecurityBundle/Command/InitAclCommand.php`
+- [x] `src/Symfony/Bundle/SecurityBundle/EventListener/AclSchemaListener.php`
+
+found with `grep -rn trigger_error .|grep ':14:'|grep ':class'`
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-18T12:51:38Z
+
+It's ready now
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-18T13:34:22Z
+
+Travis build failures seem unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-19T17:22:13Z
+
+Actually I think the convention has always been reverse: the deprecation should be just below the namespace. That's what we did in 2.7 & 2.8, and if you grep with a more generic regexp, you'll see that most of the existing notices are at the top.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-19T18:52:27Z
+
+@nicolas-grekas but then the use statements can't be used, see https://3v4l.org/8PjTg . I see 2 solutions:
+
+1. reconsider the convention
+2. refrain from using the `::class` notation when referring to other classes (is that what you meant?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-19T18:57:53Z
+
+Oh, got it! So this is a real bug fix. Let's merge as is then, no need to change everything now (and maybe discuss the general change somewhere else.)

@@ -15,7 +15,6 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
-use PHPUnit\Util\Blacklist;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Bridge\PhpUnit\DnsMock;
 
@@ -46,17 +45,6 @@ class SymfonyTestsListenerTrait
      */
     public function __construct(array $mockedNamespaces = array())
     {
-        if (class_exists('PHPUnit_Util_Blacklist')) {
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\DeprecationErrorHandler'] = 1;
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener'] = 1;
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 1;
-        } else {
-            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\DeprecationErrorHandler'] = 1;
-            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
-            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 1;
-        }
-
         $warn = false;
         foreach ($mockedNamespaces as $type => $namespaces) {
             if (!is_array($namespaces)) {
@@ -103,7 +91,7 @@ class SymfonyTestsListenerTrait
 
     public function startTestSuite($suite)
     {
-        if (class_exists('PHPUnit_Util_Blacklist', false)) {
+        if (class_exists('PHPUnit_Util_Test', false)) {
             $Test = 'PHPUnit_Util_Test';
         } else {
             $Test = 'PHPUnit\Util\Test';
@@ -190,7 +178,7 @@ class SymfonyTestsListenerTrait
                 putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$this->runsInSeparateProcess);
             }
 
-            if (class_exists('PHPUnit_Util_Blacklist', false)) {
+            if (class_exists('PHPUnit_Util_Test', false)) {
                 $Test = 'PHPUnit_Util_Test';
                 $AssertionFailedError = 'PHPUnit_Framework_AssertionFailedError';
             } else {
@@ -236,7 +224,7 @@ class SymfonyTestsListenerTrait
 
     public function endTest($test, $time)
     {
-        if (class_exists('PHPUnit_Util_Blacklist', false)) {
+        if (class_exists('PHPUnit_Util_Test', false)) {
             $Test = 'PHPUnit_Util_Test';
             $BaseTestRunner = 'PHPUnit_Runner_BaseTestRunner';
             $Warning = 'PHPUnit_Framework_Warning';

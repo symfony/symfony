@@ -97,7 +97,7 @@
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
         "predis/predis": "~1.0",
         "egulias/email-validator": "~1.2,>=1.2.8|~2.0",
-        "symfony/phpunit-bridge": "~3.2",
+        "symfony/phpunit-bridge": "~3.4|~4.0",
         "symfony/security-acl": "~2.8|~3.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0",
         "sensio/framework-extra-bundle": "^3.0.2"

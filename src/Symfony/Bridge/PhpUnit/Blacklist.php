@@ -23,12 +23,19 @@ class Blacklist
 
     public function getBlacklistedDirectories()
     {
-        $root = dirname(__DIR__);
-        while ($root !== $parent = dirname($root)) {
-            $root = $parent;
+        $blacklist = array();
+
+        foreach (get_declared_classes() as $class) {
+            if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
+                $r = new \ReflectionClass($class);
+                $v = dirname(dirname($r->getFileName()));
+                if (file_exists($v.'/composer/installed.json')) {
+                    $blacklist[] = $v;
+                }
+            }
         }
 
-        return array($root);
+        return $blacklist;
     }
 
     public function isBlacklisted($file)
@@ -37,5 +44,9 @@ class Blacklist
     }
 }
 
-class_alias('Symfony\Bridge\PhpUnit\Blacklist', 'PHPUnit\Util\Blacklist');
-class_alias('Symfony\Bridge\PhpUnit\Blacklist', 'PHPUnit_Util_Blacklist');
+if (class_exists('PHPUnit\Util\Test')) {
+    class_alias('Symfony\Bridge\PhpUnit\Blacklist', 'PHPUnit\Util\Blacklist');
+}
+if (class_exists('PHPUnit_Util_Test')) {
+    class_alias('Symfony\Bridge\PhpUnit\Blacklist', 'PHPUnit_Util_Blacklist');
+}

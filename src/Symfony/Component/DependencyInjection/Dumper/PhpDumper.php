@@ -271,11 +271,11 @@ EOF;
 
         array_unshift($inlinedDefinitions, $definition);
 
-        $collectLineage = $this->inlineRequires && !($this->hotPathTag && $definition->hasTag($this->hotPathTag));
+        $collectLineage = $this->inlineRequires && !$this->isHotPath($definition);
         $isNonLazyShared = !$this->getProxyDumper()->isProxyCandidate($definition) && $definition->isShared();
         $lineage = $calls = $behavior = array();
         foreach ($inlinedDefinitions as $iDefinition) {
-            if ($collectLineage && $class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()) {
+            if ($collectLineage && !$iDefinition->isDeprecated() && $class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()) {
                 $this->collectLineage($class, $lineage);
             }
             $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior, $isNonLazyShared);
@@ -763,7 +763,7 @@ EOTXT;
             $lazyInitialization = '';
         }
 
-        $asFile = $this->asFiles && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag));
+        $asFile = $this->asFiles && $definition->isShared() && !$this->isHotPath($definition);
         $methodName = $this->generateMethodName($id);
         if ($asFile) {
             $file = $methodName.'.php';
@@ -829,7 +829,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if ($definition->isSynthetic() || ($this->asFiles && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag)))) {
+            if ($definition->isSynthetic() || ($this->asFiles && $definition->isShared() && !$this->isHotPath($definition))) {
                 continue;
             }
             if ($definition->isPublic()) {
@@ -847,7 +847,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag))) {
+            if (!$definition->isSynthetic() && $definition->isShared() && !$this->isHotPath($definition)) {
                 $code = $this->addService($id, $definition, $file);
                 yield $file => $code;
             }
@@ -1120,7 +1120,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && (!$this->asFiles || !$definition->isShared() || ($this->hotPathTag && $definition->hasTag($this->hotPathTag)))) {
+            if (!$definition->isSynthetic() && (!$this->asFiles || !$definition->isShared() || $this->isHotPath($definition))) {
                 $code .= '            '.$this->export($id).' => '.$this->export($this->generateMethodName($id)).",\n";
             }
         }
@@ -1139,7 +1139,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag))) {
+            if (!$definition->isSynthetic() && $definition->isShared() && !$this->isHotPath($definition)) {
                 $code .= sprintf("            %s => __DIR__.'/%s.php',\n", $this->export($id), $this->generateMethodName($id));
             }
         }
@@ -1856,7 +1856,7 @@ EOF;
                 if ($definition->isShared()) {
                     $code = sprintf('$this->services[\'%s\'] = %s', $id, $code);
                 }
-            } elseif ($this->asFiles && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag))) {
+            } elseif ($this->asFiles && $definition->isShared() && !$this->isHotPath($definition)) {
                 $code = sprintf("\$this->load(__DIR__.'/%s.php')", $this->generateMethodName($id));
             } else {
                 $code = sprintf('$this->%s()', $this->generateMethodName($id));
@@ -1986,6 +1986,11 @@ EOF;
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function isHotPath(Definition $definition)
+    {
+        return $this->hotPathTag && $definition->hasTag($this->hotPathTag) && !$definition->isDeprecated();
     }
 
     private function export($value)

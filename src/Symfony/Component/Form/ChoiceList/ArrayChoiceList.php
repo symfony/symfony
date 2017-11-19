@@ -56,11 +56,11 @@ class ArrayChoiceList implements ChoiceListInterface
      *
      * The given choice array must have the same array keys as the value array.
      *
-     * @param array|\Traversable $choices The selectable choices
-     * @param callable|null      $value   The callable for creating the value
-     *                                    for a choice. If `null` is passed,
-     *                                    incrementing integers are used as
-     *                                    values
+     * @param iterable      $choices The selectable choices
+     * @param callable|null $value   The callable for creating the value
+     *                               for a choice. If `null` is passed,
+     *                               incrementing integers are used as
+     *                               values
      */
     public function __construct($choices, callable $value = null)
     {

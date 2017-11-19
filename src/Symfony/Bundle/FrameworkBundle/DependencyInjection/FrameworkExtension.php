@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
+use Psr\Log\LoggerAwareInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
@@ -294,6 +295,8 @@ class FrameworkExtension extends Extension
             ->addTag('kernel.event_subscriber');
         $container->registerForAutoconfiguration(ResettableInterface::class)
             ->addTag('kernel.reset', array('method' => 'reset'));
+        $container->registerForAutoconfiguration(LoggerAwareInterface::class)
+            ->addTag('logger.aware');
         $container->registerForAutoconfiguration(PropertyListExtractorInterface::class)
             ->addTag('property_info.list_extractor');
         $container->registerForAutoconfiguration(PropertyTypeExtractorInterface::class)

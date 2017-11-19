@@ -120,9 +120,7 @@ EOT
             }
         }
 
-        // Create the bundles directory otherwise symlink will fail.
         $bundlesDir = $targetArg.'/bundles/';
-        $this->filesystem->mkdir($bundlesDir, 0777);
 
         $io = new SymfonyStyle($input, $output);
         $io->newLine();
@@ -186,10 +184,14 @@ EOT
             }
         }
         // remove the assets of the bundles that no longer exist
-        $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($bundlesDir);
-        $this->filesystem->remove($dirsToRemove);
+        if (is_dir($bundlesDir)) {
+            $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($bundlesDir);
+            $this->filesystem->remove($dirsToRemove);
+        }
 
-        $io->table(array('', 'Bundle', 'Method / Error'), $rows);
+        if ($rows) {
+            $io->table(array('', 'Bundle', 'Method / Error'), $rows);
+        }
 
         if (0 !== $exitCode) {
             $io->error('Some errors occurred while installing assets.');
@@ -197,7 +199,7 @@ EOT
             if ($copyUsed) {
                 $io->note('Some assets were installed via copy. If you make changes to these assets you have to run this command again.');
             }
-            $io->success('All assets were successfully installed.');
+            $io->success($rows ? 'All assets were successfully installed.' : 'No assets were provided by any bundle.');
         }
 
         return $exitCode;

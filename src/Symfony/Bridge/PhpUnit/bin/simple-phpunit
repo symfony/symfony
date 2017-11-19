@@ -68,7 +68,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
         passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
-    passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"~3.3.11@dev|~3.4.0-beta2@dev|^4.0.0-beta2@dev\"");
+    passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"~3.4-beta5@dev|^4.0-beta5@dev\"");
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
     $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));

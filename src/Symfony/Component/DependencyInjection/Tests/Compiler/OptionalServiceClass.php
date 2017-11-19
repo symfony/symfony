@@ -13,8 +13,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Bug\NotExistClass;
 
-if (!function_exists('__phpunit_run_isolated_test')) {
-    class OptionalServiceClass extends NotExistClass
-    {
-    }
+class OptionalServiceClass extends NotExistClass
+{
 }

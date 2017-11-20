@@ -292,7 +292,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertCount(5, $transitions);
 
-        $this->assertSame('request_review', $transitions[0]->getArgument(0));
+        $this->assertSame('request-review', $transitions[0]->getArgument(0));
         $this->assertSame('journalist_approval', $transitions[1]->getArgument(0));
         $this->assertSame('spellchecker_approval', $transitions[2]->getArgument(0));
         $this->assertSame('publish', $transitions[3]->getArgument(0));

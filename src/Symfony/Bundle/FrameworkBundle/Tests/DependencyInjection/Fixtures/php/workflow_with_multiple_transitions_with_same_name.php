@@ -22,7 +22,7 @@ $container->loadFromExtension('framework', array(
                 'published',
             ),
             'transitions' => array(
-                'request_review' => array(
+                'request-review' => array(
                     'from' => 'draft',
                     'to' => array('wait_for_journalist', 'wait_for_spellchecker'),
                 ),

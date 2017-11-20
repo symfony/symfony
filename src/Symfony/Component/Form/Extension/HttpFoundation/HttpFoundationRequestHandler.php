@@ -108,6 +108,9 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         $form->submit($data, 'PATCH' !== $method);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isFileUpload($data)
     {
         return $data instanceof File;

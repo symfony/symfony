@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-20T11:04:36Z
+
+I would add a test case with a config like the one provided in the linked issue to prevent regressions.

@@ -66,13 +66,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarServiceService()
     {
-        $a = ${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->services['baz_service'] = new \stdClass()) && false ?: '_'};
-
-        if (isset($this->services['bar_service'])) {
-            return $this->services['bar_service'];
-        }
-
-        return $this->services['bar_service'] = new \stdClass($a);
+        return $this->services['bar_service'] = new \stdClass(${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->services['baz_service'] = new \stdClass()) && false ?: '_'});
     }
 
     /**
@@ -82,13 +76,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooServiceService()
     {
-        $a = ${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->services['baz_service'] = new \stdClass()) && false ?: '_'};
-
-        if (isset($this->services['foo_service'])) {
-            return $this->services['foo_service'];
-        }
-
-        return $this->services['foo_service'] = new \stdClass($a);
+        return $this->services['foo_service'] = new \stdClass(${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->services['baz_service'] = new \stdClass()) && false ?: '_'});
     }
 
     /**

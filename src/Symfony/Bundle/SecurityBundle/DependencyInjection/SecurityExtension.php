@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
+require_once __DIR__.'/../Resources/di/tags.php';
+
 use Symfony\Bundle\SecurityBundle\Command\InitAclCommand;
 use Symfony\Bundle\SecurityBundle\Command\SetAclCommand;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;

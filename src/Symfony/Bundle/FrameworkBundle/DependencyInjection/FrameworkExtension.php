@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+require_once __DIR__.'/../Resources/di/tags.php';
+
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

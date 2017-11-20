@@ -53,7 +53,7 @@ php: |
     array(
         'foo' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'e' => 'notnull'),
         'bar' => array('a' => 'before', 'd' => 'other', 'e' => null, 'b' => 'new', 'c' => array('foo' => 'bar', 'bar' => 'foo'), 'x' => 'Oren'),
-        'bar_inline' => array('a' => 'before', 'd' => 'other', 'b' => 'new', 'c' => array('foo' => 'bar', 'bar' => 'foo'), 'x' => 'Oren'),
+        'bar_inline' => array('a' => 'before', 'd' => 'other', 'b' => 'new', 'c' => array('foo' => 'bar', 'bar' => 'foo'), 'e' => 'notnull', 'x' => 'Oren'),
         'duplicate' => array('foo' => 'bar'),
         'foo2' => array('a' => 'Ballmer'),
         'ding' => array('fi', 'fei', 'fo', 'fam'),
@@ -61,6 +61,6 @@ php: |
         'head' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'e' => 'notnull', 'fi', 'fei', 'fo', 'fam'),
         'taz' => array('a' => 'Steve', 'w' => array('p' => 1234)),
         'nested' => array('a' => 'Steve', 'w' => array('p' => 12345), 'd' => 'Doug', 'z' => array('p' => 12345)),
-        'head_inline' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam'),
-        'recursive_inline' => array('a' => 'Steve', 'b' => 'Clark', 'c' => array('a' => 'Ballmer'), 'fi', 'fei', 'fo', 'fam')
+        'head_inline' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'e' => 'notnull', 'fi', 'fei', 'fo', 'fam'),
+        'recursive_inline' => array('a' => 'Steve', 'b' => 'Clark', 'c' => array('a' => 'Ballmer'), 'e' => 'notnull', 'fi', 'fei', 'fo', 'fam'),
     )

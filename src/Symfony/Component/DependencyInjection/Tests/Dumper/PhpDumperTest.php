@@ -176,7 +176,7 @@ class PhpDumperTest extends TestCase
         if ('\\' === DIRECTORY_SEPARATOR) {
             $dump = str_replace('\\\\Fixtures\\\\includes\\\\foo.php', '/Fixtures/includes/foo.php', $dump);
         }
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services9_as_files.txt', $dump);
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_as_files.txt', $dump);
     }
 
     public function testServicesWithAnonymousFactories()

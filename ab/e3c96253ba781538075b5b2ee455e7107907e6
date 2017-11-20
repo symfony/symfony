@@ -1,0 +1,213 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-29T20:35:28Z
+
+Could that be written in PHP, so that Windows user could use it easily also?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-01T17:52:32Z
+
+@dunglas ok to rewrite it in PHP?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-01T17:55:43Z
+
+Yes I’ll try.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-04T18:48:26Z
+
+@nicolas-grekas done.
+
+I don't have a Windows computer. It would be nice that someone test the new version on this OS.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-09T09:35:42Z
+
+@lyrixx I've added this comment to the root directory for consistency with the `phpunit` script and because it's easier to find for a new contributor. But we can change that.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-11T15:51:26Z
+
+@dunglas is it possible to create relative symlinks? That would be convenient with docker.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-11T15:53:35Z
+
+@ro0NL technically yes, but not on Windows AFAIK, so there need to be special care here.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-11T16:50:35Z
+
+Rigth, but otherwise we could just exec `ln -rs ... ...` no? That seems to do it :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-11T16:55:00Z
+
+"symlink" works just fine on Linux and Windows, no need for "exec" at all.
+The only diff is that the target on Windows has to be a full path.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-11T18:15:00Z
+
+How does it work with Docker with relative links? You put symfony/symfony in your project’s volume?
+
+What we can do is using relative links on Linux (for Docker) and absolute links on Windows.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-11T18:29:18Z
+
+> You put symfony/symfony in your project’s volume?
+
+Yep :) basically i mount my entire `~/dev` dir on a generic container. So relative to that all paths remain the same.
+
+> What we can do is using relative links on Linux (for Docker) and absolute links on Windows.
+
+Sounds good :) im not sure if generating a rel path is a hassle? hence i suggested `ln -rs`
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2017-11-12T21:04:59Z
+
+Does the same can be achevied with composer local path repository ? https://getcomposer.org/doc/05-repositories.md#path
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-15T10:08:05Z
+
+@GromNaN yes, possible :) but i still think this script should work independent from composer.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-11-18T10:47:51Z
+
+Works like a charm and it really saves the hack day for me. 👍
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-18T10:55:55Z
+
+well.. no :)
+
+![image](https://user-images.githubusercontent.com/1047696/32979552-5c842bc8-cc57-11e7-9c82-8d662834d589.png)
+
+linked on docker.. but i see if i can patch now :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-18T11:09:01Z
+
+@ro0NL, I come to the hack day and I try to create relative links on Linux!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-18T11:30:10Z
+
+my use case is
+
+```
+$ pwd
+/home/me/dev/symfony-src
+
+$ run-on-docker ./link ../project
+```
+
+```php
+$sfDir = '/var/www/html/symfony-src/src/Symfony/Component/Debug';
+$dir = '../project/vendor/symfony/debug';
+```
+
+for now i did
+
+```diff
+-    symlink($sfDir = $sfPackages[$package], $dir);
++    exec('ln -rs '.escapeshellarg($sfDir = $sfPackages[$package]).' '.escapeshellarg($dir));
+```
+
+```
+debug -> ../../../symfony-src/src/Symfony/Component/Debug/
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-18T13:15:30Z
+
+@ro0NL why don't you run the `link` command from inside your container?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-18T13:28:15Z
+
+i do that :wink: i wrap `docker run CMD`
+
+therefor i get `/var/www/html/symfony-src/...` targets, which should be `/home/me/dev/symfony-src/...` for the host
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-18T13:38:59Z
+
+@ro0NL `ln -r` is a (recent) GNU option, it doesn't work on Mac and BSD, and it looks like there is no easy alternative for those systems.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-18T13:49:03Z
+
+perhaps worth detecting availability... dunno. Or enable explicitly by `link -r`.
+
+:+1: for merging as is also.. i can change this manually now and then.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-11-18T14:39:09Z
+
+Please merge with relative links support. We containerize each project we are working on and I believe lot of other people too. It will be very common use case.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-18T14:56:47Z
+
+We don’t have a solution working both on Linux, BSD and Mac right now.
+
+I suggest to merge this PR as is because it’s a pain to debug Flex apps without, then we can try to add relative links support in another PR.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-18T19:44:30Z
+
+We could simply `include src/Symfony/Component/Filesystem/Filesystem.php`. Using `->makePathRelative` as well as `->symlink()` perhaps.
+
+I can confirm `makePathRelative($sfDir, dirname(realpath($dir))` works (before doing `rmdir($dir)`).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-18T22:13:31Z
+
+@ro0NL good idea, the same trick was proposed by @lyrixx. It's implemented!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-19T19:10:02Z
+
+@ro0NL, no we'll merge it in the lowest branch directly using `gh`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-20T18:08:51Z
+
+:+1: for merging this into 2.7, this is a tool for dev
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-20T18:09:37Z
+
+(squashing + rebasing before merging would be great)

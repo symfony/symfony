@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-18T08:59:59Z
+
+Test don't pass yet :)
+Wondering two things:
+
+- does ConsoleCommandPass prefer a specific naming scheme?
+- running debug:autowiring on a 3.4 standard edition, I get this list. Looks like there could me more FQCN ids removed (not only on symfony/symfony, would you mind cleaning them also?)
+
+```
+  Sensio\Bundle\FrameworkExtraBundle\EventListener\ControllerListener
+  Sensio\Bundle\FrameworkExtraBundle\EventListener\HttpCacheListener
+  Sensio\Bundle\FrameworkExtraBundle\EventListener\IsGrantedListener
+  Sensio\Bundle\FrameworkExtraBundle\EventListener\ParamConverterListener
+  Sensio\Bundle\FrameworkExtraBundle\EventListener\SecurityListener
+  Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener
+  Sensio\Bundle\FrameworkExtraBundle\Request\ArgumentNameConverter
+  Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DateTimeParamConverter
+  Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter
+  Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterManager
+  Sensio\Bundle\FrameworkExtraBundle\Routing\AnnotatedRouteControllerLoader
+  Sensio\Bundle\FrameworkExtraBundle\Security\ExpressionLanguage
+  Sensio\Bundle\FrameworkExtraBundle\Templating\TemplateGuesser
+  Symfony\Bridge\Twig\Command\DebugCommand
+  Symfony\Bundle\FrameworkBundle\Command\AboutCommand
+  Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand
+  Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand
+  Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand
+  Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand
+  Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand
+  Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand
+  Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand
+  Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand
+  Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand
+  Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand
+  Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand
+  Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand
+  Symfony\Bundle\FrameworkBundle\Command\XliffLintCommand
+  Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand
+  Symfony\Bundle\FrameworkBundle\Controller\RedirectController
+  Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+  Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand
+  Symfony\Bundle\TwigBundle\Command\LintCommand
+  Symfony\Component\Config\Resource\SelfCheckingResourceChecker
+  Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker
+  Symfony\Component\ExpressionLanguage\ExpressionLanguage
+  Symfony\Component\Form\Command\DebugCommand
+  Symfony\Component\Routing\Loader\AnnotationDirectoryLoader
+  Symfony\Component\Routing\Loader\AnnotationFileLoader
+```
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-19T07:52:53Z
+
+The review has been taken into account.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-11-19T16:36:45Z
+
+> does ConsoleCommandPass prefer a specific naming scheme?
+
+@nicolas-grekas if that's what you wonder, AddConsoleCommandPass should process correctly no matter the service id
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-20T07:10:10Z
+
+done @stof
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-20T09:25:37Z
+
+There are two remaining services when testing this with the standard edition:
+- Symfony\Component\Routing\Loader\AnnotationDirectoryLoader
+- Symfony\Component\Routing\Loader\AnnotationFileLoader
+
+looking more precisely with @Simperfit, we discovered that these classes are actually registered twice: first with a class as id, second with a regular id. Needs to be understood and fixed.

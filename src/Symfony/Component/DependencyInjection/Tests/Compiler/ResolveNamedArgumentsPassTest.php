@@ -154,9 +154,6 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $this->assertEquals(array(new Reference('bar'), 'qwerty', new Reference('foo')), $definition->getArguments());
     }
 
-    /**
-     * @requires PHP 5.6
-     */
     public function testVariadics()
     {
         $container = new ContainerBuilder();

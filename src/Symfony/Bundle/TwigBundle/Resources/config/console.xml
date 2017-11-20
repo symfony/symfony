@@ -7,13 +7,13 @@
     <services>
         <defaults public="false" />
 
-        <service id="Symfony\Bridge\Twig\Command\DebugCommand">
+        <service id="twig.command.debug" class="Symfony\Bridge\Twig\Command\DebugCommand">
             <argument type="service" id="twig" />
             <argument>%kernel.project_dir%</argument>
             <tag name="console.command" command="debug:twig" />
         </service>
 
-        <service id="Symfony\Bundle\TwigBundle\Command\LintCommand">
+        <service id="twig.command.lint" class="Symfony\Bundle\TwigBundle\Command\LintCommand">
             <argument type="service" id="twig" />
             <tag name="console.command" command="lint:twig" />
         </service>

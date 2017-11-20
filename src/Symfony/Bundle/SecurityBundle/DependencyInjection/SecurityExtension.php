@@ -252,8 +252,6 @@ class SecurityExtension extends Extension
             $defaultProvider = $providerIds[$normalizedName];
         } elseif (1 === count($providerIds)) {
             $defaultProvider = reset($providerIds);
-        } elseif ($providerIds) {
-            throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
         }
 
         $config->replaceArgument(5, $defaultProvider);
@@ -412,8 +410,10 @@ class SecurityExtension extends Extension
                             throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall[$key]['provider']));
                         }
                         $userProvider = $providerIds[$normalizedName];
+                    } elseif($defaultProvider) {
+                        $userProvider = $defaultProvider;
                     } else {
-                        $userProvider = $defaultProvider ?: $this->getFirstProvider($id, $key, $providerIds);
+                        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $key, $id));
                     }
 
                     list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
@@ -594,9 +594,13 @@ class SecurityExtension extends Extension
         return $exceptionListenerId;
     }
 
-    private function createSwitchUserListener($container, $id, $config, $defaultProvider, $stateless)
+    private function createSwitchUserListener($container, $id, $config, $defaultProvider = null, $stateless)
     {
-        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : ($defaultProvider ?: $this->getFirstProvider($id, 'switch_user', $providerIds));
+        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
+
+        if (!$userProvider) {
+            throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "switch_user" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
+        }
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new ChildDefinition('security.authentication.switchuser_listener'));
@@ -694,15 +698,5 @@ class SecurityExtension extends Extension
         }
 
         return $this->expressionLanguage;
-    }
-
-    /**
-     * @deprecated since version 3.4, to be removed in 4.0
-     */
-    private function getFirstProvider($firewallName, $listenerName, array $providerIds)
-    {
-        @trigger_error(sprintf('Listener "%s" on firewall "%s" has no "provider" set but multiple providers exist. Using the first configured provider (%s) is deprecated since 3.4 and will throw an exception in 4.0, set the "provider" key on the firewall instead.', $listenerName, $firewallName, $first = array_keys($providerIds)[0]), E_USER_DEPRECATED);
-
-        return $providerIds[$first];
     }
 }

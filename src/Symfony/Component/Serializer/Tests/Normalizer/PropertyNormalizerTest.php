@@ -441,6 +441,11 @@ class PropertyNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testInheritedPropertiesSupport()
+    {
+        $this->assertTrue($this->normalizer->supportsNormalization(new PropertyChildDummy()));
+    }
 }
 
 class PropertyDummy
@@ -508,4 +513,13 @@ class PropertyCamelizedDummy
 class StaticPropertyDummy
 {
     private static $property = 'value';
+}
+
+class PropertyParentDummy
+{
+    private $foo = 'bar';
+}
+
+class PropertyChildDummy extends PropertyParentDummy
+{
 }

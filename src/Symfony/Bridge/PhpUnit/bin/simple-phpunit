@@ -26,8 +26,16 @@ if (PHP_VERSION_ID >= 70200) {
     $PHPUNIT_VERSION = '4.8';
 }
 
+if (file_exists(($path = dirname(__DIR__)).'/composer.json')) {
+    if (file_exists($path.'/vendor/symfony/phpunit-bridge/composer.json')) {
+        $path .= '/vendor/symfony/phpunit-bridge';
+    }
+} elseif (file_exists($path.'/symfony/phpunit-bridge/composer.json')) {
+    $path .= '/symfony/phpunit-bridge';
+}
+
 $oldPwd = getcwd();
-$PHPUNIT_DIR = getenv('SYMFONY_PHPUNIT_DIR') ?: (__DIR__.'/.phpunit');
+$PHPUNIT_DIR = getenv('SYMFONY_PHPUNIT_DIR') ?: (dirname(dirname(__DIR__) === $path ? $path : __DIR__).'/.phpunit');
 $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
 $PHP = escapeshellarg($PHP);
 if ('phpdbg' === PHP_SAPI) {
@@ -69,15 +77,8 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
         passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
     passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"*\"");
-    if (file_exists(($path = dirname(__DIR__)).'/composer.json')) {
-        if (file_exists($path.'/vendor/symfony/phpunit-bridge/composer.json')) {
-            $path .= '/vendor/symfony/phpunit-bridge';
-        }
-    } elseif (file_exists($path.'/symfony/phpunit-bridge/composer.json')) {
-        $path .= '/symfony/phpunit-bridge';
-    }
     if (file_exists($path)) {
-        passthru("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg($path));
+        passthru("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', DIRECTORY_SEPARATOR, $path)));
     }
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");

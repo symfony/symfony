@@ -244,7 +244,7 @@ class SecurityExtension extends Extension
 
         $config->replaceArgument(4, $firewall['stateless']);
 
-        // Provider id (take the first registered provider if none defined)
+        // Provider id (must be configured explicitly per firewall/authenticator if more than one provider is set)
         if (isset($firewall['provider'])) {
             if (!isset($providerIds[$normalizedName = str_replace('-', '_', $firewall['provider'])])) {
                 throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall['provider']));

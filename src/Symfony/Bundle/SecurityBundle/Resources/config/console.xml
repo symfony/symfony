@@ -7,7 +7,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand">
+        <service id="security.command.user_password_encoder" class="Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand">
             <argument type="service" id="security.encoder_factory"/>
             <argument type="collection" /> <!-- encoders' user classes -->
             <tag name="console.command" command="security:encode-password" />

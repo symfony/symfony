@@ -68,7 +68,17 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
         passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
-    passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"~3.4-beta5@dev|^4.0-beta5@dev\"");
+    passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"*\"");
+    if (file_exists(($path = dirname(__DIR__)).'/composer.json')) {
+        if (file_exists($path.'/vendor/symfony/phpunit-bridge/composer.json')) {
+            $path .= '/vendor/symfony/phpunit-bridge';
+        }
+    } elseif (file_exists($path.'/symfony/phpunit-bridge/composer.json')) {
+        $path .= '/symfony/phpunit-bridge';
+    }
+    if (file_exists($path)) {
+        passthru("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg($path));
+    }
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
     $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));

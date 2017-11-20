@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -67,6 +68,7 @@ class PhpDumper extends Dumper
     private $hotPathTag;
     private $inlineRequires;
     private $inlinedRequires = array();
+    private $circularReferences = array();
 
     /**
      * @var ProxyDumper
@@ -133,6 +135,14 @@ class PhpDumper extends Dumper
         }
 
         $this->initializeMethodNamesMap('Container' === $baseClass ? Container::class : $baseClass);
+
+        (new AnalyzeServiceReferencesPass())->process($this->container);
+        $this->circularReferences = array();
+        $checkedNodes = array();
+        foreach ($this->container->getCompiler()->getServiceReferenceGraph()->getNodes() as $id => $node) {
+            $currentPath = array($id => $id);
+            $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
+        }
 
         $this->docStar = $options['debug'] ? '*' : '';
 
@@ -235,6 +245,7 @@ EOF;
 
         $this->targetDirRegex = null;
         $this->inlinedRequires = array();
+        $this->circularReferences = array();
 
         $unusedEnvs = array();
         foreach ($this->container->getEnvCounters() as $env => $use) {
@@ -267,19 +278,19 @@ EOF;
 
         array_unshift($inlinedDefinitions, $definition);
 
-        $collectLineage = $this->inlineRequires && !($this->hotPathTag && $definition->hasTag($this->hotPathTag));
-        $isNonLazyShared = !$this->getProxyDumper()->isProxyCandidate($definition) && $definition->isShared();
+        $collectLineage = $this->inlineRequires && !$this->isHotPath($definition);
+        $isNonLazyShared = isset($this->circularReferences[$cId]) && !$this->getProxyDumper()->isProxyCandidate($definition) && $definition->isShared();
         $lineage = $calls = $behavior = array();
         foreach ($inlinedDefinitions as $iDefinition) {
-            if ($collectLineage && $class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()) {
+            if ($collectLineage && !$iDefinition->isDeprecated() && $class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()) {
                 $this->collectLineage($class, $lineage);
             }
-            $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior, $isNonLazyShared);
+            $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior, $isNonLazyShared, $cId);
             $isPreInstantiation = $isNonLazyShared && $iDefinition !== $definition && !$this->hasReference($cId, $iDefinition->getMethodCalls(), true) && !$this->hasReference($cId, $iDefinition->getProperties(), true);
-            $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior, $isPreInstantiation);
-            $this->getServiceCallsFromArguments($iDefinition->getProperties(), $calls, $behavior, $isPreInstantiation);
-            $this->getServiceCallsFromArguments(array($iDefinition->getConfigurator()), $calls, $behavior, $isPreInstantiation);
-            $this->getServiceCallsFromArguments(array($iDefinition->getFactory()), $calls, $behavior, $isNonLazyShared);
+            $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior, $isPreInstantiation, $cId);
+            $this->getServiceCallsFromArguments($iDefinition->getProperties(), $calls, $behavior, $isPreInstantiation, $cId);
+            $this->getServiceCallsFromArguments(array($iDefinition->getConfigurator()), $calls, $behavior, $isPreInstantiation, $cId);
+            $this->getServiceCallsFromArguments(array($iDefinition->getFactory()), $calls, $behavior, $isNonLazyShared, $cId);
         }
 
         $code = '';
@@ -331,6 +342,33 @@ EOTXT
         }
 
         return $code;
+    }
+
+    private function analyzeCircularReferences(array $edges, &$checkedNodes, &$currentPath)
+    {
+        foreach ($edges as $edge) {
+            $node = $edge->getDestNode();
+            $id = $node->getId();
+
+            if (isset($checkedNodes[$id])) {
+                continue;
+            }
+
+            if ($node->getValue() && ($edge->isLazy() || $edge->isWeak())) {
+                // no-op
+            } elseif (isset($currentPath[$id])) {
+                foreach (array_reverse($currentPath) as $parentId) {
+                    $this->circularReferences[$parentId][$id] = $id;
+                    $id = $parentId;
+                }
+            } else {
+                $currentPath[$id] = $id;
+                $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
+            }
+
+            $checkedNodes[$id] = true;
+            array_pop($currentPath);
+        }
     }
 
     private function collectLineage($class, array &$lineage)
@@ -526,7 +564,7 @@ EOTXT
         }
 
         foreach ($definition->getArguments() as $arg) {
-            if (!$arg || ($arg instanceof Reference && 'service_container' === (string) $arg)) {
+            if (!$arg) {
                 continue;
             }
             if (is_array($arg) && 3 >= count($arg)) {
@@ -534,7 +572,7 @@ EOTXT
                     if ($this->dumpValue($k) !== $this->dumpValue($k, false)) {
                         return false;
                     }
-                    if (!$v || ($v instanceof Reference && 'service_container' === (string) $v)) {
+                    if (!$v) {
                         continue;
                     }
                     if ($v instanceof Reference && $this->container->has($id = (string) $v) && $this->container->findDefinition($id)->isSynthetic()) {
@@ -694,7 +732,7 @@ EOTXT
             $lazyInitialization = '';
         }
 
-        $asFile = $this->asFiles && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag));
+        $asFile = $this->asFiles && $definition->isShared() && !$this->isHotPath($definition);
         $methodName = $this->generateMethodName($id);
         if ($asFile) {
             $file = $methodName.'.php';
@@ -755,7 +793,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if ($definition->isSynthetic() || ($this->asFiles && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag)))) {
+            if ($definition->isSynthetic() || ($this->asFiles && $definition->isShared() && !$this->isHotPath($definition))) {
                 continue;
             }
             if ($definition->isPublic()) {
@@ -773,7 +811,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag))) {
+            if (!$definition->isSynthetic() && $definition->isShared() && !$this->isHotPath($definition)) {
                 $code = $this->addService($id, $definition, $file);
                 yield $file => $code;
             }
@@ -996,7 +1034,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && $definition->isPublic() && (!$this->asFiles || !$definition->isShared() || ($this->hotPathTag && $definition->hasTag($this->hotPathTag)))) {
+            if (!$definition->isSynthetic() && $definition->isPublic() && (!$this->asFiles || !$definition->isShared() || $this->isHotPath($definition))) {
                 $code .= '            '.$this->export($id).' => '.$this->export($this->generateMethodName($id)).",\n";
             }
         }
@@ -1010,7 +1048,7 @@ EOF;
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isSynthetic() && $definition->isPublic() && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag))) {
+            if (!$definition->isSynthetic() && $definition->isPublic() && $definition->isShared() && !$this->isHotPath($definition)) {
                 $code .= sprintf("            %s => __DIR__.'/%s.php',\n", $this->export($id), $this->generateMethodName($id));
             }
         }
@@ -1260,16 +1298,16 @@ EOF;
         return implode(' && ', $conditions);
     }
 
-    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior, bool $isPreInstantiation)
+    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior, bool $isPreInstantiation, string $callerId)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
-                $this->getServiceCallsFromArguments($argument, $calls, $behavior, $isPreInstantiation);
+                $this->getServiceCallsFromArguments($argument, $calls, $behavior, $isPreInstantiation, $callerId);
             } elseif ($argument instanceof Reference) {
                 $id = (string) $argument;
 
                 if (!isset($calls[$id])) {
-                    $calls[$id] = (int) ($isPreInstantiation && $this->container->has($id) && !$this->container->findDefinition($id)->isSynthetic());
+                    $calls[$id] = (int) ($isPreInstantiation && isset($this->circularReferences[$callerId][$id]));
                 }
                 if (!isset($behavior[$id])) {
                     $behavior[$id] = $argument->getInvalidBehavior();
@@ -1321,6 +1359,10 @@ EOF;
 
     private function hasReference(string $id, array $arguments, bool $deep = false, array &$visited = array()): bool
     {
+        if (!isset($this->circularReferences[$id])) {
+            return false;
+        }
+
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 if ($this->hasReference($id, $argument, $deep, $visited)) {
@@ -1334,7 +1376,7 @@ EOF;
                     return true;
                 }
 
-                if (!$deep || isset($visited[$argumentId]) || 'service_container' === $argumentId) {
+                if (!$deep || isset($visited[$argumentId]) || !isset($this->circularReferences[$id][$argumentId])) {
                     continue;
                 }
 
@@ -1570,7 +1612,7 @@ EOF;
                 if ($definition->isShared()) {
                     $code = sprintf('$this->%s[\'%s\'] = %s', $definition->isPublic() ? 'services' : 'privates', $id, $code);
                 }
-            } elseif ($this->asFiles && $definition->isShared() && !($this->hotPathTag && $definition->hasTag($this->hotPathTag))) {
+            } elseif ($this->asFiles && $definition->isShared() && !$this->isHotPath($definition)) {
                 $code = sprintf("\$this->load(__DIR__.'/%s.php')", $this->generateMethodName($id));
             } else {
                 $code = sprintf('$this->%s()', $this->generateMethodName($id));
@@ -1692,6 +1734,11 @@ EOF;
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function isHotPath(Definition $definition)
+    {
+        return $this->hotPathTag && $definition->hasTag($this->hotPathTag) && !$definition->isDeprecated();
     }
 
     private function export($value)

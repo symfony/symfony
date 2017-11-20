@@ -147,6 +147,27 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($container->getDefinition('security.authentication.switchuser_listener.some_firewall')->getArgument(9));
     }
 
+    public function testPerListenerProvider()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'first' => array('id' => 'foo'),
+                'second' => array('id' => 'bar'),
+            ),
+
+            'firewalls' => array(
+                'default' => array(
+                    'http_basic' => array('provider' => 'second'),
+                    'logout_on_user_change' => true,
+                ),
+            ),
+        ));
+
+        $container->compile();
+        $this->addToAssertionCount(1);
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

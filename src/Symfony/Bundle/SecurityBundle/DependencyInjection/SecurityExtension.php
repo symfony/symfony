@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
-use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -109,7 +108,7 @@ class SecurityExtension extends Extension
 
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
-            $container->getDefinition(UserPasswordEncoderCommand::class)->replaceArgument(1, array_keys($config['encoders']));
+            $container->getDefinition('security.command.user_password_encoder')->replaceArgument(1, array_keys($config['encoders']));
         }
 
         $container->registerForAutoconfiguration(VoterInterface::class)
@@ -245,17 +244,16 @@ class SecurityExtension extends Extension
         $config->replaceArgument(4, $firewall['stateless']);
 
         // Provider id (must be configured explicitly per firewall/authenticator if more than one provider is set)
+        $defaultProvider = null;
         if (isset($firewall['provider'])) {
             if (!isset($providerIds[$normalizedName = str_replace('-', '_', $firewall['provider'])])) {
                 throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall['provider']));
             }
             $defaultProvider = $providerIds[$normalizedName];
-        } else {
-            if (count($providerIds) > 1) {
-                throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
-            }
-
+        } elseif (1 === count($providerIds)) {
             $defaultProvider = reset($providerIds);
+        } elseif ($providerIds) {
+            throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
         }
 
         $config->replaceArgument(5, $defaultProvider);
@@ -399,7 +397,7 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $providerIds, $defaultEntryPoint)
+    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider = null, array $providerIds, $defaultEntryPoint)
     {
         $listeners = array();
         $hasListeners = false;
@@ -415,7 +413,7 @@ class SecurityExtension extends Extension
                         }
                         $userProvider = $providerIds[$normalizedName];
                     } else {
-                        $userProvider = $defaultProvider;
+                        $userProvider = $defaultProvider ?: $this->getFirstProvider($id, $key, $providerIds);
                     }
 
                     list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
@@ -598,7 +596,7 @@ class SecurityExtension extends Extension
 
     private function createSwitchUserListener($container, $id, $config, $defaultProvider, $stateless)
     {
-        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
+        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : ($defaultProvider ?: $this->getFirstProvider($id, 'switch_user', $providerIds));
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new ChildDefinition('security.authentication.switchuser_listener'));
@@ -696,5 +694,15 @@ class SecurityExtension extends Extension
         }
 
         return $this->expressionLanguage;
+    }
+
+    /**
+     * @deprecated since version 3.4, to be removed in 4.0
+     */
+    private function getFirstProvider($firewallName, $listenerName, array $providerIds)
+    {
+        @trigger_error(sprintf('Listener "%s" on firewall "%s" has no "provider" set but multiple providers exist. Using the first configured provider (%s) is deprecated since 3.4 and will throw an exception in 4.0, set the "provider" key on the firewall instead.', $listenerName, $firewallName, $first = array_keys($providerIds)[0]), E_USER_DEPRECATED);
+
+        return $providerIds[$first];
     }
 }

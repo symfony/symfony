@@ -56,11 +56,13 @@ class PropertyNormalizer extends AbstractObjectNormalizer
         $class = new \ReflectionClass($class);
 
         // We look for at least one non-static property
-        foreach ($class->getProperties() as $property) {
-            if (!$property->isStatic()) {
-                return true;
+        do {
+            foreach ($class->getProperties() as $property) {
+                if (!$property->isStatic()) {
+                    return true;
+                }
             }
-        }
+        } while ($class = $class->getParentClass());
 
         return false;
     }

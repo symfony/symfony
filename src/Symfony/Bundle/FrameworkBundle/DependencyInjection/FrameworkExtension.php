@@ -13,13 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
-use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
-use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
-use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
-use Symfony\Bundle\FrameworkBundle\Command\XliffLintCommand;
-use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
@@ -120,10 +113,10 @@ class FrameworkExtension extends Extension
             $loader->load('console.xml');
 
             if (!class_exists(BaseXliffLintCommand::class)) {
-                $container->removeDefinition(XliffLintCommand::class);
+                $container->removeDefinition('console.command.xliff_lint');
             }
             if (!class_exists(BaseYamlLintCommand::class)) {
-                $container->removeDefinition(YamlLintCommand::class);
+                $container->removeDefinition('console.command.yaml_lint');
             }
         }
 
@@ -203,7 +196,7 @@ class FrameworkExtension extends Extension
                 $container->removeDefinition('form.type_guesser.validator');
             }
         } else {
-            $container->removeDefinition('Symfony\Component\Form\Command\DebugCommand');
+            $container->removeDefinition('console.command.form_debug');
         }
 
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
@@ -431,7 +424,7 @@ class FrameworkExtension extends Extension
     private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$config['enabled']) {
-            $container->removeDefinition(WorkflowDumpCommand::class);
+            $container->removeDefinition('console.command.workflow_dump');
 
             return;
         }
@@ -603,8 +596,8 @@ class FrameworkExtension extends Extension
     private function registerRouterConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
-            $container->removeDefinition(RouterDebugCommand::class);
-            $container->removeDefinition(RouterMatchCommand::class);
+            $container->removeDefinition('console.command.router_debug');
+            $container->removeDefinition('console.command.router_match');
 
             return;
         }
@@ -857,8 +850,8 @@ class FrameworkExtension extends Extension
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
-            $container->removeDefinition(TranslationDebugCommand::class);
-            $container->removeDefinition(TranslationUpdateCommand::class);
+            $container->removeDefinition('console.command.translation_debug');
+            $container->removeDefinition('console.command.translation_update');
 
             return;
         }

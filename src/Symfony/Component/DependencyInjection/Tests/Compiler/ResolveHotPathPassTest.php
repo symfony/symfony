@@ -34,11 +34,15 @@ class ResolveHotPathPassTest extends TestCase
         ;
 
         $container->register('lazy');
-        $container->register('bar');
-        $container->register('bar')->addArgument(new Reference('buz'));
-        $container->register('baz')->addArgument(new Reference('lazy'));
-        $container->register('baz')->addArgument(new Reference('lazy'));
+        $container->register('bar')
+            ->addArgument(new Reference('buz'))
+            ->addArgument(new Reference('deprec_ref_notag'));
+        $container->register('baz')
+            ->addArgument(new Reference('lazy'))
+            ->addArgument(new Reference('lazy'));
         $container->register('buz');
+        $container->register('deprec_with_tag')->setDeprecated()->addTag('container.hot_path');
+        $container->register('deprec_ref_notag')->setDeprecated();
 
         (new ResolveHotPathPass())->process($container);
 
@@ -47,5 +51,7 @@ class ResolveHotPathPassTest extends TestCase
         $this->assertTrue($container->getDefinition('buz')->hasTag('container.hot_path'));
         $this->assertFalse($container->getDefinition('baz')->hasTag('container.hot_path'));
         $this->assertFalse($container->getDefinition('service_container')->hasTag('container.hot_path'));
+        $this->assertFalse($container->getDefinition('deprec_with_tag')->hasTag('container.hot_path'));
+        $this->assertFalse($container->getDefinition('deprec_ref_notag')->hasTag('container.hot_path'));
     }
 }

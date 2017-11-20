@@ -124,10 +124,6 @@ class ProjectServiceContainer extends Container
     {
         $a = ($this->services['foo.baz'] ?? $this->getFoo_BazService());
 
-        if (isset($this->services['bar'])) {
-            return $this->services['bar'];
-        }
-
         $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
 
         $a->configure($instance);
@@ -166,18 +162,12 @@ class ProjectServiceContainer extends Container
      */
     protected function getConfiguredServiceService()
     {
-        $a = ($this->services['baz'] ?? $this->getBazService());
-
-        if (isset($this->services['configured_service'])) {
-            return $this->services['configured_service'];
-        }
-
-        $b = new \ConfClass();
-        $b->setFoo($a);
+        $a = new \ConfClass();
+        $a->setFoo(($this->services['baz'] ?? $this->getBazService()));
 
         $this->services['configured_service'] = $instance = new \stdClass();
 
-        $b->configureStdClass($instance);
+        $a->configureStdClass($instance);
 
         return $instance;
     }
@@ -237,13 +227,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceService()
     {
-        $a = ($this->services['foo.baz'] ?? $this->getFoo_BazService());
-
-        if (isset($this->services['factory_service'])) {
-            return $this->services['factory_service'];
-        }
-
-        return $this->services['factory_service'] = $a->getInstance();
+        return $this->services['factory_service'] = ($this->services['foo.baz'] ?? $this->getFoo_BazService())->getInstance();
     }
 
     /**
@@ -253,13 +237,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceSimpleService()
     {
-        $a = ($this->privates['factory_simple'] ?? $this->getFactorySimpleService());
-
-        if (isset($this->services['factory_service_simple'])) {
-            return $this->services['factory_service_simple'];
-        }
-
-        return $this->services['factory_service_simple'] = $a->getInstance();
+        return $this->services['factory_service_simple'] = ($this->privates['factory_simple'] ?? $this->getFactorySimpleService())->getInstance();
     }
 
     /**
@@ -270,10 +248,6 @@ class ProjectServiceContainer extends Container
     protected function getFooService()
     {
         $a = ($this->services['foo.baz'] ?? $this->getFoo_BazService());
-
-        if (isset($this->services['foo'])) {
-            return $this->services['foo'];
-        }
 
         $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 

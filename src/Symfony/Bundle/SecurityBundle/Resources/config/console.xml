@@ -7,13 +7,13 @@
     <services>
         <defaults public="false" />
 
-        <service id="Symfony\Bundle\SecurityBundle\Command\InitAclCommand">
+        <service id="security.command.init_acl" class="Symfony\Bundle\SecurityBundle\Command\InitAclCommand">
             <argument type="service" id="security.acl.dbal.connection" />
             <argument type="service" id="security.acl.dbal.schema" />
             <tag name="console.command" command="init:acl" />
         </service>
 
-        <service id="Symfony\Bundle\SecurityBundle\Command\SetAclCommand">
+        <service id="security.command.set_acl" class="Symfony\Bundle\SecurityBundle\Command\SetAclCommand">
             <argument type="service" id="security.acl.provider" />
             <tag name="console.command" command="acl:set" />
         </service>

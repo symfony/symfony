@@ -75,13 +75,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarServiceService()
     {
-        $a = ${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->services['baz_service'] = new \stdClass()) && false ?: '_'};
-
-        if (isset($this->services['bar_service'])) {
-            return $this->services['bar_service'];
-        }
-
-        return $this->services['bar_service'] = new \stdClass($a);
+        return $this->services['bar_service'] = new \stdClass(${($_ = isset($this->services['baz_service']) ? $this->services['baz_service'] : $this->services['baz_service'] = new \stdClass()) && false ?: '_'});
     }
 
     /**
@@ -166,10 +160,6 @@ class ProjectServiceContainer extends Container
     protected function getTranslator3Service()
     {
         $a = ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->services['translator.loader_3'] = new \stdClass()) && false ?: '_'};
-
-        if (isset($this->services['translator_3'])) {
-            return $this->services['translator_3'];
-        }
 
         $this->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_3' => function () {
             return ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->services['translator.loader_3'] = new \stdClass()) && false ?: '_'};

@@ -90,13 +90,7 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
      */
     protected function getBarService()
     {
-        $a = ${($_ = isset($this->services['private_not_inlined']) ? $this->services['private_not_inlined'] : $this->services['private_not_inlined'] = new \stdClass()) && false ?: '_'};
-
-        if (isset($this->services['bar'])) {
-            return $this->services['bar'];
-        }
-
-        return $this->services['bar'] = new \stdClass($a);
+        return $this->services['bar'] = new \stdClass(${($_ = isset($this->services['private_not_inlined']) ? $this->services['private_not_inlined'] : $this->services['private_not_inlined'] = new \stdClass()) && false ?: '_'});
     }
 
     /**

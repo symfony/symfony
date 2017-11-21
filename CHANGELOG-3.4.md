@@ -7,6 +7,38 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.0-RC1 (2017-11-21)
+
+ * bug #25077 [Bridge/Twig] Let getFlashes starts the session (MatTheCat)
+ * bug #25082 [HttpKernel] Disable container inlining when legacy inlining has been used (nicolas-grekas)
+ * bug #25072 [Bridge/PhpUnit] Remove trailing "\n" from ClockMock::microtime(false) (joky)
+ * bug #25069 [Debug] Fix undefined variable $lightTrace (nicolas-grekas)
+ * bug #25053 [Serializer] Fixing PropertyNormalizer supports parent properties (Christopher Hertel)
+ * bug #25055 [DI] Analyze setter-circular deps more precisely (nicolas-grekas)
+ * feature #25056 [Bridge/PhpUnit] Sync the bridge version installed in vendor/ and in phpunit clone (nicolas-grekas)
+ * bug #25045 [SecurityBundle] Don't trigger auto-picking notice if provider is set per listener (chalasr)
+ * bug #25033 [FrameworkBundle] Dont create empty bundles directory by default (ro0NL)
+ * bug #25037 [DI] Skip hot_path tag for deprecated services as their class might also be (nicolas-grekas)
+ * bug #25038 [Cache] Memcached options should ignore "lazy" (nicolas-grekas)
+ * bug #25014 Move deprecation under use statements (greg0ire)
+ * bug #25030 [Console] Fix ability to disable lazy commands (chalasr)
+ * bug #25032 [Bridge\PhpUnit] Disable broken auto-require mechanism of phpunit (nicolas-grekas)
+ * bug #25027 [FrameworkBundle] Hide server:log command based on deps (sroze)
+ * bug #24991 [DependencyInjection] Single typed argument can be applied on multiple parameters (nicolas-grekas, sroze)
+ * bug #24983 [Validator] enter the context in which to validate (xabbuh)
+ * bug #24956 Fix ambiguous pattern (weltling)
+ * bug #24732 [DependencyInjection] Prevent service:method factory notation in PHP config (vudaltsov)
+ * bug #24979 [HttpKernel] remove services resetter even when it's an alias (xabbuh)
+ * bug #24972 [HttpKernel] Fix service arg resolver for controllers as array callables (sroze, nicolas-grekas)
+ * bug #24971 [FrameworkBundle] Empty event dispatcher earlier in CacheClearCommand (nicolas-grekas)
+ * security #24995 Validate redirect targets using the session cookie domain (nicolas-grekas)
+ * security #24994 Prevent bundle readers from breaking out of paths (xabbuh)
+ * security #24993 Ensure that submitted data are uploaded files (xabbuh)
+ * security #24992 Namespace generated CSRF tokens depending of the current scheme (dunglas)
+ * bug #24954 [DI] Fix dumping with custom base class (nicolas-grekas)
+ * bug #24952 [HttpFoundation] Fix session-related BC break (nicolas-grekas, sroze)
+ * bug #24943 [FrameworkBundle] Wire the translation.reader service instead of deprecated translation.loader in commands (ogizanagi)
+
 * 3.4.0-BETA4 (2017-11-12)
 
  * bug #24874 [TwigBridge] Fixed the .form-check-input class in the bs4 templates (vudaltsov)

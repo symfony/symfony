@@ -182,7 +182,7 @@ class SwitchUserListenerTest extends TestCase
         $this->request->query->set('_switch_user', 'kuba');
 
         $this->accessDecisionManager->expects($this->once())
-            ->method('decide')->with($token, array('ROLE_ALLOWED_TO_SWITCH'))
+            ->method('decide')->with($token, array('ROLE_ALLOWED_TO_SWITCH'), $user)
             ->will($this->returnValue(true));
 
         $this->userProvider->expects($this->once())

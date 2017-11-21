@@ -126,18 +126,17 @@ class SwitchUserListener implements ListenerInterface
             throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
         }
 
-        if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
-            $exception = new AccessDeniedException();
-            $exception->setAttributes($this->role);
+        $username = $request->get($this->usernameParameter);
+        $user = $this->provider->loadUserByUsername($username);
 
-            throw $exception;
+        if (false === $this->accessDecisionManager->decide($token, array($this->role), $user)) {
+            throw new AccessDeniedException();
         }
 
         if (null !== $this->logger) {
             $this->logger->info('Attempting to switch to user.', array('username' => $username));
         }
 
-        $user = $this->provider->loadUserByUsername($username);
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();

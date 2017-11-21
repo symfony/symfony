@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Tests\Authorization\Stub\ExtendedAccessDecisionManager;
 
 class TraceableAccessDecisionManagerTest extends TestCase
 {
@@ -48,5 +49,19 @@ class TraceableAccessDecisionManagerTest extends TestCase
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
 
         $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm, 'For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
+    }
+
+    public function testAccessDecisionManagePropertiesRetrieving()
+    {
+        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager(array(), AccessDecisionManager::STRATEGY_UNANIMOUS));
+
+        $this->assertEquals(array(), $adm->getVoters());
+        $this->assertEquals(AccessDecisionManager::STRATEGY_UNANIMOUS, $adm->getStrategy());
+
+        // Same tests for an extended AccessDecisionManager
+        $adm = new TraceableAccessDecisionManager(new ExtendedAccessDecisionManager(array(), AccessDecisionManager::STRATEGY_UNANIMOUS));
+
+        $this->assertEquals(array(), $adm->getVoters());
+        $this->assertEquals(AccessDecisionManager::STRATEGY_UNANIMOUS, $adm->getStrategy());
     }
 }

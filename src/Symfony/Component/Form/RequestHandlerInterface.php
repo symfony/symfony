@@ -27,7 +27,9 @@ interface RequestHandlerInterface
     public function handleRequest(FormInterface $form, $request = null);
 
     /**
-     * @param mixed $data
+     * Returns true if the given data is a file upload.
+     *
+     * @param mixed $data The form field data
      *
      * @return bool
      */

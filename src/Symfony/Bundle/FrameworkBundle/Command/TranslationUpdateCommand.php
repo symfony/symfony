@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Translation\Catalogue\TargetOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,14 +40,18 @@ class TranslationUpdateCommand extends ContainerAwareCommand
     private $reader;
     private $extractor;
     private $defaultLocale;
+    private $defaultTransPath;
+    private $defaultViewsPath;
 
     /**
      * @param TranslationWriterInterface $writer
      * @param TranslationReaderInterface $reader
      * @param ExtractorInterface         $extractor
      * @param string                     $defaultLocale
+     * @param string                     $defaultTransPath
+     * @param string                     $defaultViewsPath
      */
-    public function __construct($writer = null, TranslationReaderInterface $reader = null, ExtractorInterface $extractor = null, $defaultLocale = null)
+    public function __construct($writer = null, TranslationReaderInterface $reader = null, ExtractorInterface $extractor = null, $defaultLocale = null, $defaultTransPath = null, $defaultViewsPath = null)
     {
         if (!$writer instanceof TranslationWriterInterface) {
             @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since version 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, TranslationWriterInterface::class), E_USER_DEPRECATED);
@@ -62,6 +67,8 @@ class TranslationUpdateCommand extends ContainerAwareCommand
         $this->reader = $reader;
         $this->extractor = $extractor;
         $this->defaultLocale = $defaultLocale;
+        $this->defaultTransPath = $defaultTransPath;
+        $this->defaultViewsPath = $defaultViewsPath;
     }
 
     /**
@@ -149,24 +156,39 @@ EOF
 
             return 1;
         }
+        /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
 
-        // Define Root Path to App folder
-        $transPaths = array($kernel->getRootDir().'/Resources/');
+        // Define Root Paths
+        $transPaths = array($kernel->getRootDir().'/Resources/translations');
+        if ($this->defaultTransPath) {
+            $transPaths[] = $this->defaultTransPath;
+        }
+        $viewsPaths = array($kernel->getRootDir().'/Resources/views');
+        if ($this->defaultViewsPath) {
+            $viewsPaths[] = $this->defaultViewsPath;
+        }
         $currentName = 'app folder';
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {
             try {
                 $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
-                $transPaths = array(
-                    $foundBundle->getPath().'/Resources/',
-                    sprintf('%s/Resources/%s/', $kernel->getRootDir(), $foundBundle->getName()),
-                );
+                $transPaths = array($foundBundle->getPath().'/Resources/translations');
+                if ($this->defaultTransPath) {
+                    $transPaths[] = $this->defaultTransPath.'/'.$foundBundle->getName();
+                }
+                $transPaths[] = sprintf('%s/Resources/%s/translations', $kernel->getRootDir(), $foundBundle->getName());
+                $viewsPaths = array($foundBundle->getPath().'/Resources/views');
+                if ($this->defaultViewsPath) {
+                    $viewsPaths[] = $this->defaultViewsPath.'/bundles/'.$foundBundle->getName();
+                }
+                $viewsPaths[] = sprintf('%s/Resources/%s/views', $kernel->getRootDir(), $foundBundle->getName());
                 $currentName = $foundBundle->getName();
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path
-                $transPaths = array($input->getArgument('bundle').'/Resources/');
+                $transPaths = array($input->getArgument('bundle').'/Resources/translations');
+                $viewsPaths = array($input->getArgument('bundle').'/Resources/views');
                 $currentName = $transPaths[0];
 
                 if (!is_dir($transPaths[0])) {
@@ -188,8 +210,7 @@ EOF
             $prefix = '';
         }
         $this->extractor->setPrefix($prefix);
-        foreach ($transPaths as $path) {
-            $path .= 'views';
+        foreach ($viewsPaths as $path) {
             if (is_dir($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }
@@ -199,7 +220,6 @@ EOF
         $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $errorIo->comment('Loading translation files...');
         foreach ($transPaths as $path) {
-            $path .= 'translations';
             if (is_dir($path)) {
                 $this->reader->read($path, $currentCatalogue);
             }
@@ -267,14 +287,13 @@ EOF
 
             $bundleTransPath = false;
             foreach ($transPaths as $path) {
-                $path .= 'translations';
                 if (is_dir($path)) {
                     $bundleTransPath = $path;
                 }
             }
 
             if (!$bundleTransPath) {
-                $bundleTransPath = end($transPaths).'translations';
+                $bundleTransPath = end($transPaths);
             }
 
             $this->writer->write($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->defaultLocale));

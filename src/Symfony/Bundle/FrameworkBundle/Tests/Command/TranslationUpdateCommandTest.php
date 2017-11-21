@@ -31,6 +31,19 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
+    public function testDumpMessagesAndCleanInRootDirectory()
+    {
+        $this->fs->remove($this->translationDir);
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
+        $this->fs->mkdir($this->translationDir.'/translations');
+        $this->fs->mkdir($this->translationDir.'/templates');
+
+        $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo')));
+        $tester->execute(array('command' => 'translation:update', 'locale' => 'en', '--dump-messages' => true, '--clean' => true));
+        $this->assertRegExp('/foo/', $tester->getDisplay());
+        $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
+    }
+
     public function testDumpTwoMessagesAndClean()
     {
         $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo', 'bar' => 'bar')));
@@ -55,6 +68,18 @@ class TranslationUpdateCommandTest extends TestCase
         $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
+    public function testWriteMessagesInRootDirectory()
+    {
+        $this->fs->remove($this->translationDir);
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
+        $this->fs->mkdir($this->translationDir.'/translations');
+        $this->fs->mkdir($this->translationDir.'/templates');
+
+        $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo')));
+        $tester->execute(array('command' => 'translation:update', 'locale' => 'en', '--force' => true));
+        $this->assertRegExp('/Translation files were successfully updated./', $tester->getDisplay());
+    }
+
     public function testWriteMessagesForSpecificDomain()
     {
         $tester = $this->createCommandTester(array('messages' => array('foo' => 'foo'), 'mydomain' => array('bar' => 'bar')));
@@ -68,6 +93,8 @@ class TranslationUpdateCommandTest extends TestCase
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
         $this->fs->mkdir($this->translationDir.'/Resources/translations');
         $this->fs->mkdir($this->translationDir.'/Resources/views');
+        $this->fs->mkdir($this->translationDir.'/translations');
+        $this->fs->mkdir($this->translationDir.'/templates');
     }
 
     protected function tearDown()
@@ -152,7 +179,7 @@ class TranslationUpdateCommandTest extends TestCase
             ->method('getContainer')
             ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock()));
 
-        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en');
+        $command = new TranslationUpdateCommand($writer, $loader, $extractor, 'en', $this->translationDir.'/translations', $this->translationDir.'/templates');
 
         $application = new Application($kernel);
         $application->add($command);

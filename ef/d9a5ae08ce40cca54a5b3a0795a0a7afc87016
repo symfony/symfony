@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-20T17:58:01Z
+
+For 2.7 I guess as that's the lowest branch where this applies?
+
+---------------------------------------------------------------------------
+
+by issei-m at 2017-11-21T01:12:17Z
+
+@nicolas-grekas Sorry, made a mistake ;) Then I rebased onto 2.7.

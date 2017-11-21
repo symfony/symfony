@@ -23,7 +23,7 @@ trait ApcuTrait
 {
     public static function isSupported()
     {
-        return function_exists('apcu_fetch') && ini_get('apc.enabled');
+        return function_exists('apcu_fetch') && ini_get('cli' === PHP_SAPI ? 'apc.enable_cli' : 'apc.enabled');
     }
 
     private function init($namespace, $defaultLifetime, $version)

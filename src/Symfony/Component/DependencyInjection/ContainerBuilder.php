@@ -490,6 +490,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
     }
 
+    public function removeDefinitionAndAlias(string $id, string $aliasId)
+    {
+        if (isset($this->definitions[$id], $this->aliasDefinitions[$aliasId])) {
+            unset($this->definitions[$id], $this->aliasDefinitions[$aliasId]);
+            $this->removedIds[$id] = true;
+        }
+    }
+
     /**
      * Returns true if the given service is defined.
      *

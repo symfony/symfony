@@ -19,6 +19,9 @@
 
         <service id="Symfony\Component\HttpFoundation\Session\SessionInterface" alias="session" />
         <service id="Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface" alias="session.storage" />
+        <service id="Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag" alias="session.attribute_bag" />
+        <service id="Symfony\Component\HttpFoundation\Session\Flash\FlashBag" alias="session.flash_bag" />
+
         <service id="SessionHandlerInterface" alias="session.handler" />
 
         <service id="session.storage.metadata_bag" class="Symfony\Component\HttpFoundation\Session\Storage\MetadataBag">

@@ -86,6 +86,34 @@ class ContainerBuilderTest extends TestCase
         }
     }
 
+    public function testRemoveDefinitionWithAlias()
+    {
+        $definition = new Definition(\stdClass::class);
+        $definition->setPublic(true);
+
+        $alias = new Alias($definition->getClass(), true);
+
+        $container = new ContainerBuilder();
+        $container->setDefinition($definition->getClass(), $definition);
+        $container->setAlias('stdSvc', $alias);
+        $container->removeDefinitionAndAlias($definition->getClass(), 'stdSvc');
+        $this->assertArrayNotHasKey('stdSvc', $container->getAliases());
+    }
+
+    public function testRemoveDefinition()
+    {
+        $definition = new Definition(\stdClass::class);
+        $definition->setPublic(true);
+
+        $alias = new Alias($definition->getClass(), true);
+
+        $container = new ContainerBuilder();
+        $container->setDefinition($definition->getClass(), $definition);
+        $container->setAlias('stdSvc', $alias);
+        $container->removeDefinition($definition->getClass());
+        $this->assertArrayHasKey('stdSvc', $container->getAliases());
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.

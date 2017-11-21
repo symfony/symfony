@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-21T10:45:09Z
+
+@MatTheCat can you change the base of the pull-request to be the 3.4 branch on the UI?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-11-21T10:46:26Z
+
+@sroze done
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-11-21T10:52:23Z
+
+@MatTheCat I'm shocked about this proposal 😱  We created `getFlashes()` primarily to avoid starting the session when asking for flash messages. This behavior was reported multiple times by users ... and I personally consider this a Symfony bug (although some disagree and this was never "fixed" or changed).
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-11-21T11:01:13Z
+
+@javiereguiluz I thought the response was to check for `app.request.hasPreviousSession` as mentioned in http://symfony.com/doc/current/session/avoid_session_start.html? Following this advice it really is counter-intuitive to have to start the session from Twig.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-11-21T12:21:53Z
+
+@MatTheCat I don't know the internal details about this (@nicolas-grekas and @sroze will help us here) but if I ask Symfony whether there are flash messages or not ... I don't want the session to be started if it wasn't already started ... because that hurts app performance. I'm just asking if there are flash messages; I'm not getting them. That's why I think the session should not start. Thanks!
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-11-21T12:23:32Z
+
+@javiereguiluz but by returning an empty array how can the presence of flashes be checked?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-11-21T12:25:06Z
+
+If flash messages are stored in the session ... and the session has not even been started ... the answer to "are there flash messages?" should be no ... and that's why we return an empty array, to say that there are no flash messages.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-21T12:28:59Z
+
+@javiereguiluz AFAIK, the session is "started" when the backend has been read. I don't think we can know if any flash are set if we don't read the backend.
+The current logic is broken, because it relies on the fact that a previous session entry (not flash) has been read, so that *then* the session has started, and flash are fetched already.
+The performance issue of opening an empty session is gone with #24523, so the workaround can be removed, and the logic be fixed now. It should really.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-11-21T12:31:29Z
+
+@MatTheCat following your analogy, I'm saying: if I see there's no box, then I can say there's nothing inside the box. And you are saying (that's at least what I understand): if I see there's no box, then I'm going to create a new box an open it to see if there's something inside it.
+
+But @nicolas-grekas said this is OK, so it's clear that I'm not understanding this. So ignore my comments :) Thanks!
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-11-21T12:33:36Z
+
+Yeah okay I didn't understand the relation with #24523
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-21T12:35:31Z
+
+@javiereguiluz I think the misunderstanding comes from what "session is started" means. When there is no session cookie, no "box" is created anymore. But when there is a session cookie, we must ask the backend for a corresponding "box" there. "Starting the session" means actually this: has the potentially existing box been *opened*? If not, telling there are no flashes there is just wrong.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-11-21T12:36:02Z
+
+@javiereguiluz that's it! I don't know about performance but I would prefer to create an empty box than always saying it's empty.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-11-21T12:36:56Z
+
+(My comment was "But you can't say a box is empty just because you don't want to open it?!")
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-11-21T14:22:06Z
+
+Thanks Nico. That was what I wasn't understanding: "starting a session" and "creating a session" were the same to me ... but they are not! Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-21T14:50:16Z
+
+@MatTheCat would you mind rebasing on latest 3.4? (you can even squash)
+Tests did not run yet, that would fix that.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2017-11-21T16:09:23Z
+
+@nicolas-grekas done

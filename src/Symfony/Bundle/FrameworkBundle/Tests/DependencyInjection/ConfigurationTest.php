@@ -195,6 +195,8 @@ class ConfigurationTest extends TestCase
                 'enabled' => false,
                 'storage_id' => 'session.storage.native',
                 'handler_id' => 'session.handler.native_file',
+                'attribute_bag' => 'session.attribute_bag',
+                'flash_bag' => 'session.flash_bag',
                 'cookie_httponly' => true,
                 'gc_probability' => 1,
                 'save_path' => '%kernel.cache_dir%/sessions',

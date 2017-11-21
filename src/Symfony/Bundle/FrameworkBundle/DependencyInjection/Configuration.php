@@ -404,6 +404,8 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('storage_id')->defaultValue('session.storage.native')->end()
                         ->scalarNode('handler_id')->defaultValue('session.handler.native_file')->end()
+                        ->scalarNode('attribute_bag')->defaultValue('session.attribute_bag')->end()
+                        ->scalarNode('flash_bag')->defaultValue('session.flash_bag')->end()
                         ->scalarNode('name')->end()
                         ->scalarNode('cookie_lifetime')->end()
                         ->scalarNode('cookie_path')->end()

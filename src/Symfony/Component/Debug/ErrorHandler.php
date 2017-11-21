@@ -403,6 +403,7 @@ class ErrorHandler
                 $errorAsException = self::$silencedErrorCache[$id][$message];
                 ++$errorAsException->count;
             } else {
+                $lightTrace = array();
                 $errorAsException = null;
             }
 

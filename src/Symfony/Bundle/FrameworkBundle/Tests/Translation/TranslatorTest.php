@@ -170,6 +170,36 @@ class TranslatorTest extends TestCase
         $translator->trans('some_message', array(), null, 'some_locale');
     }
 
+    public function testResourcesAddedAfterInitializeAreLoaded()
+    {
+        $regularLoader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $restLoader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
+        $resource = $this->getMockBuilder('Symfony\Component\Config\Resource\ResourceInterface')->getMock();
+
+        $regularLoader
+            ->expects($this->any())
+            ->method('load')
+            ->will($this->returnValue($this->getCatalogue('fr', array('foo' => 'foo (fr)'))))
+        ;
+
+        $restLoader
+            ->expects($this->any())
+            ->method('load')
+            ->will($this->returnValue($this->getCatalogue('fr', array('bar' => 'bar (fr)'))))
+        ;
+
+        /** @var Translator $translator */
+        $translator = $this->createTranslator($regularLoader, array());
+
+        $translator->addLoader('regular', $regularLoader);
+        $translator->addResource('regular', $resource, 'fr');
+        $this->assertEquals('foo (fr)', $translator->trans('foo', array(), null, 'fr'));
+
+        $translator->addLoader('rest', $restLoader);
+        $translator->addResource('rest', $resource, 'fr');
+        $this->assertEquals('bar (fr)', $translator->trans('bar', array(), null, 'fr'));
+    }
+
     public function getDebugModeAndCacheDirCombinations()
     {
         return array(

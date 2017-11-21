@@ -108,7 +108,11 @@ class NativeSessionStorage implements SessionStorageInterface
             'use_cookies' => 1,
         );
 
-        session_register_shutdown();
+        if (\PHP_VERSION_ID >= 50400) {
+            session_register_shutdown();
+        } else {
+            register_shutdown_function('session_write_close');
+        }
 
         $this->setMetadataBag($metaBag);
         $this->setOptions($options);

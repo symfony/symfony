@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Kernel;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
 /**
@@ -67,6 +68,14 @@ trait MicroKernelTrait
                     'type' => 'service',
                 ),
             ));
+
+            if ($this instanceof EventSubscriberInterface) {
+                $container->register('kernel', static::class)
+                    ->setSynthetic(true)
+                    ->setPublic(true)
+                    ->addTag('kernel.event_subscriber')
+                ;
+            }
 
             $this->configureContainer($container, $loader);
 

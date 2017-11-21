@@ -1,4 +1,4 @@
-<info>MbString åpplicätion</info>
+MbString åpplicätion
 
 <comment>Usage:</comment>
   command [options] [arguments]

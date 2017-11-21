@@ -75,7 +75,7 @@ class SvnRepository
      *
      * @param string $path The path to the repository
      */
-    public function __construct($path)
+    public function __construct(string $path)
     {
         $this->path = $path;
     }

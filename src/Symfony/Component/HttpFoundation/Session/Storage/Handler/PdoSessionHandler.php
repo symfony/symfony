@@ -38,7 +38,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * @author Michael Williams <michael.williams@funsational.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class PdoSessionHandler implements \SessionHandlerInterface
+class PdoSessionHandler extends AbstractSessionHandler
 {
     /**
      * No locking is done. This means sessions are prone to loss of data due to
@@ -260,11 +260,13 @@ class PdoSessionHandler implements \SessionHandlerInterface
      */
     public function open($savePath, $sessionName)
     {
+        $this->sessionExpired = false;
+
         if (null === $this->pdo) {
             $this->connect($this->dsn ?: $savePath);
         }
 
-        return true;
+        return parent::open($savePath, $sessionName);
     }
 
     /**
@@ -273,7 +275,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     public function read($sessionId)
     {
         try {
-            return $this->doRead($sessionId);
+            return parent::read($sessionId);
         } catch (\PDOException $e) {
             $this->rollback();
 
@@ -296,7 +298,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function destroy($sessionId)
+    protected function doDestroy($sessionId)
     {
         // delete the record associated with this id
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id";
@@ -317,7 +319,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function write($sessionId, $data)
+    protected function doWrite($sessionId, $data)
     {
         $maxlifetime = (int) ini_get('session.gc_maxlifetime');
 
@@ -363,6 +365,30 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     }
                 }
             }
+        } catch (\PDOException $e) {
+            $this->rollback();
+
+            throw $e;
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateTimestamp($sessionId, $data)
+    {
+        $maxlifetime = (int) ini_get('session.gc_maxlifetime');
+
+        try {
+            $updateStmt = $this->pdo->prepare(
+                "UPDATE $this->table SET $this->lifetimeCol = :lifetime, $this->timeCol = :time WHERE $this->idCol = :id"
+            );
+            $updateStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
+            $updateStmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
+            $updateStmt->bindValue(':time', time(), \PDO::PARAM_INT);
+            $updateStmt->execute();
         } catch (\PDOException $e) {
             $this->rollback();
 
@@ -491,10 +517,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
      *
      * @return string The session data
      */
-    private function doRead($sessionId)
+    protected function doRead($sessionId)
     {
-        $this->sessionExpired = false;
-
         if (self::LOCK_ADVISORY === $this->lockMode) {
             $this->unlockStatements[] = $this->doAdvisoryLock($sessionId);
         }
@@ -517,7 +541,9 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 return is_resource($sessionRows[0][0]) ? stream_get_contents($sessionRows[0][0]) : $sessionRows[0][0];
             }
 
-            if (self::LOCK_TRANSACTIONAL === $this->lockMode && 'sqlite' !== $this->driver) {
+            if (!ini_get('session.use_strict_mode') && self::LOCK_TRANSACTIONAL === $this->lockMode && 'sqlite' !== $this->driver) {
+                // In strict mode, session fixation is not possible: new sessions always start with a unique
+                // random id, so that concurrency is not possible and this code path can be skipped.
                 // Exclusive-reading of non-existent rows does not block, so we need to do an insert to block
                 // until other connections to the session are committed.
                 try {
@@ -552,8 +578,6 @@ class PdoSessionHandler implements \SessionHandlerInterface
     /**
      * Executes an application-level lock on the database.
      *
-     * @param string $sessionId Session ID
-     *
      * @return \PDOStatement The statement that needs to be executed later to release the lock
      *
      * @throws \DomainException When an unsupported PDO driver is used
@@ -562,7 +586,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
      *       - for oci using DBMS_LOCK.REQUEST
      *       - for sqlsrv using sp_getapplock with LockOwner = Session
      */
-    private function doAdvisoryLock($sessionId)
+    private function doAdvisoryLock(string $sessionId)
     {
         switch ($this->driver) {
             case 'mysql':
@@ -615,12 +639,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
      * Encodes the first 4 (when PHP_INT_SIZE == 4) or 8 characters of the string as an integer.
      *
      * Keep in mind, PHP integers are signed.
-     *
-     * @param string $string
-     *
-     * @return int
      */
-    private function convertStringToInt($string)
+    private function convertStringToInt(string $string): int
     {
         if (4 === \PHP_INT_SIZE) {
             return (ord($string[3]) << 24) + (ord($string[2]) << 16) + (ord($string[1]) << 8) + ord($string[0]);
@@ -635,11 +655,9 @@ class PdoSessionHandler implements \SessionHandlerInterface
     /**
      * Return a locking or nonlocking SQL query to read session information.
      *
-     * @return string The SQL string
-     *
      * @throws \DomainException When an unsupported PDO driver is used
      */
-    private function getSelectSql()
+    private function getSelectSql(): string
     {
         if (self::LOCK_TRANSACTIONAL === $this->lockMode) {
             $this->beginTransaction();
@@ -664,14 +682,8 @@ class PdoSessionHandler implements \SessionHandlerInterface
 
     /**
      * Returns a merge/upsert (i.e. insert or update) statement when supported by the database for writing session data.
-     *
-     * @param string $sessionId   Session ID
-     * @param string $data        Encoded session data
-     * @param int    $maxlifetime session.gc_maxlifetime
-     *
-     * @return \PDOStatement|null The merge statement or null when not supported
      */
-    private function getMergeStatement($sessionId, $data, $maxlifetime)
+    private function getMergeStatement(string $sessionId, string $data, int$maxlifetime): ?\PDOStatement
     {
         $mergeSql = null;
         switch (true) {

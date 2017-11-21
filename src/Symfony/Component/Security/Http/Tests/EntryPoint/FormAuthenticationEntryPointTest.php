@@ -64,6 +64,6 @@ class FormAuthenticationEntryPointTest extends TestCase
         $entryPointResponse = $entryPoint->start($request);
 
         $this->assertEquals($response, $entryPointResponse);
-        $this->assertEquals(401, $entryPointResponse->headers->get('X-Status-Code'));
+        $this->assertEquals(401, $entryPointResponse->getStatusCode());
     }
 }

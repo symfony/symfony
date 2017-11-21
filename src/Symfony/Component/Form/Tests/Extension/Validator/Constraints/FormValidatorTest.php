@@ -22,14 +22,12 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\ExecutionContextInterface;
-use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormValidatorTest extends AbstractConstraintValidatorTest
+class FormValidatorTest extends ConstraintValidatorTestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -53,11 +51,6 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Extension\Validator\Util\ServerParams')->setMethods(array('getNormalizedIniPostMaxSize', 'getContentLength'))->getMock();
 
         parent::setUp();
-    }
-
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
     }
 
     protected function createValidator()
@@ -106,28 +99,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testValidateIfParentWithCascadeValidation()
-    {
-        $object = $this->getMockBuilder('\stdClass')->getMock();
-
-        $parent = $this->getBuilder('parent', null, array('cascade_validation' => true))
-            ->setCompound(true)
-            ->setDataMapper($this->getDataMapper())
-            ->getForm();
-        $options = array('validation_groups' => array('group1', 'group2'));
-        $form = $this->getBuilder('name', '\stdClass', $options)->getForm();
-        $parent->add($form);
-
-        $form->setData($object);
-
-        $this->expectValidateAt(0, 'data', $object, array('group1', 'group2'));
-
-        $this->validator->validate($form, new Form());
-
-        $this->assertNoViolation();
-    }
-
-    public function testValidateIfChildWithValidConstraint()
+    public function testValidateChildIfValidConstraint()
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
@@ -151,11 +123,11 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testDontValidateIfParentWithoutCascadeValidation()
+    public function testDontValidateIfParentWithoutValidConstraint()
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
 
-        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))
+        $parent = $this->getBuilder('parent', null)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
             ->getForm();
@@ -185,13 +157,13 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testValidateConstraintsEvenIfNoCascadeValidation()
+    public function testValidateConstraintsOptionEvenIfNoValidConstraint()
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
         $constraint1 = new NotNull(array('groups' => array('group1', 'group2')));
         $constraint2 = new NotBlank(array('groups' => 'group2'));
 
-        $parent = $this->getBuilder('parent', null, array('cascade_validation' => false))
+        $parent = $this->getBuilder('parent', null)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
             ->getForm();
@@ -640,11 +612,6 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $context->expects($this->never())
             ->method('addViolation');
 
-        if ($context instanceof ExecutionContextInterface) {
-            $context->expects($this->never())
-                ->method('addViolationAt');
-        }
-
         $this->validator->initialize($context);
         $this->validator->validate($form, new Form());
     }
@@ -677,14 +644,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         return $context;
     }
 
-    /**
-     * @param string $name
-     * @param string $dataClass
-     * @param array  $options
-     *
-     * @return FormBuilder
-     */
-    private function getBuilder($name = 'name', $dataClass = null, array $options = array())
+    private function getBuilder(string $name = 'name', string $dataClass = null, array $options = array()): FormBuilder
     {
         $options = array_replace(array(
             'constraints' => array(),

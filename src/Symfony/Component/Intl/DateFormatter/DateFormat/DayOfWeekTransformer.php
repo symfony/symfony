@@ -23,7 +23,7 @@ class DayOfWeekTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function format(\DateTime $dateTime, $length)
+    public function format(\DateTime $dateTime, int $length): string
     {
         $dayOfWeek = $dateTime->format('l');
         switch ($length) {
@@ -41,7 +41,7 @@ class DayOfWeekTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function getReverseMatchingRegExp($length)
+    public function getReverseMatchingRegExp(int $length): string
     {
         switch ($length) {
             case 4:
@@ -58,7 +58,7 @@ class DayOfWeekTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function extractDateOptions($matched, $length)
+    public function extractDateOptions(string $matched, int $length): array
     {
         return array();
     }

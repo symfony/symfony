@@ -28,4 +28,11 @@ class NameNodeTest extends AbstractNodeTest
             array('$foo', new NameNode('foo')),
         );
     }
+
+    public function getDumpData()
+    {
+        return array(
+            array('foo', new NameNode('foo')),
+        );
+    }
 }

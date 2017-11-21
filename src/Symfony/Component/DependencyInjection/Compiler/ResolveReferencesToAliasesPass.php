@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,101 +20,48 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ResolveReferencesToAliasesPass implements CompilerPassInterface
+class ResolveReferencesToAliasesPass extends AbstractRecursivePass
 {
-    private $container;
-
     /**
-     * Processes the ContainerBuilder to replace references to aliases with actual service references.
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $this->container = $container;
-
-        foreach ($container->getDefinitions() as $definition) {
-            if ($definition->isSynthetic() || $definition->isAbstract()) {
-                continue;
-            }
-
-            $definition->setArguments($this->processArguments($definition->getArguments()));
-            $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
-            $definition->setProperties($this->processArguments($definition->getProperties()));
-            $definition->setFactory($this->processFactory($definition->getFactory()));
-            $definition->setFactoryService($this->processFactoryService($definition->getFactoryService(false)), false);
-        }
+        parent::process($container);
 
         foreach ($container->getAliases() as $id => $alias) {
             $aliasId = (string) $alias;
-            if ($aliasId !== $defId = $this->getDefinitionId($aliasId)) {
-                $container->setAlias($id, new Alias($defId, $alias->isPublic()));
+            if ($aliasId !== $defId = $this->getDefinitionId($aliasId, $container)) {
+                $container->setAlias($id, $defId)->setPublic($alias->isPublic())->setPrivate($alias->isPrivate());
             }
         }
     }
 
     /**
-     * Processes the arguments to replace aliases.
-     *
-     * @param array $arguments An array of References
-     *
-     * @return array An array of References
+     * {@inheritdoc}
      */
-    private function processArguments(array $arguments)
+    protected function processValue($value, $isRoot = false)
     {
-        foreach ($arguments as $k => $argument) {
-            if (is_array($argument)) {
-                $arguments[$k] = $this->processArguments($argument);
-            } elseif ($argument instanceof Reference) {
-                $defId = $this->getDefinitionId($id = (string) $argument);
+        if ($value instanceof Reference) {
+            $defId = $this->getDefinitionId($id = (string) $value, $this->container);
 
-                if ($defId !== $id) {
-                    $arguments[$k] = new Reference($defId, $argument->getInvalidBehavior(), $argument->isStrict(false));
-                }
+            if ($defId !== $id) {
+                return new Reference($defId, $value->getInvalidBehavior());
             }
         }
 
-        return $arguments;
+        return parent::processValue($value);
     }
 
-    private function processFactoryService($factoryService)
-    {
-        if (null === $factoryService) {
-            return;
-        }
-
-        return $this->getDefinitionId($factoryService);
-    }
-
-    private function processFactory($factory)
-    {
-        if (null === $factory || !is_array($factory) || !$factory[0] instanceof Reference) {
-            return $factory;
-        }
-
-        $defId = $this->getDefinitionId($id = (string) $factory[0]);
-
-        if ($defId !== $id) {
-            $factory[0] = new Reference($defId, $factory[0]->getInvalidBehavior(), $factory[0]->isStrict(false));
-        }
-
-        return $factory;
-    }
-
-    /**
-     * Resolves an alias into a definition id.
-     *
-     * @param string $id The definition or alias id to resolve
-     *
-     * @return string The definition id with aliases resolved
-     */
-    private function getDefinitionId($id)
+    private function getDefinitionId(string $id, ContainerBuilder $container): string
     {
         $seen = array();
-        while ($this->container->hasAlias($id)) {
+        while ($container->hasAlias($id)) {
             if (isset($seen[$id])) {
                 throw new ServiceCircularReferenceException($id, array_keys($seen));
             }
             $seen[$id] = true;
-            $id = (string) $this->container->getAlias($id);
+            $id = (string) $container->getAlias($id);
         }
 
         return $id;

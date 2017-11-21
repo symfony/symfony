@@ -1,6 +1,131 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * Relying on service auto-registration while autowiring is not supported anymore.
+   Explicitly inject your dependencies or create services whose ids are
+   their fully-qualified class name.
+
+   Before:
+
+   ```php
+   namespace App\Controller;
+
+   use App\Mailer;
+
+   class DefaultController
+   {
+       public function __construct(Mailer $mailer) {
+           // ...
+       }
+
+       // ...
+   }
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+   ```
+
+   After:
+
+   ```php
+   // same PHP code
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+
+       # or
+       # App\Controller\DefaultController:
+       #     arguments: { $mailer: "@App\Mailer" }
+
+       App\Mailer:
+           autowire: true
+    ```
+ * removed autowiring services based on the types they implement
+ * added a third `$methodName` argument to the `getProxyFactoryCode()` method
+   of the `DumperInterface`
+ * removed support for autowiring types
+ * removed `Container::isFrozen`
+ * removed support for dumping an ucompiled container in `PhpDumper`
+ * removed support for generating a dumped `Container` without populating the method map
+ * removed support for case insensitive service identifiers
+ * removed the `DefinitionDecorator` class, replaced by `ChildDefinition`
+ * removed the `AutowireServiceResource` class and related `AutowirePass::createResourceForClass()` method
+ * removed `LoggingFormatter`, `Compiler::getLoggingFormatter()` and `addLogMessage()` class and methods, use the `ContainerBuilder::log()` method instead
+ * removed `FactoryReturnTypePass`
+ * removed `ContainerBuilder::addClassResource()`, use the `addObjectResource()` or the `getReflectionClass()` method instead.
+ * removed support for top-level anonymous services
+ * removed silent behavior for unused attributes and elements
+ * removed support for setting and accessing private services in `Container`
+ * removed support for setting pre-defined services in `Container`
+ * removed support for case insensitivity of parameter names
+ * removed `AutowireExceptionPass` and `AutowirePass::getAutowiringExceptions()`, use `Definition::addError()` and the `DefinitionErrorExceptionPass` instead
+
+3.4.0
+-----
+
+ * moved the `ExtensionCompilerPass` to before-optimization passes with priority -1000
+ * deprecated "public-by-default" definitions and aliases, the new default will be "private" in 4.0
+ * added `EnvVarProcessorInterface` and corresponding "container.env_var_processor" tag for processing env vars
+ * added support for ignore-on-uninitialized references
+ * deprecated service auto-registration while autowiring
+ * deprecated the ability to check for the initialization of a private service with the `Container::initialized()` method
+ * deprecated support for top-level anonymous services in XML
+ * deprecated case insensitivity of parameter names
+ * deprecated the `ResolveDefinitionTemplatesPass` class in favor of `ResolveChildDefinitionsPass`
+ * added `TaggedIteratorArgument` with YAML (`!tagged foo`) and XML (`<service type="tagged"/>`) support
+ * deprecated `AutowireExceptionPass` and `AutowirePass::getAutowiringExceptions()`, use `Definition::addError()` and the `DefinitionErrorExceptionPass` instead
+
+
+3.3.0
+-----
+
+ * deprecated autowiring services based on the types they implement;
+   rename (or alias) your services to their FQCN id to make them autowirable
+ * added "ServiceSubscriberInterface" - to allow for per-class explicit service-locator definitions
+ * added "container.service_locator" tag for defining service-locator services
+ * added anonymous services support in YAML configuration files using the `!service` tag.
+ * added "TypedReference" and "ServiceClosureArgument" for creating service-locator services
+ * added `ServiceLocator` - a PSR-11 container holding a set of services to be lazily loaded
+ * added "instanceof" section for local interface-defined configs
+ * added prototype services for PSR4-based discovery and registration
+ * added `ContainerBuilder::getReflectionClass()` for retrieving and tracking reflection class info
+ * deprecated `ContainerBuilder::getClassResource()`, use `ContainerBuilder::getReflectionClass()` or `ContainerBuilder::addObjectResource()` instead
+ * added `ContainerBuilder::fileExists()` for checking and tracking file or directory existence
+ * deprecated autowiring-types, use aliases instead
+ * added support for omitting the factory class name in a service definition if the definition class is set
+ * deprecated case insensitivity of service identifiers
+ * added "iterator" argument type for lazy iteration over a set of values and services
+ * added file-wide configurable defaults for service attributes "public", "tags",
+   "autowire" and "autoconfigure"
+ * made the "class" attribute optional, using the "id" as fallback
+ * using the `PhpDumper` with an uncompiled `ContainerBuilder` is deprecated and
+   will not be supported anymore in 4.0
+ * deprecated the `DefinitionDecorator` class in favor of `ChildDefinition`
+ * allow config files to be loaded using a glob pattern
+ * [BC BREAK] the `NullDumper` class is now final
+
+3.2.0
+-----
+
+ * allowed to prioritize compiler passes by introducing a third argument to `PassConfig::addPass()`, to `Compiler::addPass` and to `ContainerBuilder::addCompilerPass()`
+ * added support for PHP constants in YAML configuration files
+ * deprecated the ability to set or unset a private service with the `Container::set()` method
+ * deprecated the ability to check for the existence of a private service with the `Container::has()` method
+ * deprecated the ability to request a private service with the `Container::get()` method
+ * deprecated support for generating a dumped `Container` without populating the method map
+
+3.0.0
+-----
+
+ * removed all deprecated codes from 2.x versions
+
 2.8.0
 -----
 

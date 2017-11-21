@@ -1,6 +1,64 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed `FirewallContext::getContext()`
+ * made `FirewallMap::$container` and `::$map` private
+ * made the first `UserPasswordEncoderCommand::_construct()` argument mandatory
+ * `UserPasswordEncoderCommand` does not extend `ContainerAwareCommand` anymore
+ * removed support for voters that don't implement the `VoterInterface`
+ * removed HTTP digest authentication
+ * removed command `acl:set` along with `SetAclCommand` class
+ * removed command `init:acl` along with `InitAclCommand` class
+ * removed `acl` configuration key and related services, use symfony/acl-bundle instead
+ * removed auto picking the first registered provider when no configured provider on a firewall and ambiguous
+ * the firewall option `logout_on_user_change` is now always true, which will trigger a logout if the user changes
+   between requests
+ * the `switch_user.stateless` firewall option is `true` for stateless firewalls
+
+3.4.0
+-----
+
+ * Added new `security.helper` service that is an instance of `Symfony\Component\Security\Core\Security`
+   and provides shortcuts for common security tasks.
+ * Tagging voters with the `security.voter` tag without implementing the
+   `VoterInterface` on the class is now deprecated and will be removed in 4.0.
+ * [BC BREAK] `FirewallContext::getListeners()` now returns `\Traversable|array`
+ * added info about called security listeners in profiler 
+ * Added `logout_on_user_change` to the firewall options. This config item will
+   trigger a logout when the user has changed. Should be set to true to avoid
+   deprecations in the configuration.
+ * deprecated HTTP digest authentication
+ * deprecated command `acl:set` along with `SetAclCommand` class
+ * deprecated command `init:acl` along with `InitAclCommand` class
+ * Added support for the new Argon2i password encoder
+ * added `stateless` option to the `switch_user` listener
+ * deprecated auto picking the first registered provider when no configured provider on a firewall and ambiguous
+
+3.3.0
+-----
+
+ * Deprecated instantiating `UserPasswordEncoderCommand` without its constructor
+   arguments fully provided.
+ * Deprecated `UserPasswordEncoderCommand::getContainer()` and relying on the
+  `ContainerAwareCommand` sub class or `ContainerAwareInterface` implementation for this command.
+ * Deprecated the `FirewallMap::$map` and `$container` properties.
+ * [BC BREAK] Keys of the `users` node for `in_memory` user provider are no longer normalized.
+ * deprecated `FirewallContext::getListeners()`
+
+3.2.0
+-----
+
+ * Added the `SecurityUserValueResolver` to inject the security users in actions via
+   `Symfony\Component\Security\Core\User\UserInterface` in the method signature.
+
+3.0.0
+-----
+
+ * Removed the `security.context` service.
+
 2.8.0
 -----
 

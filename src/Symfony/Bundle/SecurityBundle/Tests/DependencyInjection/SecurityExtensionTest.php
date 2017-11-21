@@ -38,6 +38,7 @@ class SecurityExtensionTest extends TestCase
                     'form_login' => array(
                         'check_path' => '/some_area/login_check',
                     ),
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -61,6 +62,7 @@ class SecurityExtensionTest extends TestCase
             'firewalls' => array(
                 'some_firewall' => array(
                     'pattern' => '/.*',
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -88,6 +90,7 @@ class SecurityExtensionTest extends TestCase
                 'some_firewall' => array(
                     'pattern' => '/.*',
                     'http_basic' => array(),
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -110,6 +113,7 @@ class SecurityExtensionTest extends TestCase
                 'some_firewall' => array(
                     'pattern' => '/.*',
                     'http_basic' => null,
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -117,6 +121,30 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
+    }
+
+    public function testSwitchUserNotStatelessOnStatelessFirewall()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'stateless' => true,
+                    'http_basic' => null,
+                    'switch_user' => array('stateless' => false),
+                    'logout_on_user_change' => true,
+                ),
+            ),
+        ));
+
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('security.authentication.switchuser_listener.some_firewall')->getArgument(9));
     }
 
     protected function getRawContainer()

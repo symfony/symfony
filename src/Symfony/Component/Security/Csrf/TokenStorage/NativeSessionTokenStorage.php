@@ -33,7 +33,7 @@ class NativeSessionTokenStorage implements TokenStorageInterface
      *
      * @param string $namespace The namespace under which the token is stored in the session
      */
-    public function __construct($namespace = self::SESSION_NAMESPACE)
+    public function __construct(string $namespace = self::SESSION_NAMESPACE)
     {
         $this->namespace = $namespace;
     }
@@ -87,22 +87,24 @@ class NativeSessionTokenStorage implements TokenStorageInterface
             $this->startSession();
         }
 
-        $token = isset($_SESSION[$this->namespace][$tokenId])
-            ? (string) $_SESSION[$this->namespace][$tokenId]
-            : null;
+        if (!isset($_SESSION[$this->namespace][$tokenId])) {
+            return;
+        }
+
+        $token = (string) $_SESSION[$this->namespace][$tokenId];
 
         unset($_SESSION[$this->namespace][$tokenId]);
+
+        if (!$_SESSION[$this->namespace]) {
+            unset($_SESSION[$this->namespace]);
+        }
 
         return $token;
     }
 
     private function startSession()
     {
-        if (\PHP_VERSION_ID >= 50400) {
-            if (PHP_SESSION_NONE === session_status()) {
-                session_start();
-            }
-        } elseif (!session_id()) {
+        if (PHP_SESSION_NONE === session_status()) {
             session_start();
         }
 

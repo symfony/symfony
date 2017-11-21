@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Node;
 
+use Symfony\Component\Form\FormRenderer;
 use Twig\Compiler;
 use Twig\Node\Node;
 
@@ -19,19 +20,23 @@ use Twig\Node\Node;
  */
 class FormThemeNode extends Node
 {
-    public function __construct(Node $form, Node $resources, $lineno, $tag = null)
+    public function __construct(Node $form, Node $resources, int $lineno, string $tag = null, bool $only = false)
     {
-        parent::__construct(array('form' => $form, 'resources' => $resources), array(), $lineno, $tag);
+        parent::__construct(array('form' => $form, 'resources' => $resources), array('only' => $only), $lineno, $tag);
     }
 
     public function compile(Compiler $compiler)
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->setTheme(')
+            ->write('$this->env->getRuntime(')
+            ->string(FormRenderer::class)
+            ->raw(')->setTheme(')
             ->subcompile($this->getNode('form'))
             ->raw(', ')
             ->subcompile($this->getNode('resources'))
+            ->raw(', ')
+            ->raw(false === $this->getAttribute('only') ? 'true' : 'false')
             ->raw(");\n");
     }
 }

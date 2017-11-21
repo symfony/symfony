@@ -44,14 +44,31 @@ class WebProfilerExtension extends Extension
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('profiler.xml');
-        $container->setParameter('web_profiler.debug_toolbar.position', $config['position']);
 
         if ($config['toolbar'] || $config['intercept_redirects']) {
             $loader->load('toolbar.xml');
-            $container->getDefinition('web_profiler.debug_toolbar')->replaceArgument(5, $config['excluded_ajax_paths']);
+            $container->getDefinition('web_profiler.debug_toolbar')->replaceArgument(4, $config['excluded_ajax_paths']);
             $container->setParameter('web_profiler.debug_toolbar.intercept_redirects', $config['intercept_redirects']);
             $container->setParameter('web_profiler.debug_toolbar.mode', $config['toolbar'] ? WebDebugToolbarListener::ENABLED : WebDebugToolbarListener::DISABLED);
         }
+
+        $baseDir = array();
+        $rootDir = $container->getParameter('kernel.root_dir');
+        $rootDir = explode(DIRECTORY_SEPARATOR, realpath($rootDir) ?: $rootDir);
+        $bundleDir = explode(DIRECTORY_SEPARATOR, __DIR__);
+        for ($i = 0; isset($rootDir[$i], $bundleDir[$i]); ++$i) {
+            if ($rootDir[$i] !== $bundleDir[$i]) {
+                break;
+            }
+            $baseDir[] = $rootDir[$i];
+        }
+        $baseDir = implode(DIRECTORY_SEPARATOR, $baseDir);
+
+        $profilerController = $container->getDefinition('web_profiler.controller.profiler');
+        $profilerController->replaceArgument(5, $baseDir);
+
+        $fileLinkFormatter = $container->getDefinition('debug.file_link_formatter');
+        $fileLinkFormatter->replaceArgument(2, $baseDir);
     }
 
     /**

@@ -32,4 +32,9 @@ interface DataCollectorInterface
      * @return string The collector name
      */
     public function getName();
+
+    /**
+     * Resets this data collector to its initial state.
+     */
+    public function reset();
 }

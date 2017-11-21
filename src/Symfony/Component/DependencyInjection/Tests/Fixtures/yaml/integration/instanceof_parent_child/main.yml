@@ -1,0 +1,12 @@
+imports:
+    - { resource: _child.yml }
+
+services:
+    _instanceof:
+        stdClass:
+            autowire: true
+            tags: [from_instanceof]
+
+    parent_service:
+        class: stdClass
+        public: true

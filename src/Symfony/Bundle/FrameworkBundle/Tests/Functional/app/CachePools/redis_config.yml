@@ -1,0 +1,17 @@
+imports:
+    - { resource: ../config/default.yml }
+
+parameters:
+    env(REDIS_HOST): 'localhost'
+
+framework:
+    cache:
+        app: cache.adapter.redis
+        default_redis_provider: "redis://%env(REDIS_HOST)%"
+        pools:
+            cache.pool1:
+                public: true
+                clearer: cache.system_clearer
+            cache.pool2:
+                public: true
+                clearer: ~

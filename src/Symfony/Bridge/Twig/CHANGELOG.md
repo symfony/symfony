@@ -1,6 +1,59 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added an `only` keyword to `form_theme` tag to disable usage of default themes when rendering a form
+ * deprecated `Symfony\Bridge\Twig\Form\TwigRenderer`
+ * deprecated `DebugCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument  of the constructor instead
+ * deprecated `LintCommand::set/getTwigEnvironment`. Pass an instance of
+   `Twig\Environment` as first argument of the constructor instead
+
+3.3.0
+-----
+
+ * added a `workflow_has_marked_place` function
+ * added a `workflow_marked_places` function
+
+3.2.0
+-----
+
+ * added `AppVariable::getToken()`
+ * Deprecated the possibility to inject the Form `TwigRenderer` into the `FormExtension`.
+ * [BC BREAK] Registering the `FormExtension` without configuring a runtime loader for the `TwigRenderer`
+   doesn't work anymore.
+
+   Before:
+
+   ```php
+   use Symfony\Bridge\Twig\Extension\FormExtension;
+   use Symfony\Bridge\Twig\Form\TwigRenderer;
+   use Symfony\Bridge\Twig\Form\TwigRendererEngine;
+
+   // ...
+   $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'));
+   $rendererEngine->setEnvironment($twig);
+   $twig->addExtension(new FormExtension(new TwigRenderer($rendererEngine, $csrfTokenManager)));
+   ```
+
+   After:
+
+   ```php
+   // ...
+   $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'), $twig);
+   // require Twig 1.30+
+   $twig->addRuntimeLoader(new \Twig\RuntimeLoader\FactoryRuntimeLoader(array(
+       TwigRenderer::class => function () use ($rendererEngine, $csrfTokenManager) {
+           return new TwigRenderer($rendererEngine, $csrfTokenManager);
+       },
+   )));
+   $twig->addExtension(new FormExtension());
+   ```
+ * Deprecated the `TwigRendererEngineInterface` interface.
+ * added WorkflowExtension (provides `workflow_can` and `workflow_transitions`)
+
 2.7.0
 -----
 

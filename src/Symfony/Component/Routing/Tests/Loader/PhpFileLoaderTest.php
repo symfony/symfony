@@ -13,7 +13,10 @@ namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 class PhpFileLoaderTest extends TestCase
 {
@@ -79,5 +82,39 @@ class PhpFileLoaderTest extends TestCase
             realpath($locator->locate('with_define_path_variable.php')),
             (string) $fileResource
         );
+    }
+
+    public function testRoutingConfigurator()
+    {
+        $locator = new FileLocator(array(__DIR__.'/../Fixtures'));
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl.php');
+
+        $expectedCollection = new RouteCollection();
+
+        $expectedCollection->add('foo', (new Route('/foo'))
+            ->setOptions(array('utf8' => true))
+            ->setCondition('abc')
+        );
+        $expectedCollection->add('buz', (new Route('/zub'))
+            ->setDefaults(array('_controller' => 'foo:act'))
+        );
+        $expectedCollection->add('c_bar', (new Route('/sub/pub/bar'))
+            ->setRequirements(array('id' => '\d+'))
+        );
+        $expectedCollection->add('c_pub_buz', (new Route('/sub/pub/buz'))
+            ->setHost('host')
+            ->setRequirements(array('id' => '\d+'))
+        );
+        $expectedCollection->add('ouf', (new Route('/ouf'))
+            ->setSchemes(array('https'))
+            ->setMethods(array('GET'))
+            ->setDefaults(array('id' => 0))
+        );
+
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub.php')));
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl.php')));
+
+        $this->assertEquals($expectedCollection, $routeCollection);
     }
 }

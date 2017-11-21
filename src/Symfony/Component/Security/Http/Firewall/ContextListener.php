@@ -15,11 +15,15 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -38,17 +42,17 @@ class ContextListener implements ListenerInterface
     private $userProviders;
     private $dispatcher;
     private $registered;
+    private $trustResolver;
+    private $logoutOnUserChange = true;
 
-    public function __construct(TokenStorageInterface $tokenStorage, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    /**
+     * @param TokenStorageInterface                     $tokenStorage
+     * @param iterable|UserProviderInterface[]          $userProviders
+     */
+    public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
-        }
-
-        foreach ($userProviders as $userProvider) {
-            if (!$userProvider instanceof UserProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "Symfony\Component\Security\Core\User\UserProviderInterface".', get_class($userProvider)));
-            }
         }
 
         $this->tokenStorage = $tokenStorage;
@@ -56,6 +60,17 @@ class ContextListener implements ListenerInterface
         $this->sessionKey = '_security_'.$contextKey;
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
+        $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
+    }
+
+    /**
+     * Enables deauthentication during refreshUser when the user has changed.
+     *
+     * @param bool $logoutOnUserChange
+     */
+    public function setLogoutOnUserChange($logoutOnUserChange)
+    {
+        // no-op, method to be deprecated in 4.1
     }
 
     /**
@@ -80,7 +95,10 @@ class ContextListener implements ListenerInterface
         $token = unserialize($token);
 
         if (null !== $this->logger) {
-            $this->logger->debug('Read existing security token from the session.', array('key' => $this->sessionKey));
+            $this->logger->debug('Read existing security token from the session.', array(
+                'key' => $this->sessionKey,
+                'token_class' => is_object($token) ? get_class($token) : null,
+            ));
         }
 
         if ($token instanceof TokenInterface) {
@@ -105,17 +123,17 @@ class ContextListener implements ListenerInterface
             return;
         }
 
-        if (!$event->getRequest()->hasSession()) {
+        $request = $event->getRequest();
+
+        if (!$request->hasSession()) {
             return;
         }
 
         $this->dispatcher->removeListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
         $this->registered = false;
-
-        $request = $event->getRequest();
         $session = $request->getSession();
 
-        if ((null === $token = $this->tokenStorage->getToken()) || ($token instanceof AnonymousToken)) {
+        if ((null === $token = $this->tokenStorage->getToken()) || $this->trustResolver->isAnonymous($token)) {
             if ($request->hasPreviousSession()) {
                 $session->remove($this->sessionKey);
             }
@@ -145,12 +163,34 @@ class ContextListener implements ListenerInterface
         $userNotFoundByProvider = false;
 
         foreach ($this->userProviders as $provider) {
+            if (!$provider instanceof UserProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('User provider "%s" must implement "%s".', get_class($provider), UserProviderInterface::class));
+            }
+
             try {
                 $refreshedUser = $provider->refreshUser($user);
                 $token->setUser($refreshedUser);
 
+                // tokens can be deauthenticated if the user has been changed.
+                if (!$token->isAuthenticated()) {
+                    if (null !== $this->logger) {
+                        $this->logger->debug('Token was deauthenticated after trying to refresh it.', array('username' => $refreshedUser->getUsername(), 'provider' => get_class($provider)));
+                    }
+
+                    return null;
+                }
+
                 if (null !== $this->logger) {
-                    $this->logger->debug('User was reloaded from a user provider.', array('username' => $refreshedUser->getUsername(), 'provider' => get_class($provider)));
+                    $context = array('provider' => get_class($provider), 'username' => $refreshedUser->getUsername());
+
+                    foreach ($token->getRoles() as $role) {
+                        if ($role instanceof SwitchUserRole) {
+                            $context['impersonator_username'] = $role->getSource()->getUsername();
+                            break;
+                        }
+                    }
+
+                    $this->logger->debug('User was reloaded from a user provider.', $context);
                 }
 
                 return $token;

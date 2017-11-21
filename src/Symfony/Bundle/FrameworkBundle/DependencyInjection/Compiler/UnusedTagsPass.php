@@ -22,7 +22,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class UnusedTagsPass implements CompilerPassInterface
 {
     private $whitelist = array(
+        'cache.pool.clearer',
         'console.command',
+        'container.hot_path',
+        'container.service_locator',
+        'container.service_subscriber',
+        'controller.service_arguments',
         'config_cache.resource_checker',
         'data_collector',
         'form.type',
@@ -53,8 +58,6 @@ class UnusedTagsPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $compiler = $container->getCompiler();
-        $formatter = $compiler->getLoggingFormatter();
         $tags = array_unique(array_merge($container->findTags(), $this->whitelist));
 
         foreach ($container->findUnusedTags() as $tag) {
@@ -81,7 +84,7 @@ class UnusedTagsPass implements CompilerPassInterface
                 $message .= sprintf(' Did you mean "%s"?', implode('", "', $candidates));
             }
 
-            $compiler->addLogMessage($formatter->format($this, $message));
+            $container->log($this, $message);
         }
     }
 }

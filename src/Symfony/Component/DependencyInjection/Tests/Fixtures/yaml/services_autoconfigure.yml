@@ -1,0 +1,9 @@
+
+services:
+    _defaults:
+        autoconfigure: true
+
+    use_defaults_settings: ~
+
+    override_defaults_settings_to_false:
+        autoconfigure: false

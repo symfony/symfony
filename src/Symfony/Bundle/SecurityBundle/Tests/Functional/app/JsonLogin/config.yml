@@ -1,0 +1,24 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    dunglas: { password: foo, roles: [ROLE_USER] }
+
+    firewalls:
+        main:
+            pattern: ^/
+            anonymous: true
+            json_login:
+               check_path:    /chk
+               username_path: user.login
+               password_path: user.password
+
+    access_control:
+        - { path: ^/foo, roles: ROLE_USER }

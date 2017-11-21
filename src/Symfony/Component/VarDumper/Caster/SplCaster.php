@@ -36,7 +36,7 @@ class SplCaster
         $b = array(
             $prefix.'flag::STD_PROP_LIST' => (bool) ($flags & \ArrayObject::STD_PROP_LIST),
             $prefix.'flag::ARRAY_AS_PROPS' => (bool) ($flags & \ArrayObject::ARRAY_AS_PROPS),
-            $prefix.'iteratorClass' => $c->getIteratorClass(),
+            $prefix.'iteratorClass' => new ClassStub($c->getIteratorClass()),
             $prefix.'storage' => $c->getArrayCopy(),
         );
 
@@ -45,7 +45,7 @@ class SplCaster
         } else {
             if (!($flags & \ArrayObject::STD_PROP_LIST)) {
                 $c->setFlags(\ArrayObject::STD_PROP_LIST);
-                $a = Caster::castObject($c, new \ReflectionClass($class));
+                $a = Caster::castObject($c, $class);
                 $c->setFlags($flags);
             }
 
@@ -113,6 +113,10 @@ class SplCaster
                 $a[$prefix.$key] = $c->$accessor();
             } catch (\Exception $e) {
             }
+        }
+
+        if (isset($a[$prefix.'realPath'])) {
+            $a[$prefix.'realPath'] = new LinkStub($a[$prefix.'realPath']);
         }
 
         if (isset($a[$prefix.'perms'])) {

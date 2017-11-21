@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\Scope;
 
 /**
  * GraphvizDumper dumps a service container as a graphviz file.
@@ -81,15 +80,10 @@ class GraphvizDumper extends Dumper
             }
         }
 
-        return $this->startDot().$this->addNodes().$this->addEdges().$this->endDot();
+        return $this->container->resolveEnvPlaceholders($this->startDot().$this->addNodes().$this->addEdges().$this->endDot(), '__ENV_%s__');
     }
 
-    /**
-     * Returns all nodes.
-     *
-     * @return string A string representation of all nodes
-     */
-    private function addNodes()
+    private function addNodes(): string
     {
         $code = '';
         foreach ($this->nodes as $id => $node) {
@@ -101,17 +95,12 @@ class GraphvizDumper extends Dumper
         return $code;
     }
 
-    /**
-     * Returns all edges.
-     *
-     * @return string A string representation of all edges
-     */
-    private function addEdges()
+    private function addEdges(): string
     {
         $code = '';
         foreach ($this->edges as $id => $edges) {
             foreach ($edges as $edge) {
-                $code .= sprintf("  node_%s -> node_%s [label=\"%s\" style=\"%s\"];\n", $this->dotize($id), $this->dotize($edge['to']), $edge['name'], $edge['required'] ? 'filled' : 'dashed');
+                $code .= sprintf("  node_%s -> node_%s [label=\"%s\" style=\"%s\"%s];\n", $this->dotize($id), $this->dotize($edge['to']), $edge['name'], $edge['required'] ? 'filled' : 'dashed', $edge['lazy'] ? ' color="#9999ff"' : '');
             }
         }
 
@@ -120,15 +109,8 @@ class GraphvizDumper extends Dumper
 
     /**
      * Finds all edges belonging to a specific service id.
-     *
-     * @param string $id        The service id used to find edges
-     * @param array  $arguments An array of arguments
-     * @param bool   $required
-     * @param string $name
-     *
-     * @return array An array of edges
      */
-    private function findEdges($id, array $arguments, $required, $name)
+    private function findEdges(string $id, array $arguments, bool $required, string $name, bool $lazy = false): array
     {
         $edges = array();
         foreach ($arguments as $argument) {
@@ -139,25 +121,26 @@ class GraphvizDumper extends Dumper
             }
 
             if ($argument instanceof Reference) {
+                $lazyEdge = $lazy;
+
                 if (!$this->container->has((string) $argument)) {
                     $this->nodes[(string) $argument] = array('name' => $name, 'required' => $required, 'class' => '', 'attributes' => $this->options['node.missing']);
+                } elseif ('service_container' !== (string) $argument) {
+                    $lazyEdge = $lazy || $this->container->getDefinition((string) $argument)->isLazy();
                 }
 
-                $edges[] = array('name' => $name, 'required' => $required, 'to' => $argument);
+                $edges[] = array('name' => $name, 'required' => $required, 'to' => $argument, 'lazy' => $lazyEdge);
+            } elseif ($argument instanceof ArgumentInterface) {
+                $edges = array_merge($edges, $this->findEdges($id, $argument->getValues(), $required, $name, true));
             } elseif (is_array($argument)) {
-                $edges = array_merge($edges, $this->findEdges($id, $argument, $required, $name));
+                $edges = array_merge($edges, $this->findEdges($id, $argument, $required, $name, $lazy));
             }
         }
 
         return $edges;
     }
 
-    /**
-     * Finds all nodes.
-     *
-     * @return array An array of all nodes
-     */
-    private function findNodes()
+    private function findNodes(): array
     {
         $nodes = array();
 
@@ -175,20 +158,17 @@ class GraphvizDumper extends Dumper
             } catch (ParameterNotFoundException $e) {
             }
 
-            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => array_merge($this->options['node.definition'], array('style' => $definition->isShared() && ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope(false) ? 'filled' : 'dotted')));
+            $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => array_merge($this->options['node.definition'], array('style' => $definition->isShared() ? 'filled' : 'dotted')));
             $container->setDefinition($id, new Definition('stdClass'));
         }
 
         foreach ($container->getServiceIds() as $id) {
-            $service = $container->get($id);
-
             if (array_key_exists($id, $container->getAliases())) {
                 continue;
             }
 
             if (!$container->hasDefinition($id)) {
-                $class = ('service_container' === $id) ? get_class($this->container) : get_class($service);
-                $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => $this->options['node.instance']);
+                $nodes[$id] = array('class' => str_replace('\\', '\\\\', get_class($container->get($id))), 'attributes' => $this->options['node.instance']);
             }
         }
 
@@ -203,9 +183,6 @@ class GraphvizDumper extends Dumper
         $container->setDefinitions($this->container->getDefinitions());
         $container->setAliases($this->container->getAliases());
         $container->setResources($this->container->getResources());
-        foreach ($this->container->getScopes(false) as $scope => $parentScope) {
-            $container->addScope(new Scope($scope, $parentScope));
-        }
         foreach ($this->container->getExtensions() as $extension) {
             $container->registerExtension($extension);
         }
@@ -213,12 +190,7 @@ class GraphvizDumper extends Dumper
         return $container;
     }
 
-    /**
-     * Returns the start dot.
-     *
-     * @return string The string representation of a start dot
-     */
-    private function startDot()
+    private function startDot(): string
     {
         return sprintf("digraph sc {\n  %s\n  node [%s];\n  edge [%s];\n\n",
             $this->addOptions($this->options['graph']),
@@ -227,24 +199,12 @@ class GraphvizDumper extends Dumper
         );
     }
 
-    /**
-     * Returns the end dot.
-     *
-     * @return string
-     */
-    private function endDot()
+    private function endDot(): string
     {
         return "}\n";
     }
 
-    /**
-     * Adds attributes.
-     *
-     * @param array $attributes An array of attributes
-     *
-     * @return string A comma separated list of attributes
-     */
-    private function addAttributes(array $attributes)
+    private function addAttributes(array $attributes): string
     {
         $code = array();
         foreach ($attributes as $k => $v) {
@@ -254,14 +214,7 @@ class GraphvizDumper extends Dumper
         return $code ? ', '.implode(', ', $code) : '';
     }
 
-    /**
-     * Adds options.
-     *
-     * @param array $options An array of options
-     *
-     * @return string A space separated list of options
-     */
-    private function addOptions(array $options)
+    private function addOptions(array $options): string
     {
         $code = array();
         foreach ($options as $k => $v) {
@@ -271,26 +224,12 @@ class GraphvizDumper extends Dumper
         return implode(' ', $code);
     }
 
-    /**
-     * Dotizes an identifier.
-     *
-     * @param string $id The identifier to dotize
-     *
-     * @return string A dotized string
-     */
-    private function dotize($id)
+    private function dotize(string $id): string
     {
-        return strtolower(preg_replace('/\W/i', '_', $id));
+        return preg_replace('/\W/i', '_', $id);
     }
 
-    /**
-     * Compiles an array of aliases for a specified service id.
-     *
-     * @param string $id A service id
-     *
-     * @return array An array of aliases
-     */
-    private function getAliases($id)
+    private function getAliases(string $id): array
     {
         $aliases = array();
         foreach ($this->container->getAliases() as $alias => $origin) {

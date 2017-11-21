@@ -70,7 +70,7 @@ abstract class Loader implements LoaderInterface
         $loader = null === $this->resolver ? false : $this->resolver->resolve($resource, $type);
 
         if (false === $loader) {
-            throw new FileLoaderLoadException($resource);
+            throw new FileLoaderLoadException($resource, null, null, null, $type);
         }
 
         return $loader;

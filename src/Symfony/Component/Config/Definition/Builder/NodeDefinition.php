@@ -27,6 +27,7 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $defaultValue;
     protected $default = false;
     protected $required = false;
+    protected $deprecationMessage = null;
     protected $merge;
     protected $allowEmptyValue = true;
     protected $nullEquivalent;
@@ -35,11 +36,7 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $parent;
     protected $attributes = array();
 
-    /**
-     * @param string                   $name   The name of the node
-     * @param NodeParentInterface|null $parent The parent
-     */
-    public function __construct($name, NodeParentInterface $parent = null)
+    public function __construct(?string $name, NodeParentInterface $parent = null)
     {
         $this->parent = $parent;
         $this->name = $name;
@@ -156,6 +153,23 @@ abstract class NodeDefinition implements NodeParentInterface
     public function isRequired()
     {
         $this->required = true;
+
+        return $this;
+    }
+
+    /**
+     * Sets the node as deprecated.
+     *
+     * You can use %node% and %path% placeholders in your message to display,
+     * respectively, the node name and its complete path.
+     *
+     * @param string $message Deprecation message
+     *
+     * @return $this
+     */
+    public function setDeprecated($message = 'The child node "%node%" at path "%path%" is deprecated.')
+    {
+        $this->deprecationMessage = $message;
 
         return $this;
     }

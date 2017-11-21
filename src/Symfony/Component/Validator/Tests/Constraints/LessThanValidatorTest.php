@@ -13,18 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\LessThanValidator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
 class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new LessThanValidator();
@@ -53,6 +47,16 @@ class LessThanValidatorTest extends AbstractComparisonValidatorTestCase
             array(new ComparisonTest_Class(4), new ComparisonTest_Class(5)),
             array('22', '333'),
             array(null, 1),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function provideValidComparisonsToPropertyPath()
+    {
+        return array(
+            array(4),
         );
     }
 

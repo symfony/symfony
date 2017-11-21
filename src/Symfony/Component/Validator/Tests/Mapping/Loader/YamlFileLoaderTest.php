@@ -124,6 +124,19 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
+    public function testLoadClassMetadataWithConstants()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/mapping-with-constants.yml');
+        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+
+        $loader->loadClassMetadata($metadata);
+
+        $expected = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+        $expected->addPropertyConstraint('firstName', new Range(array('max' => PHP_INT_MAX)));
+
+        $this->assertEquals($expected, $metadata);
+    }
+
     public function testLoadGroupSequenceProvider()
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');

@@ -25,16 +25,6 @@ class LocaleTypeTest extends BaseTypeTest
         parent::setUp();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('locale');
-
-        $this->assertSame('locale', $form->getConfig()->getType()->getName());
-    }
-
     public function testLocalesAreSelectable()
     {
         $choices = $this->factory->create(static::TESTED_TYPE)

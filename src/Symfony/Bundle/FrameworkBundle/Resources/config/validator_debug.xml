@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="debug.validator" decorates="validator" decoration-priority="255" class="Symfony\Component\Validator\Validator\TraceableValidator">
+            <argument type="service" id="debug.validator.inner" />
+            <tag name="kernel.reset" method="reset" />
+        </service>
+
+        <!-- DataCollector -->
+        <service id="data_collector.validator" class="Symfony\Component\Validator\DataCollector\ValidatorDataCollector">
+            <argument type="service" id="debug.validator"/>
+            <tag name="data_collector" template="@WebProfiler/Collector/validator.html.twig" id="validator" priority="320" />
+        </service>
+    </services>
+</container>

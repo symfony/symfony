@@ -166,7 +166,7 @@ class UrlMatcherTest extends TestCase
     {
         $collection = new RouteCollection();
         $chars = '!"$%éà &\'()*+,./:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\[]^_`abcdefghijklmnopqrstuvwxyz{|}~-';
-        $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '['.preg_quote($chars).']+')));
+        $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '['.preg_quote($chars).']+'), array('utf8' => true)));
 
         $matcher = new UrlMatcher($collection, new RequestContext());
         $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.rawurlencode($chars).'/bar'));
@@ -426,5 +426,16 @@ class UrlMatcherTest extends TestCase
 
         $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
         $this->assertEquals(array('_route' => 'foo', 'locale' => 'en'), $matcher->match('/'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\NoConfigurationException
+     */
+    public function testNoConfiguration()
+    {
+        $coll = new RouteCollection();
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->match('/');
     }
 }

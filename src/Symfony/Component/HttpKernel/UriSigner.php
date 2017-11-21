@@ -19,19 +19,22 @@ namespace Symfony\Component\HttpKernel;
 class UriSigner
 {
     private $secret;
+    private $parameter;
 
     /**
-     * @param string $secret A secret
+     * @param string $secret    A secret
+     * @param string $parameter Query string parameter to use
      */
-    public function __construct($secret)
+    public function __construct(string $secret, string $parameter = '_hash')
     {
         $this->secret = $secret;
+        $this->parameter = $parameter;
     }
 
     /**
      * Signs a URI.
      *
-     * The given URI is signed by adding a _hash query string parameter
+     * The given URI is signed by adding the query string parameter
      * which value depends on the URI and the secret.
      *
      * @param string $uri A URI to sign
@@ -49,7 +52,7 @@ class UriSigner
 
         $uri = $this->buildUrl($url, $params);
 
-        return $uri.(false === strpos($uri, '?') ? '?' : '&').'_hash='.$this->computeHash($uri);
+        return $uri.(false === strpos($uri, '?') ? '?' : '&').$this->parameter.'='.$this->computeHash($uri);
     }
 
     /**
@@ -68,12 +71,12 @@ class UriSigner
             $params = array();
         }
 
-        if (empty($params['_hash'])) {
+        if (empty($params[$this->parameter])) {
             return false;
         }
 
-        $hash = urlencode($params['_hash']);
-        unset($params['_hash']);
+        $hash = urlencode($params[$this->parameter]);
+        unset($params[$this->parameter]);
 
         return $this->computeHash($this->buildUrl($url, $params)) === $hash;
     }

@@ -1,70 +1,75 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Monolog\Tests;
 
 use Monolog\Handler\TestHandler;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Monolog\Handler\DebugHandler;
+use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Monolog\Logger;
 
 class LoggerTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testEmerg()
+    public function testGetLogsWithoutDebugProcessor()
     {
         $handler = new TestHandler();
-        $logger = new Logger('test');
-        $logger->pushHandler($handler);
+        $logger = new Logger(__METHOD__, array($handler));
 
-        $this->assertTrue($logger->emerg('test'));
-        $this->assertTrue($handler->hasEmergency('test'));
+        $this->assertTrue($logger->error('error message'));
+        $this->assertSame(array(), $logger->getLogs());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testCrit()
+    public function testCountErrorsWithoutDebugProcessor()
     {
         $handler = new TestHandler();
-        $logger = new Logger('test');
-        $logger->pushHandler($handler);
+        $logger = new Logger(__METHOD__, array($handler));
 
-        $this->assertTrue($logger->crit('test'));
-        $this->assertTrue($handler->hasCritical('test'));
+        $this->assertTrue($logger->error('error message'));
+        $this->assertSame(0, $logger->countErrors());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testErr()
+    public function testGetLogsWithDebugProcessor()
     {
         $handler = new TestHandler();
-        $logger = new Logger('test');
-        $logger->pushHandler($handler);
+        $processor = new DebugProcessor();
+        $logger = new Logger(__METHOD__, array($handler), array($processor));
 
-        $this->assertTrue($logger->err('test'));
-        $this->assertTrue($handler->hasError('test'));
+        $this->assertTrue($logger->error('error message'));
+        $this->assertSame(1, count($logger->getLogs()));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testWarn()
+    public function testCountErrorsWithDebugProcessor()
     {
         $handler = new TestHandler();
-        $logger = new Logger('test');
-        $logger->pushHandler($handler);
+        $processor = new DebugProcessor();
+        $logger = new Logger(__METHOD__, array($handler), array($processor));
 
-        $this->assertTrue($logger->warn('test'));
-        $this->assertTrue($handler->hasWarning('test'));
+        $this->assertTrue($logger->debug('test message'));
+        $this->assertTrue($logger->info('test message'));
+        $this->assertTrue($logger->notice('test message'));
+        $this->assertTrue($logger->warning('test message'));
+
+        $this->assertTrue($logger->error('test message'));
+        $this->assertTrue($logger->critical('test message'));
+        $this->assertTrue($logger->alert('test message'));
+        $this->assertTrue($logger->emergency('test message'));
+
+        $this->assertSame(4, $logger->countErrors());
     }
 
-    public function testGetLogs()
+    public function testGetLogsWithDebugProcessor2()
     {
-        $logger = new Logger('test');
-        $logger->pushHandler(new DebugHandler());
+        $handler = new TestHandler();
+        $logger = new Logger('test', array($handler));
+        $logger->pushProcessor(new DebugProcessor());
 
         $logger->addInfo('test');
         $this->assertCount(1, $logger->getLogs());
@@ -74,34 +79,16 @@ class LoggerTest extends TestCase
         $this->assertEquals(Logger::INFO, $record['priority']);
     }
 
-    public function testGetLogsWithoutDebugHandler()
+    public function testClear()
     {
-        $logger = new Logger('test');
-        $logger->pushHandler(new TestHandler());
-        $logger->addInfo('test');
-
-        $this->assertSame(array(), $logger->getLogs());
-    }
-
-    public function testCountErrors()
-    {
-        $logger = new Logger('test');
-        $logger->pushHandler(new DebugHandler());
+        $handler = new TestHandler();
+        $logger = new Logger('test', array($handler));
+        $logger->pushProcessor(new DebugProcessor());
 
         $logger->addInfo('test');
-        $logger->addError('uh-oh');
+        $logger->clear();
 
-        $this->assertEquals(1, $logger->countErrors());
-    }
-
-    public function testCountErrorsWithoutDebugHandler()
-    {
-        $logger = new Logger('test');
-        $logger->pushHandler(new TestHandler());
-
-        $logger->addInfo('test');
-        $logger->addError('uh-oh');
-
-        $this->assertEquals(0, $logger->countErrors());
+        $this->assertEmpty($logger->getLogs());
+        $this->assertSame(0, $logger->countErrors());
     }
 }

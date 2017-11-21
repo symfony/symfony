@@ -1,6 +1,55 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * `OutputFormatter` throws an exception when unknown options are used
+ * removed `QuestionHelper::setInputStream()/getInputStream()`
+ * removed `Application::getTerminalWidth()/getTerminalHeight()` and 
+  `Application::setTerminalDimensions()/getTerminalDimensions()`
+* removed `ConsoleExceptionEvent`
+* removed `ConsoleEvents::EXCEPTION`
+
+3.4.0
+-----
+
+ * added `SHELL_VERBOSITY` env var to control verbosity
+ * added `CommandLoaderInterface`, `FactoryCommandLoader` and PSR-11
+   `ContainerCommandLoader` for commands lazy-loading
+ * added a case-insensitive command name matching fallback
+ * added static `Command::$defaultName/getDefaultName()`, allowing for
+   commands to be registered at compile time in the application command loader.
+   Setting the `$defaultName` property avoids the need for filling the `command`
+   attribute on the `console.command` tag when using `AddConsoleCommandPass`.
+
+3.3.0
+-----
+
+* added `ExceptionListener`
+* added `AddConsoleCommandPass` (originally in FrameworkBundle)
+* [BC BREAK] `Input::getOption()` no longer returns the default value for options
+  with value optional explicitly passed empty
+* added console.error event to catch exceptions thrown by other listeners
+* deprecated console.exception event in favor of console.error
+* added ability to handle `CommandNotFoundException` through the 
+ `console.error` event
+* deprecated default validation in `SymfonyQuestionHelper::ask`
+
+3.2.0
+------
+
+* added `setInputs()` method to CommandTester for ease testing of commands expecting inputs
+* added `setStream()` and `getStream()` methods to Input (implement StreamableInputInterface)
+* added StreamableInputInterface
+* added LockableTrait
+
+3.1.0
+-----
+
+ * added truncate method to FormatterHelper
+ * added setColumnWidth(s) method to Table 
+
 2.8.3
 -----
 

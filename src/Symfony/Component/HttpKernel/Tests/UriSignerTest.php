@@ -50,4 +50,15 @@ class UriSignerTest extends TestCase
         );
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
     }
+
+    public function testCheckWithDifferentParameter()
+    {
+        $signer = new UriSigner('foobar', 'qux');
+
+        $this->assertSame(
+            'http://example.com/foo?baz=bay&foo=bar&qux=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D',
+            $signer->sign('http://example.com/foo?foo=bar&baz=bay')
+        );
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+    }
 }

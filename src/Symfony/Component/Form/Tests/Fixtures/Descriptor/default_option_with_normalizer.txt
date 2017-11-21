@@ -1,0 +1,24 @@
+
+Symfony\Component\Form\Extension\Core\Type\ChoiceType (choice_translation_domain)
+=================================================================================
+
+ ---------------- --------------------%s 
+  Required         false              %s 
+ ---------------- --------------------%s 
+  Default          true               %s 
+ ---------------- --------------------%s 
+  Allowed types    [                  %s 
+                     "null",          %s 
+                     "bool",          %s 
+                     "string"         %s 
+                   ]                  %s 
+ ---------------- --------------------%s 
+  Allowed values   -                  %s 
+ ---------------- --------------------%s 
+  Normalizer       Closure {          %s 
+                     parameters: 2    %s 
+                     file: "%s%eExtension%eCore%eType%eChoiceType.php"  
+                     line: "%s to %s" %s 
+                   }                  %s 
+ ---------------- --------------------%s 
+

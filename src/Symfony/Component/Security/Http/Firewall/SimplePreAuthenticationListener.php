@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -39,15 +39,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
     private $logger;
     private $dispatcher;
 
-    /**
-     * @param TokenStorageInterface           $tokenStorage          A TokenStorageInterface instance
-     * @param AuthenticationManagerInterface  $authenticationManager An AuthenticationManagerInterface instance
-     * @param string                          $providerKey
-     * @param SimplePreAuthenticatorInterface $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
-     * @param LoggerInterface|null            $logger                A LoggerInterface instance
-     * @param EventDispatcherInterface|null   $dispatcher            An EventDispatcherInterface instance
-     */
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, string $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');

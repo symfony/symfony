@@ -35,9 +35,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $compiler = $container->getCompiler();
-        $formatter = $compiler->getLoggingFormatter();
-        $graph = $compiler->getServiceReferenceGraph();
+        $graph = $container->getCompiler()->getServiceReferenceGraph();
 
         $hasChanged = false;
         foreach ($container->getDefinitions() as $id => $definition) {
@@ -50,6 +48,9 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
                 $referencingAliases = array();
                 $sourceIds = array();
                 foreach ($edges as $edge) {
+                    if ($edge->isWeak()) {
+                        continue;
+                    }
                     $node = $edge->getSourceNode();
                     $sourceIds[] = $node->getId();
 
@@ -65,12 +66,14 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
 
             if (1 === count($referencingAliases) && false === $isReferenced) {
                 $container->setDefinition((string) reset($referencingAliases), $definition);
-                $definition->setPublic(true);
+                $definition->setPublic(!$definition->isPrivate());
+                $definition->setPrivate(reset($referencingAliases)->isPrivate());
                 $container->removeDefinition($id);
-                $compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'replaces alias '.reset($referencingAliases)));
+                $container->log($this, sprintf('Removed service "%s"; reason: replaces alias %s.', $id, reset($referencingAliases)));
             } elseif (0 === count($referencingAliases) && false === $isReferenced) {
                 $container->removeDefinition($id);
-                $compiler->addLogMessage($formatter->formatRemoveService($this, $id, 'unused'));
+                $container->resolveEnvPlaceholders(serialize($definition));
+                $container->log($this, sprintf('Removed service "%s"; reason: unused.', $id));
                 $hasChanged = true;
             }
         }

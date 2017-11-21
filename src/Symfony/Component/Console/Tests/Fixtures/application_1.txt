@@ -1,4 +1,4 @@
-<info>Console Tool</info>
+Console Tool
 
 <comment>Usage:</comment>
   command [options] [arguments]

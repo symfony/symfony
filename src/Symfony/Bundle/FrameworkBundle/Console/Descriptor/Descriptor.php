@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -32,7 +31,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * @var OutputInterface
      */
-    private $output;
+    protected $output;
 
     /**
      * {@inheritdoc}
@@ -55,10 +54,10 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeContainerTags($object, $options);
                 break;
             case $object instanceof ContainerBuilder && isset($options['id']):
-                $this->describeContainerService($this->resolveServiceDefinition($object, $options['id']), $options);
+                $this->describeContainerService($this->resolveServiceDefinition($object, $options['id']), $options, $object);
                 break;
             case $object instanceof ContainerBuilder && isset($options['parameter']):
-                $this->describeContainerParameter($object->getParameter($options['parameter']), $options);
+                $this->describeContainerParameter($object->resolveEnvPlaceholders($object->getParameter($options['parameter'])), $options);
                 break;
             case $object instanceof ContainerBuilder:
                 $this->describeContainerServices($object, $options);
@@ -102,23 +101,6 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * Writes content to output.
-     *
-     * @param Table $table
-     * @param bool  $decorated
-     */
-    protected function renderTable(Table $table, $decorated = false)
-    {
-        if (!$decorated) {
-            $table->getStyle()->setCellRowFormat('%s');
-            $table->getStyle()->setCellRowContentFormat('%s');
-            $table->getStyle()->setCellHeaderFormat('%s');
-        }
-
-        $table->render();
-    }
-
-    /**
      * Describes an InputArgument instance.
      */
     abstract protected function describeRouteCollection(RouteCollection $routes, array $options = array());
@@ -146,8 +128,9 @@ abstract class Descriptor implements DescriptorInterface
      *
      * @param Definition|Alias|object $service
      * @param array                   $options
+     * @param ContainerBuilder|null   $builder
      */
-    abstract protected function describeContainerService($service, array $options = array());
+    abstract protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null);
 
     /**
      * Describes container services.
@@ -165,7 +148,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Describes a service alias.
      */
-    abstract protected function describeContainerAlias(Alias $alias, array $options = array());
+    abstract protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null);
 
     /**
      * Describes a container parameter.
@@ -245,10 +228,6 @@ abstract class Descriptor implements DescriptorInterface
         // Some service IDs don't have a Definition, they're simply an Alias
         if ($builder->hasAlias($serviceId)) {
             return $builder->getAlias($serviceId);
-        }
-
-        if ('service_container' === $serviceId) {
-            return $builder;
         }
 
         // the service has been injected in some special way, just return the service

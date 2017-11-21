@@ -166,9 +166,6 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertEquals('02*2010*03 04|05|06', $transformer->transform($this->dateTime));
     }
 
-    /**
-     * @requires PHP 5.5
-     */
     public function testTransformDateTimeImmutableTimezones()
     {
         $transformer = new DateTimeToLocalizedStringTransformer('America/New_York', 'Asia/Hong_Kong');
@@ -307,22 +304,6 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
     {
         $transformer = new DateTimeToLocalizedStringTransformer();
         $transformer->reverseTransform('12345');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testValidateDateFormatOption()
-    {
-        new DateTimeToLocalizedStringTransformer(null, null, 'foobar');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testValidateTimeFormatOption()
-    {
-        new DateTimeToLocalizedStringTransformer(null, null, null, 'foobar');
     }
 
     /**

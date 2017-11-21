@@ -14,12 +14,15 @@ namespace Symfony\Component\VarDumper\Tests\Caster;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\PdoCaster;
 use Symfony\Component\VarDumper\Cloner\Stub;
+use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class PdoCasterTest extends TestCase
 {
+    use VarDumperTestTrait;
+
     /**
      * @requires extension pdo_sqlite
      */
@@ -37,22 +40,25 @@ class PdoCasterTest extends TestCase
         $this->assertSame('NATURAL', $attr['CASE']->class);
         $this->assertSame('BOTH', $attr['DEFAULT_FETCH_MODE']->class);
 
-        $xCast = array(
-            "\0~\0inTransaction" => $pdo->inTransaction(),
-            "\0~\0attributes" => array(
-                'CASE' => $attr['CASE'],
-                'ERRMODE' => $attr['ERRMODE'],
-                'PERSISTENT' => false,
-                'DRIVER_NAME' => 'sqlite',
-                'ORACLE_NULLS' => $attr['ORACLE_NULLS'],
-                'CLIENT_VERSION' => $pdo->getAttribute(\PDO::ATTR_CLIENT_VERSION),
-                'SERVER_VERSION' => $pdo->getAttribute(\PDO::ATTR_SERVER_VERSION),
-                'STATEMENT_CLASS' => array('PDOStatement'),
-                'DEFAULT_FETCH_MODE' => $attr['DEFAULT_FETCH_MODE'],
-            ),
-        );
-        unset($cast["\0~\0attributes"]['STATEMENT_CLASS'][1]);
+        $xDump = <<<'EODUMP'
+array:2 [
+  "\x00~\x00inTransaction" => false
+  "\x00~\x00attributes" => array:9 [
+    "CASE" => NATURAL
+    "ERRMODE" => SILENT
+    "PERSISTENT" => false
+    "DRIVER_NAME" => "sqlite"
+    "ORACLE_NULLS" => NATURAL
+    "CLIENT_VERSION" => "%s"
+    "SERVER_VERSION" => "%s"
+    "STATEMENT_CLASS" => array:%d [
+      0 => "PDOStatement"%A
+    ]
+    "DEFAULT_FETCH_MODE" => BOTH
+  ]
+]
+EODUMP;
 
-        $this->assertSame($xCast, $cast);
+        $this->assertDumpMatchesFormat($xDump, $cast);
     }
 }

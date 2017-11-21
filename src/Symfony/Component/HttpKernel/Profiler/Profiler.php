@@ -33,16 +33,14 @@ class Profiler
     private $collectors = array();
 
     private $logger;
-
-    /**
-     * @var bool
-     */
+    private $initiallyEnabled = true;
     private $enabled = true;
 
-    public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null)
+    public function __construct(ProfilerStorageInterface $storage, LoggerInterface $logger = null, bool $enable = true)
     {
         $this->storage = $storage;
         $this->logger = $logger;
+        $this->initiallyEnabled = $this->enabled = $enable;
     }
 
     /**
@@ -117,60 +115,23 @@ class Profiler
     }
 
     /**
-     * Exports the current profiler data.
-     *
-     * @return string The exported data
-     *
-     * @deprecated since Symfony 2.8, to be removed in 3.0.
-     */
-    public function export(Profile $profile)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        return base64_encode(serialize($profile));
-    }
-
-    /**
-     * Imports data into the profiler storage.
-     *
-     * @param string $data A data string as exported by the export() method
-     *
-     * @return Profile|false A Profile instance
-     *
-     * @deprecated since Symfony 2.8, to be removed in 3.0.
-     */
-    public function import($data)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $profile = unserialize(base64_decode($data));
-
-        if ($this->storage->read($profile->getToken())) {
-            return false;
-        }
-
-        $this->saveProfile($profile);
-
-        return $profile;
-    }
-
-    /**
      * Finds profiler tokens for the given criteria.
      *
-     * @param string $ip     The IP
-     * @param string $url    The URL
-     * @param string $limit  The maximum number of tokens to return
-     * @param string $method The request method
-     * @param string $start  The start date to search from
-     * @param string $end    The end date to search to
+     * @param string $ip         The IP
+     * @param string $url        The URL
+     * @param string $limit      The maximum number of tokens to return
+     * @param string $method     The request method
+     * @param string $start      The start date to search from
+     * @param string $end        The end date to search to
+     * @param string $statusCode The request status code
      *
      * @return array An array of tokens
      *
      * @see http://php.net/manual/en/datetime.formats.php for the supported date/time formats
      */
-    public function find($ip, $url, $limit, $method, $start, $end)
+    public function find($ip, $url, $limit, $method, $start, $end, $statusCode = null)
     {
-        return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end));
+        return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end), $statusCode);
     }
 
     /**
@@ -205,6 +166,14 @@ class Profiler
         }
 
         return $profile;
+    }
+
+    public function reset()
+    {
+        foreach ($this->collectors as $collector) {
+            $collector->reset();
+        }
+        $this->enabled = $this->initiallyEnabled;
     }
 
     /**

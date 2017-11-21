@@ -11,17 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
-class SubRequestController extends ContainerAware
+class SubRequestController implements ContainerAwareInterface
 {
-    public function indexAction()
-    {
-        $handler = $this->container->get('fragment.handler');
+    use ContainerAwareTrait;
 
+    public function indexAction($handler)
+    {
         $errorUrl = $this->generateUrl('subrequest_fragment_error', array('_locale' => 'fr', '_format' => 'json'));
         $altUrl = $this->generateUrl('subrequest_fragment', array('_locale' => 'fr', '_format' => 'json'));
 

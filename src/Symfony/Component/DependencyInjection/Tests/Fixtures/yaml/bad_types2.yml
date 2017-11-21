@@ -1,5 +1,0 @@
-services:
-    foo_service:
-        class:            FooClass
-        # autowiring_types is not a string
-        autowiring_types: [ 1 ]

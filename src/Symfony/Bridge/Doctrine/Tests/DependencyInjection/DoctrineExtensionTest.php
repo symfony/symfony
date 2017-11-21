@@ -175,6 +175,7 @@ class DoctrineExtensionTest extends TestCase
     {
         return array(
             array('doctrine.orm.cache.apc.class',       array('type' => 'apc')),
+            array('doctrine.orm.cache.apcu.class',      array('type' => 'apcu')),
             array('doctrine.orm.cache.array.class',     array('type' => 'array')),
             array('doctrine.orm.cache.xcache.class',    array('type' => 'xcache')),
             array('doctrine.orm.cache.wincache.class',  array('type' => 'wincache')),
@@ -186,12 +187,9 @@ class DoctrineExtensionTest extends TestCase
     }
 
     /**
-     * @param string $class
-     * @param array  $config
-     *
      * @dataProvider providerBasicDrivers
      */
-    public function testLoadBasicCacheDriver($class, array $config, array $expectedCalls = array())
+    public function testLoadBasicCacheDriver(string $class, array $config, array $expectedCalls = array())
     {
         $container = $this->createContainer();
         $cacheName = 'metadata_cache';

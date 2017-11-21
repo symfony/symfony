@@ -56,27 +56,15 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function getBundles();
 
     /**
-     * Checks if a given class name belongs to an active bundle.
+     * Returns a bundle.
      *
-     * @param string $class A class name
+     * @param string $name Bundle name
      *
-     * @return bool true if the class belongs to an active bundle, false otherwise
-     *
-     * @deprecated since version 2.6, to be removed in 3.0.
-     */
-    public function isClassInActiveBundle($class);
-
-    /**
-     * Returns a bundle and optionally its descendants by its name.
-     *
-     * @param string $name  Bundle name
-     * @param bool   $first Whether to return the first bundle only or together with its descendants
-     *
-     * @return BundleInterface|BundleInterface[] A BundleInterface instance or an array of BundleInterface instances if $first is false
+     * @return BundleInterface A BundleInterface instance
      *
      * @throws \InvalidArgumentException when the bundle is not enabled
      */
-    public function getBundle($name, $first = true);
+    public function getBundle($name);
 
     /**
      * Returns the file path for a given resource.
@@ -130,9 +118,9 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function isDebug();
 
     /**
-     * Gets the application root dir.
+     * Gets the application root dir (path of the project's Kernel class).
      *
-     * @return string The application root dir
+     * @return string The Kernel root dir
      */
     public function getRootDir();
 

@@ -41,12 +41,22 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
         );
     }
 
+    public function reset()
+    {
+        $this->data = array();
+
+        if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
+            $this->dispatcher->reset();
+        }
+    }
+
     public function lateCollect()
     {
         if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
             $this->setCalledListeners($this->dispatcher->getCalledListeners());
             $this->setNotCalledListeners($this->dispatcher->getNotCalledListeners());
         }
+        $this->data = $this->cloneVar($this->data);
     }
 
     /**

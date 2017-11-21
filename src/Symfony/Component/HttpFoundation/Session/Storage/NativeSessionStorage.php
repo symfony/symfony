@@ -12,8 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage;
 
 use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
@@ -25,11 +24,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 class NativeSessionStorage implements SessionStorageInterface
 {
     /**
-     * Array of SessionBagInterface.
-     *
      * @var SessionBagInterface[]
      */
-    protected $bags;
+    protected $bags = array();
 
     /**
      * @var bool
@@ -42,7 +39,7 @@ class NativeSessionStorage implements SessionStorageInterface
     protected $closed = false;
 
     /**
-     * @var AbstractProxy
+     * @var AbstractProxy|\SessionHandlerInterface
      */
     protected $saveHandler;
 
@@ -64,18 +61,15 @@ class NativeSessionStorage implements SessionStorageInterface
      * PHP starts to execute user-land code. Setting during runtime has no effect).
      *
      * cache_limiter, "" (use "0" to prevent headers from being sent entirely).
+     * cache_expire, "0"
      * cookie_domain, ""
      * cookie_httponly, ""
      * cookie_lifetime, "0"
      * cookie_path, "/"
      * cookie_secure, ""
-     * entropy_file, ""
-     * entropy_length, "0"
      * gc_divisor, "100"
      * gc_maxlifetime, "1440"
      * gc_probability, "1"
-     * hash_bits_per_character, "4"
-     * hash_function, "0"
      * lazy_write, "1"
      * name, "PHPSESSID"
      * referer_check, ""
@@ -96,16 +90,18 @@ class NativeSessionStorage implements SessionStorageInterface
      * trans_sid_hosts, $_SERVER['HTTP_HOST']
      * trans_sid_tags, "a=href,area=href,frame=src,form="
      *
-     * @param array                                                            $options Session configuration options
-     * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
-     * @param MetadataBag                                                      $metaBag MetadataBag
+     * @param array                         $options Session configuration options
+     * @param \SessionHandlerInterface|null $handler
+     * @param MetadataBag                   $metaBag MetadataBag
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
         $options += array(
-            // disable by default because it's managed by HeaderBag (if used)
             'cache_limiter' => '',
+            'cache_expire' => 0,
             'use_cookies' => 1,
+            'lazy_write' => 1,
+            'use_strict_mode' => 1,
         );
 
         session_register_shutdown();
@@ -118,7 +114,7 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * Gets the save handler instance.
      *
-     * @return AbstractProxy
+     * @return AbstractProxy|\SessionHandlerInterface
      */
     public function getSaveHandler()
     {
@@ -134,13 +130,8 @@ class NativeSessionStorage implements SessionStorageInterface
             return true;
         }
 
-        if (\PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE === session_status()) {
+        if (\PHP_SESSION_ACTIVE === session_status()) {
             throw new \RuntimeException('Failed to start the session: already started by PHP.');
-        }
-
-        if (\PHP_VERSION_ID < 50400 && !$this->closed && isset($_SESSION) && session_id()) {
-            // not 100% fool-proof, but is the most reliable way to determine if a session is active in PHP 5.3
-            throw new \RuntimeException('Failed to start the session: already started by PHP ($_SESSION is set).');
         }
 
         if (ini_get('session.use_cookies') && headers_sent($file, $line)) {
@@ -153,10 +144,6 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         $this->loadSession();
-        if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
-            // This condition matches only PHP 5.3 with internal save handlers
-            $this->saveHandler->setActive(true);
-        }
 
         return true;
     }
@@ -199,12 +186,7 @@ class NativeSessionStorage implements SessionStorageInterface
     public function regenerate($destroy = false, $lifetime = null)
     {
         // Cannot regenerate the session ID for non-active sessions.
-        if (\PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE !== session_status()) {
-            return false;
-        }
-
-        // Check if session ID exists in PHP 5.3
-        if (\PHP_VERSION_ID < 50400 && '' === session_id()) {
+        if (\PHP_SESSION_ACTIVE !== session_status()) {
             return false;
         }
 
@@ -234,11 +216,39 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function save()
     {
-        session_write_close();
+        $session = $_SESSION;
 
-        if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
-            // This condition matches only PHP 5.3 with internal save handlers
-            $this->saveHandler->setActive(false);
+        foreach ($this->bags as $bag) {
+            if (empty($_SESSION[$key = $bag->getStorageKey()])) {
+                unset($_SESSION[$key]);
+            }
+        }
+        if (array($key = $this->metadataBag->getStorageKey()) === array_keys($_SESSION)) {
+            unset($_SESSION[$key]);
+        }
+
+        // Register custom error handler to catch a possible failure warning during session write
+        set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+            throw new \ErrorException($errstr, $errno, E_WARNING, $errfile, $errline);
+        }, E_WARNING);
+
+        try {
+            $e = null;
+            session_write_close();
+        } catch (\ErrorException $e) {
+        } finally {
+            restore_error_handler();
+            $_SESSION = $session;
+        }
+        if (null !== $e) {
+            // The default PHP error message is not very helpful, as it does not give any information on the current save handler.
+            // Therefore, we catch this error and trigger a warning with a better error message
+            $handler = $this->getSaveHandler();
+            if ($handler instanceof SessionHandlerProxy) {
+                $handler = $handler->getHandler();
+            }
+
+            trigger_error(sprintf('session_write_close(): Failed to write session data with %s handler', get_class($handler)), E_USER_WARNING);
         }
 
         $this->closed = true;
@@ -331,16 +341,15 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function setOptions(array $options)
     {
-        if (headers_sent() || (\PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE === session_status())) {
+        if (headers_sent() || \PHP_SESSION_ACTIVE === session_status()) {
             return;
         }
 
         $validOptions = array_flip(array(
-            'cache_limiter', 'cookie_domain', 'cookie_httponly',
+            'cache_limiter', 'cache_expire', 'cookie_domain', 'cookie_httponly',
             'cookie_lifetime', 'cookie_path', 'cookie_secure',
-            'entropy_file', 'entropy_length', 'gc_divisor',
-            'gc_maxlifetime', 'gc_probability', 'hash_bits_per_character',
-            'hash_function', 'lazy_write', 'name', 'referer_check',
+            'gc_divisor', 'gc_maxlifetime', 'gc_probability',
+            'lazy_write', 'name', 'referer_check',
             'serialize_handler', 'use_strict_mode', 'use_cookies',
             'use_only_cookies', 'use_trans_sid', 'upload_progress.enabled',
             'upload_progress.cleanup', 'upload_progress.prefix', 'upload_progress.name',
@@ -364,7 +373,7 @@ class NativeSessionStorage implements SessionStorageInterface
      *     ini_set('session.save_handler', 'files');
      *     ini_set('session.save_path', '/tmp');
      *
-     * or pass in a NativeSessionHandler instance which configures session.save_handler in the
+     * or pass in a \SessionHandler instance which configures session.save_handler in the
      * constructor, for a template see NativeFileSessionHandler or use handlers in
      * composer package drak/native-session
      *
@@ -373,45 +382,34 @@ class NativeSessionStorage implements SessionStorageInterface
      * @see http://php.net/sessionhandler
      * @see http://github.com/drak/NativeSession
      *
-     * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $saveHandler
+     * @param \SessionHandlerInterface|null $saveHandler
      *
      * @throws \InvalidArgumentException
      */
     public function setSaveHandler($saveHandler = null)
     {
         if (!$saveHandler instanceof AbstractProxy &&
-            !$saveHandler instanceof NativeSessionHandler &&
             !$saveHandler instanceof \SessionHandlerInterface &&
             null !== $saveHandler) {
-            throw new \InvalidArgumentException('Must be instance of AbstractProxy or NativeSessionHandler; implement \SessionHandlerInterface; or be null.');
+            throw new \InvalidArgumentException('Must be instance of AbstractProxy; implement \SessionHandlerInterface; or be null.');
         }
 
         // Wrap $saveHandler in proxy and prevent double wrapping of proxy
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);
         } elseif (!$saveHandler instanceof AbstractProxy) {
-            $saveHandler = \PHP_VERSION_ID >= 50400 ?
-                new SessionHandlerProxy(new \SessionHandler()) : new NativeProxy();
+            $saveHandler = new SessionHandlerProxy(new StrictSessionHandler(new \SessionHandler()));
         }
         $this->saveHandler = $saveHandler;
 
-        if (headers_sent() || (\PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE === session_status())) {
+        if (headers_sent() || \PHP_SESSION_ACTIVE === session_status()) {
             return;
         }
 
-        if ($this->saveHandler instanceof \SessionHandlerInterface) {
-            if (\PHP_VERSION_ID >= 50400) {
-                session_set_save_handler($this->saveHandler, false);
-            } else {
-                session_set_save_handler(
-                    array($this->saveHandler, 'open'),
-                    array($this->saveHandler, 'close'),
-                    array($this->saveHandler, 'read'),
-                    array($this->saveHandler, 'write'),
-                    array($this->saveHandler, 'destroy'),
-                    array($this->saveHandler, 'gc')
-                );
-            }
+        if ($this->saveHandler instanceof SessionHandlerProxy) {
+            session_set_save_handler($this->saveHandler->getHandler(), false);
+        } elseif ($this->saveHandler instanceof \SessionHandlerInterface) {
+            session_set_save_handler($this->saveHandler, false);
         }
     }
 

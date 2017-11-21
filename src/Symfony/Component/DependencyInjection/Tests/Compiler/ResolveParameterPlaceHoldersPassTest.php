@@ -41,12 +41,12 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
 
     public function testArgumentParametersShouldBeResolved()
     {
-        $this->assertSame(array('bar', 'baz'), $this->fooDefinition->getArguments());
+        $this->assertSame(array('bar', array('bar' => 'baz')), $this->fooDefinition->getArguments());
     }
 
     public function testMethodCallParametersShouldBeResolved()
     {
-        $this->assertSame(array(array('foobar', array('bar', 'baz'))), $this->fooDefinition->getMethodCalls());
+        $this->assertSame(array(array('foobar', array('bar', array('bar' => 'baz')))), $this->fooDefinition->getMethodCalls());
     }
 
     public function testPropertyParametersShouldBeResolved()
@@ -64,6 +64,13 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $this->assertSame('foo', $this->container->getAlias('bar')->__toString());
     }
 
+    public function testBindingsShouldBeResolved()
+    {
+        list($boundValue) = $this->container->getDefinition('foo')->getBindings()['$baz']->getValues();
+
+        $this->assertSame($this->container->getParameterBag()->resolveValue('%env(BAZ)%'), $boundValue);
+    }
+
     private function createContainerBuilder()
     {
         $containerBuilder = new ContainerBuilder();
@@ -71,7 +78,7 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $containerBuilder->setParameter('foo.class', 'Foo');
         $containerBuilder->setParameter('foo.factory.class', 'FooFactory');
         $containerBuilder->setParameter('foo.arg1', 'bar');
-        $containerBuilder->setParameter('foo.arg2', 'baz');
+        $containerBuilder->setParameter('foo.arg2', array('%foo.arg1%' => 'baz'));
         $containerBuilder->setParameter('foo.method', 'foobar');
         $containerBuilder->setParameter('foo.property.name', 'bar');
         $containerBuilder->setParameter('foo.property.value', 'baz');
@@ -80,10 +87,11 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
 
         $fooDefinition = $containerBuilder->register('foo', '%foo.class%');
         $fooDefinition->setFactory(array('%foo.factory.class%', 'getFoo'));
-        $fooDefinition->setArguments(array('%foo.arg1%', '%foo.arg2%'));
+        $fooDefinition->setArguments(array('%foo.arg1%', array('%foo.arg1%' => 'baz')));
         $fooDefinition->addMethodCall('%foo.method%', array('%foo.arg1%', '%foo.arg2%'));
         $fooDefinition->setProperty('%foo.property.name%', '%foo.property.value%');
         $fooDefinition->setFile('%foo.file%');
+        $fooDefinition->setBindings(array('$baz' => '%env(BAZ)%'));
 
         $containerBuilder->setAlias('%alias.id%', 'foo');
 

@@ -562,6 +562,46 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals('Hello World', $this->response->getContent());
     }
 
+    public function testDegradationWhenCacheLocked()
+    {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skips on windows to avoid permissions issues.');
+        }
+
+        $this->cacheConfig['stale_while_revalidate'] = 10;
+
+        // The prescence of Last-Modified makes this cacheable (because Response::isValidateable() then).
+        $this->setNextResponse(200, array('Cache-Control' => 'public, s-maxage=5', 'Last-Modified' => 'some while ago'), 'Old response');
+        $this->request('GET', '/'); // warm the cache
+
+        // Now, lock the cache
+        $concurrentRequest = Request::create('/', 'GET');
+        $this->store->lock($concurrentRequest);
+
+        /*
+         *  After 10s, the cached response has become stale. Yet, we're still within the "stale_while_revalidate"
+         *  timeout so we may serve the stale response.
+         */
+        sleep(10);
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertEquals(200, $this->response->getStatusCode());
+        $this->assertTraceContains('stale-while-revalidate');
+        $this->assertEquals('Old response', $this->response->getContent());
+
+        /*
+         * Another 10s later, stale_while_revalidate is over. Resort to serving the old response, but
+         * do so with a "server unavailable" message.
+         */
+        sleep(10);
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertEquals(503, $this->response->getStatusCode());
+        $this->assertEquals('Old response', $this->response->getContent());
+    }
+
     public function testHitsCachedResponseWithSMaxAgeDirective()
     {
         $time = \DateTime::createFromFormat('U', time() - 5);
@@ -871,10 +911,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
         sleep(15); // expire the cache
 
-        $that = $this;
-
-        $this->setNextResponse(304, array(), '', function (Request $request, Response $response) use ($time, $that) {
-            $that->assertEquals($time->format(DATE_RFC2822), $request->headers->get('IF_MODIFIED_SINCE'));
+        $this->setNextResponse(304, array(), '', function (Request $request, Response $response) use ($time) {
+            $this->assertEquals($time->format(DATE_RFC2822), $request->headers->get('IF_MODIFIED_SINCE'));
         });
 
         $this->request('GET', '/');
@@ -926,11 +964,10 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testPassesHeadRequestsThroughDirectlyOnPass()
     {
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->setContent('');
             $response->setStatusCode(200);
-            $that->assertEquals('HEAD', $request->getMethod());
+            $this->assertEquals('HEAD', $request->getMethod());
         });
 
         $this->request('HEAD', '/', array('HTTP_EXPECT' => 'something ...'));
@@ -940,12 +977,11 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testUsesCacheToRespondToHeadRequestsWhenFresh()
     {
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->setContent('Hello World');
             $response->setStatusCode(200);
-            $that->assertNotEquals('HEAD', $request->getMethod());
+            $this->assertNotEquals('HEAD', $request->getMethod());
         });
 
         $this->request('GET', '/');
@@ -962,8 +998,7 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testSendsNoContentWhenFresh()
     {
         $time = \DateTime::createFromFormat('U', time());
-        $that = $this;
-        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that, $time) {
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
         });
@@ -1309,7 +1344,7 @@ class HttpCacheTest extends HttpCacheTestCase
      */
     public function testHttpCacheIsSetAsATrustedProxy(array $existing, array $expected)
     {
-        Request::setTrustedProxies($existing);
+        Request::setTrustedProxies($existing, Request::HEADER_X_FORWARDED_ALL);
 
         $this->setNextResponse();
         $this->request('GET', '/', array('REMOTE_ADDR' => '10.0.0.1'));

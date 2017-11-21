@@ -31,4 +31,9 @@ interface TraceableEventDispatcherInterface extends EventDispatcherInterface
      * @return array An array of not called listeners
      */
     public function getNotCalledListeners();
+
+    /**
+     * Resets the trace.
+     */
+    public function reset();
 }

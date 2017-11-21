@@ -45,7 +45,7 @@ class LoggingTranslatorPassTest extends TestCase
 
         $definition->expects($this->once())
             ->method('getClass')
-            ->will($this->returnValue('%translator.class%'));
+            ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Translation\Translator'));
 
         $parameterBag->expects($this->once())
             ->method('resolveValue')
@@ -54,6 +54,27 @@ class LoggingTranslatorPassTest extends TestCase
         $container->expects($this->once())
             ->method('getParameterBag')
             ->will($this->returnValue($parameterBag));
+
+        $container->expects($this->once())
+            ->method('getReflectionClass')
+            ->with('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+            ->will($this->returnValue(new \ReflectionClass('Symfony\Bundle\FrameworkBundle\Translation\Translator')));
+
+        $definition->expects($this->once())
+            ->method('getTag')
+            ->with('container.service_subscriber')
+            ->willReturn(array(array('id' => 'translator'), array('id' => 'foo')));
+
+        $definition->expects($this->once())
+            ->method('clearTag')
+            ->with('container.service_subscriber');
+
+        $definition->expects($this->any())
+            ->method('addTag')
+            ->withConsecutive(
+                array('container.service_subscriber', array('id' => 'foo')),
+                array('container.service_subscriber', array('key' => 'translator', 'id' => 'translator.logging.inner'))
+            );
 
         $pass = new LoggingTranslatorPass();
         $pass->process($container);

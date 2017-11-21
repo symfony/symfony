@@ -33,11 +33,15 @@ class AttributeMetadata implements AttributeMetadataInterface
     public $groups = array();
 
     /**
-     * Constructs a metadata for the given attribute.
+     * @var int|null
      *
-     * @param string $name
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getMaxDepth()} instead.
      */
-    public function __construct($name)
+    public $maxDepth;
+
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
@@ -71,10 +75,31 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
+    public function setMaxDepth($maxDepth)
+    {
+        $this->maxDepth = $maxDepth;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMaxDepth()
+    {
+        return $this->maxDepth;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function merge(AttributeMetadataInterface $attributeMetadata)
     {
         foreach ($attributeMetadata->getGroups() as $group) {
             $this->addGroup($group);
+        }
+
+        // Overwrite only if not defined
+        if (null === $this->maxDepth) {
+            $this->maxDepth = $attributeMetadata->getMaxDepth();
         }
     }
 
@@ -85,6 +110,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep()
     {
-        return array('name', 'groups');
+        return array('name', 'groups', 'maxDepth');
     }
 }

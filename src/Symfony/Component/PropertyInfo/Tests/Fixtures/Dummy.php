@@ -68,6 +68,13 @@ class Dummy extends ParentDummy
      */
     public $g;
 
+    /**
+     * This should not be removed.
+     *
+     * @var
+     */
+    public $emptyVar;
+
     public static function getStatic()
     {
     }

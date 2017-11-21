@@ -118,6 +118,9 @@ class NativeRequestHandler implements RequestHandlerInterface
         $form->submit($data, 'PATCH' !== $method);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isFileUpload($data)
     {
         // POST data will always be strings or arrays of strings. Thus, we can be sure

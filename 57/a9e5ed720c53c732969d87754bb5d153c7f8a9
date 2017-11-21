@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-20T22:48:58Z
+
+It looks like the junction for the bridge breaks phpunit.
+Dunno how to set the `"symlink"` in `"options"` to `false` from the CLI, any idea @Seldaek @naderman?
+Not mentioned in https://getcomposer.org/doc/05-repositories.md#path
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2017-11-21T07:01:22Z
+
+I don't even see where the path repo is defined.. got any more details? Anyway you can set it using a full repo declaration like `composer config repo.foo '{"type":"path","options":{"symlink":false},"url":"..."}'`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-21T07:49:21Z
+
+thanks, I didn't know this was possible :)
+here is the PR that uses the path repo type: #25056

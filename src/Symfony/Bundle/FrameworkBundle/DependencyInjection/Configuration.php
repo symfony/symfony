@@ -679,7 +679,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
                         ->scalarNode('default_path')
                             ->info('The default path used to load translations')
-                            ->defaultValue('%kernel.project_dir%/config/translations')
+                            ->defaultValue('%kernel.project_dir%/translations')
                         ->end()
                         ->arrayNode('paths')
                             ->prototype('scalar')->end()

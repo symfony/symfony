@@ -155,7 +155,7 @@ class ConfigurationTest extends TestCase
                 'logging' => true,
                 'formatter' => 'translator.formatter.default',
                 'paths' => array(),
-                'default_path' => '%kernel.project_dir%/config/translations',
+                'default_path' => '%kernel.project_dir%/translations',
             ),
             'validation' => array(
                 'enabled' => !class_exists(FullStack::class),

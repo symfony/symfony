@@ -496,7 +496,7 @@ abstract class FrameworkExtensionTest extends TestCase
             '->registerTranslatorConfiguration() finds translation resources in custom paths'
         );
         $this->assertContains(
-            strtr(__DIR__.'/config/translations/test_default.en.xlf', '/', DIRECTORY_SEPARATOR),
+            strtr(__DIR__.'/translations/test_default.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
             '->registerTranslatorConfiguration() finds translation resources in default path'
         );

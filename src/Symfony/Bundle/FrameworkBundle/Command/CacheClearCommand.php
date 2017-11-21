@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\RebootableInterface;
@@ -104,7 +105,11 @@ EOF
             $io->comment('Removing old cache directory...');
         }
 
-        $this->filesystem->remove($oldCacheDir);
+        try {
+            $this->filesystem->remove($oldCacheDir);
+        } catch (IOException $e) {
+            $io->warning($e->getMessage());
+        }
 
         if ($output->isVerbose()) {
             $io->comment('Finished');

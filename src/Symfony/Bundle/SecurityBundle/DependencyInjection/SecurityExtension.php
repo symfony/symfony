@@ -693,7 +693,7 @@ class SecurityExtension extends Extension
 
     private function createSwitchUserListener($container, $id, $config, $defaultProvider, $stateless)
     {
-        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : ($defaultProvider ?: $this->getFirstProvider($id, 'switch_user', $providerIds));
+        $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
 
         // in 4.0, ignore the `switch_user.stateless` key if $stateless is `true`
         if ($stateless && false === $config['stateless']) {

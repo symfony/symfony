@@ -14,7 +14,7 @@
             <argument>%data_collector.templates%</argument>
             <argument>%web_profiler.debug_toolbar.position%</argument>
             <argument type="service" id="web_profiler.csp.handler" />
-            <argument>null</argument>
+            <argument>%kernel.project_dir%</argument>
         </service>
 
         <service id="web_profiler.controller.router" class="Symfony\Bundle\WebProfilerBundle\Controller\RouterController" public="true">
@@ -55,7 +55,7 @@
         <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter">
             <argument>%debug.file_link_format%</argument>
             <argument type="service" id="request_stack" on-invalid="ignore" />
-            <argument>null</argument>
+            <argument>%kernel.project_dir%</argument>
             <argument>/_profiler/open?file=%%f&amp;line=%%l#line%%l</argument>
         </service>
     </services>

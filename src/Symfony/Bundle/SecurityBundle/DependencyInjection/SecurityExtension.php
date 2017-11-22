@@ -448,7 +448,7 @@ class SecurityExtension extends Extension
         // Switch user listener
         if (isset($firewall['switch_user'])) {
             $listenerKeys[] = 'switch_user';
-            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider, $firewall['stateless']));
+            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider, $firewall['stateless'], $providerIds));
         }
 
         // Access listener
@@ -691,7 +691,7 @@ class SecurityExtension extends Extension
         return $exceptionListenerId;
     }
 
-    private function createSwitchUserListener($container, $id, $config, $defaultProvider, $stateless)
+    private function createSwitchUserListener($container, $id, $config, $defaultProvider, $stateless, $providerIds)
     {
         $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : ($defaultProvider ?: $this->getFirstProvider($id, 'switch_user', $providerIds));
 

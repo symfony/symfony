@@ -205,15 +205,17 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
     public function testProcessForAutoconfiguredCalls()
     {
         $container = new ContainerBuilder();
-        $container->registerForAutoconfiguration(parent::class)
-            ->addMethodCall('setLogger');
+        $container->registerForAutoconfiguration(parent::class)->addMethodCall('setLogger');
 
         $def = $container->register('foo', self::class)->setAutoconfigured(true);
         $this->assertFalse($def->hasMethodCall('setLogger'), 'Definition shouldn\'t have method call yet.');
 
         (new ResolveInstanceofConditionalsPass())->process($container);
-        $def = $container->findDefinition('foo');
-        $this->assertTrue($def->hasMethodCall('setLogger'), 'Definition should have "setLogger" method call.');
+
+        $this->assertTrue(
+            $container->findDefinition('foo')->hasMethodCall('setLogger'),
+            'Definition should have "setLogger" method call.'
+        );
     }
 
     /**

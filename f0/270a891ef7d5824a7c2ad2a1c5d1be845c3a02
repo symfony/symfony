@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-22T05:48:05Z
+
+Could you please check if that happens for other components also?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-22T09:13:04Z
+
+For other components we did this in 3.3. Should we merge the PR into the `3.3` as a bugfix?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-11-22T10:34:19Z
+
+@nicolas-grekas Serializer is also affected. I can enable the component without having it installed and FrameworkBundle would register the `serializer` service, but it's impossible to wire it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-11-22T10:38:02Z
+
+I've also checked the validator: When enabling it, `FrameworkExtension` complains about the missing Translation component, which is not wrong, but seems a bit odd. However, if the Translation component is present, I get the expected exception about the missing Validator component.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-11-22T10:49:08Z
+
+Do you think, we can remove those lines?
+
+https://github.com/symfony/symfony/blob/4c930284acdde24946e1322f02c34c6b2b7cf631/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L181-L183
+
+Installing Validator without Translation is not possible, enabling validation without the Validator component will be caught elsewhere. So this block just generates a confusing error message.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2017-11-22T11:33:03Z
+
+3.3 it is, then.

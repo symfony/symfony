@@ -34,7 +34,9 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      */
     public function load($path, $type = null)
     {
-        $dir = $this->locator->locate($path);
+        if (!is_dir($dir = $this->locator->locate($path))) {
+            return parent::supports($path, $type) ? parent::load($path, $type) : new RouteCollection();
+        }
 
         $collection = new RouteCollection();
         $collection->addResource(new DirectoryResource($dir, '/\.php$/'));
@@ -74,16 +76,18 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      */
     public function supports($resource, $type = null)
     {
-        if (!is_string($resource)) {
+        if ('annotation' === $type) {
+            return true;
+        }
+
+        if ($type || !is_string($resource)) {
             return false;
         }
 
         try {
-            $path = $this->locator->locate($resource);
+            return is_dir($this->locator->locate($resource));
         } catch (\Exception $e) {
             return false;
         }
-
-        return is_dir($path) && (!$type || 'annotation' === $type);
     }
 }

@@ -1539,7 +1539,7 @@ Array
 )
 
 EOTXT;
-        $this->assertSame($expected, $p->getOutput());
+        $this->assertSame($expected, str_replace('Standard input code', '-', $p->getOutput()));
     }
 
     public function provideEscapeArgument()

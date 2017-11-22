@@ -97,6 +97,15 @@ class SymfonyTestsListenerTrait
         $suiteName = $suite->getName();
         $this->testsWithWarnings = array();
 
+        foreach ($suite->tests() as $test) {
+            if (!($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
+                continue;
+            }
+            if (null === $Test::getPreserveGlobalStateSettings(get_class($test), $test->getName(false))) {
+                $test->setPreserveGlobalState(false);
+            }
+        }
+
         if (-1 === $this->state) {
             echo "Testing $suiteName\n";
             $this->state = 0;
@@ -132,10 +141,6 @@ class SymfonyTestsListenerTrait
                         if (in_array('dns-sensitive', $groups, true)) {
                             DnsMock::register($test->getName());
                         }
-                    } elseif (!($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
-                        // no-op
-                    } elseif (null === $Test::getPreserveGlobalStateSettings(get_class($test), $test->getName(false))) {
-                        $test->setPreserveGlobalState(false);
                     }
                 }
             }
@@ -146,8 +151,6 @@ class SymfonyTestsListenerTrait
                     || isset($this->wasSkipped[$suiteName]['*'])
                     || isset($this->wasSkipped[$suiteName][$test->getName()])) {
                     $skipped[] = $test;
-                } elseif (null === $Test::getPreserveGlobalStateSettings(get_class($test), $test->getName(false))) {
-                    $test->setPreserveGlobalState(false);
                 }
             }
             $suite->setTests($skipped);

@@ -47,11 +47,9 @@ class SymfonyTestsListenerTrait
     public function __construct(array $mockedNamespaces = array())
     {
         if (class_exists('PHPUnit_Util_Blacklist')) {
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener'] = 1;
+            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
         } else {
-            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
-            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener'] = 1;
+            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
         }
 
         foreach ($mockedNamespaces as $type => $namespaces) {

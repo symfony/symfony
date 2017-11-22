@@ -323,7 +323,7 @@ Form
    ```php
    class MyTimezoneType extends AbstractType
    {
-       public function. getParent()
+       public function getParent()
        {
            return TimezoneType::class;
        }

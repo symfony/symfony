@@ -137,10 +137,6 @@ class FrameworkExtension extends Extension
                 throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
             }
 
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['validation'])) {
-                throw new LogicException('Validation support cannot be enabled as the Translation component is not installed.');
-            }
-
             if (class_exists(Translator::class)) {
                 $loader->load('identity_translator.xml');
             }
@@ -184,6 +180,10 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['form'])) {
+            if (!class_exists('Symfony\Component\Form\Form')) {
+                throw new LogicException('Form support cannot be enabled as the Form component is not installed.');
+            }
+
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
 
@@ -231,6 +231,10 @@ class FrameworkExtension extends Extension
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
+            if (!class_exists('Symfony\Component\Serializer\Serializer')) {
+                throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed.');
+            }
+
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
@@ -923,6 +927,7 @@ class FrameworkExtension extends Extension
                     return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
                 })
                 ->in($dirs)
+                ->sortByName()
             ;
 
             foreach ($finder as $file) {
@@ -1032,7 +1037,7 @@ class FrameworkExtension extends Extension
 
     private function registerMappingFilesFromDir($dir, callable $fileRecorder)
     {
-        foreach (Finder::create()->followLinks()->files()->in($dir)->name('/\.(xml|ya?ml)$/') as $file) {
+        foreach (Finder::create()->followLinks()->files()->in($dir)->name('/\.(xml|ya?ml)$/')->sortByName() as $file) {
             $fileRecorder($file->getExtension(), $file->getRealPath());
         }
     }

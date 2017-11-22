@@ -26,7 +26,10 @@ class MemcachedStoreTest extends AbstractStoreTest
     {
         $memcached = new \Memcached();
         $memcached->addServer(getenv('MEMCACHED_HOST'), 11211);
-        if (false === $memcached->getStats()) {
+        $memcached->get('foo');
+        $code = $memcached->getResultCode();
+
+        if (\Memcached::RES_SUCCESS !== $code && \Memcached::RES_NOTFOUND !== $code) {
             self::markTestSkipped('Unable to connect to the memcache host');
         }
     }

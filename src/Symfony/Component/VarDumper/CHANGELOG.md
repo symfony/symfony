@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * support selecting the format to use by setting the environment variable `VAR_DUMPER_FORMAT` to `html` or `cli`
+
 4.1.0
 -----
 

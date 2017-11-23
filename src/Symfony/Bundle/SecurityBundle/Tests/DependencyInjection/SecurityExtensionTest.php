@@ -168,6 +168,31 @@ class SecurityExtensionTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Not configuring explicitly the provider for the "http_basic" listener on "ambiguous" firewall is ambiguous as there is more than one registered provider.
+     */
+    public function testMissingProviderForListener()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'first' => array('id' => 'foo'),
+                'second' => array('id' => 'bar'),
+            ),
+
+            'firewalls' => array(
+                'ambiguous' => array(
+                    'http_basic' => true,
+                    'form_login' => array('provider' => 'second'),
+                    'logout_on_user_change' => true,
+                ),
+            ),
+        ));
+
+        $container->compile();
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

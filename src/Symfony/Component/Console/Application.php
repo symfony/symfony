@@ -120,8 +120,8 @@ class Application
 
         try {
             $exitCode = $this->doRun($input, $output);
-        } catch (\Throwable $e) {
-            if (!$this->catchExceptions || !$e instanceof \Exception) {
+        } catch (\Exception $e) {
+            if (!$this->catchExceptions) {
                 throw $e;
             }
 

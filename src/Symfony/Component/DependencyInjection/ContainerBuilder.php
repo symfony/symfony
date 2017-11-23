@@ -544,7 +544,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->{$loading}[$id] = true;
 
         try {
-            $service = $this->createService($definition, $id);
+            $service = $this->createService($definition, new \SplObjectStorage(), $id);
         } finally {
             unset($this->{$loading}[$id]);
         }
@@ -978,8 +978,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws RuntimeException         When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
-    private function createService(Definition $definition, $id, $tryProxy = true)
+    private function createService(Definition $definition, \SplObjectStorage $inlinedDefinitions, $id = null, $tryProxy = true)
     {
+        if (null === $id && isset($inlinedDefinitions[$definition])) {
+            return $inlinedDefinitions[$definition];
+        }
+
         if ($definition instanceof ChildDefinition) {
             throw new RuntimeException(sprintf('Constructing service "%s" from a parent definition is not supported at build time.', $id));
         }
@@ -998,11 +1002,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 ->instantiateProxy(
                     $this,
                     $definition,
-                    $id, function () use ($definition, $id) {
-                        return $this->createService($definition, $id, false);
+                    $id, function () use ($definition, $inlinedDefinitions, $id) {
+                        return $this->createService($definition, $inlinedDefinitions, $id, false);
                     }
                 );
-            $this->shareService($definition, $proxy, $id);
+            $this->shareService($definition, $proxy, $id, $inlinedDefinitions);
 
             return $proxy;
         }
@@ -1013,7 +1017,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             require_once $parameterBag->resolveValue($definition->getFile());
         }
 
-        $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
+        $arguments = $this->doResolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())), $inlinedDefinitions);
 
         if (null !== $id && $definition->isShared() && isset($this->services[$id]) && ($tryProxy || !$definition->isLazy())) {
             return $this->services[$id];
@@ -1021,7 +1025,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (null !== $factory = $definition->getFactory()) {
             if (is_array($factory)) {
-                $factory = array($this->resolveServices($parameterBag->resolveValue($factory[0])), $factory[1]);
+                $factory = array($this->doResolveServices($parameterBag->resolveValue($factory[0]), $inlinedDefinitions), $factory[1]);
             } elseif (!is_string($factory)) {
                 throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
             }
@@ -1047,16 +1051,16 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if ($tryProxy || !$definition->isLazy()) {
             // share only if proxying failed, or if not a proxy
-            $this->shareService($definition, $service, $id);
+            $this->shareService($definition, $service, $id, $inlinedDefinitions);
         }
 
-        $properties = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getProperties())));
+        $properties = $this->doResolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getProperties())), $inlinedDefinitions);
         foreach ($properties as $name => $value) {
             $service->$name = $value;
         }
 
         foreach ($definition->getMethodCalls() as $call) {
-            $this->callMethod($service, $call);
+            $this->callMethod($service, $call, $inlinedDefinitions);
         }
 
         if ($callable = $definition->getConfigurator()) {
@@ -1066,7 +1070,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 if ($callable[0] instanceof Reference) {
                     $callable[0] = $this->get((string) $callable[0], $callable[0]->getInvalidBehavior());
                 } elseif ($callable[0] instanceof Definition) {
-                    $callable[0] = $this->createService($callable[0], null);
+                    $callable[0] = $this->createService($callable[0], $inlinedDefinitions);
                 }
             }
 
@@ -1090,9 +1094,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function resolveServices($value)
     {
+        return $this->doResolveServices($value, new \SplObjectStorage());
+    }
+
+    private function doResolveServices($value, \SplObjectStorage $inlinedDefinitions)
+    {
         if (is_array($value)) {
             foreach ($value as $k => $v) {
-                $value[$k] = $this->resolveServices($v);
+                $value[$k] = $this->doResolveServices($v, $inlinedDefinitions);
             }
         } elseif ($value instanceof ServiceClosureArgument) {
             $reference = $value->getValues()[0];
@@ -1137,7 +1146,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } elseif ($value instanceof Reference) {
             $value = $this->get((string) $value, $value->getInvalidBehavior());
         } elseif ($value instanceof Definition) {
-            $value = $this->createService($value, null);
+            $value = $this->createService($value, $inlinedDefinitions);
         } elseif ($value instanceof Expression) {
             $value = $this->getExpressionLanguage()->evaluate($value, array('container' => $this));
         }
@@ -1434,7 +1443,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->proxyInstantiator;
     }
 
-    private function callMethod($service, $call)
+    private function callMethod($service, $call, \SplObjectStorage $inlinedDefinitions)
     {
         foreach (self::getServiceConditionals($call[1]) as $s) {
             if (!$this->has($s)) {
@@ -1447,7 +1456,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        call_user_func_array(array($service, $call[0]), $this->resolveServices($this->getParameterBag()->unescapeValue($this->getParameterBag()->resolveValue($call[1]))));
+        call_user_func_array(array($service, $call[0]), $this->doResolveServices($this->getParameterBag()->unescapeValue($this->getParameterBag()->resolveValue($call[1])), $inlinedDefinitions));
     }
 
     /**
@@ -1457,9 +1466,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param object      $service
      * @param string|null $id
      */
-    private function shareService(Definition $definition, $service, $id)
+    private function shareService(Definition $definition, $service, $id, \SplObjectStorage $inlinedDefinitions)
     {
-        if (null !== $id && $definition->isShared()) {
+        if (!$definition->isShared()) {
+            return;
+        }
+        if (null === $id) {
+            $inlinedDefinitions[$definition] = $service;
+        } else {
             $this->services[$id] = $service;
             unset($this->loading[$id], $this->alreadyLoading[$id]);
         }

@@ -353,6 +353,7 @@ EOTXT
             if (isset($checkedNodes[$id])) {
                 continue;
             }
+            $checkedNodes[$id] = true;
 
             if ($node->getValue() && ($edge->isLazy() || $edge->isWeak())) {
                 // no-op
@@ -364,10 +365,8 @@ EOTXT
             } else {
                 $currentPath[$id] = $id;
                 $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
+                array_pop($currentPath);
             }
-
-            $checkedNodes[$id] = true;
-            array_pop($currentPath);
         }
     }
 

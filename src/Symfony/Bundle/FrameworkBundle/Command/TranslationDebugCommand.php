@@ -48,13 +48,6 @@ class TranslationDebugCommand extends ContainerAwareCommand
     private $defaultTransPath;
     private $defaultViewsPath;
 
-    /**
-     * @param TranslatorInterface        $translator
-     * @param TranslationReaderInterface $reader
-     * @param ExtractorInterface         $extractor
-     * @param string                     $defaultTransPath
-     * @param string                     $defaultViewsPath
-     */
     public function __construct($translator = null, TranslationReaderInterface $reader = null, ExtractorInterface $extractor = null, $defaultTransPath = null, $defaultViewsPath = null)
     {
         if (!$translator instanceof TranslatorInterface) {

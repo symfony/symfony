@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-23T10:16:56Z
+
+Does that make Behat working with Symfony 3.4 ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-23T10:26:13Z
+
+> Does that make Behat working with Symfony 3.4 ?
+
+Almost. The `--tags` option is still broken. I'm on it.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-23T10:28:41Z
+
+Weird. @dunglas do you need a hand?

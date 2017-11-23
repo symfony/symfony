@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Vinorcola at 2017-11-23T08:16:53Z
+
+#25107 is related to search not detecting the characters after the \\. It is not an uppercase problem.
+
+---------------------------------------------------------------------------
+
+by jzawadzki at 2017-11-23T09:02:42Z
+
+@Vinorcola it is actually the same issue - in FQCN letter after backslash is uppercase and that's the reason why it's not searchable - if you would create class starting with lower letter it would work correctly
+
+---------------------------------------------------------------------------
+
+by Vinorcola at 2017-11-23T09:58:24Z
+
+@jzawadzki Ok, great ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-23T10:31:21Z
+
+@jzawadzki could you please rebase on 3.3? 3.2 is not maintained anymore (I already changed the base branch here on github).
+
+---------------------------------------------------------------------------
+
+by jzawadzki at 2017-11-23T12:48:26Z
+
+@nicolas-grekas done!

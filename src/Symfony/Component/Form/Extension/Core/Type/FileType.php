@@ -34,8 +34,13 @@ class FileType extends AbstractType
 
             if ($options['multiple']) {
                 $data = array();
+                $files = $event->getData();
 
-                foreach ($event->getData() as $file) {
+                if (!is_array($files)) {
+                    $files = array();
+                }
+
+                foreach ($files as $file) {
                     if ($requestHandler->isFileUpload($file)) {
                         $data[] = $file;
                     }

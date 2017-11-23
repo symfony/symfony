@@ -1151,7 +1151,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function shareService(Definition $definition, $service, $id, \SplObjectStorage $inlinedDefinitions)
     {
-        if (!$definition->isShared() || self::SCOPE_PROTOTYPE === $scope = $definition->getScope()) {
+        if (!$definition->isShared() || self::SCOPE_PROTOTYPE === $scope = $definition->getScope(false)) {
             return;
         }
         if (null === $id) {

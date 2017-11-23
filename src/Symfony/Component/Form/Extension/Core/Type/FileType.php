@@ -37,7 +37,7 @@ class FileType extends AbstractType
                 $files = $event->getData();
 
                 if (!is_array($files)) {
-                    $files = array($files);
+                    $files = array(null);
                 }
 
                 foreach ($files as $file) {

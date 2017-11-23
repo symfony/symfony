@@ -775,6 +775,10 @@ class YamlFileLoader extends FileLoader
                 $value[$k] = $this->resolveServices($v, $file, $isParameter);
             }
         } elseif (is_string($value) && 0 === strpos($value, '@=')) {
+            if (!class_exists(Expression::class)) {
+                throw new \LogicException(sprintf('The "@=" expression syntax cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".'));
+            }
+
             return new Expression(substr($value, 2));
         } elseif (is_string($value) && 0 === strpos($value, '@')) {
             if (0 === strpos($value, '@@')) {

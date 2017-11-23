@@ -159,6 +159,24 @@ class FileTypeTest extends BaseTypeTest
         $this->assertCount(1, $form->getData());
     }
 
+    /**
+     * @dataProvider requestHandlerProvider
+     */
+    public function testSubmitNonArrayValueWhenMultiple(RequestHandlerInterface $requestHandler)
+    {
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE, null, array(
+                'multiple' => true,
+            ))
+            ->setRequestHandler($requestHandler)
+            ->getForm();
+        $form->submit(null);
+
+        $this->assertSame(array(), $form->getData());
+        $this->assertSame(array(), $form->getNormData());
+        $this->assertSame(array(), $form->getViewData());
+    }
+
     public function requestHandlerProvider()
     {
         return array(

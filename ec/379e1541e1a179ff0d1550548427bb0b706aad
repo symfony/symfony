@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-22T12:31:50Z
+
+@yceruto do you think you'll be able to have this PR ready before 4.0.0? Would be awesome :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-11-22T12:35:59Z
+
+Sure, today! :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-11-22T19:01:30Z
+
+Tests added and all green! Also I've tested this PR in a real project and work like a charm ;)
+
+These are all paths where translations and templates are debugged and dumped:
+
+**Root paths:**
+* `%kernel.root_dir%/Resources/translations/`
+* `%kernel.root_dir%/Resources/views/`
+* `%translator.default_path%/`
+* `%twig.default_path%/`
+
+**Bundle paths:**
+* `<BundlePath>/Resources/translations/`
+* `<BundlePath>/Resources/views/`
+* `%kernel.root_dir%/Resources/<Bundle>/translations/`
+* `%kernel.root_dir%/Resources/<Bundle>/views/`
+* `%translator.default_path%/<Bundle>/`
+* `%twig.default_path%/<Bundle>/`
+
+Ready for reviews!

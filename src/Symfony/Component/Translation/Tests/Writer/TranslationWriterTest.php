@@ -30,6 +30,9 @@ class TranslationWriterTest extends TestCase
         $writer->write(new MessageCatalogue('en'), 'test');
     }
 
+    /**
+     * @group legacy
+     */
     public function testDisableBackup()
     {
         $nonBackupDumper = new NonBackupDumper();

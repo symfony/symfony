@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * The `ContextListener::setLogoutOnUserChange()` method is deprecated and will be removed in 5.0.
+
 4.0.0
 -----
 

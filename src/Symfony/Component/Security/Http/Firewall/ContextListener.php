@@ -46,8 +46,8 @@ class ContextListener implements ListenerInterface
     private $logoutOnUserChange = true;
 
     /**
-     * @param TokenStorageInterface                     $tokenStorage
-     * @param iterable|UserProviderInterface[]          $userProviders
+     * @param TokenStorageInterface            $tokenStorage
+     * @param iterable|UserProviderInterface[] $userProviders
      */
     public function __construct(TokenStorageInterface $tokenStorage, iterable $userProviders, string $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {
@@ -67,10 +67,12 @@ class ContextListener implements ListenerInterface
      * Enables deauthentication during refreshUser when the user has changed.
      *
      * @param bool $logoutOnUserChange
+     *
+     * @deprecated since version 4.1, to be removed in 5.0
      */
     public function setLogoutOnUserChange($logoutOnUserChange)
     {
-        // no-op, method to be deprecated in 4.1
+        @trigger_error(sprintf('The %s() method is deprecated since 4.1 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
     }
 
     /**

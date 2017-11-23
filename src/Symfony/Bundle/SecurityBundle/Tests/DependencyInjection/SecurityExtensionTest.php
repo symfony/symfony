@@ -38,7 +38,6 @@ class SecurityExtensionTest extends TestCase
                     'form_login' => array(
                         'check_path' => '/some_area/login_check',
                     ),
-                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -62,7 +61,6 @@ class SecurityExtensionTest extends TestCase
             'firewalls' => array(
                 'some_firewall' => array(
                     'pattern' => '/.*',
-                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -90,7 +88,6 @@ class SecurityExtensionTest extends TestCase
                 'some_firewall' => array(
                     'pattern' => '/.*',
                     'http_basic' => array(),
-                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -113,7 +110,6 @@ class SecurityExtensionTest extends TestCase
                 'some_firewall' => array(
                     'pattern' => '/.*',
                     'http_basic' => null,
-                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -137,7 +133,6 @@ class SecurityExtensionTest extends TestCase
                     'stateless' => true,
                     'http_basic' => null,
                     'switch_user' => array('stateless' => false),
-                    'logout_on_user_change' => true,
                 ),
             ),
         ));
@@ -159,7 +154,6 @@ class SecurityExtensionTest extends TestCase
             'firewalls' => array(
                 'default' => array(
                     'http_basic' => array('provider' => 'second'),
-                    'logout_on_user_change' => true,
                 ),
             ),
         ));

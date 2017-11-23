@@ -57,12 +57,12 @@
             <remember-me secret="TheSecret"/>
         </firewall>
 
-        <firewall name="host" pattern="/test" host="foo\.example\.org" methods="GET,POST" logout-on-user-change="true" provider="default">
+        <firewall name="host" pattern="/test" host="foo\.example\.org" methods="GET,POST" provider="default">
             <anonymous />
             <http-basic />
         </firewall>
 
-        <firewall name="with_user_checker" logout-on-user-change="true" provider="default">
+        <firewall name="with_user_checker" provider="default">
             <anonymous />
             <http-basic />
             <user-checker>app.user_checker</user-checker>

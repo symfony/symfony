@@ -43,7 +43,6 @@ class ContextListener implements ListenerInterface
     private $dispatcher;
     private $registered;
     private $trustResolver;
-    private $logoutOnUserChange = true;
 
     /**
      * @param TokenStorageInterface                     $tokenStorage

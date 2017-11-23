@@ -132,7 +132,9 @@ class TranslationUpdateCommandTest extends TestCase
             );
 
         if (null === $kernel) {
-            $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+            $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
+                ->disableOriginalConstructor()
+                ->getMock();
             $kernel
                 ->expects($this->any())
                 ->method('getBundle')
@@ -145,6 +147,10 @@ class TranslationUpdateCommandTest extends TestCase
         $kernel
             ->expects($this->any())
             ->method('getRootDir')
+            ->will($this->returnValue($this->translationDir));
+
+        $kernel
+            ->method('getProjectDir')
             ->will($this->returnValue($this->translationDir));
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();

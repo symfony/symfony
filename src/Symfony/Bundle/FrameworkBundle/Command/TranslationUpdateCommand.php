@@ -105,7 +105,10 @@ EOF
         $kernel = $this->getContainer()->get('kernel');
 
         // Define Root Path to App folder
-        $transPaths = array($kernel->getRootDir().'/Resources/');
+        $transPaths = array(
+            $kernel->getRootDir().'/Resources/',
+            $kernel->getProjectDir().'/',
+        );
         $currentName = 'app folder';
 
         // Override with provided Bundle info

@@ -65,7 +65,10 @@ class TranslationDebugCommandTest extends TestCase
 
     public function testDebugCustomDirectory()
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $kernel->expects($this->once())
             ->method('getBundle')
             ->with($this->equalTo($this->translationDir))
@@ -83,7 +86,10 @@ class TranslationDebugCommandTest extends TestCase
      */
     public function testDebugInvalidDirectory()
     {
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $kernel->expects($this->once())
             ->method('getBundle')
             ->with($this->equalTo('dir'))
@@ -152,7 +158,10 @@ class TranslationDebugCommandTest extends TestCase
             );
 
         if (null === $kernel) {
-            $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+            $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
+                ->disableOriginalConstructor()
+                ->getMock();
+
             $kernel
                 ->expects($this->any())
                 ->method('getBundle')
@@ -165,6 +174,10 @@ class TranslationDebugCommandTest extends TestCase
         $kernel
             ->expects($this->any())
             ->method('getRootDir')
+            ->will($this->returnValue($this->translationDir));
+
+        $kernel
+            ->method('getProjectDir')
             ->will($this->returnValue($this->translationDir));
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();

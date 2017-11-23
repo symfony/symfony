@@ -6,6 +6,13 @@ class Foo
 {
 }
 
+class FooFoo
+{
+    public function __construct(Foo $foo)
+    {
+    }
+}
+
 class Bar
 {
     public function __construct(Foo $foo)
@@ -289,6 +296,17 @@ class SetterInjectionParent
 
     /** @required */
     public function setChildMethodWithoutDocBlock(A $a)
+    {
+    }
+}
+
+class ARealClass {
+
+}
+
+class ClassMisMatch {
+
+    public function __construct(arealclass $n = null)
     {
     }
 }

@@ -21,8 +21,10 @@ class TranslatorPass implements CompilerPassInterface
     private $translatorServiceId;
     private $readerServiceId;
     private $loaderTag;
+    private $debugCommandServiceId;
+    private $updateCommandServiceId;
 
-    public function __construct($translatorServiceId = 'translator.default', $readerServiceId = 'translation.loader', $loaderTag = 'translation.loader')
+    public function __construct($translatorServiceId = 'translator.default', $readerServiceId = 'translation.loader', $loaderTag = 'translation.loader', $debugCommandServiceId = 'console.command.translation_debug', $updateCommandServiceId = 'console.command.translation_update')
     {
         if ('translation.loader' === $readerServiceId && 2 > func_num_args()) {
             @trigger_error('The default value for $readerServiceId will change in 4.0 to "translation.reader".', E_USER_DEPRECATED);
@@ -31,6 +33,8 @@ class TranslatorPass implements CompilerPassInterface
         $this->translatorServiceId = $translatorServiceId;
         $this->readerServiceId = $readerServiceId;
         $this->loaderTag = $loaderTag;
+        $this->debugCommandServiceId = $debugCommandServiceId;
+        $this->updateCommandServiceId = $updateCommandServiceId;
     }
 
     public function process(ContainerBuilder $container)
@@ -75,5 +79,10 @@ class TranslatorPass implements CompilerPassInterface
             ->replaceArgument(0, ServiceLocatorTagPass::register($container, $loaderRefs))
             ->replaceArgument(3, $loaders)
         ;
+
+        if ($container->hasParameter('twig.default_path')) {
+            $container->getDefinition($this->debugCommandServiceId)->replaceArgument(4, $container->getParameter('twig.default_path'));
+            $container->getDefinition($this->updateCommandServiceId)->replaceArgument(5, $container->getParameter('twig.default_path'));
+        }
     }
 }

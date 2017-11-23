@@ -107,6 +107,7 @@
                     parent_label_class: label_attr.class|default(''),
                     translation_domain: choice_translation_domain,
                 }) -}}
+                {{ form_errors(child) }}
             {% endfor -%}
         </div>
     {%- endif %}

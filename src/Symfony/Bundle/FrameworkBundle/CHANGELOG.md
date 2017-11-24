@@ -7,6 +7,7 @@ CHANGELOG
  * Allowed to pass an optional `LoggerInterface $logger` instance to the `Router`
  * Added a new `parameter_bag` service with related autowiring aliases to access parameters as-a-service
  * Allowed the `Router` to work with any PSR-11 container
+ * added option in workflow dump command to label graph with a custom label
 
 4.0.0
 -----

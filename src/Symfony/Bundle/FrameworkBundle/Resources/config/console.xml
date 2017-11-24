@@ -78,6 +78,8 @@
             <argument type="service" id="translator" />
             <argument type="service" id="translation.reader" />
             <argument type="service" id="translation.extractor" />
+            <argument>%translator.default_path%</argument>
+            <argument /> <!-- %twig.default_path% -->
             <tag name="console.command" command="debug:translation" />
         </service>
 
@@ -86,6 +88,8 @@
             <argument type="service" id="translation.reader" />
             <argument type="service" id="translation.extractor" />
             <argument>%kernel.default_locale%</argument>
+            <argument>%translator.default_path%</argument>
+            <argument /> <!-- %twig.default_path% -->
             <tag name="console.command" command="translation:update" />
         </service>
 

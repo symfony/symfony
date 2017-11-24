@@ -327,6 +327,15 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services24.php', $dumper->dump());
     }
 
+    public function testEnvInId()
+    {
+        $container = include self::$fixturesPath.'/containers/container_env_in_id.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_env_in_id.php', $dumper->dump());
+    }
+
     public function testEnvParameter()
     {
         $container = new ContainerBuilder();

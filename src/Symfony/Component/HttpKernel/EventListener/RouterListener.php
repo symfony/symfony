@@ -47,11 +47,8 @@ class RouterListener implements EventSubscriberInterface
 
     /**
      * @param UrlMatcherInterface|RequestMatcherInterface $matcher      The Url or Request matcher
-     * @param RequestStack                                $requestStack A RequestStack instance
      * @param RequestContext|null                         $context      The RequestContext (can be null when $matcher implements RequestContextAwareInterface)
      * @param LoggerInterface|null                        $logger       The logger
-     * @param string                                      $projectDir
-     * @param bool                                        $debug
      *
      * @throws \InvalidArgumentException
      */
@@ -83,8 +80,6 @@ class RouterListener implements EventSubscriberInterface
     /**
      * After a sub-request is done, we need to reset the routing context to the parent request so that the URL generator
      * operates on the correct context again.
-     *
-     * @param FinishRequestEvent $event
      */
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {

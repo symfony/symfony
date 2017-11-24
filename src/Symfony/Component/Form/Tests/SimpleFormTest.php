@@ -446,7 +446,7 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertEquals('third', $form->getNormData());
     }
 
-    /*
+    /**
      * When there is no data transformer, the data must have the same format
      * in all three representations
      */
@@ -461,7 +461,7 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame('1', $form->getViewData());
     }
 
-    /*
+    /**
      * Data in client format should, if possible, always be a string to
      * facilitate differentiation between '0' and ''
      */
@@ -481,7 +481,7 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame('23', $form->getViewData());
     }
 
-    /*
+    /**
      * NULL remains NULL in app and norm format to remove the need to treat
      * empty values and NULL explicitly in the application
      */

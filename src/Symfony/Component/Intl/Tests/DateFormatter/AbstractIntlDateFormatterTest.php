@@ -838,7 +838,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         );
     }
 
-    /*
+    /**
      * https://github.com/symfony/symfony/issues/4242
      */
     public function testParseAfterError()
@@ -924,9 +924,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
     }
 
     /**
-     * @param $locale
-     * @param $datetype
-     * @param $timetype
      * @param null $timezone
      * @param int  $calendar
      * @param null $pattern

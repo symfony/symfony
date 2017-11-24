@@ -32,7 +32,6 @@ class HttpUtils
     private $domainRegexp;
 
     /**
-     * @param UrlGeneratorInterface                       $urlGenerator A UrlGeneratorInterface instance
      * @param UrlMatcherInterface|RequestMatcherInterface $urlMatcher   The URL or Request matcher
      * @param string|null                                 $domainRegexp A regexp that the target of HTTP redirections must match, scheme included
      *
@@ -51,7 +50,6 @@ class HttpUtils
     /**
      * Creates a redirect Response.
      *
-     * @param Request $request A Request instance
      * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      * @param int     $status  The status code
      *
@@ -97,7 +95,6 @@ class HttpUtils
     /**
      * Checks that a given path matches the Request.
      *
-     * @param Request $request A Request instance
      * @param string  $path    A path (an absolute path (/foo), an absolute URL (http://...), or a route name (foo))
      *
      * @return bool true if the path is the same as the one from the Request, false otherwise

@@ -97,8 +97,6 @@ class ViolationMapperTest extends TestCase
     }
 
     /**
-     * @param $propertyPath
-     *
      * @return ConstraintViolation
      */
     protected function getConstraintViolation($propertyPath)

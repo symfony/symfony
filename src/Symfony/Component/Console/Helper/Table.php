@@ -85,7 +85,6 @@ class Table
      * Sets a style definition.
      *
      * @param string     $name  The style name
-     * @param TableStyle $style A TableStyle instance
      */
     public static function setStyleDefinition($name, TableStyle $style)
     {
@@ -192,8 +191,6 @@ class Table
 
     /**
      * Sets the minimum width of all columns.
-     *
-     * @param array $widths
      *
      * @return $this
      */

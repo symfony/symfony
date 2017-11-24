@@ -265,7 +265,7 @@ class FormTypeTest extends BaseTypeTest
         $this->assertEquals(new Author(), $form->getData());
     }
 
-    /*
+    /**
      * We need something to write the field values into
      */
     public function testSubmitWithEmptyDataStoresArrayIfNoClassAvailable()

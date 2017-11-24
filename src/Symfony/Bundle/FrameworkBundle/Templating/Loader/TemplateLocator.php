@@ -27,8 +27,7 @@ class TemplateLocator implements FileLocatorInterface
     private $cacheHits = array();
 
     /**
-     * @param FileLocatorInterface $locator  A FileLocatorInterface instance
-     * @param string               $cacheDir The cache path
+     * @param string $cacheDir The cache path
      */
     public function __construct(FileLocatorInterface $locator, string $cacheDir = null)
     {

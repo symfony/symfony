@@ -23,7 +23,6 @@ class Registry
     private $workflows = array();
 
     /**
-     * @param Workflow                 $workflow
      * @param SupportStrategyInterface $supportStrategy
      */
     public function add(Workflow $workflow, $supportStrategy)

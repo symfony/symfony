@@ -215,7 +215,6 @@ class XmlDumper extends Dumper
      * Adds a service alias.
      *
      * @param string      $alias
-     * @param Alias       $id
      * @param \DOMElement $parent
      */
     private function addServiceAlias($alias, Alias $id, \DOMElement $parent)
@@ -254,7 +253,6 @@ class XmlDumper extends Dumper
     /**
      * Converts parameters.
      *
-     * @param array       $parameters
      * @param string      $type
      * @param \DOMElement $parent
      * @param string      $keyAttribute

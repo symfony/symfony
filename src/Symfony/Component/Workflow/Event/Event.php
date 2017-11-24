@@ -28,9 +28,6 @@ class Event extends BaseEvent
 
     /**
      * @param object     $subject
-     * @param Marking    $marking
-     * @param Transition $transition
-     * @param string     $workflowName
      */
     public function __construct($subject, Marking $marking, Transition $transition, string $workflowName = 'unnamed')
     {

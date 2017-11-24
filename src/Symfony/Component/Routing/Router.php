@@ -84,7 +84,6 @@ class Router implements RouterInterface, RequestMatcherInterface
     private $expressionLanguageProviders = array();
 
     /**
-     * @param LoaderInterface $loader   A LoaderInterface instance
      * @param mixed           $resource The main resource to load
      * @param array           $options  An array of options
      * @param RequestContext  $context  The context

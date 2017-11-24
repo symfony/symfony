@@ -41,7 +41,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param string   $rootNodeName
      * @param int|null $loadOptions  A bit field of LIBXML_* constants
      */
     public function __construct(string $rootNodeName = 'response', int $loadOptions = null)

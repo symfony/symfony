@@ -33,10 +33,9 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
     private $collectedParameters = array();
 
     /**
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param mixed              $resource  The main resource to load
-     * @param array              $options   An array of options
-     * @param RequestContext     $context   The context
+     * @param mixed          $resource The main resource to load
+     * @param array          $options  An array of options
+     * @param RequestContext $context  The context
      */
     public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null)
     {

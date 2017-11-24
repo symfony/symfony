@@ -25,7 +25,6 @@ class FileLocator extends BaseFileLocator
     private $path;
 
     /**
-     * @param KernelInterface $kernel A KernelInterface instance
      * @param null|string     $path   The path the global resource directory
      * @param array           $paths  An array of paths where to look for resources
      */

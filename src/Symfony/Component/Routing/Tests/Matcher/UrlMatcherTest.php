@@ -89,6 +89,12 @@ class UrlMatcherTest extends TestCase
         $matcher = new UrlMatcher($collection, new RequestContext());
         $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'def' => 'test'), $matcher->match('/foo/baz'));
 
+        // test that defaults are evaluated
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/hello/{name}', array('hello' => 'Hello, {name} and {name2}.', 'name2' => 'Mary')));
+        $matcher = new UrlMatcher($collection, new RequestContext());
+        $this->assertEquals(array('_route' => 'foo', 'hello' => 'Hello, John and Mary.', 'name' => 'John', 'name2' => 'Mary'), $matcher->match('/hello/John'));
+
         // test that route "method" is ignored if no method is given in the context
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('get', 'head')));

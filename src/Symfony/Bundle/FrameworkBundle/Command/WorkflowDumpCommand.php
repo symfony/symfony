@@ -37,6 +37,7 @@ class WorkflowDumpCommand extends Command
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
+                new InputOption('workflow-name-label', null, null, 'Labels graph with workflow name'),
             ))
             ->setDescription('Dump a workflow')
             ->setHelp(<<<'EOF'
@@ -73,6 +74,11 @@ EOF
             $marking->mark($place);
         }
 
-        $output->writeln($dumper->dump($workflow->getDefinition(), $marking));
+        $options = [];
+        if ($input->getOption('workflow-name-label')) {
+            $options = ['graph' => ['label' => $serviceId]];
+        }
+
+        $output->writeln($dumper->dump($workflow->getDefinition(), $marking, $options));
     }
 }

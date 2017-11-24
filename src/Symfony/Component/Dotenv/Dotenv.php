@@ -71,16 +71,27 @@ final class Dotenv
 
         foreach ($values as $name => $value) {
             $notHttpName = 0 !== strpos($name, 'HTTP_');
+            $isSetEnv = false;
+            $isSetServer = false;
+
             // don't check existence with getenv() because of thread safety issues
-            if (!isset($loadedVars[$name]) && (isset($_ENV[$name]) || (isset($_SERVER[$name]) && $notHttpName))) {
+            if (isset($loadedVars[$name]) || !isset($_ENV[$name])) {
+                $_ENV[$name] = $value;
+                $isSetEnv = true;
+            }
+
+            if (isset($loadedVars[$name]) || !isset($_SERVER[$name])) {
+                if ($notHttpName) {
+                    $_SERVER[$name] = $value;
+                    $isSetServer = true;
+                }
+            }
+
+            if (!isset($loadedVars[$name]) && (!$isSetEnv || !$isSetServer)) {
                 continue;
             }
 
             putenv("$name=$value");
-            $_ENV[$name] = $value;
-            if ($notHttpName) {
-                $_SERVER[$name] = $value;
-            }
 
             $loadedVars[$name] = true;
         }

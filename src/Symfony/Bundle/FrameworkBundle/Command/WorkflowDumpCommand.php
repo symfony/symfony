@@ -74,9 +74,9 @@ EOF
             $marking->mark($place);
         }
 
-        $options = [];
+        $options = array();
         if ($input->getOption('workflow-name-label')) {
-            $options = ['graph' => ['label' => $serviceId]];
+            $options = array('graph' => array('label' => $serviceId));
         }
 
         $output->writeln($dumper->dump($workflow->getDefinition(), $marking, $options));

@@ -716,6 +716,29 @@ class ContainerBuilderTest extends TestCase
         $this->assertNull($container->get('foo')->fake);
     }
 
+    public function testEnvInId()
+    {
+        $container = include __DIR__.'/Fixtures/containers/container_env_in_id.php';
+        $container->compile(true);
+
+        $expected = array(
+            'service_container',
+            'foo',
+            'bar',
+            'bar_%env(BAR)%',
+        );
+        $this->assertSame($expected, array_keys($container->getDefinitions()));
+
+        $expected = array(
+            PsrContainerInterface::class => true,
+            ContainerInterface::class => true,
+            'baz_%env(BAR)%' => true,
+        );
+        $this->assertSame($expected, $container->getRemovedIds());
+
+        $this->assertSame(array('baz_bar'), array_keys($container->getDefinition('foo')->getArgument(1)));
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException
      * @expectedExceptionMessage Circular reference detected for parameter "env(resolve:DUMMY_ENV_VAR)" ("env(resolve:DUMMY_ENV_VAR)" > "env(resolve:DUMMY_ENV_VAR)").

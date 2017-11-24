@@ -243,6 +243,15 @@ class XmlFileLoader extends FileLoader
             $defaults['_controller'] = $controller;
         }
 
+        if ($redirectTo = $node->getAttribute('redirect-to')) {
+            if (isset($defaults['_controller'])) {
+                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both a controller and a redirection.', $path));
+            }
+
+            $defaults['_redirect_to'] = $redirectTo;
+            $defaults['_redirect_permanent'] = (bool) $node->getAttribute('redirect-permanent');
+        }
+
         return array($defaults, $requirements, $options, $condition);
     }
 

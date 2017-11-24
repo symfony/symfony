@@ -193,4 +193,31 @@ class YamlFileLoaderTest extends TestCase
         $this->assertNotNull($routeCollection->get('api_app_blog'));
         $this->assertEquals('/api/blog', $routeCollection->get('api_app_blog')->getPath());
     }
+
+    public function testRedirections()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/redirect_to')));
+        $routeCollection = $loader->load('routing.yml');
+
+        $route = $routeCollection->get('app_homepage');
+        $this->assertSame('AppBundle:Homepage:show', $route->getDefault('_controller'));
+
+        $route = $routeCollection->get('app_temporary_redirect');
+        $this->assertSame('app_homepage', $route->getDefault('_redirect_to'));
+        $this->assertFalse($route->getDefault('_redirect_permanent'));
+
+        $route = $routeCollection->get('app_permanent_redirect');
+        $this->assertSame('/', $route->getDefault('_redirect_to'));
+        $this->assertTrue($route->getDefault('_redirect_permanent'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /The routing file "[^"]*" must not specify both a controller and a redirection\./
+     */
+    public function testRedirectionCannotBeUsedWithController()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/redirect_to')));
+        $loader->load('redirect_with_controller.yml');
+    }
 }

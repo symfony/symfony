@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-11-24T09:04:19Z
+
+Is 3.4 the right branch to merge this? If this considered a bug, then it should be 2.7.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-24T09:08:34Z
+
+I think it should be 3.3 actually; i targeted the _new_ profiler only. Not sure we should patch 2.7 toolbar in any non-security related way.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-11-24T09:10:06Z
+
+Can you please change the branch to 3.3? Thanks.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-24T09:12:15Z
+
+way ahead of you :)

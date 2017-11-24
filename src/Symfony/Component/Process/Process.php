@@ -976,16 +976,9 @@ class Process implements \IteratorAggregate
         if ('\\' === DIRECTORY_SEPARATOR && $tty) {
             throw new RuntimeException('TTY mode is not supported on Windows platform.');
         }
-        if ($tty) {
-            static $isTtySupported;
 
-            if (null === $isTtySupported) {
-                $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', array(array('file', '/dev/tty', 'r'), array('file', '/dev/tty', 'w'), array('file', '/dev/tty', 'w')), $pipes);
-            }
-
-            if (!$isTtySupported) {
-                throw new RuntimeException('TTY mode requires /dev/tty to be read/writable.');
-            }
+        if ($tty && !self::isTtySupported()) {
+            throw new RuntimeException('TTY mode requires /dev/tty to be read/writable.');
         }
 
         $this->tty = (bool) $tty;
@@ -1167,6 +1160,22 @@ class Process implements \IteratorAggregate
 
             throw new ProcessTimedOutException($this, ProcessTimedOutException::TYPE_IDLE);
         }
+    }
+
+    /**
+     * Returns whether TTY is supported on the current operating system.
+     *
+     * @return bool
+     */
+    public static function isTtySupported()
+    {
+        static $isTtySupported;
+
+        if (null === $isTtySupported) {
+            $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', array(array('file', '/dev/tty', 'r'), array('file', '/dev/tty', 'w'), array('file', '/dev/tty', 'w')), $pipes);
+        }
+
+        return $isTtySupported;
     }
 
     /**

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-22T14:40:25Z
+
+See https://github.com/symfony/recipes/pull/272 for a corresponding recipe (verified locally.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-22T14:42:23Z
+
+Note that it would be great to deprecate using the `locator` at all in `supports()`, but 3.4 is now closed for deprecations, so should/could happen on master only.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-23T11:41:11Z
+
+Can you add some tests for that?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-23T13:40:16Z
+
+This one makes is difficult (read impossible) to have a config that works on 3.3 and 3.4/4.0 (cf. the changed recipe).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-23T13:45:03Z
+
+The current config that works will continue to work. I'm now rebasing on 3.3 as bug fix, so that Flex+3.3 can get the good DX config.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-23T13:59:31Z
+
+rebased on 3.3
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-24T10:34:04Z
+
+And we even have tests now 👍

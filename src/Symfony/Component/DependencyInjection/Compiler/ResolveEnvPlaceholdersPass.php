@@ -35,7 +35,7 @@ class ResolveEnvPlaceholdersPass extends AbstractRecursivePass
 
         $value = parent::processValue($value, $isRoot);
 
-        if ($value && is_array($value)) {
+        if ($value && is_array($value) && !$isRoot) {
             $value = array_combine($this->container->resolveEnvPlaceholders(array_keys($value), true), $value);
         }
 

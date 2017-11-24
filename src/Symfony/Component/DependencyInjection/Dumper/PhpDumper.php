@@ -199,7 +199,7 @@ EOF;
                 sort($ids);
                 $c = "<?php\n\nreturn array(\n";
                 foreach ($ids as $id) {
-                    $c .= '    '.$this->export($id)." => true,\n";
+                    $c .= '    '.$this->doExport($id)." => true,\n";
                 }
                 $files['removed-ids.php'] = $c .= ");\n";
             }
@@ -820,6 +820,7 @@ EOF;
     private function addNewInstance(Definition $definition, $return, $instantiation, $id)
     {
         $class = $this->dumpValue($definition->getClass());
+        $return = '        '.$return.$instantiation;
 
         $arguments = array();
         foreach ($definition->getArguments() as $value) {
@@ -835,7 +836,7 @@ EOF;
 
                 if ($callable[0] instanceof Reference
                     || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))) {
-                    return sprintf("        $return{$instantiation}%s->%s(%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '');
+                    return $return.sprintf("%s->%s(%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '');
                 }
 
                 $class = $this->dumpValue($callable[0]);
@@ -845,24 +846,24 @@ EOF;
                         throw new RuntimeException(sprintf('Cannot dump definition: The "%s" service is defined to be created by a factory but is missing the service reference, did you forget to define the factory service id or class?', $id));
                     }
 
-                    return sprintf("        $return{$instantiation}%s::%s(%s);\n", $this->dumpLiteralClass($class), $callable[1], $arguments ? implode(', ', $arguments) : '');
+                    return $return.sprintf("%s::%s(%s);\n", $this->dumpLiteralClass($class), $callable[1], $arguments ? implode(', ', $arguments) : '');
                 }
 
                 if (0 === strpos($class, 'new ')) {
-                    return sprintf("        $return{$instantiation}(%s)->%s(%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '');
+                    return $return.sprintf("(%s)->%s(%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '');
                 }
 
-                return sprintf("        $return{$instantiation}[%s, '%s'](%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '');
+                return $return.sprintf("[%s, '%s'](%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '');
             }
 
-            return sprintf("        $return{$instantiation}%s(%s);\n", $this->dumpLiteralClass($this->dumpValue($callable)), $arguments ? implode(', ', $arguments) : '');
+            return $return.sprintf("%s(%s);\n", $this->dumpLiteralClass($this->dumpValue($callable)), $arguments ? implode(', ', $arguments) : '');
         }
 
         if (false !== strpos($class, '$')) {
-            return sprintf("        \$class = %s;\n\n        $return{$instantiation}new \$class(%s);\n", $class, implode(', ', $arguments));
+            return sprintf("        \$class = %s;\n\n%snew \$class(%s);\n", $class, $return, implode(', ', $arguments));
         }
 
-        return sprintf("        $return{$instantiation}new %s(%s);\n", $this->dumpLiteralClass($class), implode(', ', $arguments));
+        return $return.sprintf("new %s(%s);\n", $this->dumpLiteralClass($class), implode(', ', $arguments));
     }
 
     private function startClass(string $class, string $baseClass): string
@@ -986,7 +987,7 @@ EOF;
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
             if ($definition->isSynthetic() && 'service_container' !== $id) {
-                $code .= '            '.$this->export($id)." => true,\n";
+                $code .= '            '.$this->doExport($id)." => true,\n";
             }
         }
 
@@ -1011,7 +1012,7 @@ EOF;
             $ids = array_keys($ids);
             sort($ids);
             foreach ($ids as $id) {
-                $code .= '            '.$this->export($id)." => true,\n";
+                $code .= '            '.$this->doExport($id)." => true,\n";
             }
 
             $code = "array(\n{$code}        )";
@@ -1034,7 +1035,7 @@ EOF;
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
             if (!$definition->isSynthetic() && $definition->isPublic() && (!$this->asFiles || !$definition->isShared() || $this->isHotPath($definition))) {
-                $code .= '            '.$this->export($id).' => '.$this->export($this->generateMethodName($id)).",\n";
+                $code .= '            '.$this->doExport($id).' => '.$this->doExport($this->generateMethodName($id)).",\n";
             }
         }
 
@@ -1048,7 +1049,7 @@ EOF;
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
             if (!$definition->isSynthetic() && $definition->isPublic() && $definition->isShared() && !$this->isHotPath($definition)) {
-                $code .= sprintf("            %s => __DIR__.'/%s.php',\n", $this->export($id), $this->generateMethodName($id));
+                $code .= sprintf("            %s => __DIR__.'/%s.php',\n", $this->doExport($id), $this->generateMethodName($id));
             }
         }
 
@@ -1068,7 +1069,7 @@ EOF;
             while (isset($aliases[$id])) {
                 $id = (string) $aliases[$id];
             }
-            $code .= '            '.$this->export($alias).' => '.$this->export($id).",\n";
+            $code .= '            '.$this->doExport($alias).' => '.$this->doExport($id).",\n";
         }
 
         return $code."        );\n";
@@ -1743,9 +1744,9 @@ EOF;
     private function export($value)
     {
         if (null !== $this->targetDirRegex && is_string($value) && preg_match($this->targetDirRegex, $value, $matches, PREG_OFFSET_CAPTURE)) {
-            $prefix = $matches[0][1] ? $this->doExport(substr($value, 0, $matches[0][1])).'.' : '';
+            $prefix = $matches[0][1] ? $this->doExport(substr($value, 0, $matches[0][1]), true).'.' : '';
             $suffix = $matches[0][1] + strlen($matches[0][0]);
-            $suffix = isset($value[$suffix]) ? '.'.$this->doExport(substr($value, $suffix)) : '';
+            $suffix = isset($value[$suffix]) ? '.'.$this->doExport(substr($value, $suffix), true) : '';
             $dirname = '__DIR__';
             $offset = 1 + $this->targetDirMaxMatches - count($matches);
 
@@ -1760,10 +1761,10 @@ EOF;
             return $dirname;
         }
 
-        return $this->doExport($value);
+        return $this->doExport($value, true);
     }
 
-    private function doExport($value)
+    private function doExport($value, $resolveEnv = false)
     {
         if (is_string($value) && false !== strpos($value, "\n")) {
             $cleanParts = explode("\n", $value);
@@ -1773,7 +1774,7 @@ EOF;
             $export = var_export($value, true);
         }
 
-        if ("'" === $export[0] && $export !== $resolvedExport = $this->container->resolveEnvPlaceholders($export, "'.\$this->getEnv('string:%s').'")) {
+        if ($resolveEnv && "'" === $export[0] && $export !== $resolvedExport = $this->container->resolveEnvPlaceholders($export, "'.\$this->getEnv('string:%s').'")) {
             $export = $resolvedExport;
             if (".''" === substr($export, -3)) {
                 $export = substr($export, 0, -3);

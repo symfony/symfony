@@ -21,12 +21,16 @@ class TranslatorPass implements CompilerPassInterface
     private $translatorServiceId;
     private $readerServiceId;
     private $loaderTag;
+    private $debugCommandServiceId;
+    private $updateCommandServiceId;
 
-    public function __construct(string $translatorServiceId = 'translator.default', string $readerServiceId = 'translation.reader', string $loaderTag = 'translation.loader')
+    public function __construct(string $translatorServiceId = 'translator.default', string $readerServiceId = 'translation.reader', string $loaderTag = 'translation.loader', string $debugCommandServiceId = 'console.command.translation_debug', string $updateCommandServiceId = 'console.command.translation_update')
     {
         $this->translatorServiceId = $translatorServiceId;
         $this->readerServiceId = $readerServiceId;
         $this->loaderTag = $loaderTag;
+        $this->debugCommandServiceId = $debugCommandServiceId;
+        $this->updateCommandServiceId = $updateCommandServiceId;
     }
 
     public function process(ContainerBuilder $container)
@@ -59,5 +63,10 @@ class TranslatorPass implements CompilerPassInterface
             ->replaceArgument(0, ServiceLocatorTagPass::register($container, $loaderRefs))
             ->replaceArgument(3, $loaders)
         ;
+
+        if ($container->hasParameter('twig.default_path')) {
+            $container->getDefinition($this->debugCommandServiceId)->replaceArgument(4, $container->getParameter('twig.default_path'));
+            $container->getDefinition($this->updateCommandServiceId)->replaceArgument(5, $container->getParameter('twig.default_path'));
+        }
     }
 }

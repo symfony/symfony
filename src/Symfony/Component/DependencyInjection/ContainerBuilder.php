@@ -1262,7 +1262,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *                                    true to resolve to the actual values of the referenced env vars
      * @param array            &$usedEnvs Env vars found while resolving are added to this array
      *
-     * @return string The string with env parameters resolved
+     * @return mixed The value with env parameters resolved if a string or an array is passed
      */
     public function resolveEnvPlaceholders($value, $format = null, array &$usedEnvs = null)
     {

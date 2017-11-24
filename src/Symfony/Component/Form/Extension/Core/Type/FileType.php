@@ -93,7 +93,7 @@ class FileType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $dataClass = function (Options $options) {
-            return $options['multiple'] ? null : 'Symfony\Component\HttpFoundation\File\File';
+            return $options['multiple'] || !class_exists('Symfony\Component\HttpFoundation\File\File') ? null : 'Symfony\Component\HttpFoundation\File\File';
         };
 
         $emptyData = function (Options $options) {

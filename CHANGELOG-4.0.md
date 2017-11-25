@@ -1,8 +1,6 @@
 CHANGELOG for 4.0.x
 ===================
 
-* feature #25091 [Security] Add target user to SwitchUserListener (jwmickey)
-
 This changelog references the relevant changes (bug and security fixes) done
 in 4.0 minor versions.
 

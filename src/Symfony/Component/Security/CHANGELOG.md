@@ -18,6 +18,7 @@ CHANGELOG
  * removed HTTP digest authentication
  * removed `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
  * removed `AbstractGuardAuthenticator::supports()`
+ * added target user to `SwitchUserListener`
 
 3.4.0
 -----

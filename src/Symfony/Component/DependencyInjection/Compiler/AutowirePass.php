@@ -336,14 +336,16 @@ class AutowirePass extends AbstractRecursivePass
         if ($message = $this->getAliasesSuggestionForType($type = $reference->getType())) {
             return ' '.$message;
         }
-        if (isset($this->ambiguousServiceTypes[$type])) {
+
+        $servicesAndAliases = $this->container->getServiceIds();
+        if (!$this->container->has($type) && false !== $key = array_search(strtolower($type), array_map('strtolower', $servicesAndAliases))) {
+            return sprintf(' Did you mean "%s"?', $servicesAndAliases[$key]);
+        } elseif (isset($this->ambiguousServiceTypes[$type])) {
             $message = sprintf('one of these existing services: "%s"', implode('", "', $this->ambiguousServiceTypes[$type]));
         } elseif (isset($this->types[$type])) {
             $message = sprintf('the existing "%s" service', $this->types[$type]);
         } elseif ($reference->getRequiringClass() && !$reference->canBeAutoregistered()) {
             return ' It cannot be auto-registered because it is from a different root namespace.';
-        } elseif (is_array($this->types) && (null !== $key = array_search(strtolower($type), array_map('strtolower', $this->types)))) {
-            return sprintf(' Maybe you mean %s instead of %s ?', $key, $type);
         } else {
             return;
         }

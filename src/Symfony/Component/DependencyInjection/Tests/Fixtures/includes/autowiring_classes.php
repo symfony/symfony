@@ -6,13 +6,6 @@ class Foo
 {
 }
 
-class FooFoo
-{
-    public function __construct(Foo $foo)
-    {
-    }
-}
-
 class Bar
 {
     public function __construct(Foo $foo)
@@ -300,20 +293,13 @@ class SetterInjectionParent
     }
 }
 
-class ARealClass {
-
-}
-
-class ClassMisMatch {
-
-    public function __construct(arealclass $n = null)
-    {
-    }
-}
-
 class NotWireable
 {
     public function setNotAutowireable(NotARealClass $n)
+    {
+    }
+
+    public function setNotAutowireableBecauseOfATypo(lesTilleuls $sam)
     {
     }
 

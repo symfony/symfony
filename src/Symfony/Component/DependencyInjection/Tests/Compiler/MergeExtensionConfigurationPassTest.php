@@ -84,6 +84,22 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertSame(array('BAZ', 'FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
         $this->assertSame(array('BAZ' => 1, 'FOO' => 0), $container->getEnvCounters());
     }
+
+    public function testThrowingExtensionsGetMergedBag()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new ThrowingExtension());
+        $container->prependExtensionConfig('throwing', array('bar' => '%env(FOO)%'));
+
+        try {
+            $pass = new MergeExtensionConfigurationPass();
+            $pass->process($container);
+            $this->fail('An exception should have been thrown.');
+        } catch (\Exception $e) {
+        }
+
+        $this->assertSame(array('FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
+    }
 }
 
 class FooConfiguration implements ConfigurationInterface
@@ -123,5 +139,23 @@ class FooExtension extends Extension
             $container->getParameterBag()->get('env(BOZ)');
             $container->resolveEnvPlaceholders($config['baz']);
         }
+    }
+}
+
+class ThrowingExtension extends Extension
+{
+    public function getAlias()
+    {
+        return 'throwing';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new FooConfiguration();
+    }
+
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        throw new \Exception();
     }
 }

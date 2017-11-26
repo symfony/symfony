@@ -101,6 +101,54 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->assertSame('factory', $foo->getFactoryService());
     }
 
+    /**
+     * @dataProvider getAliasVisibility
+     */
+    public function testResolveNestedDefinitionWithAliasReferences($public)
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('original_dep');
+        $container->setAlias('dependency', new Alias('original_dep', $public));
+
+        $innerDefinition = new Definition();
+        $innerDefinition->setArguments(array(new Reference('dependency')));
+
+        $container
+            ->register('service')
+            ->setArguments(array($innerDefinition));
+
+        $this->process($container);
+
+        $this->assertSame('original_dep', (string) $container->getDefinition('service')->getArgument(0)->getArgument(0));
+    }
+
+    public function getAliasVisibility()
+    {
+        return array(
+            'private' => array(false),
+            'public' => array(true),
+        );
+    }
+
+    public function testResolveNestedDefinitionWithDirectServiceReferences()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('original_dep');
+
+        $innerDefinition = new Definition();
+        $innerDefinition->setArguments(array(new Reference('original_dep')));
+
+        $container
+            ->register('service')
+            ->setArguments(array($innerDefinition));
+
+        $this->process($container);
+
+        $this->assertSame('original_dep', (string) $container->getDefinition('service')->getArgument(0)->getArgument(0));
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveReferencesToAliasesPass();

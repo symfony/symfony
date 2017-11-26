@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,15 +34,7 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
         $this->container = $container;
 
         foreach ($container->getDefinitions() as $definition) {
-            if ($definition->isSynthetic() || $definition->isAbstract()) {
-                continue;
-            }
-
-            $definition->setArguments($this->processArguments($definition->getArguments()));
-            $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
-            $definition->setProperties($this->processArguments($definition->getProperties()));
-            $definition->setFactory($this->processFactory($definition->getFactory()));
-            $definition->setFactoryService($this->processFactoryService($definition->getFactoryService(false)), false);
+            $this->processDefinition($definition);
         }
 
         foreach ($container->getAliases() as $id => $alias) {
@@ -50,6 +43,19 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
                 $container->setAlias($id, new Alias($defId, $alias->isPublic()));
             }
         }
+    }
+
+    private function processDefinition(Definition $definition)
+    {
+        if ($definition->isSynthetic() || $definition->isAbstract()) {
+            return;
+        }
+
+        $definition->setArguments($this->processArguments($definition->getArguments()));
+        $definition->setMethodCalls($this->processArguments($definition->getMethodCalls()));
+        $definition->setProperties($this->processArguments($definition->getProperties()));
+        $definition->setFactory($this->processFactory($definition->getFactory()));
+        $definition->setFactoryService($this->processFactoryService($definition->getFactoryService(false)), false);
     }
 
     /**
@@ -70,6 +76,8 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
                 if ($defId !== $id) {
                     $arguments[$k] = new Reference($defId, $argument->getInvalidBehavior(), $argument->isStrict());
                 }
+            } elseif ($argument instanceof Definition) {
+                $this->processDefinition($argument);
             }
         }
 

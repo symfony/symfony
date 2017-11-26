@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by GawainLynch at 2017-11-26T08:15:11Z
+
+@nicolas-grekas I am scratching my head on all the test fails here, they pass locally under the same PHP versions. Hints welcome :smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-26T09:53:53Z
+
+What's the use case? Can't you use an iterator instead? The downside is that this would be a Symfony specific syntax, whereas I'm aiming at making this function a PSR, so that I'd prefer handling only things that might be accepted by the FIG...
+
+---------------------------------------------------------------------------
+
+by GawainLynch at 2017-11-26T10:17:37Z
+
+Zero stress, happy to close off.
+
+In that case, doesn't it make this dead code then:
+https://github.com/symfony/symfony/blob/e83b82bf946d9080525142dc3dc69b5317b28af9/src/Symfony/Component/DependencyInjection/Compiler/RegisterServiceSubscribersPass.php#L77-L80
+
+… as the regex will only allow `?` or a letter.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-26T10:22:49Z
+
+> In that case, doesn't it make this dead code then:
+
+correct! let's remove that :)
+
+---------------------------------------------------------------------------
+
+by GawainLynch at 2017-11-26T10:25:22Z
+
+No worries, I'll rebase and change direction :+1:

@@ -793,7 +793,6 @@ class PhpDumperTest extends TestCase
 
     public function testAlmostCircularPublic()
     {
-        $public = true;
         $container = include self::$fixturesPath.'/containers/container_almost_circular.php';
         $container->compile();
         $dumper = new PhpDumper($container);

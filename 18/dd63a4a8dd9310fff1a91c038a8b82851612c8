@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-05T16:32:33Z
+
+@chalasr So it seems that the test is failling. Is here something the modify directly in the Application to make this work properly ?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-05T19:47:36Z
+
+Thanks for the review guys, tests are now green ;).

@@ -32,13 +32,16 @@ class ProjectServiceContainer extends Container
             'symfony\\component\\dependencyinjection\\tests\\fixtures\\includes\\hotpath\\c1' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C1',
             'symfony\\component\\dependencyinjection\\tests\\fixtures\\includes\\hotpath\\c2' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C2',
             'symfony\\component\\dependencyinjection\\tests\\fixtures\\includes\\hotpath\\c3' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3',
+            'symfony\\component\\dependencyinjection\\tests\\fixtures\\parentnotexists' => 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists',
         );
         $this->methodMap = array(
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists' => 'getParentNotExistsService',
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C1' => 'getC1Service',
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C2' => 'getC2Service',
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3' => 'getC3Service',
         );
         $this->privates = array(
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3' => true,
         );
 
@@ -96,6 +99,16 @@ class ProjectServiceContainer extends Container
         require_once $this->targetDirs[1].'/includes/HotPath/C3.php';
 
         return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3'] : $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3()) && false ?: '_'});
+    }
+
+    /**
+     * Gets the private 'Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists
+     */
+    protected function getParentNotExistsService()
+    {
+        return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists();
     }
 
     /**

@@ -23,11 +23,11 @@
     <div class="input-group">
         {% set append = money_pattern starts with '{{' %}
         {% if not append %}
-            <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+            <span class="input-group-addon">{{ money_pattern|convert_encoding(_charset, 'UTF-8')|replace({ '{{ widget }}':''})|raw }}</span>
         {% endif %}
         {{- block('form_widget_simple') -}}
         {% if append %}
-            <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+            <span class="input-group-addon">{{ money_pattern|convert_encoding(_charset, 'UTF-8')|replace({ '{{ widget }}':''})|raw }}</span>
         {% endif %}
     </div>
 {%- endblock money_widget %}

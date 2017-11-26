@@ -33,7 +33,7 @@ class MoneyTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE)
             ->createView();
 
-        $this->assertSame('{{ widget }} €', $view->vars['money_pattern']);
+        $this->assertSame('{{ widget }} &euro;', $view->vars['money_pattern']);
     }
 
     public function testMoneyPatternWorksForYen()
@@ -43,7 +43,7 @@ class MoneyTypeTest extends BaseTypeTest
         $view = $this->factory->create(static::TESTED_TYPE, null, array('currency' => 'JPY'))
             ->createView();
 
-        $this->assertTrue((bool) strstr($view->vars['money_pattern'], '¥'));
+        $this->assertTrue((bool) strstr($view->vars['money_pattern'], '&yen;'));
     }
 
     // https://github.com/symfony/symfony/issues/5458
@@ -54,8 +54,8 @@ class MoneyTypeTest extends BaseTypeTest
         $view1 = $this->factory->create(static::TESTED_TYPE, null, array('currency' => 'GBP'))->createView();
         $view2 = $this->factory->create(static::TESTED_TYPE, null, array('currency' => 'EUR'))->createView();
 
-        $this->assertSame('{{ widget }} £', $view1->vars['money_pattern']);
-        $this->assertSame('{{ widget }} €', $view2->vars['money_pattern']);
+        $this->assertSame('{{ widget }} &pound;', $view1->vars['money_pattern']);
+        $this->assertSame('{{ widget }} &euro;', $view2->vars['money_pattern']);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

@@ -142,7 +142,7 @@
 {%- endblock integer_widget -%}
 
 {%- block money_widget -%}
-    {{ money_pattern|replace({ '{{ widget }}': block('form_widget_simple') })|raw }}
+    {{ money_pattern|convert_encoding(_charset, 'UTF-8')|replace({ '{{ widget }}': block('form_widget_simple') })|raw }}
 {%- endblock money_widget -%}
 
 {%- block url_widget -%}

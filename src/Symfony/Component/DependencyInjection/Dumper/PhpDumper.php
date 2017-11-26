@@ -378,11 +378,7 @@ EOTXT;
         if (isset($lineage[$class])) {
             return;
         }
-        try {
-            if (!$r = $this->container->getReflectionClass($class)) {
-                return;
-            }
-        } catch (\ReflectionException $e) {
+        if (!$r = $this->container->getReflectionClass($class, false)) {
             return;
         }
         if ($this->container instanceof $class) {

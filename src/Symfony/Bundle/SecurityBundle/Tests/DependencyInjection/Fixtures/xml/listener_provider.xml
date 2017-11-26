@@ -11,7 +11,7 @@
         </sec:providers>
 
         <sec:firewalls>
-            <sec:firewall name="main" logout-on-user-change="true">
+            <sec:firewall name="main">
                 <sec:form_login provider="default" />
             </sec:firewall>
         </sec:firewalls>

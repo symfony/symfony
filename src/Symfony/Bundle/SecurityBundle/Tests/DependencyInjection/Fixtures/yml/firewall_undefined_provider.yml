@@ -8,4 +8,3 @@ security:
         main:
             provider: undefined
             form_login: true
-            logout_on_user_change: true

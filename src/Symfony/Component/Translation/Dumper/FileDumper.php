@@ -46,15 +46,16 @@ abstract class FileDumper implements DumperInterface
      * Sets backup flag.
      *
      * @param bool
+     *
+     * @deprecated since version 4.1, to be removed in 5.0
      */
     public function setBackup($backup)
     {
+        @trigger_error(sprintf('The %s() method is deprecated since 4.1 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
+
         if (false !== $backup) {
             throw new \LogicException('The backup feature is no longer supported.');
         }
-
-        // the method is only present to not break BC
-        // to be deprecated in 4.1
     }
 
     /**

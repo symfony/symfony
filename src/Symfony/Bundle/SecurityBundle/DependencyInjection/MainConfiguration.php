@@ -200,6 +200,7 @@ class MainConfiguration implements ConfigurationInterface
             ->booleanNode('logout_on_user_change')
                 ->defaultTrue()
                 ->info('When true, it will trigger a logout for the user if something has changed.')
+                ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.1 and will be removed in 5.0.')
             ->end()
             ->arrayNode('logout')
                 ->treatTrueLike(array())
@@ -288,17 +289,6 @@ class MainConfiguration implements ConfigurationInterface
                     }
 
                     return $firewall;
-                })
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) {
-                    return (isset($v['stateless']) && true === $v['stateless']) || (isset($v['security']) && false === $v['security']);
-                })
-                ->then(function ($v) {
-                    // this option doesn't change behavior when true when stateless, so prevent deprecations
-                    $v['logout_on_user_change'] = true;
-
-                    return $v;
                 })
             ->end()
         ;

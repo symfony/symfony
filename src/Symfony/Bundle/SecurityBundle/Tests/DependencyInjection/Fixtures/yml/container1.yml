@@ -64,14 +64,12 @@ security:
             methods: [GET,POST]
             anonymous: true
             http_basic: true
-            logout_on_user_change: true
 
         with_user_checker:
             provider: default
             anonymous: ~
             http_basic: ~
             user_checker: app.user_checker
-            logout_on_user_change: true
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER

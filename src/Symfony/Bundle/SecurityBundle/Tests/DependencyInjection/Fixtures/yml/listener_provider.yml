@@ -8,4 +8,3 @@ security:
         main:
             form_login:
                 provider: default
-            logout_on_user_change: true

@@ -1470,7 +1470,7 @@ class Request
 
     /**
      * @deprecated
-     * @see Request::getRequestedResponseFormat()
+     * @see getRequestedResponseFormat()
      *
      * @param string $default
      * @return string
@@ -1482,7 +1482,7 @@ class Request
 
     /**
      * @deprecated
-     * @see Request::setRequestedResponseFormat()
+     * @see setRequestedResponseFormat()
      *
      * @param $format
      */

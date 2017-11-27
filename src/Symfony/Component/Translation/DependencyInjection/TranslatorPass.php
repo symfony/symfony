@@ -80,8 +80,15 @@ class TranslatorPass implements CompilerPassInterface
             ->replaceArgument(3, $loaders)
         ;
 
-        if ($container->hasParameter('twig.default_path')) {
+        if (!$container->hasParameter('twig.default_path')) {
+            return;
+        }
+
+        if ($container->hasDefinition($this->debugCommandServiceId)) {
             $container->getDefinition($this->debugCommandServiceId)->replaceArgument(4, $container->getParameter('twig.default_path'));
+        }
+
+        if ($container->hasDefinition($this->updateCommandServiceId)) {
             $container->getDefinition($this->updateCommandServiceId)->replaceArgument(5, $container->getParameter('twig.default_path'));
         }
     }

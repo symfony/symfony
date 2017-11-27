@@ -118,7 +118,7 @@ class RouteCollectionTest extends TestCase
         $collection->add('foo', new Route('/{placeholder}'));
         $collection1 = new RouteCollection();
         $collection1->add('bar', new Route('/{placeholder}',
-            array('_controller' => 'fixed', 'placeholder' => 'default'), array('placeholder' => '.+'), array('option' => 'value'))
+                array('_controller' => 'fixed', 'placeholder' => 'default'), array('placeholder' => '.+'), array('option' => 'value'))
         );
         $collection->addCollection($collection1);
 
@@ -301,5 +301,18 @@ class RouteCollectionTest extends TestCase
 
         $this->assertEquals(array('PUT'), $routea->getMethods());
         $this->assertEquals(array('PUT'), $routeb->getMethods());
+    }
+
+    public function testAddNamePrefix()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', $foo = new Route('/foo'));
+        $collection->add('bar', $bar = new Route('/bar'));
+        $collection->addNamePrefix('api_');
+
+        $this->assertEquals($foo, $collection->get('api_foo'));
+        $this->assertEquals($bar, $collection->get('api_bar'));
+        $this->assertNull($collection->get('foo'));
+        $this->assertNull($collection->get('bar'));
     }
 }

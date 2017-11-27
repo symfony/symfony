@@ -142,6 +142,7 @@ class PhpDumper extends Dumper
             $currentPath = array($id => $id);
             $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
         }
+        $this->container->getCompiler()->getServiceReferenceGraph()->clear();
 
         $this->docStar = $options['debug'] ? '*' : '';
 

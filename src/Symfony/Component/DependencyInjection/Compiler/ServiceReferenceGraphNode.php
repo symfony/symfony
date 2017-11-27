@@ -107,4 +107,12 @@ class ServiceReferenceGraphNode
     {
         return $this->value;
     }
+
+    /**
+     * Clears all edges.
+     */
+    public function clear()
+    {
+        $this->inEdges = $this->outEdges = array();
+    }
 }

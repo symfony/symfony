@@ -52,18 +52,26 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             }
             $config = $resolvingBag->resolveValue($config);
 
-            $tmpContainer = new ContainerBuilder($resolvingBag);
-            $tmpContainer->setResourceTracking($container->isTrackingResources());
-            $tmpContainer->addObjectResource($extension);
-            if ($extension instanceof ConfigurationExtensionInterface && null !== $configuration = $extension->getConfiguration($config, $tmpContainer)) {
-                $tmpContainer->addObjectResource($configuration);
-            }
+            try {
+                $tmpContainer = new ContainerBuilder($resolvingBag);
+                $tmpContainer->setResourceTracking($container->isTrackingResources());
+                $tmpContainer->addObjectResource($extension);
+                if ($extension instanceof ConfigurationExtensionInterface && null !== $configuration = $extension->getConfiguration($config, $tmpContainer)) {
+                    $tmpContainer->addObjectResource($configuration);
+                }
 
-            foreach ($exprLangProviders as $provider) {
-                $tmpContainer->addExpressionLanguageProvider($provider);
-            }
+                foreach ($exprLangProviders as $provider) {
+                    $tmpContainer->addExpressionLanguageProvider($provider);
+                }
 
-            $extension->load($config, $tmpContainer);
+                $extension->load($config, $tmpContainer);
+            } catch (\Exception $e) {
+                if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
+                    $container->getParameterBag()->mergeEnvPlaceholders($resolvingBag);
+                }
+
+                throw $e;
+            }
 
             if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
                 // don't keep track of env vars that are *overridden* when configs are merged

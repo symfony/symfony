@@ -18,7 +18,7 @@ class MicroKernelTraitTest extends TestCase
 {
     public function test()
     {
-        $kernel = new ConcreteMicroKernel('test', true);
+        $kernel = new ConcreteMicroKernel('test', false);
         $kernel->boot();
 
         $request = Request::create('/');
@@ -31,7 +31,7 @@ class MicroKernelTraitTest extends TestCase
 
     public function testAsEventSubscriber()
     {
-        $kernel = new ConcreteMicroKernel('test', true);
+        $kernel = new ConcreteMicroKernel('test', false);
         $kernel->boot();
 
         $request = Request::create('/danger');

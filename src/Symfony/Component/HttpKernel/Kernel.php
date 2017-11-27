@@ -120,7 +120,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
             return;
         }
-        if ($this->debug && !isset($_SERVER['SHELL_VERBOSITY'])) {
+        if ($this->debug && !isset($_ENV['SHELL_VERBOSITY']) && !isset($_SERVER['SHELL_VERBOSITY'])) {
             putenv('SHELL_VERBOSITY=3');
             $_ENV['SHELL_VERBOSITY'] = 3;
             $_SERVER['SHELL_VERBOSITY'] = 3;

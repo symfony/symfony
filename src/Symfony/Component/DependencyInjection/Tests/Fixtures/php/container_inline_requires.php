@@ -41,7 +41,6 @@ class ProjectServiceContainer extends Container
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3' => 'getC3Service',
         );
         $this->privates = array(
-            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3' => true,
         );
 
@@ -79,6 +78,16 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the public 'Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists
+     */
+    protected function getParentNotExistsService()
+    {
+        return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists();
+    }
+
+    /**
      * Gets the public 'Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1' shared service.
      *
      * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C1
@@ -99,16 +108,6 @@ class ProjectServiceContainer extends Container
         require_once $this->targetDirs[1].'/includes/HotPath/C3.php';
 
         return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3'] : $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3()) && false ?: '_'});
-    }
-
-    /**
-     * Gets the private 'Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists' shared service.
-     *
-     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists
-     */
-    protected function getParentNotExistsService()
-    {
-        return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists();
     }
 
     /**

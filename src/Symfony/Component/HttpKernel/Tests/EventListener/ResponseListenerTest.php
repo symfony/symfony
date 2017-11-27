@@ -85,7 +85,7 @@ class ResponseListenerTest extends TestCase
 
         $response = new Response('foo');
         $request = Request::create('/');
-        $request->setRequestFormat('application/json');
+        $request->setRequestedResponseFormat('application/json');
 
         $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
         $this->dispatcher->dispatch(KernelEvents::RESPONSE, $event);

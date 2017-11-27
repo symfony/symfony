@@ -291,14 +291,14 @@ class RequestTest extends TestCase
         $request = new Request(array(), array(), array('_format' => 'json'));
         $dup = $request->duplicate();
 
-        $this->assertEquals('json', $dup->getRequestFormat());
+        $this->assertEquals('json', $dup->getRequestedResponseFormat());
         $this->assertEquals('json', $dup->attributes->get('_format'));
 
         $request = new Request();
-        $request->setRequestFormat('xml');
+        $request->setRequestedResponseFormat('xml');
         $dup = $request->duplicate();
 
-        $this->assertEquals('xml', $dup->getRequestFormat());
+        $this->assertEquals('xml', $dup->getRequestedResponseFormat());
     }
 
     /**
@@ -1446,22 +1446,22 @@ class RequestTest extends TestCase
     public function testGetRequestFormat()
     {
         $request = new Request();
-        $this->assertEquals('html', $request->getRequestFormat());
+        $this->assertEquals('html', $request->getRequestedResponseFormat());
 
         // Ensure that setting different default values over time is possible,
         // aka. setRequestFormat determines the state.
-        $this->assertEquals('json', $request->getRequestFormat('json'));
-        $this->assertEquals('html', $request->getRequestFormat('html'));
+        $this->assertEquals('json', $request->getRequestedResponseFormat('json'));
+        $this->assertEquals('html', $request->getRequestedResponseFormat('html'));
 
         $request = new Request();
-        $this->assertNull($request->getRequestFormat(null));
+        $this->assertNull($request->getRequestedResponseFormat(null));
 
         $request = new Request();
-        $this->assertNull($request->setRequestFormat('foo'));
-        $this->assertEquals('foo', $request->getRequestFormat(null));
+        $this->assertNull($request->setRequestedResponseFormat('foo'));
+        $this->assertEquals('foo', $request->getRequestedResponseFormat(null));
 
         $request = new Request(array('_format' => 'foo'));
-        $this->assertEquals('html', $request->getRequestFormat());
+        $this->assertEquals('html', $request->getRequestedResponseFormat());
     }
 
     public function testHasSession()

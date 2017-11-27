@@ -492,7 +492,7 @@ class ResponseTest extends ResponseTestCase
     {
         $response = new Response('foo');
         $request = Request::create('/');
-        $request->setRequestFormat('json');
+        $request->setRequestedResponseFormat('json');
 
         $response->prepare($request);
 

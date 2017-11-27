@@ -47,7 +47,7 @@ class PreviewErrorController
             '_controller' => $this->controller,
             'exception' => $exception,
             'logger' => null,
-            'format' => $request->getRequestFormat(),
+            'format' => $request->getRequestedResponseFormat(),
             'showException' => false,
         ));
 

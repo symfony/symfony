@@ -494,8 +494,8 @@ class Request
             $dup->attributes->set('_format', $this->get('_format'));
         }
 
-        if (!$dup->getRequestFormat(null)) {
-            $dup->setRequestFormat($this->getRequestFormat(null));
+        if (!$dup->getRequestedResponseFormat(null)) {
+            $dup->setRequestedResponseFormat($this->getRequestedResponseFormat(null));
         }
 
         return $dup;
@@ -1449,7 +1449,7 @@ class Request
      *
      * @return string The request format
      */
-    public function getRequestFormat($default = 'html')
+    public function getRequestedResponseFormat($default = 'html')
     {
         if (null === $this->format) {
             $this->format = $this->attributes->get('_format');
@@ -1463,9 +1463,32 @@ class Request
      *
      * @param string $format The request format
      */
-    public function setRequestFormat($format)
+    public function setRequestedResponseFormat($format)
     {
         $this->format = $format;
+    }
+
+    /**
+     * @deprecated
+     * @see Request::getRequestedResponseFormat()
+     *
+     * @param string $default
+     * @return string
+     */
+    public function getRequestFormat($default = 'html')
+    {
+        return $this->getRequestedResponseFormat($default);
+    }
+
+    /**
+     * @deprecated
+     * @see Request::setRequestedResponseFormat()
+     *
+     * @param $format
+     */
+    public function setRequestFormat($format)
+    {
+        $this->setRequestedResponseFormat($format);
     }
 
     /**

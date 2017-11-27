@@ -80,7 +80,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         $this->data = array(
             'method' => $request->getMethod(),
-            'format' => $request->getRequestFormat(),
+            'format' => $request->getRequestedResponseFormat(),
             'content' => $content,
             'content_type' => $response->headers->get('Content-Type', 'text/html'),
             'status_text' => isset(Response::$statusTexts[$statusCode]) ? Response::$statusTexts[$statusCode] : '',

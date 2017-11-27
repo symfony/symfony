@@ -51,7 +51,7 @@ class SubRequestController implements ContainerAwareInterface
 
     public function fragmentAction(Request $request)
     {
-        return new Response('--'.$request->getLocale().'/'.$request->getRequestFormat());
+        return new Response('--'.$request->getLocale().'/'.$request->getRequestedResponseFormat());
     }
 
     public function fragmentErrorAction()

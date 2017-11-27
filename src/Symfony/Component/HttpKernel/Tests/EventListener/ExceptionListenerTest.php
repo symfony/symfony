@@ -110,11 +110,11 @@ class ExceptionListenerTest extends TestCase
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
-            return new Response($request->getRequestFormat());
+            return new Response($request->getRequestedResponseFormat());
         }));
 
         $request = Request::create('/');
-        $request->setRequestFormat('xml');
+        $request->setRequestedResponseFormat('xml');
 
         $event = new GetResponseForExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
         $listener->onKernelException($event);

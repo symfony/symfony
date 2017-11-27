@@ -45,7 +45,7 @@ class ExceptionControllerTest extends TestCase
 
         $controller->showAction($request, $exception);
 
-        $this->assertEquals('html', $request->getRequestFormat());
+        $this->assertEquals('html', $request->getRequestedResponseFormat());
     }
 
     public function testFallbackToHtmlWithFullExceptionIfNoTemplateForRequestedFormatAndExceptionsShouldBeShown()
@@ -59,7 +59,7 @@ class ExceptionControllerTest extends TestCase
 
         $controller->showAction($request, $exception);
 
-        $this->assertEquals('html', $request->getRequestFormat());
+        $this->assertEquals('html', $request->getRequestedResponseFormat());
     }
 
     public function testResponseHasRequestedMimeType()
@@ -72,7 +72,7 @@ class ExceptionControllerTest extends TestCase
 
         $response = $controller->showAction($request, $exception);
 
-        $this->assertEquals('json', $request->getRequestFormat());
+        $this->assertEquals('json', $request->getRequestedResponseFormat());
         $this->assertEquals($request->getMimeType('json'), $response->headers->get('Content-Type'));
     }
 
@@ -80,7 +80,7 @@ class ExceptionControllerTest extends TestCase
     {
         $request = Request::create('whatever');
         $request->headers->set('X-Php-Ob-Level', 1);
-        $request->setRequestFormat($requestFormat);
+        $request->setRequestedResponseFormat($requestFormat);
 
         return $request;
     }

@@ -154,6 +154,20 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Adds a prefix to the name of all the routes within in the collection.
+     */
+    public function addNamePrefix(string $prefix)
+    {
+        $prefixedRoutes = array();
+
+        foreach ($this->routes as $name => $route) {
+            $prefixedRoutes[$prefix.$name] = $route;
+        }
+
+        $this->routes = $prefixedRoutes;
+    }
+
+    /**
      * Sets the host pattern on all routes.
      *
      * @param string $pattern      The pattern

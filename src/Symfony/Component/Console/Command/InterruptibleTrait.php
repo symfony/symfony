@@ -40,7 +40,13 @@ trait InterruptibleTrait
 
     public function __construct($name = null)
     {
+        pcntl_signal(\SIGHUP, function () {
+            $this->isInterrupted = true;
+        });
         pcntl_signal(\SIGINT, function () {
+            $this->isInterrupted = true;
+        });
+        pcntl_signal(\SIGTERM, function () {
             $this->isInterrupted = true;
         });
         parent::__construct($name);

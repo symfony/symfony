@@ -1249,24 +1249,26 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals(array('foo1' => new \stdClass(), 'foo3' => new \stdClass()), iterator_to_array($bar->iter));
     }
 
-    public function testAlmostCircularPrivate()
+    /**
+     * @dataProvider provideAlmostCircular
+     */
+    public function testAlmostCircular($visibility)
     {
-        $public = false;
         $container = include __DIR__.'/Fixtures/containers/container_almost_circular.php';
 
         $foo = $container->get('foo');
-
         $this->assertSame($foo, $foo->bar->foobar->foo);
+
+        $foo2 = $container->get('foo2');
+        $this->assertSame($foo2, $foo2->bar->foobar->foo);
+
+        $this->assertSame(array(), (array) $container->get('foobar4'));
     }
 
-    public function testAlmostCircularPublic()
+    public function provideAlmostCircular()
     {
-        $public = true;
-        $container = include __DIR__.'/Fixtures/containers/container_almost_circular.php';
-
-        $foo = $container->get('foo');
-
-        $this->assertSame($foo, $foo->bar->foobar->foo);
+        yield array('public');
+        yield array('private');
     }
 
     public function testRegisterForAutoconfiguration()

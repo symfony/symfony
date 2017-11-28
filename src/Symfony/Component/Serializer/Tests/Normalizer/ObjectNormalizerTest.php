@@ -713,6 +713,37 @@ class ObjectNormalizerTest extends TestCase
             'inner' => array('foo' => 'foo', 'bar' => 'bar'),
         ), DummyWithConstructorObjectAndDefaultValue::class, null, $context));
     }
+
+    public function testNormalizeSameObjectWithDifferentAttributes()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory);
+        $serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($serializer);
+
+        $dummy = new ObjectOuter();
+        $dummy->foo = new ObjectInner();
+        $dummy->foo->foo = 'foo.foo';
+        $dummy->foo->bar = 'foo.bar';
+
+        $dummy->bar = new ObjectInner();
+        $dummy->bar->foo = 'bar.foo';
+        $dummy->bar->bar = 'bar.bar';
+
+        $this->assertEquals(array(
+            'foo' => array(
+                'bar' => 'foo.bar',
+            ),
+            'bar' => array(
+                'foo' => 'bar.foo',
+            ),
+        ), $this->normalizer->normalize($dummy, 'json', array(
+            'attributes' => array(
+                'foo' => array('bar'),
+                'bar' => array('foo'),
+            ),
+        )));
+    }
 }
 
 class ObjectDummy

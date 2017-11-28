@@ -14,14 +14,16 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
+    private $parameters;
+    private $targetDirs = array();
+    protected $methodMap = array(
+        'depends_on_request' => 'getDependsOnRequestService',
+        'request' => 'getRequestService',
+    );
 
     public function __construct()
     {
         parent::__construct();
-        $this->methodMap = array(
-            'depends_on_request' => 'getDependsOnRequestService',
-            'request' => 'getRequestService',
-        );
     }
 
     /**

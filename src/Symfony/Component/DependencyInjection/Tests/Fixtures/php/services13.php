@@ -14,19 +14,16 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
+    private $parameters;
+    private $targetDirs = array();
+    protected $methodMap = array(
+        'bar' => 'getBarService',
+    );
+
+    protected $aliases = array();
 
     public function __construct()
     {
-        $this->services =
-        $this->scopedServices =
-        $this->scopeStacks = array();
-        $this->scopes = array();
-        $this->scopeChildren = array();
-        $this->methodMap = array(
-            'bar' => 'getBarService',
-        );
-
-        $this->aliases = array();
     }
 
     /**

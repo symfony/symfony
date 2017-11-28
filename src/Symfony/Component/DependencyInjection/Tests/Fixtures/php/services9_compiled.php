@@ -14,39 +14,36 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private static $parameters = array(
-            'baz_class' => 'BazClass',
-            'foo_class' => 'Bar\\FooClass',
-            'foo' => 'bar',
-        );
+    private $parameters;
+    private $targetDirs = array();
+    protected $methodMap = array(
+        'bar' => 'getBarService',
+        'baz' => 'getBazService',
+        'configured_service' => 'getConfiguredServiceService',
+        'decorator_service' => 'getDecoratorServiceService',
+        'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
+        'factory_service' => 'getFactoryServiceService',
+        'foo' => 'getFooService',
+        'foo.baz' => 'getFoo_BazService',
+        'foo_bar' => 'getFooBarService',
+        'foo_with_inline' => 'getFooWithInlineService',
+        'method_call1' => 'getMethodCall1Service',
+        'new_factory_service' => 'getNewFactoryServiceService',
+        'request' => 'getRequestService',
+        'service_from_static_method' => 'getServiceFromStaticMethodService',
+    );
+    protected $aliases = array(
+        'alias_for_alias' => 'foo',
+        'alias_for_foo' => 'foo',
+        'decorated' => 'decorator_service_with_name',
+    );
 
     public function __construct()
     {
-        $this->services =
-        $this->scopedServices =
-        $this->scopeStacks = array();
-        $this->scopes = array();
-        $this->scopeChildren = array();
-        $this->methodMap = array(
-            'bar' => 'getBarService',
-            'baz' => 'getBazService',
-            'configured_service' => 'getConfiguredServiceService',
-            'decorator_service' => 'getDecoratorServiceService',
-            'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
-            'factory_service' => 'getFactoryServiceService',
-            'foo' => 'getFooService',
-            'foo.baz' => 'getFoo_BazService',
-            'foo_bar' => 'getFooBarService',
-            'foo_with_inline' => 'getFooWithInlineService',
-            'method_call1' => 'getMethodCall1Service',
-            'new_factory_service' => 'getNewFactoryServiceService',
-            'request' => 'getRequestService',
-            'service_from_static_method' => 'getServiceFromStaticMethodService',
-        );
-        $this->aliases = array(
-            'alias_for_alias' => 'foo',
-            'alias_for_foo' => 'foo',
-            'decorated' => 'decorator_service_with_name',
+        $this->parameters = array(
+            'baz_class' => 'BazClass',
+            'foo_class' => 'Bar\\FooClass',
+            'foo' => 'bar',
         );
     }
 
@@ -219,8 +216,8 @@ class ProjectServiceContainer extends Container
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
         $instance->setBar($this->get('foo'));
-        $instance->setBar(NULL);
-        $instance->setBar(($this->get("foo")->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
+        $instance->setBar(null);
+        $instance->setBar(($this->get('foo')->foo().(($this->hasParameter('foo')) ? ($this->getParameter('foo')) : ('default'))));
 
         return $instance;
     }
@@ -269,11 +266,11 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        if (!(isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters))) {
+        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
 
-        return self::$parameters[$name];
+        return $this->parameters[$name];
     }
 
     /**
@@ -283,7 +280,7 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        return isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters);
+        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
     /**
@@ -300,7 +297,7 @@ class ProjectServiceContainer extends Container
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {
-            $this->parameterBag = new FrozenParameterBag(self::$parameters);
+            $this->parameterBag = new FrozenParameterBag($this->parameters);
         }
 
         return $this->parameterBag;

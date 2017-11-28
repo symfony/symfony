@@ -14,7 +14,12 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private static $parameters = array(
+    private $parameters;
+    private $targetDirs = array();
+
+    public function __construct()
+    {
+        parent::__construct(new ParameterBag(array(
             'foo' => '%baz%',
             'baz' => 'bar',
             'bar' => 'foo is %%foo bar',
@@ -22,20 +27,13 @@ class ProjectServiceContainer extends Container
             'values' => array(
                 0 => true,
                 1 => false,
-                2 => NULL,
+                2 => null,
                 3 => 0,
                 4 => 1000.3,
                 5 => 'true',
                 6 => 'false',
                 7 => 'null',
             ),
-        );
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct(new ParameterBag(self::$parameters));
+        )));
     }
 }

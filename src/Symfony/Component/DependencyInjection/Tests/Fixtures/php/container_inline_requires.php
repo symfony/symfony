@@ -30,6 +30,7 @@ class ProjectServiceContainer extends Container
 
         $this->services = $this->privates = array();
         $this->methodMap = array(
+            'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\ParentNotExists' => 'getParentNotExistsService',
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C1' => 'getC1Service',
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C2' => 'getC2Service',
         );
@@ -65,6 +66,16 @@ class ProjectServiceContainer extends Container
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\includes\\HotPath\\C3' => true,
         );
+    }
+
+    /**
+     * Gets the public 'Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists
+     */
+    protected function getParentNotExistsService()
+    {
+        return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists();
     }
 
     /**

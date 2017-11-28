@@ -7,6 +7,22 @@ in 4.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.0.0...v4.0.1
 
+* 4.0.0-RC2 (2017-11-24)
+
+ * bug #25146 [DI] Dont resolve envs in service ids (nicolas-grekas)
+ * bug #25113 [Routing] Fix "config-file-relative" annotation loader resources (nicolas-grekas, sroze)
+ * bug #25065 [FrameworkBundle] Update translation commands to work with default paths (yceruto)
+ * bug #25109 Make debug:container search command case-insensitive (jzawadzki)
+ * bug #25121 [FrameworkBundle] Fix AssetsInstallCommand (nicolas-grekas)
+ * bug #25102 [Form] Fixed ContextErrorException in FileType (chihiro-adachi)
+ * bug #25130 [DI] Fix handling of inlined definitions by ContainerBuilder (nicolas-grekas)
+ * bug #25119 [DI] Fix infinite loop when analyzing references (nicolas-grekas)
+ * bug #25094 [FrameworkBundle][DX] Display a nice error message if an enabled component is missing (derrabus)
+ * bug #25100 [SecurityBundle] providerIds is undefined error when firewall provider is not specified (karser)
+ * bug #25100 [SecurityBundle] providerIds is undefined error when firewall provider is not specified (karser)
+ * bug #25100 [SecurityBundle] providerIds is undefined error when firewall provider is not specified (karser)
+ * bug #25097 [Bridge\PhpUnit] Turn "preserveGlobalState" to false by default, revert "Blacklist" removal (nicolas-grekas)
+
 * 4.0.0-RC1 (2017-11-21)
 
  * bug #25077 [Bridge/Twig] Let getFlashes starts the session (MatTheCat)

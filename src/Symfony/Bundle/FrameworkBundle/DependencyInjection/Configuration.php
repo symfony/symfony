@@ -21,6 +21,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
@@ -109,7 +110,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('csrf_protection')
-                    ->canBeEnabled()
+                    ->{!class_exists(FullStack::class) && class_exists(CsrfTokenManagerInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
             ->end()
         ;

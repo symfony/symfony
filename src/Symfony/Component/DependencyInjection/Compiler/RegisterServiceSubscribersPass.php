@@ -74,9 +74,6 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             if ($optionalBehavior = '?' === $type[0]) {
                 $type = substr($type, 1);
                 $optionalBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-            } elseif ($optionalBehavior = '!' === $type[0]) {
-                $type = substr($type, 1);
-                $optionalBehavior = ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE;
             }
             if (is_int($key)) {
                 $key = $type;

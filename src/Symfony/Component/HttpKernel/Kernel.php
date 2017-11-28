@@ -112,7 +112,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
             return;
         }
-        if ($this->debug && !isset($_SERVER['SHELL_VERBOSITY'])) {
+        if ($this->debug && !isset($_ENV['SHELL_VERBOSITY']) && !isset($_SERVER['SHELL_VERBOSITY'])) {
             putenv('SHELL_VERBOSITY=3');
             $_ENV['SHELL_VERBOSITY'] = 3;
             $_SERVER['SHELL_VERBOSITY'] = 3;
@@ -451,8 +451,11 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $class = $this->getContainerClass();
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
         $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $this->debug);
-        $fresh = true;
-        if (!$cache->isFresh()) {
+        if ($fresh = $cache->isFresh()) {
+            $this->container = require $cache->getPath();
+            $fresh = \is_object($this->container);
+        }
+        if (!$fresh) {
             if ($this->debug) {
                 $collectedLogs = array();
                 $previousHandler = set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
@@ -502,11 +505,9 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $oldContainer = file_exists($cache->getPath()) && is_object($oldContainer = @include $cache->getPath()) ? new \ReflectionClass($oldContainer) : false;
 
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-
-            $fresh = false;
+            $this->container = require $cache->getPath();
         }
 
-        $this->container = require $cache->getPath();
         $this->container->set('kernel', $this);
 
         if ($fresh) {

@@ -488,6 +488,10 @@ class XmlFileLoader extends FileLoader
                     $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior);
                     break;
                 case 'expression':
+                    if (!class_exists(Expression::class)) {
+                        throw new \LogicException(sprintf('The type="expression" attribute cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".'));
+                    }
+
                     $arguments[$key] = new Expression($arg->nodeValue);
                     break;
                 case 'collection':

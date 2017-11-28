@@ -21,5 +21,10 @@
             <argument type="service" id="request_stack" on-invalid="ignore" />
         </service>
         <service id="Symfony\Component\Security\Csrf\CsrfTokenManagerInterface" alias="security.csrf.token_manager" />
+
+        <service id="twig.extension.security_csrf" class="Symfony\Bridge\Twig\Extension\CsrfExtension">
+            <tag name="twig.extension" />
+            <argument type="service" id="security.csrf.token_manager" />
+        </service>
     </services>
 </container>

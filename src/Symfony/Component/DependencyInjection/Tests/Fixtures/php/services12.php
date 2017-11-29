@@ -12,29 +12,38 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  */
-class ProjectServiceContainer extends Container
+class Symfony_DI_PhpDumper_Test_Relative_Dir extends Container
 {
+    const SAME_DIR = __DIR__ === '%path%/src/Symfony/Component/DependencyInjection/Tests/Fixtures';
+    const TARGET_DIR_1 = '%path%/src/Symfony/Component/DependencyInjection/Tests';
+    const TARGET_DIR_2 = '%path%/src/Symfony/Component/DependencyInjection';
+    const TARGET_DIR_3 = '%path%/src/Symfony/Component';
+    const TARGET_DIR_4 = '%path%/src/Symfony';
+    const TARGET_DIR_5 = '%path%/src';
+
     private $parameters;
     private $targetDirs = array();
+    protected $methodMap = array(
+        'test' => 'getTestService',
+    );
+
+    protected $aliases = array();
 
     public function __construct()
     {
-        $dir = __DIR__;
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = dirname($dir);
+        if (!self::SAME_DIR) {
+            $this->targetDirs = array();
+            $dir = __DIR__;
+            for ($i = 1; $i <= 5; ++$i) {
+                $this->targetDirs[$i] = $dir = dirname($dir);
+            }
         }
-        $this->parameters = $this->getDefaultParameters();
-
-        $this->services =
-        $this->scopedServices =
-        $this->scopeStacks = array();
-        $this->scopes = array();
-        $this->scopeChildren = array();
-        $this->methodMap = array(
-            'test' => 'getTestService',
+        $this->parameters = array(
+            'foo' => ('wiz'.(self::SAME_DIR ? self::TARGET_DIR_1 : $this->targetDirs[1])),
+            'bar' => __DIR__,
+            'baz' => (__DIR__.'/PhpDumperTest.php'),
+            'buz' => (self::SAME_DIR ? self::TARGET_DIR_2 : $this->targetDirs[2]),
         );
-
-        $this->aliases = array();
     }
 
     /**
@@ -60,7 +69,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')));
+        return $this->services['test'] = new \stdClass(('wiz'.(self::SAME_DIR ? self::TARGET_DIR_1 : $this->targetDirs[1])), array(('wiz'.(self::SAME_DIR ? self::TARGET_DIR_1 : $this->targetDirs[1])) => ((self::SAME_DIR ? self::TARGET_DIR_2 : $this->targetDirs[2]).'/')));
     }
 
     /**
@@ -105,20 +114,5 @@ class ProjectServiceContainer extends Container
         }
 
         return $this->parameterBag;
-    }
-
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return array(
-            'foo' => ('wiz'.$this->targetDirs[1]),
-            'bar' => __DIR__,
-            'baz' => (__DIR__.'/PhpDumperTest.php'),
-            'buz' => $this->targetDirs[2],
-        );
     }
 }

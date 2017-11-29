@@ -16,21 +16,18 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
+    protected $methodMap = array(
+        'test' => 'getTestService',
+    );
+
+    protected $aliases = array();
 
     public function __construct()
     {
-        $this->parameters = $this->getDefaultParameters();
-
-        $this->services =
-        $this->scopedServices =
-        $this->scopeStacks = array();
-        $this->scopes = array();
-        $this->scopeChildren = array();
-        $this->methodMap = array(
-            'test' => 'getTestService',
+        $this->parameters = array(
+            'empty_value' => '',
+            'some_string' => '-',
         );
-
-        $this->aliases = array();
     }
 
     /**
@@ -101,18 +98,5 @@ class ProjectServiceContainer extends Container
         }
 
         return $this->parameterBag;
-    }
-
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return array(
-            'empty_value' => '',
-            'some_string' => '-',
-        );
     }
 }

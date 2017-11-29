@@ -16,36 +16,34 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
+    protected $methodMap = array(
+        'bar' => 'getBarService',
+        'baz' => 'getBazService',
+        'configured_service' => 'getConfiguredServiceService',
+        'decorator_service' => 'getDecoratorServiceService',
+        'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
+        'factory_service' => 'getFactoryServiceService',
+        'foo' => 'getFooService',
+        'foo.baz' => 'getFoo_BazService',
+        'foo_bar' => 'getFooBarService',
+        'foo_with_inline' => 'getFooWithInlineService',
+        'method_call1' => 'getMethodCall1Service',
+        'new_factory_service' => 'getNewFactoryServiceService',
+        'request' => 'getRequestService',
+        'service_from_static_method' => 'getServiceFromStaticMethodService',
+    );
+    protected $aliases = array(
+        'alias_for_alias' => 'foo',
+        'alias_for_foo' => 'foo',
+        'decorated' => 'decorator_service_with_name',
+    );
 
     public function __construct()
     {
-        $this->parameters = $this->getDefaultParameters();
-
-        $this->services =
-        $this->scopedServices =
-        $this->scopeStacks = array();
-        $this->scopes = array();
-        $this->scopeChildren = array();
-        $this->methodMap = array(
-            'bar' => 'getBarService',
-            'baz' => 'getBazService',
-            'configured_service' => 'getConfiguredServiceService',
-            'decorator_service' => 'getDecoratorServiceService',
-            'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
-            'factory_service' => 'getFactoryServiceService',
-            'foo' => 'getFooService',
-            'foo.baz' => 'getFoo_BazService',
-            'foo_bar' => 'getFooBarService',
-            'foo_with_inline' => 'getFooWithInlineService',
-            'method_call1' => 'getMethodCall1Service',
-            'new_factory_service' => 'getNewFactoryServiceService',
-            'request' => 'getRequestService',
-            'service_from_static_method' => 'getServiceFromStaticMethodService',
-        );
-        $this->aliases = array(
-            'alias_for_alias' => 'foo',
-            'alias_for_foo' => 'foo',
-            'decorated' => 'decorator_service_with_name',
+        $this->parameters = array(
+            'baz_class' => 'BazClass',
+            'foo_class' => 'Bar\\FooClass',
+            'foo' => 'bar',
         );
     }
 
@@ -218,8 +216,8 @@ class ProjectServiceContainer extends Container
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
         $instance->setBar($this->get('foo'));
-        $instance->setBar(NULL);
-        $instance->setBar(($this->get("foo")->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
+        $instance->setBar(null);
+        $instance->setBar(($this->get('foo')->foo().(($this->hasParameter('foo')) ? ($this->getParameter('foo')) : ('default'))));
 
         return $instance;
     }
@@ -303,19 +301,5 @@ class ProjectServiceContainer extends Container
         }
 
         return $this->parameterBag;
-    }
-
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return array(
-            'baz_class' => 'BazClass',
-            'foo_class' => 'Bar\\FooClass',
-            'foo' => 'bar',
-        );
     }
 }

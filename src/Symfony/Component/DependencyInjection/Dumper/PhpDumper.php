@@ -52,6 +52,8 @@ class PhpDumper extends Dumper
     private $variableCount;
     private $reservedVariables = array('instance', 'class');
     private $expressionLanguage;
+    private $targetDir;
+    private $targetDirs;
     private $targetDirRegex;
     private $targetDirMaxMatches;
     private $docStar;
@@ -111,8 +113,9 @@ class PhpDumper extends Dumper
             // but every other sub-dir is optional up to the full path in $dir
             // Mandate at least 2 root dirs and not more that 5 optional dirs.
 
-            $dir = explode(DIRECTORY_SEPARATOR, realpath($dir));
-            $i = count($dir);
+            $this->targetDir = realpath($dir);
+            $dirs = explode(DIRECTORY_SEPARATOR, $this->targetDir);
+            $i = count($dirs);
 
             if (3 <= $i) {
                 $regex = '';
@@ -120,18 +123,24 @@ class PhpDumper extends Dumper
                 $this->targetDirMaxMatches = $i - $lastOptionalDir;
 
                 while (--$i >= $lastOptionalDir) {
-                    $regex = sprintf('(%s%s)?', preg_quote(DIRECTORY_SEPARATOR.$dir[$i], '#'), $regex);
+                    $regex = sprintf('(%s%s)?', preg_quote(DIRECTORY_SEPARATOR.$dirs[$i], '#'), $regex);
                 }
 
                 do {
-                    $regex = preg_quote(DIRECTORY_SEPARATOR.$dir[$i], '#').$regex;
+                    $regex = preg_quote(DIRECTORY_SEPARATOR.$dirs[$i], '#').$regex;
                 } while (0 < --$i);
 
-                $this->targetDirRegex = '#'.preg_quote($dir[0], '#').$regex.'#';
+                $this->targetDirRegex = '#'.preg_quote($dirs[0], '#').$regex.'#';
+
+                for ($i = 1; $i <= $this->targetDirMaxMatches; ++$i) {
+                    $this->targetDirs[$i] = $dir = dirname($dir);
+                }
             }
         }
 
         $code = $this->startClass($options['class'], $options['base_class'], $options['namespace']);
+        $code .= $this->addClassConstants();
+        $code .= $this->addProperties();
 
         if ($this->container->isFrozen()) {
             $code .= $this->addFrozenConstructor();
@@ -143,7 +152,7 @@ class PhpDumper extends Dumper
 
         $code .=
             $this->addServices().
-            $this->addDefaultParametersMethod().
+            $this->addParametersMethods().
             $this->endClass().
             $this->addProxyClasses()
         ;
@@ -791,7 +800,7 @@ EOF;
         $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
         $namespaceLine = $namespace ? "\nnamespace $namespace;\n" : '';
 
-        return <<<EOF
+        $code = <<<EOF
 <?php
 $namespaceLine
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -808,10 +817,10 @@ $bagClass
  */
 class $class extends $baseClass
 {
-    private \$parameters;
-    private \$targetDirs = array();
-
+    
 EOF;
+
+        return $code;
     }
 
     /**
@@ -822,26 +831,18 @@ EOF;
     private function addConstructor()
     {
         $targetDirs = $this->exportTargetDirs();
-        $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
+        if ($this->container->getParameterBag()->all()) {
+            $parameters = $this->exportParameters($this->container->getParameterBag()->all());
+            $arguments = "new ParameterBag($parameters)";
+        } else {
+            $arguments = '';
+        }
 
         $code = <<<EOF
 
     public function __construct()
     {{$targetDirs}
         parent::__construct($arguments);
-
-EOF;
-
-        if (count($scopes = $this->container->getScopes()) > 0) {
-            $code .= "\n";
-            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
-            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren()).";\n";
-        }
-
-        $code .= $this->addMethodMap();
-        $code .= $this->addAliases();
-
-        $code .= <<<'EOF'
     }
 
 EOF;
@@ -858,41 +859,21 @@ EOF;
     {
         $targetDirs = $this->exportTargetDirs();
 
-        $code = <<<EOF
+        if ($this->container->getParameterBag()->all()) {
+            $parameters = $this->exportParameters($this->container->getParameterBag()->all());
+            $parametersStatement = "\$this->parameters = $parameters;";
+        } else {
+            $parametersStatement = '';
+        }
+
+        return <<<EOF
 
     public function __construct()
     {{$targetDirs}
-EOF;
-
-        if ($this->container->getParameterBag()->all()) {
-            $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
-        }
-
-        $code .= <<<'EOF'
-
-        $this->services =
-        $this->scopedServices =
-        $this->scopeStacks = array();
-EOF;
-
-        $code .= "\n";
-        if (count($scopes = $this->container->getScopes()) > 0) {
-            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
-            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren()).";\n";
-        } else {
-            $code .= "        \$this->scopes = array();\n";
-            $code .= "        \$this->scopeChildren = array();\n";
-        }
-
-        $code .= $this->addMethodMap();
-        $code .= $this->addAliases();
-
-        $code .= <<<'EOF'
+        $parametersStatement
     }
 
 EOF;
-
-        return $code;
     }
 
     /**
@@ -935,24 +916,76 @@ EOF;
 EOF;
     }
 
+    private function addClassConstants()
+    {
+        // see https://blackfire.io/profiles/compare/b7da29a0-68eb-47f8-8e83-568a4d0d78f8/graph
+        if ($this->targetDirRegex) {
+            $code = <<<EOF
+
+    const SAME_DIR = __DIR__ === '{$this->targetDir}';
+
+EOF;
+            foreach ($this->targetDirs as $index => $dir) {
+                $code .= "    const TARGET_DIR_{$index} = '$dir';\n";
+            }
+        } else {
+            $code = '';
+        }
+
+        return $code;
+    }
+
+    private function addProperties()
+    {
+        $code = <<<EOF
+                
+    private \$parameters;
+    private \$targetDirs = array();
+
+EOF;
+
+        $code .= $this->addScopesProperties();
+        $code .= $this->addMethodMapProperty();
+        $code .= $this->addAliasesProperty();
+
+        return $code;
+    }
+
+    private function addScopesProperties()
+    {
+        $code = '';
+        if (count($scopes = $this->container->getScopes()) > 0) {
+            $scopesDump = $this->dumpValue($scopes);
+            $scopesChildrenDump = $this->dumpValue($this->container->getScopeChildren());
+            $code .= <<<EOF
+                    
+    protected \$scopes = $scopesDump;
+    protected \$scopeChildren = $scopesChildrenDump;
+
+EOF;
+        }
+
+        return $code;
+    }
+
     /**
      * Adds the methodMap property definition.
      *
      * @return string
      */
-    private function addMethodMap()
+    private function addMethodMapProperty()
     {
         if (!$definitions = $this->container->getDefinitions()) {
             return '';
         }
 
-        $code = "        \$this->methodMap = array(\n";
+        $code = "    protected \$methodMap = array(\n";
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            $code .= '            '.var_export($id, true).' => '.var_export('get'.$this->camelize($id).'Service', true).",\n";
+            $code .= '        '.var_export($id, true).' => '.var_export('get'.$this->camelize($id).'Service', true).",\n";
         }
 
-        return $code."        );\n";
+        return $code."    );\n";
     }
 
     /**
@@ -960,23 +993,23 @@ EOF;
      *
      * @return string
      */
-    private function addAliases()
+    private function addAliasesProperty()
     {
         if (!$aliases = $this->container->getAliases()) {
-            return $this->container->isFrozen() ? "\n        \$this->aliases = array();\n" : '';
+            return $this->container->isFrozen() ? "\n    protected \$aliases = array();\n" : '';
         }
 
-        $code = "        \$this->aliases = array(\n";
+        $code = "    protected \$aliases = array(\n";
         ksort($aliases);
         foreach ($aliases as $alias => $id) {
             $id = (string) $id;
             while (isset($aliases[$id])) {
                 $id = (string) $aliases[$id];
             }
-            $code .= '            '.var_export($alias, true).' => '.var_export($id, true).",\n";
+            $code .= '        '.var_export($alias, true).' => '.var_export($id, true).",\n";
         }
 
-        return $code."        );\n";
+        return $code."    );\n";
     }
 
     /**
@@ -984,13 +1017,11 @@ EOF;
      *
      * @return string
      */
-    private function addDefaultParametersMethod()
+    private function addParametersMethods()
     {
         if (!$this->container->getParameterBag()->all()) {
             return '';
         }
-
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
 
         $code = '';
         if ($this->container->isFrozen()) {
@@ -1045,20 +1076,6 @@ EOF;
                 $code = str_replace('/**', '/*', $code);
             }
         }
-
-        $code .= <<<EOF
-
-    /*{$this->docStar}
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return $parameters;
-    }
-
-EOF;
 
         return $code;
     }
@@ -1529,10 +1546,13 @@ EOF;
     private function exportTargetDirs()
     {
         return null === $this->targetDirRegex ? '' : <<<EOF
-
-        \$dir = __DIR__;
-        for (\$i = 1; \$i <= {$this->targetDirMaxMatches}; ++\$i) {
-            \$this->targetDirs[\$i] = \$dir = dirname(\$dir);
+        
+        if (!self::SAME_DIR) {
+            \$this->targetDirs = array();    
+            \$dir = __DIR__;
+            for (\$i = 1; \$i <= {$this->targetDirMaxMatches}; ++\$i) {
+                \$this->targetDirs[\$i] = \$dir = dirname(\$dir);
+            }
         }
 EOF;
     }
@@ -1546,7 +1566,7 @@ EOF;
             $dirname = '__DIR__';
 
             if (0 < $offset = 1 + $this->targetDirMaxMatches - count($matches)) {
-                $dirname = sprintf('$this->targetDirs[%d]', $offset);
+                $dirname = sprintf('(self::SAME_DIR ? self::TARGET_DIR_%d : $this->targetDirs[%d])', $offset, $offset);
             }
 
             if ($prefix || $suffix) {

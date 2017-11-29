@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
@@ -106,6 +108,48 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame(array(NonInstantiableController::class, 'action'), $controller);
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Controller "Symfony\Component\HttpKernel\Tests\Controller\ImpossibleConstructController" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?
+     */
+    public function testNonConstructController()
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $container->expects($this->at(0))
+            ->method('has')
+            ->with(ImpossibleConstructController::class)
+            ->will($this->returnValue(true))
+        ;
+
+        $container->expects($this->at(1))
+            ->method('has')
+            ->with(ImpossibleConstructController::class)
+            ->will($this->returnValue(false))
+        ;
+
+        $container->expects($this->atLeastOnce())
+            ->method('getRemovedIds')
+            ->with()
+            ->will($this->returnValue(array(ImpossibleConstructController::class)))
+        ;
+
+        $resolver = $this->createControllerResolver(null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', array(ImpossibleConstructController::class, 'action'));
+
+        if (\PHP_VERSION_ID < 70100) {
+            ErrorHandler::register();
+            try {
+                $resolver->getController($request);
+            } finally {
+                restore_error_handler();
+                restore_exception_handler();
+            }
+        } else {
+            $resolver->getController($request);
+        }
+    }
+
     public function testNonInstantiableControllerWithCorrespondingService()
     {
         $service = new \stdClass();
@@ -193,6 +237,17 @@ class InvokableController
 abstract class NonInstantiableController
 {
     public static function action()
+    {
+    }
+}
+
+class ImpossibleConstructController
+{
+    public function __construct($toto, $controller)
+    {
+    }
+
+    public function action()
     {
     }
 }

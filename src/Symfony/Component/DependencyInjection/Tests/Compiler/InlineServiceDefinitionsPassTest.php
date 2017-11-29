@@ -92,6 +92,25 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertNotSame($container->getDefinition('bar'), $arguments[2]);
     }
 
+    public function testProcessInlinesMixedServicesLoop()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->addArgument(new Reference('bar'))
+            ->setShared(false)
+        ;
+        $container
+            ->register('bar')
+            ->setPublic(false)
+            ->addMethodCall('setFoo', array(new Reference('foo')))
+        ;
+
+        $this->process($container);
+
+        $this->assertEquals($container->getDefinition('foo')->getArgument(0), $container->getDefinition('bar'));
+    }
+
     public function testProcessInlinesIfMultipleReferencesButAllFromTheSameDefinition()
     {
         $container = new ContainerBuilder();

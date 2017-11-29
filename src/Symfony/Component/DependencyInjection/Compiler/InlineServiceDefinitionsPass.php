@@ -47,10 +47,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             if ($this->isInlineableDefinition($id, $definition, $this->container->getCompiler()->getServiceReferenceGraph())) {
                 $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
 
-                if ($definition->isShared()) {
-                    return $definition;
-                }
-                $value = clone $definition;
+                return $definition->isShared() ? $definition : clone $definition;
             }
         }
 

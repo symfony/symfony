@@ -129,6 +129,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $allowedAttributes;
         }
 
+        if (isset($context['attributes'])) {
+            return $this->extractAttributes($object, $format, $context);
+        }
+
         if (isset($this->attributesCache[$class])) {
             return $this->attributesCache[$class];
         }

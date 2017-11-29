@@ -110,9 +110,25 @@ class MergeExtensionConfigurationPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new BarExtension());
-        $container->prependExtensionConfig('bar', array());
+        $container->prependExtensionConfig('bar', []);
 
         (new MergeExtensionConfigurationPass())->process($container);
+    }
+
+    public function testThrowingExtensionsGetMergedBag()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new ThrowingExtension());
+        $container->prependExtensionConfig('throwing', array('bar' => '%env(FOO)%'));
+
+        try {
+            $pass = new MergeExtensionConfigurationPass();
+            $pass->process($container);
+            $this->fail('An exception should have been thrown.');
+        } catch (\Exception $e) {
+        }
+
+        $this->assertSame(array('FOO'), array_keys($container->getParameterBag()->getEnvPlaceholders()));
     }
 }
 
@@ -161,5 +177,23 @@ class BarExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $container->resolveEnvPlaceholders('%env(int:FOO)%', true);
+    }
+}
+
+class ThrowingExtension extends Extension
+{
+    public function getAlias()
+    {
+        return 'throwing';
+    }
+
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new FooConfiguration();
+    }
+
+    public function load(array $configs, ContainerBuilder $container)
+    {
+        throw new \Exception();
     }
 }

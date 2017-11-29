@@ -402,6 +402,7 @@ class Inline
         $output = array();
         $len = strlen($mapping);
         ++$i;
+        $allowOverwrite = false;
 
         // {foo: bar, bar:foo, ...}
         while ($i < $len) {
@@ -443,6 +444,10 @@ class Inline
                 throw new ParseException('Colons must be followed by a space or an indication character (i.e. " ", ",", "[", "]", "{", "}").', self::$parsedLineNumber + 1, $mapping);
             }
 
+            if ('<<' === $key) {
+                $allowOverwrite = true;
+            }
+
             while ($i < $len) {
                 if (':' === $mapping[$i] || ' ' === $mapping[$i]) {
                     ++$i;
@@ -458,7 +463,18 @@ class Inline
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
-                        if (isset($output[$key])) {
+                        // But overwriting is allowed when a merge node is used in current block.
+                        if ('<<' === $key) {
+                            foreach ($value as $parsedValue) {
+                                $output += $parsedValue;
+                            }
+                        } elseif ($allowOverwrite || !isset($output[$key])) {
+                            if (null !== $tag) {
+                                $output[$key] = new TaggedValue($tag, $value);
+                            } else {
+                                $output[$key] = $value;
+                            }
+                        } elseif (isset($output[$key])) {
                             throw new ParseException(sprintf('Duplicate key "%s" detected.', $key), self::$parsedLineNumber + 1, $mapping);
                         }
                         break;
@@ -468,7 +484,16 @@ class Inline
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
-                        if (isset($output[$key])) {
+                        // But overwriting is allowed when a merge node is used in current block.
+                        if ('<<' === $key) {
+                            $output += $value;
+                        } elseif ($allowOverwrite || !isset($output[$key])) {
+                            if (null !== $tag) {
+                                $output[$key] = new TaggedValue($tag, $value);
+                            } else {
+                                $output[$key] = $value;
+                            }
+                        } elseif (isset($output[$key])) {
                             throw new ParseException(sprintf('Duplicate key "%s" detected.', $key), self::$parsedLineNumber + 1, $mapping);
                         }
                         break;
@@ -477,18 +502,20 @@ class Inline
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
-                        if (isset($output[$key])) {
+                        // But overwriting is allowed when a merge node is used in current block.
+                        if ('<<' === $key) {
+                            $output += $value;
+                        } elseif ($allowOverwrite || !isset($output[$key])) {
+                            if (null !== $tag) {
+                                $output[$key] = new TaggedValue($tag, $value);
+                            } else {
+                                $output[$key] = $value;
+                            }
+                        } elseif (isset($output[$key])) {
                             throw new ParseException(sprintf('Duplicate key "%s" detected.', $key), self::$parsedLineNumber + 1, $mapping);
                         }
                         --$i;
                 }
-
-                if (null !== $tag && '' !== $tag) {
-                    $output[$key] = new TaggedValue($tag, $value);
-                } else {
-                    $output[$key] = $value;
-                }
-
                 ++$i;
 
                 continue 2;

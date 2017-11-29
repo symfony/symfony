@@ -1473,6 +1473,7 @@ class Request
      * @see getRequestedResponseFormat()
      *
      * @param string $default
+     *
      * @return string
      */
     public function getRequestFormat($default = 'html')
@@ -1909,7 +1910,7 @@ class Request
 
         // Does the baseUrl have anything in common with the request_uri?
         $requestUri = $this->getRequestUri();
-        if ($requestUri !== '' && $requestUri[0] !== '/') {
+        if ('' !== $requestUri && '/' !== $requestUri[0]) {
             $requestUri = '/'.$requestUri;
         }
 
@@ -1985,7 +1986,7 @@ class Request
         if (false !== $pos = strpos($requestUri, '?')) {
             $requestUri = substr($requestUri, 0, $pos);
         }
-        if ($requestUri !== '' && $requestUri[0] !== '/') {
+        if ('' !== $requestUri && '/' !== $requestUri[0]) {
             $requestUri = '/'.$requestUri;
         }
 

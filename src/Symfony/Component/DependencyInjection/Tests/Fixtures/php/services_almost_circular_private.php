@@ -24,7 +24,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
     {
         $this->services = $this->privates = array();
         $this->methodMap = array(
+            'bar2' => 'getBar2Service',
+            'bar3' => 'getBar3Service',
             'foo' => 'getFooService',
+            'foo2' => 'getFoo2Service',
+            'foobar4' => 'getFoobar4Service',
         );
 
         $this->aliases = array();
@@ -52,8 +56,41 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'bar' => true,
+            'foo4' => true,
             'foobar' => true,
+            'foobar2' => true,
+            'foobar3' => true,
         );
+    }
+
+    /**
+     * Gets the public 'bar2' shared service.
+     *
+     * @return \BarCircular
+     */
+    protected function getBar2Service()
+    {
+        $this->services['bar2'] = $instance = new \BarCircular();
+
+        $instance->addFoobar(new \FoobarCircular(($this->services['foo2'] ?? $this->getFoo2Service())));
+
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'bar3' shared service.
+     *
+     * @return \BarCircular
+     */
+    protected function getBar3Service()
+    {
+        $this->services['bar3'] = $instance = new \BarCircular();
+
+        $a = new \FoobarCircular();
+
+        $instance->addFoobar($a, $a);
+
+        return $instance;
     }
 
     /**
@@ -69,6 +106,37 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
 
         $a->addFoobar(new \FoobarCircular($instance));
 
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'foo2' shared service.
+     *
+     * @return \FooCircular
+     */
+    protected function getFoo2Service()
+    {
+        $a = ($this->services['bar2'] ?? $this->getBar2Service());
+
+        if (isset($this->services['foo2'])) {
+            return $this->services['foo2'];
+        }
+
+        return $this->services['foo2'] = new \FooCircular($a);
+    }
+
+    /**
+     * Gets the public 'foobar4' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getFoobar4Service()
+    {
+        $a = new \stdClass();
+
+        $this->services['foobar4'] = $instance = new \stdClass($a);
+
+        $a->foobar = $instance;
 
         return $instance;
     }

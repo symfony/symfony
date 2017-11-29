@@ -52,7 +52,6 @@ class PhpDumper extends Dumper
      */
     const NON_FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 
-    private $inlinedDefinitions;
     private $definitionVariables;
     private $referenceVariables;
     private $variableCount;
@@ -85,8 +84,6 @@ class PhpDumper extends Dumper
         }
 
         parent::__construct($container);
-
-        $this->inlinedDefinitions = new \SplObjectStorage();
     }
 
     /**
@@ -143,6 +140,7 @@ class PhpDumper extends Dumper
             $currentPath = array($id => $id);
             $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
         }
+        $this->container->getCompiler()->getServiceReferenceGraph()->clear();
 
         $this->docStar = $options['debug'] ? '*' : '';
 
@@ -272,54 +270,46 @@ EOF;
         return $this->proxyDumper;
     }
 
-    private function addServiceLocalTempVariables(string $cId, Definition $definition, array $inlinedDefinitions): string
+    private function addServiceLocalTempVariables(string $cId, Definition $definition, \SplObjectStorage $inlinedDefinitions, \SplObjectStorage $allInlinedDefinitions): string
     {
-        static $template = "        \$%s = %s;\n";
+        $allCalls = $calls = $behavior = array();
 
-        array_unshift($inlinedDefinitions, $definition);
+        foreach ($allInlinedDefinitions as $def) {
+            $arguments = array($def->getArguments(), $def->getFactory(), $def->getProperties(), $def->getMethodCalls(), $def->getConfigurator());
+            $this->getServiceCallsFromArguments($arguments, $allCalls, false, $cId, $behavior, $allInlinedDefinitions[$def]);
+        }
 
-        $collectLineage = $this->inlineRequires && !$this->isHotPath($definition);
-        $isNonLazyShared = isset($this->circularReferences[$cId]) && !$this->getProxyDumper()->isProxyCandidate($definition) && $definition->isShared();
-        $lineage = $calls = $behavior = array();
-        foreach ($inlinedDefinitions as $iDefinition) {
-            if ($collectLineage && !$iDefinition->isDeprecated() && $class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()) {
-                $this->collectLineage($class, $lineage);
+        $isPreInstance = isset($inlinedDefinitions[$definition]) && isset($this->circularReferences[$cId]) && !$this->getProxyDumper()->isProxyCandidate($definition) && $definition->isShared();
+        foreach ($inlinedDefinitions as $def) {
+            $this->getServiceCallsFromArguments(array($def->getArguments(), $def->getFactory()), $calls, $isPreInstance, $cId);
+            if ($def !== $definition) {
+                $arguments = array($def->getProperties(), $def->getMethodCalls(), $def->getConfigurator());
+                $this->getServiceCallsFromArguments($arguments, $calls, $isPreInstance && !$this->hasReference($cId, $arguments, true), $cId);
             }
-            $this->getServiceCallsFromArguments($iDefinition->getArguments(), $calls, $behavior, $isNonLazyShared, $cId);
-            $isPreInstantiation = $isNonLazyShared && $iDefinition !== $definition && !$this->hasReference($cId, $iDefinition->getMethodCalls(), true) && !$this->hasReference($cId, $iDefinition->getProperties(), true);
-            $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior, $isPreInstantiation, $cId);
-            $this->getServiceCallsFromArguments($iDefinition->getProperties(), $calls, $behavior, $isPreInstantiation, $cId);
-            $this->getServiceCallsFromArguments(array($iDefinition->getConfigurator()), $calls, $behavior, $isPreInstantiation, $cId);
-            $this->getServiceCallsFromArguments(array($iDefinition->getFactory()), $calls, $behavior, $isNonLazyShared, $cId);
+        }
+        if (!isset($inlinedDefinitions[$definition])) {
+            $arguments = array($definition->getProperties(), $definition->getMethodCalls(), $definition->getConfigurator());
+            $this->getServiceCallsFromArguments($arguments, $calls, false, $cId);
         }
 
         $code = '';
         foreach ($calls as $id => $callCount) {
-            if ('service_container' === $id || $id === $cId) {
+            if ('service_container' === $id || $id === $cId || isset($this->referenceVariables[$id])) {
+                continue;
+            }
+            if ($callCount <= 1 && $allCalls[$id] <= 1) {
                 continue;
             }
 
-            if ($collectLineage && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE !== $behavior[$id] && $this->container->has($id)
-                && $this->isTrivialInstance($iDefinition = $this->container->findDefinition($id))
-                && $class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()
-            ) {
-                $this->collectLineage($class, $lineage);
-            }
+            $name = $this->getNextVariableName();
+            $this->referenceVariables[$id] = new Variable($name);
 
-            if ($callCount > 1) {
-                $name = $this->getNextVariableName();
-                $this->referenceVariables[$id] = new Variable($name);
-
-                if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $behavior[$id]) {
-                    $code .= sprintf($template, $name, $this->getServiceCall($id));
-                } else {
-                    $code .= sprintf($template, $name, $this->getServiceCall($id, new Reference($id, $behavior[$id])));
-                }
-            }
+            $reference = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $behavior[$id] ? new Reference($id, $behavior[$id]) : null;
+            $code .= sprintf("        \$%s = %s;\n", $name, $this->getServiceCall($id, $reference));
         }
 
         if ('' !== $code) {
-            if ($isNonLazyShared) {
+            if ($isPreInstance) {
                 $code .= sprintf(<<<'EOTXT'
 
         if (isset($this->%s['%s'])) {
@@ -333,14 +323,6 @@ EOTXT
             $code .= "\n";
         }
 
-        if ($lineage && $lineage = array_diff_key(array_flip($lineage), $this->inlinedRequires)) {
-            $code = "\n".$code;
-
-            foreach (array_reverse($lineage) as $file => $class) {
-                $code = sprintf("        require_once %s;\n", $file).$code;
-            }
-        }
-
         return $code;
     }
 
@@ -350,11 +332,6 @@ EOTXT
             $node = $edge->getDestNode();
             $id = $node->getId();
 
-            if (isset($checkedNodes[$id])) {
-                continue;
-            }
-            $checkedNodes[$id] = true;
-
             if ($node->getValue() && ($edge->isLazy() || $edge->isWeak())) {
                 // no-op
             } elseif (isset($currentPath[$id])) {
@@ -362,10 +339,11 @@ EOTXT
                     $this->circularReferences[$parentId][$id] = $id;
                     $id = $parentId;
                 }
-            } else {
+            } elseif (!isset($checkedNodes[$id])) {
+                $checkedNodes[$id] = true;
                 $currentPath[$id] = $id;
                 $this->analyzeCircularReferences($node->getOutEdges(), $checkedNodes, $currentPath);
-                array_pop($currentPath);
+                unset($currentPath[$id]);
             }
         }
     }
@@ -420,18 +398,39 @@ EOTXT
         }
     }
 
-    private function addServiceInclude(Definition $definition, array $inlinedDefinitions): string
+    private function addServiceInclude(string $cId, Definition $definition, \SplObjectStorage $inlinedDefinitions): string
     {
-        $template = "        require_once %s;\n";
         $code = '';
 
-        if (null !== $file = $definition->getFile()) {
-            $code .= sprintf($template, $this->dumpValue($file));
+        if ($this->inlineRequires && !$this->isHotPath($definition)) {
+            $lineage = $calls = $behavior = array();
+            foreach ($inlinedDefinitions as $def) {
+                if (!$def->isDeprecated() && $class = is_array($factory = $def->getFactory()) && is_string($factory[0]) ? $factory[0] : $def->getClass()) {
+                    $this->collectLineage($class, $lineage);
+                }
+                $arguments = array($def->getArguments(), $def->getFactory(), $def->getProperties(), $def->getMethodCalls(), $def->getConfigurator());
+                $this->getServiceCallsFromArguments($arguments, $calls, false, $cId, $behavior, $inlinedDefinitions[$def]);
+            }
+
+            foreach ($calls as $id => $callCount) {
+                if ('service_container' !== $id && $id !== $cId
+                    && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE !== $behavior[$id]
+                    && $this->container->has($id)
+                    && $this->isTrivialInstance($def = $this->container->findDefinition($id))
+                    && $class = is_array($factory = $def->getFactory()) && is_string($factory[0]) ? $factory[0] : $def->getClass()
+                ) {
+                    $this->collectLineage($class, $lineage);
+                }
+            }
+
+            foreach (array_diff_key(array_flip($lineage), $this->inlinedRequires) as $file => $class) {
+                $code .= sprintf("        require_once %s;\n", $file);
+            }
         }
 
-        foreach ($inlinedDefinitions as $definition) {
-            if (null !== $file = $definition->getFile()) {
-                $code .= sprintf($template, $this->dumpValue($file));
+        foreach ($inlinedDefinitions as $def) {
+            if ($file = $def->getFile()) {
+                $code .= sprintf("        require_once %s;\n", $this->dumpValue($file));
             }
         }
 
@@ -448,54 +447,46 @@ EOTXT
      * @throws RuntimeException                  When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
      */
-    private function addServiceInlinedDefinitions(string $id, array $inlinedDefinitions): string
+    private function addServiceInlinedDefinitions(string $id, Definition $definition, \SplObjectStorage $inlinedDefinitions, bool &$isSimpleInstance): string
     {
         $code = '';
-        $variableMap = $this->definitionVariables;
-        $nbOccurrences = new \SplObjectStorage();
-        $processed = new \SplObjectStorage();
 
-        foreach ($inlinedDefinitions as $definition) {
-            if (false === $nbOccurrences->contains($definition)) {
-                $nbOccurrences->offsetSet($definition, 1);
-            } else {
-                $i = $nbOccurrences->offsetGet($definition);
-                $nbOccurrences->offsetSet($definition, $i + 1);
-            }
-        }
-
-        foreach ($inlinedDefinitions as $sDefinition) {
-            if ($processed->contains($sDefinition)) {
+        foreach ($inlinedDefinitions as $def) {
+            if ($definition === $def) {
                 continue;
             }
-            $processed->offsetSet($sDefinition);
-
-            $class = $this->dumpValue($sDefinition->getClass());
-            if ($nbOccurrences->offsetGet($sDefinition) > 1 || $sDefinition->getMethodCalls() || $sDefinition->getProperties() || null !== $sDefinition->getConfigurator() || false !== strpos($class, '$')) {
-                $name = $this->getNextVariableName();
-                $variableMap->offsetSet($sDefinition, new Variable($name));
-
-                // a construct like:
-                // $a = new ServiceA(ServiceB $b); $b = new ServiceB(ServiceA $a);
-                // this is an indication for a wrong implementation, you can circumvent this problem
-                // by setting up your service structure like this:
-                // $b = new ServiceB();
-                // $a = new ServiceA(ServiceB $b);
-                // $b->setServiceA(ServiceA $a);
-                if ($this->hasReference($id, $sDefinition->getArguments())) {
-                    throw new ServiceCircularReferenceException($id, array($id));
-                }
-
-                $code .= $this->addNewInstance($sDefinition, '$'.$name, ' = ', $id);
-
-                if (!$this->hasReference($id, $sDefinition->getMethodCalls(), true) && !$this->hasReference($id, $sDefinition->getProperties(), true)) {
-                    $code .= $this->addServiceProperties($sDefinition, $name);
-                    $code .= $this->addServiceMethodCalls($sDefinition, $name);
-                    $code .= $this->addServiceConfigurator($sDefinition, $name);
-                }
-
-                $code .= "\n";
+            if ($inlinedDefinitions[$def] <= 1 && !$def->getMethodCalls() && !$def->getProperties() && !$def->getConfigurator() && false === strpos($this->dumpValue($def->getClass()), '$')) {
+                continue;
             }
+            if (isset($this->definitionVariables[$def])) {
+                $name = $this->definitionVariables[$def];
+            } else {
+                $name = $this->getNextVariableName();
+                $this->definitionVariables[$def] = new Variable($name);
+            }
+
+            // a construct like:
+            // $a = new ServiceA(ServiceB $b); $b = new ServiceB(ServiceA $a);
+            // this is an indication for a wrong implementation, you can circumvent this problem
+            // by setting up your service structure like this:
+            // $b = new ServiceB();
+            // $a = new ServiceA(ServiceB $b);
+            // $b->setServiceA(ServiceA $a);
+            if ($this->hasReference($id, array($def->getArguments(), $def->getFactory()))) {
+                throw new ServiceCircularReferenceException($id, array($id));
+            }
+
+            $code .= $this->addNewInstance($def, '$'.$name, ' = ', $id);
+
+            if (!$this->hasReference($id, array($def->getProperties(), $def->getMethodCalls(), $def->getConfigurator()), true)) {
+                $code .= $this->addServiceProperties($def, $name);
+                $code .= $this->addServiceMethodCalls($def, $name);
+                $code .= $this->addServiceConfigurator($def, $name);
+            } else {
+                $isSimpleInstance = false;
+            }
+
+            $code .= "\n";
         }
 
         return $code;
@@ -536,21 +527,6 @@ EOTXT
         }
 
         return $code;
-    }
-
-    private function isSimpleInstance(string $id, Definition $definition, array $inlinedDefinitions): bool
-    {
-        foreach (array_merge(array($definition), $inlinedDefinitions) as $sDefinition) {
-            if ($definition !== $sDefinition && !$this->hasReference($id, $sDefinition->getMethodCalls())) {
-                continue;
-            }
-
-            if ($sDefinition->getMethodCalls() || $sDefinition->getProperties() || $sDefinition->getConfigurator()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private function isTrivialInstance(Definition $definition): bool
@@ -623,19 +599,13 @@ EOTXT
     /**
      * @throws ServiceCircularReferenceException when the container contains a circular reference
      */
-    private function addServiceInlinedDefinitionsSetup(string $id, array $inlinedDefinitions, bool $isSimpleInstance): string
+    private function addServiceInlinedDefinitionsSetup(string $id, Definition $definition, \SplObjectStorage $inlinedDefinitions, bool $isSimpleInstance): string
     {
         $this->referenceVariables[$id] = new Variable('instance');
 
         $code = '';
-        $processed = new \SplObjectStorage();
-        foreach ($inlinedDefinitions as $iDefinition) {
-            if ($processed->contains($iDefinition)) {
-                continue;
-            }
-            $processed->offsetSet($iDefinition);
-
-            if (!$this->hasReference($id, $iDefinition->getMethodCalls(), true) && !$this->hasReference($id, $iDefinition->getProperties(), true)) {
+        foreach ($inlinedDefinitions as $def) {
+            if ($definition === $def || !$this->hasReference($id, array($def->getProperties(), $def->getMethodCalls(), $def->getConfigurator()), true)) {
                 continue;
             }
 
@@ -645,13 +615,13 @@ EOTXT
                 throw new ServiceCircularReferenceException($id, array($id));
             }
 
-            $name = (string) $this->definitionVariables->offsetGet($iDefinition);
-            $code .= $this->addServiceProperties($iDefinition, $name);
-            $code .= $this->addServiceMethodCalls($iDefinition, $name);
-            $code .= $this->addServiceConfigurator($iDefinition, $name);
+            $name = (string) $this->definitionVariables[$def];
+            $code .= $this->addServiceProperties($def, $name);
+            $code .= $this->addServiceMethodCalls($def, $name);
+            $code .= $this->addServiceConfigurator($def, $name);
         }
 
-        if ('' !== $code) {
+        if ('' !== $code && ($definition->getProperties() || $definition->getMethodCalls() || $definition->getConfigurator())) {
             $code .= "\n";
         }
 
@@ -759,15 +729,28 @@ EOF;
             $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
         }
 
-        $inlinedDefinitions = $this->getInlinedDefinitions($definition);
-        $isSimpleInstance = $this->isSimpleInstance($id, $definition, $inlinedDefinitions);
+        $inlinedDefinitions = $this->getDefinitionsFromArguments(array($definition));
+        $constructorDefinitions = $this->getDefinitionsFromArguments(array($definition->getArguments(), $definition->getFactory()));
+        $otherDefinitions = new \SplObjectStorage();
+
+        foreach ($inlinedDefinitions as $def) {
+            if ($def === $definition || isset($constructorDefinitions[$def])) {
+                $constructorDefinitions[$def] = $inlinedDefinitions[$def];
+            } else {
+                $otherDefinitions[$def] = $inlinedDefinitions[$def];
+            }
+        }
+
+        $isSimpleInstance = !$definition->getProperties() && !$definition->getMethodCalls() && !$definition->getConfigurator();
 
         $code .=
-            $this->addServiceInclude($definition, $inlinedDefinitions).
-            $this->addServiceLocalTempVariables($id, $definition, $inlinedDefinitions).
-            $this->addServiceInlinedDefinitions($id, $inlinedDefinitions).
+            $this->addServiceInclude($id, $definition, $inlinedDefinitions).
+            $this->addServiceLocalTempVariables($id, $definition, $constructorDefinitions, $inlinedDefinitions).
+            $this->addServiceInlinedDefinitions($id, $definition, $constructorDefinitions, $isSimpleInstance).
             $this->addServiceInstance($id, $definition, $isSimpleInstance).
-            $this->addServiceInlinedDefinitionsSetup($id, $inlinedDefinitions, $isSimpleInstance).
+            $this->addServiceLocalTempVariables($id, $definition, $otherDefinitions, $inlinedDefinitions).
+            $this->addServiceInlinedDefinitions($id, $definition, $otherDefinitions, $isSimpleInstance).
+            $this->addServiceInlinedDefinitionsSetup($id, $definition, $inlinedDefinitions, $isSimpleInstance).
             $this->addServiceProperties($definition).
             $this->addServiceMethodCalls($definition).
             $this->addServiceConfigurator($definition).
@@ -1085,11 +1068,10 @@ EOF;
 
         foreach ($this->container->findTaggedServiceIds($this->hotPathTag) as $id => $tags) {
             $definition = $this->container->getDefinition($id);
-            $inlinedDefinitions = $this->getInlinedDefinitions($definition);
-            array_unshift($inlinedDefinitions, $definition);
+            $inlinedDefinitions = $this->getDefinitionsFromArguments(array($definition));
 
-            foreach ($inlinedDefinitions as $iDefinition) {
-                if ($class = is_array($factory = $iDefinition->getFactory()) && is_string($factory[0]) ? $factory[0] : $iDefinition->getClass()) {
+            foreach ($inlinedDefinitions as $def) {
+                if ($class = is_array($factory = $def->getFactory()) && is_string($factory[0]) ? $factory[0] : $def->getClass()) {
                     $this->collectLineage($class, $lineage);
                 }
             }
@@ -1298,16 +1280,16 @@ EOF;
         return implode(' && ', $conditions);
     }
 
-    private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior, bool $isPreInstantiation, string $callerId)
+    private function getServiceCallsFromArguments(array $arguments, array &$calls, bool $isPreInstance, string $callerId, array &$behavior = array(), int $step = 1)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
-                $this->getServiceCallsFromArguments($argument, $calls, $behavior, $isPreInstantiation, $callerId);
+                $this->getServiceCallsFromArguments($argument, $calls, $isPreInstance, $callerId, $behavior, $step);
             } elseif ($argument instanceof Reference) {
                 $id = (string) $argument;
 
                 if (!isset($calls[$id])) {
-                    $calls[$id] = (int) ($isPreInstantiation && isset($this->circularReferences[$callerId][$id]));
+                    $calls[$id] = (int) ($isPreInstance && isset($this->circularReferences[$callerId][$id]));
                 }
                 if (!isset($behavior[$id])) {
                     $behavior[$id] = $argument->getInvalidBehavior();
@@ -1315,42 +1297,35 @@ EOF;
                     $behavior[$id] = min($behavior[$id], $argument->getInvalidBehavior());
                 }
 
-                ++$calls[$id];
+                $calls[$id] += $step;
             }
         }
     }
 
-    private function getInlinedDefinitions(Definition $definition): array
+    private function getDefinitionsFromArguments(array $arguments, \SplObjectStorage $definitions = null): \SplObjectStorage
     {
-        if (false === $this->inlinedDefinitions->contains($definition)) {
-            $definitions = array_merge(
-                $this->getDefinitionsFromArguments($definition->getArguments()),
-                $this->getDefinitionsFromArguments($definition->getMethodCalls()),
-                $this->getDefinitionsFromArguments($definition->getProperties()),
-                $this->getDefinitionsFromArguments(array($definition->getConfigurator())),
-                $this->getDefinitionsFromArguments(array($definition->getFactory()))
-            );
-
-            $this->inlinedDefinitions->offsetSet($definition, $definitions);
-
-            return $definitions;
+        if (null === $definitions) {
+            $definitions = new \SplObjectStorage();
         }
 
-        return $this->inlinedDefinitions->offsetGet($definition);
-    }
-
-    private function getDefinitionsFromArguments(array $arguments): array
-    {
-        $definitions = array();
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
-                $definitions = array_merge($definitions, $this->getDefinitionsFromArguments($argument));
-            } elseif ($argument instanceof Definition) {
-                $definitions = array_merge(
-                    $definitions,
-                    $this->getInlinedDefinitions($argument),
-                    array($argument)
-                );
+                $this->getDefinitionsFromArguments($argument, $definitions);
+            } elseif (!$argument instanceof Definition) {
+                // no-op
+            } elseif (isset($definitions[$argument])) {
+                $definitions[$argument] = 1 + $definitions[$argument];
+            } else {
+                $definitions[$argument] = 1;
+                $this->getDefinitionsFromArguments($argument->getArguments(), $definitions);
+                $this->getDefinitionsFromArguments(array($argument->getFactory()), $definitions);
+                $this->getDefinitionsFromArguments($argument->getProperties(), $definitions);
+                $this->getDefinitionsFromArguments($argument->getMethodCalls(), $definitions);
+                $this->getDefinitionsFromArguments(array($argument->getConfigurator()), $definitions);
+                // move current definition last in the list
+                $nbOccurences = $definitions[$argument];
+                unset($definitions[$argument]);
+                $definitions[$argument] = $nbOccurences;
             }
         }
 
@@ -1395,9 +1370,7 @@ EOF;
                 continue;
             }
 
-            $arguments = array_merge($service->getMethodCalls(), $service->getArguments(), $service->getProperties());
-
-            if ($this->hasReference($id, $arguments, $deep, $visited)) {
+            if ($this->hasReference($id, array($service->getArguments(), $service->getFactory(), $service->getProperties(), $service->getMethodCalls(), $service->getConfigurator()), $deep, $visited)) {
                 return true;
             }
         }
@@ -1473,7 +1446,7 @@ EOF;
             }
         } elseif ($value instanceof Definition) {
             if (null !== $this->definitionVariables && $this->definitionVariables->contains($value)) {
-                return $this->dumpValue($this->definitionVariables->offsetGet($value), $interpolate);
+                return $this->dumpValue($this->definitionVariables[$value], $interpolate);
             }
             if ($value->getMethodCalls()) {
                 throw new RuntimeException('Cannot dump definitions which have method calls.');

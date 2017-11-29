@@ -113,6 +113,8 @@ class Compiler
             }
 
             throw $e;
+        } finally {
+            $this->getServiceReferenceGraph()->clear();
         }
     }
 }

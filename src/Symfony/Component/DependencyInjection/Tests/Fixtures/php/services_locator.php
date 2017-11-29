@@ -159,11 +159,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getTranslator3Service()
     {
-        $a = ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->services['translator.loader_3'] = new \stdClass()) && false ?: '_'};
-
         $this->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(array('translator.loader_3' => function () {
             return ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->services['translator.loader_3'] = new \stdClass()) && false ?: '_'};
         })));
+
+        $a = ${($_ = isset($this->services['translator.loader_3']) ? $this->services['translator.loader_3'] : $this->services['translator.loader_3'] = new \stdClass()) && false ?: '_'};
 
         $instance->addResource('db', $a, 'nl');
         $instance->addResource('db', $a, 'en');

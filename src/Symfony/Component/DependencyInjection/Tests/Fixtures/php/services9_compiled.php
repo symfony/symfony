@@ -129,10 +129,10 @@ class ProjectServiceContainer extends Container
      */
     protected function getConfiguredServiceService()
     {
+        $this->services['configured_service'] = $instance = new \stdClass();
+
         $a = new \ConfClass();
         $a->setFoo(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->getBazService()) && false ?: '_'});
-
-        $this->services['configured_service'] = $instance = new \stdClass();
 
         $a->configureStdClass($instance);
 
@@ -259,9 +259,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooWithInlineService()
     {
-        $a = new \Bar();
-
         $this->services['foo_with_inline'] = $instance = new \Foo();
+
+        $a = new \Bar();
 
         $a->pub = 'pub';
         $a->setBaz(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->getBazService()) && false ?: '_'});

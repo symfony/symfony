@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-28T05:39:03Z
+
+Tests? :)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-28T05:47:01Z
+
+There are no way to return new, so If I add a test It will be the same as the `all` or the `clear` one.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-28T08:51:07Z
+
+And you've got one now 😉
+
+I believe that it's a real bug.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-28T12:06:07Z
+
+ping @Tobion I guess
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-28T18:05:48Z
+
+The current behavior is intended. That's not a bug. A flash is something you can get once and only once, no matter if you get it for the current or the next request.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-28T20:33:43Z
+
+@fabpot agreed. The point is: if in your code, you add something before the
+"previous" ones are displayed, it should not remove the ones you've just
+added.
+On Tue, 28 Nov 2017 at 18:05, Fabien Potencier <notifications@github.com>
+wrote:
+
+> The current behavior is intended. That's not a bug. A flash is something
+> you can get once and only once, no matter if you get it for the current or
+> the next request.
+>
+> —
+> You are receiving this because you commented.
+>
+>
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25182#issuecomment-347611297>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEeBB1MzEdgrHdnZ7AVXrEwElx2Grks5s7EuFgaJpZM4Qst4B>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-29T01:54:14Z
+
+I should have read the code first. The code is weird indeed, as `all()` does not return the new ones, only the previous ones. So, the fix looks fine.

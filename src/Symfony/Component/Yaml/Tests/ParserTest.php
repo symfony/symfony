@@ -2046,6 +2046,18 @@ YAML;
 
         $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Reference "foo" does not exist
+     */
+    public function testEvalRefException()
+    {
+        $yaml = <<<EOE
+foo: { &foo { a: Steve, <<: *foo} }
+EOE;
+        $this->parser->parse($yaml);
+    }
 }
 
 class B

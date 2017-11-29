@@ -478,6 +478,7 @@ class Inline
         $output = array();
         $len = strlen($mapping);
         ++$i;
+        $allowOverwrite = false;
 
         // {foo: bar, bar:foo, ...}
         while ($i < $len) {
@@ -518,6 +519,10 @@ class Inline
                 @trigger_error(self::getDeprecationMessage('Using a colon after an unquoted mapping key that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}") is deprecated since version 3.2 and will throw a ParseException in 4.0.'), E_USER_DEPRECATED);
             }
 
+            if ('<<' === $key) {
+                $allowOverwrite = true;
+            }
+
             while ($i < $len) {
                 if (':' === $mapping[$i] || ' ' === $mapping[$i]) {
                     ++$i;
@@ -526,7 +531,6 @@ class Inline
                 }
 
                 $tag = self::parseTag($mapping, $i, $flags);
-                $duplicate = false;
                 switch ($mapping[$i]) {
                     case '[':
                         // nested sequence
@@ -534,9 +538,19 @@ class Inline
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
-                        if (isset($output[$key])) {
+                        // But overwriting is allowed when a merge node is used in current block.
+                        if ('<<' === $key) {
+                            foreach ($value as $parsedValue) {
+                                $output += $parsedValue;
+                            }
+                        } elseif ($allowOverwrite || !isset($output[$key])) {
+                            if (null !== $tag) {
+                                $output[$key] = new TaggedValue($tag, $value);
+                            } else {
+                                $output[$key] = $value;
+                            }
+                        } elseif (isset($output[$key])) {
                             @trigger_error(self::getDeprecationMessage(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key)), E_USER_DEPRECATED);
-                            $duplicate = true;
                         }
                         break;
                     case '{':
@@ -545,9 +559,17 @@ class Inline
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
-                        if (isset($output[$key])) {
+                        // But overwriting is allowed when a merge node is used in current block.
+                        if ('<<' === $key) {
+                            $output += $value;
+                        } elseif ($allowOverwrite || !isset($output[$key])) {
+                            if (null !== $tag) {
+                                $output[$key] = new TaggedValue($tag, $value);
+                            } else {
+                                $output[$key] = $value;
+                            }
+                        } elseif (isset($output[$key])) {
                             @trigger_error(self::getDeprecationMessage(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key)), E_USER_DEPRECATED);
-                            $duplicate = true;
                         }
                         break;
                     default:
@@ -555,19 +577,19 @@ class Inline
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.
-                        if (isset($output[$key])) {
+                        // But overwriting is allowed when a merge node is used in current block.
+                        if ('<<' === $key) {
+                            $output += $value;
+                        } elseif ($allowOverwrite || !isset($output[$key])) {
+                            if (null !== $tag) {
+                                $output[$key] = new TaggedValue($tag, $value);
+                            } else {
+                                $output[$key] = $value;
+                            }
+                        } elseif (isset($output[$key])) {
                             @trigger_error(self::getDeprecationMessage(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key)), E_USER_DEPRECATED);
-                            $duplicate = true;
                         }
                         --$i;
-                }
-
-                if (!$duplicate) {
-                    if (null !== $tag) {
-                        $output[$key] = new TaggedValue($tag, $value);
-                    } else {
-                        $output[$key] = $value;
-                    }
                 }
                 ++$i;
 

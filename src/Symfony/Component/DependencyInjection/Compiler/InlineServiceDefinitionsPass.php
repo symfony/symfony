@@ -65,10 +65,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
                 $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
                 $this->inlinedServiceIds[$id][] = $this->currentId;
 
-                if ($definition->isShared()) {
-                    return $definition;
-                }
-                $value = clone $definition;
+                return $definition->isShared() ? $definition : clone $definition;
             }
         }
 

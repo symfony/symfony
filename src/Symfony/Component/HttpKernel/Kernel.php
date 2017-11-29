@@ -644,19 +644,18 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             return;
         }
 
-        if ($oldContainer) {
+        if ($oldContainer && get_class($this->container) !== $oldContainer->name) {
             // Because concurrent requests might still be using them,
             // old container files are not removed immediately,
             // but on a next dump of the container.
             $oldContainerDir = dirname($oldContainer->getFileName());
             foreach (glob(dirname($oldContainerDir).'/*.legacyContainer') as $legacyContainer) {
-                if (@unlink($legacyContainer)) {
+                if ($oldContainerDir.'.legacyContainer' !== $legacyContainer && @unlink($legacyContainer)) {
                     (new Filesystem())->remove(substr($legacyContainer, 0, -16));
                 }
             }
-            if (get_class($this->container) !== $oldContainer->name) {
-                touch($oldContainerDir.'.legacyContainer');
-            }
+
+            touch($oldContainerDir.'.legacyContainer');
         }
 
         if ($this->container->has('cache_warmer')) {

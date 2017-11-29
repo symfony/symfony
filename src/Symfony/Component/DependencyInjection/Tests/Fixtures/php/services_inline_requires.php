@@ -95,8 +95,8 @@ class ProjectServiceContainer extends Container
      */
     protected function getC2Service()
     {
-        require_once $this->targetDirs[1].'/includes/HotPath/C2.php';
         require_once $this->targetDirs[1].'/includes/HotPath/C3.php';
+        require_once $this->targetDirs[1].'/includes/HotPath/C2.php';
 
         return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3());
     }

@@ -301,21 +301,6 @@ class PhpDumperTest extends TestCase
         $this->assertSame($decorator, $container->get('decorator_service'), '->set() overrides an already defined service');
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
-     */
-    public function testCircularReference()
-    {
-        $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass')->addArgument(new Reference('bar'))->setPublic(true);
-        $container->register('bar', 'stdClass')->setPublic(false)->addMethodCall('setA', array(new Reference('baz')));
-        $container->register('baz', 'stdClass')->addMethodCall('setA', array(new Reference('foo')))->setPublic(true);
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-        $dumper->dump();
-    }
-
     public function testDumpAutowireData()
     {
         $container = include self::$fixturesPath.'/containers/container24.php';
@@ -773,38 +758,35 @@ class PhpDumperTest extends TestCase
         $this->assertEquals(array('foo1' => new \stdClass(), 'foo3' => new \stdClass()), iterator_to_array($bar->iter));
     }
 
-    public function testAlmostCircularPrivate()
+    /**
+     * @dataProvider provideAlmostCircular
+     */
+    public function testAlmostCircular($visibility)
     {
-        $public = false;
         $container = include self::$fixturesPath.'/containers/container_almost_circular.php';
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_almost_circular_private.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Almost_Circular_Private')));
+        $container = 'Symfony_DI_PhpDumper_Test_Almost_Circular_'.ucfirst($visibility);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_almost_circular_'.$visibility.'.php', $dumper->dump(array('class' => $container)));
 
-        require self::$fixturesPath.'/php/container_almost_circular_private.php';
+        require self::$fixturesPath.'/php/services_almost_circular_'.$visibility.'.php';
 
-        $container = new \Symfony_DI_PhpDumper_Test_Almost_Circular_Private();
+        $container = new $container();
+
         $foo = $container->get('foo');
-
         $this->assertSame($foo, $foo->bar->foobar->foo);
+
+        $foo2 = $container->get('foo2');
+        $this->assertSame($foo2, $foo2->bar->foobar->foo);
+
+        $this->assertSame(array(), (array) $container->get('foobar4'));
     }
 
-    public function testAlmostCircularPublic()
+    public function provideAlmostCircular()
     {
-        $public = true;
-        $container = include self::$fixturesPath.'/containers/container_almost_circular.php';
-        $container->compile();
-        $dumper = new PhpDumper($container);
-
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_almost_circular_public.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Almost_Circular_Public')));
-
-        require self::$fixturesPath.'/php/container_almost_circular_public.php';
-
-        $container = new \Symfony_DI_PhpDumper_Test_Almost_Circular_Public();
-        $foo = $container->get('foo');
-
-        $this->assertSame($foo, $foo->bar->foobar->foo);
+        yield array('public');
+        yield array('private');
     }
 
     public function testHotPathOptimizations()
@@ -814,12 +796,12 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $dump = $dumper->dump(array('hot_path_tag' => 'container.hot_path', 'inline_class_loader_parameter' => 'inline_requires', 'file' => self::$fixturesPath.'/php/container_inline_requires.php'));
+        $dump = $dumper->dump(array('hot_path_tag' => 'container.hot_path', 'inline_class_loader_parameter' => 'inline_requires', 'file' => self::$fixturesPath.'/php/services_inline_requires.php'));
         if ('\\' === DIRECTORY_SEPARATOR) {
             $dump = str_replace("'\\\\includes\\\\HotPath\\\\", "'/includes/HotPath/", $dump);
         }
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/container_inline_requires.php', $dump);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_inline_requires.php', $dump);
     }
 
     public function testDumpHandlesLiteralClassWithRootNamespace()

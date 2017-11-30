@@ -34,7 +34,15 @@ class EsiFragmentRendererTest extends TestCase
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true), new UriSigner('foo'));
         $request = Request::create('/');
-        $reference = new ControllerReference('main_controller', array('foo' => array('a' => array(), 'b' => new \stdClass())), array());
+        $reference = new ControllerReference('main_controller', array('foo' => new \stdClass()), array());
+        $strategy->render($reference, $request);
+    }
+
+    public function testRenderFallbackWithScalarIsNotDeprecated()
+    {
+        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true), new UriSigner('foo'));
+        $request = Request::create('/');
+        $reference = new ControllerReference('main_controller', array('foo' => array(true)), array());
         $strategy->render($reference, $request);
     }
 

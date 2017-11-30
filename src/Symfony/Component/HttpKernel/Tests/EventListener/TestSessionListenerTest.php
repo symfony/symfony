@@ -121,6 +121,10 @@ class TestSessionListenerTest extends TestCase
         $this->session->expects($this->once())
             ->method('isStarted')
             ->will($this->returnValue(true));
+
+        $this->session->expects($this->once())
+            ->method('all')
+            ->will($this->returnValue(array('foo' => 'bar')));
     }
 
     private function sessionHasNotBeenStarted()

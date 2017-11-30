@@ -173,7 +173,7 @@ final class Dotenv
 
     private function lexValue()
     {
-        if (preg_match('/[ \t]*+(?:#.*)?$/Am', $this->data, $matches, null, $this->cursor)) {
+        if (preg_match('/[ \t]*+(?:#.*)?$/Am', $this->data, $matches, 0, $this->cursor)) {
             $this->moveCursor($matches[0]);
             $this->skipEmptyLines();
 
@@ -295,7 +295,7 @@ final class Dotenv
 
     private function skipEmptyLines()
     {
-        if (preg_match('/(?:\s*+(?:#[^\n]*+)?+)++/A', $this->data, $match, null, $this->cursor)) {
+        if (preg_match('/(?:\s*+(?:#[^\n]*+)?+)++/A', $this->data, $match, 0, $this->cursor)) {
             $this->moveCursor($match[0]);
         }
     }

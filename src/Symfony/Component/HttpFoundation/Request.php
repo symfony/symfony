@@ -196,7 +196,7 @@ class Request
     /**
      * @var string
      */
-    protected $requestedResponseFormat;
+    protected $format;
 
     /**
      * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
@@ -288,7 +288,7 @@ class Request
         $this->baseUrl = null;
         $this->basePath = null;
         $this->method = null;
-        $this->requestedResponseFormat = null;
+        $this->format = null;
     }
 
     /**
@@ -488,7 +488,7 @@ class Request
         $dup->baseUrl = null;
         $dup->basePath = null;
         $dup->method = null;
-        $dup->requestedResponseFormat = null;
+        $dup->format = null;
 
         if (!$dup->get('_format') && $this->get('_format')) {
             $dup->attributes->set('_format', $this->get('_format'));
@@ -1451,11 +1451,11 @@ class Request
      */
     public function getRequestedResponseFormat($default = 'html')
     {
-        if (null === $this->requestedResponseFormat) {
-            $this->requestedResponseFormat = $this->attributes->get('_format');
+        if (null === $this->format) {
+            $this->format = $this->attributes->get('_format');
         }
 
-        return null === $this->requestedResponseFormat ? $default : $this->requestedResponseFormat;
+        return null === $this->format ? $default : $this->format;
     }
 
     /**
@@ -1465,7 +1465,7 @@ class Request
      */
     public function setRequestedResponseFormat($format)
     {
-        $this->requestedResponseFormat = $format;
+        $this->format = $format;
     }
 
     /**

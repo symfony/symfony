@@ -76,12 +76,17 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      */
     public function supports($resource, $type = null)
     {
-        if ('annotation' === $type) {
-            return true;
+        if (!is_string($resource) || ($type && 'annotation' !== $type)) {
+            return false;
         }
 
-        if ($type || !is_string($resource)) {
+        // classes are handled by the AnnotationClassLoader
+        if (preg_match('/^(?:\\\\?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)+$/', $resource) && (false !== strpos($resource, '\\') || class_exists($resource))) {
             return false;
+        }
+
+        if ('annotation' === $type) {
+            return true;
         }
 
         try {

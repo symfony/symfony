@@ -74,6 +74,11 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->assertTrue($this->loader->supports(__DIR__.'/../Fixtures/even-with-not-existing-folder', 'annotation'));
     }
 
+    public function testItDoesNotSupportAnnotatedControllerClasses()
+    {
+        $this->assertFalse($this->loader->supports('App\Controller\TestController', 'annotation'));
+    }
+
     public function testLoadFileIfLocatedResourceIsFile()
     {
         $this->reader->expects($this->exactly(1))->method('getClassAnnotation');

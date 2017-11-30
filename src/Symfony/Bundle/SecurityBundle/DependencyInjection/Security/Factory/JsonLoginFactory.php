@@ -28,7 +28,6 @@ class JsonLoginFactory extends AbstractFactory
         $this->addOption('password_path', 'password');
         $this->defaultFailureHandlerOptions = array();
         $this->defaultSuccessHandlerOptions = array();
-        $this->options['require_previous_session'] = false;
     }
 
     /**

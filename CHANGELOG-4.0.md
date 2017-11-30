@@ -7,6 +7,32 @@ in 4.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.0.0...v4.0.1
 
+* 4.0.0 (2017-11-30)
+
+ * bug #25220 [HttpFoundation] Add Session::isEmpty(), fix MockFileSessionStorage to behave like the native one (nicolas-grekas)
+ * bug #25209 [VarDumper] Dont use empty(), it chokes on eg GMP objects (nicolas-grekas)
+ * bug #25200 [HttpKernel] Arrays with scalar values passed to ESI fragment renderer throw deprecation notice (Simperfit)
+ * bug #25201 [HttpKernel] Add a better error messages when passing a private or non-tagged controller (Simperfit)
+ * bug #25155 [DependencyInjection] Detect case mismatch in autowiring (Simperfit, sroze)
+ * bug #25217 [Dotenv] Changed preg_match flags from null to 0 (deekthesqueak)
+ * bug #25180 [DI] Fix circular reference when using setters (nicolas-grekas)
+ * bug #25204 [DI] Clear service reference graph (nicolas-grekas)
+ * bug #25203 [DI] Fix infinite loop in InlineServiceDefinitionsPass (nicolas-grekas)
+ * bug #25185 [Serializer] Do not cache attributes if `attributes` in context (sroze)
+ * bug #25190 [HttpKernel] Keep legacy container files for concurrent requests (nicolas-grekas)
+ * bug #25182 [HttpFoundation] AutExpireFlashBag should not clear new flashes (Simperfit, sroze)
+ * bug #25174 [Translation] modify definitions only if the do exist (xabbuh)
+ * bug #25179 [FrameworkBundle][Serializer] Remove YamlEncoder definition if Yaml component isn't installed (ogizanagi)
+ * bug #25160 [DI] Prevent a ReflectionException during cache:clear when the parent class doesn't exist (dunglas)
+ * bug #25163 [DI] Fix tracking of env vars in exceptions (nicolas-grekas)
+ * bug #25162 [HttpKernel] Read $_ENV when checking SHELL_VERBOSITY (nicolas-grekas)
+ * bug #25158 [DI] Remove unreachable code (GawainLynch)
+ * bug #25152 [Form] Don't rely on `Symfony\Component\HttpFoundation\File\File` if http-foundation isn't in FileType (issei-m)
+ * bug #24987 [Console] Fix global console flag when used in chain (Simperfit)
+ * bug #25137 Adding checks for the expression language (weaverryan)
+ * bug #25151 [FrameworkBundle] Automatically enable the CSRF protection if CSRF manager exists (sroze)
+ * bug #25043 [Yaml] added ability for substitute aliases when mapping is on single line (Michał Strzelecki, xabbuh)
+
 * 4.0.0-RC2 (2017-11-24)
 
  * bug #25146 [DI] Dont resolve envs in service ids (nicolas-grekas)

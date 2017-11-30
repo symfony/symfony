@@ -221,4 +221,22 @@ class SessionTest extends TestCase
     {
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\MetadataBag', $this->session->getMetadataBag());
     }
+
+    public function testIsEmpty()
+    {
+        $this->assertTrue($this->session->isEmpty());
+
+        $this->session->set('hello', 'world');
+        $this->assertFalse($this->session->isEmpty());
+
+        $this->session->remove('hello');
+        $this->assertTrue($this->session->isEmpty());
+
+        $flash = $this->session->getFlashBag();
+        $flash->set('hello', 'world');
+        $this->assertFalse($this->session->isEmpty());
+
+        $flash->get('hello');
+        $this->assertTrue($this->session->isEmpty());
+    }
 }

@@ -46,7 +46,6 @@ class Debug
         }
 
         if ('cli' !== PHP_SAPI) {
-            ini_set('display_errors', 0);
             ExceptionHandler::register();
         } elseif ($displayErrors && (!ini_get('log_errors') || ini_get('error_log'))) {
             // CLI - display errors only if they're not already logged to STDERR

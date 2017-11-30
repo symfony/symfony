@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-30T14:53:50Z
+
+> Too bad that this requires a new public method in Session just for the test layer though.
+
+the method is now `@internal`

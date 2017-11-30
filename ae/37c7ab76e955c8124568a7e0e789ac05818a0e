@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-29T07:45:23Z
+
+oops i pushed it to fast since I was in the train will remove it
+Le mer. 29 nov. 2017 à 08:31, Samuel ROZE <notifications@github.com> a
+écrit :
+
+> *@sroze* commented on this pull request.
+> ------------------------------
+>
+> In
+> src/Symfony/Component/HttpKernel/Controller/ContainerControllerResolver.php
+> <https://github.com/symfony/symfony/pull/25201#discussion_r153709793>:
+>
+> > @@ -82,10 +85,19 @@ protected function createController($controller)
+>       */
+>      protected function instantiateController($class)
+>      {
+> -        if ($this->container->has($class)) {
+> -            return $this->container->get($class);
+> +        try {
+> +            if ($this->container->has($class)) {
+> +                return $this->container->get($class);
+> +            }
+> +
+> +            return parent::instantiateController($class);
+> +        } catch (FatalThrowableError $e) {
+> +            if ($this->container instanceof ContainerBuilder) {
+> +                var_dump($this->container->getRemovedIds());
+>
+> Meh
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25201#pullrequestreview-79755243>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8r-Ka3NRfSQN47vNDH_zF_4JpHFrks5s7QhtgaJpZM4Quh-N>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-29T08:13:40Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-29T09:30:05Z
+
+to be rebased on 3.4 btw

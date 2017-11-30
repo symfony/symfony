@@ -118,8 +118,8 @@ class Caster
 
             if (null === $v) {
                 $type |= self::EXCLUDE_NULL & $filter;
-            }
-            if (empty($v)) {
+                $type |= self::EXCLUDE_EMPTY & $filter;
+            } elseif (false === $v || '' === $v || '0' === $v || 0 === $v || 0.0 === $v || array() === $v) {
                 $type |= self::EXCLUDE_EMPTY & $filter;
             }
             if ((self::EXCLUDE_NOT_IMPORTANT & $filter) && !in_array($k, $listedProperties, true)) {

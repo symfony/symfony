@@ -3,7 +3,7 @@
 <style{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
     {{ include('@WebProfiler/Profiler/toolbar.css.twig', { 'position': position, 'floatable': true }) }}
 </style>
-<script{% if csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>/*<![CDATA[*/
+<script{% if csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>/*<![CDATA[*/
     (function () {
         {% if 'top' == position %}
             var sfwdt = document.getElementById('sfwdt{{ token }}');

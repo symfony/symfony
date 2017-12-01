@@ -21,6 +21,7 @@ CHANGELOG
  * setting session save handlers that do not implement `\SessionHandlerInterface` in 
    `NativeSessionStorage::setSaveHandler()` is not supported anymore and throws a 
    `\TypeError`
+ * The `getClientOriginalNameWithoutExtension()` helper was added to File/UploadedFile  
 
 3.4.0
 -----

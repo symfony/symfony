@@ -46,4 +46,13 @@ $container->register('foo4', 'stdClass')->setPublic($public)
 $container->register('foobar4', 'stdClass')->setPublic(true)
     ->addArgument(new Reference('foo4'));
 
+// loop on the constructor of a setter-injected dep with property
+
+$container->register('foo5', 'stdClass')->setPublic(true)
+    ->setProperty('bar', new Reference('bar5'));
+
+$container->register('bar5', 'stdClass')->setPublic($public)
+    ->addArgument(new Reference('foo5'))
+    ->setProperty('foo', new Reference('foo5'));
+
 return $container;

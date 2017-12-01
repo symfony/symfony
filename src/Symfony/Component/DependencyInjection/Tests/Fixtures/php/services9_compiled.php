@@ -70,8 +70,10 @@ class ProjectServiceContainer extends Container
             'configurator_service_simple' => true,
             'decorated.pif-pouf' => true,
             'decorator_service.inner' => true,
+            'factory_simple' => true,
             'inlined' => true,
             'new_factory' => true,
+            'tagged_iterator_foo' => true,
         );
     }
 

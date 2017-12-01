@@ -44,6 +44,7 @@ class ProjectServiceContainer extends Container
         return array(
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'bar_%env(BAR)%' => true,
             'baz_%env(BAR)%' => true,
         );
     }

@@ -39,6 +39,7 @@ class ProjectServiceContainer extends Container
         return array(
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'baz_service' => true,
         );
     }
 

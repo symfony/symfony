@@ -45,6 +45,7 @@ class ProjectServiceContainer extends Container
         return array(
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'baz_service' => true,
             'translator.loader_1_locator' => true,
             'translator.loader_2_locator' => true,
             'translator.loader_3_locator' => true,

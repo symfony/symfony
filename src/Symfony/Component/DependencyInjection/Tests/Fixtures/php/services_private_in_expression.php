@@ -39,6 +39,7 @@ class ProjectServiceContainer extends Container
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'private_bar' => true,
+            'private_foo' => true,
         );
     }
 

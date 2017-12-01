@@ -41,6 +41,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'foo2' => true,
+            'foo3' => true,
         );
     }
 

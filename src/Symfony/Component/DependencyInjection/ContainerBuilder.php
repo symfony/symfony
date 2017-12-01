@@ -556,15 +556,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        if ($this->isCompiled()) {
-            $id = $this->normalizeId($id);
-
-            if (isset($this->definitions[$id]) && $this->definitions[$id]->isPrivate()) {
-                @trigger_error(sprintf('Fetching the "%s" private service is deprecated and will fail in Symfony 4.0. Make the service public instead.', $id), E_USER_DEPRECATED);
-            }
-            if (isset($this->aliasDefinitions[$id]) && $this->aliasDefinitions[$id]->isPrivate()) {
-                @trigger_error(sprintf('Fetching the "%s" private alias is deprecated and will fail in Symfony 4.0. Make the alias public instead.', $id), E_USER_DEPRECATED);
-            }
+        if ($this->isCompiled() && isset($this->removedIds[$id = $this->normalizeId($id)])) {
+            @trigger_error(sprintf('Fetching the "%s" private service or alias is deprecated since Symfony 3.4 and will fail in 4.0. Make it public instead.', $id), E_USER_DEPRECATED);
         }
 
         return $this->doGet($id, $invalidBehavior);
@@ -776,6 +769,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         parent::compile();
+
+        foreach ($this->definitions + $this->aliasDefinitions as $id => $definition) {
+            if (!$definition->isPublic() || $definition->isPrivate()) {
+                $this->removedIds[$id] = true;
+            }
+        }
     }
 
     /**

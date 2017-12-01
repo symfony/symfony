@@ -733,6 +733,7 @@ class ContainerBuilderTest extends TestCase
             PsrContainerInterface::class => true,
             ContainerInterface::class => true,
             'baz_%env(BAR)%' => true,
+            'bar_%env(BAR)%' => true,
         );
         $this->assertSame($expected, $container->getRemovedIds());
 

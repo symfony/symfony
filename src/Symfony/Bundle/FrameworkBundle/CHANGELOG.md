@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * allowed to pass an optional `LoggerInterface $logger` instance to the `Router`
+
 4.0.0
 -----
 

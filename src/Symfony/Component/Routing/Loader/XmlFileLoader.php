@@ -165,6 +165,10 @@ class XmlFileLoader extends FileLoader
         $subCollection->addRequirements($requirements);
         $subCollection->addOptions($options);
 
+        if ($namePrefix = $node->getAttribute('name-prefix')) {
+            $subCollection->addNamePrefix($namePrefix);
+        }
+
         $collection->addCollection($subCollection);
     }
 

@@ -361,4 +361,15 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
         $loader->load('import_override_defaults.xml');
     }
+
+    public function testImportRouteWithNamePrefix()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_name_prefix')));
+        $routeCollection = $loader->load('routing.xml');
+
+        $this->assertNotNull($routeCollection->get('app_blog'));
+        $this->assertEquals('/blog', $routeCollection->get('app_blog')->getPath());
+        $this->assertNotNull($routeCollection->get('api_app_blog'));
+        $this->assertEquals('/api/blog', $routeCollection->get('api_app_blog')->getPath());
+    }
 }

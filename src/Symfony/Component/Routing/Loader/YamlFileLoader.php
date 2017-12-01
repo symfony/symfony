@@ -27,7 +27,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix',
     );
     private $yamlParser;
 
@@ -168,6 +168,10 @@ class YamlFileLoader extends FileLoader
         $subCollection->addDefaults($defaults);
         $subCollection->addRequirements($requirements);
         $subCollection->addOptions($options);
+
+        if (isset($config['name_prefix'])) {
+            $subCollection->addNamePrefix($config['name_prefix']);
+        }
 
         $collection->addCollection($subCollection);
     }

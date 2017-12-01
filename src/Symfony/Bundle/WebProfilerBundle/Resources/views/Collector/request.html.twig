@@ -167,7 +167,15 @@
                 {% endif %}
 
                 <h3>Server Parameters</h3>
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestserver }, with_context = false) }}
+                <h4>Defined in .env</h4>
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.dotenvvars }, with_context = false) }}
+
+                <h4>Defined as regular env variables</h4>
+                {% set requestserver = [] %}
+                {% for key, value in collector.requestserver if key not in collector.dotenvvars.keys %}
+                    {% set requestserver = requestserver|merge({(key): value}) %}
+                {% endfor %}
+                {{ include('@WebProfiler/Profiler/table.html.twig', { data: requestserver }, with_context = false) }}
             </div>
         </div>
 

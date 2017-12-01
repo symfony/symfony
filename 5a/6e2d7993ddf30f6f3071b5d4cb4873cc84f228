@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T18:36:16Z
+
+For which branch is this PR?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-10-30T20:53:19Z
+
+I think it's for 4.1 since it's a new feature
+Le lun. 30 oct. 2017 à 19:36, Nicolas Grekas <notifications@github.com> a
+écrit :
+
+> For which branch is this PR?
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/24750#issuecomment-340542745>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8kpLZvv5kOkFN37xDRa9kmKWFfzyks5sxhcwgaJpZM4QKsHg>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-01T14:54:27Z
+
+It looks like a bug to me. The current behavior does not make much sense, it "works" by change. Displaying a generic "object" string is never something one would expect, right?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-01T15:15:01Z
+
+fine for me as a bugfix too
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-01T17:17:09Z
+
+rebased to 2.7

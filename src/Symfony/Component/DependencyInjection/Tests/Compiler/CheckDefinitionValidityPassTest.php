@@ -31,6 +31,17 @@ class CheckDefinitionValidityPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
+    public function testProcessDetectsSyntheticNonPublicDefinitionsRegression()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->setSynthetic(true)->setPrivate(true);
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     */
     public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
     {
         $container = new ContainerBuilder();

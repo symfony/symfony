@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-01T17:24:30Z
+
+new features are for 4.1 (master) only
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-01T18:23:35Z
+
+@nicolas-grekas comments done and PR rebased
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-01T18:48:23Z
+
+With these changes, it's not possible at all to set `framework.translator.logging` to `true` with profiler enabled, as it'll behave like if you set `false`, right?
+Instead, what about updating the Fwb `Configuration` class only to normalize the value to `false` if no value was set explicitly and the profiler is enabled, `$this->debug` if profiler is disabled?
+
+But IMHO, changing the default value to `false` probably is enough. Anyone can opt-in if they need it for whatever reason. Not sure it would be considered a BC break.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-01T18:52:09Z
+
+I may have misunderstood what we wanted here, I understood that we wanted to enforce it at `false` whenever the profiler is enabled. I guess we could just change the default value in here and in the recipe and it would be ok.
+
+I don't think it would be considered as BC too.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-11-01T19:03:26Z
+
+To clarify: from dev point of view, there is no apparent reason we want the logging + translator panel being enabled at the same time, as the info is redundant.
+But that doesn't mean we must enforce the logging to be disabled when the profiler is enabled, as you might have use cases for using the `LoggingTranslator` despite this. For instance by using it to collect missing translations and get a report at the end of the day thanks to a dedicated monolog handler using the `translation` channel. Not quite common surely, but may exist.
+
+The point is that in most case the info is just redundant and disabling this feature when the profiler is enabled (or at all) is a better default.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-05T16:33:17Z
+
+@ogizanagi changes done.

@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\FormView;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\InitRuntimeInterface;
@@ -97,6 +98,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     {
         return array(
             new TwigTest('selectedchoice', array($this, 'isSelectedChoice')),
+            new TwigTest('rootform', array($this, 'isRootForm')),
         );
     }
 
@@ -154,6 +156,11 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
         }
 
         return $choice->value === $selectedValue;
+    }
+
+    public function isRootForm(FormView $formView)
+    {
+        return null === $formView->parent;
     }
 
     /**

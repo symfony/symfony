@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-01T09:45:13Z
+
+Would be OK as bug fix on 3.3 also.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-01T10:20:41Z
+
+@tistre thanks for fixing this issue. Could you please rebase it to 3.3 to merge it as a bug fix instead of a new feature? Thanks!

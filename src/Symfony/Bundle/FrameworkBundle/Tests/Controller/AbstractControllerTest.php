@@ -13,9 +13,21 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Container;
 
 class AbstractControllerTest extends ControllerTraitTest
 {
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage You have requested a non-existent service "unknown". Did you forget to add it to "Symfony\Bundle\FrameworkBundle\Tests\Controller\TestAbstractController::getSubscribedServices()"?
+     */
+    public function testServiceNotFound()
+    {
+        $controller = $this->createController();
+        $controller->setContainer(new Container());
+        $controller->serviceNotFoundAction();
+    }
+
     protected function createController()
     {
         return new TestAbstractController();
@@ -59,5 +71,10 @@ class TestAbstractController extends AbstractController
 
     public function fooAction()
     {
+    }
+
+    public function serviceNotFoundAction()
+    {
+        $this->get('unknown');
     }
 }

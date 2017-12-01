@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added support for variadics in named arguments
+
 4.0.0
 -----
 

@@ -78,6 +78,13 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $responseCookies[$cookie->getName()] = $cookie;
         }
 
+        $dotenvVars = array();
+        foreach (explode(',', getenv('SYMFONY_DOTENV_VARS')) as $name) {
+            if ('' !== $name && false !== $value = getenv($name)) {
+                $dotenvVars[$name] = $value;
+            }
+        }
+
         $this->data = array(
             'method' => $request->getMethod(),
             'format' => $request->getRequestFormat(),
@@ -100,6 +107,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'path_info' => $request->getPathInfo(),
             'controller' => 'n/a',
             'locale' => $request->getLocale(),
+            'dotenv_vars' => $dotenvVars,
         );
 
         if (isset($this->data['request_headers']['php-auth-pw'])) {
@@ -252,6 +260,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     public function getLocale()
     {
         return $this->data['locale'];
+    }
+
+    public function getDotenvVars()
+    {
+        return new ParameterBag($this->data['dotenv_vars']->getValue());
     }
 
     /**

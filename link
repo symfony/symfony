@@ -57,3 +57,8 @@ foreach (glob("$argv[1]/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as $dir) 
     $filesystem->symlink($sfDir, $dir);
     echo "\"$package\" has been linked to \"$sfPackages[$package]\".".PHP_EOL;
 }
+
+
+if ($filesystem->exists($cacheFiles = "$argv[1]/var/cache")) {
+    $filesystem->remove("$argv[1]/var/cache");
+}

@@ -44,10 +44,31 @@ class RedirectControllerTest extends TestCase
         }
     }
 
+    public function testEmptyRouteInvoke()
+    {
+        $request = new Request(array(), array(), array('route' => '', 'permanent' => true));
+        $controller = new RedirectController();
+
+        try {
+            $controller($request);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(410, $e->getStatusCode());
+        }
+
+        $request = new Request(array(), array(), array('route' => '', 'permanent' => false));
+        try {
+            $controller($request);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(404, $e->getStatusCode());
+        }
+    }
+
     /**
      * @dataProvider provider
      */
-    public function testRoute($permanent, $ignoreAttributes, $expectedCode, $expectedAttributes)
+    public function testRoute($permanent, $ignoreAttributes, $expectedCode, $expectedAttributes, bool $invoke)
     {
         $request = new Request();
 
@@ -56,14 +77,12 @@ class RedirectControllerTest extends TestCase
         $attributes = array(
             'route' => $route,
             'permanent' => $permanent,
-            '_route' => 'current-route',
-            '_route_params' => array(
-                'route' => $route,
-                'permanent' => $permanent,
-                'additional-parameter' => 'value',
-                'ignoreAttributes' => $ignoreAttributes,
-            ),
+            'additional-parameter' => 'value',
+            'ignoreAttributes' => $ignoreAttributes,
         );
+
+        $attributes['_route_params'] = $attributes;
+        $attributes['_route'] = 'current-route';
 
         $request->attributes = new ParameterBag($attributes);
 
@@ -76,7 +95,7 @@ class RedirectControllerTest extends TestCase
 
         $controller = new RedirectController($router);
 
-        $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes);
+        $returnResponse = $invoke ? $controller($request) : $controller->redirectAction($request, $route, $permanent, $ignoreAttributes);
 
         $this->assertRedirectUrl($returnResponse, $url);
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
@@ -85,10 +104,14 @@ class RedirectControllerTest extends TestCase
     public function provider()
     {
         return array(
-            array(true, false, 301, array('additional-parameter' => 'value')),
-            array(false, false, 302, array('additional-parameter' => 'value')),
-            array(false, true, 302, array()),
-            array(false, array('additional-parameter'), 302, array()),
+            array(true, false, 301, array('additional-parameter' => 'value'), false),
+            array(true, false, 301, array('additional-parameter' => 'value'), true),
+            array(false, false, 302, array('additional-parameter' => 'value'), false),
+            array(false, false, 302, array('additional-parameter' => 'value'), true),
+            array(false, true, 302, array(), false),
+            array(false, true, 302, array(), true),
+            array(false, array('additional-parameter'), 302, array(), false),
+            array(false, array('additional-parameter'), 302, array(), true),
         );
     }
 
@@ -112,11 +135,42 @@ class RedirectControllerTest extends TestCase
         }
     }
 
+    public function testEmptyPathInvoke()
+    {
+        $request = new Request(array(), array(), array('path' => '', 'permanent' => true));
+        $controller = new RedirectController();
+
+        try {
+            $controller($request);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(410, $e->getStatusCode());
+        }
+
+        $request = new Request(array(), array(), array('path' => '', 'permanent' => false));
+        try {
+            $controller($request);
+            $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
+        } catch (HttpException $e) {
+            $this->assertSame(404, $e->getStatusCode());
+        }
+    }
+
     public function testFullURL()
     {
         $request = new Request();
         $controller = new RedirectController();
         $returnResponse = $controller->urlRedirectAction($request, 'http://foo.bar/');
+
+        $this->assertRedirectUrl($returnResponse, 'http://foo.bar/');
+        $this->assertEquals(302, $returnResponse->getStatusCode());
+    }
+
+    public function testFullURLInvoke()
+    {
+        $request = new Request(array(), array(), array('path' => 'http://foo.bar/'));
+        $controller = new RedirectController();
+        $returnResponse = $controller($request);
 
         $this->assertRedirectUrl($returnResponse, 'http://foo.bar/');
         $this->assertEquals(302, $returnResponse->getStatusCode());
@@ -143,84 +197,132 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
+    public function testUrlRedirectDefaultPortsInvoke()
+    {
+        $host = 'www.example.com';
+        $baseUrl = '/base';
+        $path = '/redirect-path';
+        $httpPort = 1080;
+        $httpsPort = 1443;
+
+        $expectedUrl = "https://$host:$httpsPort$baseUrl$path";
+        $request = $this->createRequestObject('http', $host, $httpPort, $baseUrl, '', array('path' => $path, 'permanent' => false, 'scheme' => 'https', 'httpPort' => $httpPort));
+        $controller = $this->createRedirectController(null, $httpsPort);
+        $returnValue = $controller($request);
+        $this->assertRedirectUrl($returnValue, $expectedUrl);
+
+        $expectedUrl = "http://$host:$httpPort$baseUrl$path";
+        $request = $this->createRequestObject('https', $host, $httpPort, $baseUrl, '', array('path' => $path, 'permanent' => false, 'scheme' => 'http'));
+        $controller = $this->createRedirectController($httpPort);
+        $returnValue = $controller($request);
+        $this->assertRedirectUrl($returnValue, $expectedUrl);
+    }
+
     public function urlRedirectProvider()
     {
         return array(
             // Standard ports
-            array('http',  null, null,  'http',  80,   ''),
-            array('http',  80,   null,  'http',  80,   ''),
-            array('https', null, null,  'http',  80,   ''),
-            array('https', 80,   null,  'http',  80,   ''),
+            array('http',  null, null,  'http',  80,   '', false),
+            array('http',  null, null,  'http',  80,   '', true),
+            array('http',  80,   null,  'http',  80,   '', false),
+            array('http',  80,   null,  'http',  80,   '', true),
+            array('https', null, null,  'http',  80,   '', false),
+            array('https', null, null,  'http',  80,   '', true),
+            array('https', 80,   null,  'http',  80,   '', false),
+            array('https', 80,   null,  'http',  80,   '', true),
 
-            array('http',  null,  null, 'https', 443,  ''),
-            array('http',  null,  443,  'https', 443,  ''),
-            array('https', null,  null, 'https', 443,  ''),
-            array('https', null,  443,  'https', 443,  ''),
+            array('http',  null,  null, 'https', 443,  '', false),
+            array('http',  null,  null, 'https', 443,  '', true),
+            array('http',  null,  443,  'https', 443,  '', false),
+            array('http',  null,  443,  'https', 443,  '', true),
+            array('https', null,  null, 'https', 443,  '', false),
+            array('https', null,  null, 'https', 443,  '', true),
+            array('https', null,  443,  'https', 443,  '', false),
+            array('https', null,  443,  'https', 443,  '', true),
 
             // Non-standard ports
-            array('http',  null,  null, 'http',  8080, ':8080'),
-            array('http',  4080,  null, 'http',  8080, ':4080'),
-            array('http',  80,    null, 'http',  8080, ''),
-            array('https', null,  null, 'http',  8080, ''),
-            array('https', null,  8443, 'http',  8080, ':8443'),
-            array('https', null,  443,  'http',  8080, ''),
+            array('http',  null,  null, 'http',  8080, ':8080', false),
+            array('http',  null,  null, 'http',  8080, ':8080', true),
+            array('http',  4080,  null, 'http',  8080, ':4080', false),
+            array('http',  4080,  null, 'http',  8080, ':4080', true),
+            array('http',  80,    null, 'http',  8080, '', false),
+            array('http',  80,    null, 'http',  8080, '', true),
+            array('https', null,  null, 'http',  8080, '', false),
+            array('https', null,  null, 'http',  8080, '', true),
+            array('https', null,  8443, 'http',  8080, ':8443', false),
+            array('https', null,  8443, 'http',  8080, ':8443', true),
+            array('https', null,  443,  'http',  8080, '', false),
+            array('https', null,  443,  'http',  8080, '', true),
 
-            array('https', null,  null, 'https', 8443, ':8443'),
-            array('https', null,  4443, 'https', 8443, ':4443'),
-            array('https', null,  443,  'https', 8443, ''),
-            array('http',  null,  null, 'https', 8443, ''),
-            array('http',  8080,  4443, 'https', 8443, ':8080'),
-            array('http',  80,    4443, 'https', 8443, ''),
+            array('https', null,  null, 'https', 8443, ':8443', false),
+            array('https', null,  null, 'https', 8443, ':8443', true),
+            array('https', null,  4443, 'https', 8443, ':4443', false),
+            array('https', null,  4443, 'https', 8443, ':4443', true),
+            array('https', null,  443,  'https', 8443, '', false),
+            array('https', null,  443,  'https', 8443, '', true),
+            array('http',  null,  null, 'https', 8443, '', false),
+            array('http',  null,  null, 'https', 8443, '', true),
+            array('http',  8080,  4443, 'https', 8443, ':8080', false),
+            array('http',  8080,  4443, 'https', 8443, ':8080', true),
+            array('http',  80,    4443, 'https', 8443, '', false),
+            array('http',  80,    4443, 'https', 8443, '', true),
         );
     }
 
     /**
      * @dataProvider urlRedirectProvider
      */
-    public function testUrlRedirect($scheme, $httpPort, $httpsPort, $requestScheme, $requestPort, $expectedPort)
+    public function testUrlRedirect($scheme, $httpPort, $httpsPort, $requestScheme, $requestPort, $expectedPort, bool $invoke)
     {
         $host = 'www.example.com';
         $baseUrl = '/base';
         $path = '/redirect-path';
         $expectedUrl = "$scheme://$host$expectedPort$baseUrl$path";
 
-        $request = $this->createRequestObject($requestScheme, $host, $requestPort, $baseUrl);
+        $attributes = $invoke ? array('path' => $path, 'permanent' => false, 'scheme' => $scheme, 'httpPort' => $httpPort, 'httpsPort' => $httpsPort) : array();
+        $request = $this->createRequestObject($requestScheme, $host, $requestPort, $baseUrl, '', $attributes);
         $controller = $this->createRedirectController();
 
-        $returnValue = $controller->urlRedirectAction($request, $path, false, $scheme, $httpPort, $httpsPort);
+        $returnValue = $invoke ? $controller($request) : $controller->urlRedirectAction($request, $path, false, $scheme, $httpPort, $httpsPort);
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
     public function pathQueryParamsProvider()
     {
         return array(
-            array('http://www.example.com/base/redirect-path', '/redirect-path',  ''),
-            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''),
-            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'),
-            array('http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'),
-            array('http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'),
+            array('http://www.example.com/base/redirect-path', '/redirect-path',  '', false),
+            array('http://www.example.com/base/redirect-path', '/redirect-path',  '', true),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  '', false),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  '', true),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar', false),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar', true),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example', false),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example', true),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def', false),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def', true),
         );
     }
 
     /**
      * @dataProvider pathQueryParamsProvider
      */
-    public function testPathQueryParams($expectedUrl, $path, $queryString)
+    public function testPathQueryParams($expectedUrl, $path, $queryString, bool $invoke)
     {
         $scheme = 'http';
         $host = 'www.example.com';
         $baseUrl = '/base';
         $port = 80;
 
-        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, $queryString);
+        $attributes = $invoke ? array('path' => $path, 'permanent' => false, 'scheme' => $scheme, 'port' => $port) : array();
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, $queryString, $attributes);
 
         $controller = $this->createRedirectController();
 
-        $returnValue = $controller->urlRedirectAction($request, $path, false, $scheme, $port, null);
+        $returnValue = $invoke ? $controller($request) : $controller->urlRedirectAction($request, $path, false, $scheme, $port, null);
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
-    private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
+    private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '', $attributes = array())
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $request
@@ -243,6 +345,8 @@ class RedirectControllerTest extends TestCase
             ->expects($this->any())
             ->method('getQueryString')
             ->will($this->returnValue($queryString));
+
+        $request->attributes = new ParameterBag($attributes);
 
         return $request;
     }

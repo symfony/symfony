@@ -15,6 +15,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\ToString;
 use Symfony\Component\Validator\Validation;
 
 class ExpressionValidatorTest extends AbstractConstraintValidatorTest
@@ -87,6 +88,39 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'object')
+            ->assertRaised();
+    }
+
+    public function testSucceedingExpressionAtObjectLevelWithToString()
+    {
+        $constraint = new Expression('this.data == 1');
+
+        $object = new ToString();
+        $object->data = '1';
+
+        $this->setObject($object);
+
+        $this->validator->validate($object, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testFailingExpressionAtObjectLevelWithToString()
+    {
+        $constraint = new Expression(array(
+            'expression' => 'this.data == 1',
+            'message' => 'myMessage',
+        ));
+
+        $object = new ToString();
+        $object->data = '2';
+
+        $this->setObject($object);
+
+        $this->validator->validate($object, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'toString')
             ->assertRaised();
     }
 

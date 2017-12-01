@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-11-13T07:48:39Z
+
+As this is a new feature, it should target the master branch (which is 4.1). 3.4 is closed for new features and you're currently targeting 3.3, which will only receive bug fixes.
+
+---------------------------------------------------------------------------
+
+by PabloKowalczyk at 2017-11-13T21:10:41Z
+
+@iltar should i open new PR?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-11-14T08:00:09Z
+
+@PabloKowalczyk you'll have to change your branch to be based on the master, both locally and in in this PR, no need to create a new PR.
+
+---------------------------------------------------------------------------
+
+by PabloKowalczyk at 2017-11-19T10:36:49Z
+
+@ro0NL Could you give me more details, please? What methods should i test?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-19T10:46:26Z
+
+@ro0NL what exactly are you willing to test? I'm not convinced yet of the value of more tests for these changes :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-19T11:00:23Z
+
+in general, you would test the usecase from a compiled/dumped container; asserting a real constructed service instead of a definition. But i agree the current test implies it should work :+1:

@@ -27,7 +27,7 @@ if (PHP_VERSION_ID >= 70200) {
 }
 
 $root = __DIR__;
-while (!file_exists($root.'/composer.json') || file_exists($root.'/bin/simple-phpunit')) {
+while (!file_exists($root.'/composer.json') || file_exists($root.'/DeprecationErrorHandler.php')) {
     if ($root === dirname($root)) {
         break;
     }

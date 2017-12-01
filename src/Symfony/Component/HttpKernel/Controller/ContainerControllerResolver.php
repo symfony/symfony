@@ -92,7 +92,7 @@ class ContainerControllerResolver extends ControllerResolver
         } catch (\ArgumentCountError $e) {
         }
 
-        if ($this->container instanceof Container && in_array($class, $this->container->getRemovedIds(), true)) {
+        if ($this->container instanceof Container && isset($this->container->getRemovedIds()[$class])) {
             throw new \LogicException(sprintf('Controller "%s" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?', $class), 0, $e);
         }
 

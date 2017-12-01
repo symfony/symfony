@@ -519,6 +519,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
+        if ($this->isCompiled() && isset($this->removedIds[$id]) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+            return parent::get($id);
+        }
+
         return $this->doGet($id, $invalidBehavior);
     }
 
@@ -715,6 +719,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         parent::compile();
+
+        foreach ($this->definitions + $this->aliasDefinitions as $id => $definition) {
+            if (!$definition->isPublic() || $definition->isPrivate()) {
+                $this->removedIds[$id] = true;
+            }
+        }
     }
 
     /**

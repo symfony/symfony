@@ -25,9 +25,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $this->methodMap = array(
             'bar' => 'getBarService',
             'bar3' => 'getBar3Service',
+            'bar5' => 'getBar5Service',
             'foo' => 'getFooService',
             'foo2' => 'getFoo2Service',
             'foo4' => 'getFoo4Service',
+            'foo5' => 'getFoo5Service',
             'foobar' => 'getFoobarService',
             'foobar2' => 'getFoobar2Service',
             'foobar3' => 'getFoobar3Service',
@@ -94,6 +96,26 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     }
 
     /**
+     * Gets the public 'bar5' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getBar5Service()
+    {
+        $a = ${($_ = isset($this->services['foo5']) ? $this->services['foo5'] : $this->getFoo5Service()) && false ?: '_'};
+
+        if (isset($this->services['bar5'])) {
+            return $this->services['bar5'];
+        }
+
+        $this->services['bar5'] = $instance = new \stdClass($a);
+
+        $instance->foo = $a;
+
+        return $instance;
+    }
+
+    /**
      * Gets the public 'foo' shared service.
      *
      * @return \FooCircular
@@ -135,6 +157,20 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $instance = new \stdClass();
 
         $instance->foobar = ${($_ = isset($this->services['foobar4']) ? $this->services['foobar4'] : $this->getFoobar4Service()) && false ?: '_'};
+
+        return $instance;
+    }
+
+    /**
+     * Gets the public 'foo5' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getFoo5Service()
+    {
+        $this->services['foo5'] = $instance = new \stdClass();
+
+        $instance->bar = ${($_ = isset($this->services['bar5']) ? $this->services['bar5'] : $this->getBar5Service()) && false ?: '_'};
 
         return $instance;
     }

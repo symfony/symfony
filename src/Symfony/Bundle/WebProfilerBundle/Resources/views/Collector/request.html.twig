@@ -167,10 +167,10 @@
                 {% endif %}
 
                 <h3>Server Parameters</h3>
-                <h4>Managed by Symfony Dotenv</h4>
+                <h4>Defined in .env</h4>
                 {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.dotenvvars }, with_context = false) }}
 
-                <h4>Standard variables</h4>
+                <h4>Defined as regular env variables</h4>
                 {% set requestserver = [] %}
                 {% for key, value in collector.requestserver if key not in collector.dotenvvars.keys %}
                     {% set requestserver = requestserver|merge({(key): value}) %}

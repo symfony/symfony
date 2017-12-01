@@ -623,7 +623,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                             ->defaultValue(array('en'))
                         ->end()
-                        ->booleanNode('logging')->defaultValue($this->debug)->end()
+                        ->booleanNode('logging')->defaultValue(false)->end()
                         ->scalarNode('formatter')->defaultValue('translator.formatter.default')->end()
                         ->scalarNode('default_path')
                             ->info('The default path used to load translations')

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-01T09:48:37Z
+
+It's clearly a WIP PR. @Simperfit I suggest you either add `WIP` to your PR title or just not open the PR yet (and enable Travis on your fork if you need the tests to run) :)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-01T15:48:09Z
+
+here is a little gif of the french fields with snow:
+![image uploaded from ios](https://user-images.githubusercontent.com/3451634/33490409-5935bcf6-d6b7-11e7-9dea-67afc1eb8581.gif)

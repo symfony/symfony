@@ -166,7 +166,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function reset()
     {
-        $this->stopwatch->reset();
+        if ($this->stopwatch) {
+            $this->stopwatch->reset();
+        }
         $this->data = array();
         $this->dataCount = 0;
         $this->isCollected = false;

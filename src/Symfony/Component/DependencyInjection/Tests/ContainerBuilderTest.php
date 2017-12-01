@@ -733,6 +733,7 @@ class ContainerBuilderTest extends TestCase
             PsrContainerInterface::class => true,
             ContainerInterface::class => true,
             'baz_%env(BAR)%' => true,
+            'bar_%env(BAR)%' => true,
         );
         $this->assertSame($expected, $container->getRemovedIds());
 
@@ -1237,6 +1238,9 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame($foo2, $foo2->bar->foobar->foo);
 
         $this->assertSame(array(), (array) $container->get('foobar4'));
+
+        $foo5 = $container->get('foo5');
+        $this->assertSame($foo5, $foo5->bar->foo);
     }
 
     public function provideAlmostCircular()

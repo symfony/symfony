@@ -28,6 +28,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'bar3' => 'getBar3Service',
             'foo' => 'getFooService',
             'foo2' => 'getFoo2Service',
+            'foo5' => 'getFoo5Service',
             'foobar4' => 'getFoobar4Service',
         );
 
@@ -56,6 +57,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'bar' => true,
+            'bar5' => true,
             'foo4' => true,
             'foobar' => true,
             'foobar2' => true,
@@ -123,6 +125,24 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Private extends Container
         }
 
         return $this->services['foo2'] = new \FooCircular($a);
+    }
+
+    /**
+     * Gets the public 'foo5' shared service.
+     *
+     * @return \stdClass
+     */
+    protected function getFoo5Service()
+    {
+        $this->services['foo5'] = $instance = new \stdClass();
+
+        $a = new \stdClass(($this->services['foo5'] ?? $this->getFoo5Service()));
+
+        $a->foo = $instance;
+
+        $instance->bar = $a;
+
+        return $instance;
     }
 
     /**

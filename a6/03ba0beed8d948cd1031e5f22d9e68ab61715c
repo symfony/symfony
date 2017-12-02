@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-11-27T18:00:01Z
+
+Does the PHP DSL also need this feature, or is it already available in it ?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-28T05:36:19Z
+
+@stof it was't. I've added it to the trait.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-30T15:57:01Z
+
+Status: Needs review

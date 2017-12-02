@@ -127,7 +127,7 @@ class SecurityExtensionTest extends TestCase
      * @group legacy
      * @expectedDeprecation Not setting "logout_on_user_change" to true on firewall "some_firewall" is deprecated as of 3.4, it will always be true in 4.0.
      */
-    public function testDeprecationForUserLogout()
+    public function testConfiguresLogoutOnUserChangeForContextListenersCorrectly()
     {
         $container = $this->getRawContainer();
 
@@ -142,10 +142,18 @@ class SecurityExtensionTest extends TestCase
                     'http_basic' => null,
                     'logout_on_user_change' => false,
                 ),
+                'some_other_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                    'logout_on_user_change' => true,
+                ),
             ),
         ));
 
         $container->compile();
+
+        $this->assertEquals(array(array('setLogoutOnUserChange', array(false))), $container->getDefinition('security.context_listener.0')->getMethodCalls());
+        $this->assertEquals(array(array('setLogoutOnUserChange', array(true))), $container->getDefinition('security.context_listener.1')->getMethodCalls());
     }
 
     /**

@@ -276,15 +276,19 @@ class SecurityExtension extends Extension
                 $customUserChecker = true;
             }
 
+            $configId = 'security.firewall.map.config.'.$name;
+
+            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
+
             if (!isset($firewall['logout_on_user_change']) || !$firewall['logout_on_user_change']) {
                 @trigger_error(sprintf('Not setting "logout_on_user_change" to true on firewall "%s" is deprecated as of 3.4, it will always be true in 4.0.', $name), E_USER_DEPRECATED);
             }
 
-            $contextListenerDefinition->addMethodCall('setLogoutOnUserChange', array($firewall['logout_on_user_change']));
-
-            $configId = 'security.firewall.map.config.'.$name;
-
-            list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
+            foreach ($listeners as $listener) {
+                if (0 === strpos($listenerId = (string) $listener, 'security.context_listener.')) {
+                    $container->getDefinition($listenerId)->addMethodCall('setLogoutOnUserChange', array($firewall['logout_on_user_change']));
+                }
+            }
 
             $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new ChildDefinition('security.firewall.context'));

@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by votemike at 2017-12-01T20:07:25Z
+
+You can tell the original typehint was incorrect if you add `declare(strict_types=1);` at the top of this file and run the tests.
+The changes also now match the docblocks.

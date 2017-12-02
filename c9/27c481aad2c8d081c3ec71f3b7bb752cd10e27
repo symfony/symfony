@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by theofidry at 2017-12-01T18:01:17Z
+
+@nicolas-grekas so you would still get a silent hard failure if you do `c:c --env prod`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-01T18:06:30Z
+
+Not since 10 minutes. When did you read the code ? :)
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-12-01T18:08:05Z
+
+I didn't, but I have trouble following :P
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-01T18:24:36Z
+
+Fwiw, I believe a user on Twitter hit the same issue - when removing Twig https://twitter.com/neelion333/status/936623941937795072 - looks very easy to reproduce
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-02T03:42:06Z
+
+I think this bug might be quite critical. I think I'm even able to hit it through the web interface. While upgrading a project from 3.3 to 3.4, I did the following:
+
+1) Added the `container.autowiring.strict_mode: true` parameter.
+2) Refreshed to rebuild the container
+3) Removed this parameter
+4) Refreshed to this error:
+
+<img width="1165" alt="screen shot 2017-12-01 at 10 40 10 pm" src="https://user-images.githubusercontent.com/121003/33511430-c3fd361e-d6e8-11e7-9c1e-2552628e98af.png">
+
+@nicolas-grekas Do you think it's related? Do you need me to try to create a repeater (the above was done on our big KnpU Symfony 3 tutorial project).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-02T18:30:43Z
+
+@weaverryan looks like the same yes.
+
+I improved the behavior by replacing the nasty `@`-silencing by a specific `E_WARNING` silencing. The container-loading file is also now resilient to a broken container folder, by using include+return in case of failure. Also handled by Kernel.
+
+PR is ready. Dunno how to test it as the behavior is triggered by edge case fatal errors...

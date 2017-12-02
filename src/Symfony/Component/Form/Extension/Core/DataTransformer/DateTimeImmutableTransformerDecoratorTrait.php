@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * A BC-layer trait for DateTimeTo*Transformers
+ * A BC-layer trait for DateTimeTo*Transformers.
  *
  * @author Valentin Udaltsov <udaltsov.valentin@gmail.com>
  *

@@ -50,6 +50,7 @@
     <xsd:attribute name="resource" type="xsd:string" use="required" />
     <xsd:attribute name="type" type="xsd:string" />
     <xsd:attribute name="prefix" type="xsd:string" />
+    <xsd:attribute name="name-prefix" type="xsd:string" />
     <xsd:attribute name="host" type="xsd:string" />
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />

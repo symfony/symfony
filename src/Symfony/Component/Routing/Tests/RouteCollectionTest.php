@@ -302,4 +302,19 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals(array('PUT'), $routea->getMethods());
         $this->assertEquals(array('PUT'), $routeb->getMethods());
     }
+
+    public function testAddNamePrefix()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', $foo = new Route('/foo'));
+        $collection->add('bar', $bar = new Route('/bar'));
+        $collection->add('api_foo', $apiFoo = new Route('/api/foo'));
+        $collection->addNamePrefix('api_');
+
+        $this->assertEquals($foo, $collection->get('api_foo'));
+        $this->assertEquals($bar, $collection->get('api_bar'));
+        $this->assertEquals($apiFoo, $collection->get('api_api_foo'));
+        $this->assertNull($collection->get('foo'));
+        $this->assertNull($collection->get('bar'));
+    }
 }

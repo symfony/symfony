@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added support for invokable event listeners tagged with `kernel.event_listener` by default 
+
 4.0.0
 -----
 

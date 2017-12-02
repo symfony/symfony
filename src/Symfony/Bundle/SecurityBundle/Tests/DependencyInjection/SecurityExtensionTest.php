@@ -127,7 +127,7 @@ class SecurityExtensionTest extends TestCase
      * @group legacy
      * @expectedDeprecation Not setting "logout_on_user_change" to true on firewall "some_firewall" is deprecated as of 3.4, it will always be true in 4.0.
      */
-    public function testDeprecationForUserLogout()
+    public function testConfiguresLogoutOnUserChangeForContextListenersCorrectly()
     {
         $container = $this->getRawContainer();
 
@@ -135,12 +135,51 @@ class SecurityExtensionTest extends TestCase
             'providers' => array(
                 'default' => array('id' => 'foo'),
             ),
-
             'firewalls' => array(
                 'some_firewall' => array(
                     'pattern' => '/.*',
                     'http_basic' => null,
                     'logout_on_user_change' => false,
+                ),
+                'some_other_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                    'logout_on_user_change' => true,
+                ),
+            ),
+        ));
+
+        $container->compile();
+
+        $this->assertEquals(array(array('setLogoutOnUserChange', array(false))), $container->getDefinition('security.context_listener.0')->getMethodCalls());
+        $this->assertEquals(array(array('setLogoutOnUserChange', array(true))), $container->getDefinition('security.context_listener.1')->getMethodCalls());
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Firewalls "some_firewall" and "some_other_firewall" need to have the same value for option "logout_on_user_change" as they are sharing the context "my_context"
+     */
+    public function testThrowsIfLogoutOnUserChangeDifferentForSharedContext()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                    'context' => 'my_context',
+                    'logout_on_user_change' => false,
+                ),
+                'some_other_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                    'context' => 'my_context',
+                    'logout_on_user_change' => true,
                 ),
             ),
         ));

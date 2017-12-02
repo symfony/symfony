@@ -12,16 +12,17 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToTimestampTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToImmutableTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\ReversedTransformer;
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -55,7 +56,7 @@ class TimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
+            $builder->addViewTransformer(new DateTimeImmutableToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
 
             // handle seconds ignored by user's browser when with_seconds enabled
             // https://codereview.chromium.org/450533009/
@@ -130,20 +131,22 @@ class TimeType extends AbstractType
                 $builder->add('second', self::$widgets[$options['widget']], $secondOptions);
             }
 
-            $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
+            $builder->addViewTransformer(new DateTimeImmutableToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
         }
 
-        if ('string' === $options['input']) {
+        if ('datetime' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeToImmutableTransformer());
+        } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'H:i:s')
+                new DateTimeImmutableToStringTransformer($options['model_timezone'], $options['model_timezone'], 'H:i:s')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeImmutableToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
+                new DateTimeImmutableToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
             ));
         }
     }

@@ -11,70 +11,21 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
-use Symfony\Component\Form\Exception\TransformationFailedException;
-
 /**
  * Transforms between a timestamp and a DateTime object.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
+ *
+ * @deprecated The Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer class is deprecated since version 4.1 and will be removed in 5.0. Use the Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToTimestampTransformer class instead.
  */
 class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
 {
-    /**
-     * Transforms a DateTime object into a timestamp in the configured timezone.
-     *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
-     *
-     * @return int A timestamp
-     *
-     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
-     */
-    public function transform($dateTime)
+    use DateTimeImmutableTransformerDecoratorTrait;
+
+    public function __construct($inputTimezone = null, $outputTimezone = null)
     {
-        if (null === $dateTime) {
-            return;
-        }
-
-        if (!$dateTime instanceof \DateTimeInterface) {
-            throw new TransformationFailedException('Expected a \DateTimeInterface.');
-        }
-
-        return $dateTime->getTimestamp();
-    }
-
-    /**
-     * Transforms a timestamp in the configured timezone into a DateTime object.
-     *
-     * @param string $value A timestamp
-     *
-     * @return \DateTime A \DateTime object
-     *
-     * @throws TransformationFailedException If the given value is not a timestamp
-     *                                       or if the given timestamp is invalid
-     */
-    public function reverseTransform($value)
-    {
-        if (null === $value) {
-            return;
-        }
-
-        if (!is_numeric($value)) {
-            throw new TransformationFailedException('Expected a numeric.');
-        }
-
-        try {
-            $dateTime = new \DateTime();
-            $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
-            $dateTime->setTimestamp($value);
-
-            if ($this->inputTimezone !== $this->outputTimezone) {
-                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
-            }
-        } catch (\Exception $e) {
-            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        return $dateTime;
+        parent::__construct($inputTimezone, $outputTimezone);
+        $this->decorated = new DateTimeImmutableToTimestampTransformer($inputTimezone, $outputTimezone);
     }
 }

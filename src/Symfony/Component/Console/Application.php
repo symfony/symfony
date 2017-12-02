@@ -40,6 +40,7 @@ use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -118,6 +119,25 @@ class Application
             $output = new ConsoleOutput();
         }
 
+        $renderException = function ($e) use ($output) {
+            if (!$e instanceof \Exception) {
+                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+            }
+            if ($output instanceof ConsoleOutputInterface) {
+                $this->renderException($e, $output->getErrorOutput());
+            } else {
+                $this->renderException($e, $output);
+            }
+        };
+        if ($phpHandler = set_exception_handler($renderException)) {
+            restore_exception_handler();
+            if (!is_array($phpHandler) || !$phpHandler[0] instanceof ErrorHandler) {
+                $debugHandler = true;
+            } elseif ($debugHandler = $phpHandler[0]->setExceptionHandler($renderException)) {
+                $phpHandler[0]->setExceptionHandler($debugHandler);
+            }
+        }
+
         if (null !== $this->dispatcher && $this->dispatcher->hasListeners(ConsoleEvents::EXCEPTION)) {
             @trigger_error(sprintf('The "ConsoleEvents::EXCEPTION" event is deprecated since Symfony 3.3 and will be removed in 4.0. Listen to the "ConsoleEvents::ERROR" event instead.'), E_USER_DEPRECATED);
         }
@@ -125,21 +145,13 @@ class Application
         $this->configureIO($input, $output);
 
         try {
-            $e = null;
             $exitCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
-        }
-
-        if (null !== $e) {
             if (!$this->catchExceptions) {
                 throw $e;
             }
 
-            if ($output instanceof ConsoleOutputInterface) {
-                $this->renderException($e, $output->getErrorOutput());
-            } else {
-                $this->renderException($e, $output);
-            }
+            $renderException($e);
 
             $exitCode = $e->getCode();
             if (is_numeric($exitCode)) {
@@ -149,6 +161,12 @@ class Application
                 }
             } else {
                 $exitCode = 1;
+            }
+        } finally {
+            if (!$phpHandler) {
+                restore_exception_handler();
+            } elseif (!$debugHandler) {
+                $phpHandler[0]->setExceptionHandler(null);
             }
         }
 

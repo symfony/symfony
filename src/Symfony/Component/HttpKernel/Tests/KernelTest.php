@@ -833,7 +833,7 @@ EOF;
 
         $this->assertTrue(get_class($kernel->getContainer()) !== $containerClass);
         $this->assertFileExists($containerFile);
-        $this->assertFileExists(dirname($containerFile).'.legacyContainer');
+        $this->assertFileExists(dirname($containerFile).'.legacy');
     }
 
     public function testKernelPass()

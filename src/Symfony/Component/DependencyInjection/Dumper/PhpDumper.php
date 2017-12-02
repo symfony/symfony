@@ -874,7 +874,11 @@ class $class extends $baseClass
 {
     private \$parameters;
     private \$targetDirs = array();
-    private \$privates = array();
+
+    /*{$this->docStar}
+     * @internal but protected for BC on cache:clear
+     */
+    protected \$privates = array();
 
     public function __construct()
     {
@@ -1058,7 +1062,7 @@ EOF;
         return $code."        );\n";
     }
 
-    private function addInlineRequires() :string
+    private function addInlineRequires(): string
     {
         if (!$this->hotPathTag || !$this->inlineRequires) {
             return '';

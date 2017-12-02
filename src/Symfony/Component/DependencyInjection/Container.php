@@ -174,7 +174,7 @@ class Container implements ResettableContainerInterface
         }
 
         if (isset($this->privates[$id]) || !(isset($this->fileMap[$id]) || isset($this->methodMap[$id]))) {
-            if (isset($this->syntheticIds[$id]) || (!isset($this->privates[$id]) && !isset($this->getRemovedIds()[$id]))) {
+            if (!isset($this->privates[$id]) && !isset($this->getRemovedIds()[$id])) {
                 // no-op
             } elseif (null === $service) {
                 @trigger_error(sprintf('The "%s" service is private, unsetting it is deprecated since Symfony 3.2 and will fail in 4.0.', $id), E_USER_DEPRECATED);

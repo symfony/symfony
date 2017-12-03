@@ -369,7 +369,7 @@ class SecurityExtension extends Extension
                 @trigger_error(sprintf('Not setting "logout_on_user_change" to true on firewall "%s" is deprecated as of 3.4, it will always be true in 4.0.', $id), E_USER_DEPRECATED);
             }
 
-            if (isset($this->firewallsByContextKey[$contextKey]) && $firewall['logout_on_user_change'] !== $this->firewallsByContextKey[$contextKey][1]['logout_on_user_change']) {
+            if (isset($this->firewallsByContextKey[$contextKey]) && $this->firewallsByContextKey[$contextKey][1]['logout_on_user_change'] !== $firewall['logout_on_user_change']) {
                 throw new InvalidConfigurationException(sprintf('Firewalls "%s" and "%s" need to have the same value for option "logout_on_user_change" as they are sharing the context "%s"', $this->firewallsByContextKey[$contextKey][0], $id, $contextKey));
             }
 

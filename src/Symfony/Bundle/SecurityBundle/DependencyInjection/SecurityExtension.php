@@ -485,7 +485,7 @@ class SecurityExtension extends Extension
         return array($matcher, $listeners, $exceptionListener);
     }
 
-    private function createContextListener(ContainerBuilder $container, $contextKey, $logoutUserOnChange)
+    private function createContextListener($container, $contextKey, $logoutUserOnChange)
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];

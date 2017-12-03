@@ -85,13 +85,17 @@ EOF
         }
         $io->newLine();
         $tableRows = array();
+        $hasAlias = array();
         foreach ($serviceIds as $serviceId) {
-            $tableRows[] = array(sprintf('<fg=cyan>%s</fg=cyan>', $serviceId));
             if ($builder->hasAlias($serviceId)) {
+                $tableRows[] = array(sprintf('<fg=cyan>%s</fg=cyan>', $serviceId));
                 $tableRows[] = array(sprintf('    alias to %s', $builder->getAlias($serviceId)));
+                $hasAlias[(string) $builder->getAlias($serviceId)] = true;
+            } else {
+                $tableRows[$serviceId] = array(sprintf('<fg=cyan>%s</fg=cyan>', $serviceId));
             }
         }
 
-        $io->table(array(), $tableRows);
+        $io->table(array(), array_diff_key($tableRows, $hasAlias));
     }
 }

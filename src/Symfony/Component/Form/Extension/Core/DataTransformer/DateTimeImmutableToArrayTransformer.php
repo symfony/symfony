@@ -22,7 +22,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class DateTimeImmutableToArrayTransformer extends BaseDateTimeTransformer
 {
     private $pad;
-
     private $fields;
 
     /**

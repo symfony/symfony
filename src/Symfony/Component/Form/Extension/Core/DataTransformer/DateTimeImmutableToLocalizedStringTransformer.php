@@ -23,11 +23,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class DateTimeImmutableToLocalizedStringTransformer extends BaseDateTimeTransformer
 {
     private $dateFormat;
-
     private $timeFormat;
-
     private $pattern;
-
     private $calendar;
 
     /**

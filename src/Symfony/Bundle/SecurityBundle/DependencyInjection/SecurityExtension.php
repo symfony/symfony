@@ -43,6 +43,7 @@ class SecurityExtension extends Extension
     private $factories = array();
     private $userProviderFactories = array();
     private $expressionLanguage;
+    private $firewallsByContextKey = array();
 
     public function __construct()
     {
@@ -368,6 +369,11 @@ class SecurityExtension extends Extension
                 @trigger_error(sprintf('Not setting "logout_on_user_change" to true on firewall "%s" is deprecated as of 3.4, it will always be true in 4.0.', $id), E_USER_DEPRECATED);
             }
 
+            if (isset($this->firewallsByContextKey[$contextKey]) && $firewall['logout_on_user_change'] !== $this->firewallsByContextKey[$contextKey][1]['logout_on_user_change']) {
+                throw new InvalidConfigurationException(sprintf('Firewalls "%s" and "%s" need to have the same value for option "logout_on_user_change" as they are sharing the context "%s"', $this->firewallsByContextKey[$contextKey][0], $id, $contextKey));
+            }
+
+            $this->firewallsByContextKey[$contextKey] = array($id, $firewall);
             $listeners[] = new Reference($this->createContextListener($container, $contextKey, $firewall['logout_on_user_change']));
         }
 
@@ -479,7 +485,7 @@ class SecurityExtension extends Extension
         return array($matcher, $listeners, $exceptionListener);
     }
 
-    private function createContextListener($container, $contextKey, $logoutUserOnChange)
+    private function createContextListener(ContainerBuilder $container, $contextKey, $logoutUserOnChange)
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];

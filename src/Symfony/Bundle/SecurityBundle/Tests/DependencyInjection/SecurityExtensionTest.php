@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SecurityExtensionTest extends TestCase
@@ -135,7 +136,6 @@ class SecurityExtensionTest extends TestCase
             'providers' => array(
                 'default' => array('id' => 'foo'),
             ),
-
             'firewalls' => array(
                 'some_firewall' => array(
                     'pattern' => '/.*',
@@ -154,6 +154,38 @@ class SecurityExtensionTest extends TestCase
 
         $this->assertEquals(array(array('setLogoutOnUserChange', array(false))), $container->getDefinition('security.context_listener.0')->getMethodCalls());
         $this->assertEquals(array(array('setLogoutOnUserChange', array(true))), $container->getDefinition('security.context_listener.1')->getMethodCalls());
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Firewalls "some_firewall" and "some_other_firewall" need to have the same value for option "logout_on_user_change" as they are sharing the context "my_context"
+     */
+    public function testThrowsIfLogoutOnUserChangeDifferentForSharedContext()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                    'context' => 'my_context',
+                    'logout_on_user_change' => false,
+                ),
+                'some_other_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                    'context' => 'my_context',
+                    'logout_on_user_change' => true,
+                ),
+            ),
+        ));
+
+        $container->compile();
     }
 
     /**

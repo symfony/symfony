@@ -56,7 +56,7 @@
             <argument>null</argument> <!-- name converter -->
             <argument type="service" id="serializer.property_accessor" />
             <argument type="service" id="property_info" on-invalid="ignore" />
-            <argument type="service" id="serializer.mapping.class_discriminator_resolver" />
+            <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
 
             <!-- Run after all custom normalizers -->
             <tag name="serializer.normalizer" priority="-1000" />

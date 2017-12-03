@@ -38,7 +38,7 @@ class WorkflowDumpCommand extends Command
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
-                new InputOption('label', 'l',  InputArgument::OPTIONAL,  'Labels a graph'),
+                new InputOption('label', 'l', InputArgument::OPTIONAL, 'Labels a graph'),
             ))
             ->setDescription('Dump a workflow')
             ->setHelp(<<<'EOF'

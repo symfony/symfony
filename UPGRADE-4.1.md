@@ -1,6 +1,11 @@
 UPGRADE FROM 4.0 to 4.1
 =======================
 
+Event Dispatcher
+----------------
+
+ * The `TraceableEventDispatcherInterface` has been deprecated and will be removed in 5.0.
+
 HttpFoundation
 --------------
 

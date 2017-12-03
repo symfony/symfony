@@ -1,6 +1,11 @@
 UPGRADE FROM 4.x to 5.0
 =======================
 
+Event Dispatcher
+----------------
+
+ * The `TraceableEventDispatcherInterface` has been removed.
+
 HttpFoundation
 --------------
 

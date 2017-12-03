@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added support for variadics in named arguments
+ * added PSR-11 `ContainerBagInterface` and its `ContainerBag` implementation to access parameters as-a-service
 
 4.0.0
 -----

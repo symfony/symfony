@@ -7,6 +7,12 @@
     <services>
         <defaults public="false" />
 
+        <service id="parameter_bag" class="Symfony\Component\DependencyInjection\ParameterBag\ContainerBag">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface" alias="parameter_bag" />
+        <service id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface" alias="parameter_bag" />
+
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\EventDispatcher" public="true">
             <tag name="container.hot_path" />
         </service>

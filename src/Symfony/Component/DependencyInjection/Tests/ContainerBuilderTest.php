@@ -1310,6 +1310,24 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame('via-argument', $container->get('foo')->class1->identifier);
         $this->assertSame('via-bindings', $container->get('foo')->class2->identifier);
     }
+
+    public function testIdCanBeAnObjectAsLongAsItCanBeCastToString()
+    {
+        $id = new Reference('another_service');
+        $aliasId = new Reference('alias_id');
+
+        $container = new ContainerBuilder();
+        $container->set($id, new \stdClass());
+        $container->setAlias($aliasId, 'another_service');
+
+        $this->assertTrue($container->has('another_service'));
+        $this->assertTrue($container->has($id));
+        $this->assertTrue($container->hasAlias('alias_id'));
+        $this->assertTrue($container->hasAlias($aliasId));
+
+        $container->removeAlias($aliasId);
+        $container->removeDefinition($id);
+    }
 }
 
 class FooClass

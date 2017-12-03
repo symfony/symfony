@@ -276,20 +276,9 @@ class SecurityExtension extends Extension
                 $customUserChecker = true;
             }
 
-            if (!isset($firewall['logout_on_user_change']) || !$firewall['logout_on_user_change']) {
-                @trigger_error(sprintf('Not setting "logout_on_user_change" to true on firewall "%s" is deprecated as of 3.4, it will always be true in 4.0.', $name), E_USER_DEPRECATED);
-            }
-
             $configId = 'security.firewall.map.config.'.$name;
 
             list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
-
-            foreach ($listeners as $listener) {
-                if (0 === strpos($listenerId = (string) $listener, 'security.context_listener.')) {
-                    $container->getDefinition($listenerId)->addMethodCall('setLogoutOnUserChange', array($firewall['logout_on_user_change']));
-                    break;
-                }
-            }
 
             $contextId = 'security.firewall.map.context.'.$name;
             $context = $container->setDefinition($contextId, new ChildDefinition('security.firewall.context'));
@@ -375,7 +364,11 @@ class SecurityExtension extends Extension
                 $contextKey = $firewall['context'];
             }
 
-            $listeners[] = new Reference($this->createContextListener($container, $contextKey));
+            if (!isset($firewall['logout_on_user_change']) || !$firewall['logout_on_user_change']) {
+                @trigger_error(sprintf('Not setting "logout_on_user_change" to true on firewall "%s" is deprecated as of 3.4, it will always be true in 4.0.', $id), E_USER_DEPRECATED);
+            }
+
+            $listeners[] = new Reference($this->createContextListener($container, $contextKey, $firewall['logout_on_user_change']));
         }
 
         $config->replaceArgument(6, $contextKey);
@@ -486,7 +479,7 @@ class SecurityExtension extends Extension
         return array($matcher, $listeners, $exceptionListener);
     }
 
-    private function createContextListener($container, $contextKey)
+    private function createContextListener($container, $contextKey, $logoutUserOnChange)
     {
         if (isset($this->contextListeners[$contextKey])) {
             return $this->contextListeners[$contextKey];
@@ -495,6 +488,7 @@ class SecurityExtension extends Extension
         $listenerId = 'security.context_listener.'.count($this->contextListeners);
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.context_listener'));
         $listener->replaceArgument(2, $contextKey);
+        $listener->addMethodCall('setLogoutOnUserChange', array($logoutUserOnChange));
 
         return $this->contextListeners[$contextKey] = $listenerId;
     }

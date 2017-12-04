@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Bridge\Twig\TokenParser\FormThemeTokenParser;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -72,7 +73,13 @@ class FormExtension extends AbstractExtension
     {
         return array(
             new TwigTest('selectedchoice', 'Symfony\Bridge\Twig\Extension\twig_is_selected_choice'),
+            new TwigTest('rootform', array($this, 'isRootForm')),
         );
+    }
+
+    public function isRootForm(FormView $formView)
+    {
+        return null === $formView->parent;
     }
 
     /**

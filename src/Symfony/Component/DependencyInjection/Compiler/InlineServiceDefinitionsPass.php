@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -23,6 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class InlineServiceDefinitionsPass extends AbstractRecursivePass implements RepeatablePassInterface
 {
     private $repeatedPass;
+    private $cloningIds = array();
     private $inlinedServiceIds = array();
 
     /**
@@ -54,18 +56,44 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             // Reference found in ArgumentInterface::getValues() are not inlineable
             return $value;
         }
-        if ($value instanceof Reference && $this->container->hasDefinition($id = (string) $value)) {
-            $definition = $this->container->getDefinition($id);
 
-            if ($this->isInlineableDefinition($id, $definition, $this->container->getCompiler()->getServiceReferenceGraph())) {
-                $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
-                $this->inlinedServiceIds[$id][] = $this->currentId;
-
-                return $definition->isShared() ? $definition : clone $definition;
+        if ($value instanceof Definition && $this->cloningIds) {
+            if ($value->isShared()) {
+                return $value;
             }
+            $value = clone $value;
         }
 
-        return parent::processValue($value, $isRoot);
+        if (!$value instanceof Reference || !$this->container->hasDefinition($id = (string) $value)) {
+            return parent::processValue($value, $isRoot);
+        }
+
+        $definition = $this->container->getDefinition($id);
+
+        if (!$this->isInlineableDefinition($id, $definition, $this->container->getCompiler()->getServiceReferenceGraph())) {
+            return $value;
+        }
+
+        $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
+        $this->inlinedServiceIds[$id][] = $this->currentId;
+
+        if ($definition->isShared()) {
+            return $definition;
+        }
+
+        if (isset($this->cloningIds[$id])) {
+            $ids = array_keys($this->cloningIds);
+            $ids[] = $id;
+
+            throw new ServiceCircularReferenceException($id, array_slice($ids, array_search($id, $ids)));
+        }
+
+        $this->cloningIds[$id] = true;
+        try {
+            return $this->processValue($definition);
+        } finally {
+            unset($this->cloningIds[$id]);
+        }
     }
 
     /**

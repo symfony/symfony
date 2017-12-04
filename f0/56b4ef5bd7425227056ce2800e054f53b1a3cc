@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-12-02T15:05:28Z
+
+See a sample of output before this patch here: https://travis-ci.org/greg0ire/enum/jobs/310505991#L572
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-12-02T15:14:43Z
+
+The Travis failure seems unrelated

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-03T13:39:15Z
+
+Are we really going to do this now on each place where optional dependency is used? I'm 👎 on that. There should be global solution and/or not doing this at all and just document what such php error usually means.

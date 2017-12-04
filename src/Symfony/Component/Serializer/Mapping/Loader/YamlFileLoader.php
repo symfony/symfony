@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * YAML File Loader.
@@ -113,7 +114,7 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new Parser();
         }
 
-        $classes = $this->yamlParser->parseFile($this->file);
+        $classes = $this->yamlParser->parseFile($this->file, Yaml::PARSE_CONSTANT);
 
         if (empty($classes)) {
             return array();

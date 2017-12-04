@@ -467,6 +467,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function set($id, $service)
     {
+        $id = (string) $id;
+
         if ($this->isCompiled() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
             // setting a synthetic service on a compiled container is alright
             throw new BadMethodCallException(sprintf('Setting service "%s" for an unknown or non-synthetic service definition on a compiled container is not allowed.', $id));
@@ -484,7 +486,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function removeDefinition($id)
     {
-        if (isset($this->definitions[$id])) {
+        if (isset($this->definitions[$id = (string) $id])) {
             unset($this->definitions[$id]);
             $this->removedIds[$id] = true;
         }
@@ -499,6 +501,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function has($id)
     {
+        $id = (string) $id;
+
         return isset($this->definitions[$id]) || isset($this->aliasDefinitions[$id]) || parent::has($id);
     }
 
@@ -519,7 +523,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        if ($this->isCompiled() && isset($this->removedIds[$id]) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+        if ($this->isCompiled() && isset($this->removedIds[$id = (string) $id]) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
             return parent::get($id);
         }
 
@@ -779,6 +783,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setAlias($alias, $id)
     {
+        $alias = (string) $alias;
+
         if (is_string($id)) {
             $id = new Alias($id);
         } elseif (!$id instanceof Alias) {
@@ -801,7 +807,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function removeAlias($alias)
     {
-        if (isset($this->aliasDefinitions[$alias])) {
+        if (isset($this->aliasDefinitions[$alias = (string) $alias])) {
             unset($this->aliasDefinitions[$alias]);
             $this->removedIds[$alias] = true;
         }
@@ -816,7 +822,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function hasAlias($id)
     {
-        return isset($this->aliasDefinitions[$id]);
+        return isset($this->aliasDefinitions[$id = (string) $id]);
     }
 
     /**
@@ -840,6 +846,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getAlias($id)
     {
+        $id = (string) $id;
+
         if (!isset($this->aliasDefinitions[$id])) {
             throw new InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $id));
         }
@@ -928,6 +936,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Adding definition to a compiled container is not allowed');
         }
 
+        $id = (string) $id;
+
         unset($this->aliasDefinitions[$id], $this->removedIds[$id]);
 
         return $this->definitions[$id] = $definition;
@@ -942,7 +952,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function hasDefinition($id)
     {
-        return isset($this->definitions[$id]);
+        return isset($this->definitions[(string) $id]);
     }
 
     /**
@@ -956,6 +966,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getDefinition($id)
     {
+        $id = (string) $id;
+
         if (!isset($this->definitions[$id])) {
             throw new ServiceNotFoundException($id);
         }
@@ -976,6 +988,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function findDefinition($id)
     {
+        $id = (string) $id;
+
         while (isset($this->aliasDefinitions[$id])) {
             $id = (string) $this->aliasDefinitions[$id];
         }

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-04T16:53:19Z
+
+@ostrolucky For next time, having just 1 PR instead of 3 would have been better. First, because all the changes are related, so having one commit with all changes make sense. Then, it's much faster for the core team to process one PR :) Thanks for the contribution.

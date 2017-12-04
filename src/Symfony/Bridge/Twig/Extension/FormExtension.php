@@ -73,13 +73,8 @@ class FormExtension extends AbstractExtension
     {
         return array(
             new TwigTest('selectedchoice', 'Symfony\Bridge\Twig\Extension\twig_is_selected_choice'),
-            new TwigTest('rootform', array($this, 'isRootForm')),
+            new TwigTest('rootform', 'Symfony\Bridge\Twig\Extension\twig_is_root_form'),
         );
-    }
-
-    public function isRootForm(FormView $formView)
-    {
-        return null === $formView->parent;
     }
 
     /**
@@ -109,4 +104,12 @@ function twig_is_selected_choice(ChoiceView $choice, $selectedValue)
     }
 
     return $choice->value === $selectedValue;
+}
+
+/**
+ * @internal
+ */
+function twig_is_root_form(FormView $formView)
+{
+    return null === $formView->parent;
 }

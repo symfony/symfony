@@ -1579,6 +1579,20 @@ YAML;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    public function testBlankLinesInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+foobar: 'foo
+
+    bar'
+YAML;
+        $expected = array(
+            'foobar' => "foo\nbar",
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     public function testParseMultiLineUnquotedString()
     {
         $yaml = <<<EOT

@@ -31,7 +31,7 @@
 
 {%- block form_widget_compound -%}
     <table {{ block('widget_container_attributes') }}>
-        {%- if form.parent is empty and errors|length > 0 -%}
+        {%- if form is rootform and errors|length > 0 -%}
         <tr>
             <td colspan="2">
                 {{- form_errors(form) -}}

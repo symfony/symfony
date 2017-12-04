@@ -7,6 +7,33 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.1 (2017-12-04)
+
+ * bug #25304 [Bridge/PhpUnit] Prefer $_SERVER['argv'] over $argv (ricknox)
+ * bug #25272 [SecurityBundle] fix setLogoutOnUserChange calls for context listeners (dmaicher)
+ * bug #25282 [DI] Register singly-implemented interfaces when doing PSR-4 discovery (nicolas-grekas)
+ * bug #25274 [Security] Adding a GuardAuthenticatorHandler alias (weaverryan)
+ * bug #25308 [FrameworkBundle] Fix a bug where a color tag will be shown when passing an antislash (Simperfit)
+ * bug #25278 Fix for missing whitespace control modifier in form layout (kubawerlos)
+ * bug #25306 [Form][TwigBridge] Fix collision between view properties and form fields (yceruto)
+ * bug #25305 [Form][TwigBridge] Fix collision between view properties and form fields (yceruto)
+ * bug #25236 [Form][TwigBridge] Fix collision between view properties and form fields (yceruto)
+ * bug #25312 [DI] Fix deep-inlining of non-shared refs (nicolas-grekas)
+ * bug #25309 [Yaml] parse newlines in quoted multiline strings (xabbuh)
+ * bug #25313 [DI] Fix missing unset leading to false-positive circular ref (nicolas-grekas)
+ * bug #25285 [DI] Throw an exception if Expression Language is not installed (sroze)
+ * bug #25241 [Yaml] do not eagerly filter comment lines (xabbuh)
+ * bug #25297 [Validator] Fixed the @Valid(groups={"group"}) against null exception case (vudaltsov)
+ * bug #25255 [Console][DI] Fail gracefully (nicolas-grekas)
+ * bug #25264 [DI] Trigger deprecation when setting a to-be-private synthetic service (nicolas-grekas)
+ * bug #25258 [link] Prevent warnings when running link with 2.7 (dunglas)
+ * bug #25244 [DI] Add missing deprecation when fetching private services from ContainerBuilder (nicolas-grekas)
+ * bug #24750 [Validator] ExpressionValidator should use OBJECT_TO_STRING  (Simperfit)
+ * bug #25247 [DI] Fix false-positive circular exception (nicolas-grekas)
+ * bug #25226 [HttpKernel] Fix issue when resetting DumpDataCollector (Pierstoval)
+ * bug #25230 Use a more specific file for detecting the bridge (greg0ire)
+ * bug #25232 [WebProfilerBundle] [TwigBundle] Fix Profiler breaking XHTML pages (tistre)
+
 * 3.4.0 (2017-11-30)
 
  * bug #25220 [HttpFoundation] Add Session::isEmpty(), fix MockFileSessionStorage to behave like the native one (nicolas-grekas)

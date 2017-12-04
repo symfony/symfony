@@ -7,6 +7,20 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.39 (2017-12-04)
+
+ * bug #25278 Fix for missing whitespace control modifier in form layout (kubawerlos)
+ * bug #25236 [Form][TwigBridge] Fix collision between view properties and form fields (yceruto)
+ * bug #25258 [link] Prevent warnings when running link with 2.7 (dunglas)
+ * bug #24750 [Validator] ExpressionValidator should use OBJECT_TO_STRING  (Simperfit)
+ * bug #25182 [HttpFoundation] AutExpireFlashBag should not clear new flashes (Simperfit, sroze)
+ * bug #25152 [Form] Don't rely on `Symfony\Component\HttpFoundation\File\File` if http-foundation isn't in FileType (issei-m)
+ * bug #24987 [Console] Fix global console flag when used in chain (Simperfit)
+ * bug #25043 [Yaml] added ability for substitute aliases when mapping is on single line (Michał Strzelecki, xabbuh)
+ * bug #25102 [Form] Fixed ContextErrorException in FileType (chihiro-adachi)
+ * bug #25130 [DI] Fix handling of inlined definitions by ContainerBuilder (nicolas-grekas)
+ * bug #24956 Fix ambiguous pattern (weltling)
+
 * 2.7.38 (2017-11-16)
 
  * security #24995 Validate redirect targets using the session cookie domain (nicolas-grekas)

@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T10:04:11Z
+
+As explained on another issue: the profiler is already exposing sensitive information (eg. cookies)
+
+The policy is to *not* consider anything done by the profiler as a security issue. Opening dot files is no exception IMHO.
+
+> Based on 3.2 as it's a security issue
+
+There is a BIG issue here: if this where to be a valid security issue, the public disclosure would be BAD.
+Please consider the policy here: https://symfony.com/security
+TL;DR: security issues must be reported on security@symfony.com ONLY.
+Thanks :)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2017-12-04T12:00:58Z
+
+Responsible disclosure is in my opinion only required for exploits usable right now on active sites. This specific issue is a privilege escalation loophole that causes *more* problems after another attack, and it was already being discussed in other issues.
+
+> The policy is to not consider anything done by the profiler as a security issue.
+
+Well if that's the case I heartily disagree with the policy. Yes, access to the profiler should be considered an absolute and complete security breach of the **site it is part of**. No, it should not compromise the entire server or network. So by no means should the profiler be allowed to:
+- Disclose files with absolute paths like `/etc/passwd`
+- Access potentially highly sensitive files on the host, like `.composer/auth.json`, or `.docker/config.json`, or `.ssh/id_rsa`, which incidentally are all in dot-folders for good reason
+- Download my entire `.git` folder with commit histories et al, disclosing personal information and email addresses of my employees
+- View other files with potentially highly privileged information and/or credentials, like `.travis.yml` and `.gitlab-ci.yml`
+
+The file viewer itself was already guarded against directory walking, with this PR this stretches to other files that should never be relevant through a web interface.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T13:01:04Z
+
+> Responsible disclosure is in my opinion only required for exploits usable right now on active sites
+
+The issue is by disclosing publicly, this makes it impossible for anyone else to disagree, as it's public.
+Please reconsider next time :)

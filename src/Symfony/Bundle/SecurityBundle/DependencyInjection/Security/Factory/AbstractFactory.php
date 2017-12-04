@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 
 /**
  * AbstractFactory is the base class for all classes inheriting from
@@ -29,7 +30,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     protected $options = array(
         'check_path' => '/login_check',
         'use_forward' => false,
-        'require_previous_session' => true,
+        'require_previous_session' => null,
     );
 
     protected $defaultSuccessHandlerOptions = array(
@@ -79,6 +80,10 @@ abstract class AbstractFactory implements SecurityFactoryInterface
             ->scalarNode('success_handler')->end()
             ->scalarNode('failure_handler')->end()
         ;
+
+        if (array_key_exists('require_previous_session', $this->options) && null === $this->options['require_previous_session']) {
+            $this->options['require_previous_session'] = !class_exists(AbstractSessionHandler::class);
+        }
 
         foreach (array_merge($this->options, $this->defaultSuccessHandlerOptions, $this->defaultFailureHandlerOptions) as $name => $default) {
             if (is_bool($default)) {

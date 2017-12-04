@@ -276,12 +276,12 @@
 
 {% block form_errors -%}
     {% if errors|length > 0 -%}
-    {% if form.parent %}<span class="help-block">{% else %}<div class="alert alert-danger">{% endif %}
+    {% if form is not rootform %}<span class="help-block">{% else %}<div class="alert alert-danger">{% endif %}
     <ul class="list-unstyled">
         {%- for error in errors -%}
             <li><span class="glyphicon glyphicon-exclamation-sign"></span> {{ error.message }}</li>
         {%- endfor -%}
     </ul>
-    {% if form.parent %}</span>{% else %}</div>{% endif %}
+    {% if form is not rootform %}</span>{% else %}</div>{% endif %}
     {%- endif %}
 {%- endblock form_errors %}

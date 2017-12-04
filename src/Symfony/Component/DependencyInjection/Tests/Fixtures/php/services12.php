@@ -18,7 +18,11 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
-    private $privates = array();
+
+    /**
+     * @internal but protected for BC on cache:clear
+     */
+    protected $privates = array();
 
     public function __construct()
     {

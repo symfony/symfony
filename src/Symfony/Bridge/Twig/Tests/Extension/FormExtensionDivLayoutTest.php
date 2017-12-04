@@ -149,6 +149,23 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
+    public function isRootFormProvider()
+    {
+        return array(
+            array(true, new FormView()),
+            array(false, new FormView(new FormView())),
+        );
+    }
+
+    /**
+     * @dataProvider isRootFormProvider
+     */
+    public function testIsRootForm($expected, FormView $formView)
+    {
+        $extension = new FormExtension();
+        $this->assertSame($expected, $extension->isRootForm($formView));
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->renderer->renderBlock($view, 'form', $vars);

@@ -111,6 +111,60 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertEquals($container->getDefinition('foo')->getArgument(0), $container->getDefinition('bar'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @expectedExceptionMessage Circular reference detected for service "bar", path: "bar -> foo -> bar".
+     */
+    public function testProcessThrowsOnNonSharedLoops()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->addArgument(new Reference('bar'))
+            ->setShared(false)
+        ;
+        $container
+            ->register('bar')
+            ->setShared(false)
+            ->addMethodCall('setFoo', array(new Reference('foo')))
+        ;
+
+        $this->process($container);
+    }
+
+    public function testProcessNestedNonSharedServices()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->addArgument(new Reference('bar1'))
+            ->addArgument(new Reference('bar2'))
+        ;
+        $container
+            ->register('bar1')
+            ->setShared(false)
+            ->addArgument(new Reference('baz'))
+        ;
+        $container
+            ->register('bar2')
+            ->setShared(false)
+            ->addArgument(new Reference('baz'))
+        ;
+        $container
+            ->register('baz')
+            ->setShared(false)
+        ;
+
+        $this->process($container);
+
+        $baz1 = $container->getDefinition('foo')->getArgument(0)->getArgument(0);
+        $baz2 = $container->getDefinition('foo')->getArgument(1)->getArgument(0);
+
+        $this->assertEquals($container->getDefinition('baz'), $baz1);
+        $this->assertEquals($container->getDefinition('baz'), $baz2);
+        $this->assertNotSame($baz1, $baz2);
+    }
+
     public function testProcessInlinesIfMultipleReferencesButAllFromTheSameDefinition()
     {
         $container = new ContainerBuilder();

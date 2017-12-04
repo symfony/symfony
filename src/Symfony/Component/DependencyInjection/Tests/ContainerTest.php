@@ -538,6 +538,16 @@ class ContainerTest extends TestCase
 
         $this->assertSame($bar, $c->get('bar'), '->set() replaces a pre-defined service');
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "synthetic" service is private, replacing it is deprecated since Symfony 3.2 and will fail in 4.0.
+     */
+    public function testSetWithPrivateSyntheticServiceThrowsDeprecation()
+    {
+        $c = new ProjectServiceContainer();
+        $c->set('synthetic', new \stdClass());
+    }
 }
 
 class ProjectServiceContainer extends Container
@@ -565,8 +575,12 @@ class ProjectServiceContainer extends Container
         $this->__foo_bar = new \stdClass();
         $this->__foo_baz = new \stdClass();
         $this->__internal = new \stdClass();
-        $this->privates = array('internal' => true);
+        $this->privates = array(
+            'internal' => true,
+            'synthetic' => true,
+        );
         $this->aliases = array('alias' => 'bar');
+        $this->syntheticIds['synthetic'] = true;
     }
 
     protected function getInternalService()

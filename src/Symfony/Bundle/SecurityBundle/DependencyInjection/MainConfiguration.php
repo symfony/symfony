@@ -340,17 +340,6 @@ class MainConfiguration implements ConfigurationInterface
                     return $firewall;
                 })
             ->end()
-            ->validate()
-                ->ifTrue(function ($v) {
-                    return (isset($v['stateless']) && true === $v['stateless']) || (isset($v['security']) && false === $v['security']);
-                })
-                ->then(function ($v) {
-                    // this option doesn't change behavior when true when stateless, so prevent deprecations
-                    $v['logout_on_user_change'] = true;
-
-                    return $v;
-                })
-            ->end()
         ;
     }
 

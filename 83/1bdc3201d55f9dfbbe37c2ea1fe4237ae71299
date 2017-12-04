@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-12-03T12:15:03Z
+
+Oh yes, this is probably the missing piece that will reduce my autowire config by another 30 lines!
+
+3.4 please, as this looks like a bugfix to me ;)
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-03T12:58:43Z
+
+For sure, that should be in 3.4. My biggest fear of the autowiring (i.e. typehinting implementations instead of contracts) has an answer I'm happy with now 👍 🎉
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-12-04T16:53:53Z
+
+So the interface check is not done globally but per `registerClasses` call? So if I import two different namespaces that both have an implementation for one interface, the alias is still created?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T16:54:58Z
+
+@Tobion Yes, that's exactly what "local" means here, "short scope" on purpose.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-12-04T16:56:37Z
+
+I fail to see how that is a good thing. How do I know which one is used then? The last import I do?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T17:03:42Z
+
+Yes, as always.
+And in practice, you'll load a folder/namespace at once, that contains both the interface + its implementations.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-12-04T17:13:25Z
+
+> And in practice, you'll load a folder/namespace at once, that contains both the interface + its implementations.
+
+There are also cases where you just define the interfaces and then have two different namespaces implementing one of those interfaces. If you use psr-4 based service registration for each namespace, the last one wins? Too much magic IMO.
+
+Also this sounds like a big bc break. If the first namespace already defined the alias for the interface, and I load the second namespace, the alias gets changed suddenly?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T17:23:26Z
+
+> There are also cases where you just define the interfaces and then have two different namespaces implementing one of those interfaces. If you use psr-4 based service registration for each namespace, the last one wins?
+
+Let's be pragmatic:
+- How many ppl will be affected by this? None.
+- How many ppl will benefit from the provided interface/alias? Many.
+
+> Also this sounds like a big bc break. If the first namespace already defined the alias for the interface, and I load the second namespace, the alias gets changed suddenly?
+
+The BC break is theoretical. It requires so many crazy conditions that nobody can be hit in practice.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-12-04T17:28:27Z
+
+> How many ppl will be affected by this? None.
+
+We would be affected for example. We have a bundle that defines and implements some interfaces. And we have an app that uses those things but also adds app-specific implementations that add caching for example.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T17:30:49Z
+
+> We would be affected for example. We have a bundle that defines and implements some interfaces. And we have an app that uses those things but also adds app-specific implementations that add caching for example.
+
+From this description, you may have misunderstood the feature: the interfaces are defined as aliases only if they are discovered in the same "registerClass" call. If your interfaces are in the bundle, that's not the case.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-12-04T17:49:19Z
+
+> the interfaces are defined as aliases only if they are discovered in the same "registerClass" call
+
+I see. That's better.

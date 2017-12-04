@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-12-01T09:23:56Z
+
+I tried something similar with `form.root` (#20369). I agree a twig solution for this is much better IMHO :+1:
+
+But is a new feature :)
+
+Should we add a method to _get_ the root from, along with the test.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-01T09:41:40Z
+
+OK as bug fix to me.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-12-01T16:10:59Z
+
+> But is a new feature :)
+
+@ro0NL I don't think so :) this fix a bug that affects all previous versions.
+
+> Should we add a method to _get_ the root from, along with the test.
+
+This is a new feature that will be great to have, a lot of third-party bundle check for `form.parent.vars` incurring the same problem.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-12-04T04:57:35Z
+
+(AppVeyor failure unrelated)
+
+/cc @ogizanagi @HeahDude @xabbuh
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-04T08:36:04Z
+
+LGTM 👍
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-12-04T14:30:32Z
+
+I've created https://github.com/symfony/symfony/pull/25305  for `foundation_5_layout.html.twig` and https://github.com/symfony/symfony/pull/25306 for `bootstrap_4_layout.html.twig`.

@@ -298,6 +298,7 @@ class Container implements ResettableContainerInterface
                 } elseif (isset($this->methodMap[$id])) {
                     return self::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior ? null : $this->{$this->methodMap[$id]}();
                 } elseif (--$i && $id !== $normalizedId = $this->normalizeId($id)) {
+                    unset($this->loading[$id]);
                     $id = $normalizedId;
                     continue;
                 } elseif (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {

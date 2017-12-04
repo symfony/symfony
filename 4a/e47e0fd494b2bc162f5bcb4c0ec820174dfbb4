@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-03T14:21:08Z
+
+It seems that the file loader can't load the file anymore, could you please check why ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-03T14:30:00Z
+
+@Simperfit yea, I borked it :). Let's try that again
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-04T16:56:42Z
+
+Yea, it could be considered a bug fix: it really *should* be usable by the end-user. When the service became private in 4.0, that made it not easily usable. So, I think 3.4 makes sense (we could do 3.3... but I don't want to make a policy of back-porting all aliases to 3.3: we just need to make sure they exist on 3.4 so people can upgrade)

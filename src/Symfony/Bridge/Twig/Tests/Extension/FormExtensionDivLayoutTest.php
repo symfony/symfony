@@ -162,7 +162,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
      */
     public function testIsRootForm($expected, FormView $formView)
     {
-        $this->assertSame($expected, twig_is_root_form($formView));
+        $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_root_form($formView));
     }
 
     protected function renderForm(FormView $view, array $vars = array())

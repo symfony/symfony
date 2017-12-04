@@ -318,11 +318,11 @@
 
 {% block form_errors -%}
     {% if errors|length > 0 -%}
-        {% if form.parent %}<small class="error">{% else %}<div data-alert class="alert-box alert">{% endif %}
+        {% if form is not rootform %}<small class="error">{% else %}<div data-alert class="alert-box alert">{% endif %}
         {%- for error in errors -%}
             {{ error.message }}
             {% if not loop.last %}, {% endif %}
         {%- endfor -%}
-        {% if form.parent %}</small>{% else %}</div>{% endif %}
+        {% if form is not rootform %}</small>{% else %}</div>{% endif %}
     {%- endif %}
 {%- endblock form_errors %}

@@ -199,7 +199,7 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('context')->cannotBeEmpty()->end()
             ->booleanNode('logout_on_user_change')
                 ->defaultTrue()
-                ->info('When true, it will trigger a logout for the user if something has changed.')
+                ->info('When true, it will trigger a logout for the user if something has changed. Note: No-Op option since 4.0. Will always be true.')
             ->end()
             ->arrayNode('logout')
                 ->treatTrueLike(array())

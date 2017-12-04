@@ -301,7 +301,7 @@
         {% if not child.rendered %}
             {{- form_row(child) -}}
         {% endif %}
-    {%- endfor %}
+    {%- endfor -%}
 
     {% if not form.methodRendered and form is rootform %}
         {%- do form.setMethodRendered() -%}
@@ -315,7 +315,7 @@
         {%- if form_method != method -%}
             <input type="hidden" name="_method" value="{{ method }}" />
         {%- endif -%}
-    {% endif %}
+    {% endif -%}
 {% endblock form_rest %}
 
 {# Support #}

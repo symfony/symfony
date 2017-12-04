@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
@@ -25,7 +27,10 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\AnotherSub\DeeperBaz;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Baz;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\FooInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\BarInterface;
 
 class FileLoaderTest extends TestCase
 {
@@ -91,6 +96,14 @@ class FileLoaderTest extends TestCase
             array('service_container', Bar::class),
             array_keys($container->getDefinitions())
         );
+        $this->assertEquals(
+            array(
+                PsrContainerInterface::class,
+                ContainerInterface::class,
+                BarInterface::class,
+            ),
+            array_keys($container->getAliases())
+        );
     }
 
     public function testRegisterClassesWithExclude()
@@ -111,6 +124,43 @@ class FileLoaderTest extends TestCase
         $this->assertTrue($container->has(Baz::class));
         $this->assertFalse($container->has(Foo::class));
         $this->assertFalse($container->has(DeeperBaz::class));
+
+        $this->assertEquals(
+            array(
+                PsrContainerInterface::class,
+                ContainerInterface::class,
+                BarInterface::class,
+            ),
+            array_keys($container->getAliases())
+        );
+    }
+
+    public function testNestedRegisterClasses()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+
+        $prototype = new Definition();
+        $prototype->setPublic(true)->setPrivate(true);
+        $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\\', 'Prototype/*');
+
+        $this->assertTrue($container->has(Bar::class));
+        $this->assertTrue($container->has(Baz::class));
+        $this->assertTrue($container->has(Foo::class));
+
+        $this->assertEquals(
+            array(
+                PsrContainerInterface::class,
+                ContainerInterface::class,
+                FooInterface::class,
+            ),
+            array_keys($container->getAliases())
+        );
+
+        $alias = $container->getAlias(FooInterface::class);
+        $this->assertSame(Foo::class, (string) $alias);
+        $this->assertFalse($alias->isPublic());
+        $this->assertFalse($alias->isPrivate());
     }
 
     /**

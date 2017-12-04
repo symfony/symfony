@@ -181,8 +181,6 @@ class SecurityExtension extends Extension
                 $customUserChecker = true;
             }
 
-            $contextListenerDefinition->addMethodCall('setLogoutOnUserChange', array($firewall['logout_on_user_change']));
-
             $configId = 'security.firewall.map.config.'.$name;
 
             list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);

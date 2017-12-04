@@ -106,7 +106,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     {
         return array(
             new TwigTest('selectedchoice', 'Symfony\Bridge\Twig\Extension\twig_is_selected_choice'),
-            new TwigTest('rootform', array($this, 'isRootForm')),
+            new TwigTest('rootform', 'Symfony\Bridge\Twig\Extension\twig_is_root_form'),
         );
     }
 
@@ -167,14 +167,6 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     }
 
     /**
-     * @internal
-     */
-    public function isRootForm(FormView $formView)
-    {
-        return null === $formView->parent;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getName()
@@ -201,4 +193,12 @@ function twig_is_selected_choice(ChoiceView $choice, $selectedValue)
     }
 
     return $choice->value === $selectedValue;
+}
+
+/**
+ * @internal
+ */
+function twig_is_root_form(FormView $formView)
+{
+    return null === $formView->parent;
 }

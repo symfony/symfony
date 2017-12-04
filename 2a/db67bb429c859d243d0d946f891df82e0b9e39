@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by kalessil at 2017-11-13T21:16:33Z
+
+BTW @nicolas-grekas, probably the modified code should rely on atomic writes (like FS component do, it's the right way to go IMO) and not exclusive lock as per mine changes.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-11-17T14:04:41Z
+
+@kalessil I don't think adding a new dependency on FS is needed:
+
+- the ClassLoader component is deprecated (and ClassMapGenerator is not a runtime tool anyway)
+- `Kernel::setClassCache` is deprecated too
+- the Intl PhpBundleWriter is a maintainer tool (used to update the data shipped in the component)
+
+---------------------------------------------------------------------------
+
+by kalessil at 2017-11-17T14:34:30Z
+
+@stof: for sure, new dependency is not needed =)
+
+That's not so bad idea to not touch deprecated code - ths =) Will revert.
+
+---------------------------------------------------------------------------
+
+by kalessil at 2017-11-17T20:55:27Z
+
+I did revert changes in deprecated/dev-tools code.

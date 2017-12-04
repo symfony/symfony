@@ -231,7 +231,8 @@ if ($components) {
         class SymfonyBlacklistSimplePhpunit {}
     }
     array_splice($_SERVER['argv'], 1, 0, array('--colors=always'));
-
+    $_SERVER['argv'] = $argv;
+    $_SERVER['argc'] = ++$argc;
     include "$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit";
 }
 

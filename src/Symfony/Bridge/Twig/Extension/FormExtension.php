@@ -166,6 +166,9 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
         unset($this->$name);
     }
 
+    /**
+     * @internal
+     */
     public function isRootForm(FormView $formView)
     {
         return null === $formView->parent;

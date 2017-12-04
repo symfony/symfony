@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by Xymanek at 2017-12-03T14:36:10Z
+
+How will this work if multiple firewalls share the same context?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-12-03T14:39:19Z
+
+@Xymanek hmm I think you are right. That case is still not handled properly :cry:
+
+I will look into it.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-12-03T14:49:56Z
+
+@iltar @chalasr any idea how to fix this?
+
+Seems `ContextListener::$logoutOnUserChange` needs some rethinking as indeed the context instance can be shared amongst multiple firewalls.
+
+Within the `ContextListener` I don't see any way of knowing which firewall(s) its currently handling? So how to decide `$logoutOnUserChange` per firewall then?
+
+Or we enforce (with an error when validating the config?) that all firewalls that share a context have the same value for `logout_on_user_change`?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-03T16:57:04Z
+
+@dmaicher I think it should throw indeed

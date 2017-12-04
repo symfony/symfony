@@ -66,6 +66,22 @@
                 <source>Account is locked.</source>
                 <target>Account is locked.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials.</source>
+                <target>Bad credentials.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>The credentials were changed from another session.</source>
+                <target>The credentials were changed from another session.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>The presented password cannot be empty.</source>
+                <target>The presented password cannot be empty.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>The presented password is invalid.</source>
+                <target>The presented password is invalid.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

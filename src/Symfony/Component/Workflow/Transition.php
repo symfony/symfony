@@ -30,7 +30,7 @@ class Transition
      */
     public function __construct($name, $froms, $tos)
     {
-        if (!preg_match('{^[\w\d_-]+$}', $name)) {
+        if (!preg_match('{^[\w_-]+$}', $name)) {
             throw new InvalidArgumentException(sprintf('The transition "%s" contains invalid characters.', $name));
         }
 

@@ -26,6 +26,10 @@ class ValidValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Valid');
         }
 
+        if (null === $value) {
+            return;
+        }
+
         $this->context
             ->getValidator()
             ->inContext($this->context)

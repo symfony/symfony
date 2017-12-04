@@ -59,7 +59,12 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
         passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? '(del /S /F /Q %s & rmdir %1$s) >nul': 'rm -rf %s', "phpunit-$PHPUNIT_VERSION"));
     }
     if (extension_loaded('openssl') && ini_get('allow_url_fopen') && !isset($_SERVER['http_proxy']) && !isset($_SERVER['https_proxy'])) {
-        stream_copy_to_stream(fopen("https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip", 'rb'), fopen("$PHPUNIT_VERSION.zip", 'wb'));
+        $remoteZip = "https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip";
+        $remoteZipStream = @fopen($remoteZip, 'rb');
+        if (!$remoteZipStream) {
+            throw new \RuntimeException("Could not find $remoteZip");
+        }
+        stream_copy_to_stream($remoteZipStream, fopen("$PHPUNIT_VERSION.zip", 'wb'));
     } else {
         @unlink("$PHPUNIT_VERSION.zip");
         passthru("wget https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip");

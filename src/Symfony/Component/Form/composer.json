@@ -32,7 +32,7 @@
         "symfony/http-kernel": "^3.3.5|~4.0",
         "symfony/security-csrf": "~2.8|~3.0|~4.0",
         "symfony/translation": "~2.8|~3.0|~4.0",
-        "symfony/var-dumper": "~3.3.11|~3.4-beta3|~4.0-beta3",
+        "symfony/var-dumper": "~3.3.11|~3.4|~4.0",
         "symfony/console": "~3.4|~4.0"
     },
     "conflict": {

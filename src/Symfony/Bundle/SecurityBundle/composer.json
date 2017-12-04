@@ -18,7 +18,7 @@
     "require": {
         "php": "^5.5.9|>=7.0.8",
         "ext-xml": "*",
-        "symfony/security": "~3.4-rc1|~4.0-rc1",
+        "symfony/security": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/http-kernel": "~3.3|~4.0",
         "symfony/polyfill-php70": "~1.0"
@@ -29,9 +29,9 @@
         "symfony/console": "~3.4|~4.0",
         "symfony/css-selector": "~2.8|~3.0|~4.0",
         "symfony/dom-crawler": "~2.8|~3.0|~4.0",
-        "symfony/event-dispatcher": "^3.3.1|~4.0",
+        "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/form": "^3.4|~4.0",
-        "symfony/framework-bundle": "^3.4-rc1|~4.0-rc1",
+        "symfony/framework-bundle": "~3.4|~4.0",
         "symfony/http-foundation": "~3.3|~4.0",
         "symfony/security-acl": "~2.8|~3.0",
         "symfony/translation": "~3.4|~4.0",
@@ -47,7 +47,7 @@
     },
     "conflict": {
         "symfony/var-dumper": "<3.3",
-        "symfony/event-dispatcher": "<3.3.1",
+        "symfony/event-dispatcher": "<3.4",
         "symfony/framework-bundle": "<3.4",
         "symfony/console": "<3.4"
     },

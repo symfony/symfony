@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T16:44:34Z
+
+I'm removing the photo from the description, it's a bit weird to see your face when reviewing the PR :)
+For which branch is the bug fix? This targets master right now, not sure it's correct.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-04T16:51:24Z
+
+@nicolas-grekas it's for 3.3 since the bug does not exist before.

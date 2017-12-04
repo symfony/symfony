@@ -43,7 +43,7 @@ class SecurityExtension extends Extension
     private $factories = array();
     private $userProviderFactories = array();
     private $expressionLanguage;
-    private $firewallsByContextKey = array();
+    private $logoutOnUserChangeByContextKey = array();
 
     public function __construct()
     {
@@ -365,16 +365,16 @@ class SecurityExtension extends Extension
                 $contextKey = $firewall['context'];
             }
 
-            if (!isset($firewall['logout_on_user_change']) || !$firewall['logout_on_user_change']) {
+            if (!$logoutOnUserChange = $firewall['logout_on_user_change']) {
                 @trigger_error(sprintf('Not setting "logout_on_user_change" to true on firewall "%s" is deprecated as of 3.4, it will always be true in 4.0.', $id), E_USER_DEPRECATED);
             }
 
-            if (isset($this->firewallsByContextKey[$contextKey]) && $this->firewallsByContextKey[$contextKey][1]['logout_on_user_change'] !== $firewall['logout_on_user_change']) {
-                throw new InvalidConfigurationException(sprintf('Firewalls "%s" and "%s" need to have the same value for option "logout_on_user_change" as they are sharing the context "%s"', $this->firewallsByContextKey[$contextKey][0], $id, $contextKey));
+            if (isset($this->logoutOnUserChangeByContextKey[$contextKey]) && $this->logoutOnUserChangeByContextKey[$contextKey][1] !== $logoutOnUserChange) {
+                throw new InvalidConfigurationException(sprintf('Firewalls "%s" and "%s" need to have the same value for option "logout_on_user_change" as they are sharing the context "%s"', $this->logoutOnUserChangeByContextKey[$contextKey][0], $id, $contextKey));
             }
 
-            $this->firewallsByContextKey[$contextKey] = array($id, $firewall);
-            $listeners[] = new Reference($this->createContextListener($container, $contextKey, $firewall['logout_on_user_change']));
+            $this->logoutOnUserChangeByContextKey[$contextKey] = array($id, $logoutOnUserChange);
+            $listeners[] = new Reference($this->createContextListener($container, $contextKey, $logoutOnUserChange));
         }
 
         $config->replaceArgument(6, $contextKey);

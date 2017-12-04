@@ -119,6 +119,7 @@ EOPHP
 
 }
 
+global $argv, $argc;
 $argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
 $argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
 $components = array();

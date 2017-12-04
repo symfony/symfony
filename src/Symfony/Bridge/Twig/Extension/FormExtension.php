@@ -158,6 +158,9 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
         return $choice->value === $selectedValue;
     }
 
+    /**
+     * @internal
+     */
     public function isRootForm(FormView $formView)
     {
         return null === $formView->parent;

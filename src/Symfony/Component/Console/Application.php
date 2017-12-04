@@ -39,6 +39,8 @@ use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -116,6 +118,25 @@ class Application
             $output = new ConsoleOutput();
         }
 
+        $renderException = function ($e) use ($output) {
+            if (!$e instanceof \Exception) {
+                $e = class_exists(FatalThrowableError::class) ? new FatalThrowableError($e) : new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+            }
+            if ($output instanceof ConsoleOutputInterface) {
+                $this->renderException($e, $output->getErrorOutput());
+            } else {
+                $this->renderException($e, $output);
+            }
+        };
+        if ($phpHandler = set_exception_handler($renderException)) {
+            restore_exception_handler();
+            if (!is_array($phpHandler) || !$phpHandler[0] instanceof ErrorHandler) {
+                $debugHandler = true;
+            } elseif ($debugHandler = $phpHandler[0]->setExceptionHandler($renderException)) {
+                $phpHandler[0]->setExceptionHandler($debugHandler);
+            }
+        }
+
         $this->configureIO($input, $output);
 
         try {
@@ -125,11 +146,7 @@ class Application
                 throw $e;
             }
 
-            if ($output instanceof ConsoleOutputInterface) {
-                $this->renderException($e, $output->getErrorOutput());
-            } else {
-                $this->renderException($e, $output);
-            }
+            $renderException($e);
 
             $exitCode = $e->getCode();
             if (is_numeric($exitCode)) {
@@ -139,6 +156,12 @@ class Application
                 }
             } else {
                 $exitCode = 1;
+            }
+        } finally {
+            if (!$phpHandler) {
+                restore_exception_handler();
+            } elseif (!$debugHandler) {
+                $phpHandler[0]->setExceptionHandler(null);
             }
         }
 

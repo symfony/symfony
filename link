@@ -35,11 +35,14 @@ if (!is_dir("$argv[1]/vendor/symfony")) {
 }
 
 $sfPackages = array('symfony/symfony' => __DIR__);
-foreach (glob(__DIR__.'/src/Symfony/{Bundle,Bridge,Component,Component/Security}/*', GLOB_BRACE | GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
-    $sfPackages[json_decode(file_get_contents("$dir/composer.json"))->name] = $dir;
-}
 
 $filesystem = new Filesystem();
+foreach (glob(__DIR__.'/src/Symfony/{Bundle,Bridge,Component,Component/Security}/*', GLOB_BRACE | GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
+    if ($filesystem->exists($composer = "$dir/composer.json")) {
+        $sfPackages[json_decode(file_get_contents($composer))->name] = $dir;
+    }
+}
+
 foreach (glob("$argv[1]/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
     $package = 'symfony/'.basename($dir);
     if (is_link($dir)) {
@@ -56,4 +59,8 @@ foreach (glob("$argv[1]/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as $dir) 
     $filesystem->remove($dir);
     $filesystem->symlink($sfDir, $dir);
     echo "\"$package\" has been linked to \"$sfPackages[$package]\".".PHP_EOL;
+}
+
+foreach (glob("$argv[1]/var/cache/*") as $cacheDir) {
+    $filesystem->remove($cacheDir);
 }

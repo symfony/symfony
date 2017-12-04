@@ -1,6 +1,6 @@
 {# This file is based on WebProfilerBundle/Resources/views/Profiler/base_js.html.twig.
    If you make any change in this file, verify the same change is needed in the other file. #}
-<script{% if csp_script_nonce is defined and csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>/*<![CDATA[*/
+<script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>/*<![CDATA[*/
     {# Caution: the contents of this file are processed by Twig before loading
                 them as JavaScript source code. Always use '/*' comments instead
                 of '//' comments to avoid impossible-to-debug side-effects #}

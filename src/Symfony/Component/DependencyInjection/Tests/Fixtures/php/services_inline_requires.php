@@ -37,10 +37,10 @@ class ProjectServiceContainer extends Container
 
         $this->aliases = array();
 
-        require_once $this->targetDirs[1].'/includes/HotPath/I1.php';
-        require_once $this->targetDirs[1].'/includes/HotPath/P1.php';
-        require_once $this->targetDirs[1].'/includes/HotPath/T1.php';
-        require_once $this->targetDirs[1].'/includes/HotPath/C1.php';
+        include_once $this->targetDirs[1].'/includes/HotPath/I1.php';
+        include_once $this->targetDirs[1].'/includes/HotPath/P1.php';
+        include_once $this->targetDirs[1].'/includes/HotPath/T1.php';
+        include_once $this->targetDirs[1].'/includes/HotPath/C1.php';
     }
 
     public function reset()
@@ -95,8 +95,8 @@ class ProjectServiceContainer extends Container
      */
     protected function getC2Service()
     {
-        require_once $this->targetDirs[1].'/includes/HotPath/C3.php';
-        require_once $this->targetDirs[1].'/includes/HotPath/C2.php';
+        include_once $this->targetDirs[1].'/includes/HotPath/C3.php';
+        include_once $this->targetDirs[1].'/includes/HotPath/C2.php';
 
         return $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C2(new \Symfony\Component\DependencyInjection\Tests\Fixtures\includes\HotPath\C3());
     }

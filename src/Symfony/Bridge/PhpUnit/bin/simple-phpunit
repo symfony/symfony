@@ -119,8 +119,10 @@ EOPHP
 
 }
 
+$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
+$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
 $components = array();
-$cmd = array_map('escapeshellarg', $_SERVER['argv']);
+$cmd = array_map('escapeshellarg', $argv);
 $exit = 0;
 
 if (isset($argv[1]) && 'symfony' === $argv[1] && !file_exists('symfony') && file_exists('src/Symfony')) {
@@ -230,9 +232,9 @@ if ($components) {
     if (!class_exists('SymfonyBlacklistSimplePhpunit', false)) {
         class SymfonyBlacklistSimplePhpunit {}
     }
-    array_splice($_SERVER['argv'], 1, 0, array('--colors=always'));
-    $argv = $_SERVER['argv'];
-    $argc = ++$_SERVER['argc'];
+    array_splice($argv, 1, 0, array('--colors=always'));
+    $_SERVER['argv'] = $argv;
+    $_SERVER['argc'] = ++$argc;
     include "$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit";
 }
 

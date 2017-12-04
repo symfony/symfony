@@ -385,7 +385,7 @@ class ProfilerController
 
         $filename = $this->baseDir.DIRECTORY_SEPARATOR.$file;
 
-        if (preg_match("'(^|[/\\\\])\.\.?([/\\\\]|$)'", $file) || !is_readable($filename)) {
+        if (preg_match("'(^|[/\\\\])\.'", $file) || !is_readable($filename)) {
             throw new NotFoundHttpException(sprintf('The file "%s" cannot be opened.', $file));
         }
 

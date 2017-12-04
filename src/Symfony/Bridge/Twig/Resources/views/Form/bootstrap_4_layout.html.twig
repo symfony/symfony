@@ -173,7 +173,7 @@
 
 {% block form_errors -%}
     {%- if errors|length > 0 -%}
-    <div class="{% if form.parent %}invalid-feedback{% else %}alert alert-danger{% endif %}">
+    <div class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %}">
         <ul class="list-unstyled mb-0">
             {%- for error in errors -%}
                 <li>{{ error.message }}</li>

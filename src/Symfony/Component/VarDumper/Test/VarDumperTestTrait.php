@@ -19,14 +19,14 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 trait VarDumperTestTrait
 {
-    public function assertDumpEquals($dump, $data, $filter = 0, $message = '')
+    public function assertDumpEquals($expected, $data, $filter = 0, $message = '')
     {
-        $this->assertSame(rtrim($dump), $this->getDump($data, null, $filter), $message);
+        $this->assertSame($this->prepareExpectation($expected, $filter), $this->getDump($data, null, $filter), $message);
     }
 
-    public function assertDumpMatchesFormat($dump, $data, $filter = 0, $message = '')
+    public function assertDumpMatchesFormat($expected, $data, $filter = 0, $message = '')
     {
-        $this->assertStringMatchesFormat(rtrim($dump), $this->getDump($data, null, $filter), $message);
+        $this->assertStringMatchesFormat($this->prepareExpectation($expected, $filter), $this->getDump($data, null, $filter), $message);
     }
 
     protected function getDump($data, $key = null, $filter = 0)
@@ -44,5 +44,14 @@ trait VarDumperTestTrait
         }
 
         return rtrim($dumper->dump($data, true));
+    }
+
+    private function prepareExpectation($expected, $filter)
+    {
+        if (!is_string($expected)) {
+            $expected = $this->getDump($expected, null, $filter);
+        }
+
+        return rtrim($expected);
     }
 }

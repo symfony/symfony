@@ -621,7 +621,7 @@ class ContainerBuilderTest extends TestCase
 
         $container = new ContainerBuilder();
         $container->setParameter('dummy', '%env(ANOTHER_DUMMY_ENV_VAR)%');
-        $container->setParameter('dummy2', ['1' => 'one', '2' => 'two']);
+        $container->setParameter('dummy2', array('1' => 'one', '2' => 'two'));
 
         $container->resolveEnvPlaceholders('%dummy%', true);
         $container->resolveEnvPlaceholders('%dummy2%', true);

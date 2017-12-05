@@ -2013,6 +2013,68 @@ foo: { &foo { a: Steve, <<: *foo} }
 EOE;
         $this->parser->parse($yaml);
     }
+
+    /**
+     * @dataProvider indentedMappingData
+     */
+    public function testParseIndentedMappings($yaml, $expected)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function indentedMappingData()
+    {
+        $tests = array();
+
+        $yaml = <<<YAML
+foo:
+  - bar: "foobar"
+    # A comment
+    baz: "foobaz"
+YAML;
+        $expected = array(
+            'foo' => array(
+                array(
+                    'bar' => 'foobar',
+                    'baz' => 'foobaz',
+                ),
+            ),
+        );
+        $tests['comment line is first line in indented block'] = array($yaml, $expected);
+
+        $yaml = <<<YAML
+foo:
+    - bar:
+        # comment
+        baz: [1, 2, 3]
+YAML;
+        $expected = array(
+            'foo' => array(
+                array(
+                    'bar' => array(
+                        'baz' => array(1, 2, 3),
+                    ),
+                ),
+            ),
+        );
+        $tests['mapping value on new line starting with a comment line'] = array($yaml, $expected);
+
+        $yaml = <<<YAML
+foo:
+  -
+    bar: foobar
+YAML;
+        $expected = array(
+            'foo' => array(
+                array(
+                    'bar' => 'foobar',
+                ),
+            ),
+        );
+        $tests['mapping in sequence starting on a new line'] = array($yaml, $expected);
+
+        return $tests;
+    }
 }
 
 class B

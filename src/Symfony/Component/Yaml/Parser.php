@@ -537,7 +537,27 @@ class Parser
         }
 
         if (null === $indentation) {
-            $newIndent = $this->getCurrentLineIndentation();
+            $newIndent = null;
+            $movements = 0;
+
+            do {
+                $EOF = false;
+
+                // comment-like lines do not influence the indentation depth
+                if ($this->isCurrentLineComment()) {
+                    $EOF = !$this->moveToNextLine();
+
+                    if (!$EOF) {
+                        ++$movements;
+                    }
+                } else {
+                    $newIndent = $this->getCurrentLineIndentation();
+                }
+            } while (!$EOF && null === $newIndent);
+
+            for ($i = 0; $i < $movements; ++$i) {
+                $this->moveToPreviousLine();
+            }
 
             $unindentedEmbedBlock = $this->isStringUnIndentedCollectionItem();
 
@@ -551,6 +571,8 @@ class Parser
         $data = array();
         if ($this->getCurrentLineIndentation() >= $newIndent) {
             $data[] = substr($this->currentLine, $newIndent);
+        } elseif ($this->isCurrentLineComment()) {
+            $data[] = $this->currentLine;
         } else {
             $this->moveToPreviousLine();
 
@@ -866,11 +888,15 @@ class Parser
     private function isNextLineIndented()
     {
         $currentIndentation = $this->getCurrentLineIndentation();
-        $EOF = !$this->moveToNextLine();
+        $movements = 0;
 
-        while (!$EOF && $this->isCurrentLineEmpty()) {
+        do {
             $EOF = !$this->moveToNextLine();
-        }
+
+            if (!$EOF) {
+                ++$movements;
+            }
+        } while (!$EOF && ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()));
 
         if ($EOF) {
             return false;
@@ -878,7 +904,9 @@ class Parser
 
         $ret = $this->getCurrentLineIndentation() > $currentIndentation;
 
-        $this->moveToPreviousLine();
+        for ($i = 0; $i < $movements; ++$i) {
+            $this->moveToPreviousLine();
+        }
 
         return $ret;
     }
@@ -967,19 +995,25 @@ class Parser
     private function isNextLineUnIndentedCollection()
     {
         $currentIndentation = $this->getCurrentLineIndentation();
-        $notEOF = $this->moveToNextLine();
+        $movements = 0;
 
-        while ($notEOF && $this->isCurrentLineEmpty()) {
-            $notEOF = $this->moveToNextLine();
-        }
+        do {
+            $EOF = !$this->moveToNextLine();
 
-        if (false === $notEOF) {
+            if (!$EOF) {
+                ++$movements;
+            }
+        } while (!$EOF && ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()));
+
+        if ($EOF) {
             return false;
         }
 
         $ret = $this->getCurrentLineIndentation() === $currentIndentation && $this->isStringUnIndentedCollectionItem();
 
-        $this->moveToPreviousLine();
+        for ($i = 0; $i < $movements; ++$i) {
+            $this->moveToPreviousLine();
+        }
 
         return $ret;
     }

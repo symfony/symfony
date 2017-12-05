@@ -615,6 +615,20 @@ class ContainerBuilderTest extends TestCase
         unset($_ENV['DUMMY_ENV_VAR'], $_SERVER['DUMMY_SERVER_VAR'], $_SERVER['HTTP_DUMMY_VAR']);
     }
 
+    public function testResolveEnvValuesWithArray()
+    {
+        $_ENV['ANOTHER_DUMMY_ENV_VAR'] = 'dummy';
+
+        $container = new ContainerBuilder();
+        $container->setParameter('dummy', '%env(ANOTHER_DUMMY_ENV_VAR)%');
+        $container->setParameter('dummy2', ['1' => 'one', '2' => 'two']);
+
+        $container->resolveEnvPlaceholders('%dummy%', true);
+        $container->resolveEnvPlaceholders('%dummy2%', true);
+
+        unset($_ENV['ANOTHER_DUMMY_ENV_VAR']);
+    }
+
     public function testCompileWithResolveEnv()
     {
         putenv('DUMMY_ENV_VAR=du%%y');

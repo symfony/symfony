@@ -6,6 +6,11 @@ Config
 
  * Added the `getChildNodeDefinitions()` method to `ParentNodeDefinitionInterface`.
 
+Console
+-------
+
+ * Removed the `setCrossingChar()` method in favor of the `setDefaultCrossingChar()` method in `TableStyle`.
+
 EventDispatcher
 ---------------
 

@@ -19,6 +19,7 @@ use Symfony\Component\Console\Exception\LogicException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Саша Стаменковић <umpirsky@gmail.com>
+ * @author Dany Maillard <danymaillard93b@gmail.com>
  */
 class TableStyle
 {
@@ -26,6 +27,14 @@ class TableStyle
     private $horizontalBorderChar = '-';
     private $verticalBorderChar = '|';
     private $crossingChar = '+';
+    private $crossingTopRightChar = '+';
+    private $crossingTopMidChar = '+';
+    private $crossingTopLeftChar = '+';
+    private $crossingMidRightChar = '+';
+    private $crossingBottomRightChar = '+';
+    private $crossingBottomMidChar = '+';
+    private $crossingBottomLeftChar = '+';
+    private $crossingMidLeftChar = '+';
     private $cellHeaderFormat = '<info>%s</info>';
     private $cellRowFormat = '%s';
     private $cellRowContentFormat = ' %s ';
@@ -109,17 +118,68 @@ class TableStyle
     }
 
     /**
+     * Sets crossing characters.
+     *
+     * Example:
+     * <code>
+     * 1---------------2-----------------------2------------------3
+     * | ISBN          | Title                 | Author           |
+     * 8---------------0-----------------------0------------------4
+     * | 99921-58-10-7 | Divine Comedy         | Dante Alighieri  |
+     * | 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |
+     * | 960-425-059-0 | The Lord of the Rings | J. R. R. Tolkien |
+     * 7---------------6-----------------------6------------------5
+     * </code>
+     *
+     * @param string $cross       Crossing char (see #0 of example)
+     * @param string $topLeft     Top left char (see #1 of example)
+     * @param string $topMid      Top mid char (see #2 of example)
+     * @param string $topRight    Top right char (see #3 of example)
+     * @param string $midRight    Mid right char (see #4 of example)
+     * @param string $bottomRight Bottom right char (see #5 of example)
+     * @param string $bottomMid   Bottom mid char (see #6 of example)
+     * @param string $bottomLeft  Bottom left char (see #7 of example)
+     * @param string $midLeft     Mid left char (see #8 of example)
+     */
+    public function setCrossingChars(string $cross, string $topLeft, string $topMid, string $topRight, string $midRight, string $bottomRight, string $bottomMid, string $bottomLeft, string $midLeft): self
+    {
+        $this->crossingChar = $cross;
+        $this->crossingTopLeftChar = $topLeft;
+        $this->crossingTopMidChar = $topMid;
+        $this->crossingTopRightChar = $topRight;
+        $this->crossingMidRightChar = $midRight;
+        $this->crossingBottomRightChar = $bottomRight;
+        $this->crossingBottomMidChar = $bottomMid;
+        $this->crossingBottomLeftChar = $bottomLeft;
+        $this->crossingMidLeftChar = $midLeft;
+
+        return $this;
+    }
+
+    /**
+     * Sets default crossing character used for each cross.
+     *
+     * @see {@link setCrossingChars()} for setting each crossing individually.
+     */
+    public function setDefaultCrossingChar(string $char): self
+    {
+        return $this->setCrossingChars($char, $char, $char, $char, $char, $char, $char, $char, $char);
+    }
+
+    /**
      * Sets crossing character.
      *
      * @param string $crossingChar
      *
      * @return $this
+     *
+     * @deprecated since Symfony 4.1. Use {@link setDefaultCrossingChar()} instead.
      */
     public function setCrossingChar($crossingChar)
     {
-        $this->crossingChar = $crossingChar;
+        @trigger_error(sprintf('Method %s() is deprecated since Symfony 4.1. Use setDefaultCrossingChar() instead.', __METHOD__), E_USER_DEPRECATED);
 
-        return $this;
+        return $this->setDefaultCrossingChar($crossingChar);
     }
 
     /**
@@ -130,6 +190,26 @@ class TableStyle
     public function getCrossingChar()
     {
         return $this->crossingChar;
+    }
+
+    /**
+     * Gets crossing characters.
+     *
+     * @internal
+     */
+    public function getCrossingChars(): array
+    {
+        return array(
+            $this->crossingChar,
+            $this->crossingTopLeftChar,
+            $this->crossingTopMidChar,
+            $this->crossingTopRightChar,
+            $this->crossingMidRightChar,
+            $this->crossingBottomRightChar,
+            $this->crossingBottomMidChar,
+            $this->crossingBottomLeftChar,
+            $this->crossingMidLeftChar,
+        );
     }
 
     /**

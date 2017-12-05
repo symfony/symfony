@@ -58,6 +58,7 @@ class InlineTest extends TestCase
             array('!php/const PHP_INT_MAX', PHP_INT_MAX),
             array('[!php/const PHP_INT_MAX]', array(PHP_INT_MAX)),
             array('{ foo: !php/const PHP_INT_MAX }', array('foo' => PHP_INT_MAX)),
+            array('!php/const NULL', null),
         );
     }
 
@@ -82,10 +83,22 @@ class InlineTest extends TestCase
     /**
      * @group legacy
      * @expectedDeprecation The !php/const: tag to indicate dumped PHP constants is deprecated since version 3.4 and will be removed in 4.0. Use the !php/const (without the colon) tag instead on line 1.
+     * @dataProvider getTestsForParseLegacyPhpConstants
      */
-    public function testDeprecatedConstantTag()
+    public function testDeprecatedConstantTag($yaml, $expectedValue)
     {
-        Inline::parse('!php/const:PHP_INT_MAX', Yaml::PARSE_CONSTANT);
+        $this->assertSame($expectedValue, Inline::parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
+    public function getTestsForParseLegacyPhpConstants()
+    {
+        return array(
+            array('!php/const:Symfony\Component\Yaml\Yaml::PARSE_CONSTANT', Yaml::PARSE_CONSTANT),
+            array('!php/const:PHP_INT_MAX', PHP_INT_MAX),
+            array('[!php/const:PHP_INT_MAX]', array(PHP_INT_MAX)),
+            array('{ foo: !php/const:PHP_INT_MAX }', array('foo' => PHP_INT_MAX)),
+            array('!php/const:NULL', null),
+        );
     }
 
     /**

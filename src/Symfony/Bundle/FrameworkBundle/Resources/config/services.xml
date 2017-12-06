@@ -18,6 +18,7 @@
             <argument type="service" id="controller_resolver" />
             <argument type="service" id="request_stack" />
             <argument type="service" id="argument_resolver" />
+            <argument type="service" id="service_container" />
             <tag name="container.hot_path" />
         </service>
         <service id="Symfony\Component\HttpKernel\HttpKernelInterface" alias="http_kernel" />

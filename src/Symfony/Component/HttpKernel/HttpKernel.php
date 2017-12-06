@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
@@ -42,13 +44,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     protected $resolver;
     protected $requestStack;
     private $argumentResolver;
+    private $container;
 
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null, Container $container = null)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?: new RequestStack();
         $this->argumentResolver = $argumentResolver;
+        $this->container = $container;
 
         if (null === $this->argumentResolver) {
             @trigger_error(sprintf('As of 3.1 an %s is used to resolve arguments. In 4.0 the $argumentResolver becomes the %s if no other is provided instead of using the $resolver argument.', ArgumentResolverInterface::class, ArgumentResolver::class), E_USER_DEPRECATED);
@@ -67,6 +71,15 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
+            if ($this->container && $e instanceof ServiceNotFoundException) {
+                $id = $e->getId();
+
+                if (!$e->getSourceId() && ($this->container->has($id) || isset($this->container->getRemovedIds()[$id]))) {
+                    $r = new \ReflectionProperty(\Exception::class, 'message');
+                    $r->setAccessible(true);
+                    $r->setValue($e, sprintf('Service "%s" exists, but not in the service locator of your own service. Did you forget to declare it as a dependency using e.g. "ServiceSubscriberInterface::getSubscribedServices()"?', $id));
+                }
+            }
             if ($e instanceof RequestExceptionInterface) {
                 $e = new BadRequestHttpException($e->getMessage(), $e);
             }
@@ -150,7 +163,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $arguments = $event->getArguments();
 
         // call controller
-        $response = call_user_func_array($controller, $arguments);
+        $response = \call_user_func_array($controller, $arguments);
 
         // view
         if (!$response instanceof Response) {

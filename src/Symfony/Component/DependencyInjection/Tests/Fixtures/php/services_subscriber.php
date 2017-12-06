@@ -45,6 +45,7 @@ class ProjectServiceContainer extends Container
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
             'service_locator.jmktfsv' => true,
+            'service_locator.jmktfsv.foo_service' => true,
         );
     }
 
@@ -82,7 +83,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooServiceService()
     {
-        return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber(new \Symfony\Component\DependencyInjection\ServiceLocator(array('Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => function () {
+        return $this->services['foo_service'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber(\call_user_func(array(new \Symfony\Component\DependencyInjection\ServiceLocator(array('Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => function () {
             $f = function (\Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition $v = null) { return $v; }; return $f(${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] : $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition()) && false ?: '_'});
         }, 'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\TestServiceSubscriber' => function () {
             $f = function (\Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber $v) { return $v; }; return $f(${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] : $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber()) && false ?: '_'});
@@ -90,7 +91,7 @@ class ProjectServiceContainer extends Container
             $f = function (\Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition $v) { return $v; }; return $f(${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] : $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber()) && false ?: '_'});
         }, 'baz' => function () {
             $f = function (\Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition $v = null) { return $v; }; return $f(${($_ = isset($this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition']) ? $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] : $this->services['Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition()) && false ?: '_'});
-        })));
+        })), 'withContext'), 'foo_service', $this));
     }
 
     /**

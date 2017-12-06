@@ -619,12 +619,20 @@ class ContainerBuilderTest extends TestCase
     {
         $_ENV['ANOTHER_DUMMY_ENV_VAR'] = 'dummy';
 
+        $dummyArray = array('1' => 'one', '2' => 'two');
+
         $container = new ContainerBuilder();
         $container->setParameter('dummy', '%env(ANOTHER_DUMMY_ENV_VAR)%');
-        $container->setParameter('dummy2', array('1' => 'one', '2' => 'two'));
+        $container->setParameter('dummy2', $dummyArray);
 
         $container->resolveEnvPlaceholders('%dummy%', true);
         $container->resolveEnvPlaceholders('%dummy2%', true);
+
+        $this->assertInternalType('array', $container->resolveEnvPlaceholders('%dummy2%', true));
+
+        foreach ($dummyArray as $key => $value) {
+            $this->assertArrayHasKey($key, $container->resolveEnvPlaceholders('%dummy2%', true));
+        }
 
         unset($_ENV['ANOTHER_DUMMY_ENV_VAR']);
     }

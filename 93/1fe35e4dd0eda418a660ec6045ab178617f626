@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-12-05T16:16:35Z
+
+Do we use `LOCK_EX` in other places of Symfony which may be affected too ?
+
+---------------------------------------------------------------------------
+
+by brianfreytag at 2017-12-05T16:18:22Z
+
+@stof Good question. Let me do a search on the codebase. I'll get back with you in a moment.
+
+---------------------------------------------------------------------------
+
+by brianfreytag at 2017-12-05T16:29:21Z
+
+It appears it's used in several other places:
+
+Symfony\Component\Filesystem\LockHandler::lock (100)
+Symfony\Component\HttpKernel\Store::lock|isLocked (75|120)
+Symfony\Component\Lock\Store\FlockStore::lock (100)
+Symfony\Component\Process\Tests\ProcessTest::testIncrementalOutput (399|402)
+
+There are also a few in non-Symfony components that are tied closely to Symfony:
+Doctrine\ORM\Cache\Region::lock (242)
+Monolog\Handler\DeduplicationHandler::collectLogs (141)
+Monolog\Handler\StreamHandler::write (113)
+
+Honestly, I've never run into issues with these and I don't think any of these locks are new, so I don't know that they are that big of a deal. It looks to me that the vast majority of these check to make sure we can get a lock with `flock()` before it attempts to do anything. If not, it just returns null or false or wahtever. I didn't dig closely into each one, but they may handle things differently if they're not able to get a lock.
+
+I'm open to opinions. Like I said, I've never had any issues with the rest of these.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-12-05T17:37:53Z
+
+Well, place implementing a lock indeed must use LOCK_EX. So this list looks fine to me.
+
+---------------------------------------------------------------------------
+
+by brianfreytag at 2017-12-05T17:39:04Z
+
+@stof my thought exactly. Let me know if you need anything else from me.

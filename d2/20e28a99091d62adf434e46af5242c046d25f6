@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-15T12:46:05Z
+
+Should probably go into 3.4 as it's a new feature, even though I know why it "broke".
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-16T15:13:52Z
+
+@iltar this tries to remove a behavior change introduced in #23195
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-16T15:14:30Z
+
+So, ping @stof, original reporter of #23177.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T15:47:49Z
+
+I'd propose to reverse the flag, and submit it on 3.4, as a new feature, so that people can opt-out if they want (yes, that'd mean keeping the BC break, I know, let's live with that.)
+
+---------------------------------------------------------------------------
+
+by robinlehrmann at 2017-11-26T17:09:37Z
+
+@xabbuh Okay, I changed it. Good point 👍

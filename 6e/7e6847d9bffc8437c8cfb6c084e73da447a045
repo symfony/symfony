@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-06T16:45:06Z
+
+AppVeyor's failure is not related... memory on `composer ...` 💥
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-06T16:54:55Z
+
+Thanks for the PR.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-12-06T18:30:05Z
+
+The same loop can happen in `get()` right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-07T08:54:16Z
+
+> The same loop can happen in get() right?
+
+Yes, but is already handled there AFAIK.
+
+---------------------------------------------------------------------------
+
+by leotiger at 2017-12-07T15:16:15Z
+
+I've tested the fix and it throws now a circular reference exception as expected. Thx.

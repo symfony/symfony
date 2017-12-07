@@ -1,11 +1,11 @@
 {
     "path": "\/name\/add",
-    "pathRegex": "#^\/name\/add$#s",
+    "pathRegex": "#PATH_REGEX#",
     "host": "localhost",
-    "hostRegex": "#^localhost$#si",
+    "hostRegex": "#HOST_REGEX#",
     "scheme": "http|https",
     "method": "PUT|POST",
-    "class": "Symfony\\Component\\Routing\\Route",
+    "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\RouteStub",
     "defaults": [],
     "requirements": "NO CUSTOM",
     "options": {

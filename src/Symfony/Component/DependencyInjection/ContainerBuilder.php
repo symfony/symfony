@@ -998,10 +998,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $id = (string) $this->aliasDefinitions[$id];
 
             if (isset($seen[$id])) {
-                throw new ServiceCircularReferenceException($id, array_keys($seen));
+                $seen = array_values($seen);
+                $seen = array_slice($seen, array_search($id, $seen));
+                $seen[] = $id;
+
+                throw new ServiceCircularReferenceException($id, $seen);
             }
 
-            $seen[$id] = true;
+            $seen[$id] = $id;
         }
 
         return $this->getDefinition($id);

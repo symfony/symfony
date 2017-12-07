@@ -1,0 +1,123 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T18:34:09Z
+
+Note that changing a public interface is a BC break, so this cannot be merged as is, isn't it?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-30T20:51:37Z
+
+@nicolas-grekas the upgrade note is misleading, this replaces the whole interface.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-10-30T20:52:34Z
+
+I guess i have to update the upgrade node
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-02T19:42:12Z
+
+@lyrixx Thanks for the review :)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-04T07:36:24Z
+
+Status: Needs Review
+
+travis failure is unrelated
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-04T15:10:48Z
+
+@nicolas-grekas @xabbuh PR changed with the new behaviour deprecating `ClassInstanceSupportStrategy` and creating 4.1 files, since this will be in 4.1 and not in 4.0.
+
+Thanks for the review.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-06T14:26:21Z
+
+We should already start with an `UPGRADE-5.0.md` guide which explains the consequences this will have in 5.0 (removed methods and interfaces).
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-07T06:36:49Z
+
+Thanks @xabbuh @chalasr @lyrixx for the review ;) !
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-08T06:36:44Z
+
+@chalasr @xabbuh I've taken care of the comments
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-08T17:12:05Z
+
+Thanks @chalasr done ;)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-14T06:49:36Z
+
+WDYT of @ro0NL's path ?
+
+It's not too late to say that Registry is final since 3.4 @nicolas-grekas  ?
+
+I guess it could be a thing too to be able to re-implement the registry, and users won't need to change alot of thing. I think it's a good idea @ro0NL. (i'll take care of the comments, I just want to wait a little for others' thoughts).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-11-15T14:01:11Z
+
+> It's not too late to say that Registry if final since 3.4
+
+It is to me, 3.4 should not receive new deprecations anymore. I think this is fine.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-16T07:35:25Z
+
+Ill take care of the 2 comments.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-16T12:54:03Z
+
+:+1: lets go with `addWorkflow`. It's not like that's super bad or so.. but im not sure which method comes after that ;-) in case we need to patch this signature one day.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-30T09:18:21Z
+
+Needs a rebase.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-01T12:19:21Z
+
+The PR has been rebased
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-04T11:28:34Z
+
+Looks good to me.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-04T15:23:11Z
+
+done @lyrixx
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-04T16:56:48Z
+
+This PR is ready.

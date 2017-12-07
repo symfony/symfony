@@ -120,7 +120,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
+            if (!preg_match($compiledRoute->getRegex().'D', $pathinfo, $matches)) {
                 continue;
             }
 

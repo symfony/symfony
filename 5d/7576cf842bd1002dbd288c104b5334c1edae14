@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by rs-orlov at 2017-12-05T08:00:12Z
+
+I've renamed variables as @javiereguiluz suggested.
+
+---------------------------------------------------------------------------
+
+by rs-orlov at 2017-12-07T08:42:13Z
+
+Are you asking me? If `master` means only symfony 4+, than no. We are on 3.4 right now, that's why I've picked 3.4 as the base branch.

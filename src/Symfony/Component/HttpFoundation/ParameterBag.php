@@ -218,7 +218,9 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function getInt($key, $default = 0, $deep = false)
     {
-        return (int) $this->get($key, $default, $deep);
+        $value = $this->get($key, $default, $deep);
+
+        return is_array($value) ? array_map('intval', $value) : (int) $value;
     }
 
     /**

@@ -126,33 +126,37 @@ class ParameterBagTest extends TestCase
 
     public function testGetAlpha()
     {
-        $bag = new ParameterBag(array('word' => 'foo_BAR_012'));
+        $bag = new ParameterBag(array('word' => 'foo_BAR_012', 'word_array' => array('foo_BAR_012', 'FOO_bar_013')));
 
         $this->assertEquals('fooBAR', $bag->getAlpha('word'), '->getAlpha() gets only alphabetic characters');
+        $this->assertEquals(array('fooBAR', 'FOObar'), $bag->getAlpha('word_array'), '->getAlpha() gets only alphabetic characters');
         $this->assertEquals('', $bag->getAlpha('unknown'), '->getAlpha() returns empty string if a parameter is not defined');
     }
 
     public function testGetAlnum()
     {
-        $bag = new ParameterBag(array('word' => 'foo_BAR_012'));
+        $bag = new ParameterBag(array('word' => 'foo_BAR_012', 'word_array' => array('foo_BAR_012', 'FOO_bar_013')));
 
         $this->assertEquals('fooBAR012', $bag->getAlnum('word'), '->getAlnum() gets only alphanumeric characters');
+        $this->assertEquals(array('fooBAR012', 'FOObar013'), $bag->getAlnum('word_array'), '->getAlnum() gets only alphanumeric characters');
         $this->assertEquals('', $bag->getAlnum('unknown'), '->getAlnum() returns empty string if a parameter is not defined');
     }
 
     public function testGetDigits()
     {
-        $bag = new ParameterBag(array('word' => 'foo_BAR_012'));
+        $bag = new ParameterBag(array('word' => 'foo_BAR_012', 'word_array' => array('foo_BAR_012', 'FOO_bar_013')));
 
         $this->assertEquals('012', $bag->getDigits('word'), '->getDigits() gets only digits as string');
+        $this->assertEquals(array('012', '013'), $bag->getDigits('word_array'), '->getDigits() gets only digits as string');
         $this->assertEquals('', $bag->getDigits('unknown'), '->getDigits() returns empty string if a parameter is not defined');
     }
 
     public function testGetInt()
     {
-        $bag = new ParameterBag(array('digits' => '0123'));
+        $bag = new ParameterBag(array('digits' => '0123', 'digits_array' => array('0123', '0456')));
 
         $this->assertEquals(123, $bag->getInt('digits'), '->getInt() gets a value of parameter as integer');
+        $this->assertEquals(array(123, 456), $bag->getInt('digits_array'), '->getInt() gets a value of parameter as integer');
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 
@@ -165,7 +169,7 @@ class ParameterBagTest extends TestCase
             'dec' => '256',
             'hex' => '0x100',
             'array' => array('bang'),
-            ));
+        ));
 
         $this->assertEmpty($bag->filter('nokey'), '->filter() should return empty by default if no key is found');
 
@@ -215,11 +219,12 @@ class ParameterBagTest extends TestCase
 
     public function testGetBoolean()
     {
-        $parameters = array('string_true' => 'true', 'string_false' => 'false');
+        $parameters = array('string_true' => 'true', 'string_false' => 'false', 'string_array' => array('true', 'false'));
         $bag = new ParameterBag($parameters);
 
         $this->assertTrue($bag->getBoolean('string_true'), '->getBoolean() gets the string true as boolean true');
         $this->assertFalse($bag->getBoolean('string_false'), '->getBoolean() gets the string false as boolean false');
+        $this->assertEquals(array(true, false), $bag->getBoolean('string_array'), '->getBoolean() gets the string false as boolean false');
         $this->assertFalse($bag->getBoolean('unknown'), '->getBoolean() returns false if a parameter is not defined');
     }
 }

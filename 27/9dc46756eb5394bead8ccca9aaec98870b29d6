@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-09-29T12:51:05Z
+
+Great, I like it a lot. Would fit perfectly to denormalize JSON-LD documents (`@type`).
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-09-29T13:33:22Z
+
+@dunglas updated based on your requests and added the framework bundle bridge.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-09-29T14:15:00Z
+
+Can't get the bottom of this Travis issue for PHP 7+ 🤔
+
+---------------------------------------------------------------------------
+
+by theofidry at 2017-09-29T14:51:12Z
+
+@sroze could you provide a sample of the problematic code? I do have similar relationships in my codebase and it works, because at the end of the day the class you need to serialize is not `CodeRepository` but `GitHubRepository` or `BitbucketRepository` which the serializer knows how to handle.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-09-29T16:21:24Z
+
+@theofidry the tricky bit is the de-serialization, it would complain about not being able to instanciate an abstract class 😉
+
+---------------------------------------------------------------------------
+
+by jderusse at 2017-09-29T20:30:05Z
+
+Is this feature extensible to everything? and not only abstract classes.
+
+Would love to use `$message = $serializer->unserialize($data, MessageInterface::class, 'json');`
+Without need to extend an abstract class nor writing a the list of existing mapping.
+
+Mapping could be done by using the basename of the Entity classname (serialize), and reverse mapping by browsing a list of known namespaces and chaking if the class name exists.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-29T20:31:54Z
+
+I didn't look at this deep, but:
+1. why do we expose both `framework.serializer.discriminator_class_mapping` and yml/xml/annotations for this?
+2. why allowing to pass a `ClassDiscriminatorResolverInterface` to `ObjectNormalizer` instead of relying on the metadata already registered?
+3. What about allowing to call a resolver instead of a property?
+
+I agree this feature could be useful not only with abstract classes.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-09-30T07:10:10Z
+
+> Would love to use $message = $serializer->unserialize($data, MessageInterface::class, 'json');
+
+@jderusse yes, good point, I'll do this.
+
+> Mapping could be done by using the basename of the Entity classname (serialize), and reverse mapping by browsing a list of known namespaces and chaking if the class name exists.
+
+That's a very good point as well, this could potentially be automated using a `class name => class name` mapping. But I believe it would be better to start with an explicit configuration as I wouldn't personally advise to use class names within serialised documents. If we see people having no problem with this and see the DX can be drastically improved this way, why not :)
+
+> why do we expose both framework.serializer.discriminator_class_mapping and yml/xml/annotations for this?
+> why allowing to pass a ClassDiscriminatorResolverInterface to ObjectNormalizer instead of relying on the metadata already registered?
+
+@ogizanagi The reason is that I started by exposing the `discriminator_class_mapping` service but @dunglas told me he would prefer to have some configuration looking like the existing one. I have kept both as I believe it gives us a greater configuration flexibility but happy to keep only one.
+
+> What about allowing to call a resolver instead of a property?
+
+@ogizanagi I don't get the question.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-09-30T12:34:50Z
+
+Serializer's functional tests are the only one failing, with an exception with the newly introduced class:
+```
+1) Symfony\Bundle\FrameworkBundle\Tests\Functional\SerializerTest::testDeserializeArrayOfObject
+Error: Class 'Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata' not found
+```
+
+Any idea why @dunglas @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-01T16:55:47Z
+
+@jderusse this is now working with interfaces as well.
+@ogizanagi I've removed the configuration via the FrameworkBundle, only kept annotations/xml/yaml.
+@dunglas added the resolver local cache and changed the CS.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-01T17:00:05Z
+
+Test errors are normal as the functional tests are using `dev-master` components and therefore don't get the class introduced and used while creating the serializer. Should be ready 🤗
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-01T17:45:29Z
+
+Moving this one to 4.1. There is no need to rush out such a new feature.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-02T07:24:26Z
+
+@fabpot changed the PR to be based on `master` and used PHP 7 things. The bot isn't happy about PHP7 yet tho 😉
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-03T12:00:26Z
+
+Rebased on `master` & squashed all the commits. Failure on `DEPS=low` is expected until we merge it.
+
+For you @symfony/deciders 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-03T12:18:04Z
+
+A failure on deps=low is almost never legitimate. Should be doubly checked.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-03T12:24:02Z
+
+@nicolas-grekas a new class used by FrameworkBundle's configuration (in the declared services). Should we add it only when the class exists or something? 🤔
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-03T12:28:07Z
+
+class_exists if possible is best, instead of bumping the minimum version
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-03T12:43:01Z
+
+Good shout, just made the [`FrameworkBundle` able to deal without the class](https://github.com/symfony/symfony/pull/24375/commits/72ee086f22fcbafac4fb52936b27a3cdc3dfddb6) 👍
+
+And it's green now. 💚

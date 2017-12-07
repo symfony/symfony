@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\WorkflowExtension;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Registry;
-use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
+use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
@@ -38,9 +38,46 @@ class WorkflowExtensionTest extends TestCase
         $workflow = new Workflow($definition);
 
         $registry = new Registry();
-        $registry->add($workflow, new ClassInstanceSupportStrategy(\stdClass::class));
+        $registry->addWorkflow($workflow, new InstanceOfSupportStrategy(\stdClass::class));
 
         $this->extension = new WorkflowExtension($registry);
+    }
+
+    /**
+     * @group legacy
+     */
+    protected function setUpLegacyAdd()
+    {
+        if (!class_exists(Workflow::class)) {
+            $this->markTestSkipped('The Workflow component is needed to run tests for this extension.');
+        }
+
+        $places = array('ordered', 'waiting_for_payment', 'processed');
+        $transitions = array(
+            new Transition('t1', 'ordered', 'waiting_for_payment'),
+            new Transition('t2', 'waiting_for_payment', 'processed'),
+        );
+        $definition = new Definition($places, $transitions);
+        $workflow = new Workflow($definition);
+
+        $registry = new Registry();
+        $registry->add($workflow, new InstanceOfSupportStrategy(\stdClass::class));
+
+        $this->extension = new WorkflowExtension($registry);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Symfony\Component\Workflow\Registry::add is deprecated since Symfony 4.1. Use addWorkflow() instead.
+     */
+    public function testCanTransitionLegacy()
+    {
+        $this->setUpLegacyAdd();
+        $subject = new \stdClass();
+        $subject->marking = array();
+
+        $this->assertTrue($this->extension->canTransition($subject, 't1'));
+        $this->assertFalse($this->extension->canTransition($subject, 't2'));
     }
 
     public function testCanTransition()

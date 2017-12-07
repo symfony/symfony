@@ -90,7 +90,8 @@ class ExpressionLanguageTest extends TestCase
      */
     public function testParseThrowsInsteadOfNotice()
     {
-        (new ExpressionLanguage())->parse('node.', array('node'));
+        $expressionLanguage = new ExpressionLanguage();
+        $expressionLanguage->parse('node.', array('node'));
     }
 
     public function shortCircuitProviderEvaluate()

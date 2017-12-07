@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-06T06:55:50Z
+
+AppVeyor failure is unrelated, do you want me to push force to restart the build ?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-12-06T08:17:28Z
+
+@Simperfit: I've restarted it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-06T09:47:58Z
+
+That's a feature, thus for master.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-06T12:00:56Z
+
+done @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-07T16:16:33Z
+
+travis failure is unrelated

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-06T12:00:12Z
+
+Yep, I like your wording suggestions @nicolas-grekas. Changed 👍
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-12-06T13:49:50Z
+
+I'm a bit confused here, are you referring to missing controllers or missing actions?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-06T14:01:30Z
+
+AFAIK "actions" are not an "official" Symfony thing. It's just a controller.

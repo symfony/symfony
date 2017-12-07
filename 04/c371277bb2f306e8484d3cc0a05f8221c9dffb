@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-11-24T11:09:43Z
+
+Adding a new public method **is** a new feature. So this cannot go in 2.7
+
+---------------------------------------------------------------------------
+
+by nesk at 2017-11-24T11:11:55Z
+
+OK! Would you like me to create a new PR for the master branch?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-11-24T11:17:24Z
+
+You can [change the target branch](https://github.com/blog/2224-change-the-base-branch-of-a-pull-request) on this PR and rebase accordingly.
+
+---------------------------------------------------------------------------
+
+by nesk at 2017-11-24T12:09:37Z
+
+The target branch has been changed and the rebase too.

@@ -673,6 +673,16 @@ class ObjectNormalizerTest extends TestCase
             ),
             $serializer->normalize($objectDummy, null, $context)
         );
+
+        $context = array('attributes' => array('foo', 'baz', 'object'));
+        $this->assertEquals(
+            array(
+                'foo' => 'foo',
+                'baz' => true,
+                'object' => array('foo' => 'innerFoo', 'bar' => 'innerBar'),
+            ),
+            $serializer->normalize($objectDummy, null, $context)
+        );
     }
 
     public function testAttributesContextDenormalize()

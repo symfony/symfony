@@ -16,7 +16,7 @@ namespace Symfony\Component\Validator;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ConstraintViolation implements ConstraintViolationInterface
+class ConstraintViolation implements ConstraintViolationInterface, \Serializable
 {
     private $message;
     private $messageTemplate;
@@ -200,5 +200,29 @@ class ConstraintViolation implements ConstraintViolationInterface
     public function getCode()
     {
         return $this->code;
+    }
+
+    public function serialize()
+    {
+        return serialize(array(
+            $this->message,
+            $this->messageTemplate,
+            $this->parameters,
+            $this->plural,
+            $this->propertyPath,
+            $this->invalidValue,
+            $this->constraint,
+            $this->code,
+            $this->cause,
+        ));
+    }
+
+    public function unserialize($serialized)
+    {
+        if (\PHP_VERSION_ID >= 70000) {
+            list($this->message, $this->messageTemplate, $this->parameters, $this->plural, $this->propertyPath, $this->invalidValue, $this->constraint, $this->code, $this->cause) = unserialize($serialized, array('allowed_classes' => true));
+        } else {
+            list($this->message, $this->messageTemplate, $this->parameters, $this->plural, $this->propertyPath, $this->invalidValue, $this->constraint, $this->code, $this->cause) = unserialize($serialized);
+        }
     }
 }

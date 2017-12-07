@@ -172,8 +172,8 @@ class DoctrineDataCollector extends DataCollector
             $className = get_class($var);
 
             return method_exists($var, '__toString') ?
-                array(sprintf('Object(%s): "%s"', $className, $var->__toString()), false) :
-                array(sprintf('Object(%s)', $className), false);
+                array(sprintf('/* Object(%s): */"%s"', $className, $var->__toString()), false) :
+                array(sprintf('/* Object(%s) */', $className), false);
         }
 
         if (is_array($var)) {
@@ -189,7 +189,7 @@ class DoctrineDataCollector extends DataCollector
         }
 
         if (is_resource($var)) {
-            return array(sprintf('Resource(%s)', get_resource_type($var)), false);
+            return array(sprintf('/* Resource(%s) */', get_resource_type($var)), false);
         }
 
         return array($var, true);

@@ -62,6 +62,7 @@ use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -1151,6 +1152,11 @@ class FrameworkExtension extends Extension
 
         if (!class_exists(DateIntervalNormalizer::class)) {
             $container->removeDefinition('serializer.normalizer.dateinterval');
+        }
+
+        if (!class_exists(ClassDiscriminatorFromClassMetadata::class)) {
+            $container->removeAlias('Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface');
+            $container->removeDefinition('serializer.mapping.class_discriminator_resolver');
         }
 
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');

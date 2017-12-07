@@ -335,7 +335,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         foreach ($value as $key => $val) {
-            if (\is_array($val) && 1 === \count($val)) {
+            if (empty($context['as_collection']) && \is_array($val) && 1 === \count($val)) {
                 $value[$key] = current($val);
             }
         }

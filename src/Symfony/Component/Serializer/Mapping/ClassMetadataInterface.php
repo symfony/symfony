@@ -54,4 +54,14 @@ interface ClassMetadataInterface
      * @return \ReflectionClass
      */
     public function getReflectionClass();
+
+    /**
+     * @return ClassDiscriminatorMapping|null
+     */
+    public function getClassDiscriminatorMapping();
+
+    /**
+     * @param ClassDiscriminatorMapping|null $mapping
+     */
+    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null);
 }

@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-08T14:35:58Z
+
+Why remove the version number?
+For reference, we changed from 2 to 3 without much discussion in #17340
+So let's have a real discussion now?
+To me, the version seems legit as it provides a hint that could be useful.
+I wouldn't mind either removing it, but why in the first place?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-12-08T14:47:53Z
+
+Actually I really don't care. I removed it as @javiereguiluz  suggested it in order to ease maintenance.
+More over this value is almost useless, as it's a default value that is almost every-time overrided. I don't really see when this value could give an hint. You may be confused because of the [BrowserKit Client](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/BrowserKit/Client.php#L125) ?

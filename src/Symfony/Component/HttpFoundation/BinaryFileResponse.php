@@ -86,6 +86,21 @@ class BinaryFileResponse extends Response
     public function setFile($file, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
         if (!$file instanceof File) {
+            if ($file instanceof \SplTempFileObject) {
+                $tempFile = $file;
+                $tempFile->fflush();
+                $tempFile->rewind();
+
+                $this->deleteFileAfterSend = true;
+                $file = tempnam(sys_get_temp_dir(), 'temp-file-object-');
+                $fp = fopen($file, 'wb');
+                while (!$tempFile->eof()) {
+                    $s = $tempFile->fgets();
+                    fwrite($fp, $s);
+                }
+                fclose($fp);
+            }
+
             if ($file instanceof \SplFileInfo) {
                 $file = new File($file->getPathname());
             } else {

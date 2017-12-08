@@ -281,7 +281,7 @@ HttpKernel
        # ...
 
        # explicit commands registration
-       AppBundle\Command:
+       AppBundle\Command\:
            resource: '../../src/AppBundle/Command/*'
            tags: ['console.command']
    ```

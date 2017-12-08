@@ -126,30 +126,32 @@ class TextDescriptor extends Descriptor
 
     private function normalizeAndSortOptionsColumns(array $options)
     {
-        foreach ($options as $group => &$opts) {
+        foreach ($options as $group => $opts) {
             $sorted = false;
             foreach ($opts as $class => $opt) {
+                if (is_string($class)) {
+                    unset($options[$group][$class]);
+                }
+
                 if (!is_array($opt) || 0 === count($opt)) {
                     continue;
                 }
 
-                unset($opts[$class]);
-
                 if (!$sorted) {
-                    $opts = array();
+                    $options[$group] = array();
                 } else {
-                    $opts[] = null;
+                    $options[$group][] = null;
                 }
-                $opts[] = sprintf('<info>%s</info>', (new \ReflectionClass($class))->getShortName());
-                $opts[] = new TableSeparator();
+                $options[$group][] = sprintf('<info>%s</info>', (new \ReflectionClass($class))->getShortName());
+                $options[$group][] = new TableSeparator();
 
                 sort($opt);
                 $sorted = true;
-                $opts = array_merge($opts, $opt);
+                $options[$group] = array_merge($options[$group], $opt);
             }
 
             if (!$sorted) {
-                sort($opts);
+                sort($options[$group]);
             }
         }
 

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-08T10:49:36Z
+
+Nice :-)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-12-08T12:09:26Z
+
+setters turned into no-ops here should be deprecated in master if they were not already in previous releases.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2017-12-08T12:10:35Z
+
+@stof Thanks, I planned to do that indeed.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2017-12-08T12:20:31Z
+
+Tests are green.

@@ -413,7 +413,7 @@ EOTXT;
         if ($this->inlineRequires && !$this->isHotPath($definition)) {
             $lineage = $calls = $behavior = array();
             foreach ($inlinedDefinitions as $def) {
-                if (!$def->isDeprecated() && $class = is_array($factory = $def->getFactory()) && is_string($factory[0]) ? $factory[0] : $def->getClass()) {
+                if (!$def->isDeprecated() && is_string($class = is_array($factory = $def->getFactory()) && is_string($factory[0]) ? $factory[0] : $def->getClass())) {
                     $this->collectLineage($class, $lineage);
                 }
                 $arguments = array($def->getArguments(), $def->getFactory(), $def->getProperties(), $def->getMethodCalls(), $def->getConfigurator());
@@ -425,7 +425,7 @@ EOTXT;
                     && ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE !== $behavior[$id]
                     && $this->container->has($id)
                     && $this->isTrivialInstance($def = $this->container->findDefinition($id))
-                    && $class = is_array($factory = $def->getFactory()) && is_string($factory[0]) ? $factory[0] : $def->getClass()
+                    && is_string($class = is_array($factory = $def->getFactory()) && is_string($factory[0]) ? $factory[0] : $def->getClass())
                 ) {
                     $this->collectLineage($class, $lineage);
                 }
@@ -1226,7 +1226,7 @@ EOF;
             $inlinedDefinitions = $this->getDefinitionsFromArguments(array($definition));
 
             foreach ($inlinedDefinitions as $def) {
-                if ($class = is_array($factory = $def->getFactory()) && is_string($factory[0]) ? $factory[0] : $def->getClass()) {
+                if (is_string($class = is_array($factory = $def->getFactory()) && is_string($factory[0]) ? $factory[0] : $def->getClass())) {
                     $this->collectLineage($class, $lineage);
                 }
             }

@@ -28,7 +28,7 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
     {
         $dir = __DIR__;
         for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = dirname($dir);
+            $this->targetDirs[$i] = $dir = \dirname($dir);
         }
         $this->parameters = $this->getDefaultParameters();
 

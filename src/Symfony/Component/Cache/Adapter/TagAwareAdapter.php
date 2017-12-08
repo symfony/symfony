@@ -32,7 +32,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, PruneableInterface, R
     private $setCacheItemTags;
     private $getTagsByKey;
     private $invalidateTags;
-    private $tagsPool;
+    private $tags;
 
     public function __construct(AdapterInterface $itemsPool, AdapterInterface $tagsPool = null)
     {

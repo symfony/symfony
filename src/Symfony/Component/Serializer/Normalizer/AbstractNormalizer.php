@@ -388,6 +388,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     {
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];
+        } else {
+            unset($parentContext[self::ATTRIBUTES]);
         }
 
         return $parentContext;

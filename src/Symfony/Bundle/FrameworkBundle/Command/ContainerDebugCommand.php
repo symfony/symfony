@@ -247,7 +247,7 @@ EOF
         }
 
         try {
-            $r = new \ReflectionClass($serviceId);
+            new \ReflectionClass($serviceId);
 
             return true;
         } catch (\ReflectionException $e) {

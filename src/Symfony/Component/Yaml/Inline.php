@@ -583,7 +583,8 @@ class Inline
                         return;
                     case 0 === strpos($scalar, '!php/const'):
                         if (self::$constantSupport) {
-                            if (defined($const = self::parseScalar(substr($scalar, 11)))) {
+                            $i = 0;
+                            if (defined($const = self::parseScalar(substr($scalar, 11), 0, null, $i, false))) {
                                 return constant($const);
                             }
 

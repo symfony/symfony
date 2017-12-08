@@ -59,6 +59,7 @@ class InlineTest extends TestCase
             array('!php/const PHP_INT_MAX', PHP_INT_MAX),
             array('[!php/const PHP_INT_MAX]', array(PHP_INT_MAX)),
             array('{ foo: !php/const PHP_INT_MAX }', array('foo' => PHP_INT_MAX)),
+            array('!php/const NULL', null),
         );
     }
 

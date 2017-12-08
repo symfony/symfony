@@ -109,6 +109,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         $headers = null;
         $nbHeaders = 0;
+        $headerCount = array();
         $result = array();
 
         list($delimiter, $enclosure, $escapeChar, $keySeparator) = $this->getCsvOptions($context);
@@ -120,7 +121,9 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                 $nbHeaders = $nbCols;
 
                 foreach ($cols as $col) {
-                    $headers[] = explode($keySeparator, $col);
+                    $header = explode($keySeparator, $col);
+                    $headers[] = $header;
+                    $headerCount[] = count($header);
                 }
 
                 continue;
@@ -128,7 +131,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
             $item = array();
             for ($i = 0; ($i < $nbCols) && ($i < $nbHeaders); ++$i) {
-                $depth = count($headers[$i]);
+                $depth = $headerCount[$i];
                 $arr = &$item;
                 for ($j = 0; $j < $depth; ++$j) {
                     // Handle nested arrays

@@ -119,7 +119,7 @@ abstract class AbstractPipes implements PipesInterface
         $w = array($this->pipes[0]);
 
         // let's have a look if something changed in streams
-        if (false === $n = @stream_select($r, $w, $e, 0, 0)) {
+        if (false === @stream_select($r, $w, $e, 0, 0)) {
             return;
         }
 

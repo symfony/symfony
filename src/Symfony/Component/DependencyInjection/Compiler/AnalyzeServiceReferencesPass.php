@@ -30,7 +30,6 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
     private $container;
     private $currentId;
     private $currentDefinition;
-    private $repeatedPass;
     private $onlyConstructorArguments;
 
     /**
@@ -46,7 +45,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
-        $this->repeatedPass = $repeatedPass;
+        // no-op for BC
     }
 
     /**

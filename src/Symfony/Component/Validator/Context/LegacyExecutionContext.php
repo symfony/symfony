@@ -26,8 +26,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class LegacyExecutionContext extends ExecutionContext
 {
-    private $metadataFactory;
-
     /**
      * Creates a new context.
      *
@@ -44,7 +42,5 @@ class LegacyExecutionContext extends ExecutionContext
             $translator,
             $translationDomain
         );
-
-        $this->metadataFactory = $metadataFactory;
     }
 }

@@ -24,12 +24,6 @@ use Symfony\Component\Lock\StoreInterface;
  */
 class MemcachedStore implements StoreInterface
 {
-    private static $defaultClientOptions = array(
-        'persistent_id' => null,
-        'username' => null,
-        'password' => null,
-    );
-
     private $memcached;
     private $initialTtl;
     /** @var bool */

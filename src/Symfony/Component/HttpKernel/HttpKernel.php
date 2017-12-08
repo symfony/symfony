@@ -134,7 +134,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $arguments = $this->resolver->getArguments($request, $controller);
 
         // call controller
-        $response = call_user_func_array($controller, $arguments);
+        $response = \call_user_func_array($controller, $arguments);
 
         // view
         if (!$response instanceof Response) {

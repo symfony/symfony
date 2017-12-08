@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class InlineServiceDefinitionsPass implements RepeatablePassInterface
 {
-    private $repeatedPass;
     private $graph;
     private $compiler;
     private $formatter;
@@ -34,7 +33,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
-        $this->repeatedPass = $repeatedPass;
+        // no-op for BC
     }
 
     /**

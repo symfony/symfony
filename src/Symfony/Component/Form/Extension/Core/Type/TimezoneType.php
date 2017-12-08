@@ -24,13 +24,6 @@ class TimezoneType extends AbstractType
     private static $timezones;
 
     /**
-     * Stores the available timezone choices.
-     *
-     * @var array
-     */
-    private static $flippedTimezones;
-
-    /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)

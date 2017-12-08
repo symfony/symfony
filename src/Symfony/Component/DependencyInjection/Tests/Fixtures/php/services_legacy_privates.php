@@ -23,7 +23,7 @@ class Symfony_DI_PhpDumper_Test_Legacy_Privates extends Container
     {
         $dir = __DIR__;
         for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = dirname($dir);
+            $this->targetDirs[$i] = $dir = \dirname($dir);
         }
         $this->services = array();
         $this->methodMap = array(

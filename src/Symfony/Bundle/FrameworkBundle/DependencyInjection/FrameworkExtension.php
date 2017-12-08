@@ -35,6 +35,8 @@ use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -110,6 +112,12 @@ class FrameworkExtension extends Extension
         $loader->load('web.xml');
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
+
+        if (!interface_exists(ContainerBagInterface::class)) {
+            $container->removeDefinition('parameter_bag');
+            $container->removeAlias(ContainerBagInterface::class);
+            $container->removeAlias(ParameterBagInterface::class);
+        }
 
         if (class_exists(Application::class)) {
             $loader->load('console.xml');

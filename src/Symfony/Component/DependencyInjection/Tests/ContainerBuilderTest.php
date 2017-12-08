@@ -1123,6 +1123,23 @@ class ContainerBuilderTest extends TestCase
         $this->assertNotSame($bar->foo, $barUser->foo);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @expectedExceptionMessage Circular reference detected for service "app.test_class", path: "app.test_class -> App\TestClass -> app.test_class".
+     */
+    public function testThrowsCircularExceptionForCircularAliases()
+    {
+        $builder = new ContainerBuilder();
+
+        $builder->setAliases(array(
+            'foo' => new Alias('app.test_class'),
+            'app.test_class' => new Alias('App\\TestClass'),
+            'App\\TestClass' => new Alias('app.test_class'),
+        ));
+
+        $builder->findDefinition('foo');
+    }
+
     public function testInitializePropertiesBeforeMethodCalls()
     {
         $container = new ContainerBuilder();

@@ -399,6 +399,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     {
         if (isset($parentContext[self::ATTRIBUTES][$attribute])) {
             $parentContext[self::ATTRIBUTES] = $parentContext[self::ATTRIBUTES][$attribute];
+        } else {
+            unset($parentContext[self::ATTRIBUTES]);
         }
 
         return $parentContext;

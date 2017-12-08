@@ -78,7 +78,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         $this->lazyLoad($eventName);
 
         if (isset($this->listenerIds[$eventName])) {
-            foreach ($this->listenerIds[$eventName] as $i => list($serviceId, $method, $priority)) {
+            foreach ($this->listenerIds[$eventName] as $i => list($serviceId, $method)) {
                 $key = $serviceId.'.'.$method;
                 if (isset($this->listeners[$eventName][$key]) && $listener === array($this->listeners[$eventName][$key], $method)) {
                     unset($this->listeners[$eventName][$key]);

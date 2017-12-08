@@ -146,6 +146,16 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    /**
+     * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
+     * @expectedExceptionMessage Unexpected end of expression around position 6 for expression `node.`.
+     */
+    public function testParseThrowsInsteadOfNotice()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expressionLanguage->parse('node.', array('node'));
+    }
+
     public function shortCircuitProviderEvaluate()
     {
         $object = $this->getMockBuilder('stdClass')->setMethods(array('foo'))->getMock();

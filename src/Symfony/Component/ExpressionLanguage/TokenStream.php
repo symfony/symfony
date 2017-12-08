@@ -50,11 +50,11 @@ class TokenStream
      */
     public function next()
     {
+        ++$this->position;
+
         if (!isset($this->tokens[$this->position])) {
             throw new SyntaxError('Unexpected end of expression', $this->current->cursor, $this->expression);
         }
-
-        ++$this->position;
 
         $this->current = $this->tokens[$this->position];
     }

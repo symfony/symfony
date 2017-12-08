@@ -1164,10 +1164,8 @@ class Process implements \IteratorAggregate
 
     /**
      * Returns whether TTY is supported on the current operating system.
-     *
-     * @return bool
      */
-    public static function isTtySupported()
+    public static function isTtySupported(): bool
     {
         static $isTtySupported;
 

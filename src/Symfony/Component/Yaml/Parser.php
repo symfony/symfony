@@ -310,6 +310,8 @@ class Parser
                             throw new ParseException(sprintf('Duplicate key "%s" detected.', $key), $this->getRealCurrentLineNb() + 1, $this->currentLine);
                         }
                     } else {
+                        // remember the parsed line number here in case we need it to provide some contexts in error messages below
+                        $realCurrentLineNbKey = $this->getRealCurrentLineNb();
                         $value = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(), $flags);
                         if ('<<' === $key) {
                             $this->refs[$refMatches['ref']] = $value;

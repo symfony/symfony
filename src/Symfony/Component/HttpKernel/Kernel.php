@@ -678,10 +678,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             'file' => $cache->getPath(),
             'as_files' => true,
             'debug' => $this->debug,
-<<<<<<< HEAD
-=======
-            'inline_class_loader_parameter' => \PHP_VERSION_ID >= 70000 && !$this->loadClassCache && !class_exists(ClassCollectionLoader::class, false) ? 'container.dumper.inline_class_loader' : null,
->>>>>>> 3.4
         ));
 
         $rootCode = array_pop($content);

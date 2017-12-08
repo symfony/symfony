@@ -92,7 +92,7 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         foreach ($this->listeners[$eventName] as $priority => $listeners) {
-            if (false !== in_array($listener, $listeners, true)) {
+            if (\in_array($listener, $listeners, true)) {
                 return $priority;
             }
         }

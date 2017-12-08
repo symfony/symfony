@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-12-07T18:11:20Z
+
+none of the fixture files are namespaced. So is the container actually namespaced in actual usage ? This would mean dumper tests are incomplete
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-07T18:12:40Z
+
+@stof `src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/services9_as_files.txt` is (and this is the style we use on 3.4)

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-04T09:23:54Z
+
+Should we make `AbstractController` use it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T09:42:32Z
+
+> Should we make AbstractController use it?
+
+could be, but not in this PR

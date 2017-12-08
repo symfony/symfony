@@ -112,7 +112,7 @@ final class Dotenv
         $this->end = strlen($this->data);
         $this->state = self::STATE_VARNAME;
         $this->values = array();
-        $name = $value = '';
+        $name = '';
 
         $this->skipEmptyLines();
 

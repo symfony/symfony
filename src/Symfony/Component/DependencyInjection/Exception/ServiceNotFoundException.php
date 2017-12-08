@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Exception;
 
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 
 /**
  * This exception is thrown when a non-existent service is requested.
@@ -34,7 +35,17 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
             $msg = sprintf('The service "%s" has a dependency on a non-existent service "%s".', $sourceId, $id);
         }
 
-        if ($alternatives) {
+        $subscriber = null;
+        foreach (array_reverse(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)) as $trace) {
+            if (isset($trace['class']) && in_array(ServiceSubscriberInterface::class, class_implements($trace['class']))) {
+                $subscriber = $trace['class'];
+                break;
+            }
+        }
+
+        if (null !== $subscriber) {
+            $msg .= sprintf(' Did you forget to add it to "%s::getSubscribedServices()"?', $subscriber);
+        } elseif ($alternatives) {
             if (1 == count($alternatives)) {
                 $msg .= ' Did you mean this: "';
             } else {

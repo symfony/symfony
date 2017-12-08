@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class InlineServiceDefinitionsPass extends AbstractRecursivePass implements RepeatablePassInterface
 {
-    private $repeatedPass;
     private $cloningIds = array();
     private $inlinedServiceIds = array();
 
@@ -32,7 +31,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
-        $this->repeatedPass = $repeatedPass;
+        // no-op for BC
     }
 
     /**

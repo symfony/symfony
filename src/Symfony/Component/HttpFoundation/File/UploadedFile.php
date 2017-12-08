@@ -80,6 +80,19 @@ class UploadedFile extends File
     }
 
     /**
+     * Returns the original file name without extension.
+     *
+     * It is extracted from the original file name that was uploaded.
+     * Then it should not be considered as a safe value.
+     *
+     * @return string The origin name without extension
+     */
+    public function getClientOriginalNameWithoutExtension()
+    {
+        return pathinfo($this->originalName, PATHINFO_FILENAME);
+    }
+
+    /**
      * Returns the original file extension.
      *
      * It is extracted from the original file name that was uploaded.

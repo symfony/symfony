@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-06T12:08:54Z
+
+Shouldn't we try to stringify instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-06T12:10:38Z
+
+The outcome here is a few less classes/files inlined. Not a big deal. Resolving the parameter could led to subtle bugs that are not worth the effort.

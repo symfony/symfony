@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -485,7 +486,17 @@ class AutowirePass extends AbstractRecursivePass
     private function createTypeNotFoundMessage(TypedReference $reference, $label)
     {
         if (!$r = $this->container->getReflectionClass($type = $reference->getType(), false)) {
-            $message = sprintf('is type-hinted with "%s" but this class was not found.', $type);
+            // either $type does not exist or a parent class does not exist
+            try {
+                $resource = new ClassExistenceResource($type, false);
+                // isFresh() will explode ONLY if a parent class/trait does not exist
+                $resource->isFresh(0);
+                $classExists = false;
+            } catch (\ReflectionException $e) {
+                $classExists = true;
+            }
+
+            $message = sprintf('has type "%s" but this class %s.', $type, $classExists ? 'cannot be loaded: its parent class may be missing' : 'was not found');
         } else {
             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';
             $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($reference));

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added the `Process::isTtySupported()` method that allows to check for TTY support
+
 4.0.0
 -----
 

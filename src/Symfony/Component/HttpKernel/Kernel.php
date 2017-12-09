@@ -536,7 +536,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if (!$cache->isFresh()) {
             if ($this->debug) {
                 $collectedLogs = array();
-                $previousHandler = set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
+                $previousHandler = defined('PHPUNIT_COMPOSER_INSTALL');
+                $previousHandler = $previousHandler ?: set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
                     if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
                         return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
                     }
@@ -572,7 +573,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 $container = $this->buildContainer();
                 $container->compile();
             } finally {
-                if ($this->debug) {
+                if ($this->debug && true !== $previousHandler) {
                     restore_error_handler();
 
                     file_put_contents($this->getCacheDir().'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));

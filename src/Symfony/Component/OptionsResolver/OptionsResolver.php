@@ -777,7 +777,7 @@ class OptionsResolver implements Options
             $invalidTypes = array();
 
             foreach ($this->allowedTypes[$option] as $type) {
-                $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
+                $type = self::$typeAliases[$type] ?? $type;
 
                 if ($valid = $this->verifyTypes($type, $value, $invalidTypes)) {
                     break;

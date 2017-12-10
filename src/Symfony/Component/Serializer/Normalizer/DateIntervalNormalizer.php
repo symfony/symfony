@@ -42,7 +42,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
             throw new InvalidArgumentException('The object must be an instance of "\DateInterval".');
         }
 
-        $dateIntervalFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
+        $dateIntervalFormat = $context[self::FORMAT_KEY] ?? $this->format;
 
         return $object->format($dateIntervalFormat);
     }
@@ -71,7 +71,7 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
             throw new UnexpectedValueException('Expected a valid ISO 8601 interval string.');
         }
 
-        $dateIntervalFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
+        $dateIntervalFormat = $context[self::FORMAT_KEY] ?? $this->format;
 
         $valuePattern = '/^'.preg_replace('/%([yYmMdDhHiIsSwW])(\w)/', '(?P<$1>\d+)$2', $dateIntervalFormat).'$/';
         if (!preg_match($valuePattern, $data)) {

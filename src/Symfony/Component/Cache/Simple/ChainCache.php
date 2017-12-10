@@ -89,7 +89,7 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
     {
         $missing = array();
         $nextCacheIndex = $cacheIndex + 1;
-        $nextCache = isset($this->caches[$nextCacheIndex]) ? $this->caches[$nextCacheIndex] : null;
+        $nextCache = $this->caches[$nextCacheIndex] ?? null;
 
         foreach ($values as $k => $value) {
             if ($miss !== $value) {

@@ -87,7 +87,7 @@ class ApplicationDescription
             throw new CommandNotFoundException(sprintf('Command %s does not exist.', $name));
         }
 
-        return isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
+        return $this->commands[$name] ?? $this->aliases[$name];
     }
 
     private function inspectApplication()

@@ -103,7 +103,7 @@ class ObjectRouteLoaderForTest extends ObjectRouteLoader
 
     protected function getServiceObject($id)
     {
-        return isset($this->loaderMap[$id]) ? $this->loaderMap[$id] : null;
+        return $this->loaderMap[$id] ?? null;
     }
 }
 

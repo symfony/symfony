@@ -53,8 +53,8 @@ class MemcachedSessionHandler extends AbstractSessionHandler
             ));
         }
 
-        $this->ttl = isset($options['expiretime']) ? (int) $options['expiretime'] : 86400;
-        $this->prefix = isset($options['prefix']) ? $options['prefix'] : 'sf2s';
+        $this->ttl = (int) ($options['expiretime'] ?? 86400);
+        $this->prefix = $options['prefix'] ?? 'sf2s';
     }
 
     /**

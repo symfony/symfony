@@ -50,7 +50,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return parent::supportsDenormalization($data, $type, $format) && (isset($this->cache[$type]) ? $this->cache[$type] : $this->cache[$type] = $this->supports($type));
+        return parent::supportsDenormalization($data, $type, $format) && ($this->cache[$type] ?? $this->cache[$type] = $this->supports($type));
     }
 
     /**

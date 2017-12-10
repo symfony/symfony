@@ -102,7 +102,7 @@ class ReflectionCaster
         }
         $function = $c->getFunction();
         $frame = array(
-            'class' => isset($function->class) ? $function->class : null,
+            'class' => $function->class ?? null,
             'type' => isset($function->class) ? ($function->isStatic() ? '::' : '->') : null,
             'function' => $function->name,
             'file' => $c->getExecutingFile(),

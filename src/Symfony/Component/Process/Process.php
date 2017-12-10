@@ -678,7 +678,7 @@ class Process implements \IteratorAggregate
             return;
         }
 
-        return isset(self::$exitCodes[$exitcode]) ? self::$exitCodes[$exitcode] : 'Unknown error';
+        return self::$exitCodes[$exitcode] ?? 'Unknown error';
     }
 
     /**

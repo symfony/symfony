@@ -101,7 +101,7 @@ trait RedisTrait
             $scheme = 'unix';
         }
         $params += array(
-            'host' => isset($params['host']) ? $params['host'] : $params['path'],
+            'host' => $params['host'] ?? $params['path'],
             'port' => isset($params['host']) ? 6379 : null,
             'dbindex' => 0,
         );
@@ -223,7 +223,7 @@ trait RedisTrait
             }
 
             $info = $host->info('Server');
-            $info = isset($info['Server']) ? $info['Server'] : $info;
+            $info = $info['Server'] ?? $info;
 
             if (!version_compare($info['redis_version'], '2.8', '>=')) {
                 // As documented in Redis documentation (http://redis.io/commands/keys) using KEYS

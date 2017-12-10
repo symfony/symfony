@@ -451,7 +451,7 @@ class Response
         }
 
         if (null === $text) {
-            $this->statusText = isset(self::$statusTexts[$code]) ? self::$statusTexts[$code] : 'unknown status';
+            $this->statusText = self::$statusTexts[$code] ?? 'unknown status';
 
             return $this;
         }

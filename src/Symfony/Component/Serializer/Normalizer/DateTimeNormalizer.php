@@ -51,7 +51,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
             throw new InvalidArgumentException('The object must implement the "\DateTimeInterface".');
         }
 
-        $format = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
+        $format = $context[self::FORMAT_KEY] ?? $this->format;
         $timezone = $this->getTimezone($context);
 
         if (null !== $timezone) {
@@ -76,7 +76,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $dateTimeFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : null;
+        $dateTimeFormat = $context[self::FORMAT_KEY] ?? null;
         $timezone = $this->getTimezone($context);
 
         if (null !== $dateTimeFormat) {

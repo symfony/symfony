@@ -386,7 +386,7 @@ class CliDumper extends AbstractDumper
                             }
                         }
 
-                        $this->line .= $bin.$this->style($style, $key[1], $attr).(isset($attr['separator']) ? $attr['separator'] : ': ');
+                        $this->line .= $bin.$this->style($style, $key[1], $attr).($attr['separator'] ?? ': ');
                     } else {
                         // This case should not happen
                         $this->line .= '-'.$bin.'"'.$this->style('private', $key, array('class' => '')).'": ';

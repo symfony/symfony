@@ -478,9 +478,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     private function resolveXmlRootName(array $context = array()): string
     {
-        return isset($context['xml_root_node_name'])
-            ? $context['xml_root_node_name']
-            : $this->rootNodeName;
+        return $context['xml_root_node_name'] ?? $this->rootNodeName;
     }
 
     /**
@@ -488,9 +486,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      */
     private function resolveXmlTypeCastAttributes(array $context = array()): bool
     {
-        return isset($context['xml_type_cast_attributes'])
-            ? (bool) $context['xml_type_cast_attributes']
-            : true;
+        return (bool) ($context['xml_type_cast_attributes'] ?? true);
     }
 
     /**

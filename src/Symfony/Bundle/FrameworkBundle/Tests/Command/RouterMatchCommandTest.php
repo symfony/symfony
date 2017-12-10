@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
@@ -46,9 +47,10 @@ class RouterMatchCommandTest extends TestCase
      */
     private function createCommandTester()
     {
-        $application = new Application($this->getKernel());
+        $kernel = $this->getKernel();
+        $application = new Application($kernel);
         $application->add(new RouterMatchCommand($this->getRouter()));
-        $application->add(new RouterDebugCommand($this->getRouter()));
+        $application->add(new RouterDebugCommand($this->getRouter(), new ControllerNameParser($kernel)));
 
         return new CommandTester($application->find('router:match'));
     }

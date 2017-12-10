@@ -145,6 +145,7 @@ class ControllerNameParserTest extends TestCase
     {
         $bundles = array(
             'SensioCmsFooBundle' => $this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle'),
+            'FoooooBundle' => $this->getBundle('TestBundle\FooBundle', 'FoooooBundle'),
             'FooBundle' => $this->getBundle('TestBundle\FooBundle', 'FooBundle'),
         );
 
@@ -161,11 +162,6 @@ class ControllerNameParserTest extends TestCase
             }))
         ;
 
-        $bundles = array(
-            'SensioCmsFooBundle' => $this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle'),
-            'FoooooBundle' => $this->getBundle('TestBundle\FooBundle', 'FoooooBundle'),
-            'FooBundle' => $this->getBundle('TestBundle\FooBundle', 'FooBundle'),
-        );
         $kernel
             ->expects($this->any())
             ->method('getBundles')

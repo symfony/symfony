@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Controller;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
- * Class for holding bundle + controller name + action name
+ * Class for holding bundle + controller name + action name.
  *
  * @author Pavel Batanov <pavel@batanov.me>
  */

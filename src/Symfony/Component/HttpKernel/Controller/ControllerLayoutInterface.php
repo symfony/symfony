@@ -15,14 +15,14 @@ use Symfony\Component\HttpKernel\Exception\ControllerLayoutException;
 
 /**
  * Responsible for build FQCN::action from bundle + controller name + action name
- * and parse FQCN::action into bundle + controller name + action name
+ * and parse FQCN::action into bundle + controller name + action name.
  *
  * @author Pavel Batanov <pavel@batanov.me>
  */
 interface ControllerLayoutInterface
 {
     /**
-     * Decompose controller string into bundle, controller and action
+     * Decompose controller string into bundle, controller and action.
      *
      * @param string $controller
      *
@@ -33,7 +33,7 @@ interface ControllerLayoutInterface
     public function parse(string $controller): ActionReference;
 
     /**
-     * Builds a controller string for given bundle, controller, and action
+     * Builds a controller string for given bundle, controller, and action.
      *
      * @param ActionReference $action
      *

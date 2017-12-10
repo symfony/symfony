@@ -21,6 +21,7 @@ final class AlternativeBundleNameProvider
 
     /**
      * AlternativeBundleNameProvider constructor.
+     *
      * @param KernelInterface $kernel
      */
     public function __construct(KernelInterface $kernel)

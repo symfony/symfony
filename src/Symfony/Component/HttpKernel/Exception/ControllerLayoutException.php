@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Controller\ActionReference;
  */
 class ControllerLayoutException extends \InvalidArgumentException
 {
-    public static function unknownControllerClass(ActionReference $reference, string $try): ControllerLayoutException
+    public static function unknownControllerClass(ActionReference $reference, string $try): self
     {
         throw new static(
             sprintf(
@@ -31,7 +31,7 @@ class ControllerLayoutException extends \InvalidArgumentException
         );
     }
 
-    public static function unknownBundleForController(string $controller): ControllerLayoutException
+    public static function unknownBundleForController(string $controller): self
     {
         return new static(sprintf('Unable to find a bundle that defines controller "%s".', $controller));
     }

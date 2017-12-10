@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\ControllerLayoutException;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Class for generic *Bundle/Controller/*Controller::*Action layout
+ * Class for generic *Bundle/Controller/*Controller::*Action layout.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Pavel Batanov <pavel@batanov.me>
@@ -31,6 +31,7 @@ final class GenericControllerLayout implements ControllerLayoutInterface
 
     /**
      * GenericControllerLayout constructor.
+     *
      * @param KernelInterface $kernel
      */
     public function __construct(KernelInterface $kernel)

@@ -11,7 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\HttpKernel\Controller\ActionReference;
+use Symfony\Component\HttpKernel\Controller\ControllerLayoutInterface;
+use Symfony\Component\HttpKernel\Controller\Layout\GenericControllerLayout;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\Util\AlternativeBundleNameProvider;
 
 /**
  * ControllerNameParser converts controller from the short notation a:b:c
@@ -24,9 +28,12 @@ class ControllerNameParser
 {
     protected $kernel;
 
-    public function __construct(KernelInterface $kernel)
+    private $layout;
+
+    public function __construct(KernelInterface $kernel, ControllerLayoutInterface $layout = null)
     {
         $this->kernel = $kernel;
+        $this->layout = $layout ?: new GenericControllerLayout($this->kernel);
     }
 
     /**
@@ -60,19 +67,16 @@ class ControllerNameParser
                 $originalController
             );
 
-            if ($alternative = $this->findAlternative($bundleName)) {
+            $provider = new AlternativeBundleNameProvider($this->kernel);
+
+            if ($alternative = $provider->findAlternative($bundleName)) {
                 $message .= sprintf(' Did you mean "%s:%s:%s"?', $alternative, $controller, $action);
             }
 
             throw new \InvalidArgumentException($message, 0, $e);
         }
 
-        $try = $bundle->getNamespace().'\\Controller\\'.$controller.'Controller';
-        if (class_exists($try)) {
-            return $try.'::'.$action.'Action';
-        }
-
-        throw new \InvalidArgumentException(sprintf('The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.', $bundleName, $controller, $action, $try));
+        return $this->layout->build(new ActionReference($bundle, $controller, $action));
     }
 
     /**
@@ -86,48 +90,8 @@ class ControllerNameParser
      */
     public function build($controller)
     {
-        if (0 === preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)::(.+)Action$#', $controller, $match)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "class::method" string.', $controller));
-        }
+        $reference = $this->layout->parse($controller);
 
-        $className = $match[1];
-        $controllerName = $match[2];
-        $actionName = $match[3];
-        foreach ($this->kernel->getBundles() as $name => $bundle) {
-            if (0 !== strpos($className, $bundle->getNamespace())) {
-                continue;
-            }
-
-            return sprintf('%s:%s:%s', $name, $controllerName, $actionName);
-        }
-
-        throw new \InvalidArgumentException(sprintf('Unable to find a bundle that defines controller "%s".', $controller));
-    }
-
-    /**
-     * Attempts to find a bundle that is *similar* to the given bundle name.
-     */
-    private function findAlternative(string $nonExistentBundleName): ?string
-    {
-        $bundleNames = array_map(function ($b) {
-            return $b->getName();
-        }, $this->kernel->getBundles());
-
-        $alternative = null;
-        $shortest = null;
-        foreach ($bundleNames as $bundleName) {
-            // if there's a partial match, return it immediately
-            if (false !== strpos($bundleName, $nonExistentBundleName)) {
-                return $bundleName;
-            }
-
-            $lev = levenshtein($nonExistentBundleName, $bundleName);
-            if ($lev <= strlen($nonExistentBundleName) / 3 && (null === $alternative || $lev < $shortest)) {
-                $alternative = $bundleName;
-                $shortest = $lev;
-            }
-        }
-
-        return $alternative;
+        return sprintf('%s:%s:%s', $reference->bundle->getName(), $reference->controller, $reference->action);
     }
 }

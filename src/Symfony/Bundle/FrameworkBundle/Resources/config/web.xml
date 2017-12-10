@@ -7,9 +7,14 @@
     <services>
         <defaults public="false" />
 
+        <service id="controller_layout.generic" class="Symfony\Component\HttpKernel\Controller\Layout\GenericControllerLayout">
+            <argument type="service" id="kernel" />
+        </service>
+
         <service id="controller_name_converter" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser">
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="kernel" />
+            <argument type="service" id="controller_layout.generic" />
         </service>
 
         <service id="controller_resolver" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver">

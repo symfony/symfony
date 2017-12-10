@@ -84,9 +84,7 @@ abstract class AbstractExtension implements FormExtensionInterface
             $this->initTypeExtensions();
         }
 
-        return isset($this->typeExtensions[$name])
-            ? $this->typeExtensions[$name]
-            : array();
+        return $this->typeExtensions[$name] ?? array();
     }
 
     /**

@@ -242,7 +242,7 @@ class MockArraySessionStorage implements SessionStorageInterface
 
         foreach ($bags as $bag) {
             $key = $bag->getStorageKey();
-            $this->data[$key] = isset($this->data[$key]) ? $this->data[$key] : array();
+            $this->data[$key] = $this->data[$key] ?? array();
             $bag->initialize($this->data[$key]);
         }
 

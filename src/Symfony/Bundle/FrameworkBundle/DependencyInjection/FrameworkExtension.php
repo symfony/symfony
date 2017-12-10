@@ -475,7 +475,7 @@ class FrameworkExtension extends Extension
             $definitionDefinition->addTag('workflow.definition', array(
                 'name' => $name,
                 'type' => $type,
-                'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
+                'marking_store' => $workflow['marking_store']['type'] ?? null,
             ));
             if (isset($workflow['initial_place'])) {
                 $definitionDefinition->addArgument($workflow['initial_place']);
@@ -803,7 +803,7 @@ class FrameworkExtension extends Extension
             } else {
                 // let format fallback to main version_format
                 $format = $package['version_format'] ?: $config['version_format'];
-                $version = isset($package['version']) ? $package['version'] : null;
+                $version = $package['version'] ?? null;
                 $version = $this->createVersion($container, $version, $format, $package['json_manifest_path'], $name);
             }
 

@@ -53,7 +53,7 @@ class RequestDataCollector extends BaseRequestCollector implements EventSubscrib
      */
     public function getForward()
     {
-        return isset($this->data['forward']) ? $this->data['forward'] : false;
+        return $this->data['forward'] ?? false;
     }
 
     public function onKernelController(FilterControllerEvent $event)

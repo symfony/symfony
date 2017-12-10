@@ -51,7 +51,7 @@ class ResponseHeaderBag extends HeaderBag
     {
         $headers = array();
         foreach ($this->all() as $name => $value) {
-            $headers[isset($this->headerNames[$name]) ? $this->headerNames[$name] : $name] = $value;
+            $headers[$this->headerNames[$name] ?? $name] = $value;
         }
 
         return $headers;

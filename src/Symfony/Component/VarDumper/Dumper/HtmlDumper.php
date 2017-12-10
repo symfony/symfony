@@ -435,7 +435,7 @@ return function (root, x) {
                     return this.current();
                 }
                 this.idx = this.idx < (this.nodes.length - 1) ? this.idx + 1 : 0;
-        
+
                 return this.current();
             },
             previous: function () {
@@ -443,7 +443,7 @@ return function (root, x) {
                     return this.current();
                 }
                 this.idx = this.idx > 0 ? this.idx - 1 : (this.nodes.length - 1);
-        
+
                 return this.current();
             },
             isEmpty: function () {
@@ -519,7 +519,7 @@ return function (root, x) {
                 var xpathResult = doc.evaluate('//pre[@id="' + root.id + '"]//span[@class="sf-dump-str" or @class="sf-dump-key" or @class="sf-dump-public" or @class="sf-dump-protected" or @class="sf-dump-private"][contains(translate(child::text(), ' + xpathString(searchQuery.toUpperCase()) + ', ' + xpathString(searchQuery.toLowerCase()) + '), ' + xpathString(searchQuery.toLowerCase()) + ')]', document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
 
                 while (node = xpathResult.iterateNext()) state.nodes.push(node);
-                
+
                 showCurrent(state);
             }, 400);
         });
@@ -829,13 +829,13 @@ EOHTML
             $s = '<span class=sf-dump-default>';
             $c = $c[$i = 0];
             do {
-                $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', ord($c[$i]));
+                $s .= $map[$c[$i]] ?? sprintf('\x%02X', ord($c[$i]));
             } while (isset($c[++$i]));
 
             return $s.'</span>';
         }, $v).'</span>';
 
-        if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
+        if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], $attr['line'] ?? 0)) {
             $attr['href'] = $href;
         }
         if (isset($attr['href'])) {

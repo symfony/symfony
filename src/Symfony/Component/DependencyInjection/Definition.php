@@ -475,7 +475,7 @@ class Definition
      */
     public function getTag($name)
     {
-        return isset($this->tags[$name]) ? $this->tags[$name] : array();
+        return $this->tags[$name] ?? array();
     }
 
     /**

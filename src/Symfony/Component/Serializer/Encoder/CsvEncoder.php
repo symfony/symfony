@@ -185,11 +185,11 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
     private function getCsvOptions(array $context)
     {
-        $delimiter = isset($context[self::DELIMITER_KEY]) ? $context[self::DELIMITER_KEY] : $this->delimiter;
-        $enclosure = isset($context[self::ENCLOSURE_KEY]) ? $context[self::ENCLOSURE_KEY] : $this->enclosure;
-        $escapeChar = isset($context[self::ESCAPE_CHAR_KEY]) ? $context[self::ESCAPE_CHAR_KEY] : $this->escapeChar;
-        $keySeparator = isset($context[self::KEY_SEPARATOR_KEY]) ? $context[self::KEY_SEPARATOR_KEY] : $this->keySeparator;
-        $headers = isset($context[self::HEADERS_KEY]) ? $context[self::HEADERS_KEY] : array();
+        $delimiter = $context[self::DELIMITER_KEY] ?? $this->delimiter;
+        $enclosure = $context[self::ENCLOSURE_KEY] ?? $this->enclosure;
+        $escapeChar = $context[self::ESCAPE_CHAR_KEY] ?? $this->escapeChar;
+        $keySeparator = $context[self::KEY_SEPARATOR_KEY] ?? $this->keySeparator;
+        $headers = $context[self::HEADERS_KEY] ?? array();
 
         if (!is_array($headers)) {
             throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, gettype($headers)));

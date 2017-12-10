@@ -125,8 +125,8 @@ EOPHP
 }
 
 global $argv, $argc;
-$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
-$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
+$argv = $_SERVER['argv'] ?? array();
+$argc = $_SERVER['argc'] ?? 0;
 $components = array();
 $cmd = array_map('escapeshellarg', $argv);
 $exit = 0;
@@ -161,7 +161,7 @@ if ('\\' === DIRECTORY_SEPARATOR) {
 }
 
 if ($components) {
-    $skippedTests = isset($_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS']) ? $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] : false;
+    $skippedTests = $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] ?? false;
     $runningProcs = array();
 
     foreach ($components as $component) {

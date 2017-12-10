@@ -431,7 +431,7 @@ class NativeSessionStorage implements SessionStorageInterface
 
         foreach ($bags as $bag) {
             $key = $bag->getStorageKey();
-            $session[$key] = isset($session[$key]) ? $session[$key] : array();
+            $session[$key] = $session[$key] ?? array();
             $bag->initialize($session[$key]);
         }
 

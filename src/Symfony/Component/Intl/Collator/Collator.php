@@ -114,7 +114,7 @@ class Collator
             self::SORT_STRING => \SORT_STRING,
         );
 
-        $plainSortFlag = isset($intlToPlainFlagMap[$sortFlag]) ? $intlToPlainFlagMap[$sortFlag] : self::SORT_REGULAR;
+        $plainSortFlag = $intlToPlainFlagMap[$sortFlag] ?? self::SORT_REGULAR;
 
         return asort($array, $plainSortFlag);
     }

@@ -61,7 +61,7 @@ class Terminal
                 // extract [w, H] from "wxh (WxH)"
                 // or [w, h] from "wxh"
                 self::$width = (int) $matches[1];
-                self::$height = isset($matches[4]) ? (int) $matches[4] : (int) $matches[2];
+                self::$height = (int) ($matches[4] ?? $matches[2]);
             } elseif (null !== $dimensions = self::getConsoleMode()) {
                 // extract [w, h] from "wxh"
                 self::$width = (int) $dimensions[0];

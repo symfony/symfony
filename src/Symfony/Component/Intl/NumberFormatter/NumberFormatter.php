@@ -393,7 +393,7 @@ class NumberFormatter
      */
     public function getAttribute($attr)
     {
-        return isset($this->attributes[$attr]) ? $this->attributes[$attr] : null;
+        return $this->attributes[$attr] ?? null;
     }
 
     /**

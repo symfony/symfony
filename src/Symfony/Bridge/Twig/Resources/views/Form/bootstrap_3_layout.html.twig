@@ -20,16 +20,21 @@
 {%- endblock %}
 
 {% block money_widget -%}
-    <div class="input-group">
-        {% set append = money_pattern starts with '{{' %}
-        {% if not append %}
-            <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
-        {% endif %}
+    {% set prepend = not (money_pattern starts with '{{') %}
+    {% set append = not (money_pattern ends with '}}') %}
+    {% if prepend or append %}
+        <div class="input-group">
+            {% if prepend %}
+                <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+            {% endif %}
+            {{- block('form_widget_simple') -}}
+            {% if append %}
+                <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+            {% endif %}
+        </div>
+    {% else %}
         {{- block('form_widget_simple') -}}
-        {% if append %}
-            <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
-        {% endif %}
-    </div>
+    {% endif %}
 {%- endblock money_widget %}
 
 {% block percent_widget -%}

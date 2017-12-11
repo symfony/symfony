@@ -37,6 +37,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     private $fileLinkFormat;
     private $scope;
     private $firstCall = true;
+    private $hasTerminatedWithException;
 
     /**
      * @param callable|null        $exceptionHandler A handler that will be called on Exception
@@ -63,14 +64,16 @@ class DebugHandlersListener implements EventSubscriberInterface
      */
     public function configure(Event $event = null)
     {
-        if (!$this->firstCall) {
+        if (!$event instanceof KernelEvent ? !$this->firstCall : !$event->isMasterRequest()) {
             return;
         }
-        $this->firstCall = false;
+        $this->firstCall = $this->hasTerminatedWithException = false;
+
+        $handler = set_exception_handler('var_dump');
+        $handler = is_array($handler) ? $handler[0] : null;
+        restore_exception_handler();
+
         if ($this->logger || null !== $this->throwAt) {
-            $handler = set_error_handler('var_dump');
-            $handler = is_array($handler) ? $handler[0] : null;
-            restore_error_handler();
             if ($handler instanceof ErrorHandler) {
                 if ($this->logger) {
                     $handler->setDefaultLogger($this->logger, $this->levels);
@@ -99,8 +102,16 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
         if (!$this->exceptionHandler) {
             if ($event instanceof KernelEvent) {
-                if (method_exists($event->getKernel(), 'terminateWithException')) {
-                    $this->exceptionHandler = array($event->getKernel(), 'terminateWithException');
+                if (method_exists($kernel = $event->getKernel(), 'terminateWithException')) {
+                    $request = $event->getRequest();
+                    $hasRun = &$this->hasTerminatedWithException;
+                    $this->exceptionHandler = function (\Exception $e) use ($kernel, $request, &$hasRun) {
+                        if ($hasRun) {
+                            throw $e;
+                        }
+                        $hasRun = true;
+                        $kernel->terminateWithException($e, $request);
+                    };
                 }
             } elseif ($event instanceof ConsoleEvent && $app = $event->getCommand()->getApplication()) {
                 $output = $event->getOutput();
@@ -113,9 +124,6 @@ class DebugHandlersListener implements EventSubscriberInterface
             }
         }
         if ($this->exceptionHandler) {
-            $handler = set_exception_handler('var_dump');
-            $handler = is_array($handler) ? $handler[0] : null;
-            restore_exception_handler();
             if ($handler instanceof ErrorHandler) {
                 $h = $handler->setExceptionHandler('var_dump') ?: $this->exceptionHandler;
                 $handler->setExceptionHandler($h);

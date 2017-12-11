@@ -30,9 +30,9 @@ class RedisCaster
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
-        if (!$connected = $c->isConnected()) {
+        if (!$c->isConnected()) {
             return $a + array(
-                $prefix.'isConnected' => $connected,
+                $prefix.'isConnected' => false,
             );
         }
 
@@ -40,7 +40,7 @@ class RedisCaster
         $retry = defined('Redis::OPT_SCAN') ? $c->getOption(\Redis::OPT_SCAN) : 0;
 
         return $a + array(
-            $prefix.'isConnected' => $connected,
+            $prefix.'isConnected' => true,
             $prefix.'host' => $c->getHost(),
             $prefix.'port' => $c->getPort(),
             $prefix.'auth' => $c->getAuth(),

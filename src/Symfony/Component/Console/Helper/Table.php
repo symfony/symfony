@@ -637,11 +637,18 @@ class Table
             ->setCellHeaderFormat('%s')
         ;
 
+        $box = (new TableStyle())
+            ->setHorizontalBorderChar('─')
+            ->setVerticalBorderChar('│')
+            ->setCrossingChar('┼')
+        ;
+
         return array(
             'default' => new TableStyle(),
             'borderless' => $borderless,
             'compact' => $compact,
             'symfony-style-guide' => $styleGuide,
+            'box' => $box,
         );
     }
 

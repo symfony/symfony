@@ -520,8 +520,8 @@ class DateTimeTypeTest extends BaseTypeTest
     {
         parent::testSubmitNull($expected, $norm, array(
             // View data is an array of choice values array
-            'date' => array('year' => '', 'month' => '', 'day' => ''),
-            'time' => array('hour' => '', 'minute' => ''),
+            'date' => array('year' => null, 'month' => null, 'day' => null),
+            'time' => array('hour' => null, 'minute' => null),
         ));
     }
 
@@ -536,8 +536,8 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertNull($form->getNormData());
         $this->assertSame(array(
             // View data is an array of choice values array
-            'date' => array('year' => '', 'month' => '', 'day' => ''),
-            'time' => array('hour' => '', 'minute' => ''),
+            'date' => array('year' => null, 'month' => null, 'day' => null),
+            'time' => array('hour' => null, 'minute' => null),
         ), $form->getViewData());
     }
 

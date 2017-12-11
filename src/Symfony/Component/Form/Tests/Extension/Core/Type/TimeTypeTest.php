@@ -745,7 +745,7 @@ class TimeTypeTest extends BaseTypeTest
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
-        $view = array('hour' => '', 'minute' => '');
+        $view = array('hour' => null, 'minute' => null);
 
         parent::testSubmitNull($expected, $norm, $view);
     }

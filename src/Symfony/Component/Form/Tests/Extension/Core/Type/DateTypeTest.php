@@ -942,7 +942,7 @@ class DateTypeTest extends BaseTypeTest
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
-        parent::testSubmitNull($expected, $norm, array('year' => '', 'month' => '', 'day' => ''));
+        parent::testSubmitNull($expected, $norm, array('year' => null, 'month' => null, 'day' => null));
     }
 
     public function testSubmitNullWithSingleText()

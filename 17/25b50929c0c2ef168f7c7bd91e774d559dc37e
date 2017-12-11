@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-10T18:09:37Z
+
+We should tell about the two new opt-in parameters, that should really be OK to enable most of the time (container.dumper.inline_class_loader and container.autowiring.strict_mode)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-11-11T15:14:06Z
+
+I agree with this. But shouldn’t we do it in the docs? Also (as Javier knows) there are already some Flex upgrade details on the Flex docs page (and we need to make sure those describe the best strategy, as it’s currently very laborious)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T10:41:35Z
+
+@javiereguiluz what should we do here? A link to the doc?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2017-12-04T11:02:36Z
+
+> We should tell about the two new opt-in parameters, that should really be OK to enable most of the time (container.dumper.inline_class_loader and container.autowiring.strict_mode)
+
+Can you explain in which cases something can not be OK? PrestaShop still have his own autoloader for instance, and I have the feeling that we wont be able to enjoy all the perfs improvements you have done in 3.4 ^^
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T11:05:29Z
+
+@mickaelandrieu when the autoloader does something more than just finding + requiring a file. IE runs some logic before or after the load.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-12-04T11:08:41Z
+
+@mickaelandrieu the behavior of `container.autowiring.strict_mode` is that it disables the BC layer for the SF 3.2 autowiring behavior. If you don't get any autowiring-related deprecation warning in 3.3+, you can turn on this parameter (or you can turn it on already, and then fix any autowiring error you get).
+
+For `container.dumper.inline_class_loader`, there are 2 cases breaking it:
+
+- weird autoloading logic (cf @nicolas-grekas's comment). Note that Swiftmailer is a case doing that.
+- using `$kernel->loadClassCache()` (which is deprecated, and actually *hurts* performance on PHP 7+), so this should just be removed from the project.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2017-12-04T11:14:50Z
+
+> when the autoloader does something more than just finding + requiring a file.
+
+:'( fml
+
+Thank for information, both of you :+1:

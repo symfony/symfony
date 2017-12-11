@@ -379,7 +379,7 @@ trait ControllerTrait
     }
 
     /**
-     * Gets a container configuration parameter by its name.
+     * Gets a container parameter by its name.
      *
      * @return mixed
      *

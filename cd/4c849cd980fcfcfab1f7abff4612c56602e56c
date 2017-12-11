@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-06T10:59:21Z
+
+I'm all in for simplifications, but don't you think this is now too confusing?
+
+```php
+$this->assertDumpEquals(new Toto('baz'), new Toto('baz'));
+```
+
+The two arguments are the same, I'm testing a dump but no dump is provided, etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-08T19:36:54Z
+
+@javiereguiluz that's an real improvement over the current, where you have to maintain a dump for the expected side.
+The fact that dumps are compared instead of the value is what makes the "dump" word legitimate.
+The failure is much improved vs standard phpunit behavior, as the diff that will be generated then will be top notch.
+I confirm my :+1: personally.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-09T15:42:39Z
+
+So I guess we could use this feature to improve the test in symfony ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-11T21:48:00Z
+
+I also like this for the better exception message you get instead of the standard PHPUnit one.

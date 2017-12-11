@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by PurpleBooth at 2017-10-05T18:08:09Z
+
+I think I've addressed the feedback so far, excluding one where I have a question about deprecation notices (which is the cause of the failing tests).
+
+Is there any additional feedback now that the diff is a little tidier?
+
+**Edit:** Fixed the deprecation warning failing tests issue too.
+
+---------------------------------------------------------------------------
+
+by PurpleBooth at 2017-10-29T11:15:11Z
+
+Failing tests come from current 3.4 branch (as of 3.4 being at  98dae3edb1ba8fa35c06a8c9a459e0ffb9105826).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-30T14:05:57Z
+
+We talked about including this on 3.4 and decided it was too late. As such, moving to 4.1.
+
+---------------------------------------------------------------------------
+
+by PurpleBooth at 2017-10-30T16:36:58Z
+
+I'll rebase against that tonight
+
+---------------------------------------------------------------------------
+
+by PurpleBooth at 2017-10-31T07:19:15Z
+
+Okay that's done now. (broken tests from master, again)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-08T19:47:19Z
+
+Time to merge @symfony/deciders ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-11T08:00:35Z
+
+The deprecation also needs to be documented in `UPGRADE-4.1.md`, `UPGRADE-5.0.md` and the component's changelog file. But otherwise this looks good to me.
+
+---------------------------------------------------------------------------
+
+by PurpleBooth at 2017-12-11T08:20:46Z
+
+I'll update those tonight, or at lunchtime if I get a chance 👍
+
+---------------------------------------------------------------------------
+
+by PurpleBooth at 2017-12-11T19:30:23Z
+
+That should be the version numbers corrected in the deprication notices

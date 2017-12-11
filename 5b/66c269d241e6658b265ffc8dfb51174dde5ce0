@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-07T18:50:43Z
+
+@stof @weaverryan thanks for the review, comments addressed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-08T12:37:35Z
+
+PR green and ready.
+We could even improve the message further, by suggesting *what* to type-hint for.
+But this requires some code infrastructure that we don't have right now, so for 4.1 if someone wants to make it happen after merge.
+
+Status: needs review

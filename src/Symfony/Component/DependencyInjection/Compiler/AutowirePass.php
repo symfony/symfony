@@ -491,12 +491,12 @@ class AutowirePass extends AbstractRecursivePass
                 $resource = new ClassExistenceResource($type, false);
                 // isFresh() will explode ONLY if a parent class/trait does not exist
                 $resource->isFresh(0);
-                $classExists = false;
+                $parentMsg = false;
             } catch (\ReflectionException $e) {
-                $classExists = true;
+                $parentMsg = $e->getMessage();
             }
 
-            $message = sprintf('has type "%s" but this class %s.', $type, $classExists ? 'cannot be loaded: its parent class may be missing' : 'was not found');
+            $message = sprintf('has type "%s" but this class %s.', $type, $parentMsg ? sprintf('is missing a parent class (%s)', $parentMsg) : 'was not found');
         } else {
             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';
             $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($reference));

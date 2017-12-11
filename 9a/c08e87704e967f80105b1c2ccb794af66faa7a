@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by julienfalque at 2017-12-02T10:57:22Z
+
+Tests added.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-02T16:52:18Z
+
+Do we have the same issue with Bootstrap 4 support?
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2017-12-02T17:08:06Z
+
+It looks like when Bootstrap 4 theme was added, most of the content of the Bootstrap 3 theme was moved to a common file used by both so yes, I think Bootstrap 4 theme has the same issue. Merging this PR up to 3.4 would probably bring conflicts: the patch must be moved to the common file, which will also fix the issue for Bootstrap 4. Same applies with the tests as they use a common base class.

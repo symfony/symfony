@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-11T22:17:47Z
+
+Could you please rebase to fix the conflict ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-11T22:35:12Z
+
+@shdev Can you rebase the pull request? You've merged master, but we don't merge pull requests with merge commits. I can help you do that if needed. Thanks.
+
+---------------------------------------------------------------------------
+
+by shdev at 2017-12-11T22:47:09Z
+
+@fabpot Thx. It would be nice, if you give me some hints to do the rebase. Sorry for the merges, I did the changes on Github.com and I'm not familiar with rebasing there
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-11T23:02:26Z
+
+I don't think it's possible to rebase from the UI. I see that you did everything with the web UI, so I've just done the rebase for you. I've downloaded your code and did a `git rebase origin/master`. Then, I fixed the conflicts for each commit (`git rebase --continue` when done), and that removed the merge commits.
+
+---------------------------------------------------------------------------
+
+by shdev at 2017-12-11T23:07:09Z
+
+Thank you @fabpot for the work, next time I use rebase

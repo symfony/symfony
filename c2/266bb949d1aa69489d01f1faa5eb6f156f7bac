@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-12-05T13:41:00Z
+
+Could you change the base branch of your PR to 3.3?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-05T13:48:17Z
+
+> Could you change the base branch of your PR to 3.3?
+
+done :)
+but actually, a rebase is now needed @Phantas0s : we don't merge PRs that have merge commits.
+
+---------------------------------------------------------------------------
+
+by Phantas0s at 2017-12-06T08:49:42Z
+
+Sorry I definitely didn't follow correctly the guideline for pull request... I will do better next time :)

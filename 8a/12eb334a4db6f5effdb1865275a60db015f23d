@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-04T07:56:52Z
+
+@maidmaid thanks for this contribution. And now the usual question for changes like this one: does this work perfectly on every operating system and terminal application? (We always have issues with Windows support).
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-12-04T10:55:08Z
+
+It supposed to work with DOS, according to the wiki page. Moreover, AppVeyor is green. But I didn't try on Windows. Maybe a Windows friend can give us a feedback? A friend like @ZHB maybe? ;)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-12-06T03:23:22Z
+
+The test script (to use as-is, without my fork):
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableStyle;
+use Symfony\Component\Console\Output\ConsoleOutput;
+
+(new Table(new ConsoleOutput()))
+    ->setStyle((new TableStyle())
+        ->setHorizontalBorderChar('─')
+        ->setVerticalBorderChar('│')
+        ->setCrossingChar('┼')
+    )
+    ->setHeaders(array('ISBN', 'Title', 'Author'))
+    ->setRows(array(
+        array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'),
+        array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'),
+        array('960-425-059-0', 'The Lord of the Rings', 'J. R. R. Tolkien'),
+        array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
+    ))
+    ->render()
+;
+```
+
+---------------------------------------------------------------------------
+
+by ZHB at 2017-12-06T20:49:28Z
+
+The result on Windows 10 command prompt :
+
+![sf-console-box-drawing](https://user-images.githubusercontent.com/219280/33684602-21888ad8-dacf-11e7-9213-ac0d876474d1.png)

@@ -73,10 +73,15 @@
                             </dd>
 
                             <dt>Profiled on</dt>
-                            <dd>{{ profile.time|date('r') }}</dd>
+                            <dd>{{ profile.time|date('r') }}
+                                <a class="btn btn-sm" href="{{ path('_profiler', { token: 'latest', id: profile.ip, method: profile.method|upper, url: profile.url }|merge(request.query.all)) }}">
+                                    {{ include('@WebProfiler/Icon/ajax.svg') }}</a>
+                            </dd>
 
                             <dt>Token</dt>
-                            <dd>{{ profile.token }}</dd>
+                            <dd>
+                                {{ profile.token }}
+                            </dd>
                         </dl>
                     </div>
                 </div>

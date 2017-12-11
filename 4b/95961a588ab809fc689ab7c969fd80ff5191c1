@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-09T19:22:32Z
+
+it looks like PHP 7.2 may behave differently, that could be the reason for the failure on deps=low
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-10T11:54:13Z
+
+Just tested with php7.2 locally, green.
+Which means the lowest version of the Config component might need a bump.
+Also, what about putting the caught exception message in the one we construct? Would help I guess.
+"...class is missing a parent class (%$e->getMessage()%)"
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-10T16:38:59Z
+
+So, `symfony/config` must be bumped to `^3.3.7` to account for #23755.
+
+Here is the full patch accounting for my comments:
+```patch
+diff --git a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
+index d4abf04..58c1a9c 100644
+--- a/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
++++ b/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php
+@@ -491,12 +491,12 @@ class AutowirePass extends AbstractRecursivePass
+                 $resource = new ClassExistenceResource($type, false);
+                 // isFresh() will explode ONLY if a parent class/trait does not exist
+                 $resource->isFresh(0);
+-                $classExists = false;
++                $parentMsg = false;
+             } catch (\ReflectionException $e) {
+-                $classExists = true;
++                $parentMsg = $e->getMessage();
+             }
+
+-            $message = sprintf('has type "%s" but this class %s.', $type, $classExists ? 'cannot be loaded: its parent class may be missing' : 'was not found');
++            $message = sprintf('has type "%s" but this class %s.', $type, $parentMsg ? sprintf('is missing a parent class (%s)', $parentMsg) : 'was not found');
+         } else {
+             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';
+             $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($reference));
+diff --git a/src/Symfony/Component/DependencyInjection/Tests/Compiler/AutowirePassTest.php b/src/Symfony/Component/DependencyInjection/Tests/Compiler/AutowirePassTest.php
+index 6687583..cae761e 100644
+--- a/src/Symfony/Component/DependencyInjection/Tests/Compiler/AutowirePassTest.php
++++ b/src/Symfony/Component/DependencyInjection/Tests/Compiler/AutowirePassTest.php
+@@ -374,7 +374,7 @@ class AutowirePassTest extends TestCase
+
+     /**
+      * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
+-     * @expectedExceptionMessage Cannot autowire service "a": argument "$r" of method "Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass" but this class cannot be loaded: its parent class may be missing.
++     * @expectedExceptionMessage Cannot autowire service "a": argument "$r" of method "Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct()" has type "Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass" but this class is missing a parent class (Class Symfony\Bug\NotExistClass not found).
+      */
+     public function testParentClassNotFoundThrowsException()
+     {
+diff --git a/src/Symfony/Component/DependencyInjection/composer.json b/src/Symfony/Component/DependencyInjection/composer.json
+index 0ce0ffe..5f79b19 100644
+--- a/src/Symfony/Component/DependencyInjection/composer.json
++++ b/src/Symfony/Component/DependencyInjection/composer.json
+@@ -32,7 +32,7 @@
+         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
+     },
+     "conflict": {
+-        "symfony/config": "<3.3.1",
++        "symfony/config": "<3.3.7",
+         "symfony/finder": "<3.3",
+         "symfony/yaml": "<3.3"
+     },
+```
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-11T13:33:38Z
+
+@nicolas-grekas That patch looks great - the message is even better!
+
+I've made the changes. Fabbot failure is a false-positive.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-11T14:46:18Z
+
+Rock-n-Roll :)

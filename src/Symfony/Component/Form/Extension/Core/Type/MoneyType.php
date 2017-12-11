@@ -43,7 +43,7 @@ class MoneyType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['money_pattern'] = self::getPattern($options['currency']);
+        $view->vars['money_pattern'] = htmlentities(self::getPattern($options['currency']), ENT_QUOTES | (defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
     }
 
     /**
@@ -83,7 +83,7 @@ class MoneyType extends AbstractType
     }
 
     /**
-     * Returns the pattern for this locale.
+     * Returns the pattern for this locale in UTF-8.
      *
      * The pattern contains the placeholder "{{ widget }}" where the HTML tag should
      * be inserted

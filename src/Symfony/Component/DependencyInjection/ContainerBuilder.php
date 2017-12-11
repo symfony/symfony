@@ -1305,6 +1305,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $format = '%%env(%s)%%';
         }
 
+        $bag = $this->getParameterBag();
+        if (true === $format) {
+            $value = $bag->resolveValue($value);
+        }
+
         if (is_array($value)) {
             $result = array();
             foreach ($value as $k => $v) {
@@ -1316,11 +1321,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (!is_string($value)) {
             return $value;
-        }
-
-        $bag = $this->getParameterBag();
-        if (true === $format) {
-            $value = $bag->resolveValue($value);
         }
         $envPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : $this->envPlaceholders;
 

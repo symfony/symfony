@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-09T16:16:52Z
+
+I confirm fix works in Symfony 4.0. However, reproducer I posted in #8703 does not work in Symfony 2.7 project. Also I really think there should be a test for this, since this went under radar for so long.
+
+edit: thank you for adding tests
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-09T17:12:21Z
+
+Now with tests and green.

@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\Email;
 class EmailTest extends TestCase
 {
     /**
-     * @expectedDeprecation The "strict" property is deprecated since version 4.1 and will be removed in 5.0. Use 'mode'=>"strict" instead.
+     * @expectedDeprecation The "strict" property is deprecated since version 4.1 and will be removed in 5.0. Use "mode"=>"strict" instead.
      * @group legacy
      */
     public function testLegacyConstructorStrict()
@@ -36,7 +36,7 @@ class EmailTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The 'mode' parameter value is not valid.
+     * @expectedExceptionMessage The "mode" parameter value is not valid.
      */
     public function testUnknownModesTriggerException()
     {

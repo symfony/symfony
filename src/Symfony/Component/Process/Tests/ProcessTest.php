@@ -1420,6 +1420,7 @@ class ProcessTest extends TestCase
     public function testEnvBackupDoesNotDeleteExistingVars()
     {
         putenv('existing_var=foo');
+        $_ENV['existing_var'] = 'foo';
         $process = $this->getProcess('php -r "echo getenv(\'new_test_var\');"');
         $process->setEnv(array('existing_var' => 'bar', 'new_test_var' => 'foo'));
         $process->inheritEnvironmentVariables();
@@ -1429,6 +1430,9 @@ class ProcessTest extends TestCase
         $this->assertSame('foo', $process->getOutput());
         $this->assertSame('foo', getenv('existing_var'));
         $this->assertFalse(getenv('new_test_var'));
+
+        putenv('existing_var');
+        unset($_ENV['existing_var']);
     }
 
     public function testEnvIsInherited()
@@ -1436,6 +1440,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcessForCode('echo serialize($_SERVER);', null, array('BAR' => 'BAZ'));
 
         putenv('FOO=BAR');
+        $_ENV['FOO'] = 'BAR';
 
         $process->run();
 
@@ -1443,6 +1448,9 @@ class ProcessTest extends TestCase
         $env = array_intersect_key(unserialize($process->getOutput()), $expected);
 
         $this->assertEquals($expected, $env);
+
+        putenv('FOO');
+        unset($_ENV['FOO']);
     }
 
     /**
@@ -1453,6 +1461,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcessForCode('echo serialize($_SERVER);', null, array('BAR' => 'BAZ'));
 
         putenv('FOO=BAR');
+        $_ENV['FOO'] = 'BAR';
 
         $this->assertSame($process, $process->inheritEnvironmentVariables(false));
         $this->assertFalse($process->areEnvironmentVariablesInherited());
@@ -1464,6 +1473,9 @@ class ProcessTest extends TestCase
         unset($expected['FOO']);
 
         $this->assertSame($expected, $env);
+
+        putenv('FOO');
+        unset($_ENV['FOO']);
     }
 
     public function testGetCommandLine()

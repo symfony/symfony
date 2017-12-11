@@ -47,9 +47,7 @@ final class GenericControllerLayout implements ControllerLayoutInterface
             );
         }
 
-        $className = $match[1];
-        $controllerName = $match[2];
-        $actionName = $match[3];
+        [,$className, $controllerName, $actionName] = $match;
         foreach ($this->kernel->getBundles() as $name => $bundle) {
             if (0 !== strpos($className, $bundle->getNamespace())) {
                 continue;

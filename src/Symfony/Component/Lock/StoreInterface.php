@@ -31,7 +31,7 @@ interface StoreInterface
     public function save(Key $key);
 
     /**
-     * Waits a key becomes free, then stores the resource.
+     * Waits until a key becomes free, then stores the resource.
      *
      * If the store does not support this feature it should throw a NotSupportedException.
      *

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by BjornTwachtmann at 2017-10-20T14:44:52Z
+
+@stof , changes made as requested :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-05T15:31:39Z
+
+But tests are failing.
+
+---------------------------------------------------------------------------
+
+by BjornTwachtmann at 2017-11-06T13:40:13Z
+
+@nicolas-grekas I've rebased the branch on 3.3 and all tests pass now. I think there were some failing tests in the 3.2 branch
+
+---------------------------------------------------------------------------
+
+by BjornTwachtmann at 2017-11-27T11:39:45Z
+
+@nicolas-grekas @stof tests are passing, is this okay to merge now?
+
+---------------------------------------------------------------------------
+
+by Tasiobg at 2017-12-07T12:45:06Z
+
+This has been rebased on 3.3 and tests are passing. Can this be merged please?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-08T07:37:47Z
+
+Are 2.7 and 2.8 not affected?
+
+---------------------------------------------------------------------------
+
+by BPScott at 2017-12-08T17:19:38Z
+
+@xabbuh the escaping code that this touches was added in v3.2 in https://github.com/symfony/symfony/pull/17662

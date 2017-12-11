@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by bobdenotter at 2017-12-11T12:35:09Z
+
+Hi @javiereguiluz, good question.
+
+I confirmed the issue on Chrome, Firefox, Safari and MS Edge across OSX and Win10. This fix works on all tested browsers.

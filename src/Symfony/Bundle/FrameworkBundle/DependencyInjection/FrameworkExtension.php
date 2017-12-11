@@ -168,6 +168,7 @@ class FrameworkExtension extends Extension
                     'emacs' => 'emacs://open?url=file://%%f&line=%%l',
                     'sublime' => 'subl://open?url=file://%%f&line=%%l',
                     'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
+                    'atom' => 'atom://core/open/file?filename=%%f&line=%%l',
                 );
                 $ide = $config['ide'];
 

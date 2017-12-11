@@ -71,7 +71,11 @@ class PhpMatcherDumperTest extends TestCase
 
         $class = $this->generateDumpedMatcher($collection, true);
 
-        $matcher = $this->getMock($class, array('redirect'), array(new RequestContext()));
+        $matcher = $this->getMockBuilder($class)
+                        ->setMethods(array('redirect'))
+                        ->setConstructorArgs(array(new RequestContext()))
+                        ->getMock();
+        
         $matcher->expects($this->once())->method('redirect')->with('/foo%3Abar/', 'foo');
 
         $matcher->match('/foo%3Abar');

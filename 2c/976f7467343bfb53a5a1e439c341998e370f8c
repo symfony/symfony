@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-11T16:18:57Z
+
+should we add an `hasParameter` also?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-11T16:24:25Z
+
+@nicolas-grekas `Controller` does not have it (little value in userland?) but no objection for me

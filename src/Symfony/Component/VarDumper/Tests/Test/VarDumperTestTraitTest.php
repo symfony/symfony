@@ -38,4 +38,9 @@ EODUMP;
 
         $this->assertDumpEquals($expected, $data);
     }
+
+    public function testAllowsNonScalarExpectation()
+    {
+        $this->assertDumpEquals(new \ArrayObject(array('bim' => 'bam')), new \ArrayObject(array('bim' => 'bam')));
+    }
 }

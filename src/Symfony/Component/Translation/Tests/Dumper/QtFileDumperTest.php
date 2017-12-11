@@ -26,7 +26,7 @@ class QtFileDumperTest extends TestCase
         $dumper = new QtFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.ts'), file_get_contents($tempDir.'/resources.en.ts'));
+        $this->assertFileEquals(__DIR__.'/../fixtures/resources.ts', $tempDir.'/resources.en.ts');
 
         unlink($tempDir.'/resources.en.ts');
     }

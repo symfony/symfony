@@ -172,7 +172,7 @@ class ContainerTest extends TestCase
         $c->set('foo', $foo = new \stdClass(), 'foo');
 
         $scoped = $this->getField($c, 'scopedServices');
-        $this->assertTrue(isset($scoped['foo']['foo']), '->set() sets a scoped service');
+        $this->assertArrayHasKey('foo', $scoped['foo'], '->set() sets a scoped service');
         $this->assertSame($foo, $scoped['foo']['foo'], '->set() sets a scoped service');
     }
 
@@ -340,14 +340,14 @@ class ContainerTest extends TestCase
         $container->set('a', $a, 'bar');
 
         $scoped = $this->getField($container, 'scopedServices');
-        $this->assertTrue(isset($scoped['bar']['a']));
+        $this->assertArrayHasKey('a', $scoped['bar']);
         $this->assertSame($a, $scoped['bar']['a']);
         $this->assertTrue($container->has('a'));
 
         $container->leaveScope('foo');
 
         $scoped = $this->getField($container, 'scopedServices');
-        $this->assertFalse(isset($scoped['bar']));
+        $this->assertArrayNotHasKey('bar', $scoped);
         $this->assertFalse($container->isScopeActive('foo'));
         $this->assertFalse($container->has('a'));
     }
@@ -370,14 +370,14 @@ class ContainerTest extends TestCase
         $container->set('a', $a, 'foo');
 
         $scoped = $this->getField($container, 'scopedServices');
-        $this->assertTrue(isset($scoped['foo']['a']));
+        $this->assertArrayHasKey('a', $scoped['foo']);
         $this->assertSame($a, $scoped['foo']['a']);
         $this->assertTrue($container->has('a'));
 
         $container->enterScope('foo');
 
         $scoped = $this->getField($container, 'scopedServices');
-        $this->assertFalse(isset($scoped['a']));
+        $this->assertArrayNotHasKey('a', $scoped);
         $this->assertTrue($container->isScopeActive('foo'));
         $this->assertFalse($container->isScopeActive('bar'));
         $this->assertFalse($container->has('a'));
@@ -409,14 +409,14 @@ class ContainerTest extends TestCase
         $container->set('a', $a, 'bar');
 
         $scoped = $this->getField($container, 'scopedServices');
-        $this->assertTrue(isset($scoped['bar']['a']));
+        $this->assertArrayHasKey('a', $scoped['bar']);
         $this->assertSame($a, $scoped['bar']['a']);
         $this->assertTrue($container->has('a'));
 
         $container->enterScope('bar');
 
         $scoped = $this->getField($container, 'scopedServices');
-        $this->assertFalse(isset($scoped['a']));
+        $this->assertArrayNotHasKey('a', $scoped);
         $this->assertTrue($container->isScopeActive('foo'));
         $this->assertTrue($container->isScopeActive('bar'));
         $this->assertFalse($container->has('a'));

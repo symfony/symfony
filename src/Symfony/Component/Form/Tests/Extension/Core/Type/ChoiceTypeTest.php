@@ -243,7 +243,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices_as_values' => true,
         ));
 
-        $this->assertTrue(isset($form['placeholder']));
+        $this->assertArrayHasKey('placeholder', $form);
         $this->assertCount(count($this->choices) + 1, $form, 'Each choice should become a new field');
     }
 
@@ -257,7 +257,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices_as_values' => true,
         ));
 
-        $this->assertFalse(isset($form['placeholder']));
+        $this->assertArrayNotHasKey('placeholder', $form);
         $this->assertCount(count($this->choices), $form, 'Each choice should become a new field');
     }
 
@@ -271,7 +271,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices_as_values' => true,
         ));
 
-        $this->assertFalse(isset($form['placeholder']));
+        $this->assertArrayNotHasKey('placeholder', $form);
         $this->assertCount(count($this->choices), $form, 'Each choice should become a new field');
     }
 
@@ -288,7 +288,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices_as_values' => true,
         ));
 
-        $this->assertFalse(isset($form['placeholder']));
+        $this->assertArrayNotHasKey('placeholder', $form);
         $this->assertCount(2, $form, 'Each choice should become a new field');
     }
 
@@ -348,7 +348,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices_as_values' => true,
         ));
 
-        $this->assertTrue(isset($form['placeholder']), 'Placeholder should be set');
+        $this->assertArrayHasKey('placeholder', $form, 'Placeholder should be set');
         $this->assertCount(3, $form, 'Each choice should become a new field, placeholder included');
 
         $view = $form->createView();
@@ -373,7 +373,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'choices_as_values' => true,
         ));
 
-        $this->assertTrue(isset($form['placeholder']), 'Placeholder should be set');
+        $this->assertArrayHasKey('placeholder', $form, 'Placeholder should be set');
         $this->assertCount(3, $form, 'Each choice should become a new field, placeholder included');
 
         $view = $form->createView();

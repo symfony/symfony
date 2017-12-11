@@ -35,7 +35,7 @@ class PhpBundleReaderTest extends TestCase
 
         $this->assertInternalType('array', $data);
         $this->assertSame('Bar', $data['Foo']);
-        $this->assertFalse(isset($data['ExistsNot']));
+        $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
     /**

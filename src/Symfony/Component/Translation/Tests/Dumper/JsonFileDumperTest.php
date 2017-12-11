@@ -30,7 +30,7 @@ class JsonFileDumperTest extends TestCase
         $dumper = new JsonFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.json'), file_get_contents($tempDir.'/messages.en.json'));
+        $this->assertFileEquals(__DIR__.'/../fixtures/resources.json', $tempDir.'/messages.en.json');
 
         unlink($tempDir.'/messages.en.json');
     }

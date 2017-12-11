@@ -26,7 +26,7 @@ class IniFileDumperTest extends TestCase
         $dumper = new IniFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.ini'), file_get_contents($tempDir.'/messages.en.ini'));
+        $this->assertFileEquals(__DIR__.'/../fixtures/resources.ini', $tempDir.'/messages.en.ini');
 
         unlink($tempDir.'/messages.en.ini');
     }

@@ -25,7 +25,7 @@ class MoFileDumperTest extends TestCase
         $tempDir = sys_get_temp_dir();
         $dumper = new MoFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.mo'), file_get_contents($tempDir.'/messages.en.mo'));
+        $this->assertFileEquals(__DIR__.'/../fixtures/resources.mo', $tempDir.'/messages.en.mo');
 
         unlink($tempDir.'/messages.en.mo');
     }

@@ -181,7 +181,7 @@ class MutableAclProviderTest extends TestCase
 
         $provider->propertyChanged($acl, 'entriesInheriting', false, true);
         $changes = $propertyChanges->offsetGet($acl);
-        $this->assertTrue(isset($changes['entriesInheriting']));
+        $this->assertArrayHasKey('entriesInheriting', $changes);
         $this->assertFalse($changes['entriesInheriting'][0]);
         $this->assertTrue($changes['entriesInheriting'][1]);
 
@@ -189,7 +189,7 @@ class MutableAclProviderTest extends TestCase
         $provider->propertyChanged($acl, 'entriesInheriting', false, true);
         $provider->propertyChanged($acl, 'entriesInheriting', true, false);
         $changes = $propertyChanges->offsetGet($acl);
-        $this->assertFalse(isset($changes['entriesInheriting']));
+        $this->assertArrayNotHasKey('entriesInheriting', $changes);
     }
 
     public function testPropertyChangedTracksChangesToAceProperties()
@@ -202,42 +202,42 @@ class MutableAclProviderTest extends TestCase
 
         $provider->propertyChanged($ace, 'mask', 1, 3);
         $changes = $propertyChanges->offsetGet($acl);
-        $this->assertTrue(isset($changes['aces']));
+        $this->assertArrayHasKey('aces', $changes);
         $this->assertInstanceOf('\SplObjectStorage', $changes['aces']);
         $this->assertTrue($changes['aces']->contains($ace));
         $aceChanges = $changes['aces']->offsetGet($ace);
-        $this->assertTrue(isset($aceChanges['mask']));
+        $this->assertArrayHasKey('mask', $aceChanges);
         $this->assertEquals(1, $aceChanges['mask'][0]);
         $this->assertEquals(3, $aceChanges['mask'][1]);
 
         $provider->propertyChanged($ace, 'strategy', 'all', 'any');
         $changes = $propertyChanges->offsetGet($acl);
-        $this->assertTrue(isset($changes['aces']));
+        $this->assertArrayHasKey('aces', $changes);
         $this->assertInstanceOf('\SplObjectStorage', $changes['aces']);
         $this->assertTrue($changes['aces']->contains($ace));
         $aceChanges = $changes['aces']->offsetGet($ace);
-        $this->assertTrue(isset($aceChanges['mask']));
-        $this->assertTrue(isset($aceChanges['strategy']));
+        $this->assertArrayHasKey('mask', $aceChanges);
+        $this->assertArrayHasKey('strategy', $aceChanges);
         $this->assertEquals('all', $aceChanges['strategy'][0]);
         $this->assertEquals('any', $aceChanges['strategy'][1]);
 
         $provider->propertyChanged($ace, 'mask', 3, 1);
         $changes = $propertyChanges->offsetGet($acl);
         $aceChanges = $changes['aces']->offsetGet($ace);
-        $this->assertFalse(isset($aceChanges['mask']));
-        $this->assertTrue(isset($aceChanges['strategy']));
+        $this->assertArrayNotHasKey('mask', $aceChanges);
+        $this->assertArrayHasKey('strategy', $aceChanges);
 
         $provider->propertyChanged($ace2, 'mask', 1, 3);
         $provider->propertyChanged($ace, 'strategy', 'any', 'all');
         $changes = $propertyChanges->offsetGet($acl);
-        $this->assertTrue(isset($changes['aces']));
+        $this->assertArrayHasKey('aces', $changes);
         $this->assertFalse($changes['aces']->contains($ace));
         $this->assertTrue($changes['aces']->contains($ace2));
 
         $provider->propertyChanged($ace2, 'mask', 3, 4);
         $provider->propertyChanged($ace2, 'mask', 4, 1);
         $changes = $propertyChanges->offsetGet($acl);
-        $this->assertFalse(isset($changes['aces']));
+        $this->assertArrayNotHasKey('aces', $changes);
     }
 
     /**
@@ -319,7 +319,7 @@ class MutableAclProviderTest extends TestCase
 
         $aces = $acl->getObjectAces();
         $reloadedAces = $reloadedAcl->getObjectAces();
-        $this->assertEquals(count($aces), count($reloadedAces));
+        $this->assertCount(count($aces), $reloadedAces);
         foreach ($aces as $index => $ace) {
             $this->assertAceEquals($ace, $reloadedAces[$index]);
         }
@@ -437,7 +437,7 @@ class MutableAclProviderTest extends TestCase
 
         $aces = $acl->getObjectAces();
         $reloadedAces = $reloadedAcl->getObjectAces();
-        $this->assertEquals(count($aces), count($reloadedAces));
+        $this->assertCount(count($aces), $reloadedAces);
         foreach ($reloadedAces as $ace) {
             $this->assertTrue($ace->getSecurityIdentity()->equals($newSid));
         }

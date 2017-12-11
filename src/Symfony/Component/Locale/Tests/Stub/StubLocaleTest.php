@@ -43,6 +43,6 @@ class StubLocaleTest extends TestCase
     public function testGetCurrencies()
     {
         $currencies = StubLocale::getCurrencies();
-        $this->assertTrue(in_array('BRL', $currencies));
+        $this->assertContains('BRL', $currencies);
     }
 }

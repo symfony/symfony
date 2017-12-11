@@ -29,11 +29,9 @@ class PhpExecutableFinder
     /**
      * Finds The PHP executable.
      *
-     * @param bool $includeArgs Whether or not include command arguments
-     *
      * @return string|false The PHP executable path or false if it cannot be found
      */
-    public function find($includeArgs = true)
+    public function find(bool $includeArgs = true)
     {
         $args = $this->findArguments();
         $args = $includeArgs && $args ? ' '.implode(' ', $args) : '';
@@ -65,12 +63,7 @@ class PhpExecutableFinder
         return $this->executableFinder->find('php', false, $dirs);
     }
 
-    /**
-     * Finds the PHP executable arguments.
-     *
-     * @return array The PHP executable arguments
-     */
-    public function findArguments()
+    public function findArguments(): array
     {
         $arguments = array();
         if ('phpdbg' === PHP_SAPI) {

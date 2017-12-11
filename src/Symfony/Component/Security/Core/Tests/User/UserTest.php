@@ -12,7 +12,9 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserTest extends TestCase
 {
@@ -98,5 +100,38 @@ class UserTest extends TestCase
     {
         $user = new User('fabien', 'superpass');
         $this->assertEquals('fabien', (string) $user);
+    }
+
+    /**
+     * @dataProvider isEqualToData
+     *
+     * @param bool                             $expectation
+     * @param EquatableInterface|UserInterface $a
+     * @param EquatableInterface|UserInterface $b
+     */
+    public function testIsEqualTo($expectation, $a, $b)
+    {
+        $this->assertSame($expectation, $a->isEqualTo($b));
+        $this->assertSame($expectation, $b->isEqualTo($a));
+    }
+
+    public static function isEqualToData()
+    {
+        return array(
+            array(true, new User('username', 'password'), new User('username', 'password')),
+            array(true, new User('username', 'password', array('ROLE')), new User('username', 'password')),
+            array(true, new User('username', 'password', array('ROLE')), new User('username', 'password', array('NO ROLE'))),
+            array(false, new User('diff', 'diff'), new User('username', 'password')),
+            array(false, new User('diff', 'diff', array(), false), new User('username', 'password')),
+            array(false, new User('diff', 'diff', array(), false, false), new User('username', 'password')),
+            array(false, new User('diff', 'diff', array(), false, false, false), new User('username', 'password')),
+            array(false, new User('diff', 'diff', array(), false, false, false, false), new User('username', 'password')),
+        );
+    }
+
+    public function testIsEqualToWithDifferentUser()
+    {
+        $user = new User('username', 'password');
+        $this->assertFalse($user->isEqualTo($this->getMockBuilder(UserInterface::class)->getMock()));
     }
 }

@@ -26,6 +26,7 @@ Security
 --------
 
  * The `ContextListener::setLogoutOnUserChange()` method has been removed.
+ * The `Symfony\Component\Security\Core\User\AdvancedUserInterface` has been removed.
 
 SecurityBundle
 --------------

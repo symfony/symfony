@@ -78,7 +78,7 @@ EOF
         $options = array();
         $label = $input->getOption('label');
         if (null !== $label && '' !== trim($label)) {
-            $options = array('graph' => array('label' => $input->getOption('label')));
+            $options = array('graph' => array('label' => $label));
         }
         $output->writeln($dumper->dump($workflow->getDefinition(), $marking, $options));
     }

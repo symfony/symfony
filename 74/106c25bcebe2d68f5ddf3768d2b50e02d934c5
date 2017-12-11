@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-29T09:03:51Z
+
+For 4.1 is fine also, no need to hurry IMHO.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-10-29T09:06:10Z
+
+But we'll keep the `routing.loader` service public then?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-29T09:55:13Z
+
+Public services don't really hurt anymore, and we'll always be able to find a way to make it privta later if we really want to.
+Better prefer stabilization now IMHO.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-29T16:13:15Z
+
+Moving the target to 4.1 as I agree with @nicolas-grekas, we need to restrict changes to important flaws and bug fixes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-01T17:53:43Z
+
+@ogizanagi Can you rebase this PR? Thanks.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-12-02T09:37:17Z
+
+Rebased. Should we do anything further with this one?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-02T18:36:21Z
+
+> Not a big fan of the param fetcher callable, but I don't have any better idea.
+
+I have one (two in fact):
+- make ParameterBag implement PSR-11 (should be easy),
+- make the container's parameter bag a service (may be a little bit more involving).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-03T15:06:19Z
+
+See #25288
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-08T12:41:35Z
+
+@ogizanagi now that #25288 is merged, you can move forward on this one when you have some time.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-12-09T10:39:59Z
+
+@nicolas-grekas : Done. Thanks for working on the PSR-11 ContainerBag feature and for the ping. I'm kinda out of the game currently.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-09T14:44:07Z
+
+(but failing test for now)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-12-09T15:22:10Z
+
+[This failure on deps="low" build](https://travis-ci.org/symfony/symfony/jobs/313973148#L2851) means we must either:
+1. drop 3-cross-4 compat' for this by requiring DI 4.1 in the Fwb, so we can always use the `parameter_bag` service.
+2. replace the injected service locator by the `service_container` as injected before if `parameter_bag` isn't available.
+
+For now, 2 is implemented.

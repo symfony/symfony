@@ -20,7 +20,6 @@
         "twig/twig": "^1.35|^2.4.4"
     },
     "require-dev": {
-        "fig/link-util": "^1.0",
         "symfony/asset": "~2.8|~3.0|~4.0",
         "symfony/dependency-injection": "~2.8|~3.0|~4.0",
         "symfony/finder": "~2.8|~3.0|~4.0",
@@ -38,7 +37,8 @@
         "symfony/console": "~3.4|~4.0",
         "symfony/var-dumper": "~2.8.10|~3.1.4|~3.2|~4.0",
         "symfony/expression-language": "~2.8|~3.0|~4.0",
-        "symfony/web-link": "~3.3|~4.0"
+        "symfony/web-link": "~3.3|~4.0",
+        "symfony/workflow": "~3.3|~4.0"
     },
     "conflict": {
         "symfony/form": "<3.4",

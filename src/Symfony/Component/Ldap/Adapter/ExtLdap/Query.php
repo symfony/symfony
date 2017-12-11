@@ -73,7 +73,7 @@ class Query extends AbstractQuery
                     $func = 'ldap_search';
                     break;
                 default:
-                    throw new LdapException(sprintf('Could not search in scope %s', $this->options['scopen']));
+                    throw new LdapException(sprintf('Could not search in scope "%s"', $this->options['scope']));
             }
 
             $this->search = @$func(

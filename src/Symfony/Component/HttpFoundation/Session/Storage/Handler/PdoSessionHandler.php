@@ -721,15 +721,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
      */
     private function getMergeStatement($sessionId, $data, $maxlifetime)
     {
-        $mergeSql = null;
         switch (true) {
             case 'mysql' === $this->driver:
                 $mergeSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time) ".
                     "ON DUPLICATE KEY UPDATE $this->dataCol = VALUES($this->dataCol), $this->lifetimeCol = VALUES($this->lifetimeCol), $this->timeCol = VALUES($this->timeCol)";
-                break;
-            case 'oci' === $this->driver:
-                // MERGE is not supported with LOBs: http://www.oracle.com/technetwork/articles/fuecks-lobs-095315.html
-                return null;
                 break;
             case 'sqlsrv' === $this->driver && version_compare($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '10', '>='):
                 // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
@@ -745,29 +740,30 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 $mergeSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time) ".
                     "ON CONFLICT ($this->idCol) DO UPDATE SET ($this->dataCol, $this->lifetimeCol, $this->timeCol) = (EXCLUDED.$this->dataCol, EXCLUDED.$this->lifetimeCol, EXCLUDED.$this->timeCol)";
                 break;
+            default:
+                // MERGE is not supported with LOBs: http://www.oracle.com/technetwork/articles/fuecks-lobs-095315.html
+                return null;
         }
 
-        if (null !== $mergeSql) {
-            $mergeStmt = $this->pdo->prepare($mergeSql);
+        $mergeStmt = $this->pdo->prepare($mergeSql);
 
-            if ('sqlsrv' === $this->driver || 'oci' === $this->driver) {
-                $mergeStmt->bindParam(1, $sessionId, \PDO::PARAM_STR);
-                $mergeStmt->bindParam(2, $sessionId, \PDO::PARAM_STR);
-                $mergeStmt->bindParam(3, $data, \PDO::PARAM_LOB);
-                $mergeStmt->bindParam(4, $maxlifetime, \PDO::PARAM_INT);
-                $mergeStmt->bindValue(5, time(), \PDO::PARAM_INT);
-                $mergeStmt->bindParam(6, $data, \PDO::PARAM_LOB);
-                $mergeStmt->bindParam(7, $maxlifetime, \PDO::PARAM_INT);
-                $mergeStmt->bindValue(8, time(), \PDO::PARAM_INT);
-            } else {
-                $mergeStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
-                $mergeStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
-                $mergeStmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
-                $mergeStmt->bindValue(':time', time(), \PDO::PARAM_INT);
-            }
-
-            return $mergeStmt;
+        if ('sqlsrv' === $this->driver) {
+            $mergeStmt->bindParam(1, $sessionId, \PDO::PARAM_STR);
+            $mergeStmt->bindParam(2, $sessionId, \PDO::PARAM_STR);
+            $mergeStmt->bindParam(3, $data, \PDO::PARAM_LOB);
+            $mergeStmt->bindParam(4, $maxlifetime, \PDO::PARAM_INT);
+            $mergeStmt->bindValue(5, time(), \PDO::PARAM_INT);
+            $mergeStmt->bindParam(6, $data, \PDO::PARAM_LOB);
+            $mergeStmt->bindParam(7, $maxlifetime, \PDO::PARAM_INT);
+            $mergeStmt->bindValue(8, time(), \PDO::PARAM_INT);
+        } else {
+            $mergeStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
+            $mergeStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
+            $mergeStmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
+            $mergeStmt->bindValue(':time', time(), \PDO::PARAM_INT);
         }
+
+        return $mergeStmt;
     }
 
     /**

@@ -543,8 +543,8 @@ class Parser
             do {
                 $EOF = false;
 
-                // comment-like lines do not influence the indentation depth
-                if ($this->isCurrentLineComment()) {
+                // empty and comment-like lines do not influence the indentation depth
+                if ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()) {
                     $EOF = !$this->moveToNextLine();
 
                     if (!$EOF) {
@@ -571,7 +571,7 @@ class Parser
         $data = array();
         if ($this->getCurrentLineIndentation() >= $newIndent) {
             $data[] = substr($this->currentLine, $newIndent);
-        } elseif ($this->isCurrentLineComment()) {
+        } elseif ($this->isCurrentLineEmpty() || $this->isCurrentLineComment()) {
             $data[] = $this->currentLine;
         } else {
             $this->moveToPreviousLine();

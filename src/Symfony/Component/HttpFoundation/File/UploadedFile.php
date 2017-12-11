@@ -60,6 +60,9 @@ class UploadedFile extends File
         $this->originalName = $this->getName($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
+        if (null !== $size) {
+            @trigger_error('Passing a size in the constructor is deprecated since 4.1 and will be removed in 5.0. Use getSize() instead.', E_USER_DEPRECATED);
+        }
         $this->error = $error ?: UPLOAD_ERR_OK;
         $this->test = $test;
 
@@ -141,10 +144,14 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @return int|null The file size
+     * @deprecated since 4.1 will be removed in 5.0 use getSize() instead.
+     *
+     * @return int|null The file sizes
      */
     public function getClientSize()
     {
+        @trigger_error(sprintf('"%s" is deprecated since 4.1 and will be removed in 5.0. Use getSize() instead.', __METHOD__), E_USER_DEPRECATED);
+
         return $this->size;
     }
 

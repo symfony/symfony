@@ -20,26 +20,26 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class RedisCaster
 {
-    private static $serializer = [
+    private static $serializer = array(
         \Redis::SERIALIZER_NONE => 'NONE',
         \Redis::SERIALIZER_PHP => 'PHP',
         2 => 'IGBINARY', // Optional Redis::SERIALIZER_IGBINARY
-	];
+    );
 
     public static function castRedis(\Redis $c, array $a, Stub $stub, $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
         if (!$c->isConnected()) {
-            return $a + [
+            return $a + array(
                 $prefix.'isConnected' => false,
-			];
+            );
         }
 
         $ser = $c->getOption(\Redis::OPT_SERIALIZER);
         $retry = defined('Redis::OPT_SCAN') ? $c->getOption(\Redis::OPT_SCAN) : 0;
 
-        return $a + [
+        return $a + array(
             $prefix.'isConnected' => true,
             $prefix.'host' => $c->getHost(),
             $prefix.'port' => $c->getPort(),
@@ -47,22 +47,22 @@ class RedisCaster
             $prefix.'dbNum' => $c->getDbNum(),
             $prefix.'timeout' => $c->getTimeout(),
             $prefix.'persistentId' => $c->getPersistentID(),
-            $prefix.'options' => new EnumStub([
+            $prefix.'options' => new EnumStub(array(
                 'READ_TIMEOUT' => $c->getOption(\Redis::OPT_READ_TIMEOUT),
                 'SERIALIZER' => isset(self::$serializer[$ser]) ? new ConstStub(self::$serializer[$ser], $ser) : $ser,
                 'PREFIX' => $c->getOption(\Redis::OPT_PREFIX),
                 'SCAN' => new ConstStub($retry ? 'RETRY' : 'NORETRY', $retry),
-			]),
-		];
+            )),
+        );
     }
 
     public static function castRedisArray(\RedisArray $c, array $a, Stub $stub, $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
 
-        return $a + [
+        return $a + array(
             $prefix.'hosts' => $c->_hosts(),
             $prefix.'function' => ClassStub::wrapCallable($c->_function()),
-		];
+        );
     }
 }

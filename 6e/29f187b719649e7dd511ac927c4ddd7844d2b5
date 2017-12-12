@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-19T07:43:20Z
+
+Related; should we patch [`isEnabled`](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/WebServerBundle/Command/ServerLogCommand.php#L36) as well? If you load the webserverbundle based on a symfony/symfony project the CLI app crashes due a missing FormatterInterface from monolog/monolog.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-20T07:25:27Z
+
+I'm personally :-1: on adding more `suggest`ions in `composer.json`. I don't see how it adds value as I don't see why people would read those suggestions when installing a new dependency. That's more something for the docs.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-11-20T13:04:08Z
+
+@ro0NL Well seen! I added this one.
+
+@fabpot Indeed, these suggestions must appear in the documentation; however, I think suggestions' composer must match with the documentation. Personally, I sometimes launch  `composer suggest -v` for discover the suggestions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-04T10:38:05Z
+
+ping @fabpot still not sold? I'm still +1 on my side :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-11T22:21:22Z
+
+@nicolas-grekas Let's say I'm just +0 on this.

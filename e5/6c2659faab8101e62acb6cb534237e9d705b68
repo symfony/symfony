@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-12T08:10:26Z
+
+Travis and AppVeyor are not related to this, the console tests are fixed but we should fix the other too.

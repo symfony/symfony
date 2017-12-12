@@ -13,6 +13,7 @@ security:
 
     firewalls:
         main:
+            logout_on_user_change: true
             pattern: ^/
             anonymous: true
             json_login:

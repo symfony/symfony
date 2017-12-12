@@ -20,6 +20,7 @@ security:
             security: false
 
         default:
+            logout_on_user_change: true
             form_login:
                 check_path: /login_check
                 default_target_path: /profile
@@ -28,6 +29,7 @@ security:
 
         # This firewall is here just to check its the logout functionality
         second_area:
+            logout_on_user_change: true
             http_basic: ~
             anonymous: ~
             logout:

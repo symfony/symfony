@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Psr\Container\ContainerInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -53,6 +52,22 @@ abstract class AbstractController implements ServiceSubscriberInterface
         return $previous;
     }
 
+    /**
+     * Gets a container parameter by its name.
+     *
+     * @return mixed
+     *
+     * @final
+     */
+    protected function getParameter(string $name)
+    {
+        if (!$this->container->has('parameter_bag')) {
+            throw new \LogicException('The "parameter_bag" service is not available. Try running "composer require dependency-injection:^4.1"');
+        }
+
+        return $this->container->get('parameter_bag')->get($name);
+    }
+
     public static function getSubscribedServices()
     {
         return array(
@@ -68,7 +83,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
             'form.factory' => '?'.FormFactoryInterface::class,
             'security.token_storage' => '?'.TokenStorageInterface::class,
             'security.csrf.token_manager' => '?'.CsrfTokenManagerInterface::class,
-            'parameter_bag' => '?'.ContainerBagInterface::class,
+            'parameter_bag' => '?'.ContainerInterface::class,
         );
     }
 }

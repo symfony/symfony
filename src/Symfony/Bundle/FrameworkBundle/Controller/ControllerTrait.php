@@ -377,20 +377,4 @@ trait ControllerTrait
 
         return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
     }
-
-    /**
-     * Gets a container parameter by its name.
-     *
-     * @return mixed
-     *
-     * @final
-     */
-    protected function getParameter(string $name)
-    {
-        if (!$this->container->has('parameter_bag')) {
-            throw new \LogicException('The "parameter_bag" service is not available. Try running "composer require dependency-injection:^4.1"');
-        }
-
-        return $this->container->get('parameter_bag')->get($name);
-    }
 }

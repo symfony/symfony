@@ -13,12 +13,32 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 class AbstractControllerTest extends ControllerTraitTest
 {
     protected function createController()
     {
         return new TestAbstractController();
+    }
+
+    public function testGetParameter()
+    {
+        $container = new Container(new FrozenParameterBag(array('foo' => 'bar')));
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        if (!class_exists(ContainerBag::class)) {
+            $this->expectException(\LogicException::class);
+            $this->expectExceptionMessage('The "parameter_bag" service is not available. Try running "composer require dependency-injection:^4.1"');
+        } else {
+            $container->set('parameter_bag', new ContainerBag($container));
+        }
+
+        $this->assertSame('bar', $controller->getParameter('foo'));
     }
 }
 
@@ -55,6 +75,11 @@ class TestAbstractController extends AbstractController
         }
 
         return parent::setContainer($container);
+    }
+
+    public function getParameter(string $name)
+    {
+        return parent::getParameter($name);
     }
 
     public function fooAction()

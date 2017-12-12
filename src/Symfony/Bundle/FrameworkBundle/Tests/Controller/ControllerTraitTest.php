@@ -14,9 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -531,23 +528,6 @@ abstract class ControllerTraitTest extends TestCase
 
         $this->assertEquals($doctrine, $controller->getDoctrine());
     }
-
-    public function testGetParameter()
-    {
-        $container = new Container(new FrozenParameterBag(array('foo' => 'bar')));
-
-        $controller = $this->createController();
-        $controller->setContainer($container);
-
-        if (!interface_exists(ContainerBagInterface::class)) {
-            $this->expectException(\LogicException::class);
-            $this->expectExceptionMessage('The "parameter_bag" service is not available. Try running "composer require dependency-injection:^4.1"');
-        } else {
-            $container->set('parameter_bag', new ContainerBag($container));
-        }
-
-        $this->assertSame('bar', $controller->getParameter('foo'));
-    }
 }
 
 trait TestControllerTrait
@@ -572,6 +552,5 @@ trait TestControllerTrait
         createForm as public;
         createFormBuilder as public;
         getDoctrine as public;
-        getParameter as public;
     }
 }

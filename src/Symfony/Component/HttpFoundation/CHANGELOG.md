@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Passing the file size to the constructor of the `UploadedFile` class is deprecated and won't be
+   supported anymore in 5.0.
+
+ * The `getClientSize()` method of the `UploadedFile` class is deprecated. Use `getSize()` instead.
+
 4.0.0
 -----
 

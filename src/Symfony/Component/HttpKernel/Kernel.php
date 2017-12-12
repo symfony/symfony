@@ -635,13 +635,13 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
                 $oldContainer = file_exists($cache->getPath()) && is_object($oldContainer = include $cache->getPath()) ? new \ReflectionClass($oldContainer) : false;
             } finally {
-                if ($this->debug && true !== $previousHandler) {
+                if (!$this->debug) {
+                    error_reporting($errorLevel);
+                } elseif (true !== $previousHandler) {
                     restore_error_handler();
 
                     file_put_contents($cacheDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));
                     file_put_contents($cacheDir.'/'.$class.'Compiler.log', null !== $container ? implode("\n", $container->getCompiler()->getLog()) : '');
-                } else {
-                    error_reporting($errorLevel);
                 }
             }
 

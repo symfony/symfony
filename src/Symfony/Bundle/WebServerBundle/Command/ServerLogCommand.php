@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebServerBundle\Command;
 
+use Monolog\Formatter\FormatterInterface;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\Command\Command;
@@ -34,6 +35,11 @@ class ServerLogCommand extends Command
     public function isEnabled()
     {
         if (!class_exists(ConsoleFormatter::class)) {
+            return false;
+        }
+
+        // based on a symfony/symfony package, it crashes due a missing FormatterInterface from monolog/monolog
+        if (!class_exists(FormatterInterface::class)) {
             return false;
         }
 

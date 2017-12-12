@@ -269,18 +269,13 @@ class Process implements \IteratorAggregate
         if ($this->env) {
             $env += $this->env;
         }
-
-        $envBackup = array();
-        foreach ($env as $k => $v) {
-            $envBackup[$k] = getenv($k);
-            putenv(false === $v || null === $v ? $k : "$k=$v");
-        }
+        $env += $this->getDefaultEnv();
 
         $options = array('suppress_errors' => true);
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             $options['bypass_shell'] = true;
-            $commandline = $this->prepareWindowsCommandLine($commandline, $envBackup);
+            $commandline = $this->prepareWindowsCommandLine($commandline, $env);
         } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = array('pipe', 'w');
@@ -298,11 +293,7 @@ class Process implements \IteratorAggregate
             throw new RuntimeException('The provided cwd does not exist.');
         }
 
-        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, null, $options);
-
-        foreach ($envBackup as $k => $v) {
-            putenv(false === $v ? $k : "$k=$v");
-        }
+        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $options);
 
         if (!is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
@@ -1451,7 +1442,7 @@ class Process implements \IteratorAggregate
         return true;
     }
 
-    private function prepareWindowsCommandLine($cmd, array &$envBackup)
+    private function prepareWindowsCommandLine(string $cmd, array &$env)
     {
         $uid = uniqid('', true);
         $varCount = 0;
@@ -1464,7 +1455,7 @@ class Process implements \IteratorAggregate
                     [^"%!^]*+
                 )++
             ) | [^"]*+ )"/x',
-            function ($m) use (&$envBackup, &$varCache, &$varCount, $uid) {
+            function ($m) use (&$env, &$varCache, &$varCount, $uid) {
                 if (!isset($m[1])) {
                     return $m[0];
                 }
@@ -1482,9 +1473,7 @@ class Process implements \IteratorAggregate
                 $value = '"'.preg_replace('/(\\\\*)"/', '$1$1\\"', $value).'"';
                 $var = $uid.++$varCount;
 
-                putenv("$var=$value");
-
-                $envBackup[$var] = false;
+                $env[$var] = $value;
 
                 return $varCache[$m[0]] = '!'.$var.'!';
             },
@@ -1543,5 +1532,18 @@ class Process implements \IteratorAggregate
         $argument = preg_replace('/(\\\\+)$/', '$1$1', $argument);
 
         return '"'.str_replace(array('"', '^', '%', '!', "\n"), array('""', '"^^"', '"^%"', '"^!"', '!LF!'), $argument).'"';
+    }
+
+    private function getDefaultEnv()
+    {
+        $env = getenv();
+
+        foreach ($_ENV as $k => $v) {
+            if (is_string($v)) {
+                $env[$k] = $v;
+            }
+        }
+
+        return $env;
     }
 }

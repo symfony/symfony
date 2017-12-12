@@ -54,7 +54,7 @@ final class CodePoints implements GenericStringInterface, \Countable
         }
 
         if ('' === $this->string) {
-            return;
+            return null;
         }
 
         if (65535 < $maxChunkLength) {
@@ -71,10 +71,10 @@ final class CodePoints implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function indexOf(string $needle, int $offset = 0)
+    public function indexOf(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (0 <= $offset || PHP_VERSION_ID >= 70100) {
@@ -93,10 +93,10 @@ final class CodePoints implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function indexOfIgnoreCase(string $needle, int $offset = 0)
+    public function indexOfIgnoreCase(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (0 <= $offset || PHP_VERSION_ID >= 70100) {
@@ -115,10 +115,10 @@ final class CodePoints implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function lastIndexOf(string $needle, int $offset = 0)
+    public function lastIndexOf(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         $result = mb_strrpos($this->string, $needle, $offset);
@@ -129,10 +129,10 @@ final class CodePoints implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function lastIndexOfIgnoreCase(string $needle, int $offset = 0)
+    public function lastIndexOfIgnoreCase(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         $result = mb_strripos($this->string, $needle, $offset);
@@ -146,11 +146,11 @@ final class CodePoints implements GenericStringInterface, \Countable
     public function substringOf(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (false === $part = mb_strstr($this->string, $needle, $beforeNeedle, 'UTF-8')) {
-            return;
+            return null;
         }
 
         $result = clone $this;
@@ -165,11 +165,11 @@ final class CodePoints implements GenericStringInterface, \Countable
     public function substringOfIgnoreCase(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (false === $part = mb_stristr($this->string, $needle, $beforeNeedle, 'UTF-8')) {
-            return;
+            return null;
         }
 
         $result = clone $this;

@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.1.3",
         "symfony/polyfill-intl-grapheme": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-xml": "~1.0"
@@ -30,7 +30,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.3-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

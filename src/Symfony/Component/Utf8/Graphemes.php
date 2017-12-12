@@ -61,7 +61,7 @@ final class Graphemes implements GenericStringInterface, \Countable
         }
 
         if ('' === $this->string) {
-            return;
+            return null;
         }
 
         if (65535 < $maxChunkLength) {
@@ -82,7 +82,7 @@ final class Graphemes implements GenericStringInterface, \Countable
                 yield $clone;
             }
 
-            return;
+            return null;
         }
 
         // Intl extension is not available.
@@ -96,10 +96,10 @@ final class Graphemes implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function indexOf(string $needle, int $offset = 0)
+    public function indexOf(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         $result = grapheme_strpos($this->string, $needle, $offset);
@@ -110,10 +110,10 @@ final class Graphemes implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function indexOfIgnoreCase(string $needle, int $offset = 0)
+    public function indexOfIgnoreCase(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         $result = grapheme_stripos($this->string, $needle, $offset);
@@ -124,17 +124,17 @@ final class Graphemes implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function lastIndexOf(string $needle, int $offset = 0)
+    public function lastIndexOf(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         // Workaround for bug 74264
         // @see https://bugs.php.net/bug.php?id=74264
         if (0 > $offset) {
             if (false === $pos = strrpos($this->string, $needle, $offset)) {
-                return;
+                return null;
             }
 
             return grapheme_strlen(substr($this->string, 0, $pos));
@@ -148,7 +148,7 @@ final class Graphemes implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function lastIndexOfIgnoreCase(string $needle, int $offset = 0)
+    public function lastIndexOfIgnoreCase(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
             return null;
@@ -158,7 +158,7 @@ final class Graphemes implements GenericStringInterface, \Countable
         // @see https://bugs.php.net/bug.php?id=74264
         if (0 > $offset) {
             if (false === $pos = mb_strripos($this->string, $needle, $offset)) {
-                return;
+                return null;
             }
 
             return grapheme_strlen(mb_substr($this->string, 0, $pos));
@@ -175,11 +175,11 @@ final class Graphemes implements GenericStringInterface, \Countable
     public function substringOf(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (false === $part = grapheme_strstr($this->string, $needle, $beforeNeedle)) {
-            return;
+            return null;
         }
 
         $result = clone $this;
@@ -194,11 +194,11 @@ final class Graphemes implements GenericStringInterface, \Countable
     public function substringOfIgnoreCase(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (false === $part = grapheme_stristr($this->string, $needle, $beforeNeedle)) {
-            return;
+            return null;
         }
 
         $result = clone $this;

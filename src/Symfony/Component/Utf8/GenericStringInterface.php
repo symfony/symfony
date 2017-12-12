@@ -17,7 +17,7 @@ use Symfony\Component\Utf8\Exception\ExceptionInterface;
  * Represents a generic string implementation.
  *
  * @author Nicolas Grekas <p@tchwork.com>
- * @author Hugo Hamon <hugo.hamon@sensiolabs.com>
+ * @author Hugo Hamon <hugohamon@neuf.fr>
  *
  * @throws ExceptionInterface
  * 
@@ -25,27 +25,15 @@ use Symfony\Component\Utf8\Exception\ExceptionInterface;
  */
 interface GenericStringInterface extends \IteratorAggregate
 {
-    public function __toString();
+    public function __toString(): string;
 
-    /**
-     * @return int|null
-     */
-    public function indexOf(string $needle, int $offset = 0);
+    public function indexOf(string $needle, int $offset = 0): ?int;
 
-    /**
-     * @return int|null
-     */
-    public function indexOfIgnoreCase(string $needle, int $offset = 0);
+    public function indexOfIgnoreCase(string $needle, int $offset = 0): ?int;
 
-    /**
-     * @return int|null
-     */
-    public function lastIndexOf(string $needle, int $offset = 0);
+    public function lastIndexOf(string $needle, int $offset = 0): ?int;
 
-    /**
-     * @return int|null
-     */
-    public function lastIndexOfIgnoreCase(string $needle, int $offset = 0);
+    public function lastIndexOfIgnoreCase(string $needle, int $offset = 0): ?int;
 
     /**
      * @return static|null

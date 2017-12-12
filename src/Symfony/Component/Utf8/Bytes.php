@@ -36,7 +36,7 @@ final class Bytes implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->string;
     }
@@ -202,7 +202,7 @@ final class Bytes implements GenericStringInterface, \Countable
         }
 
         if ('' === $this->string) {
-            return;
+            return null;
         }
 
         foreach (str_split($this->string, $maxChunkLength) as $char) {
@@ -237,10 +237,10 @@ final class Bytes implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function indexOf(string $needle, int $offset = 0)
+    public function indexOf(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (0 <= $offset || PHP_VERSION_ID >= 70100) {
@@ -259,10 +259,10 @@ final class Bytes implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function indexOfIgnoreCase(string $needle, int $offset = 0)
+    public function indexOfIgnoreCase(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         $current = setlocale(LC_CTYPE, '0');
@@ -288,10 +288,10 @@ final class Bytes implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function lastIndexOf(string $needle, int $offset = 0)
+    public function lastIndexOf(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         $result = strrpos($this->string, $needle, $offset);
@@ -302,10 +302,10 @@ final class Bytes implements GenericStringInterface, \Countable
     /**
      * {@inheritdoc}
      */
-    public function lastIndexOfIgnoreCase(string $needle, int $offset = 0)
+    public function lastIndexOfIgnoreCase(string $needle, int $offset = 0): ?int
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         $current = setlocale(LC_CTYPE, '0');
@@ -326,11 +326,11 @@ final class Bytes implements GenericStringInterface, \Countable
     public function substringOf(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (false === $part = strstr($this->string, $needle, $beforeNeedle)) {
-            return;
+            return null;
         }
 
         $result = clone $this;
@@ -345,7 +345,7 @@ final class Bytes implements GenericStringInterface, \Countable
     public function substringOfIgnoreCase(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         $result = null;
@@ -370,13 +370,13 @@ final class Bytes implements GenericStringInterface, \Countable
     public function lastSubstringOf(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (!$beforeNeedle) {
 
             if (false === $part = strrchr($this->string, $needle)) {
-                return;
+                return null;
             }
 
             $result = clone $this;
@@ -386,7 +386,7 @@ final class Bytes implements GenericStringInterface, \Countable
         }
 
         if (false === $offset = strrpos($this->string, $needle)) {
-            return;
+            return null;
         }
 
         $result = clone $this;
@@ -401,11 +401,11 @@ final class Bytes implements GenericStringInterface, \Countable
     public function lastSubstringOfIgnoreCase(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (false === $offset = strripos($this->string, $needle)) {
-            return;
+            return null;
         }
 
         $result = null;

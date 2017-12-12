@@ -91,14 +91,14 @@ class OrderedHashMapTest extends TestCase
         $map = new OrderedHashMap();
         $map['first'] = 1;
 
-        $this->assertTrue(isset($map['first']));
+        $this->assertArrayHasKey('first', $map);
     }
 
     public function testIssetReturnsFalseForNonExisting()
     {
         $map = new OrderedHashMap();
 
-        $this->assertFalse(isset($map['first']));
+        $this->assertArrayNotHasKey('first', $map);
     }
 
     public function testIssetReturnsFalseForNull()
@@ -106,7 +106,7 @@ class OrderedHashMapTest extends TestCase
         $map = new OrderedHashMap();
         $map['first'] = null;
 
-        $this->assertFalse(isset($map['first']));
+        $this->assertArrayNotHasKey('first', $map);
     }
 
     public function testUnset()

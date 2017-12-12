@@ -143,7 +143,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
 
         $listeners = $dispatcher->getListeners();
 
-        $this->assertTrue(isset($listeners['onEvent']));
+        $this->assertArrayHasKey('onEvent', $listeners);
 
         $this->assertCount(1, $dispatcher->getListeners('onEvent'));
     }

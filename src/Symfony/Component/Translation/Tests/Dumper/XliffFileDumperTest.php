@@ -32,10 +32,7 @@ class XliffFileDumperTest extends TestCase
         $dumper = new XliffFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir, 'default_locale' => 'fr_FR'));
 
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/../fixtures/resources-clean.xlf'),
-            file_get_contents($tempDir.'/messages.en_US.xlf')
-        );
+        $this->assertFileEquals(__DIR__.'/../fixtures/resources-clean.xlf', $tempDir.'/messages.en_US.xlf');
 
         unlink($tempDir.'/messages.en_US.xlf');
     }

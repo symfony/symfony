@@ -39,7 +39,7 @@ class LegacySecurityContextTest extends TestCase
             ->method('getToken')
             ->will($this->returnValue($token));
 
-        $this->assertTrue($token === $this->securityContext->getToken());
+        $this->assertSame($token, $this->securityContext->getToken());
     }
 
     public function testSetTokenDelegation()

@@ -25,7 +25,7 @@ class PoFileDumperTest extends TestCase
         $tempDir = sys_get_temp_dir();
         $dumper = new PoFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.po'), file_get_contents($tempDir.'/messages.en.po'));
+        $this->assertFileEquals(__DIR__.'/../fixtures/resources.po', $tempDir.'/messages.en.po');
 
         unlink($tempDir.'/messages.en.po');
     }

@@ -26,7 +26,7 @@ class YamlFileDumperTest extends TestCase
         $dumper = new YamlFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.yml'), file_get_contents($tempDir.'/messages.en.yml'));
+        $this->assertFileEquals(__DIR__.'/../fixtures/resources.yml', $tempDir.'/messages.en.yml');
 
         unlink($tempDir.'/messages.en.yml');
     }

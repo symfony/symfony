@@ -567,7 +567,7 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertTrue(strlen($process->getOutput()) > 0);
+        $this->assertGreaterThan(0, strlen($process->getOutput()));
     }
 
     public function testGetExitCodeIsNullOnStart()

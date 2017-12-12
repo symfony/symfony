@@ -96,7 +96,7 @@ class MaskBuilderTest extends TestCase
         $this->assertEquals(0, $builder->get());
 
         $builder->add('view');
-        $this->assertTrue($builder->get() > 0);
+        $this->assertGreaterThan(0, $builder->get());
 
         $builder->reset();
         $this->assertEquals(0, $builder->get());

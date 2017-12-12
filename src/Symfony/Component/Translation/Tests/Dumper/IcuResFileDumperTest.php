@@ -29,7 +29,7 @@ class IcuResFileDumperTest extends TestCase
         $dumper = new IcuResFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resourcebundle/res/en.res'), file_get_contents($tempDir.'/messages/en.res'));
+        $this->assertFileEquals(__DIR__.'/../fixtures/resourcebundle/res/en.res', $tempDir.'/messages/en.res');
 
         @unlink($tempDir.'/messages/en.res');
         @rmdir($tempDir.'/messages');

@@ -112,7 +112,7 @@ class ConfigCacheTest extends TestCase
         $cache->write('FOOBAR');
 
         $this->assertFileExists($this->cacheFile, 'Cache file is created');
-        $this->assertSame('FOOBAR', file_get_contents($this->cacheFile));
+        $this->assertStringEqualsFile($this->cacheFile, 'FOOBAR');
         $this->assertFileNotExists($this->metaFile, 'Meta file is not created');
     }
 
@@ -128,7 +128,7 @@ class ConfigCacheTest extends TestCase
 
         $this->assertFileExists($this->cacheFile, 'Cache file is created');
         $this->assertFileExists($this->metaFile, 'Meta file is created');
-        $this->assertSame(serialize($metadata), file_get_contents($this->metaFile));
+        $this->assertStringEqualsFile($this->metaFile, serialize($metadata));
     }
 
     private function makeCacheFresh()

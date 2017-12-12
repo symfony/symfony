@@ -1979,7 +1979,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testMoneyWithoutCurrency()
     {
-        $form = $this->factory->createNamed('name', 'money', 1234.56, array(
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType', 1234.56, array(
             'currency' => false,
         ));
 

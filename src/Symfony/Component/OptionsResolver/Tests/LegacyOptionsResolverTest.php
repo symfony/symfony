@@ -124,7 +124,7 @@ class LegacyOptionsResolverTest extends TestCase
         $this->resolver->setDefaults(array(
             'two' => function (Options $options) use ($test) {
                 /* @var TestCase $test */
-                $test->assertFalse(isset($options['one']));
+                $test->assertArrayNotHasKey('one', $options);
 
                 return '2';
             },
@@ -148,7 +148,7 @@ class LegacyOptionsResolverTest extends TestCase
         $this->resolver->setDefaults(array(
             'two' => function (Options $options) use ($test) {
                 /* @var TestCase $test */
-                $test->assertTrue(isset($options['one']));
+                $test->assertArrayHasKey('one', $options);
 
                 return $options['one'].'2';
             },

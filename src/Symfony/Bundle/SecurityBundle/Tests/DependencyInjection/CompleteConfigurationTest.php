@@ -150,7 +150,7 @@ abstract class CompleteConfigurationTest extends TestCase
             list($matcherId, $attributes, $channel) = $rule;
             $requestMatcher = $container->getDefinition($matcherId);
 
-            $this->assertFalse(isset($matcherIds[$matcherId]));
+            $this->assertArrayNotHasKey($matcherId, $matcherIds);
             $matcherIds[$matcherId] = true;
 
             $i = count($matcherIds);

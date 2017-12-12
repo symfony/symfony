@@ -454,7 +454,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDontPassHtml5TypeIfNotHtml5Format()
@@ -465,7 +465,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDontPassHtml5TypeIfNotSingleText()
@@ -475,7 +475,7 @@ class DateTimeTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDateTypeChoiceErrorsBubbleUp()

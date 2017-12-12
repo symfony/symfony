@@ -169,7 +169,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->copy($sourceFilePath, $targetFilePath, false);
 
         $this->assertFileExists($targetFilePath);
-        $this->assertFileEquals($sourceFilePath, $targetFilePath);
+        $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
     }
 
     public function testMkdirCreatesDirectoriesRecursively()
@@ -1518,7 +1518,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->appendToFile($filename, 'bar');
 
         $this->assertFileExists($filename);
-        $this->assertStringEqualsFile($filename, 'bar');
+        $this->assertStringEqualsFile($filename, 'foobar');
 
         // skip mode check on Windows
         if ('\\' !== DIRECTORY_SEPARATOR) {

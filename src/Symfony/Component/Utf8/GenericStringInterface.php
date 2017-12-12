@@ -20,7 +20,7 @@ use Symfony\Component\Utf8\Exception\ExceptionInterface;
  * @author Hugo Hamon <hugohamon@neuf.fr>
  *
  * @throws ExceptionInterface
- * 
+ *
  * @final
  */
 interface GenericStringInterface extends \IteratorAggregate

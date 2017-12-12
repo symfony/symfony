@@ -374,7 +374,6 @@ final class Bytes implements GenericStringInterface, \Countable
         }
 
         if (!$beforeNeedle) {
-
             if (false === $part = strrchr($this->string, $needle)) {
                 return null;
             }

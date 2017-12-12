@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-12-11T18:22:34Z
+
+such changes should be done in 2.7 first (and then additional PRs for 2.8, 3.3, 3.4, 4.0 and master with the necessary additional changes after things have been propagated each time).
+Making our test diverge between master and older branches is making maintenance harder (as future changes to these tests would then create conflicts when propagating them to master)
+
+---------------------------------------------------------------------------
+
+by carusogabriel at 2017-12-11T18:41:49Z
+
+@stof @nicolas-grekas @OskarStark Should I replicate this PR to each branch? Isn't there a better way?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-11T20:27:57Z
+
+@carusogabriel Doing one PR on 2.7 is enough for now.
+
+---------------------------------------------------------------------------
+
+by carusogabriel at 2017-12-11T20:29:11Z
+
+@fabpot Gonna work on that!
+
+---------------------------------------------------------------------------
+
+by carusogabriel at 2017-12-11T21:57:30Z
+
+Done! I've also added:
+- `assertStringEqualsFile` when comparing a `string` and a file;
+- `assertFileEquals` when comparing two files.

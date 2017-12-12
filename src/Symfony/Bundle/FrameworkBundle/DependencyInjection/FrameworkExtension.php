@@ -976,6 +976,10 @@ class FrameworkExtension extends Extension
             throw new LogicException('Validation support cannot be enabled as the Validator component is not installed.');
         }
 
+        if (!isset($config['email_validation_mode'])) {
+            $config['email_validation_mode'] = 'loose';
+        }
+
         $loader->load('validator.xml');
 
         $validatorBuilder = $container->getDefinition('validator.builder');
@@ -994,7 +998,7 @@ class FrameworkExtension extends Extension
         }
 
         $definition = $container->findDefinition('validator.email');
-        $definition->replaceArgument(0, $config['strict_email']);
+        $definition->replaceArgument(0, $config['email_validation_mode']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled) {

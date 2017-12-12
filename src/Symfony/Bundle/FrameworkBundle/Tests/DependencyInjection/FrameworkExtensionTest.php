@@ -695,6 +695,46 @@ abstract class FrameworkExtensionTest extends TestCase
         // no cache, no annotations, no static methods
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "strict_email" and "email_validation_mode" cannot be used together.
+     */
+    public function testCannotConfigureStrictEmailAndEmailValidationModeAtTheSameTime()
+    {
+        $this->createContainerFromFile('validation_strict_email_and_validation_mode');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
+     */
+    public function testEnabledStrictEmailOptionIsMappedToStrictEmailValidationMode()
+    {
+        $container = $this->createContainerFromFile('validation_strict_email_enabled');
+
+        $this->assertSame('strict', $container->getDefinition('validator.email')->getArgument(0));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
+     */
+    public function testDisabledStrictEmailOptionIsMappedToLooseEmailValidationMode()
+    {
+        $container = $this->createContainerFromFile('validation_strict_email_disabled');
+
+        $this->assertSame('loose', $container->getDefinition('validator.email')->getArgument(0));
+    }
+
+    public function testEmailValidationModeIsPassedToEmailValidator()
+    {
+        $container = $this->createContainerFromFile('validation_email_validation_mode');
+
+        $this->assertSame('html5', $container->getDefinition('validator.email')->getArgument(0));
+    }
+
     public function testValidationMapping()
     {
         $container = $this->createContainerFromFile('validation_mapping');

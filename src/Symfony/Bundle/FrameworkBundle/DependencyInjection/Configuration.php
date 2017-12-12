@@ -645,6 +645,27 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('validation')
                     ->info('validation configuration')
                     ->{!class_exists(FullStack::class) && class_exists(Validation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->validate()
+                        ->ifTrue(function ($v) { return isset($v['strict_email']) && isset($v['email_validation_mode']); })
+                        ->thenInvalid('"strict_email" and "email_validation_mode" cannot be used together.')
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return isset($v['strict_email']); })
+                        ->then(function ($v) {
+                            @trigger_error('The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.', E_USER_DEPRECATED);
+
+                            return $v;
+                        })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return isset($v['strict_email']) && !isset($v['email_validation_mode']); })
+                        ->then(function ($v) {
+                            $v['email_validation_mode'] = $v['strict_email'] ? 'strict' : 'loose';
+                            unset($v['strict_email']);
+
+                            return $v;
+                        })
+                    ->end()
                     ->children()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
@@ -658,7 +679,8 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
-                        ->booleanNode('strict_email')->defaultFalse()->end()
+                        ->booleanNode('strict_email')->end()
+                        ->enumNode('email_validation_mode')->values(array('html5', 'loose', 'strict'))->end()
                         ->arrayNode('mapping')
                             ->addDefaultsIfNotSet()
                             ->fixXmlConfig('path')

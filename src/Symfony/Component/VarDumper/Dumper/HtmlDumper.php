@@ -839,7 +839,8 @@ EOHTML
             $attr['href'] = $href;
         }
         if (isset($attr['href'])) {
-            $v = sprintf('<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $v);
+            $target = isset($attr['file']) ? '' : ' target="_blank"';
+            $v = sprintf('<a href="%s"%s rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $target, $v);
         }
         if (isset($attr['lang'])) {
             $v = sprintf('<code class="%s">%s</code>', esc($attr['lang']), $v);

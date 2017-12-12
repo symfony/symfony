@@ -1992,6 +1992,18 @@ YAML;
         );
         $tests['mapping in sequence starting on a new line'] = array($yaml, $expected);
 
+        $yaml = <<<YAML
+foo:
+
+    bar: baz
+YAML;
+        $expected = array(
+            'foo' => array(
+                'bar' => 'baz',
+            ),
+        );
+        $tests['blank line at the beginning of an indented mapping value'] = array($yaml, $expected);
+
         return $tests;
     }
 }

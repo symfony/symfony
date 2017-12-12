@@ -346,6 +346,7 @@ abstract class Client
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
         putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
+        $_ENV['SYMFONY_DEPRECATIONS_SERIALIZE'] = $deprecationsFile;
         $process = new PhpProcess($this->getScript($request), null, null);
         $process->run();
 

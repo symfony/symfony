@@ -25,10 +25,6 @@ class WorkflowExtensionTest extends TestCase
 
     protected function setUp()
     {
-        if (!class_exists(Workflow::class)) {
-            $this->markTestSkipped('The Workflow component is needed to run tests for this extension.');
-        }
-
         $places = array('ordered', 'waiting_for_payment', 'processed');
         $transitions = array(
             new Transition('t1', 'ordered', 'waiting_for_payment'),

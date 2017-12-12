@@ -49,10 +49,16 @@ class MessageSelector
      */
     public function choose($message, $number, $locale)
     {
-        preg_match_all('/(?:\|\||[^\|])++/', $message, $parts);
+        $parts = array();
+        if (preg_match('/^\|++$/', $message)) {
+            $parts = explode('|', $message);
+        } elseif (preg_match_all('/(?:\|\||[^\|])++/', $message, $matches)) {
+            $parts = $matches[0];
+        }
+
         $explicitRules = array();
         $standardRules = array();
-        foreach ($parts[0] as $part) {
+        foreach ($parts as $part) {
             $part = trim(str_replace('||', '|', $part));
 
             if (preg_match('/^(?P<interval>'.Interval::getIntervalRegexp().')\s*(?P<message>.*?)$/xs', $part, $matches)) {
@@ -76,7 +82,7 @@ class MessageSelector
         if (!isset($standardRules[$position])) {
             // when there's exactly one rule given, and that rule is a standard
             // rule, use this rule
-            if (1 === count($parts[0]) && isset($standardRules[0])) {
+            if (1 === count($parts) && isset($standardRules[0])) {
                 return $standardRules[0];
             }
 

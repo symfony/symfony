@@ -134,11 +134,11 @@ class Connection extends AbstractConnection
         }
 
         if (false === $this->connection) {
-            throw new LdapException(sprintf('Could not connect to Ldap server: %s', ldap_error($this->connection)));
+            throw new LdapException(sprintf('Could not connect to Ldap server: %s.', ldap_error($this->connection)));
         }
 
         if ('tls' === $this->config['encryption'] && false === ldap_start_tls($this->connection)) {
-            throw new LdapException(sprintf('Could not initiate TLS connection: %s', ldap_error($this->connection)));
+            throw new LdapException(sprintf('Could not initiate TLS connection: %s.', ldap_error($this->connection)));
         }
     }
 

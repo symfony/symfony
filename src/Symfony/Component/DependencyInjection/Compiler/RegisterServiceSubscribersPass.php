@@ -94,7 +94,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $this->currentId));
         }
 
-        $value->addTag('container.service_subscriber.locator', array('id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap)));
+        $value->addTag('container.service_subscriber.locator', array('id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId)));
 
         return parent::processValue($value);
     }

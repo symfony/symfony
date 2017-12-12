@@ -10,10 +10,12 @@ cache:
 matrix:
     include:
         - php: 5.3
+          dist: 'precise'
         - php: 5.4
         - php: 5.5
         - php: 5.6
         - php: 5.3
+          dist: 'precise'
           env: COMPOSER_OPTIONS="--prefer-lowest --prefer-stable" SYMFONY_DEPRECATIONS_HELPER=weak
         - php: 5.6
           env: COMPOSER_OPTIONS="" SYMFONY_DEPRECATIONS_HELPER=weak

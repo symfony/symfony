@@ -16,10 +16,12 @@ services:
 security:
     firewalls:
         secure:
+            logout_on_user_change: true
             pattern: ^/secure/
             http_basic: { realm: "Secure Gateway API" }
             entry_point: firewall_entry_point.entry_point.stub
         default:
+            logout_on_user_change: true
             anonymous: ~
     access_control:
         - { path: ^/secure/, roles: ROLE_SECURE }

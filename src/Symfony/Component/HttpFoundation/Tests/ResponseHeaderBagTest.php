@@ -199,10 +199,10 @@ class ResponseHeaderBagTest extends TestCase
 
         $cookies = $bag->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
 
-        $this->assertArrayHasKey('foo', $cookies['foo.bar']['/path/foo']));
-        $this->assertArrayHasKey('foo', $cookies['foo.bar']['/path/bar']));
-        $this->assertArrayHasKey('foo', $cookies['bar.foo']['/path/bar']));
-        $this->assertArrayHasKey('foo', $cookies['']['/']));
+        $this->assertArrayHasKey('foo', $cookies['foo.bar']['/path/foo']);
+        $this->assertArrayHasKey('foo', $cookies['foo.bar']['/path/bar']);
+        $this->assertArrayHasKey('foo', $cookies['bar.foo']['/path/bar']);
+        $this->assertArrayHasKey('foo', $cookies['']['/']);
     }
 
     public function testRemoveCookie()

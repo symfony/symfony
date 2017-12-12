@@ -40,11 +40,6 @@ final class Graphemes implements GenericStringInterface, \Countable
      */
     public function substr(int $start = 0, int $length = null): self
     {
-        // Workaround to support negative offsets with grapheme_substr() in HHVM
-        if (0 > $start && defined('HHVM_VERSION')) {
-            $start += grapheme_strlen($this->string);
-        }
-
         $result = clone $this;
         $result->string = grapheme_substr($this->string, $start, $length);
 

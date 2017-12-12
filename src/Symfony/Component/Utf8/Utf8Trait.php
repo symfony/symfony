@@ -242,11 +242,11 @@ trait Utf8Trait
     public function lastSubstringOf(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (false === $part = mb_strrchr($this->string, $needle, $beforeNeedle, 'UTF-8')) {
-            return;
+            return null;
         }
 
         $result = clone $this;
@@ -261,11 +261,11 @@ trait Utf8Trait
     public function lastSubstringOfIgnoreCase(string $needle, bool $beforeNeedle = false)
     {
         if ('' === $needle) {
-            return;
+            return null;
         }
 
         if (false === $part = mb_strrichr($this->string, $needle, $beforeNeedle, 'UTF-8')) {
-            return;
+            return null;
         }
 
         $result = clone $this;

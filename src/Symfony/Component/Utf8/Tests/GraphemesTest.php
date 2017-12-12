@@ -67,17 +67,6 @@ class GraphemesTest extends AbstractUtf8TestCase
         $this->assertSame($graphemes, $graphemes->toGraphemes());
     }
 
-    public function testSubstrWithNegativeOffsetOnHHVM()
-    {
-        if (!defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM runtime is required to run this test.');
-        }
-
-        $graphemes = Graphemes::fromString('abc123abc123');
-
-        $this->assertEquals(Graphemes::fromString('bc123'), $graphemes->substr(-5));
-    }
-
     public static function provideLength()
     {
         return array_merge(

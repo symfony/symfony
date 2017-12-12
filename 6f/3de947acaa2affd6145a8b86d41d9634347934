@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-12T10:08:28Z
+
+Should we plan to remove all the new `@legacy` method? Won't that reduce the test coverage?
+Shouldn't we instead upgrade the test suite to use the not-deprecated API (and keep a few legacy calls  just to ensure the legacy way keeps working)?
+Feels like so to me.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-12T10:13:43Z
+
+we do not plan to remove but to update when we will update the Bridge to
+use the new features. but yeah I agree if we can update now let’s do it :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-12T10:16:00Z
+
+Keeping these legacy tests do not make sense to me either. `setUp()` should just use the right api based on method existence (the actual code does not even use this part of the api, only the test does).
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-12T10:18:24Z
+
+Oh, maybe we should add a condition like you said and instead of using the
+annotation use the method from phpunit ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-12T10:24:35Z
+
+IMO there is no deprecation to assert here.
+We want to keep 3.x compatibility, the test should just use the right api i.e. `$registry->{method_exists($registry, $_ = 'addWorkflow') ? $_ : 'add'}($workflow, ...);`, no possible deprecation as the new api is used if it exists.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-12T10:36:43Z
+
+We can remove the deprecation tag ;)

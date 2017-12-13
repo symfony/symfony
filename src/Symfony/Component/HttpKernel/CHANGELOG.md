@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * `RequestAttributeValueResolver` now tries to cast values based on argument's type hint
+
 4.0.0
 -----
 

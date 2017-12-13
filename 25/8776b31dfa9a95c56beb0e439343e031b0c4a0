@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-10T22:11:25Z
+
+There is another call to registerLoader in an XML file in FrameworkBundle, should be replaced also I believe when possible.
+
+---------------------------------------------------------------------------
+
+by jrjohnson at 2017-12-10T22:12:11Z
+
+I split into two PRs since this one could maintain BC and the change in the XML could not (as far as I can tell).
+
+---------------------------------------------------------------------------
+
+by stof at 2017-12-11T09:27:35Z
+
+Changing the registration in the XML file means you should alter the Definition object from the DI extension instead of registering it from the XML, to be able to choose the one being registered
+
+---------------------------------------------------------------------------
+
+by jrjohnson at 2017-12-11T17:27:30Z
+
+Thanks @stof and @nicolas-grekas. I reverted the false positive code style fix and moved the invocation on `AnnotationRegistry` into the configuration PHP. I'm not sure that is the right place for it so please let me know if I went the wrong direction.
+
+---------------------------------------------------------------------------
+
+by jrjohnson at 2017-12-12T23:49:27Z
+
+Thanks for the assist @nicolas-grekas! A rebase seems to have cleared up the test issues so I believe this is ready.

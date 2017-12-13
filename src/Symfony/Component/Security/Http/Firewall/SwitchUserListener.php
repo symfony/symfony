@@ -131,6 +131,7 @@ class SwitchUserListener implements ListenerInterface
         if (false === $this->accessDecisionManager->decide($token, array($this->role), $user)) {
             $exception = new AccessDeniedException();
             $exception->setAttributes($this->role);
+            
             throw $exception;
         }
 

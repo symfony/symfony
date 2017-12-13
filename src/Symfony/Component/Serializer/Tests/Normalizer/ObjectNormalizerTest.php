@@ -203,6 +203,38 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize($data, DummyWithConstructorInexistingObject::class);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException
+     * @expectedExceptionMessage Cannot create an instance of Symfony\Component\Serializer\Tests\Normalizer\DummyValueObject from serialized data because its constructor requires parameter "bar" to be present.
+     */
+    public function testConstructorWithMissingData()
+    {
+        $data = array(
+            'foo' => 10,
+        );
+
+        $normalizer = new ObjectNormalizer();
+
+        $normalizer->denormalize($data, DummyValueObject::class);
+    }
+
+    public function testFillWithEmptyDataWhenMissingData()
+    {
+        $data = array(
+            'foo' => 10,
+        );
+
+        $normalizer = new ObjectNormalizer();
+
+        $result = $normalizer->denormalize($data, DummyValueObject::class, 'json', array(
+            'default_constructor_arguments' => array(
+                DummyValueObject::class => array('foo' => '', 'bar' => ''),
+            ),
+        ));
+
+        $this->assertEquals(new DummyValueObject(10, ''), $result);
+    }
+
     public function testGroupsNormalize()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -1023,6 +1055,17 @@ class DummyWithConstructorInexistingObject
 {
     public function __construct($id, Unknown $unknown)
     {
+    }
+}
+class DummyValueObject
+{
+    private $foo;
+    private $bar;
+
+    public function __construct($foo, $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
     }
 }
 

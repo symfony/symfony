@@ -35,6 +35,20 @@ final class RequestAttributeValueResolver implements ArgumentValueResolverInterf
      */
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
-        yield $request->attributes->get($argument->getName());
+        yield $this->resolveByType($request, $argument);
+    }
+
+    private function resolveByType(Request $request, ArgumentMetadata $argument)
+    {
+        switch ($argument->getType()) {
+            case 'float':
+                return (float) $request->attributes->get($argument->getName());
+            case 'int':
+                return $request->attributes->getInt($argument->getName());
+            case 'bool':
+                return $request->attributes->getBoolean($argument->getName());
+            default:
+                return $request->attributes->get($argument->getName());
+        }
     }
 }

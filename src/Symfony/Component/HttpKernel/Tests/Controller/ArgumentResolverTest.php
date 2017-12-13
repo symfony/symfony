@@ -292,6 +292,60 @@ class ArgumentResolverTest extends TestCase
         self::$resolver->getArguments($request, $controller);
     }
 
+    public function testGetStringArgument()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('string', 'some string');
+        $controller = array(new self(), 'controllerWithStringTypeHint');
+
+        $this->assertSame(array('some string'), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetIntArgument()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('int', '123');
+        $controller = array(new self(), 'controllerWithIntTypeHint');
+
+        $this->assertSame(array(123), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetFloatArgument()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('float', '123.456');
+        $controller = array(new self(), 'controllerWithFloatTypeHint');
+
+        $this->assertSame(array(123.456), self::$resolver->getArguments($request, $controller));
+    }
+
+    /**
+     * @dataProvider boolishDataProvider
+     */
+    public function testGetBooleanArgument($boolish, $expected)
+    {
+        $request = Request::create('/');
+        $request->attributes->set('bool', $boolish);
+        $controller = array(new self(), 'controllerWithBoolTypeHint');
+
+        $this->assertSame(array($expected), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function boolishDataProvider()
+    {
+        return array(
+            array('on', true),
+            array('1', true),
+            array('true', true),
+            array('yes', true),
+            array('off', false),
+            array('0', false),
+            array('false', false),
+            array('no', false),
+            array('', false),
+        );
+    }
+
     public function __invoke($foo, $bar = null)
     {
     }
@@ -329,6 +383,22 @@ class ArgumentResolverTest extends TestCase
     }
 
     protected function controllerWithExtendingSession(ExtendingSession $session)
+    {
+    }
+
+    protected function controllerWithIntTypeHint(int $int)
+    {
+    }
+
+    protected function controllerWithBoolTypeHint(bool $bool)
+    {
+    }
+
+    protected function controllerWithFloatTypeHint(float $float)
+    {
+    }
+
+    protected function controllerWithStringTypeHint(string $string)
     {
     }
 }

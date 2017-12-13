@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -308,6 +309,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @return object
      *
      * @throws RuntimeException
+     * @throws MissingConstructorArgumentsException
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
@@ -356,7 +358,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
-                    throw new RuntimeException(
+                    throw new MissingConstructorArgumentsException(
                         sprintf(
                             'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
                             $class,

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+* added `MissingConstructorArgumentsException` new exception for deserialization failure
+  of objects that needs data insertion in constructor
+
 4.0.0
 -----
 

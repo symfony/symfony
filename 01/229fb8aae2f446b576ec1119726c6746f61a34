@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-11T22:02:52Z
+
+Can you check the failures please?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-12-11T22:29:22Z
+
+fabbot complains about fixtures (`src/Symfony/Component/Routing/Tests/Fixtures/dumper/url_matcher{1,2,3}.php`). Won't fix that, as it would also mean having to change the MatcherDumper.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-12-11T22:47:48Z
+
+Overall, would it be better to apply `rawurlencode` instead of trying to preserve the URL as- is?

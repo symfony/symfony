@@ -65,7 +65,7 @@ class PhpEngineTest extends TestCase
         $engine[$foo] = 'bar';
         $this->assertEquals($foo, $engine->get('bar'), '->set() takes an alias as a second argument');
 
-        $this->assertTrue(isset($engine['bar']));
+        $this->assertArrayHasKey('bar', $engine);
 
         try {
             $engine->get('foobar');
@@ -75,7 +75,7 @@ class PhpEngineTest extends TestCase
             $this->assertEquals('The helper "foobar" is not defined.', $e->getMessage(), '->get() throws an InvalidArgumentException if the helper is not defined');
         }
 
-        $this->assertTrue(isset($engine['bar']));
+        $this->assertArrayHasKey('bar', $engine);
         $this->assertTrue($engine->has('foo'), '->has() returns true if the helper exists');
         $this->assertFalse($engine->has('foobar'), '->has() returns false if the helper does not exist');
     }

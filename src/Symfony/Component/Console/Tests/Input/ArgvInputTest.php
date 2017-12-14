@@ -317,6 +317,9 @@ class ArgvInputTest extends TestCase
         $input = new ArgvInput(array('cli.php', '-fh'));
         $this->assertTrue($input->hasParameterOption('-fh'), '->hasParameterOption() returns true if the given short option is in the raw input');
 
+        $input = new ArgvInput(array('cli.php', '-e=test'));
+        $this->assertFalse($input->hasParameterOption('-s'), '->hasParameterOption() returns true if the given short option is in the raw input');
+
         $input = new ArgvInput(array('cli.php', '--foo', 'foo'));
         $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if the given short option is in the raw input');
 

@@ -181,6 +181,6 @@ class AttributeBagTest extends TestCase
 
     public function testCount()
     {
-        $this->assertEquals(count($this->array), count($this->bag));
+        $this->assertCount(count($this->array), $this->bag);
     }
 }

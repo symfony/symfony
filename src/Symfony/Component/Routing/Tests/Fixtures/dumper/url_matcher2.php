@@ -15,10 +15,10 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $this->context = $context;
     }
 
-    public function match($pathinfo)
+    public function match($rawPathinfo)
     {
         $allow = array();
-        $pathinfo = rawurldecode($pathinfo);
+        $pathinfo = rawurldecode($rawPathinfo);
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $request = $this->request;
@@ -84,7 +84,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/test/baz3' === $trimmedPathinfo) {
                     $ret = array('_route' => 'baz3');
                     if (substr($pathinfo, -1) !== '/') {
-                        return array_replace($ret, $this->redirect($pathinfo.'/', 'baz3'));
+                        return array_replace($ret, $this->redirect($rawPathinfo.'/', 'baz3'));
                     }
 
                     return $ret;
@@ -96,7 +96,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             if (preg_match('#^/test/(?P<foo>[^/]++)/?$#s', $pathinfo, $matches)) {
                 $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz4')), array ());
                 if (substr($pathinfo, -1) !== '/') {
-                    return array_replace($ret, $this->redirect($pathinfo.'/', 'baz4'));
+                    return array_replace($ret, $this->redirect($rawPathinfo.'/', 'baz4'));
                 }
 
                 return $ret;
@@ -180,7 +180,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             if ('/multi/hey' === $trimmedPathinfo) {
                 $ret = array('_route' => 'hey');
                 if (substr($pathinfo, -1) !== '/') {
-                    return array_replace($ret, $this->redirect($pathinfo.'/', 'hey'));
+                    return array_replace($ret, $this->redirect($rawPathinfo.'/', 'hey'));
                 }
 
                 return $ret;
@@ -327,7 +327,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $ret = array('_route' => 'secure');
             $requiredSchemes = array (  'https' => 0,);
             if (!isset($requiredSchemes[$scheme])) {
-                return array_replace($ret, $this->redirect($pathinfo, 'secure', key($requiredSchemes)));
+                return array_replace($ret, $this->redirect($rawPathinfo, 'secure', key($requiredSchemes)));
             }
 
             return $ret;
@@ -338,7 +338,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $ret = array('_route' => 'nonsecure');
             $requiredSchemes = array (  'http' => 0,);
             if (!isset($requiredSchemes[$scheme])) {
-                return array_replace($ret, $this->redirect($pathinfo, 'nonsecure', key($requiredSchemes)));
+                return array_replace($ret, $this->redirect($rawPathinfo, 'nonsecure', key($requiredSchemes)));
             }
 
             return $ret;

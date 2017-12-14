@@ -191,6 +191,40 @@ abstract class MergeCollectionListenerTest extends TestCase
         $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
+    public function testKeepSubmittedOrder()
+    {
+        $originalDataArray = array(0 => 'first', 1 => 'second', 2 => 'third');
+        $newDataArray = array(2 => 'third', 1 => 'second', 3 => 'fourth');
+        // This values are ordered regarding the original data
+        $wronglyOrderedArray = array(1 => 'second', 2 => 'third', 3 => 'fourth');
+        $originalData = $this->getData($originalDataArray);
+        $newData = $this->getData($newDataArray);
+
+        $listener = new MergeCollectionListener(true, true);
+
+        $this->form->setData($originalData);
+
+        $event = new FormEvent($this->form, $newData);
+        $listener->onSubmit($event);
+
+        // We still have the original object
+        if (is_object($originalData)) {
+            $this->assertSame($originalData, $event->getData());
+        }
+
+        // We ensure we get the new data
+        // regardless of the order
+        $this->assertEquals($this->getData($newDataArray), $event->getData());
+        $this->assertEquals($this->getData($wronglyOrderedArray), $event->getData());
+
+        // We also ensure we get them in the order they were submitted
+        // in case of an array
+        if (is_array($event->getData())) {
+            $this->assertSame($this->getData($newDataArray), $event->getData());
+            $this->assertNotSame($this->getData($wronglyOrderedArray), $event->getData());
+        }
+    }
+
     /**
      * @dataProvider getBooleanMatrix2
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException

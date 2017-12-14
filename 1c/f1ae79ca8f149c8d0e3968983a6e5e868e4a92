@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-11T22:43:56Z
+
+fabbot failure is a false positive.
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-12-12T16:13:45Z
+
+Why not cover this change with test using `@expectedException`?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-12T19:57:20Z
+
+Because I did not find an easy way to do it. But I can look into it to add
+one
+Le mar. 12 déc. 2017 à 17:13, Konstantin Myakshin <notifications@github.com>
+a écrit :
+
+> Why not cover this change with test using expectsException?
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25450#issuecomment-351100255>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8tximFTQC2YdXN4ZHERAOCJ5e_bVks5s_qZGgaJpZM4Q9_yn>
+> .
+>

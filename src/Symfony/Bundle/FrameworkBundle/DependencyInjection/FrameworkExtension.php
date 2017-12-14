@@ -1343,14 +1343,12 @@ class FrameworkExtension extends Extension
 
         $loader->load('annotations.xml');
 
-<<<<<<< HEAD
         $container->getAlias('annotation_reader')->setPrivate(true);
-=======
+
         if (!method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
             $container->getDefinition('annotations.dummy_registry')
                 ->setMethodCalls(array(array('registerLoader', array('class_exists'))));
         }
->>>>>>> 3.3
 
         if ('none' !== $config['cache']) {
             if (!class_exists('Doctrine\Common\Cache\CacheProvider')) {

@@ -105,7 +105,7 @@ class RedirectableUrlMatcherTest extends TestCase
         $coll->add('foo', new Route('/foo:bar/'));
 
         $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
-        $matcher->expects($this->once())->method('redirect')->with('/foo%3Abar/');
+        $matcher->expects($this->once())->method('redirect')->with('/foo%3Abar/')->willReturn(array());
         $matcher->match('/foo%3Abar');
     }
 }

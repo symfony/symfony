@@ -143,6 +143,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('fragment.renderer.esi'), 'The ESI fragment renderer is not registered');
     }
 
+    public function testEsiInactive()
+    {
+        $container = $this->createContainerFromFile('default_config');
+
+        $this->assertFalse($container->hasDefinition('fragment.renderer.esi'));
+        $this->assertFalse($container->hasDefinition('esi'));
+    }
+
     public function testSsi()
     {
         $container = $this->createContainerFromFile('full');
@@ -165,6 +173,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('fragment.renderer.hinclude'), 'The HInclude fragment renderer is not registered');
         $this->assertTrue($container->hasDefinition('fragment.renderer.esi'), 'The ESI fragment renderer is registered');
         $this->assertTrue($container->hasDefinition('fragment.renderer.ssi'), 'The SSI fragment renderer is registered');
+    }
+
+    public function testSsiInactive()
+    {
+        $container = $this->createContainerFromFile('default_config');
+
+        $this->assertFalse($container->hasDefinition('fragment.renderer.ssi'));
+        $this->assertFalse($container->hasDefinition('ssi'));
     }
 
     public function testEnabledProfiler()

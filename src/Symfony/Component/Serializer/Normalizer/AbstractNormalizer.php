@@ -37,6 +37,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     const GROUPS = 'groups';
     const ATTRIBUTES = 'attributes';
     const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
+    const DEFAULT_CONSTRUCTOR_ARGUMENTS = 'default_constructor_arguments';
 
     /**
      * @var int
@@ -355,6 +356,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     // Don't run set for a parameter passed to the constructor
                     $params[] = $parameterData;
                     unset($data[$key]);
+                } elseif (isset($context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key])) {
+                    $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {

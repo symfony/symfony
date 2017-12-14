@@ -218,6 +218,23 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize($data, DummyValueObject::class);
     }
 
+    public function testFillWithEmptyDataWhenMissingData()
+    {
+        $data = array(
+            'foo' => 10,
+        );
+
+        $normalizer = new ObjectNormalizer();
+
+        $result = $normalizer->denormalize($data, DummyValueObject::class, 'json', array(
+            'default_constructor_arguments' => array(
+                DummyValueObject::class => array('foo' => '', 'bar' => ''),
+            ),
+        ));
+
+        $this->assertEquals(new DummyValueObject(10, ''), $result);
+    }
+
     public function testGroupsNormalize()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));

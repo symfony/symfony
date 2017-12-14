@@ -96,10 +96,10 @@ EOF;
         $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections), "\n");
 
         return <<<EOF
-    public function match(\$pathinfo)
+    public function match(\$rawPathinfo)
     {
         \$allow = array();
-        \$pathinfo = rawurldecode(\$pathinfo);
+        \$pathinfo = rawurldecode(\$rawPathinfo);
         \$trimmedPathinfo = rtrim(\$pathinfo, '/');
         \$context = \$this->context;
         \$request = \$this->request;
@@ -331,7 +331,7 @@ EOF;
         if ($hasTrailingSlash) {
             $code .= <<<EOF
             if (substr(\$pathinfo, -1) !== '/') {
-                return \$this->redirect(\$pathinfo.'/', '$name');
+                return \$this->redirect(\$rawPathinfo.'/', '$name');
             }
 
 
@@ -346,7 +346,7 @@ EOF;
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$scheme])) {
-                return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
+                return \$this->redirect(\$rawPathinfo, '$name', key(\$requiredSchemes));
             }
 
 

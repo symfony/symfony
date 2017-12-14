@@ -1,6 +1,14 @@
 UPGRADE FROM 4.0 to 4.1
 =======================
 
+HttpFoundation
+--------------
+
+ * Passing the file size to the constructor of the `UploadedFile` class is deprecated and won't be
+   supported anymore in 5.0.
+
+ * The `getClientSize()` method of the `UploadedFile` class is deprecated. Use `getSize()` instead.
+
 Security
 --------
 

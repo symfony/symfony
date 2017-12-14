@@ -1,6 +1,13 @@
 UPGRADE FROM 4.x to 5.0
 =======================
 
+HttpFoundation
+--------------
+
+ * The `$size` argument of the `UploadedFile` constructor has been removed.
+
+ * The `getClientSize()` method of the `UploadedFile` class has been removed.
+
 Security
 --------
 

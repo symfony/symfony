@@ -121,7 +121,7 @@ class ProfilerListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::RESPONSE => array('onKernelResponse', -100),
-            KernelEvents::EXCEPTION => 'onKernelException',
+            KernelEvents::EXCEPTION => array('onKernelException', 2048),
             KernelEvents::TERMINATE => array('onKernelTerminate', -1024),
         );
     }

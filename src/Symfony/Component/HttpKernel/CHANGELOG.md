@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * `ExceptionListener` now logs and collects exceptions at priority `2048` (previously logged at `-128` and collected at `0`)
+
 4.0.0
 -----
 

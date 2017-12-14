@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-13T07:38:39Z
+
+This makes it possible to configure the default validation mode for the email validator according to the changes made in #24442.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-13T07:42:59Z
+
+Cool. Then I propose to patch the recipe for 4.1 and turn html5 on by default there.

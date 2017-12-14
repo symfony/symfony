@@ -200,6 +200,6 @@ class HeaderBagTest extends TestCase
         $headers = array('foo' => 'bar', 'HELLO' => 'WORLD');
         $headerBag = new HeaderBag($headers);
 
-        $this->assertEquals(count($headers), count($headerBag));
+        $this->assertCount(count($headers), $headerBag);
     }
 }

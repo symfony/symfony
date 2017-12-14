@@ -111,7 +111,11 @@ class SymfonyTestsListenerTrait
             $this->state = 0;
 
             if (!class_exists('Doctrine\Common\Annotations\AnnotationRegistry', false) && class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
-                AnnotationRegistry::registerLoader('class_exists');
+                if (method_exists('Doctrine\Common\Annotations\AnnotationRegistry', 'registerUniqueLoader')) {
+                    AnnotationRegistry::registerUniqueLoader('class_exists');
+                } else {
+                    AnnotationRegistry::registerLoader('class_exists');
+                }
             }
 
             if ($this->skippedFile = getenv('SYMFONY_PHPUNIT_SKIPPED_TESTS')) {

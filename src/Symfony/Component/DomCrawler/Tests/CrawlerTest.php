@@ -204,7 +204,7 @@ EOF
 EOF
         , 'UTF-8');
 
-        $this->assertTrue(count(libxml_get_errors()) > 1);
+        $this->assertGreaterThan(1, libxml_get_errors());
 
         libxml_clear_errors();
         libxml_use_internal_errors($internalErrors);

@@ -236,7 +236,7 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
-            $this->assertFalse(isset($matcherIds[$matcherId]));
+            $this->assertArrayNotHasKey($matcherId, $matcherIds);
             $matcherIds[$matcherId] = true;
 
             $i = count($matcherIds);

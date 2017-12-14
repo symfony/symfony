@@ -376,15 +376,15 @@ class FormTest extends TestCase
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
         unset($form['foo']);
-        $this->assertFalse(isset($form['foo']), '->offsetUnset() removes a field');
+        $this->assertArrayNotHasKey('foo', $form, '->offsetUnset() removes a field');
     }
 
     public function testOffsetExists()
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
 
-        $this->assertTrue(isset($form['foo']), '->offsetExists() return true if the field exists');
-        $this->assertFalse(isset($form['bar']), '->offsetExists() return false if the field does not exist');
+        $this->assertArrayHasKey('foo', $form, '->offsetExists() return true if the field exists');
+        $this->assertArrayNotHasKey('bar', $form, '->offsetExists() return false if the field does not exist');
     }
 
     public function testGetValues()

@@ -72,7 +72,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ))
             ->createView();
 
-        $this->assertTrue(isset($view['csrf']));
+        $this->assertArrayHasKey('csrf', $view);
     }
 
     public function testNoCsrfProtectionByDefaultIfCompoundButNotRoot()
@@ -89,7 +89,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->get('form')
             ->createView();
 
-        $this->assertFalse(isset($view['csrf']));
+        $this->assertArrayNotHasKey('csrf', $view);
     }
 
     public function testNoCsrfProtectionByDefaultIfRootButNotCompound()
@@ -101,7 +101,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ))
             ->createView();
 
-        $this->assertFalse(isset($view['csrf']));
+        $this->assertArrayNotHasKey('csrf', $view);
     }
 
     public function testCsrfProtectionCanBeDisabled()
@@ -114,7 +114,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ))
             ->createView();
 
-        $this->assertFalse(isset($view['csrf']));
+        $this->assertArrayNotHasKey('csrf', $view);
     }
 
     public function testGenerateCsrfToken()
@@ -357,7 +357,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->createView()
             ->vars['prototype'];
 
-        $this->assertFalse(isset($prototypeView['csrf']));
+        $this->assertArrayNotHasKey('csrf', $prototypeView);
         $this->assertCount(1, $prototypeView);
     }
 

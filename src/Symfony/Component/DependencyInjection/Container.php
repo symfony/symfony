@@ -207,7 +207,7 @@ class Container implements ResettableContainerInterface
      *
      * @see Reference
      */
-    public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
+    public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
     {
         if (isset($this->aliases[$id])) {
             $id = $this->aliases[$id];
@@ -229,9 +229,9 @@ class Container implements ResettableContainerInterface
 
         try {
             if (isset($this->fileMap[$id])) {
-                return self::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior ? null : $this->load($this->fileMap[$id]);
+                return /* self::IGNORE_ON_UNINITIALIZED_REFERENCE */ 4 === $invalidBehavior ? null : $this->load($this->fileMap[$id]);
             } elseif (isset($this->methodMap[$id])) {
-                return self::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior ? null : $this->{$this->methodMap[$id]}();
+                return /* self::IGNORE_ON_UNINITIALIZED_REFERENCE */ 4 === $invalidBehavior ? null : $this->{$this->methodMap[$id]}();
             }
         } catch (\Exception $e) {
             unset($this->services[$id]);
@@ -241,7 +241,7 @@ class Container implements ResettableContainerInterface
             unset($this->loading[$id]);
         }
 
-        if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+        if (/* self::EXCEPTION_ON_INVALID_REFERENCE */ 1 === $invalidBehavior) {
             if (!$id) {
                 throw new ServiceNotFoundException($id);
             }

@@ -36,7 +36,7 @@ class IntlBundleReaderTest extends TestCase
 
         $this->assertInstanceOf('\ArrayAccess', $data);
         $this->assertSame('Bar', $data['Foo']);
-        $this->assertFalse(isset($data['ExistsNot']));
+        $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
     public function testReadFollowsAlias()
@@ -46,7 +46,7 @@ class IntlBundleReaderTest extends TestCase
 
         $this->assertInstanceOf('\ArrayAccess', $data);
         $this->assertSame('Bar', $data['Foo']);
-        $this->assertFalse(isset($data['ExistsNot']));
+        $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
     public function testReadDoesNotFollowFallback()
@@ -56,9 +56,9 @@ class IntlBundleReaderTest extends TestCase
 
         $this->assertInstanceOf('\ArrayAccess', $data);
         $this->assertSame('Bam', $data['Baz']);
-        $this->assertFalse(isset($data['Foo']));
+        $this->assertArrayNotHasKey('Foo', $data);
         $this->assertNull($data['Foo']);
-        $this->assertFalse(isset($data['ExistsNot']));
+        $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
     public function testReadDoesNotFollowFallbackAlias()
@@ -68,9 +68,9 @@ class IntlBundleReaderTest extends TestCase
 
         $this->assertInstanceOf('\ArrayAccess', $data);
         $this->assertSame('Bam', $data['Baz'], 'data from the aliased locale can be accessed');
-        $this->assertFalse(isset($data['Foo']));
+        $this->assertArrayNotHasKey('Foo', $data);
         $this->assertNull($data['Foo']);
-        $this->assertFalse(isset($data['ExistsNot']));
+        $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
     /**

@@ -308,12 +308,12 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->form[] = $child;
 
-        $this->assertTrue(isset($this->form['foo']));
+        $this->assertArrayHasKey('foo', $this->form);
         $this->assertSame($child, $this->form['foo']);
 
         unset($this->form['foo']);
 
-        $this->assertFalse(isset($this->form['foo']));
+        $this->assertArrayNotHasKey('foo', $this->form);
     }
 
     public function testCountable()

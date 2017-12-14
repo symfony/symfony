@@ -141,7 +141,7 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services6.yml');
         $services = $container->getDefinitions();
-        $this->assertTrue(isset($services['foo']), '->load() parses service elements');
+        $this->assertArrayHasKey('foo', $services, '->load() parses service elements');
         $this->assertFalse($services['not_shared']->isShared(), '->load() parses the shared flag');
         $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Definition', $services['foo'], '->load() converts service element to Definition instances');
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
@@ -159,10 +159,10 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(array('foo', new Reference('baz')), $services['Acme\WithShortCutArgs']->getArguments(), '->load() parses short service definition');
 
         $aliases = $container->getAliases();
-        $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses aliases');
+        $this->assertArrayHasKey('alias_for_foo', $aliases, '->load() parses aliases');
         $this->assertEquals('foo', (string) $aliases['alias_for_foo'], '->load() parses aliases');
         $this->assertTrue($aliases['alias_for_foo']->isPublic());
-        $this->assertTrue(isset($aliases['another_alias_for_foo']));
+        $this->assertArrayHasKey('another_alias_for_foo', $aliases);
         $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
         $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
         $this->assertTrue(isset($aliases['another_third_alias_for_foo']));
@@ -206,8 +206,8 @@ class YamlFileLoaderTest extends TestCase
         $services = $container->getDefinitions();
         $parameters = $container->getParameterBag()->all();
 
-        $this->assertTrue(isset($services['project.service.bar']), '->load() parses extension elements');
-        $this->assertTrue(isset($parameters['project.parameter.bar']), '->load() parses extension elements');
+        $this->assertArrayHasKey('project.service.bar', $services, '->load() parses extension elements');
+        $this->assertArrayHasKey('project.parameter.bar', $parameters, '->load() parses extension elements');
 
         $this->assertEquals('BAR', $services['project.service.foo']->getClass(), '->load() parses extension elements');
         $this->assertEquals('BAR', $parameters['project.parameter.foo'], '->load() parses extension elements');

@@ -30,6 +30,7 @@ class Expression extends Constraint
 
     public $message = 'This value is not valid.';
     public $expression;
+    public $values = array();
 
     /**
      * {@inheritdoc}

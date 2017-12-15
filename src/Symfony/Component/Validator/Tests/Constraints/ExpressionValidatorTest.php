@@ -270,4 +270,18 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
     }
+
+    public function testPassingCustomValues()
+    {
+        $constraint = new Expression(array(
+            'expression' => 'value + custom == 2',
+            'values' => array(
+                'custom' => 1,
+            ),
+        ));
+
+        $this->validator->validate(1, $constraint);
+
+        $this->assertNoViolation();
+    }
 }

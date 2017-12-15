@@ -17,6 +17,7 @@ use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
+use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -63,6 +64,7 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
@@ -229,6 +231,11 @@ class FrameworkExtension extends Extension
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
+        if (null === $config['csrf_protection']['enabled']) {
+            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class);
+        }
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+
         if ($this->isConfigEnabled($container, $config['form'])) {
             if (!class_exists('Symfony\Component\Form\Form')) {
                 throw new LogicException('Form support cannot be enabled as the Form component is not installed.');
@@ -248,8 +255,6 @@ class FrameworkExtension extends Extension
         } else {
             $container->removeDefinition('console.command.form_debug');
         }
-
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['assets'])) {
             if (!class_exists('Symfony\Component\Asset\Package')) {

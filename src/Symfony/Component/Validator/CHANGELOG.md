@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Deprecated the `checkDNS` and `dnsMessage` options in the `Url` constraint. They will be removed in 5.0.
+
 4.0.0
 -----
 

@@ -148,13 +148,8 @@ class Application
 
             $renderException($e);
 
-            $exitCode = $e->getCode();
-            if (is_numeric($exitCode)) {
-                $exitCode = (int) $exitCode;
-                if (0 === $exitCode) {
-                    $exitCode = 1;
-                }
-            } else {
+            $exitCode = (int) $e->getCode();
+            if (! is_numeric($e->getCode()) || 0 === $exitCode) {
                 $exitCode = 1;
             }
         } finally {

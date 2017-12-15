@@ -758,13 +758,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('messages', $container->getParameter('validator.translation_domain'));
     }
 
-    public function testValidationStrictEmail()
-    {
-        $container = $this->createContainerFromFile('validation_strict_email');
-
-        $this->assertTrue($container->getDefinition('validator.email')->getArgument(0));
-    }
-
     public function testValidationMapping()
     {
         $container = $this->createContainerFromFile('validation_mapping');

@@ -524,6 +524,7 @@ class Application
      */
     public function findNamespace($namespace)
     {
+
         $allNamespaces = $this->getNamespaces();
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $namespace);
         $namespaces = preg_grep('{^'.$expr.'}', $allNamespaces);
@@ -531,15 +532,7 @@ class Application
         if (empty($namespaces)) {
             $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
 
-            if ($alternatives = $this->findAlternatives($namespace, $allNamespaces)) {
-                if (1 == count($alternatives)) {
-                    $message .= "\n\nDid you mean this?\n    ";
-                } else {
-                    $message .= "\n\nDid you mean one of these?\n    ";
-                }
-
-                $message .= implode("\n    ", $alternatives);
-            }
+            $alternatives = $this->getAlternativesMessages($namespace, $allNamespaces, $message);
 
             throw new CommandNotFoundException($message, $alternatives);
         }
@@ -550,6 +543,19 @@ class Application
         }
 
         return $exact ? $namespace : reset($namespaces);
+    }
+
+    protected function getAlternativesMessages($name, $collection, &$message)
+    {
+        if ($alternatives = $this->findAlternatives($name, $collection)) {
+            $message .= (1 == count($alternatives))
+                ? "\n\nDid you mean this?\n    "
+                : "\n\nDid you mean one of these?\n    ";
+
+            $message .= implode("\n    ", $alternatives);
+        }
+
+        return $alternatives;
     }
 
     /**
@@ -585,14 +591,7 @@ class Application
 
             $message = sprintf('Command "%s" is not defined.', $name);
 
-            if ($alternatives = $this->findAlternatives($name, $allCommands)) {
-                if (1 == count($alternatives)) {
-                    $message .= "\n\nDid you mean this?\n    ";
-                } else {
-                    $message .= "\n\nDid you mean one of these?\n    ";
-                }
-                $message .= implode("\n    ", $alternatives);
-            }
+            $alternatives = $this->getAlternativesMessages($name, $allCommands, $message);
 
             throw new CommandNotFoundException($message, $alternatives);
         }

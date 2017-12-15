@@ -83,10 +83,10 @@ class FormRegistry implements FormRegistryInterface
             if (!$type) {
                 // Support fully-qualified class names
                 if (!class_exists($name)) {
-                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not exist', $name));
+                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not exist.', $name));
                 }
                 if (!in_array(FormTypeInterface::class, class_implements($name))) {
-                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not implement "%s"', $name, FormTypeInterface::class));
+                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not implement "%s".', $name, FormTypeInterface::class));
                 }
 
                 $type = new $name();

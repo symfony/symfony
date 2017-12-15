@@ -196,7 +196,7 @@ class ProgressBar
      *
      * @return int The progress bar step width
      */
-    private function getStepWidth()
+    public function getStepWidth()
     {
         return $this->stepWidth;
     }

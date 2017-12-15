@@ -85,7 +85,7 @@ class FormRegistry implements FormRegistryInterface
                 if (!class_exists($name)) {
                   throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not exist', $name));
                 }
-                else if (!in_array('Symfony\Component\Form\FormTypeInterface', class_implements($name))) {
+                if (!in_array('Symfony\Component\Form\FormTypeInterface', class_implements($name))) {
                   throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not implement "Symfony\Component\Form\FormTypeInterface"', $name));
                 }
 

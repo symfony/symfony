@@ -989,7 +989,9 @@ class Application
                 if (!isset($parts[$i]) && $exists) {
                     $alternatives[$collectionName] += $threshold;
                     continue;
-                } elseif (!isset($parts[$i])) {
+                }
+
+                if (!isset($parts[$i])) {
                     continue;
                 }
 

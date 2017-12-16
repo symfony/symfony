@@ -150,7 +150,7 @@ class WebServer
             throw new \RuntimeException('Unable to find the PHP binary.');
         }
 
-        $process = new Process(array($binary, '-S', $config->getAddress(), $config->getRouter()));
+        $process = new Process(array($binary, '-dvariables_order=EGPCS', '-S', $config->getAddress(), $config->getRouter()));
         $process->setWorkingDirectory($config->getDocumentRoot());
         $process->setTimeout(null);
 

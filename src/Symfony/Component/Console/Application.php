@@ -861,10 +861,9 @@ class Application
         try {
             $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
 
+            $exitCode = ConsoleCommandEvent::RETURN_CODE_DISABLED;
             if ($event->commandShouldRun()) {
                 $exitCode = $command->run($input, $output);
-            } else {
-                $exitCode = ConsoleCommandEvent::RETURN_CODE_DISABLED;
             }
         } catch (\Throwable $e) {
             $event = new ConsoleErrorEvent($input, $output, $e, $command);

@@ -84,6 +84,10 @@ class QuestionHelperTest extends TestCase
         $question->setMultiselect(true);
 
         $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, 0);
+        // We are supposed to get the default value since we are not in interactive mode
+        $this->assertEquals('Superman', $questionHelper->ask($this->createInputInterfaceMock(true), $this->createOutputInterface(), $question));
     }
 
     public function testAsk()

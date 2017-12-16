@@ -148,13 +148,8 @@ class Application
 
             $renderException($e);
 
-            $exitCode = $e->getCode();
-            if (is_numeric($exitCode)) {
-                $exitCode = (int) $exitCode;
-                if (0 === $exitCode) {
-                    $exitCode = 1;
-                }
-            } else {
+            $exitCode = (int) $e->getCode();
+            if (! is_numeric($e->getCode()) || 0 === $exitCode) {
                 $exitCode = 1;
             }
         } finally {
@@ -529,6 +524,7 @@ class Application
      */
     public function findNamespace($namespace)
     {
+
         $allNamespaces = $this->getNamespaces();
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $namespace);
         $namespaces = preg_grep('{^'.$expr.'}', $allNamespaces);
@@ -536,15 +532,7 @@ class Application
         if (empty($namespaces)) {
             $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
 
-            if ($alternatives = $this->findAlternatives($namespace, $allNamespaces)) {
-                if (1 == count($alternatives)) {
-                    $message .= "\n\nDid you mean this?\n    ";
-                } else {
-                    $message .= "\n\nDid you mean one of these?\n    ";
-                }
-
-                $message .= implode("\n    ", $alternatives);
-            }
+            $alternatives = $this->getAlternativesMessages($namespace, $allNamespaces, $message);
 
             throw new CommandNotFoundException($message, $alternatives);
         }
@@ -555,6 +543,19 @@ class Application
         }
 
         return $exact ? $namespace : reset($namespaces);
+    }
+
+    protected function getAlternativesMessages($name, $collection, &$message)
+    {
+        if ($alternatives = $this->findAlternatives($name, $collection)) {
+            $message .= (1 == count($alternatives))
+                ? "\n\nDid you mean this?\n    "
+                : "\n\nDid you mean one of these?\n    ";
+
+            $message .= implode("\n    ", $alternatives);
+        }
+
+        return $alternatives;
     }
 
     /**
@@ -590,14 +591,7 @@ class Application
 
             $message = sprintf('Command "%s" is not defined.', $name);
 
-            if ($alternatives = $this->findAlternatives($name, $allCommands)) {
-                if (1 == count($alternatives)) {
-                    $message .= "\n\nDid you mean this?\n    ";
-                } else {
-                    $message .= "\n\nDid you mean one of these?\n    ";
-                }
-                $message .= implode("\n    ", $alternatives);
-            }
+            $alternatives = $this->getAlternativesMessages($name, $allCommands, $message);
 
             throw new CommandNotFoundException($message, $alternatives);
         }
@@ -721,11 +715,10 @@ class Application
     {
         do {
             $message = trim($e->getMessage());
+            $len = 0;
             if ('' === $message || OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $title = sprintf('  [%s%s]  ', get_class($e), 0 !== ($code = $e->getCode()) ? ' ('.$code.')' : '');
                 $len = Helper::strlen($title);
-            } else {
-                $len = 0;
             }
 
             $width = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : PHP_INT_MAX;
@@ -868,10 +861,9 @@ class Application
         try {
             $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
 
+            $exitCode = ConsoleCommandEvent::RETURN_CODE_DISABLED;
             if ($event->commandShouldRun()) {
                 $exitCode = $command->run($input, $output);
-            } else {
-                $exitCode = ConsoleCommandEvent::RETURN_CODE_DISABLED;
             }
         } catch (\Throwable $e) {
             $event = new ConsoleErrorEvent($input, $output, $e, $command);
@@ -907,7 +899,6 @@ class Application
     {
         return new InputDefinition(array(
             new InputArgument('command', InputArgument::REQUIRED, 'The command to execute'),
-
             new InputOption('--help', '-h', InputOption::VALUE_NONE, 'Display this help message'),
             new InputOption('--quiet', '-q', InputOption::VALUE_NONE, 'Do not output any message'),
             new InputOption('--verbose', '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug'),
@@ -998,7 +989,9 @@ class Application
                 if (!isset($parts[$i]) && $exists) {
                     $alternatives[$collectionName] += $threshold;
                     continue;
-                } elseif (!isset($parts[$i])) {
+                }
+
+                if (!isset($parts[$i])) {
                     continue;
                 }
 
@@ -1090,11 +1083,7 @@ class Application
         $namespaces = array();
 
         foreach ($parts as $part) {
-            if (count($namespaces)) {
-                $namespaces[] = end($namespaces).':'.$part;
-            } else {
-                $namespaces[] = $part;
-            }
+            $namespaces[] = empty($namespaces) ? $part : end($namespaces).':'.$part;
         }
 
         return $namespaces;

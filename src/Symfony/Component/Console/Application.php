@@ -1083,11 +1083,7 @@ class Application
         $namespaces = array();
 
         foreach ($parts as $part) {
-            if (count($namespaces)) {
-                $namespaces[] = end($namespaces).':'.$part;
-            } else {
-                $namespaces[] = $part;
-            }
+            $namespaces[] = empty($namespaces) ? $part : end($namespaces).':'.$part;
         }
 
         return $namespaces;

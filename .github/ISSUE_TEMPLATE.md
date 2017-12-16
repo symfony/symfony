@@ -5,6 +5,7 @@
 | BC Break report? | yes/no
 | RFC?             | yes/no
 | Symfony version  | x.y.z
+| PHP version      | x.y.z
 
 <!--
 - Please fill in this template according to your issue.

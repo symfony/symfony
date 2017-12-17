@@ -21,6 +21,7 @@
         "symfony/routing": "~3.4|~4.0",
         "symfony/twig-bridge": "~3.4|~4.0",
         "symfony/var-dumper": "~3.4|~4.0",
+        "symfony/twig-bundle": "~3.4|~4.0",
         "twig/twig": "~1.34|~2.4"
     },
     "require-dev": {

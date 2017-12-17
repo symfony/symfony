@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +33,7 @@ class ExceptionListener implements EventSubscriberInterface
 {
     protected $controller;
     protected $logger;
+    public static $httpStatusCodeLogLevel = [];
 
     public function __construct($controller, LoggerInterface $logger = null)
     {
@@ -103,11 +105,19 @@ class ExceptionListener implements EventSubscriberInterface
     protected function logException(\Exception $exception, $message)
     {
         if (null !== $this->logger) {
-            if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
-                $this->logger->critical($message, array('exception' => $exception));
-            } else {
-                $this->logger->error($message, array('exception' => $exception));
+            $logLevel = LogLevel::ERROR;
+            if ($exception instanceof HttpExceptionInterface) {
+                $statusCode = $exception->getStatusCode();
+                if (isset(static::$httpStatusCodeLogLevel[$statusCode])) {
+                    $logLevel = static::$httpStatusCodeLogLevel[$statusCode];
+                } else if ($statusCode >= 500) {
+                    $logLevel = LogLevel::CRITICAL;
+                } else if ($statusCode >= 400) {
+                    $logLevel = LogLevel::WARNING;
+                }
             }
+
+            $this->logger->log($logLevel, $message, array('exception' => $exception));
         }
     }
 

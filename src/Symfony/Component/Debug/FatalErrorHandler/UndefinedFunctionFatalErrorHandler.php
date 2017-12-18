@@ -54,7 +54,7 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
         }
 
         $candidates = array();
-        foreach (get_defined_functions() as $type => $definedFunctionNames) {
+        foreach (get_defined_functions(false) as $type => $definedFunctionNames) {
             foreach ($definedFunctionNames as $definedFunctionName) {
                 if (false !== $namespaceSeparatorIndex = strrpos($definedFunctionName, '\\')) {
                     $definedFunctionNameBasename = substr($definedFunctionName, $namespaceSeparatorIndex + 1);

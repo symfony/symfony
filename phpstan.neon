@@ -7,6 +7,7 @@ parameters:
         - '#__construct\(\) does not call parent constructor from .+#'
         - '#Function opcache_[^\s]* not found.#'
         - '#Function pcntl_[^\s]* not found.#'
+        - '#Function xdebug_[^\s]* not found.#'
 
         # not errors, actually expected to fail
         - '#Class Symfony\\Bundle\\FrameworkBundle\\Tests\\DependencyInjection\\Compiler\\NotFound not found.#'
@@ -36,3 +37,9 @@ parameters:
 
         # temporary, loading a NotLoadableClass throws a fatal error
         - src/Symfony/Component/VarDumper/Tests/Caster/ReflectionCasterTest.php
+
+        # temporary, it's full of actual errors (which are triggers for the handler)
+        - src/Symfony/Component/Debug/Tests/ErrorHandlerTest.php
+
+        # temporary, PHPStan doesn't seem to understand namespaced functions properly
+        - src/Symfony/Component/Debug/Tests/HeaderMock.php

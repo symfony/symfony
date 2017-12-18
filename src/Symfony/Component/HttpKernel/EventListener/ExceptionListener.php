@@ -33,7 +33,7 @@ class ExceptionListener implements EventSubscriberInterface
 {
     protected $controller;
     protected $logger;
-    public static $httpStatusCodeLogLevel = [];
+    protected $httpStatusCodeLogLevel = [];
 
     public function __construct($controller, LoggerInterface $logger = null)
     {
@@ -108,8 +108,8 @@ class ExceptionListener implements EventSubscriberInterface
             $logLevel = LogLevel::ERROR;
             if ($exception instanceof HttpExceptionInterface) {
                 $statusCode = $exception->getStatusCode();
-                if (isset(static::$httpStatusCodeLogLevel[$statusCode])) {
-                    $logLevel = static::$httpStatusCodeLogLevel[$statusCode];
+                if (isset($this->httpStatusCodeLogLevel[$statusCode])) {
+                    $logLevel = $this->httpStatusCodeLogLevel[$statusCode];
                 } else if ($statusCode >= 500) {
                     $logLevel = LogLevel::CRITICAL;
                 } else if ($statusCode >= 400) {

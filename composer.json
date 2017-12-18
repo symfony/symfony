@@ -96,7 +96,8 @@
         "egulias/email-validator": "~1.2,>=1.2.8|~2.0",
         "symfony/phpunit-bridge": "~3.4|~4.0",
         "symfony/security-acl": "~2.8|~3.0",
-        "phpdocumentor/reflection-docblock": "^3.0|^4.0"
+        "phpdocumentor/reflection-docblock": "^3.0|^4.0",
+        "swiftmailer/swiftmailer": "^6.0@dev"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",

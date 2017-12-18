@@ -127,7 +127,10 @@
         ]
     },
     "autoload-dev": {
-        "files": [ "src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
+        "files": [
+            "src/Symfony/Component/VarDumper/Resources/functions/dump.php",
+            "vendor/twig/twig/src/Extension/CoreExtension.php"
+        ]
     },
     "minimum-stability": "dev",
     "extra": {

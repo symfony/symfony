@@ -3,12 +3,22 @@ parameters:
         - vendor/autoload.php
         - .phpunit/phpunit-6.0/vendor/autoload.php
         - vendor/bin/.phpunit/phpunit-5.7/vendor/autoload.php
+    ignoreErrors:
+        - '#__construct\(\) does not call parent constructor from .+#'
+        - '#Function pcntl_[^\s]* not found.#'
+
+        # not errors, actually expected to fail
+        - '#Class Symfony\\Bundle\\FrameworkBundle\\Tests\\DependencyInjection\\Compiler\\NotFound not found.#'
     excludes_analyse:
         - */src/Symfony/Bridge/*/Tests/Fixtures/*
         - */src/Symfony/Bridge/*/Tests/*/Fixtures/*
         - src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/fake_vendor/
 
         - */src/Symfony/Bundle/*/Tests/Fixtures/*
+        - */src/Symfony/Bundle/*/Tests/*/Fixtures/*
+        - src/Symfony/Bundle/FrameworkBundle/Resources/views
+        - src/Symfony/Bundle/FrameworkBundle/Tests/Functional/app/Resources/views
+        - src/Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources
 
         - */src/Symfony/Component/*/Tests/Fixtures/*
 
@@ -16,3 +26,7 @@ parameters:
 
         # temporary, it's currently incompatible with the interface
         - src/Symfony/Bridge/ProxyManager
+
+        # temporary, currently crashing PHPStan 0.9.1
+        - src/Symfony/Bundle/FrameworkBundle/Tests/Controller/AbstractControllerTest.php
+        - src/Symfony/Bundle/FrameworkBundle/Tests/Controller/ControllerTest.php

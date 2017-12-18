@@ -258,9 +258,7 @@ class FlattenExceptionTest extends TestCase
 
     public function testRecursionInArguments()
     {
-        if (!isset($a)) {
-            $a = [];
-        }
+        $a = null;
         $a = array('foo', array(2, &$a));
         $exception = $this->createException($a);
 

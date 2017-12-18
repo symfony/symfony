@@ -1,0 +1,18 @@
+parameters:
+    autoload_files:
+        - vendor/autoload.php
+        - .phpunit/phpunit-6.0/vendor/autoload.php
+        - vendor/bin/.phpunit/phpunit-5.7/vendor/autoload.php
+    excludes_analyse:
+        - */src/Symfony/Bridge/*/Tests/Fixtures/*
+        - */src/Symfony/Bridge/*/Tests/*/Fixtures/*
+        - src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/fake_vendor/
+
+        - */src/Symfony/Bundle/*/Tests/Fixtures/*
+
+        - */src/Symfony/Component/*/Tests/Fixtures/*
+
+        - vendor/
+
+        # temporary, it's currently incompatible with the interface
+        - src/Symfony/Bridge/ProxyManager

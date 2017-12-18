@@ -127,6 +127,9 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             array('http://symfony.com#fragment'),
             array('http://symfony.com/#fragment'),
             array('http://symfony.com/#one_more%20test'),
+            array('http://sym_fony.com'),
+            array('http://foo_bar.symfony.com'),
+            array('http://foor_bar.sym_fony.com'),
         );
     }
 
@@ -154,7 +157,6 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             array('://google.com'),
             array('http ://google.com'),
             array('http:/google.com'),
-            array('http://goog_le.com'),
             array('http://google.com::aa'),
             array('http://google.com:aa'),
             array('ftp://google.fr'),

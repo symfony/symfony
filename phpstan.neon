@@ -5,6 +5,7 @@ parameters:
         - vendor/bin/.phpunit/phpunit-5.7/vendor/autoload.php
     ignoreErrors:
         - '#__construct\(\) does not call parent constructor from .+#'
+        - '#Function opcache_[^\s]* not found.#'
         - '#Function pcntl_[^\s]* not found.#'
 
         # not errors, actually expected to fail
@@ -21,6 +22,8 @@ parameters:
         - src/Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources
 
         - */src/Symfony/Component/*/Tests/Fixtures/*
+        - */src/Symfony/Component/*/Tests/*/Fixtures/*
+        - */src/Symfony/Component/*/Tests/Resource/*
 
         - vendor/
 
@@ -30,3 +33,6 @@ parameters:
         # temporary, currently crashing PHPStan 0.9.1
         - src/Symfony/Bundle/FrameworkBundle/Tests/Controller/AbstractControllerTest.php
         - src/Symfony/Bundle/FrameworkBundle/Tests/Controller/ControllerTest.php
+
+        # temporary, loading a NotLoadableClass throws a fatal error
+        - src/Symfony/Component/VarDumper/Tests/Caster/ReflectionCasterTest.php

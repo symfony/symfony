@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T11:48:07Z
+
+Test added
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T11:50:33Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by mathroc at 2017-12-16T12:01:26Z
+
+thx @Simperfit to have taken a look at this. there’s still something odd.
+
+I’m not sure the default value passed to the question should be its key, the doc comment says `@param mixed  $default  The default answer to return` so maybe the problem is instead that SymfonyStyle is converting the default value to its key
+
+ps: but to be fair, that’s what [the documentation](https://symfony.com/doc/current/components/console/helpers/questionhelper.html#let-the-user-choose-from-a-list-of-answers) is doing
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T12:05:15Z
+
+@mathroc SymfonyStyle is transforming this array. So it has value -> key. This fixes both behaviour when passing the key or the value look at the reproducer i've done to be sure that nothing will be broken : https://github.com/Simperfit/symfony-reproducer/commit/b37a2a5ddfd3a04540d8c93f9e8d810ef7c519cb
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T12:30:56Z
+
+Travis failure is unrelated

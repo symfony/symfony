@@ -3,16 +3,20 @@ parameters:
         - vendor/autoload.php
         - .phpunit/phpunit-6.0/vendor/autoload.php
         - vendor/bin/.phpunit/phpunit-5.7/vendor/autoload.php
+
+        # files containing multiple classes are not autoloaded properly
+
+        - src/Symfony/Component/Form/Tests/Extension/Csrf/Type/FormTypeCsrfExtensionTest.php
+        - src/Symfony/Component/Form/Tests/Guess/GuessTest.php
+        - src/Symfony/Component/Form/Tests/SimpleFormTest.php
+        - src/Symfony/Component/Process/Tests/NonStopableProcess.php
     ignoreErrors:
         - '#__construct\(\) does not call parent constructor from .+#'
-        - '#Function opcache_[^\s]* not found.#'
-        - '#Function pcntl_[^\s]* not found.#'
         - '#Function xdebug_[^\s]* not found.#'
 
         # not errors, actually expected to fail
         - '#Class Symfony\\Bundle\\FrameworkBundle\\Tests\\DependencyInjection\\Compiler\\NotFound not found.#'
         - '#Class Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\NotExist not found.#'
-        - '#Class Symfony\\Bug\\NotExistClass not found and could not be autoloaded.#'
     excludes_analyse:
         - */src/Symfony/Bridge/*/Tests/Fixtures/*
         - */src/Symfony/Bridge/*/Tests/*/Fixtures/*
@@ -26,9 +30,10 @@ parameters:
 
         - */src/Symfony/Component/*/Tests/Fixtures/*
         - */src/Symfony/Component/*/Tests/*/Fixtures/*
-        - */src/Symfony/Component/*/Tests/Resource/*
+        - */src/Symfony/Component/*/Tests/Resources/*
 
-        - vendor/
+        # Typo: lowercase "fixtures"
+        - src/Symfony/Component/Translation/Tests/fixtures/
 
         # temporary, it's currently incompatible with the interface
         - src/Symfony/Bridge/ProxyManager

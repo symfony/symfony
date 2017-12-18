@@ -96,6 +96,21 @@ class ExceptionListener implements EventSubscriberInterface
         );
     }
 
+    protected function getExceptionLogLevel(\Exception $exception)
+    {
+        $logLevel = LogLevel::CRITICAL;
+        if ($exception instanceof HttpExceptionInterface) {
+            $statusCode = $exception->getStatusCode();
+            if (isset($this->httpStatusCodeLogLevel[$statusCode])) {
+                $logLevel = $this->httpStatusCodeLogLevel[$statusCode];
+            } else if ($statusCode < 500) {
+                $logLevel = LogLevel::ERROR;
+            }
+        }
+
+        return $logLevel;
+    }
+
     /**
      * Logs an exception.
      *
@@ -105,19 +120,7 @@ class ExceptionListener implements EventSubscriberInterface
     protected function logException(\Exception $exception, $message)
     {
         if (null !== $this->logger) {
-            $logLevel = LogLevel::ERROR;
-            if ($exception instanceof HttpExceptionInterface) {
-                $statusCode = $exception->getStatusCode();
-                if (isset($this->httpStatusCodeLogLevel[$statusCode])) {
-                    $logLevel = $this->httpStatusCodeLogLevel[$statusCode];
-                } else if ($statusCode >= 500) {
-                    $logLevel = LogLevel::CRITICAL;
-                } else if ($statusCode >= 400) {
-                    $logLevel = LogLevel::WARNING;
-                }
-            }
-
-            $this->logger->log($logLevel, $message, array('exception' => $exception));
+            $this->logger->log($this->getExceptionLogLevel($exception), $message, array('exception' => $exception));
         }
     }
 

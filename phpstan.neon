@@ -11,6 +11,8 @@ parameters:
 
         # not errors, actually expected to fail
         - '#Class Symfony\\Bundle\\FrameworkBundle\\Tests\\DependencyInjection\\Compiler\\NotFound not found.#'
+        - '#Class Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\NotExist not found.#'
+        - '#Class Symfony\\Bug\\NotExistClass not found and could not be autoloaded.#'
     excludes_analyse:
         - */src/Symfony/Bridge/*/Tests/Fixtures/*
         - */src/Symfony/Bridge/*/Tests/*/Fixtures/*
@@ -35,7 +37,8 @@ parameters:
         - src/Symfony/Bundle/FrameworkBundle/Tests/Controller/AbstractControllerTest.php
         - src/Symfony/Bundle/FrameworkBundle/Tests/Controller/ControllerTest.php
 
-        # temporary, loading a NotLoadableClass throws a fatal error
+        # temporary, loading a non-existant class, these should probably be fixtures
+        - src/symfony/Component/DependencyInjection/Tests/Compiler/OptionalServiceClass.php
         - src/Symfony/Component/VarDumper/Tests/Caster/ReflectionCasterTest.php
 
         # temporary, it's full of actual errors (which are triggers for the handler)

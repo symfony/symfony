@@ -15,7 +15,6 @@ use Symfony\Component\Debug\Exception\ClassNotFoundException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\DebugClassLoader;
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
-use Symfony\Component\ClassLoader\ClassLoader as SymfonyClassLoader;
 
 /**
  * ErrorHandler for classes that do not exist.
@@ -105,7 +104,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
                 }
             }
 
-            if ($function[0] instanceof ComposerClassLoader || $function[0] instanceof SymfonyClassLoader) {
+            if ($function[0] instanceof ComposerClassLoader || is_subclass_of($function[0], '\Symfony\Component\ClassLoader\ClassLoader')) {
                 foreach ($function[0]->getPrefixes() as $prefix => $paths) {
                     foreach ($paths as $path) {
                         $classes = array_merge($classes, $this->findClassInPath($path, $class, $prefix));

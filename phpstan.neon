@@ -1,0 +1,75 @@
+parameters:
+    autoload_files:
+        - vendor/autoload.php
+        - .phpunit/phpunit-6.0/vendor/autoload.php
+        - vendor/bin/.phpunit/phpunit-5.7/vendor/autoload.php
+
+        # Twig functions are called by the codebase, but are not autoloaded by default
+        - vendor/twig/twig/src/Extension/CoreExtension.php
+
+        # files containing multiple classes are not autoloaded properly
+        - src/Symfony/Component/Form/Tests/Extension/Csrf/Type/FormTypeCsrfExtensionTest.php
+        - src/Symfony/Component/Form/Tests/Guess/GuessTest.php
+        - src/Symfony/Component/Form/Tests/SimpleFormTest.php
+        - src/Symfony/Component/Process/Tests/NonStopableProcess.php
+    ignoreErrors:
+        ##
+        ## False positive
+        ##
+        # incorrect, no params is valid
+        - '#Function get_defined_functions invoked with 0 parameters, 1 required.#'
+
+        ##
+        ## By design
+        ##
+        - '#__construct\(\) does not call parent constructor from .+#'
+        - '#Function xdebug_[^\s]* not found.#'
+        # traits do not own their own properties: https://github.com/symfony/symfony/pull/25536/files#r157608526
+        - '#Access to an undefined property Symfony\\Component\\DependencyInjection\\Loader\\Configurator\\InlineServiceConfigurator::\$id.#'
+        - '#Access to an undefined property Symfony\\Component\\DependencyInjection\\Loader\\Configurator\\InlineServiceConfigurator::\$allowParent.#'
+        # not errors, actually expected to fail
+        - '#Class Symfony\\Bundle\\FrameworkBundle\\Tests\\DependencyInjection\\Compiler\\NotFound not found.#'
+        - '#Class Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\NotExist not found.#'
+    excludes_analyse:
+        ##
+        ## False positive
+        ##
+        # PHPStan doesn't seem to understand namespaced functions properly
+        - src/Symfony/Component/Debug/Tests/HeaderMock.php
+        # currently crashing PHPStan 0.9.1
+        - src/Symfony/Bundle/FrameworkBundle/Tests/Controller/AbstractControllerTest.php
+        - src/Symfony/Bundle/FrameworkBundle/Tests/Controller/ControllerTest.php
+
+        ##
+        ## By design
+        ##
+        # broken require-dev: https://github.com/symfony/symfony/pull/25536/files#r157591181
+        - src/Symfony/Bridge/Monolog/Handler/SwiftMailerHandler.php
+
+        ##
+        ## Temporary
+        ##
+        # loading a non-existent class, these should probably be fixtures
+        - src/symfony/Component/DependencyInjection/Tests/Compiler/OptionalServiceClass.php
+        - src/Symfony/Component/VarDumper/Tests/Caster/ReflectionCasterTest.php
+        # it's full of actual errors (which are triggers for the handler), move to fixtures?
+        - src/Symfony/Component/Debug/Tests/ErrorHandlerTest.php
+        # typo, lowercase "fixtures"
+        - src/Symfony/Component/Translation/Tests/fixtures/
+        # it's currently incompatible with the interface
+        - src/Symfony/Bridge/ProxyManager
+
+        ##
+        ## Uninteresting for analysis (mostly test fixtures or other test resources)
+        ##
+        - */src/Symfony/Bridge/*/Tests/Fixtures/*
+        - */src/Symfony/Bridge/*/Tests/*/Fixtures/*
+        - src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/fake_vendor/
+        - */src/Symfony/Bundle/*/Tests/Fixtures/*
+        - */src/Symfony/Bundle/*/Tests/*/Fixtures/*
+        - src/Symfony/Bundle/FrameworkBundle/Resources/views
+        - src/Symfony/Bundle/FrameworkBundle/Tests/Functional/app/Resources/views
+        - src/Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources
+        - */src/Symfony/Component/*/Tests/Fixtures/*
+        - */src/Symfony/Component/*/Tests/*/Fixtures/*
+        - */src/Symfony/Component/*/Tests/Resources/*

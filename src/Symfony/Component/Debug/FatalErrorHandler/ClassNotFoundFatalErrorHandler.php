@@ -104,7 +104,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
                 }
             }
 
-            if ($function[0] instanceof ComposerClassLoader) {
+            if ($function[0] instanceof ComposerClassLoader || is_subclass_of($function[0], '\Symfony\Component\ClassLoader\ClassLoader')) {
                 foreach ($function[0]->getPrefixes() as $prefix => $paths) {
                     foreach ($paths as $path) {
                         $classes = array_merge($classes, $this->findClassInPath($path, $class, $prefix));

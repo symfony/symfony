@@ -13,9 +13,17 @@ parameters:
         - src/Symfony/Component/Form/Tests/SimpleFormTest.php
         - src/Symfony/Component/Process/Tests/NonStopableProcess.php
     ignoreErrors:
+        ##
+        ## False positive
+        ##
+        # incorrect, no params is valid
+        - '#Function get_defined_functions invoked with 0 parameters, 1 required.#'
+
+        ##
+        ## By design
+        ##
         - '#__construct\(\) does not call parent constructor from .+#'
         - '#Function xdebug_[^\s]* not found.#'
-
         # not errors, actually expected to fail
         - '#Class Symfony\\Bundle\\FrameworkBundle\\Tests\\DependencyInjection\\Compiler\\NotFound not found.#'
         - '#Class Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\NotExist not found.#'
@@ -30,11 +38,10 @@ parameters:
         - src/Symfony/Bundle/FrameworkBundle/Tests/Controller/ControllerTest.php
 
         ##
-        ## By Symfony design
+        ## By design
         ##
         # broken require-dev: https://github.com/symfony/symfony/pull/25536/files#r157591181
         - src/Symfony/Bridge/Monolog/Handler/SwiftMailerHandler.php
-
 
         ##
         ## Temporary

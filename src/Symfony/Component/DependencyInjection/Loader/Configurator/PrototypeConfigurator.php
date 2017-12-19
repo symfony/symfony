@@ -40,6 +40,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
     private $loader;
     private $resource;
     private $exclude;
+    private $allowParent;
 
     public function __construct(ServicesConfigurator $parent, PhpFileLoader $loader, Definition $defaults, string $namespace, string $resource, bool $allowParent)
     {

@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 trait BindTrait
 {
-    protected $id;
-
     /**
      * Sets bindings.
      *

@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 trait ParentTrait
 {
-    protected $allowParent;
-
     /**
      * Sets the Definition to inherit from.
      *

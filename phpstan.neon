@@ -24,6 +24,9 @@ parameters:
         ##
         - '#__construct\(\) does not call parent constructor from .+#'
         - '#Function xdebug_[^\s]* not found.#'
+        # traits do not own their own properties: https://github.com/symfony/symfony/pull/25536/files#r157608526
+        - '#Access to an undefined property Symfony\\Component\\DependencyInjection\\Loader\\Configurator\\InlineServiceConfigurator::\$id.#'
+        - '#Access to an undefined property Symfony\\Component\\DependencyInjection\\Loader\\Configurator\\InlineServiceConfigurator::\$allowParent.#'
         # not errors, actually expected to fail
         - '#Class Symfony\\Bundle\\FrameworkBundle\\Tests\\DependencyInjection\\Compiler\\NotFound not found.#'
         - '#Class Symfony\\Component\\DependencyInjection\\Tests\\Compiler\\NotExist not found.#'

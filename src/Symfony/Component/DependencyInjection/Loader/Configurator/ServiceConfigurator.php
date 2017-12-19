@@ -44,6 +44,7 @@ class ServiceConfigurator extends AbstractServiceConfigurator
 
     private $container;
     private $instanceof;
+    private $allowParent;
 
     public function __construct(ContainerBuilder $container, array $instanceof, bool $allowParent, ServicesConfigurator $parent, Definition $definition, $id, array $defaultTags)
     {

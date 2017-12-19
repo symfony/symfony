@@ -35,10 +35,13 @@ class ExceptionListener implements EventSubscriberInterface
     protected $logger;
     protected $httpStatusCodeLogLevel = array();
 
-    public function __construct($controller, LoggerInterface $logger = null)
+    public function __construct($controller, LoggerInterface $logger = null, $httpStatusCodeLogLevel = array())
     {
         $this->controller = $controller;
         $this->logger = $logger;
+        if ($httpStatusCodeLogLevel && is_array($httpStatusCodeLogLevel)) {
+            $this->httpStatusCodeLogLevel = $httpStatusCodeLogLevel;
+        }
     }
 
     public function logKernelException(GetResponseForExceptionEvent $event)

@@ -704,6 +704,23 @@ class AutowirePassTest extends TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
+     * @expectedExceptionMessage Cannot autowire service "my_service": argument "$i" of method "Symfony\Component\DependencyInjection\Tests\Compiler\K::__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\IInterface" but no such service exists. Did you create a class that implements this interface?
+     */
+    public function testInterfaceWithNoImplementationSuggestToWriteOne()
+    {
+        $container = new ContainerBuilder();
+
+        $aDefinition = $container->register('my_service', K::class);
+        $aDefinition->setAutowired(true);
+
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    /**
      * @group legacy
      * @expectedDeprecation Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won't be supported in version 4.0. You should rename (or alias) the "foo" service to "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" instead.
      * @expectedExceptionInSymfony4 \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException

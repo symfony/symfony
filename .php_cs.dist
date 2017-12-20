@@ -10,6 +10,7 @@ return PhpCsFixer\Config::create()
         '@Symfony:risky' => true,
         'array_syntax' => array('syntax' => 'long'),
         'protected_to_private' => false,
+        'php_unit_dedicate_assert' => array('target' => '3.5'),
     ))
     ->setRiskyAllowed(true)
     ->setFinder(

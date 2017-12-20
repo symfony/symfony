@@ -231,7 +231,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
             array('s', 3601, '1'),
             array('s', 3630, '30'),
             array('s', 43200, '0'), // 12 hours
-
         );
 
         $dateTime = new \DateTime('@0');

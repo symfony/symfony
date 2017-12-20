@@ -182,6 +182,7 @@
             <argument type="service" id="router" on-invalid="null" />
             <argument type="service" id="router" on-invalid="null" />
         </service>
+        <service id="Symfony\Component\Security\Http\HttpUtils" alias="security.http_utils" />
 
 
         <!-- Validator -->

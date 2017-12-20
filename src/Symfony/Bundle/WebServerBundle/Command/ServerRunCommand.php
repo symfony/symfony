@@ -76,6 +76,8 @@ Use the <info>--docroot</info> option to change the default docroot directory:
 Specify your own router script via the <info>--router</info> option:
 
   <info>%command.full_name% --router=app/config/router.php</info>
+  
+Custom executable to run the server can be set using SYMFONY_SERVER_EXECUTABLE environment variable. 
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
 EOF

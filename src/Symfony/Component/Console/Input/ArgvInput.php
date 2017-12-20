@@ -331,7 +331,17 @@ class ArgvInput extends Input
      */
     public function __toString()
     {
-        $tokens = array_map(function ($token) {
+        $tokens = $this->getCommandLineArray();
+
+        return implode(' ', $tokens);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCommandLineArray()
+    {
+        return array_map(function ($token) {
             if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {
                 return $match[1].$this->escapeToken($match[2]);
             }
@@ -342,7 +352,5 @@ class ArgvInput extends Input
 
             return $token;
         }, $this->tokens);
-
-        return implode(' ', $tokens);
     }
 }

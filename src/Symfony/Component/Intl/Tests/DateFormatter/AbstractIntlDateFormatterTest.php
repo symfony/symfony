@@ -870,7 +870,9 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $position = null;
         $formatter = $this->getDefaultDateFormatter('y');
         $this->assertSame(0, $formatter->parse('1970', $position));
-        $this->assertNull($position);
+        // Since $position is not supported by the Symfony implementation, the following won't work.
+        // The intl implementation works this way since 60.2.
+        // $this->assertSame(4, $position);
     }
 
     public function testSetPattern()

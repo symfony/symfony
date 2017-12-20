@@ -32,7 +32,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $parent = 'instanceof.'.parent::class.'.0.foo';
         $def = $container->getDefinition('foo');
         $this->assertEmpty($def->getInstanceofConditionals());
-        $this->assertInstanceof(ChildDefinition::class, $def);
+        $this->assertInstanceOf(ChildDefinition::class, $def);
         $this->assertTrue($def->isAutowired());
         $this->assertSame($parent, $def->getParent());
         $this->assertSame(array('tag' => array(array()), 'baz' => array(array('attr' => 123))), $def->getTags());

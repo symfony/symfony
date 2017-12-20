@@ -1142,7 +1142,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @return static
      */
-    private function createSubCrawler($nodes)
+    protected function createSubCrawler($nodes)
     {
         $crawler = new static($nodes, $this->uri, $this->baseHref);
         $crawler->isHtml = $this->isHtml;

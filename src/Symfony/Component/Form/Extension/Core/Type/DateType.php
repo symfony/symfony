@@ -12,17 +12,18 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToLocalizedStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToTimestampTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToImmutableTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ReversedTransformer;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateType extends AbstractType
 {
@@ -60,7 +61,7 @@ class DateType extends AbstractType
                 throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" or "d". Its current value is "%s".', $pattern));
             }
 
-            $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
+            $builder->addViewTransformer(new DateTimeImmutableToLocalizedStringTransformer(
                 $options['model_timezone'],
                 $options['view_timezone'],
                 $dateFormat,
@@ -116,24 +117,25 @@ class DateType extends AbstractType
                 ->add('year', self::$widgets[$options['widget']], $yearOptions)
                 ->add('month', self::$widgets[$options['widget']], $monthOptions)
                 ->add('day', self::$widgets[$options['widget']], $dayOptions)
-                ->addViewTransformer(new DateTimeToArrayTransformer(
+                ->addViewTransformer(new DateTimeImmutableToArrayTransformer(
                     $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))
-                ->setAttribute('formatter', $formatter)
-            ;
+                ->setAttribute('formatter', $formatter);
         }
 
-        if ('string' === $options['input']) {
+        if ('datetime' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeToImmutableTransformer());
+        } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'Y-m-d')
+                new DateTimeImmutableToStringTransformer($options['model_timezone'], $options['model_timezone'], 'Y-m-d')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeImmutableToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], array('year', 'month', 'day'))
+                new DateTimeImmutableToArrayTransformer($options['model_timezone'], $options['model_timezone'], array('year', 'month', 'day'))
             ));
         }
     }

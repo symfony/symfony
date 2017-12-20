@@ -12,18 +12,19 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToArrayTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToLocalizedStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToRfc3339Transformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToTimestampTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToImmutableTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ReversedTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
-use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -93,12 +94,12 @@ class DateTimeType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             if (self::HTML5_FORMAT === $pattern) {
-                $builder->addViewTransformer(new DateTimeToRfc3339Transformer(
+                $builder->addViewTransformer(new DateTimeImmutableToRfc3339Transformer(
                     $options['model_timezone'],
                     $options['view_timezone']
                 ));
             } else {
-                $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
+                $builder->addViewTransformer(new DateTimeImmutableToLocalizedStringTransformer(
                     $options['model_timezone'],
                     $options['view_timezone'],
                     $dateFormat,
@@ -154,28 +155,29 @@ class DateTimeType extends AbstractType
 
             $builder
                 ->addViewTransformer(new DataTransformerChain(array(
-                    new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts),
+                    new DateTimeImmutableToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts),
                     new ArrayToPartsTransformer(array(
                         'date' => $dateParts,
                         'time' => $timeParts,
                     )),
                 )))
                 ->add('date', __NAMESPACE__.'\DateType', $dateOptions)
-                ->add('time', __NAMESPACE__.'\TimeType', $timeOptions)
-            ;
+                ->add('time', __NAMESPACE__.'\TimeType', $timeOptions);
         }
 
-        if ('string' === $options['input']) {
+        if ('datetime' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeToImmutableTransformer());
+        } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeImmutableToStringTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeImmutableToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
+                new DateTimeImmutableToArrayTransformer($options['model_timezone'], $options['model_timezone'], $parts)
             ));
         }
     }

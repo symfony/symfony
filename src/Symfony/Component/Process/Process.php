@@ -1718,15 +1718,11 @@ class Process implements \IteratorAggregate
 
     private function getDefaultEnv()
     {
-        if (\PHP_VERSION_ID >= 70100) {
-            $env = getenv();
-        } else {
-            $env = array();
+        $env = array();
 
-            foreach ($_SERVER as $k => $v) {
-                if (is_string($v) && false !== $v = getenv($k)) {
-                    $env[$k] = $v;
-                }
+        foreach ($_SERVER as $k => $v) {
+            if (is_string($v) && false !== $v = getenv($k)) {
+                $env[$k] = $v;
             }
         }
 

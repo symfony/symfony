@@ -250,6 +250,8 @@
                             mode: arguments[0].mode,
                             redirect: arguments[0].redirect
                         };
+                    } else {
+                        url = String(url);
                     }
                     if (!url.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
                         var method = 'GET';

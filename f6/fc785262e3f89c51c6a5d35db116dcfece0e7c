@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-19T12:37:38Z
+
+This is risky because those methods exist only under PHPUnit 5.x.
+But our 5.3/5.4 builds only run 4.8
+Isn't it?
+
+---------------------------------------------------------------------------
+
+by carusogabriel at 2017-12-19T12:45:48Z
+
+All the methods are available from PHPUnit `4.x` to `6.x` (I take this careful while doing that). I guess I didn't get your ask :disappointed:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-19T12:48:37Z
+
+so, `php_unit_dedicate_assert` is safe for that?
+eg `assertNan()` should not be used, `$this->assertTrue(is_nan(...))` should always be used instead.
+I just want to ensure this will be the case :)
+
+---------------------------------------------------------------------------
+
+by carusogabriel at 2017-12-19T12:52:33Z
+
+Oh, ok, now I get it. As I understood from PHP-CS-Fixer, [its checks the `PHPUnit` version before](https://github.com/FriendsOfPHP/PHP-CS-Fixer/blob/2.8/src/Fixer/PhpUnit/PhpUnitDedicateAssertFixer.php#L84) doing this changes.
+Maybe @keradus can help us :relaxed:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-19T12:53:57Z
+
+OK cool, can we then target 4.8 explicitly?
+
+---------------------------------------------------------------------------
+
+by carusogabriel at 2017-12-19T13:00:12Z
+
+`4.8` no, but `3.5` yes. I'm running locally to see if we face it any incompatibility.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-12-19T21:35:23Z
+
+it doesn't check the installed version, as there could not be one installed yet, it checks requested version.
+
+target could be configured for 3.0, 3.5, 5.0 and 5.6 (and newest ever).
+as we run tests on phpunit 4.x as well, we need to set target for this fixer for highest compatible, thus 3.5. (@nicolas-grekas , then it will not affects `assertNan` !)
+note: phpunit 3.6+ | 4.0+ did not introduced new assertions that could be fixed, that's why there is no target for them.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-12-19T21:46:12Z
+
+we shall not use one rule only. use full set instead: #25556

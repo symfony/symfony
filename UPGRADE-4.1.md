@@ -18,6 +18,8 @@ SecurityBundle
 --------------
 
  * The `logout_on_user_change` firewall option is deprecated and will be removed in 5.0.
+ * The `SecurityUserValueResolver` class is deprecated and will be removed in 5.0, use
+   `Symfony\Component\Security\Http\Controller\UserValueResolver` instead.
 
 Translation
 -----------

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
+use Symfony\Bundle\SecurityBundle\SecurityUserValueResolver;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Alias;
@@ -27,6 +28,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
 /**
  * SecurityExtension.
@@ -109,6 +111,10 @@ class SecurityExtension extends Extension
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
             $container->getDefinition('security.command.user_password_encoder')->replaceArgument(1, array_keys($config['encoders']));
+        }
+
+        if (!class_exists(UserValueResolver::class)) {
+            $container->getDefinition('security.user_value_resolver')->setClass(SecurityUserValueResolver::class);
         }
 
         $container->registerForAutoconfiguration(VoterInterface::class)

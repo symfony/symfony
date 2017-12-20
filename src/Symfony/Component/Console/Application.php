@@ -499,7 +499,20 @@ class Application
     {
         $this->init();
 
+        foreach ($this->commands as $command) {
+            foreach ($command->getAliases() as $alias) {
+                if (!isset($this->commands[$alias])) {
+                    $this->commands[$alias] = $command;
+                }
+            }
+        }
+
         $allCommands = array_keys($this->commands);
+
+        if (\in_array($name, $allCommands, true)) {
+            return $this->get($name);
+        }
+
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
 

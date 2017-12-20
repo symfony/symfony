@@ -49,6 +49,8 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/BarBucCommand.php';
         require_once self::$fixturesPath.'/FooSubnamespaced1Command.php';
         require_once self::$fixturesPath.'/FooSubnamespaced2Command.php';
+        require_once self::$fixturesPath.'/TestTiti.php';
+        require_once self::$fixturesPath.'/TestToto.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -118,6 +120,27 @@ class ApplicationTest extends TestCase
         $application = new Application();
         $command = $application->register('foo');
         $this->assertEquals('foo', $command->getName(), '->register() registers a new command');
+    }
+
+    public function testRegisterAmbiugous()
+    {
+        $code = function (InputInterface $input, OutputInterface $output) {
+            $output->writeln('It works!');
+        };
+
+        $application = new Application();
+        $application
+            ->register('test-foo')
+            ->setAliases(array('test'))
+            ->setCode($code);
+
+        $application
+            ->register('test-bar')
+            ->setCode($code);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('test'));
+        $this->assertContains('It works!', $tester->getDisplay(true));
     }
 
     public function testAdd()

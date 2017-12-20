@@ -24,8 +24,8 @@ class StrictSessionHandlerTest extends TestCase
             ->with('path', 'name')->willReturn(true);
         $proxy = new StrictSessionHandler($handler);
 
-        $this->assertInstanceof('SessionUpdateTimestampHandlerInterface', $proxy);
-        $this->assertInstanceof(AbstractSessionHandler::class, $proxy);
+        $this->assertInstanceOf('SessionUpdateTimestampHandlerInterface', $proxy);
+        $this->assertInstanceOf(AbstractSessionHandler::class, $proxy);
         $this->assertTrue($proxy->open('path', 'name'));
     }
 

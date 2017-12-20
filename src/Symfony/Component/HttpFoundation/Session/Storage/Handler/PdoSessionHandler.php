@@ -340,7 +340,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             // false positives due to longer gap locking.
             if (!$updateStmt->rowCount()) {
                 try {
-                    $this->getInsertStatement($sessionId, $data, $maxlifetime);
+                    $insertStmt = $this->getInsertStatement($sessionId, $data, $maxlifetime);
                     $insertStmt->execute();
                 } catch (\PDOException $e) {
                     // Handle integrity violation SQLSTATE 23000 (or a subclass like 23505 in Postgres) for duplicate keys

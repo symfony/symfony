@@ -231,7 +231,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
             array('s', 3601, '1'),
             array('s', 3630, '30'),
             array('s', 43200, '0'), // 12 hours
-
         );
 
         $dateTime = new \DateTime('@0');
@@ -936,7 +935,9 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         $position = null;
         $formatter = $this->getDefaultDateFormatter('y');
         $this->assertSame(0, $formatter->parse('1970', $position));
-        $this->assertNull($position);
+        // Since $position is not supported by the Symfony implementation, the following won't work.
+        // The intl implementation works this way since 60.2.
+        // $this->assertSame(4, $position);
     }
 
     public function testSetPattern()

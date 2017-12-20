@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T18:03:55Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-16T20:26:08Z
+
+There should be some investigation regarding general usage of getenv/putenv/$_ENV/$_SERVER  in Symfony code. I've seen people on slack too who complained that $_SERVER is not populated with Apache, but $_ENV is.
+
+I have tried it now with apache and neither $_SERVER nor $_ENV is populated, but getenv() is. When env is set via .htaccess, both $_SERVER and getenv is populated, but $_ENV isn't
+
+Then there are concurrency issues with getenv()/putenv() and now this PHP bug(?).
+
+Other than these bugs(?), there are also several other disadvantages for env variables. Old parameters.yml seems sweeter and sweeter to me as time goes on.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-17T05:43:57Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-18T20:23:22Z
+
+Should it target 3.3? This code did not change in 3.4 AFAIK
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-19T07:35:28Z
+
+i'll rebase on 3.3, tell me if it's better to rebase on 3.4.
+
+The things is the bug appear only on 3.4 but hey, it could be on 3.3 too I guess.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-19T12:34:14Z
+
+@Simperfit you forgot to account for this comment (just replace ^3.4.2 by ^3.3.14 since you rebased on 3.3):
+
+> symfony/process should be bumped to symfony/process ^3.4.2 in the bundle's composer.json
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-20T05:01:00Z
+
+done @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-20T14:27:26Z
+
+@Simperfit not quite: ^3.3.14 != ~3.3.14 ;)

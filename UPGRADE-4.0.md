@@ -535,11 +535,11 @@ FrameworkBundle
     first argument.
 
  * `RouterDebugCommand::__construct()` now requires an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument.
 
  * `RouterMatchCommand::__construct()` now requires an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument.
 
  * `TranslationDebugCommand::__construct()` now requires an instance of

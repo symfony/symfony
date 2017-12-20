@@ -204,12 +204,12 @@ FrameworkBundle
     a `TypeError` in 4.0.
 
  * `RouterDebugCommand::__construct()` now takes an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument. Not passing it is deprecated and will throw
     a `TypeError` in 4.0.
 
  * `RouterMatchCommand::__construct()` now takes an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument. Not passing it is deprecated and will throw
     a `TypeError` in 4.0.
 

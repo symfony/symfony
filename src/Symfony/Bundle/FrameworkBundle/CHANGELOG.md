@@ -44,10 +44,10 @@ CHANGELOG
    `Symfony\Component\EventDispatcher\EventDispatcherInterface` as
     first argument
  * `RouterDebugCommand::__construct()` now takes an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument
  * `RouterMatchCommand::__construct()` now takes an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument
  * `TranslationDebugCommand::__construct()` now takes an instance of
    `Symfony\Component\Translation\TranslatorInterface` as

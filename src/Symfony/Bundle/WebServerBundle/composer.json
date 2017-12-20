@@ -19,7 +19,7 @@
         "php": "^5.5.9|>=7.0.8",
         "symfony/console": "~3.3",
         "symfony/http-kernel": "~3.3",
-        "symfony/process": "~3.3"
+        "symfony/process": "~3.3.14|^3.4.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebServerBundle\\": "" },

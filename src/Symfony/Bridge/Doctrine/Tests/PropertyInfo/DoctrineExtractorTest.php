@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\Doctrine\PropertyInfo\Tests;
+namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo;
 
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManager;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Component\Workflow\Tests;
+namespace Symfony\Component\Workflow\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

@@ -12,9 +12,10 @@
 namespace Symfony\Component\Translation\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorFallbackInterface;
 
 class DataCollectorTranslatorTest extends TestCase
 {
@@ -31,49 +32,49 @@ class DataCollectorTranslatorTest extends TestCase
 
         $expectedMessages = array();
         $expectedMessages[] = array(
-              'id' => 'foo',
-              'translation' => 'foo (en)',
-              'locale' => 'en',
-              'domain' => 'messages',
-              'state' => DataCollectorTranslator::MESSAGE_DEFINED,
-              'parameters' => array(),
-              'transChoiceNumber' => null,
+            'id' => 'foo',
+            'translation' => 'foo (en)',
+            'locale' => 'en',
+            'domain' => 'messages',
+            'state' => DataCollectorTranslator::MESSAGE_DEFINED,
+            'parameters' => array(),
+            'transChoiceNumber' => null,
         );
         $expectedMessages[] = array(
-              'id' => 'bar',
-              'translation' => 'bar (fr)',
-              'locale' => 'fr',
-              'domain' => 'messages',
-              'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
-              'parameters' => array(),
-              'transChoiceNumber' => null,
+            'id' => 'bar',
+            'translation' => 'bar (fr)',
+            'locale' => 'fr',
+            'domain' => 'messages',
+            'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
+            'parameters' => array(),
+            'transChoiceNumber' => null,
         );
         $expectedMessages[] = array(
-              'id' => 'choice',
-              'translation' => 'choice',
-              'locale' => 'en',
-              'domain' => 'messages',
-              'state' => DataCollectorTranslator::MESSAGE_MISSING,
-              'parameters' => array(),
-              'transChoiceNumber' => 0,
+            'id' => 'choice',
+            'translation' => 'choice',
+            'locale' => 'en',
+            'domain' => 'messages',
+            'state' => DataCollectorTranslator::MESSAGE_MISSING,
+            'parameters' => array(),
+            'transChoiceNumber' => 0,
         );
         $expectedMessages[] = array(
-              'id' => 'bar_ru',
-              'translation' => 'bar (ru)',
-              'locale' => 'ru',
-              'domain' => 'messages',
-              'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
-              'parameters' => array(),
-              'transChoiceNumber' => null,
+            'id' => 'bar_ru',
+            'translation' => 'bar (ru)',
+            'locale' => 'ru',
+            'domain' => 'messages',
+            'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
+            'parameters' => array(),
+            'transChoiceNumber' => null,
         );
         $expectedMessages[] = array(
-              'id' => 'bar_ru',
-              'translation' => 'bar (ru)',
-              'locale' => 'ru',
-              'domain' => 'messages',
-              'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
-              'parameters' => array('foo' => 'bar'),
-              'transChoiceNumber' => null,
+            'id' => 'bar_ru',
+            'translation' => 'bar (ru)',
+            'locale' => 'ru',
+            'domain' => 'messages',
+            'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
+            'parameters' => array('foo' => 'bar'),
+            'transChoiceNumber' => null,
         );
 
         $this->assertEquals($expectedMessages, $collector->getCollectedMessages());
@@ -88,5 +89,50 @@ class DataCollectorTranslatorTest extends TestCase
         $translator->addResource('array', array('bar_ru' => 'bar (ru)'), 'ru');
 
         return new DataCollectorTranslator($translator);
+    }
+
+    public function testFallbackLocalesReturned()
+    {
+        $internalTranslator = new Translator('en');
+        $internalTranslator->setFallbackLocales(array('bg'));
+
+        $translator = new DataCollectorTranslator($internalTranslator);
+
+        $this->assertInstanceOf(TranslatorFallbackInterface::class, $translator);
+        $fallbackLocales = $translator->getFallbackLocales();
+        $this->assertCount(1, $fallbackLocales);
+        $this->assertEquals('bg', $fallbackLocales[0]);
+    }
+
+    public function testWrappedTranslatorWithFallbackLocalesWithoutImplementingFallbackInterface()
+    {
+        set_error_handler(
+            function () {
+                return false;
+            }
+        );
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        $internalTranslator = new DummyTranslator('en', array('bg'));
+
+        $translator = new DataCollectorTranslator($internalTranslator);
+
+        $fallbackLocales = $translator->getFallbackLocales();
+        $this->assertCount(1, $fallbackLocales);
+        $this->assertEquals('bg', $fallbackLocales[0]);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $expected = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => sprintf('Having `getFallbackLocales` in %s without implementing %s is deprecated', get_class($internalTranslator), TranslatorFallbackInterface::class),
+        );
+
+        $this->assertSame($expected, $lastError);
     }
 }

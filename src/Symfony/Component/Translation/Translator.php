@@ -26,7 +26,7 @@ use Symfony\Component\Translation\Formatter\MessageFormatter;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Translator implements TranslatorInterface, TranslatorBagInterface
+class Translator implements TranslatorFallbackInterface, TranslatorBagInterface
 {
     /**
      * @var MessageCatalogueInterface[]
@@ -150,11 +150,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     }
 
     /**
-     * Sets the fallback locales.
+     * @param string[] $locales
      *
-     * @param array $locales The fallback locales
-     *
-     * @throws InvalidArgumentException If a locale contains invalid characters
+     * @throws \InvalidArgumentException If a locale contains invalid characters
      */
     public function setFallbackLocales(array $locales)
     {
@@ -169,9 +167,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     }
 
     /**
-     * Gets the fallback locales.
-     *
-     * @return array $locales The fallback locales
+     * {@inheritdoc}
      */
     public function getFallbackLocales()
     {

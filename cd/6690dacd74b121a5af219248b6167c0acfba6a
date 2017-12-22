@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-21T15:56:32Z
+
+What deprecation are you getting? Usually we merge this as a new feature on master.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-21T15:59:51Z
+
+Ah, I guess the service gets auto registered and corresponding notice triggered. But this can be disabled by setting the `container.autowiring.strict_mode` parameter to `true` (see https://github.com/symfony/symfony-docs/issues/8561).
+This should be rebased on master.
+
+---------------------------------------------------------------------------
+
+by xavren at 2017-12-21T16:01:07Z
+
+I have this deprecated on sf 3.4.2
+
+```
+Autowiring services based on the types they implement is deprecated since Symfony 3.3 and won't be supported in version 4.0. You should rename (or alias) the "security.authentication.session_strategy" service to "Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface" instead.
+Hide context    Hide trace
+[▼
+  "exception" => SilencedErrorContext {#2472 ▶}
+]
+{▼
+  /srv/www/vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php:304 {▶}
+  /srv/www/vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/Compiler/AutowirePass.php:245 {▶}
+}```
+
+---------------------------------------------------------------------------
+
+by xavren at 2017-12-21T16:18:53Z
+
+For information, i created my own LoginManager and i inject $sessionStrategy, but my manager cannot be autowired because of this service

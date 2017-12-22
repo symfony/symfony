@@ -1154,7 +1154,7 @@ class Process implements \IteratorAggregate
      *
      * This content will be passed to the underlying process standard input.
      *
-     * @param resource|scalar|\Traversable|null $input The content
+     * @param string|resource|scalar|\Traversable|null $input The content
      *
      * @return self The current Process instance
      *

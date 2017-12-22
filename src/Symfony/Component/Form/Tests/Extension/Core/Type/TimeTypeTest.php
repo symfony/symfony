@@ -39,6 +39,28 @@ class TimeTypeTest extends BaseTypeTest
         $this->assertEquals($input, $form->getViewData());
     }
 
+    public function testSubmitDateTimeImmutable()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'datetime_immutable',
+        ));
+
+        $input = array(
+            'hour' => '3',
+            'minute' => '4',
+        );
+
+        $form->submit($input);
+
+        $dateTime = new \DateTimeImmutable('1970-01-01 03:04:00 UTC');
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
+        $this->assertEquals($input, $form->getViewData());
+    }
+
     public function testSubmitString()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(

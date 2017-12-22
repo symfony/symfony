@@ -52,6 +52,34 @@ class DateTimeTypeTest extends BaseTypeTest
         $this->assertEquals($dateTime, $form->getData());
     }
 
+    public function testSubmitDateTimeImmutable()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'date_widget' => 'choice',
+            'years' => array(2010),
+            'time_widget' => 'choice',
+            'input' => 'datetime_immutable',
+        ));
+
+        $form->submit(array(
+            'date' => array(
+                'day' => '2',
+                'month' => '6',
+                'year' => '2010',
+            ),
+            'time' => array(
+                'hour' => '3',
+                'minute' => '4',
+            ),
+        ));
+
+        $dateTime = new \DateTimeImmutable('2010-06-02 03:04:00 UTC');
+
+        $this->assertEquals($dateTime, $form->getData());
+    }
+
     public function testSubmitString()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -215,6 +243,26 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
+        $this->assertEquals($outputTime, $form->getData());
+        $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
+    }
+
+    public function testSubmitDifferentTimezonesDateTimeImmutable()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'model_timezone' => 'America/New_York',
+            'view_timezone' => 'Pacific/Tahiti',
+            'widget' => 'single_text',
+            'input' => 'datetime_immutable',
+        ));
+
+        $outputTime = new \DateTimeImmutable('2010-06-02 03:04:00 Pacific/Tahiti');
+
+        $form->submit('2010-06-02T03:04:00-10:00');
+
+        $outputTime = $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
         $this->assertEquals($outputTime, $form->getData());
         $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
     }

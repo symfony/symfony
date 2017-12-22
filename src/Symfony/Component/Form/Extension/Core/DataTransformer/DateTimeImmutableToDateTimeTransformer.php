@@ -40,7 +40,7 @@ class DateTimeImmutableToDateTimeTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a \DateTimeImmutable.');
         }
 
-        return new \DateTime($value->format(\DateTime::RFC3339));
+        return \DateTime::createFromFormat(\DateTime::RFC3339, $value->format(\DateTime::RFC3339));
     }
 
     /**

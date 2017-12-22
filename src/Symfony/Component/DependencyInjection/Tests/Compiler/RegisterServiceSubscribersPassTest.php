@@ -81,8 +81,8 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $expected = array(
             TestServiceSubscriber::class => new ServiceClosureArgument(new TypedReference(TestServiceSubscriber::class, TestServiceSubscriber::class, TestServiceSubscriber::class)),
             CustomDefinition::class => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, TestServiceSubscriber::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
-            'bar' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, TestServiceSubscriber::class)),
-            'baz' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, TestServiceSubscriber::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            'bar' => new ServiceClosureArgument(new TypedReference('bar', CustomDefinition::class, TestServiceSubscriber::class)),
+            'baz' => new ServiceClosureArgument(new TypedReference('baz', CustomDefinition::class, TestServiceSubscriber::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
         );
 
         $this->assertEquals($expected, $locator->getArgument(0));
@@ -112,7 +112,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
             TestServiceSubscriber::class => new ServiceClosureArgument(new TypedReference(TestServiceSubscriber::class, TestServiceSubscriber::class, TestServiceSubscriber::class)),
             CustomDefinition::class => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, TestServiceSubscriber::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
             'bar' => new ServiceClosureArgument(new TypedReference('bar', CustomDefinition::class, TestServiceSubscriber::class)),
-            'baz' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, TestServiceSubscriber::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            'baz' => new ServiceClosureArgument(new TypedReference('baz', CustomDefinition::class, TestServiceSubscriber::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
         );
 
         $this->assertEquals($expected, $locator->getArgument(0));

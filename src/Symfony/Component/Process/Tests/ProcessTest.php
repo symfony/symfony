@@ -54,6 +54,10 @@ class ProcessTest extends TestCase
      */
     public function testInvalidCwd()
     {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('False-positive on Windows/appveyor.');
+        }
+
         // Check that it works fine if the CWD exists
         $cmd = new Process('echo test', __DIR__);
         $cmd->run();

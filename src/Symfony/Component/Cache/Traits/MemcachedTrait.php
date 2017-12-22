@@ -71,7 +71,7 @@ trait MemcachedTrait
      *
      * @return \Memcached
      *
-     * @throws \ErrorEception When invalid options or servers are provided
+     * @throws \ErrorException When invalid options or servers are provided
      */
     public static function createConnection($servers, array $options = array())
     {

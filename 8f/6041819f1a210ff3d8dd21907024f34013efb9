@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-20T10:22:54Z
+
+@keradus I merged #25553 because it contained other minor changes.
+Can you please rebase?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-20T10:24:27Z
+
+I closed  #25551 also, but if there is anything from it that should be merged, please add it to this PR.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-12-20T14:55:40Z
+
+then I simply have to revert  #25551 in my PR.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-12-20T15:00:31Z
+
+done

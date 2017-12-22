@@ -58,6 +58,11 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         self::assertEquals($expected->format('c'), $actual->format('c'));
     }
 
+    public static function assertDateTimeImmutableEquals(\DateTimeImmutable $expected, \DateTimeImmutable $actual)
+    {
+        self::assertEquals($expected->format('c'), $actual->format('c'));
+    }
+
     public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)
     {
         self::assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));

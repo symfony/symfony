@@ -23,9 +23,9 @@ class ControllerLayoutException extends \InvalidArgumentException
         throw new static(
             sprintf(
                 'The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.',
-                $reference->bundle->getName(),
-                $reference->controller,
-                $reference->action,
+                $reference->getBundle()->getName(),
+                $reference->getController(),
+                $reference->getAction(),
                 $try
             )
         );

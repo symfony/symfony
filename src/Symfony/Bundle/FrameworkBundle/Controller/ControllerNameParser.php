@@ -92,6 +92,6 @@ class ControllerNameParser
     {
         $reference = $this->layout->parse($controller);
 
-        return sprintf('%s:%s:%s', $reference->bundle->getName(), $reference->controller, $reference->action);
+        return sprintf('%s:%s:%s', $reference->getBundle()->getName(), $reference->getController(), $reference->getAction());
     }
 }

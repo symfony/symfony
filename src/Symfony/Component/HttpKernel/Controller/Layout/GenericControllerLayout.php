@@ -62,12 +62,12 @@ final class GenericControllerLayout implements ControllerLayoutInterface
     /** {@inheritdoc} */
     public function build(ActionReference $reference): string
     {
-        $try = $reference->bundle->getNamespace().'\\Controller\\'.$reference->controller.'Controller';
+        $try = $reference->getBundle()->getNamespace().'\\Controller\\'.$reference->getController().'Controller';
 
         if (!class_exists($try)) {
             throw ControllerLayoutException::unknownControllerClass($reference, $try);
         }
 
-        return $try.'::'.$reference->action.'Action';
+        return $try.'::'.$reference->getAction().'Action';
     }
 }

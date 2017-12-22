@@ -18,19 +18,34 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *
  * @author Pavel Batanov <pavel@batanov.me>
  */
-class ActionReference
+final class ActionReference
 {
     /** @var BundleInterface */
-    public $bundle;
+    private $bundle;
     /** @var string */
-    public $controller;
+    private $controller;
     /** @var string */
-    public $action;
+    private $action;
 
     public function __construct(BundleInterface $bundle, string $controller, string $action)
     {
         $this->bundle = $bundle;
         $this->controller = $controller;
         $this->action = $action;
+    }
+
+    public function getBundle(): BundleInterface
+    {
+        return $this->bundle;
+    }
+
+    public function getController(): string
+    {
+        return $this->controller;
+    }
+
+    public function getAction(): string
+    {
+        return $this->action;
     }
 }

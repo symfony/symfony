@@ -326,8 +326,16 @@ class Process implements \IteratorAggregate
             // @see : https://bugs.php.net/69442
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
+        if (defined('HHVM_VERSION')) {
+            $envPairs = $env;
+        } else {
+            $envPairs = array();
+            foreach ($env as $k => $v) {
+                $envPairs[] = $k.'='.$v;
+            }
+        }
 
-        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $this->options);
+        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
 
         if (!is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');

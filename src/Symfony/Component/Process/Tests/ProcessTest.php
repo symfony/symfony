@@ -1423,14 +1423,14 @@ class ProcessTest extends TestCase
 
     public function testEnvIsInherited()
     {
-        $process = $this->getProcessForCode('echo serialize($_SERVER);', null, array('BAR' => 'BAZ'));
+        $process = $this->getProcessForCode('echo serialize($_SERVER);', null, array('BAR' => 'BAZ', 'EMPTY' => ''));
 
         putenv('FOO=BAR');
         $_ENV['FOO'] = 'BAR';
 
         $process->run();
 
-        $expected = array('BAR' => 'BAZ', 'FOO' => 'BAR');
+        $expected = array('BAR' => 'BAZ', 'EMPTY' => '', 'FOO' => 'BAR');
         $env = array_intersect_key(unserialize($process->getOutput()), $expected);
 
         $this->assertEquals($expected, $env);
@@ -1511,7 +1511,7 @@ Array
 )
 
 EOTXT;
-        $this->assertSame($expected, $p->getOutput());
+        $this->assertSame($expected, str_replace('Standard input code', '-', $p->getOutput()));
     }
 
     public function provideEscapeArgument()

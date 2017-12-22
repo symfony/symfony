@@ -388,6 +388,10 @@ class SecurityExtension extends Extension
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
                 'csrf_token_id' => $firewall['logout']['csrf_token_id'],
                 'logout_path' => $firewall['logout']['path'],
+                'default_target_path' => isset($firewall['form_login']) ? $firewall['form_login']['default_target_path'] : null,
+                'always_use_default_target_path' => isset($firewall['form_login']) ? $firewall['form_login']['always_use_default_target_path'] : null,
+                'target_path_parameter' => isset($firewall['form_login']) ? $firewall['form_login']['target_path_parameter'] : null,
+                'use_referer' => isset($firewall['form_login']) ? $firewall['form_login']['use_referer'] : null,
             ));
             $listeners[] = new Reference($listenerId);
 

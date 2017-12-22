@@ -355,6 +355,23 @@ abstract class CompleteConfigurationTest extends TestCase
         ), $matchers);
     }
 
+    public function testLogoutListenerOptions()
+    {
+        $container = $this->getContainer('container1');
+        $listenerArguments = $container->getDefinition('security.logout_listener.secure')->getArguments();
+        $listenerOptions = $listenerArguments['index_3'];
+
+        $this->assertSame(array(
+            'csrf_parameter' => '_csrf_token',
+            'csrf_token_id' => 'logout',
+            'logout_path' => '/logout',
+            'default_target_path' => '/',
+            'always_use_default_target_path' => false,
+            'target_path_parameter' => '_target_path',
+            'use_referer' => false,
+        ), $listenerOptions);
+    }
+
     public function testUserCheckerAliasIsRegistered()
     {
         $container = $this->getContainer('no_custom_user_checker');

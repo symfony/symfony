@@ -26,7 +26,6 @@ class MysqlStore implements StoreInterface
     private $username;
     private $password;
     private $options;
-
     private $waitTimeout;
 
     /**

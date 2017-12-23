@@ -36,6 +36,7 @@ cache:
 services:
     - memcached
     - mongodb
+    - mysql
     - redis-server
 
 before_install:

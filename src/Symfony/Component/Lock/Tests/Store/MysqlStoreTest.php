@@ -27,21 +27,17 @@ class MysqlStoreTest extends AbstractStoreTest
      */
     public function getStore()
     {
-        return new MysqlStore(getenv('MYSQL_DSN'), array(
-            'db_username' => getenv('MYSQL_USER'),
+        return new MysqlStore('mysql:host='.getenv('MYSQL_HOST'), array(
+            'db_username' => getenv('MYSQL_USERNAME'),
             'db_password' => getenv('MYSQL_PASSWORD'),
+            'wait_timeout' => 1,
         ));
     }
 
-    /**
-     * @medium
-     *
-     * @todo use phpunit/php-invoker to avoid infinite wait ?
-     */
     public function testConfigurableWaitTimeout()
     {
-        $store = new MysqlStore(getenv('MYSQL_DSN'), array(
-            'db_username' => getenv('MYSQL_USER'),
+        $store = new MysqlStore('mysql:host='.getenv('MYSQL_HOST'), array(
+            'db_username' => getenv('MYSQL_USERNAME'),
             'db_password' => getenv('MYSQL_PASSWORD'),
             'wait_timeout' => 1,
         ));
@@ -50,7 +46,7 @@ class MysqlStoreTest extends AbstractStoreTest
         $key1 = new Key($resource);
         $key2 = new Key($resource);
 
-        $store->waitAndSave($key1);
+        $store->save($key1);
 
         $startTime = microtime(true);
 

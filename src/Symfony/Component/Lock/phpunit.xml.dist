@@ -12,8 +12,8 @@
         <ini name="error_reporting" value="-1" />
         <env name="REDIS_HOST" value="localhost" />
         <env name="MEMCACHED_HOST" value="localhost" />
-        <env name="MYSQL_DSN" value="mysql:host=localhost" />
-        <env name="MYSQL_USER" value="root" />
+        <env name="MYSQL_HOST" value="127.0.0.1" />
+        <env name="MYSQL_USERNAME" value="root" />
         <env name="MYSQL_PASSWORD" value="" />
     </php>
 

@@ -240,9 +240,10 @@ class XliffFileLoader implements LoaderInterface
             if ($tmpfile) {
                 copy($newPath, $tmpfile);
                 $parts = explode('/', str_replace('\\', '/', $tmpfile));
+            }else{
+                array_shift($parts);
+                $locationstart = 'phar:///';
             }
-            array_shift($parts);
-            $locationstart = 'phar:///';
         }
 
         $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';

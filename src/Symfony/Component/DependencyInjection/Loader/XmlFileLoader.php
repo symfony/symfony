@@ -606,9 +606,11 @@ class XmlFileLoader extends FileLoader
                     copy($location, $tmpfile);
                     $tmpfiles[] = $tmpfile;
                     $parts = explode('/', str_replace('\\', '/', $tmpfile));
+
+                }else{
+                    array_shift($parts);
+                    $locationstart = 'phar:///';
                 }
-                array_shift($parts);
-                $locationstart = 'phar:///';
             }
             $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
             $location = $locationstart.$drive.implode('/', array_map('rawurlencode', $parts));

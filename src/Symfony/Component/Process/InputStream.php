@@ -22,7 +22,7 @@ class InputStream implements \IteratorAggregate
 {
     /** @var null|callable */
     private $onEmpty = null;
-    private $input = [];
+    private $input = array();
     private $open = true;
 
     /**

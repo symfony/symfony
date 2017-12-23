@@ -607,7 +607,7 @@ class XmlFileLoader extends FileLoader
                     $tmpfiles[] = $tmpfile;
                     $parts = explode('/', str_replace('\\', '/', $tmpfile));
 
-                }else{
+                } else {
                     array_shift($parts);
                     $locationstart = 'phar:///';
                 }

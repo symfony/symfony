@@ -599,7 +599,7 @@ class XmlFileLoader extends FileLoader
         $imports = '';
         foreach ($schemaLocations as $namespace => $location) {
             $parts = explode('/', $location);
-            $locationstart= 'file:///';
+            $locationstart = 'file:///';
             if (0 === stripos($location, 'phar://')) {
                 $tmpfile = tempnam(sys_get_temp_dir(), 'symfony');
                 if ($tmpfile) {
@@ -608,7 +608,7 @@ class XmlFileLoader extends FileLoader
                     $parts = explode('/', str_replace('\\', '/', $tmpfile));
                 }
                 array_shift($parts);
-                $locationstart='phar:///';
+                $locationstart = 'phar:///';
             }
             $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
             $location = $locationstart.$drive.implode('/', array_map('rawurlencode', $parts));

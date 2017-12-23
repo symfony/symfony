@@ -234,7 +234,7 @@ class XliffFileLoader implements LoaderInterface
     {
         $newPath = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
         $parts = explode('/', $newPath);
-        $locationstart= 'file:///';
+        $locationstart = 'file:///';
         if (0 === stripos($newPath, 'phar://')) {
             $tmpfile = tempnam(sys_get_temp_dir(), 'symfony');
             if ($tmpfile) {
@@ -242,7 +242,7 @@ class XliffFileLoader implements LoaderInterface
                 $parts = explode('/', str_replace('\\', '/', $tmpfile));
             }
             array_shift($parts);
-            $locationstart='phar:///';
+            $locationstart = 'phar:///';
         }
 
         $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';

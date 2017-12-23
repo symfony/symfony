@@ -65,6 +65,31 @@ class KernelTest extends TestCase
         $this->assertNull($clone->getContainer());
     }
 
+    public function testInitializeContainerClearsOldContainers()
+    {
+        $fs = new Filesystem();
+        $legacyContainerDir = __DIR__.'/Fixtures/cache/custom/ContainerA123456';
+        $fs->mkdir($legacyContainerDir);
+        touch($legacyContainerDir.'.legacy');
+
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $containerDir = __DIR__.'/Fixtures/cache/custom/'.substr(get_class($kernel->getContainer()), 0, 16);
+        $this->assertTrue(unlink(__DIR__.'/Fixtures/cache/custom/FixturesCustomDebugProjectContainer.php.meta'));
+        $this->assertFileExists($containerDir);
+        $this->assertFileNotExists($containerDir.'.legacy');
+
+        $kernel = new CustomProjectDirKernel(function ($container) { $container->register('foo', 'stdClass')->setPublic(true); });
+        $kernel->boot();
+
+        $this->assertFileExists($containerDir);
+        $this->assertFileExists($containerDir.'.legacy');
+
+        $this->assertFileNotExists($legacyContainerDir);
+        $this->assertFileNotExists($legacyContainerDir.'.legacy');
+    }
+
     public function testBootInitializesBundlesAndContainer()
     {
         $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer'));
@@ -1022,7 +1047,7 @@ class CustomProjectDirKernel extends Kernel
 
 class PassKernel extends CustomProjectDirKernel implements CompilerPassInterface
 {
-    public function __construct(\Closure $buildContainer = null)
+    public function __construct()
     {
         parent::__construct();
         Kernel::__construct('pass', true);

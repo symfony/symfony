@@ -1875,7 +1875,7 @@ class Request
             'txt' => array('text/plain'),
             'js' => array('application/javascript', 'application/x-javascript', 'text/javascript'),
             'css' => array('text/css'),
-            'json' => array('application/json', 'application/x-json'),
+            'json' => array('application/json', 'application/x-json', 'application/ld+json'),
             'xml' => array('text/xml', 'application/xml', 'application/x-xml'),
             'rdf' => array('application/rdf+xml'),
             'atom' => array('application/atom+xml'),

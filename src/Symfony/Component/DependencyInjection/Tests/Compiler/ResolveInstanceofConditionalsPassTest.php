@@ -153,6 +153,28 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame(array('duplicated_tag' => array(array(), array('and_attributes' => 1))), $def->getTags());
     }
 
+    public function testAutoconfigureInstanceofPreserveExplicitTagsAsPrimary()
+    {
+        $container = new ContainerBuilder();
+        $def = $container->register('normal_service', self::class);
+        $def
+            ->addTag('duplicated_tag', array('and_attributes' => 1))
+        ;
+        $def->setInstanceofConditionals(array(
+            parent::class => (new ChildDefinition(''))->addTag('duplicated_tag'),
+        ));
+        $def->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(parent::class)
+            ->addTag('duplicated_tag')
+        ;
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new ResolveChildDefinitionsPass())->process($container);
+
+        $def = $container->getDefinition('normal_service');
+        $this->assertSame(array('duplicated_tag' => array(array('and_attributes' => 1), array())), $def->getTags());
+    }
+
     public function testProcessDoesNotUseAutoconfiguredInstanceofIfNotEnabled()
     {
         $container = new ContainerBuilder();

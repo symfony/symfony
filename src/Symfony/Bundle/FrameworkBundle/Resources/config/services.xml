@@ -49,6 +49,7 @@
             <argument>%kernel.root_dir%/Resources</argument>
             <argument type="collection">
                 <argument>%kernel.root_dir%</argument>
+                <argument>%kernel.project_dir%/resources</argument>
             </argument>
         </service>
         <service id="Symfony\Component\HttpKernel\Config\FileLocator" alias="file_locator" />

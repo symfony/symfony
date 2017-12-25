@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-24T14:30:02Z
+
+Can we remove this check https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Console/Application.php#L166 or is it needed for 3-4 compatibility?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-12-25T03:11:23Z
+
+It's needed as long as framework bundle supports 3.4 console.

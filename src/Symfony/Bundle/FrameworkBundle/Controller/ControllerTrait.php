@@ -296,7 +296,7 @@ trait ControllerTrait
     protected function createAccessDeniedException(string $message = 'Access Denied.', \Exception $previous = null): AccessDeniedException
     {
         if (!class_exists(AccessDeniedException::class)) {
-            throw new \LogicException('You can not use the "createAccessDeniedException" method if the SecurityBundle is not registered in your application.');
+            throw new \LogicException('You can not use the "createAccessDeniedException" method if the SecurityBundle is not registered in your application. Try running "composer require security".');
         }
 
         return new AccessDeniedException($message, $previous);

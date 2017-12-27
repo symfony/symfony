@@ -33,15 +33,13 @@ class ExceptionListener implements EventSubscriberInterface
 {
     protected $controller;
     protected $logger;
-    protected $httpStatusCodeLogLevel = array();
+    protected $httpStatusCodeLogLevel;
 
-    public function __construct($controller, LoggerInterface $logger = null, $httpStatusCodeLogLevel = array())
+    public function __construct($controller, LoggerInterface $logger = null, array $httpStatusCodeLogLevel = array())
     {
         $this->controller = $controller;
         $this->logger = $logger;
-        if ($httpStatusCodeLogLevel && is_array($httpStatusCodeLogLevel)) {
-            $this->httpStatusCodeLogLevel = $httpStatusCodeLogLevel;
-        }
+        $this->httpStatusCodeLogLevel = $httpStatusCodeLogLevel;
     }
 
     public function logKernelException(GetResponseForExceptionEvent $event)
@@ -99,7 +97,7 @@ class ExceptionListener implements EventSubscriberInterface
         );
     }
 
-    protected function getExceptionLogLevel(\Exception $exception)
+    protected function getExceptionLogLevel(\Exception $exception): string
     {
         $logLevel = LogLevel::CRITICAL;
         if ($exception instanceof HttpExceptionInterface) {

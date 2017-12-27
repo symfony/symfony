@@ -104,8 +104,8 @@ class ExceptionListener implements EventSubscriberInterface
             $statusCode = $exception->getStatusCode();
             if (isset($this->httpStatusCodeLogLevel[$statusCode])) {
                 $logLevel = $this->httpStatusCodeLogLevel[$statusCode];
-            } elseif ($statusCode < 500) {
-                $logLevel = LogLevel::ERROR;
+            } elseif (400 <= $statusCode && $statusCode < 500) {
+                $logLevel = LogLevel::WARNING;
             }
         }
 

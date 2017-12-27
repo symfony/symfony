@@ -281,7 +281,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @throws NotNormalizableValueException
      * @throws LogicException
      */
-    private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context)
+    private function validateAndDenormalize(string $currentClass, string $attribute, $data, string $format, array $context)
     {
         if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
             return $data;
@@ -392,7 +392,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * @return bool|string
      */
-    private function getCacheKey(?string $format, array $context)
+    private function getCacheKey(string $format, array $context)
     {
         try {
             return md5($format.serialize($context));

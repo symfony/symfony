@@ -210,7 +210,7 @@ class Configuration implements ConfigurationInterface
                         ->always(function ($v) {
                             $map = array();
                             foreach ($v as $status => $level) {
-                                if (!(is_int($status) && 100 <= $status && $status <= 599)) {
+                                if (!(is_int($status) && $status >= 100 && $status <= 599)) {
                                     throw new InvalidConfigurationException(sprintf(
                                         'The configured status code "%s" in twig.http_exception_log_levels is not a valid http status code.',
                                          $status

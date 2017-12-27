@@ -35,6 +35,7 @@ install:
     - echo extension=php_intl.dll >> php.ini-max
     - echo extension=php_mbstring.dll >> php.ini-max
     - echo extension=php_fileinfo.dll >> php.ini-max
+    - echo extension=php_pdo_mysql.dll >> php.ini-max
     - echo extension=php_pdo_sqlite.dll >> php.ini-max
     - echo extension=php_curl.dll >> php.ini-max
     - copy /Y php.ini-max php.ini

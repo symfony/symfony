@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Logger;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * ExceptionListenerTest.
@@ -155,6 +156,44 @@ class ExceptionListenerTest extends TestCase
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
         $this->assertFalse($dispatcher->hasListeners(KernelEvents::RESPONSE), 'CSP removal listener has been removed');
     }
+
+    public function testHttp4xxLogLevel()
+    {
+        $logger = new TestLogger();
+        $l = new ExceptionListener('foo', $logger);
+        $exception = new \Exception('foo');
+        $event = new GetResponseForExceptionEvent(new TestKernelThatThrowsHttp4xxException(), Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
+        try {
+            $l->logKernelException($event);
+            $l->onKernelException($event);
+            $this->fail('NotFoundHttpException expected');
+        } catch (NotFoundHttpException $e) {
+            $this->assertSame('4xx', $e->getMessage());
+            $this->assertSame('foo', $e->getPrevious()->getMessage());
+        }
+
+        $this->assertEquals(1, $logger->countErrors());
+        $this->assertCount(1, $logger->getLogs('warning'));
+    }
+
+    public function testHttpLogLevelOverride()
+    {
+        $logger = new TestLogger();
+        $l = new ExceptionListener('foo', $logger, array(404 => 'notice'));
+        $exception = new \Exception('foo');
+        $event = new GetResponseForExceptionEvent(new TestKernelThatThrowsHttp4xxException(), Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
+        try {
+            $l->logKernelException($event);
+            $l->onKernelException($event);
+            $this->fail('NotFoundHttpException expected');
+        } catch (NotFoundHttpException $e) {
+            $this->assertSame('4xx', $e->getMessage());
+            $this->assertSame('foo', $e->getPrevious()->getMessage());
+        }
+
+        $this->assertEquals(1, $logger->countErrors());
+        $this->assertCount(1, $logger->getLogs('notice'));
+    }
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface
@@ -178,5 +217,13 @@ class TestKernelThatThrowsException implements HttpKernelInterface
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         throw new \RuntimeException('bar');
+    }
+}
+
+class TestKernelThatThrowsHttp4xxException implements HttpKernelInterface
+{
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    {
+        throw new NotFoundHttpException('4xx');
     }
 }

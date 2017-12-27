@@ -78,6 +78,7 @@ class TwigExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('twig.exception_listener.controller', $config['exception_controller']);
+        $container->setParameter('twig.exception_listener.http_log_levels', $config['http_exception_log_levels']);
 
         $container->setParameter('twig.form.resources', $config['form_themes']);
         $container->setParameter('twig.default_path', $config['default_path']);

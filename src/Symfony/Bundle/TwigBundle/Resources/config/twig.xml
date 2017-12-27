@@ -128,7 +128,7 @@
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
-            <argument>%framework.http_exception.log_levels%</argument>
+            <argument>%twig.exception_listener.http_log_levels%</argument>
         </service>
 
         <service id="twig.controller.exception" class="Symfony\Bundle\TwigBundle\Controller\ExceptionController" public="true">

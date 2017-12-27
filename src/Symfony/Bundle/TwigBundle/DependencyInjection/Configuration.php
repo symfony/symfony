@@ -14,6 +14,7 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * TwigExtension configuration structure.
@@ -42,6 +43,7 @@ class Configuration implements ConfigurationInterface
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
         $this->addTwigFormatOptions($rootNode);
+        $this->addHttpExceptionLogLevels($rootNode);
 
         return $treeBuilder;
     }
@@ -189,6 +191,45 @@ class Configuration implements ConfigurationInterface
                         ->integerNode('decimals')->defaultValue(0)->end()
                         ->scalarNode('decimal_point')->defaultValue('.')->end()
                         ->scalarNode('thousands_separator')->defaultValue(',')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addHttpExceptionLogLevels(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('http_exception_log_levels')
+                    ->info('The override log levels for http exceptions')
+                    ->example(array('403' => 'NOTICE', '404' => 'INFO'))
+                    ->useAttributeAsKey('http_exception_log_levels')
+                    ->prototype('variable')->end()
+                    ->validate()
+                        ->always(function ($v) {
+                            $map = array();
+                            foreach ($v as $status => $level) {
+                                if (!(is_int($status) && 100 <= $status && $status <= 599)) {
+                                    throw new InvalidConfigurationException(sprintf(
+                                        'The configured status code "%s" in twig.http_exception_log_levels is not a valid http status code.',
+                                         $status
+                                    ));
+                                }
+
+                                $levelConstant = 'Psr\Log\LogLevel::'.$level;
+                                if (!defined($levelConstant)) {
+                                    throw new InvalidConfigurationException(sprintf(
+                                        'The configured log level "%s" in twig.http_exception_log_levels is invalid as it is not defined in Psr\\Log\\LogLevel.',
+                                         $level
+                                    ));
+                                }
+
+                                $map[$status] = constant($levelConstant);
+                            }
+
+                            return $map;
+                        })
                     ->end()
                 ->end()
             ->end()

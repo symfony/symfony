@@ -49,7 +49,7 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
     }
 
     /**
-     * Checks if the given class implements the NormalizableInterface.
+     * Checks if the given class implements the DenormalizableInterface.
      *
      * @param mixed  $data   Data to denormalize from
      * @param string $type   The class to which the data should be denormalized

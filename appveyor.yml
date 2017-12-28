@@ -2,6 +2,9 @@ build: false
 clone_depth: 1
 clone_folder: c:\projects\symfony
 
+services:
+    - mysql
+
 cache:
     - composer.phar
     - .phpunit -> phpunit

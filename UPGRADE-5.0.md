@@ -1,8 +1,8 @@
 UPGRADE FROM 4.x to 5.0
 =======================
 
-Event Dispatcher
-----------------
+EventDispatcher
+---------------
 
  * The `TraceableEventDispatcherInterface` has been removed.
 

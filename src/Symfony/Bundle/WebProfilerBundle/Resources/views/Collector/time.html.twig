@@ -83,7 +83,7 @@
                     {% set subrequests_time = subrequests_time + child.getcollector('time').events.__section__.duration %}
                 {% endfor %}
             {% else %}
-                {% set subrequests_time = 0 %}
+                {% set subrequests_time = 'n/a' %}
             {% endif %}
 
             <div class="metric">

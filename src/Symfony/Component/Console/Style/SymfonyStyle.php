@@ -99,11 +99,11 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function listing(array $elements)
+    public function listing(array $elements, $icon = '*')
     {
         $this->autoPrependText();
-        $elements = array_map(function ($element) {
-            return sprintf(' * %s', $element);
+        $elements = array_map(function ($element) use ($icon) {
+            return sprintf(' %s %s', $icon, $element);
         }, $elements);
 
         $this->writeln($elements);

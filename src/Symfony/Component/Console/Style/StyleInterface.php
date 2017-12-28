@@ -34,8 +34,11 @@ interface StyleInterface
 
     /**
      * Formats a list.
+     *
+     * @param array  $elements
+     * @param string $icon
      */
-    public function listing(array $elements);
+    public function listing(array $elements, $icon = '*');
 
     /**
      * Formats informational text.

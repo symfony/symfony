@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Allow customization of icon in `SymfonyStyle::listing()`
+
 4.0.0
 -----
 

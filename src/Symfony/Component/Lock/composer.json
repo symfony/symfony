@@ -20,6 +20,7 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "doctrine/dbal": "~2.4",
         "predis/predis": "~1.0"
     },
     "autoload": {

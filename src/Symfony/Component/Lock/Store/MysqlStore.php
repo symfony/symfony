@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Doctrine\DBAL\Connection;
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
@@ -22,29 +25,32 @@ use Symfony\Component\Lock\StoreInterface;
  */
 class MysqlStore implements StoreInterface
 {
-    private $dsn;
-    private $username;
-    private $password;
-    private $options;
+    /**
+     * @var \PDO|Connection
+     */
+    private $connection;
     private $waitTimeout;
 
     /**
-     * List of available options:
-     *  * db_username: The username when lazy-connect [default: '']
-     *  * db_password: The password when lazy-connect [default: '']
-     *  * db_connection_options: An array of driver-specific connection options [default: array()]
-     *  * wait_timeout: Time in seconds to wait for a lock to be released. A negative value means infinite. [default: -1].
-     *
-     * @param string $dsn     The connection DSN string
-     * @param array  $options configuration options
+     * @param \PDO|Connection $connection
+     * @param int             $waitTimeout Time in seconds to wait for a lock to be released. A negative value means infinite.
      */
-    public function __construct($dsn, array $options)
+    public function __construct($connection, $waitTimeout = -1)
     {
-        $this->dsn = $dsn;
-        $this->username = $options['db_username'] ?? '';
-        $this->password = $options['db_password'] ?? '';
-        $this->options = $options['db_connection_options'] ?? array();
-        $this->waitTimeout = $options['wait_timeout'] ?? -1;
+        if ($connection instanceof \PDO) {
+            if ('mysql' !== $driver = $connection->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+                throw new InvalidArgumentException(sprintf('%s requires a "mysql" connection. "%s" given.', __CLASS__, $driver));
+            }
+        } elseif ($connection instanceof Connection) {
+            if ('pdo_mysql' !== $driver = $connection->getDriver()->getName()) {
+                throw new InvalidArgumentException(sprintf('%s requires a "pdo_mysql" connection. "%s" given.', __CLASS__, $driver));
+            }
+        } else {
+            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance, "%s" given.', __CLASS__, is_object($connection) ? get_class($connection) : gettype($connection)));
+        }
+
+        $this->connection = $connection;
+        $this->waitTimeout = $waitTimeout;
     }
 
     /**
@@ -73,23 +79,31 @@ class MysqlStore implements StoreInterface
         // no timeout for impatient
         $timeout = $blocking ? $this->waitTimeout : 0;
 
-        $connection = new \PDO($this->dsn, $this->username, $this->password, $this->options);
-        $connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        // Hash the key to guarantee it contains between 1 and 64 characters
+        $storedKey = hash('sha256', $key);
 
-        $stmt = $connection->prepare('SELECT GET_LOCK(:key, :timeout)');
-        $stmt->bindValue(':key', hash('sha256', $key), \PDO::PARAM_STR);
+        $stmt = $this->connection->prepare('SELECT IF(IS_USED_LOCK(:key) = CONNECTION_ID(), -1, GET_LOCK(:key, :timeout))');
+        $stmt->bindValue(':key', $storedKey, \PDO::PARAM_STR);
         $stmt->bindValue(':timeout', $timeout, \PDO::PARAM_INT);
         $stmt->setFetchMode(\PDO::FETCH_COLUMN, 0);
         $stmt->execute();
+
+        // 1:  Lock successful
+        // 0:  Already locked by another session
+        // -1: Already locked by the same session
         $success = $stmt->fetchColumn();
 
-        if ('0' === $success) {
+        if ($blocking && '-1' === $success) {
+            throw new LockAcquiringException('Lock already acquired with the same MySQL connection.');
+        }
+
+        if ('1' !== $success) {
             throw new LockConflictedException();
         }
 
         // store the release statement in the state
-        $releaseStmt = $connection->prepare('SELECT RELEASE_LOCK(:key)');
-        $releaseStmt->bindValue(':key', hash('sha256', $key), \PDO::PARAM_STR);
+        $releaseStmt = $this->connection->prepare('SELECT RELEASE_LOCK(:key)');
+        $releaseStmt->bindValue(':key', $storedKey, \PDO::PARAM_STR);
 
         $key->setState(__CLASS__, $releaseStmt);
     }
@@ -114,7 +128,6 @@ class MysqlStore implements StoreInterface
         $releaseStmt = $key->getState(__CLASS__);
         $releaseStmt->execute();
 
-        // Close the connection.
         $key->removeState(__CLASS__);
     }
 

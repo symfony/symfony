@@ -221,7 +221,7 @@ class NativeSessionStorage implements SessionStorageInterface
     public function save()
     {
         // Register custom error handler to catch a possible failure warning during session write
-        set_error_handler(function ($errno, $errstr, $errfile, $errline, $errcontext) {
+        set_error_handler(function ($errno, $errstr, $errfile, $errline, $errcontext = array()) {
             throw new ContextErrorException($errstr, $errno, E_WARNING, $errfile, $errline, $errcontext);
         }, E_WARNING);
 

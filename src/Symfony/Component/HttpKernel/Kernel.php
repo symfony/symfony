@@ -532,7 +532,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
             $oldContainerDir = dirname($oldContainer->getFileName());
             foreach (glob(dirname($oldContainerDir).'/*.legacy') as $legacyContainer) {
                 if ($oldContainerDir.'.legacy' !== $legacyContainer && @unlink($legacyContainer)) {
-                    (new Filesystem())->remove(substr($legacyContainer, 0, -16));
+                    (new Filesystem())->remove(substr($legacyContainer, 0, -7));
                 }
             }
 

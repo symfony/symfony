@@ -289,10 +289,16 @@ trait ControllerTrait
      *
      *     throw $this->createAccessDeniedException('Unable to access this page!');
      *
+     * @throws \LogicException If the Security component is not available
+     *
      * @final since version 3.4
      */
     protected function createAccessDeniedException(string $message = 'Access Denied.', \Exception $previous = null): AccessDeniedException
     {
+        if (!class_exists(AccessDeniedException::class)) {
+            throw new \LogicException('You can not use the "createAccessDeniedException" method if the Security component is not available.');
+        }
+
         return new AccessDeniedException($message, $previous);
     }
 

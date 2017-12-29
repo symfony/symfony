@@ -968,6 +968,26 @@ class RequestTest extends TestCase
         $request->getClientIps();
     }
 
+    /**
+     * @dataProvider getClientIpsWithConflictingHeadersProvider
+     */
+    public function testGetClientIpsOnlyXHttpForwardedForTrusted($httpForwarded, $httpXForwardedFor)
+    {
+        $request = new Request();
+
+        $server = array(
+            'REMOTE_ADDR' => '88.88.88.88',
+            'HTTP_FORWARDED' => $httpForwarded,
+            'HTTP_X_FORWARDED_FOR' => $httpXForwardedFor,
+        );
+
+        Request::setTrustedProxies(array('88.88.88.88'), Request::HEADER_X_FORWARDED_FOR);
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertSame(array_reverse(explode(',', $httpXForwardedFor)), $request->getClientIps());
+    }
+
     public function getClientIpsWithConflictingHeadersProvider()
     {
         //        $httpForwarded                   $httpXForwardedFor

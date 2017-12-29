@@ -326,12 +326,20 @@ class Process implements \IteratorAggregate
             // @see : https://bugs.php.net/69442
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
+        if (defined('HHVM_VERSION')) {
+            $envPairs = $env;
+        } else {
+            $envPairs = array();
+            foreach ($env as $k => $v) {
+                $envPairs[] = $k.'='.$v;
+            }
+        }
 
         if (!is_dir($this->cwd)) {
             @trigger_error('The provided cwd does not exist. Command is currently ran against getcwd(). This behavior is deprecated since version 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
         }
 
-        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $env, $this->options);
+        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $this->options);
 
         if (!is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
@@ -1722,15 +1730,11 @@ class Process implements \IteratorAggregate
 
     private function getDefaultEnv()
     {
-        if (\PHP_VERSION_ID >= 70100) {
-            $env = getenv();
-        } else {
-            $env = array();
+        $env = array();
 
-            foreach ($_SERVER as $k => $v) {
-                if (is_string($v) && false !== $v = getenv($k)) {
-                    $env[$k] = $v;
-                }
+        foreach ($_SERVER as $k => $v) {
+            if (is_string($v) && false !== $v = getenv($k)) {
+                $env[$k] = $v;
             }
         }
 

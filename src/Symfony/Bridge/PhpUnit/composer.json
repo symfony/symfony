@@ -41,6 +41,10 @@
     "extra": {
         "branch-alias": {
             "dev-master": "3.4-dev"
+        },
+        "thanks": {
+            "name": "phpunit/phpunit",
+            "url": "https://github.com/sebastianbergmann/phpunit"
         }
     }
 }

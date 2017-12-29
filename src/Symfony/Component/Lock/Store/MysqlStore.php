@@ -71,7 +71,7 @@ class MysqlStore implements StoreInterface
 
     private function lock(Key $key, bool $blocking)
     {
-        // The lock is maybe already acquired.
+        // the lock is maybe already acquired.
         if ($key->hasState(__CLASS__)) {
             return;
         }
@@ -102,7 +102,7 @@ class MysqlStore implements StoreInterface
         }
 
         // store the release statement in the state
-        $releaseStmt = $this->connection->prepare('SELECT RELEASE_LOCK(:key)');
+        $releaseStmt = $this->connection->prepare('DO RELEASE_LOCK(:key)');
         $releaseStmt->bindValue(':key', $storedKey, \PDO::PARAM_STR);
 
         $key->setState(__CLASS__, $releaseStmt);
@@ -113,7 +113,10 @@ class MysqlStore implements StoreInterface
      */
     public function putOffExpiration(Key $key, $ttl)
     {
-        // do nothing, the GET_LOCK locks forever, until the session terminates.
+        // the GET_LOCK locks forever, until the session terminates.
+        $stmt = $this->connection->exec('SET SESSION wait_timeout=GREATEST(@@wait_timeout, :ttl)');
+        $stmt->bindValue(':ttl', $ttl, \PDO::PARAM_INT);
+        $stmt->execute();
     }
 
     /**

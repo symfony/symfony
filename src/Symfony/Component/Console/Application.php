@@ -550,7 +550,7 @@ class Application
     public function find($name)
     {
         $this->init();
-
+        $aliases = array();
         $allCommands = array_keys($this->commands);
         $expr = preg_replace_callback('{([^:]+|)}', function ($matches) { return preg_quote($matches[1]).'[^:]*'; }, $name);
         $commands = preg_grep('{^'.$expr.'}', $allCommands);
@@ -578,14 +578,15 @@ class Application
         // filter out aliases for commands which are already on the list
         if (count($commands) > 1) {
             $commandList = $this->commands;
-            $commands = array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
+            $commands = array_filter($commands, function ($nameOrAlias) use ($commandList, $commands, &$aliases) {
                 $commandName = $commandList[$nameOrAlias]->getName();
+                $aliases[$nameOrAlias] = $commandName;
 
                 return $commandName === $nameOrAlias || !in_array($commandName, $commands);
             });
         }
 
-        $exact = in_array($name, $commands, true);
+        $exact = in_array($name, $commands, true) || isset($aliases[$name]);
         if (count($commands) > 1 && !$exact) {
             $usableWidth = $this->terminal->getWidth() - 10;
             $abbrevs = array_values($commands);

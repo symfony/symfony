@@ -62,6 +62,7 @@
         <service id="security.authentication.session_strategy" class="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy">
             <argument>%security.authentication.session_strategy.strategy%</argument>
         </service>
+        <service id="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface" alias="security.authentication.session_strategy" />
 
         <service id="security.encoder_factory.generic" class="Symfony\Component\Security\Core\Encoder\EncoderFactory">
             <argument type="collection" />

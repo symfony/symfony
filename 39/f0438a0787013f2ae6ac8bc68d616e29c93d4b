@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by FGM at 2017-12-27T20:47:33Z
+
+OK, added the change just to that method. The AppVeyor fail is caused by a composer download failure, which seems unrelated.

@@ -82,7 +82,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         $time = filemtime($this->file);
         $signalingException = new \UnexpectedValueException();
         $prevUnserializeHandler = ini_set('unserialize_callback_func', '');
-        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) use (&$prevErrorHandler, $signalingException) {
+        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) use (&$prevErrorHandler, $signalingException) {
             if (E_WARNING === $type && 'Class __PHP_Incomplete_Class has no unserializer' === $msg) {
                 throw $signalingException;
             }

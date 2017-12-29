@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-25T09:50:07Z
+
+If we decide to add this format, to merge in 4.1 as a new feature.
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2017-12-25T09:55:23Z
+
+@nicolas-grekas Do you agree with @dunglas to merge it in 3.1 instead of 2.7? If so, I must close this PR and open a new one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-25T10:08:14Z
+
+looks ok as bug fix to me,
+won't object if ends up in 4.1 (not 3.1)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-25T10:23:47Z
+
+If we merge it in 2.7, we'll be able to remove some code in API Platform, so 👍 for 2.7 for me.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-25T21:02:16Z
+
+You don't need to create new PR, just edit this PR and change target branch.
+
+Target for new feature can be master only
+
+---------------------------------------------------------------------------
+
+by vincentchalamon at 2017-12-25T21:06:00Z
+
+@ostrolucky But I cannot change the origin of my PR (which is currently 2.7), that's why I was saying to close & open a new PR. But @nicolas-grekas & @dunglas both agree for 2.7.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-25T21:16:52Z
+
+@vincentchalamon you can rebase and change the target branch from the GitHub UI (but 2.7 is fine here, indeed).

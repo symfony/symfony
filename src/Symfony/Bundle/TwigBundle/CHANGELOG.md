@@ -1,11 +1,14 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+ * added priority to twig extensions 
+
 4.0.0
 -----
 
  * removed `ContainerAwareRuntimeLoader`
- * added priority to twig extensions 
 
 3.4.0
 -----

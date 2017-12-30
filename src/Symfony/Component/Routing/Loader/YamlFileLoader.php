@@ -153,56 +153,34 @@ class YamlFileLoader extends FileLoader
 
         $subCollection = $this->import($config['resource'], $type, false, $file);
         
-        if (is_array($subCollection)) {
-            /* @var $value RouteCollection */
-            foreach($subCollection as $value) {
-                $value->addPrefix($prefix);
-                if (null !== $host) {
-                    $value->setHost($host);
-                }
-                if (null !== $condition) {
-                    $value->setCondition($condition);
-                }
-                if (null !== $schemes) {
-                    $value->setSchemes($schemes);
-                }
-                if (null !== $methods) {
-                    $value->setMethods($methods);
-                }
-                $value->addDefaults($defaults);
-                $value->addRequirements($requirements);
-                $value->addOptions($options);
-                
-                if (isset($config['name_prefix'])) {
-                    $value->addNamePrefix($config['name_prefix']);
-                }
+        if (!is_array($subCollection)) {
+            $subCollection = array($subCollection);
+        }
 
-                $collection->addCollection($value);
-            }
-        } else {
-            /* @var $subCollection RouteCollection */
-            $subCollection->addPrefix($prefix);
+        /* @var $value RouteCollection */
+        foreach ($subCollection as $value) {
+            $value->addPrefix($prefix);
             if (null !== $host) {
-                $subCollection->setHost($host);
+                $value->setHost($host);
             }
             if (null !== $condition) {
-                $subCollection->setCondition($condition);
+                $value->setCondition($condition);
             }
             if (null !== $schemes) {
-                $subCollection->setSchemes($schemes);
+                $value->setSchemes($schemes);
             }
             if (null !== $methods) {
-                $subCollection->setMethods($methods);
+                $value->setMethods($methods);
             }
-            $subCollection->addDefaults($defaults);
-            $subCollection->addRequirements($requirements);
-            $subCollection->addOptions($options);
+            $value->addDefaults($defaults);
+            $value->addRequirements($requirements);
+            $value->addOptions($options);
 
             if (isset($config['name_prefix'])) {
-                $subCollection->addNamePrefix($config['name_prefix']);
+                $value->addNamePrefix($config['name_prefix']);
             }
 
-            $collection->addCollection($subCollection);
+            $collection->addCollection($value);
         }
     }
 

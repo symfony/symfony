@@ -57,8 +57,8 @@ class ProjectServiceContainer extends Container
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\CustomDefinition' => true,
-            'service_locator.MtGsMEd' => true,
-            'service_locator.MtGsMEd.foo_service' => true,
+            'service_locator.KT3jhJ7' => true,
+            'service_locator.KT3jhJ7.foo_service' => true,
         );
     }
 

@@ -288,13 +288,10 @@ class Process implements \IteratorAggregate
             // @see : https://bugs.php.net/69442
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
-        if (defined('HHVM_VERSION')) {
-            $envPairs = $env;
-        } else {
-            $envPairs = array();
-            foreach ($env as $k => $v) {
-                $envPairs[] = $k.'='.$v;
-            }
+
+        $envPairs = array();
+        foreach ($env as $k => $v) {
+            $envPairs[] = $k.'='.$v;
         }
 
         if (!is_dir($this->cwd)) {

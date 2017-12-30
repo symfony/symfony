@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-26T00:44:00Z
+
+Thanks for this Nicolas. Obviously, this is a one-off solution, but it IS one of the most common situations. So... are you thinking w could merg this and start with this alone? Or do you intend for this to turn into something bigger?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-26T09:21:49Z
+
+Implementation now ready with the full list of Twig functions/filters handled by the bridge.
+@weaverryan yes, I think this is enough to close #25256 - we don't want to create "autoconf for PHP" (because this is what it could look like :) )
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-27T05:50:43Z
+
+@xabbuh thanks, comments addressed.
+
+> form_enctype() function is missing
+
+deprecated in 2.3, removed in 3.0
+
+> What about the filters from the CodeExtension?
+
+http-kernel/foundation/routing are always installed with Flex, no need for special care

@@ -15,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarDecorator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NonAutowirableBarDecorator;
 
 class DecoratorServicePassTest extends TestCase
 {
@@ -142,6 +145,53 @@ class DecoratorServicePassTest extends TestCase
 
         $this->assertEmpty($container->getDefinition('baz.inner')->getTags());
         $this->assertEquals(array('bar' => array('attr' => 'baz'), 'foobar' => array('attr' => 'bar')), $container->getDefinition('baz')->getTags());
+    }
+
+    public function testAutowire()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Bar::class, Bar::class);
+        $container
+            ->register(BarDecorator::class, BarDecorator::class)
+            ->setDecoratedService(Bar::class)
+            ->setAutowired(true)
+        ;
+
+        $this->process($container);
+
+        $definition = $container->getDefinition(BarDecorator::class);
+        $this->assertCount(1, $definition->getArguments(), 'The "$logger" argument must not be autowired.');
+        $this->assertSame('Symfony\Component\DependencyInjection\Tests\Fixtures\BarDecorator.inner', (string) $definition->getArgument(1));
+    }
+
+    public function testDoNotAutowireWhenSeveralArgumentOfTheType()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Bar::class, Bar::class);
+        $container
+            ->register(NonAutowirableBarDecorator::class, NonAutowirableBarDecorator::class)
+            ->setDecoratedService(Bar::class)
+            ->setAutowired(true)
+        ;
+
+        $this->process($container);
+
+        $this->assertEmpty($container->getDefinition(NonAutowirableBarDecorator::class)->getArguments());
+    }
+
+    public function testDoNotAutowireWhenNoConstructor()
+    {
+        $container = new ContainerBuilder();
+        $container->register(Bar::class, Bar::class);
+        $container
+            ->register(NoConstructor::class, NoConstructor::class)
+            ->setDecoratedService(Bar::class)
+            ->setAutowired(true)
+        ;
+
+        $this->process($container);
+
+        $this->assertEmpty($container->getDefinition(NoConstructor::class)->getArguments());
     }
 
     protected function process(ContainerBuilder $container)

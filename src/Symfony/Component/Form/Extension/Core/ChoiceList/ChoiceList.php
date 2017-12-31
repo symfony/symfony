@@ -200,7 +200,7 @@ class ChoiceList implements ChoiceListInterface
      */
     public function getIndicesForChoices(array $choices)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $choices = $this->fixChoices($choices);
         $indices = array();
@@ -228,7 +228,7 @@ class ChoiceList implements ChoiceListInterface
      */
     public function getIndicesForValues(array $values)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $values = $this->fixValues($values);
         $indices = array();

@@ -187,7 +187,7 @@ class ExecutionContext implements ExecutionContextInterface
         // API, as they are not present in the new interface anymore.
         // You should use buildViolation() instead.
         if (func_num_args() > 2) {
-            @trigger_error('The parameters $invalidValue, $plural and $code in method '.__METHOD__.' are deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
+            @trigger_error('The parameters $invalidValue, $plural and $code in method '.__METHOD__.' are deprecated since Symfony 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
 
             $this
                 ->buildViolation($message, $parameters)
@@ -401,7 +401,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getMetadataFactory()
     {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0. Use the new Symfony\Component\Validator\Context\ExecutionContext::getValidator method in combination with Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' is deprecated since Symfony 2.5 and will be removed in 3.0. Use the new Symfony\Component\Validator\Context\ExecutionContext::getValidator method in combination with Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
 
         $validator = $this->getValidator();
 

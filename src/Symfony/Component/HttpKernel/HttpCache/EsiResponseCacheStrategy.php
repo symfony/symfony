@@ -15,7 +15,7 @@
 
 namespace Symfony\Component\HttpKernel\HttpCache;
 
-@trigger_error('The '.__NAMESPACE__.'\EsiResponseCacheStrategy class is deprecated since version 2.6 and will be removed in 3.0. Use the Symfony\Component\HttpKernel\HttpCache\ResponseCacheStrategy class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\EsiResponseCacheStrategy class is deprecated since Symfony 2.6 and will be removed in 3.0. Use the Symfony\Component\HttpKernel\HttpCache\ResponseCacheStrategy class instead.', E_USER_DEPRECATED);
 
 /**
  * EsiResponseCacheStrategy knows how to compute the Response cache HTTP header

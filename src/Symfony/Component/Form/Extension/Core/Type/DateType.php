@@ -188,7 +188,7 @@ class DateType extends AbstractType
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
             if (ChoiceType::DEPRECATED_EMPTY_VALUE !== $options['empty_value']) {
-                @trigger_error('The form option "empty_value" is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
+                @trigger_error('The form option "empty_value" is deprecated since Symfony 2.6 and will be removed in 3.0. Use "placeholder" instead.', E_USER_DEPRECATED);
 
                 $placeholder = $options['empty_value'];
             }

@@ -115,7 +115,7 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('acl')
-                    ->setDeprecated('The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.')
+                    ->setDeprecated('The "security.acl" configuration key is deprecated since Symfony 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.')
                     ->children()
                         ->scalarNode('connection')
                             ->defaultNull()

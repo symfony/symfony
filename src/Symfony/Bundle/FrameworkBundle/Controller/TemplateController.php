@@ -45,7 +45,7 @@ class TemplateController implements ContainerAwareInterface
      */
     public function setContainer(ContainerInterface $container = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.4 and will be removed in 4.0. Inject a Twig Environment or an EngineInterface using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0. Inject a Twig Environment or an EngineInterface using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
 
         if ($container->has('templating')) {
             $this->templating = $container->get('templating');

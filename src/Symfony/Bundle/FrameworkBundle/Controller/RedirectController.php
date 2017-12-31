@@ -49,7 +49,7 @@ class RedirectController implements ContainerAwareInterface
      */
     public function setContainer(ContainerInterface $container = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.4 and will be removed in 4.0. Inject an UrlGeneratorInterface using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0. Inject an UrlGeneratorInterface using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
 
         $this->container = $container;
         $this->router = $container->get('router');

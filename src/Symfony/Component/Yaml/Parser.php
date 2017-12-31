@@ -119,7 +119,7 @@ class Parser
         }
 
         if (Yaml::PARSE_KEYS_AS_STRINGS & $flags) {
-            @trigger_error('Using the Yaml::PARSE_KEYS_AS_STRINGS flag is deprecated since version 3.4 as it will be removed in 4.0. Quote your keys when they are evaluable instead.', E_USER_DEPRECATED);
+            @trigger_error('Using the Yaml::PARSE_KEYS_AS_STRINGS flag is deprecated since Symfony 3.4 as it will be removed in 4.0. Quote your keys when they are evaluable instead.', E_USER_DEPRECATED);
         }
 
         if (false === preg_match('//u', $value)) {

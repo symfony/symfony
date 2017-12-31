@@ -20,7 +20,7 @@ class TranslationWriterTest extends TestCase
 {
     /**
      * @group legacy
-     * @expectedDeprecation Method Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations() is deprecated since version 3.4 and will be removed in 4.0. Use write() instead.
+     * @expectedDeprecation Method Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations() is deprecated since Symfony 3.4 and will be removed in 4.0. Use write() instead.
      */
     public function testWriteTranslations()
     {

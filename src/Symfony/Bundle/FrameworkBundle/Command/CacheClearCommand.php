@@ -46,7 +46,7 @@ class CacheClearCommand extends ContainerAwareCommand
     public function __construct($cacheClearer = null, Filesystem $filesystem = null)
     {
         if (!$cacheClearer instanceof CacheClearerInterface) {
-            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since version 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, CacheClearerInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('%s() expects an instance of "%s" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.', __METHOD__, CacheClearerInterface::class), E_USER_DEPRECATED);
 
             parent::__construct($cacheClearer);
 
@@ -179,7 +179,7 @@ EOF
             $realKernel->reboot($warmupDir);
             $tempKernel = $realKernel;
         } else {
-            $this->warning = 'Calling "cache:clear" with a kernel that does not implement "Symfony\Component\HttpKernel\RebootableInterface" is deprecated since version 3.4 and will be unsupported in 4.0.';
+            $this->warning = 'Calling "cache:clear" with a kernel that does not implement "Symfony\Component\HttpKernel\RebootableInterface" is deprecated since Symfony 3.4 and will be unsupported in 4.0.';
             $realKernelClass = get_class($realKernel);
             $namespace = '';
             if (false !== $pos = strrpos($realKernelClass, '\\')) {

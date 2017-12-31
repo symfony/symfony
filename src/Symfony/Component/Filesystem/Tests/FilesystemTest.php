@@ -1144,7 +1144,7 @@ class FilesystemTest extends FilesystemTestCase
     /**
      * @group legacy
      * @dataProvider provideLegacyPathsForMakePathRelativeWithRelativePaths
-     * @expectedDeprecation Support for passing relative paths to Symfony\Component\Filesystem\Filesystem::makePathRelative() is deprecated since version 3.4 and will be removed in 4.0.
+     * @expectedDeprecation Support for passing relative paths to Symfony\Component\Filesystem\Filesystem::makePathRelative() is deprecated since Symfony 3.4 and will be removed in 4.0.
      */
     public function testMakePathRelativeWithRelativePaths($endPath, $startPath, $expectedPath)
     {

@@ -391,7 +391,7 @@ class GuardAuthenticationListenerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Returning null from "%s::getCredentials()" is deprecated since version 3.4 and will throw an \UnexpectedValueException in 4.0. Return false from "%s::supports()" instead.
+     * @expectedDeprecation Returning null from "%s::getCredentials()" is deprecated since Symfony 3.4 and will throw an \UnexpectedValueException in 4.0. Return false from "%s::supports()" instead.
      */
     public function testReturnNullFromGetCredentialsTriggersForAbstractGuardAuthenticatorInstances()
     {

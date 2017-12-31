@@ -9,10 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\SecurityBundle\Tests;
+namespace Symfony\Component\Security\Http\Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\SecurityBundle\SecurityUserValueResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
@@ -20,16 +19,14 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
-/**
- * @group legacy
- */
-class SecurityUserValueResolverTest extends TestCase
+class UserValueResolverTest extends TestCase
 {
     public function testResolveNoToken()
     {
         $tokenStorage = new TokenStorage();
-        $resolver = new SecurityUserValueResolver($tokenStorage);
+        $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
 
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
@@ -42,7 +39,7 @@ class SecurityUserValueResolverTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
-        $resolver = new SecurityUserValueResolver($tokenStorage);
+        $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', get_class($mock), false, false, null);
 
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
@@ -51,7 +48,7 @@ class SecurityUserValueResolverTest extends TestCase
     public function testResolveWrongType()
     {
         $tokenStorage = new TokenStorage();
-        $resolver = new SecurityUserValueResolver($tokenStorage);
+        $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', null, false, false, null);
 
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
@@ -65,7 +62,7 @@ class SecurityUserValueResolverTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
-        $resolver = new SecurityUserValueResolver($tokenStorage);
+        $resolver = new UserValueResolver($tokenStorage);
         $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
 
         $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
@@ -80,7 +77,7 @@ class SecurityUserValueResolverTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
-        $argumentResolver = new ArgumentResolver(null, array(new SecurityUserValueResolver($tokenStorage)));
+        $argumentResolver = new ArgumentResolver(null, array(new UserValueResolver($tokenStorage)));
         $this->assertSame(array($user), $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user) {}));
     }
 
@@ -90,7 +87,7 @@ class SecurityUserValueResolverTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
-        $argumentResolver = new ArgumentResolver(null, array(new SecurityUserValueResolver($tokenStorage), new DefaultValueResolver()));
+        $argumentResolver = new ArgumentResolver(null, array(new UserValueResolver($tokenStorage), new DefaultValueResolver()));
         $this->assertSame(array(null), $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user = null) {}));
     }
 }

@@ -39,7 +39,7 @@
         </service>
         <service id="Symfony\Component\Security\Core\Security" alias="security.helper" />
 
-        <service id="security.user_value_resolver" class="Symfony\Bundle\SecurityBundle\SecurityUserValueResolver">
+        <service id="security.user_value_resolver" class="Symfony\Component\Security\Http\Controller\UserValueResolver">
             <argument type="service" id="security.token_storage" />
             <tag name="controller.argument_value_resolver" priority="40" />
         </service>

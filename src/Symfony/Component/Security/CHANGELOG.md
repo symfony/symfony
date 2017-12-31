@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * The `ContextListener::setLogoutOnUserChange()` method is deprecated and will be removed in 5.0.
+ * added `UserValueResolver`.
 
 4.0.0
 -----

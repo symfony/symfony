@@ -82,7 +82,7 @@ class YamlFileLoader extends FileLoader
                     throw new \InvalidArgumentException(sprintf('The file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
                 }
 
-                @trigger_error(sprintf('The "pattern" option in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "path" option in the route definition instead.', $path), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The "pattern" option in file "%s" is deprecated since Symfony 2.2 and will be removed in 3.0. Use the "path" option in the route definition instead.', $path), E_USER_DEPRECATED);
 
                 $config['path'] = $config['pattern'];
                 unset($config['pattern']);
@@ -132,7 +132,7 @@ class YamlFileLoader extends FileLoader
             }
 
             unset($requirements['_method']);
-            @trigger_error(sprintf('The "_method" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" option instead.', $name, $path), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "_method" requirement of route "%s" in file "%s" is deprecated since Symfony 2.2 and will be removed in 3.0. Use the "methods" option instead.', $name, $path), E_USER_DEPRECATED);
         }
 
         if (isset($requirements['_scheme'])) {
@@ -141,7 +141,7 @@ class YamlFileLoader extends FileLoader
             }
 
             unset($requirements['_scheme']);
-            @trigger_error(sprintf('The "_scheme" requirement of route "%s" in file "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" option instead.', $name, $path), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "_scheme" requirement of route "%s" in file "%s" is deprecated since Symfony 2.2 and will be removed in 3.0. Use the "schemes" option instead.', $name, $path), E_USER_DEPRECATED);
         }
 
         $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);

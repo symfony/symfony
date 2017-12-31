@@ -109,7 +109,7 @@ class Route
                 $this->methods = explode('|', $requirements['_method']);
             }
 
-            @trigger_error('The "_method" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the "methods" option instead.', E_USER_DEPRECATED);
+            @trigger_error('The "_method" requirement is deprecated since Symfony 2.2 and will be removed in 3.0. Use the "methods" option instead.', E_USER_DEPRECATED);
         }
 
         if (isset($requirements['_scheme'])) {
@@ -117,7 +117,7 @@ class Route
                 $this->schemes = explode('|', $requirements['_scheme']);
             }
 
-            @trigger_error('The "_scheme" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the "schemes" option instead.', E_USER_DEPRECATED);
+            @trigger_error('The "_scheme" requirement is deprecated since Symfony 2.2 and will be removed in 3.0. Use the "schemes" option instead.', E_USER_DEPRECATED);
         }
 
         $this->requirements = $requirements;

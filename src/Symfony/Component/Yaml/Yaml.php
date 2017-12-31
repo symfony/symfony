@@ -33,7 +33,7 @@ class Yaml
      * you must validate the input before calling this method. Passing a file
      * as an input is a deprecated feature and will be removed in 3.0.
      *
-     * Note: the ability to pass file names to the Yaml::parse method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.
+     * Note: the ability to pass file names to the Yaml::parse method is deprecated since Symfony 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.
      *
      * @param string $input                  Path to a YAML file or a string containing YAML
      * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
@@ -49,7 +49,7 @@ class Yaml
         // if input is a file, process it
         $file = '';
         if (false === strpos($input, "\n") && is_file($input)) {
-            @trigger_error('The ability to pass file names to the '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.', E_USER_DEPRECATED);
+            @trigger_error('The ability to pass file names to the '.__METHOD__.' method is deprecated since Symfony 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.', E_USER_DEPRECATED);
 
             if (false === is_readable($input)) {
                 throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));

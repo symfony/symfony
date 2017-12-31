@@ -104,7 +104,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function getIterator()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         return new \ArrayIterator($this->groups);
     }
@@ -122,7 +122,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetExists($offset)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         return isset($this->groups[$offset]);
     }
@@ -142,7 +142,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetGet($offset)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if (!isset($this->groups[$offset])) {
             throw new OutOfBoundsException(sprintf(
@@ -166,7 +166,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetSet($offset, $value)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if (null !== $offset) {
             $this->groups[$offset] = $value;
@@ -188,7 +188,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function offsetUnset($offset)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         unset($this->groups[$offset]);
     }
@@ -204,7 +204,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function count()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         return count($this->groups);
     }

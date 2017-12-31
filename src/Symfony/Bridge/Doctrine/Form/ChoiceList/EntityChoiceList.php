@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-@trigger_error('The '.__NAMESPACE__.'\EntityChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\EntityChoiceList class is deprecated since Symfony 2.7 and will be removed in 3.0. Use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader instead.', E_USER_DEPRECATED);
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -312,7 +312,7 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getIndicesForChoices(array $entities)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         // Performance optimization
         if (empty($entities)) {
@@ -355,7 +355,7 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getIndicesForValues(array $values)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         // Performance optimization
         if (empty($values)) {

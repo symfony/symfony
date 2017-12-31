@@ -684,7 +684,7 @@ class Form implements \IteratorAggregate, FormInterface
         // This method is deprecated for Request too, but the error is
         // triggered in Form::submit() method.
         if (!$submittedData instanceof Request) {
-            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::submit method instead.', E_USER_DEPRECATED);
+            @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::submit method instead.', E_USER_DEPRECATED);
         }
 
         return $this->submit($submittedData);
@@ -724,7 +724,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isBound()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::isSubmitted method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::isSubmitted method instead.', E_USER_DEPRECATED);
 
         return $this->submitted;
     }
@@ -844,7 +844,7 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrorsAsString($level = 0)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use (string) Form::getErrors(true, false) instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.5 and will be removed in 3.0. Use (string) Form::getErrors(true, false) instead.', E_USER_DEPRECATED);
 
         return self::indent((string) $this->getErrors(true, false), $level);
     }

@@ -41,7 +41,7 @@ class TemplateCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInte
             $this->container = $container;
         } elseif ($container instanceof Environment) {
             $this->twig = $container;
-            @trigger_error(sprintf('Using a "%s" as first argument of %s is deprecated since version 3.4 and will be unsupported in version 4.0. Use a %s instead.', Environment::class, __CLASS__, ContainerInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using a "%s" as first argument of %s is deprecated since Symfony 3.4 and will be unsupported in version 4.0. Use a %s instead.', Environment::class, __CLASS__, ContainerInterface::class), E_USER_DEPRECATED);
         } else {
             throw new \InvalidArgumentException(sprintf('%s only accepts instance of Psr\Container\ContainerInterface as first argument.', __CLASS__));
         }

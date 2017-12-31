@@ -41,7 +41,7 @@ class DigestAuthenticationListener implements ListenerInterface
 
     public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
-        @trigger_error(sprintf('The %s class and the whole HTTP digest authentication system is deprecated since 3.4 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s class and the whole HTTP digest authentication system is deprecated since Symfony 3.4 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
 
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -150,7 +150,7 @@ class DigestData
 
     public function __construct($header)
     {
-        @trigger_error(sprintf('The %s class and the whole HTTP digest authentication system is deprecated since 3.4 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s class and the whole HTTP digest authentication system is deprecated since Symfony 3.4 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
 
         $this->header = $header;
         preg_match_all('/(\w+)=("((?:[^"\\\\]|\\\\.)+)"|([^\s,$]+))/', $header, $matches, PREG_SET_ORDER);

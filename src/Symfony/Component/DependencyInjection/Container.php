@@ -304,7 +304,7 @@ class Container implements ResettableContainerInterface
                 } elseif (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
                     // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
                     // and only when the dumper has not generated the method map (otherwise the method map is considered to be fully populated by the dumper)
-                    @trigger_error('Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
+                    @trigger_error('Generating a dumped container without populating the method map is deprecated since Symfony 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.', E_USER_DEPRECATED);
 
                     return /* self::IGNORE_ON_UNINITIALIZED_REFERENCE */ 4 === $invalidBehavior ? null : $this->{$method}();
                 }

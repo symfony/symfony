@@ -19,6 +19,6 @@ class NativeSessionHandler extends \SessionHandler
 {
     public function __construct()
     {
-        @trigger_error('The '.__NAMESPACE__.'\NativeSessionHandler class is deprecated since version 3.4 and will be removed in 4.0. Use the \SessionHandler class instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__NAMESPACE__.'\NativeSessionHandler class is deprecated since Symfony 3.4 and will be removed in 4.0. Use the \SessionHandler class instead.', E_USER_DEPRECATED);
     }
 }

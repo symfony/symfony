@@ -38,7 +38,7 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
             $this->router = $container->get('router'); // For BC, the $router property must be populated in the constructor
         } elseif ($container instanceof RouterInterface) {
             $this->router = $container;
-            @trigger_error(sprintf('Using a "%s" as first argument of %s is deprecated since version 3.4 and will be unsupported in version 4.0. Use a %s instead.', RouterInterface::class, __CLASS__, ContainerInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using a "%s" as first argument of %s is deprecated since Symfony 3.4 and will be unsupported in version 4.0. Use a %s instead.', RouterInterface::class, __CLASS__, ContainerInterface::class), E_USER_DEPRECATED);
         } else {
             throw new \InvalidArgumentException(sprintf('%s only accepts instance of Psr\Container\ContainerInterface as first argument.', __CLASS__));
         }

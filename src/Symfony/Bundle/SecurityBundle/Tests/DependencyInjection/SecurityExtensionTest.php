@@ -215,7 +215,7 @@ class SecurityExtensionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Listener "http_basic" on firewall "default" has no "provider" set but multiple providers exist. Using the first configured provider (first) is deprecated since 3.4 and will throw an exception in 4.0, set the "provider" key on the firewall instead.
+     * @expectedDeprecation Listener "http_basic" on firewall "default" has no "provider" set but multiple providers exist. Using the first configured provider (first) is deprecated since Symfony 3.4 and will throw an exception in 4.0, set the "provider" key on the firewall instead.
      */
     public function testDeprecationForAmbiguousProvider()
     {

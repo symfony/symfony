@@ -451,7 +451,7 @@ class Filesystem
     public function makePathRelative($endPath, $startPath)
     {
         if (!$this->isAbsolutePath($endPath) || !$this->isAbsolutePath($startPath)) {
-            @trigger_error(sprintf('Support for passing relative paths to %s() is deprecated since version 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Support for passing relative paths to %s() is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
         }
 
         // Normalize separators on Windows

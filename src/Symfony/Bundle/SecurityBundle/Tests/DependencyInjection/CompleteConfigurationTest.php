@@ -38,7 +38,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
+     * @expectedDeprecation The "security.acl" configuration key is deprecated since Symfony 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
      */
     public function testRolesHierarchyWithAcl()
     {
@@ -467,7 +467,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
+     * @expectedDeprecation The "security.acl" configuration key is deprecated since Symfony 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
      */
     public function testAcl()
     {
@@ -479,7 +479,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "security.acl" configuration key is deprecated since version 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
+     * @expectedDeprecation The "security.acl" configuration key is deprecated since Symfony 3.4 and will be removed in 4.0. Install symfony/acl-bundle and use the "acl" key instead.
      */
     public function testCustomAclProvider()
     {

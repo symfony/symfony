@@ -77,7 +77,7 @@ class CachePoolClearCommandTest extends WebTestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand::__construct() expects an instance of "Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer" as first argument since version 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.
+     * @expectedDeprecation Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand::__construct() expects an instance of "Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.
      */
     public function testLegacyClearCommand()
     {

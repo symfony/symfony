@@ -35,7 +35,7 @@ abstract class ManagerRegistry extends AbstractManagerRegistry implements Contai
      */
     public function setContainer(SymfonyContainerInterface $container = null)
     {
-        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.4 and will be removed in 4.0. Inject a PSR-11 container using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0. Inject a PSR-11 container using the constructor instead.', __METHOD__), E_USER_DEPRECATED);
 
         $this->container = $container;
     }

@@ -87,7 +87,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
         if ($formatter instanceof MessageSelector) {
             $formatter = new MessageFormatter($formatter);
-            @trigger_error(sprintf('Passing a "%s" instance into the "%s" as a second argument is deprecated since version 3.4 and will be removed in 4.0. Inject a "%s" implementation instead.', MessageSelector::class, __METHOD__, MessageFormatterInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a "%s" instance into the "%s" as a second argument is deprecated since Symfony 3.4 and will be removed in 4.0. Inject a "%s" implementation instead.', MessageSelector::class, __METHOD__, MessageFormatterInterface::class), E_USER_DEPRECATED);
         } elseif (null === $formatter) {
             $formatter = new MessageFormatter();
         }

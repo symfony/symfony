@@ -50,7 +50,7 @@ class ProcessTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd(). This behavior is deprecated since version 3.4 and will be removed in 4.0.
+     * @expectedDeprecation The provided cwd does not exist. Command is currently ran against getcwd(). This behavior is deprecated since Symfony 3.4 and will be removed in 4.0.
      */
     public function testInvalidCwd()
     {

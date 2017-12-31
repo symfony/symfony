@@ -29,8 +29,6 @@ class BinaryNode extends Node
     private static $functions = array(
         '**' => 'pow',
         '..' => 'range',
-        'in' => 'in_array',
-        'not in' => '!in_array',
     );
 
     public function __construct(string $operator, Node $left, Node $right)
@@ -55,6 +53,28 @@ class BinaryNode extends Node
             ;
 
             return;
+        }
+
+        switch ($operator) {
+            case 'not in':
+                $compiler->raw('!');
+                // no break
+            case 'in':
+                $compiler
+                    ->raw('in_array(')
+                        ->compile($this->nodes['left'])
+                        ->raw(', ')
+                        ->raw('is_array(')
+                            ->compile($this->nodes['right'])
+                        ->raw(') ? ')
+                        ->compile($this->nodes['right'])
+                        ->raw(' : iterator_to_array(')
+                            ->compile($this->nodes['right'])
+                        ->raw(')')
+                    ->raw(')')
+                ;
+
+                return;
         }
 
         if (isset(self::$functions[$operator])) {
@@ -92,9 +112,6 @@ class BinaryNode extends Node
         if (isset(self::$functions[$operator])) {
             $right = $this->nodes['right']->evaluate($functions, $values);
 
-            if ('not in' === $operator) {
-                return !in_array($left, $right);
-            }
             $f = self::$functions[$operator];
 
             return $f($left, $right);
@@ -135,9 +152,9 @@ class BinaryNode extends Node
             case '<=':
                 return $left <= $right;
             case 'not in':
-                return !in_array($left, $right);
+                return !in_array($left, is_array($right) ? $right : iterator_to_array($right));
             case 'in':
-                return in_array($left, $right);
+                return in_array($left, is_array($right) ? $right : iterator_to_array($right));
             case '+':
                 return $left + $right;
             case '-':

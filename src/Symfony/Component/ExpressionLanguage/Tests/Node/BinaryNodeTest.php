@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
-use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
+use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\Node\NameNode;
+use Symfony\Component\ExpressionLanguage\Tests\Fixtures\Collection;
 
 class BinaryNodeTest extends AbstractNodeTest
 {
@@ -22,6 +24,8 @@ class BinaryNodeTest extends AbstractNodeTest
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
         $array->addElement(new ConstantNode('b'));
+
+        $collectionValues = array('collection' => new Collection());
 
         return array(
             array(true, new BinaryNode('or', new ConstantNode(true), new ConstantNode(false))),
@@ -56,9 +60,13 @@ class BinaryNodeTest extends AbstractNodeTest
             array('ab', new BinaryNode('~', new ConstantNode('a'), new ConstantNode('b'))),
 
             array(true, new BinaryNode('in', new ConstantNode('a'), $array)),
+            array(true, new BinaryNode('in', new ConstantNode('a'), new NameNode('collection')), $collectionValues),
             array(false, new BinaryNode('in', new ConstantNode('c'), $array)),
+            array(false, new BinaryNode('in', new ConstantNode('c'), new NameNode('collection')), $collectionValues),
             array(true, new BinaryNode('not in', new ConstantNode('c'), $array)),
+            array(true, new BinaryNode('not in', new ConstantNode('c'), new NameNode('collection')), $collectionValues),
             array(false, new BinaryNode('not in', new ConstantNode('a'), $array)),
+            array(false, new BinaryNode('not in', new ConstantNode('a'), new NameNode('collection')), $collectionValues),
 
             array(array(1, 2, 3), new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))),
 
@@ -104,10 +112,10 @@ class BinaryNodeTest extends AbstractNodeTest
             array('pow(5, 2)', new BinaryNode('**', new ConstantNode(5), new ConstantNode(2))),
             array('("a" . "b")', new BinaryNode('~', new ConstantNode('a'), new ConstantNode('b'))),
 
-            array('in_array("a", array(0 => "a", 1 => "b"))', new BinaryNode('in', new ConstantNode('a'), $array)),
-            array('in_array("c", array(0 => "a", 1 => "b"))', new BinaryNode('in', new ConstantNode('c'), $array)),
-            array('!in_array("c", array(0 => "a", 1 => "b"))', new BinaryNode('not in', new ConstantNode('c'), $array)),
-            array('!in_array("a", array(0 => "a", 1 => "b"))', new BinaryNode('not in', new ConstantNode('a'), $array)),
+            array('in_array("a", is_array(array(0 => "a", 1 => "b")) ? array(0 => "a", 1 => "b") : iterator_to_array(array(0 => "a", 1 => "b")))', new BinaryNode('in', new ConstantNode('a'), $array)),
+            array('in_array("c", is_array(array(0 => "a", 1 => "b")) ? array(0 => "a", 1 => "b") : iterator_to_array(array(0 => "a", 1 => "b")))', new BinaryNode('in', new ConstantNode('c'), $array)),
+            array('!in_array("c", is_array(array(0 => "a", 1 => "b")) ? array(0 => "a", 1 => "b") : iterator_to_array(array(0 => "a", 1 => "b")))', new BinaryNode('not in', new ConstantNode('c'), $array)),
+            array('!in_array("a", is_array(array(0 => "a", 1 => "b")) ? array(0 => "a", 1 => "b") : iterator_to_array(array(0 => "a", 1 => "b")))', new BinaryNode('not in', new ConstantNode('a'), $array)),
 
             array('range(1, 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))),
 

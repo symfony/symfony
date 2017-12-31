@@ -32,6 +32,7 @@ Validator
 
  * The `Email::__construct()` 'strict' property is deprecated and will be removed in 5.0. Use 'mode'=>"strict" instead.
  * Calling `EmailValidator::__construct()` method with a boolean parameter is deprecated and will be removed in 5.0, use `EmailValidator("strict")` instead.
+ * Deprecated the `checkDNS` and `dnsMessage` options of the `Url` constraint. They will be removed in 5.0.
 
 Workflow
 --------

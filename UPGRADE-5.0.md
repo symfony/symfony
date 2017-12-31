@@ -30,7 +30,7 @@ Validator
 
  * The `Email::__construct()` 'strict' property has been removed. Use 'mode'=>"strict" instead.
  * Calling `EmailValidator::__construct()` method with a boolean parameter has been removed, use `EmailValidator("strict")` instead.
-
+ * Removed the `checkDNS` and `dnsMessage` options from the `Url` constraint.
 
 Workflow
 --------

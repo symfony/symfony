@@ -49,7 +49,7 @@ class YamlFileDumper extends FileDumper
      */
     protected function format(MessageCatalogue $messages, $domain)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use the formatCatalogue() method instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0. Use the formatCatalogue() method instead.', E_USER_DEPRECATED);
 
         return $this->formatCatalogue($messages, $domain);
     }

@@ -87,7 +87,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     public function get($key, $default = null, $deep = false)
     {
         if ($deep) {
-            @trigger_error('Using paths to find deeper items in '.__METHOD__.' is deprecated since version 2.8 and will be removed in 3.0. Filter the returned value in your own code instead.', E_USER_DEPRECATED);
+            @trigger_error('Using paths to find deeper items in '.__METHOD__.' is deprecated since Symfony 2.8 and will be removed in 3.0. Filter the returned value in your own code instead.', E_USER_DEPRECATED);
         }
 
         if (!$deep || false === $pos = strpos($key, '[')) {
@@ -264,7 +264,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
             }
         }
         if (is_bool($filter) || !isset($filters[$filter]) || is_array($deep)) {
-            @trigger_error('Passing the $deep boolean as 3rd argument to the '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Remove it altogether as the $deep argument will be removed in 3.0.', E_USER_DEPRECATED);
+            @trigger_error('Passing the $deep boolean as 3rd argument to the '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0. Remove it altogether as the $deep argument will be removed in 3.0.', E_USER_DEPRECATED);
             $tmp = $deep;
             $deep = $filter;
             $filter = $options;

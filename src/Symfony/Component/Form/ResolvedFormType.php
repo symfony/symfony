@@ -71,7 +71,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
             // Anyone else should only override getBlockPrefix() if they actually
             // want to have a different block prefix than the default one
             if ($isOldOverwritten && !$isNewOverwritten) {
-                @trigger_error(get_class($innerType).': The FormTypeInterface::getName() method is deprecated since version 2.8 and will be removed in 3.0. Remove it from your classes. Use getBlockPrefix() if you want to customize the template block prefix. This method will be added to the FormTypeInterface with Symfony 3.0.', E_USER_DEPRECATED);
+                @trigger_error(get_class($innerType).': The FormTypeInterface::getName() method is deprecated since Symfony 2.8 and will be removed in 3.0. Remove it from your classes. Use getBlockPrefix() if you want to customize the template block prefix. This method will be added to the FormTypeInterface with Symfony 3.0.', E_USER_DEPRECATED);
             }
 
             $blockPrefix = $innerType->getBlockPrefix();

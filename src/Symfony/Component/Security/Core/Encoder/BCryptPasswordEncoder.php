@@ -68,7 +68,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
         $options = array('cost' => $this->cost);
 
         if ($salt) {
-            @trigger_error('Passing a $salt to '.__METHOD__.'() is deprecated since version 2.8 and will be ignored in 3.0.', E_USER_DEPRECATED);
+            @trigger_error('Passing a $salt to '.__METHOD__.'() is deprecated since Symfony 2.8 and will be ignored in 3.0.', E_USER_DEPRECATED);
 
             $options['salt'] = $salt;
         }

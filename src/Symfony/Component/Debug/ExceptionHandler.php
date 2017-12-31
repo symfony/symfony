@@ -39,7 +39,7 @@ class ExceptionHandler
     public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
     {
         if (false !== strpos($charset, '%')) {
-            @trigger_error('Providing $fileLinkFormat as second argument to '.__METHOD__.' is deprecated since version 2.8 and will be unsupported in 3.0. Please provide it as third argument, after $charset.', E_USER_DEPRECATED);
+            @trigger_error('Providing $fileLinkFormat as second argument to '.__METHOD__.' is deprecated since Symfony 2.8 and will be unsupported in 3.0. Please provide it as third argument, after $charset.', E_USER_DEPRECATED);
 
             // Swap $charset and $fileLinkFormat for BC reasons
             $pivot = $fileLinkFormat;
@@ -164,7 +164,7 @@ class ExceptionHandler
             $response = $this->createResponse($exception);
             $response->sendHeaders();
             $response->sendContent();
-            @trigger_error(sprintf("The %s::createResponse method is deprecated since 2.8 and won't be called anymore when handling an exception in 3.0.", $reflector->class), E_USER_DEPRECATED);
+            @trigger_error(sprintf("The %s::createResponse method is deprecated since Symfony 2.8 and won't be called anymore when handling an exception in 3.0.", $reflector->class), E_USER_DEPRECATED);
 
             return;
         }
@@ -208,7 +208,7 @@ class ExceptionHandler
      */
     public function createResponse($exception)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if (!$exception instanceof FlattenException) {
             $exception = FlattenException::create($exception);

@@ -75,7 +75,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function supportsAttribute($attribute)
     {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' is deprecated since Symfony 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
 
         foreach ($this->voters as $voter) {
             if ($voter->supportsAttribute($attribute)) {
@@ -91,7 +91,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function supportsClass($class)
     {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' is deprecated since Symfony 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
 
         foreach ($this->voters as $voter) {
             if ($voter->supportsClass($class)) {

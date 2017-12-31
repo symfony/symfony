@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Util;
 
-@trigger_error('The '.__NAMESPACE__.'\SecureRandom class is deprecated since version 2.8 and will be removed in 3.0. Use the random_bytes() function instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\SecureRandom class is deprecated since Symfony 2.8 and will be removed in 3.0. Use the random_bytes() function instead.', E_USER_DEPRECATED);
 
 /**
  * A secure random number generator implementation.

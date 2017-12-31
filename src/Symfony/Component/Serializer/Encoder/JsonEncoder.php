@@ -98,7 +98,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      */
     public static function getLastErrorMessage()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use json_last_error_msg() instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0. Use json_last_error_msg() instead.', E_USER_DEPRECATED);
 
         return json_last_error_msg();
     }

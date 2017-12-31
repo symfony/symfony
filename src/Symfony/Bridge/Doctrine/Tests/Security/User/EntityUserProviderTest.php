@@ -82,7 +82,7 @@ class EntityUserProviderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Implementing Symfony\Component\Security\Core\User\UserProviderInterface in a Doctrine repository when using the entity provider is deprecated since version 2.8 and will not be supported in 3.0. Make the repository implement Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface instead.
+     * @expectedDeprecation Implementing Symfony\Component\Security\Core\User\UserProviderInterface in a Doctrine repository when using the entity provider is deprecated since Symfony 2.8 and will not be supported in 3.0. Make the repository implement Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface instead.
      */
     public function testLoadUserByUsernameWithUserProviderRepositoryAndWithoutProperty()
     {

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
-@trigger_error('The '.__NAMESPACE__.'\FilePathsIterator class is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\FilePathsIterator class is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
 use Symfony\Component\Finder\SplFileInfo;
 

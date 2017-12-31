@@ -94,7 +94,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function addAdapter(AdapterInterface $adapter, $priority = 0)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $this->initDefaultAdapters();
 
@@ -116,7 +116,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function useBestAdapter()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $this->initDefaultAdapters();
 
@@ -138,7 +138,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function setAdapter($name)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $this->initDefaultAdapters();
 
@@ -161,7 +161,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function removeAdapters()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $this->adapters = array();
 
@@ -177,7 +177,7 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function getAdapters()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         $this->initDefaultAdapters();
 

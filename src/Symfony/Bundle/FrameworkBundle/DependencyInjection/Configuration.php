@@ -282,7 +282,7 @@ class Configuration implements ConfigurationInterface
                             ->beforeNormalization()
                                 ->ifTrue(function ($v) { return 'file:' !== substr($v, 0, 5); })
                                 ->then(function ($v) {
-                                    @trigger_error('The profiler.dsn configuration key must start with "file:" because all the storages except the filesystem are deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+                                    @trigger_error('The profiler.dsn configuration key must start with "file:" because all the storages except the filesystem are deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
                                     return $v;
                                 })
@@ -293,7 +293,7 @@ class Configuration implements ConfigurationInterface
                             ->beforeNormalization()
                                 ->always()
                                 ->then(function ($v) {
-                                    @trigger_error('The profiler.username configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+                                    @trigger_error('The profiler.username configuration key is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
                                     return $v;
                                 })
@@ -304,7 +304,7 @@ class Configuration implements ConfigurationInterface
                             ->beforeNormalization()
                                 ->always()
                                 ->then(function ($v) {
-                                    @trigger_error('The profiler.password configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+                                    @trigger_error('The profiler.password configuration key is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
                                     return $v;
                                 })
@@ -315,7 +315,7 @@ class Configuration implements ConfigurationInterface
                             ->beforeNormalization()
                                 ->always()
                                 ->then(function ($v) {
-                                    @trigger_error('The profiler.lifetime configuration key is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+                                    @trigger_error('The profiler.lifetime configuration key is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
                                     return $v;
                                 })
@@ -663,7 +663,7 @@ class Configuration implements ConfigurationInterface
                                 // Can be removed in 3.0, once ApcCache support is dropped
                                 ->ifString()->then(function ($v) {
                                     if ('apc' === $v) {
-                                        @trigger_error('The ability to pass "apc" as the framework.validation.cache configuration key value is deprecated since version 2.8 and will be removed in 3.0. Use the "validator.mapping.cache.doctrine.apc" service id instead.', E_USER_DEPRECATED);
+                                        @trigger_error('The ability to pass "apc" as the framework.validation.cache configuration key value is deprecated since Symfony 2.8 and will be removed in 3.0. Use the "validator.mapping.cache.doctrine.apc" service id instead.', E_USER_DEPRECATED);
 
                                         return 'validator.mapping.cache.apc';
                                     }

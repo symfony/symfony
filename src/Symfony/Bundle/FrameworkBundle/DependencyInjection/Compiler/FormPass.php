@@ -64,10 +64,10 @@ class FormPass implements CompilerPassInterface
             if (isset($tag[0]['extended_type'])) {
                 $extendedType = $tag[0]['extended_type'];
             } elseif (isset($tag[0]['alias'])) {
-                @trigger_error(sprintf('The alias option of the form.type_extension tag of service "%s" is deprecated since version 2.8 and will be removed in 3.0. Use the extended_type option instead.', $serviceId), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The alias option of the form.type_extension tag of service "%s" is deprecated since Symfony 2.8 and will be removed in 3.0. Use the extended_type option instead.', $serviceId), E_USER_DEPRECATED);
                 $extendedType = $tag[0]['alias'];
             } else {
-                @trigger_error(sprintf('The extended_type option of the form.type_extension tag of service "%s" is required since version 2.8.', $serviceId), E_USER_DEPRECATED);
+                @trigger_error(sprintf('The extended_type option of the form.type_extension tag of service "%s" is required since Symfony 2.8.', $serviceId), E_USER_DEPRECATED);
                 $extendedType = $serviceId;
             }
 

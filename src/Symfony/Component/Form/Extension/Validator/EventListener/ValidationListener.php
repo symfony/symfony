@@ -47,7 +47,7 @@ class ValidationListener implements EventSubscriberInterface
         }
 
         if (!$validator instanceof ValidatorInterface) {
-            @trigger_error('Passing an instance of Symfony\Component\Validator\ValidatorInterface as argument to the '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use an implementation of Symfony\Component\Validator\Validator\ValidatorInterface instead', E_USER_DEPRECATED);
+            @trigger_error('Passing an instance of Symfony\Component\Validator\ValidatorInterface as argument to the '.__METHOD__.' method is deprecated since Symfony 2.8 and will be removed in 3.0. Use an implementation of Symfony\Component\Validator\Validator\ValidatorInterface instead', E_USER_DEPRECATED);
         }
 
         $this->validator = $validator;

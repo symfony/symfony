@@ -1029,7 +1029,7 @@ class Crawler extends \SplObjectStorage
 
             // BC for Symfony 2.4 and lower were elements were adding in a fake _root parent
             if (0 === strpos($expression, '/_root/')) {
-                @trigger_error('XPath expressions referencing the fake root node are deprecated since version 2.8 and will be unsupported in 3.0. Please use "./" instead of "/_root/".', E_USER_DEPRECATED);
+                @trigger_error('XPath expressions referencing the fake root node are deprecated since Symfony 2.8 and will be unsupported in 3.0. Please use "./" instead of "/_root/".', E_USER_DEPRECATED);
 
                 $expression = './'.substr($expression, 7);
             } elseif (0 === strpos($expression, 'self::*/')) {
@@ -1199,6 +1199,6 @@ class Crawler extends \SplObjectStorage
             }
         }
 
-        @trigger_error('The '.$methodName.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.$methodName.' method is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
     }
 }

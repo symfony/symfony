@@ -825,7 +825,7 @@ class FrameworkExtension extends Extension
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
-        $options = array();
+        $options = array('cache_limiter' => '0');
         foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor', 'use_strict_mode') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];

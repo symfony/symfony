@@ -62,7 +62,7 @@ class ProxyDumper implements DumperInterface
         if (func_num_args() >= 3) {
             $methodName = func_get_arg(2);
         } else {
-            @trigger_error(sprintf('You must use the third argument of %s to define the method to call to construct your service since version 3.1, not using it won\'t be supported in 4.0.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('You must use the third argument of %s to define the method to call to construct your service since Symfony 3.1, not using it won\'t be supported in 4.0.', __METHOD__), E_USER_DEPRECATED);
             $methodName = 'get'.Container::camelize($id).'Service';
         }
         $proxyClass = $this->getProxyClassName($definition);

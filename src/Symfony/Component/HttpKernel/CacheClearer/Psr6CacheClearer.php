@@ -27,7 +27,7 @@ class Psr6CacheClearer implements CacheClearerInterface
 
     public function addPool(CacheItemPoolInterface $pool)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Pass an array of pools indexed by name to the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Pass an array of pools indexed by name to the constructor instead.', __METHOD__), E_USER_DEPRECATED);
 
         $this->pools[] = $pool;
     }

@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass as BaseAddValidatorsInitializerPass;
 
-@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use %s instead.', AddValidatorInitializersPass::class, BaseAddValidatorsInitializerPass::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0. Use %s instead.', AddValidatorInitializersPass::class, BaseAddValidatorsInitializerPass::class), E_USER_DEPRECATED);
 
 /**
  * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseAddValidatorInitializersPass} instead

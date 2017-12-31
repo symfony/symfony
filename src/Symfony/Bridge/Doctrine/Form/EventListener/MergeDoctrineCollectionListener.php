@@ -47,7 +47,7 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
     {
         if ($this->bc) {
             // onBind() has been overridden from a child class
-            @trigger_error('The onBind() method is deprecated since version 3.1 and will be removed in 4.0. Use the onSubmit() method instead.', E_USER_DEPRECATED);
+            @trigger_error('The onBind() method is deprecated since Symfony 3.1 and will be removed in 4.0. Use the onSubmit() method instead.', E_USER_DEPRECATED);
 
             if (!$this->bcLayer) {
                 // If parent::onBind() has not been called, then logic has been executed

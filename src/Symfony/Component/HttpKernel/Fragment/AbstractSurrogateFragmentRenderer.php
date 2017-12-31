@@ -63,7 +63,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
     {
         if (!$this->surrogate || !$this->surrogate->hasSurrogateCapability($request)) {
             if ($uri instanceof ControllerReference && $this->containsNonScalars($uri->attributes)) {
-                @trigger_error('Passing non-scalar values as part of URI attributes to the ESI and SSI rendering strategies is deprecated since version 3.1, and will be removed in 4.0. Use a different rendering strategy or pass scalar values.', E_USER_DEPRECATED);
+                @trigger_error('Passing non-scalar values as part of URI attributes to the ESI and SSI rendering strategies is deprecated since Symfony 3.1, and will be removed in 4.0. Use a different rendering strategy or pass scalar values.', E_USER_DEPRECATED);
             }
 
             return $this->inlineStrategy->render($uri, $request, $options);

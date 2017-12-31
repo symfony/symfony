@@ -280,7 +280,7 @@ class ChoiceType extends AbstractType
                 throw new \RuntimeException(sprintf('The "choices_as_values" option of the %s should not be used. Remove it and flip the contents of the "choices" option instead.', get_class($this)));
             }
 
-            @trigger_error('The "choices_as_values" option is deprecated since version 3.1 and will be removed in 4.0. You should not use it anymore.', E_USER_DEPRECATED);
+            @trigger_error('The "choices_as_values" option is deprecated since Symfony 3.1 and will be removed in 4.0. You should not use it anymore.', E_USER_DEPRECATED);
 
             return true;
         };

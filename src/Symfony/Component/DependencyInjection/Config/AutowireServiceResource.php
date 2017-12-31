@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Config;
 
-@trigger_error('The '.__NAMESPACE__.'\AutowireServiceResource class is deprecated since version 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\AutowireServiceResource class is deprecated since Symfony 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;

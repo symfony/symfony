@@ -61,7 +61,7 @@ class Parser
     public function parse($value, $flags = 0)
     {
         if (is_bool($flags)) {
-            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
 
             if ($flags) {
                 $flags = Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE;
@@ -71,7 +71,7 @@ class Parser
         }
 
         if (func_num_args() >= 3) {
-            @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT flag instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing a boolean flag to toggle object support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT flag instead.', E_USER_DEPRECATED);
 
             if (func_get_arg(2)) {
                 $flags |= Yaml::PARSE_OBJECT;
@@ -79,7 +79,7 @@ class Parser
         }
 
         if (func_num_args() >= 4) {
-            @trigger_error('Passing a boolean flag to toggle object for map support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT_FOR_MAP flag instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing a boolean flag to toggle object for map support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::PARSE_OBJECT_FOR_MAP flag instead.', E_USER_DEPRECATED);
 
             if (func_get_arg(3)) {
                 $flags |= Yaml::PARSE_OBJECT_FOR_MAP;
@@ -178,7 +178,7 @@ class Parser
                 }
 
                 if (isset($values['value'][1]) && '?' === $values['value'][0] && ' ' === $values['value'][1]) {
-                    @trigger_error(sprintf('Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Starting an unquoted string with a question mark followed by a space is deprecated since Symfony 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
                 }
 
                 // array
@@ -238,7 +238,7 @@ class Parser
 
                 if (!(Yaml::PARSE_KEYS_AS_STRINGS & $flags) && !is_string($key) && !is_int($key)) {
                     $keyType = is_numeric($key) ? 'numeric key' : 'non-string key';
-                    @trigger_error(sprintf('Implicit casting of %s to string is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead on line %d.', $keyType, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Implicit casting of %s to string is deprecated since Symfony 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0. Quote your evaluable mapping keys instead on line %d.', $keyType, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
                 }
 
                 // Convert float keys to strings, to avoid being converted to integers by PHP
@@ -324,7 +324,7 @@ class Parser
                                 $data[$key] = null;
                             }
                         } else {
-                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $key, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since Symfony 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $key, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
                         }
                     } else {
                         // remember the parsed line number here in case we need it to provide some contexts in error messages below
@@ -347,7 +347,7 @@ class Parser
                                 $data[$key] = $value;
                             }
                         } else {
-                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $key, $realCurrentLineNbKey + 1), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since Symfony 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $key, $realCurrentLineNbKey + 1), E_USER_DEPRECATED);
                         }
                     }
                 } else {
@@ -357,7 +357,7 @@ class Parser
                     if ($allowOverwrite || !isset($data[$key])) {
                         $data[$key] = $value;
                     } else {
-                        @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $key, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
+                        @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated since Symfony 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $key, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
                     }
                 }
                 if ($isRef) {
@@ -370,7 +370,7 @@ class Parser
                 }
 
                 if (isset($this->currentLine[1]) && '?' === $this->currentLine[0] && ' ' === $this->currentLine[1]) {
-                    @trigger_error(sprintf('Starting an unquoted string with a question mark followed by a space is deprecated since version 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Starting an unquoted string with a question mark followed by a space is deprecated since Symfony 3.3 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0 on line %d.', $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
                 }
 
                 // 1-liner optionally followed by newline(s)
@@ -707,7 +707,7 @@ class Parser
                 if ('!!binary' === $matches['tag']) {
                     return Inline::evaluateBinaryScalar($data);
                 } elseif ('!' !== $matches['tag']) {
-                    @trigger_error(sprintf('Using the custom tag "%s" for the value "%s" is deprecated since version 3.3. It will be replaced by an instance of %s in 4.0 on line %d.', $matches['tag'], $data, TaggedValue::class, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Using the custom tag "%s" for the value "%s" is deprecated since Symfony 3.3. It will be replaced by an instance of %s in 4.0 on line %d.', $matches['tag'], $data, TaggedValue::class, $this->getRealCurrentLineNb() + 1), E_USER_DEPRECATED);
                 }
             }
 

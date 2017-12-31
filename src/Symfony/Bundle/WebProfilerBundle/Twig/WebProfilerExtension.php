@@ -116,7 +116,7 @@ class WebProfilerExtension extends ProfilerExtension
      */
     public function dumpValue($value)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use the dumpData() method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use the dumpData() method instead.', __METHOD__), E_USER_DEPRECATED);
 
         if (null === $this->valueExporter) {
             $this->valueExporter = new ValueExporter();

@@ -37,7 +37,7 @@ class UserPasswordEncoderCommand extends ContainerAwareCommand
     public function __construct(EncoderFactoryInterface $encoderFactory = null, array $userClasses = array())
     {
         if (null === $encoderFactory) {
-            @trigger_error(sprintf('Passing null as the first argument of "%s" is deprecated since version 3.3 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing null as the first argument of "%s" is deprecated since Symfony 3.3 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
         }
 
         $this->encoderFactory = $encoderFactory;
@@ -53,7 +53,7 @@ class UserPasswordEncoderCommand extends ContainerAwareCommand
      */
     protected function getContainer()
     {
-        @trigger_error(sprintf('Method "%s" is deprecated since version 3.3 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Method "%s" is deprecated since Symfony 3.3 and "%s" won\'t extend "%s" nor implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareCommand::class, ContainerAwareInterface::class), E_USER_DEPRECATED);
 
         return parent::getContainer();
     }

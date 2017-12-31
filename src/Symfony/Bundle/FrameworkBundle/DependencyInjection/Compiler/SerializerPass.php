@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Component\Serializer\DependencyInjection\SerializerPass instead.', SerializerPass::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0. Use Symfony\Component\Serializer\DependencyInjection\SerializerPass instead.', SerializerPass::class), E_USER_DEPRECATED);
 
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass as BaseSerializerPass;
 

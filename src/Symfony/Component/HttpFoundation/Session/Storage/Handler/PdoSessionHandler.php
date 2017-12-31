@@ -645,7 +645,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Returns a insert statement supported by the database for writing session data.
+     * Returns an insert statement supported by the database for writing session data.
      *
      * @param string $sessionId   Session ID
      * @param string $sessionData Encoded session data
@@ -678,7 +678,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Returns a update statement supported by the database for writing session data.
+     * Returns an update statement supported by the database for writing session data.
      *
      * @param string $sessionId   Session ID
      * @param string $sessionData Encoded session data

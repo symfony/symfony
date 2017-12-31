@@ -25,50 +25,62 @@ class Url extends Constraint
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_ANY = 'ANY';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_NONE = false;
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_A = 'A';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_A6 = 'A6';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_AAAA = 'AAAA';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_CNAME = 'CNAME';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_MX = 'MX';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_NAPTR = 'NAPTR';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_NS = 'NS';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_PTR = 'PTR';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_SOA = 'SOA';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     const CHECK_DNS_TYPE_SRV = 'SRV';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
@@ -81,11 +93,13 @@ class Url extends Constraint
     );
 
     public $message = 'This value is not a valid URL.';
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     public $dnsMessage = 'The host could not be resolved.';
     public $protocols = array('http', 'https');
+
     /**
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */

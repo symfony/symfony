@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2017-12-08T15:50:57Z
+
+(Travis failure unrelated)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-12-08T15:55:41Z
+
+this will remove also options with a `false` value for instance, which looks bad
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-12-08T16:04:56Z
+
+> this will remove also options with a false value for instance, which looks bad
+
+@stof no, this is a list of defined options only, i.e they are names (strings).
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-12-09T02:01:29Z
+
+I just applied your patch, and yes it works.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-12-09T02:22:58Z
+
+@maidmaid thanks!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-10T21:01:38Z
+
+@yceruto Could you add a test case to prevent regressions?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2017-12-13T05:59:01Z
+
+Test added (still failure is unrelated)

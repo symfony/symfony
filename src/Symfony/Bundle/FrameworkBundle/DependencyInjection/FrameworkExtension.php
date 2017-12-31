@@ -1155,9 +1155,6 @@ class FrameworkExtension extends Extension
             if ($container->fileExists($dir = $bundle['path'].'/Resources/translations')) {
                 $dirs[] = $dir;
             }
-            if ($container->fileExists($dir = $defaultDir.'/'.$name)) {
-                $dirs[] = $dir;
-            }
             if ($container->fileExists($dir = $rootDir.sprintf('/Resources/%s/translations', $name))) {
                 $dirs[] = $dir;
             }

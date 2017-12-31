@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added the `Process::isTtySupported()` method that allows to check for TTY support
+ * made `PhpExecutableFinder` look for the `PHP_BINARY` env var when searching the php binary
 
 4.0.0
 -----

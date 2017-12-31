@@ -25,6 +25,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -386,6 +387,16 @@ class YamlFileLoaderTest extends TestCase
         $resources = array_map('strval', $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo', $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);
+    }
+
+    public function testPrototypeDoNotOverrideExistingServiceDefinition()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_prototype2.yml');
+
+        $this->assertSame('foo', (string) $container->getAlias(Prototype2\ServiceAlreadyDefinedInterface::class));
+        $this->assertTrue($container->getDefinition(Prototype2\ServiceAlreadyDefined::class)->hasTag('test'));
     }
 
     public function testDefaults()

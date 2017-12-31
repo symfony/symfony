@@ -59,6 +59,10 @@ abstract class FileLoader extends BaseFileLoader
         $prototype = serialize($prototype);
 
         foreach ($classes as $class) {
+            if ($this->container->has($class)) {
+                continue;
+            }
+
             $this->setDefinition($class, unserialize($prototype));
         }
     }

@@ -33,7 +33,7 @@ class ContextErrorException extends \ErrorException
      */
     public function getContext()
     {
-        @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
 
         return $this->context;
     }

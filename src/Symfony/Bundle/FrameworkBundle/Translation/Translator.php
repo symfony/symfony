@@ -73,7 +73,7 @@ class Translator extends BaseTranslator implements WarmableInterface
             $options = $loaderIds;
             $loaderIds = $defaultLocale;
             $defaultLocale = $container->getParameter('kernel.default_locale');
-            @trigger_error(sprintf('Method %s() takes the default locale as 3rd argument since version 3.3. Not passing it is deprecated and will trigger an error in 4.0.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Method %s() takes the default locale as 3rd argument since Symfony 3.3. Not passing it is deprecated and will trigger an error in 4.0.', __METHOD__), E_USER_DEPRECATED);
         }
 
         $this->container = $container;

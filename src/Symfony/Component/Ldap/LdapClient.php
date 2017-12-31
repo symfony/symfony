@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Ldap;
 
-@trigger_error('The '.__NAMESPACE__.'\LdapClient class is deprecated since version 3.1 and will be removed in 4.0. Use the Ldap class directly instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\LdapClient class is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Ldap class directly instead.', E_USER_DEPRECATED);
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -60,7 +60,7 @@ final class LdapClient implements LdapClientInterface
      */
     public function find($dn, $query, $filter = '*')
     {
-        @trigger_error('The "find" method is deprecated since version 3.1 and will be removed in 4.0. Use the "query" method instead.', E_USER_DEPRECATED);
+        @trigger_error('The "find" method is deprecated since Symfony 3.1 and will be removed in 4.0. Use the "query" method instead.', E_USER_DEPRECATED);
 
         $query = $this->ldap->query($dn, $query, array('filter' => $filter));
         $entries = $query->execute();

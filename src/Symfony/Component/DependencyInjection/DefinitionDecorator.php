@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-@trigger_error('The '.__NAMESPACE__.'\DefinitionDecorator class is deprecated since version 3.3 and will be removed in 4.0. Use the Symfony\Component\DependencyInjection\ChildDefinition class instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\DefinitionDecorator class is deprecated since Symfony 3.3 and will be removed in 4.0. Use the Symfony\Component\DependencyInjection\ChildDefinition class instead.', E_USER_DEPRECATED);
 
 class_exists(ChildDefinition::class);
 

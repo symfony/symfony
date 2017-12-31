@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-@trigger_error(sprintf('%s is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass instead.', AddConsoleCommandPass::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('%s is deprecated since Symfony 3.3 and will be removed in 4.0. Use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass instead.', AddConsoleCommandPass::class), E_USER_DEPRECATED);
 
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass as BaseAddConsoleCommandPass;
 

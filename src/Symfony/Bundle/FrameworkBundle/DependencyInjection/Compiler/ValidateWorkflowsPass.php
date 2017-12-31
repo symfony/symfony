@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Workflow\DependencyInjection\ValidateWorkflowsPass as BaseValidateWorkflowsPass;
 
-@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use %s instead.', ValidateWorkflowsPass::class, BaseValidateWorkflowsPass::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0. Use %s instead.', ValidateWorkflowsPass::class, BaseValidateWorkflowsPass::class), E_USER_DEPRECATED);
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>

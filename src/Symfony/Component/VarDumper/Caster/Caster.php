@@ -49,7 +49,7 @@ class Caster
     public static function castObject($obj, $class, $hasDebugInfo = false)
     {
         if ($class instanceof \ReflectionClass) {
-            @trigger_error(sprintf('Passing a ReflectionClass to %s() is deprecated since version 3.3 and will be unsupported in 4.0. Pass the class name as string instead.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a ReflectionClass to %s() is deprecated since Symfony 3.3 and will be unsupported in 4.0. Pass the class name as string instead.', __METHOD__), E_USER_DEPRECATED);
             $hasDebugInfo = $class->hasMethod('__debugInfo');
             $class = $class->name;
         }

@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-12-21T09:55:39Z
+
+this will not collect the info about the class/interface being deprecated, and so will not warn for *other* modified files starting to use it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-21T09:57:23Z
+
+It will, but only once. I think the perf penalty for running these checks all the time is too high today, don't you think? (look at the profiles...)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-12-21T10:38:44Z
+
+no, it will warn you only if you modify the interface file in the same request than the new implementation file.
+Otherwise, when analysing your new implementation (only once), it will not have the interface in the list of deprecated interfaces (as this list is not persistent from previous analyses).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-21T15:22:58Z
+
+Oh, indeed :)
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-21T21:39:53Z
+
+Comment addressed.
+This was a bug in fact: when a parent class wasn't loaded by DebugClassLoadr itself, tracking of parent annotations was missing.
+Embeds locally micro-optimisations since this is a critical code path.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T22:56:02Z
+
+Now with a test case for the bug fix part.

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T15:18:06Z
+
+I think it's more important to be correct on the http boundary than correct internally.
+The issue with this approach is that it doesn't follow this principle.
+I'd suggest to try harder looking at fixing internal handling instead.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2017-12-22T15:23:29Z
+
+I don't quite understand. To me the concept of the `Response` is that it represents exactly what's going to be sent to the client and to me that means it's correct on the http boundary. That's not the case currently.
+
+>  I'd suggest to try harder looking at fixing internal handling instead.
+
+Can you elaborate on that?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2017-12-22T15:51:23Z
+
+Failing tests do not seem to be related.

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-28T13:16:33Z
+
+I like the goal (but didn't really look at the code yet.) I think this could target 3.4, as a bug fix.
+Note that this wouldn't make the change atomic, as there is still a small window where the cache folder doesn't exist at all (between steps 5&6.) But there is no portable way to fix it on our side, so that if ppl want to workaround the issue, they should just use a proper deployment script with offline cache creation.
+There is one step which can be improved: the new cache folder could get the legacy `ContainerBlablah` directory copied into it before the swap happens, so that a concurrent request that's still using the legacy container could still complete.
+This legacy container directory should then be removed, but only after a bit of time, so that these concurrent requests could fully complete.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-27T09:56:16Z
+
+Re-qualified as bug on 3.4 btw.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2017-12-27T10:20:56Z
+
+Wasn't the `--no-warmup` option for `cache:clear` deprecated at some point ? So that `cache:clear` would *never* warmup the cache ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-27T10:22:50Z
+
+@Taluu this has been un-deprecated in #23792
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2017-12-30T13:02:17Z
+
+@nicolas-grekas Thanks for the review!
+
+> There is one step which can be improved: the new cache folder could get the legacy ContainerBlablah directory copied into it before the swap happens, so that a concurrent request that's still using the legacy container could still complete.
+This legacy container directory should then be removed, but only after a bit of time, so that these concurrent requests could fully complete.
+
+~~Do you think we should do this as part of this PR?~~
+
+P.S. Or I just realised you've implemented that suggestion as well, I thought you were talking only about the Windows-specific thing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-30T13:05:40Z
+
+@hkdobrev that's already the case, I pushed on your branch.

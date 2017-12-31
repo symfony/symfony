@@ -55,7 +55,7 @@ class ConfigCache extends ResourceCheckerConfigCache
      */
     public function __toString()
     {
-        @trigger_error('ConfigCache::__toString() is deprecated since version 2.7 and will be removed in 3.0. Use the getPath() method instead.', E_USER_DEPRECATED);
+        @trigger_error('ConfigCache::__toString() is deprecated since Symfony 2.7 and will be removed in 3.0. Use the getPath() method instead.', E_USER_DEPRECATED);
 
         return $this->getPath();
     }

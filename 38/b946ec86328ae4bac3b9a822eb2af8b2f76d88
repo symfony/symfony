@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-12-22T14:50:19Z
+
+Forgot to deprecate `$dnsMessage` option. Now updated. Should it be mentioned explicitly? In general it's only enabled thru `$checkDNS` so fine to me as is.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-22T15:10:44Z
+
+As people may forgot to not use the `dnsMessage` option when dropping `checkDNS` it might be good to deprecate it explicitly too.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-12-23T12:45:12Z
+
+Deprecation now moved to constraint constructor.

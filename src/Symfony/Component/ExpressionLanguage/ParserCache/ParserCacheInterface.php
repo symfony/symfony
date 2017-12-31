@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\ExpressionLanguage\ParserCache;
 
-@trigger_error('The '.__NAMESPACE__.'\ParserCacheInterface interface is deprecated since version 3.2 and will be removed in 4.0. Use Psr\Cache\CacheItemPoolInterface instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\ParserCacheInterface interface is deprecated since Symfony 3.2 and will be removed in 4.0. Use Psr\Cache\CacheItemPoolInterface instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 

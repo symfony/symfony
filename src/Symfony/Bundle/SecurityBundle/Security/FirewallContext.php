@@ -42,7 +42,7 @@ class FirewallContext
      */
     public function getContext()
     {
-        @trigger_error(sprintf('Method %s() is deprecated since version 3.3 and will be removed in 4.0. Use %s::getListeners/getExceptionListener() instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Method %s() is deprecated since Symfony 3.3 and will be removed in 4.0. Use %s::getListeners/getExceptionListener() instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
 
         return array($this->getListeners(), $this->getExceptionListener());
     }

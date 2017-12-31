@@ -59,7 +59,7 @@ class ChoiceValidator extends ConstraintValidator
         }
 
         if (false === $constraint->strict) {
-            @trigger_error('Setting the strict option of the Choice constraint to false is deprecated since version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
+            @trigger_error('Setting the strict option of the Choice constraint to false is deprecated since Symfony 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
         }
 
         if ($constraint->multiple) {

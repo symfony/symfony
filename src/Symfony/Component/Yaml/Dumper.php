@@ -46,7 +46,7 @@ class Dumper
      */
     public function setIndentation($num)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.1 and will be removed in 4.0. Pass the indentation to the constructor instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 3.1 and will be removed in 4.0. Pass the indentation to the constructor instead.', E_USER_DEPRECATED);
 
         $this->indentation = (int) $num;
     }
@@ -64,7 +64,7 @@ class Dumper
     public function dump($input, $inline = 0, $indent = 0, $flags = 0)
     {
         if (is_bool($flags)) {
-            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing a boolean flag to toggle exception handling is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE flag instead.', E_USER_DEPRECATED);
 
             if ($flags) {
                 $flags = Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE;
@@ -74,7 +74,7 @@ class Dumper
         }
 
         if (func_num_args() >= 5) {
-            @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
+            @trigger_error('Passing a boolean flag to toggle object support is deprecated since Symfony 3.1 and will be removed in 4.0. Use the Yaml::DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
 
             if (func_get_arg(4)) {
                 $flags |= Yaml::DUMP_OBJECT;

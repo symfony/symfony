@@ -240,7 +240,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // the developer asked for a specific status code
         if ($response->headers->has('X-Status-Code')) {
-            @trigger_error(sprintf('Using the X-Status-Code header is deprecated since version 3.3 and will be removed in 4.0. Use %s::allowCustomResponseCode() instead.', GetResponseForExceptionEvent::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Using the X-Status-Code header is deprecated since Symfony 3.3 and will be removed in 4.0. Use %s::allowCustomResponseCode() instead.', GetResponseForExceptionEvent::class), E_USER_DEPRECATED);
 
             $response->setStatusCode($response->headers->get('X-Status-Code'));
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Handler;
 
-@trigger_error('The '.__NAMESPACE__.'\DebugHandler class is deprecated since version 3.2 and will be removed in 4.0. Use Symfony\Bridge\Monolog\Processor\DebugProcessor instead.', E_USER_DEPRECATED);
+@trigger_error('The '.__NAMESPACE__.'\DebugHandler class is deprecated since Symfony 3.2 and will be removed in 4.0. Use Symfony\Bridge\Monolog\Processor\DebugProcessor instead.', E_USER_DEPRECATED);
 
 use Monolog\Logger;
 use Monolog\Handler\TestHandler;

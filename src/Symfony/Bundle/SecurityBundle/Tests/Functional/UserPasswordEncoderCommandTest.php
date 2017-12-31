@@ -195,7 +195,7 @@ EOTXT
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing null as the first argument of "Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand::__construct" is deprecated since version 3.3 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
+     * @expectedDeprecation Passing null as the first argument of "Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand::__construct" is deprecated since Symfony 3.3 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
      */
     public function testLegacy()
     {

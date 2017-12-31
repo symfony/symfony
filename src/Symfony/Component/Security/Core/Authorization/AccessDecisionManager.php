@@ -61,7 +61,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function setVoters(array $voters)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Pass the voters to the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Pass the voters to the constructor instead.', __METHOD__), E_USER_DEPRECATED);
 
         $this->voters = $voters;
     }

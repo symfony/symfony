@@ -81,7 +81,7 @@ class AutowirePass extends AbstractRecursivePass
      */
     public static function createResourceForClass(\ReflectionClass $reflectionClass)
     {
-        @trigger_error('The '.__METHOD__.'() method is deprecated since version 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.'() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
 
         $metadata = array();
 

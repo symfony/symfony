@@ -47,7 +47,7 @@ class PhpProcess extends Process
             $script = null;
         }
         if (null !== $options) {
-            @trigger_error(sprintf('The $options parameter of the %s constructor is deprecated since version 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The $options parameter of the %s constructor is deprecated since Symfony 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
         }
 
         parent::__construct($php, $cwd, $env, $script, $timeout, $options);

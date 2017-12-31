@@ -27,7 +27,7 @@ class FactoryReturnTypePass implements CompilerPassInterface
     public function __construct(ResolveClassPass $resolveClassPass = null)
     {
         if (null === $resolveClassPass) {
-            @trigger_error('The '.__CLASS__.' class is deprecated since version 3.3 and will be removed in 4.0.', E_USER_DEPRECATED);
+            @trigger_error('The '.__CLASS__.' class is deprecated since Symfony 3.3 and will be removed in 4.0.', E_USER_DEPRECATED);
         }
         $this->resolveClassPass = $resolveClassPass;
     }

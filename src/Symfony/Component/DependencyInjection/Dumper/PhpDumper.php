@@ -73,7 +73,7 @@ class PhpDumper extends Dumper
     public function __construct(ContainerBuilder $container)
     {
         if (!$container->isCompiled()) {
-            @trigger_error('Dumping an uncompiled ContainerBuilder is deprecated since version 3.3 and will not be supported anymore in 4.0. Compile the container beforehand.', E_USER_DEPRECATED);
+            @trigger_error('Dumping an uncompiled ContainerBuilder is deprecated since Symfony 3.3 and will not be supported anymore in 4.0. Compile the container beforehand.', E_USER_DEPRECATED);
         }
 
         parent::__construct($container);
@@ -871,7 +871,7 @@ EOF;
      */
     public function isFrozen()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
 
         return true;
     }

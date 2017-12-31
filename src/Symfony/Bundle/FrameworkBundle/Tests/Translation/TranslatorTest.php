@@ -45,7 +45,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since version 3.3. Not passing it is deprecated and will trigger an error in 4.0.
+     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since Symfony 3.3. Not passing it is deprecated and will trigger an error in 4.0.
      */
     public function testTransWithoutCachingOmittingLocale()
     {
@@ -66,7 +66,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since version 3.3. Not passing it is deprecated and will trigger an error in 4.0.
+     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since Symfony 3.3. Not passing it is deprecated and will trigger an error in 4.0.
      */
     public function testTransWithCachingOmittingLocale()
     {
@@ -106,7 +106,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since version 3.3. Not passing it is deprecated and will trigger an error in 4.0.
+     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since Symfony 3.3. Not passing it is deprecated and will trigger an error in 4.0.
      * @expectedException \InvalidArgumentException
      */
     public function testTransWithCachingWithInvalidLocaleOmittingLocale()
@@ -119,7 +119,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since version 3.3. Not passing it is deprecated and will trigger an error in 4.0.
+     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since Symfony 3.3. Not passing it is deprecated and will trigger an error in 4.0.
      */
     public function testLoadResourcesWithoutCachingOmittingLocale()
     {
@@ -138,7 +138,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since version 3.3. Not passing it is deprecated and will trigger an error in 4.0.
+     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since Symfony 3.3. Not passing it is deprecated and will trigger an error in 4.0.
      */
     public function testGetDefaultLocaleOmittingLocale()
     {
@@ -167,7 +167,7 @@ class TranslatorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since version 3.3. Not passing it is deprecated and will trigger an error in 4.0.
+     * @expectedDeprecation Method Symfony\Bundle\FrameworkBundle\Translation\Translator::__construct() takes the default locale as 3rd argument since Symfony 3.3. Not passing it is deprecated and will trigger an error in 4.0.
      */
     public function testWarmupOmittingLocale()
     {

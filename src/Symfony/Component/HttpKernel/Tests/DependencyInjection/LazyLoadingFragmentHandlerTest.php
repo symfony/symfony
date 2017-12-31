@@ -20,7 +20,7 @@ class LazyLoadingFragmentHandlerTest extends TestCase
 {
     /**
      * @group legacy
-     * @expectedDeprecation The Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler::addRendererService() method is deprecated since version 3.3 and will be removed in 4.0.
+     * @expectedDeprecation The Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler::addRendererService() method is deprecated since Symfony 3.3 and will be removed in 4.0.
      */
     public function testRenderWithLegacyMapping()
     {

@@ -44,7 +44,20 @@ class PhpFileLoader extends FileLoader
         $callback = $load($path);
 
         if ($callback instanceof \Closure) {
-            $callback(new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource), $this->container, $this);
+            $method = new \ReflectionFunction($callback);
+
+            if (0 === $method->getNumberOfParameters()) {
+                throw new \LogicException('Closure in %s:%d must have at least 1 argument.', $path, $method->getStartLine());
+            }
+
+            $configurator = new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource);
+            $configuratorClass = $method->getParameters()[0]->getClass()->name;
+
+            if (ContainerConfigurator::class !== $configuratorClass) {
+                $configurator = $this->container->getCustomConfigurator($configuratorClass, $configurator);
+            }
+
+            $callback($configurator, $this->container, $this);
         }
     }
 

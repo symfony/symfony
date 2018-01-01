@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
@@ -122,6 +123,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
     private $removedIds = array();
     private $alreadyLoading = array();
+
+    /**
+     * @var callable[] configurator class name => callable
+     */
+    private $customConfiguratorFactories;
 
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -220,6 +226,38 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function hasExtension($name)
     {
         return isset($this->extensions[$name]) || isset($this->extensionsByNs[$name]);
+    }
+
+    /**
+     * @param string   $configuratorClassName
+     * @param callable $factory               function (ContainerConfigurator $c) { .... }
+     */
+    public function registerCustomConfiguratorFactory(string $configuratorClassName, callable $factory)
+    {
+        if (!class_exists($configuratorClassName)) {
+            throw new \LogicException(sprintf('Container configurator class %s does not exist.', $configuratorClassName));
+        }
+
+        if (isset($this->customConfiguratorFactories[$configuratorClassName])) {
+            throw new \LogicException(sprintf('Container configurator factory for %s was already registered.', $configuratorClassName));
+        }
+
+        $this->customConfiguratorFactories[$configuratorClassName] = $factory;
+    }
+
+    /**
+     * @param string                $configuratorClassName
+     * @param ContainerConfigurator $configurator
+     *
+     * @return mixed
+     */
+    public function getCustomConfigurator(string $configuratorClassName, ContainerConfigurator $configurator)
+    {
+        if (!isset($this->customConfiguratorFactories[$configuratorClassName])) {
+            throw new \LogicException(sprintf('Container configurator factory for %s does not exist.', $configuratorClassName));
+        }
+
+        return call_user_func($this->customConfiguratorFactories[$configuratorClassName], $configurator);
     }
 
     /**

@@ -15,8 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooContainerConfigurator;
 
 class PhpFileLoaderTest extends TestCase
 {
@@ -72,6 +74,23 @@ class PhpFileLoaderTest extends TestCase
         yield array('prototype');
         yield array('child');
         yield array('php7');
+    }
+
+    public function testCustomContainerConfigurator()
+    {
+        $container = new ContainerBuilder();
+        $container->registerCustomConfiguratorFactory(
+            FooContainerConfigurator::class,
+            function (ContainerConfigurator $c) {
+                return new FooContainerConfigurator($c);
+            }
+        );
+
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container, new FileLocator());
+        $loader->load($fixtures.'/config/custom_configurator.php');
+
+        $this->assertEquals('bar', $container->getParameter('foo'));
     }
 
     /**

@@ -1,7 +1,9 @@
 --TEST--
 Test symfony_debug_backtrace in case of fatal error
 --SKIPIF--
-<?php if (!extension_loaded('symfony_debug')) print 'skip'; ?>
+<?php if (!extension_loaded('symfony_debug')) {
+    echo 'skip';
+} ?>
 --FILE--
 <?php
 

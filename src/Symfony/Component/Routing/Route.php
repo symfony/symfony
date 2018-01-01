@@ -34,6 +34,8 @@ class Route implements \Serializable
     private $compiled;
 
     /**
+     * Constructor.
+     *
      * Available options:
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)

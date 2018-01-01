@@ -29,6 +29,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     private $options;
 
     /**
+     * Constructing new MongoDB session handler.
+     *
      * List of available options:
      *  * database: The name of the database [required]
      *  * collection: The name of the collection [required]

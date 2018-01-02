@@ -67,11 +67,11 @@ class ContextListener implements ListenerInterface
      *
      * @param bool $logoutOnUserChange
      *
-     * @deprecated since version 4.1, to be removed in 5.0
+     * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     public function setLogoutOnUserChange($logoutOnUserChange)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since 4.1 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.1 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
     }
 
     /**

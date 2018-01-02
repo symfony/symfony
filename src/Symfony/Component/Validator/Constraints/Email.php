@@ -51,7 +51,7 @@ class Email extends Constraint
     public $checkHost = false;
 
     /**
-     * @deprecated since version 4.1, to be removed in 5.0. Set mode to "strict" instead.
+     * @deprecated since Symfony 4.1, to be removed in 5.0. Set mode to "strict" instead.
      */
     public $strict;
     public $mode;
@@ -59,7 +59,7 @@ class Email extends Constraint
     public function __construct($options = null)
     {
         if (is_array($options) && array_key_exists('strict', $options)) {
-            @trigger_error(sprintf('The "strict" property is deprecated since version 4.1 and will be removed in 5.0. Use "mode"=>"%s" instead.', self::VALIDATION_MODE_STRICT), E_USER_DEPRECATED);
+            @trigger_error(sprintf('The "strict" property is deprecated since Symfony 4.1 and will be removed in 5.0. Use "mode"=>"%s" instead.', self::VALIDATION_MODE_STRICT), E_USER_DEPRECATED);
         }
 
         if (is_array($options) && array_key_exists('mode', $options) && !in_array($options['mode'], self::$validationModes, true)) {

@@ -27,7 +27,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @expectedDeprecation Calling `new Symfony\Component\Validator\Constraints\EmailValidator(true)` is deprecated since version 4.1 and will be removed in 5.0, use `new Symfony\Component\Validator\Constraints\EmailValidator("strict")` instead.
+     * @expectedDeprecation Calling `new Symfony\Component\Validator\Constraints\EmailValidator(true)` is deprecated since Symfony 4.1 and will be removed in 5.0, use `new Symfony\Component\Validator\Constraints\EmailValidator("strict")` instead.
      * @group legacy
      */
     public function testLegacyValidatorConstructorStrict()
@@ -226,8 +226,8 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @expectedDeprecation The "strict" property is deprecated since version 4.1 and will be removed in 5.0. Use "mode"=>"strict" instead.
-     * @expectedDeprecation The Symfony\Component\Validator\Constraints\Email::$strict property is deprecated since version 4.1 and will be removed in 5.0. Use Symfony\Component\Validator\Constraints\Email::mode="strict" instead.
+     * @expectedDeprecation The "strict" property is deprecated since Symfony 4.1 and will be removed in 5.0. Use "mode"=>"strict" instead.
+     * @expectedDeprecation The Symfony\Component\Validator\Constraints\Email::$strict property is deprecated since Symfony 4.1 and will be removed in 5.0. Use Symfony\Component\Validator\Constraints\Email::mode="strict" instead.
      * @group legacy
      */
     public function testStrict()

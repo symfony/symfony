@@ -26,7 +26,6 @@
  * The `standalone` option is deprecated and will be replaced with the `strategy` option in 2.3.
  * The values `true`, `false`, `js` for the `standalone` option were deprecated and replaced respectively with the `esi`, `inline`, `hinclude` in 2.3.
 
-
    Before:
 
    ```jinja
@@ -42,7 +41,6 @@
    {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'inline'}) }}
    {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'hinclude'}) }}
    ```
-
 
 ### HttpFoundation
 

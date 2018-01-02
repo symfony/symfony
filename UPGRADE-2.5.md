@@ -245,7 +245,6 @@ Validator
        ->getValidator();
    ```
 
-
 Yaml Component
 --------------
 

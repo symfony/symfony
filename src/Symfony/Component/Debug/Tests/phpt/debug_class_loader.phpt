@@ -1,5 +1,5 @@
 --TEST--
-Test DebugClassLoader with previoulsy loaded parents
+Test DebugClassLoader with previously loaded parents
 --FILE--
 <?php
 

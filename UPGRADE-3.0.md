@@ -49,7 +49,6 @@ UPGRADE FROM 2.x to 3.0
    `DebugClassLoader`. The difference is that the constructor now takes a
    loader to wrap.
 
-
 ### Config
 
  * The `__toString()` method of the `\Symfony\Component\Config\ConfigCache` class

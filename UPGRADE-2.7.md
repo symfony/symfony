@@ -32,10 +32,10 @@ Router
 
  * The `getMatcherDumperInstance()` and `getGeneratorDumperInstance()` methods in the
    `Symfony\Component\Routing\Router` have been changed from `protected` to `public`.
-   If you override these methods in a subclass, you will need to change your 
+   If you override these methods in a subclass, you will need to change your
    methods to `public` as well. Note however that this is a temporary change needed for
    PHP 5.3 compatibility only. It will be reverted in Symfony 3.0.
- 
+
 Form
 ----
 
@@ -530,9 +530,9 @@ PropertyAccess
 Config
 ------
 
- * The `__toString()` method of the `\Symfony\Component\Config\ConfigCache` is marked as 
+ * The `__toString()` method of the `\Symfony\Component\Config\ConfigCache` is marked as
    deprecated in favor of the new `getPath()` method.
-   
+
 Validator
 ---------
 
@@ -601,7 +601,7 @@ FrameworkBundle
  * The `templating.helper.assets` service was refactored and now returns an object of type
    `Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper` instead of
    `Symfony\Component\Templating\Helper\CoreAssetsHelper`. You can update your class definition
-   or use the `assets.packages` service instead. Using the `assets.packages` service is the recommended 
+   or use the `assets.packages` service instead. Using the `assets.packages` service is the recommended
    way.
 
    Before:
@@ -676,48 +676,48 @@ Form
 
  * In order to fix a few regressions in the new `ChoiceList` implementation,
    a few details had to be changed compared to 2.7.
-   
-   The legacy `Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface` 
+
+   The legacy `Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface`
    now does not extend the new `Symfony\Component\Form\ChoiceList\ChoiceListInterface`
    anymore. If you pass an implementation of the old interface in a context
    where the new interface is required, wrap the list into a
    `LegacyChoiceListAdapter`:
-   
+
    Before:
-   
+
    ```php
    use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
-   
+
    function doSomething(ChoiceListInterface $choiceList)
    {
        // ...
    }
-   
+
    doSomething($legacyList);
    ```
-   
+
    After:
-   
+
    ```php
    use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
    use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;
-   
+
    function doSomething(ChoiceListInterface $choiceList)
    {
        // ...
    }
-   
+
    doSomething(new LegacyChoiceListAdapter($legacyList));
    ```
-   
+
    The new `ChoiceListInterface` now has two additional methods
    `getStructuredValues()` and `getOriginalKeys()`. You should add these methods
    if you implement this interface. See their doc blocks and the implementation
    of the core choice lists for inspiration.
-   
+
    The method `ArrayKeyChoiceList::toArrayKey()` was marked as internal. This
    method was never supposed to be used outside the class.
-   
+
    The method `ChoiceListFactoryInterface::createView()` does not accept arrays
    and `Traversable` instances anymore for the `$groupBy` parameter. Pass a
    callable instead.

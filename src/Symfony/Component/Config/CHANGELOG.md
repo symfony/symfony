@@ -33,7 +33,7 @@ After: the code will work as expected and it will restrict the values of the
 
  * added `ConfigCacheInterface`, `ConfigCacheFactoryInterface` and a basic `ConfigCacheFactory`
    implementation to delegate creation of ConfigCache instances
-   
+
 2.2.0
 -----
 

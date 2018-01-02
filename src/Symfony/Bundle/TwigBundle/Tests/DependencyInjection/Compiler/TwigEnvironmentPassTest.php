@@ -13,12 +13,13 @@ namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 class TwigEnvironmentPassTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerBuilder
      */
     private $builder;
     /**
@@ -32,34 +33,23 @@ class TwigEnvironmentPassTest extends TestCase
 
     protected function setUp()
     {
-        $this->builder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'setAlias', 'getDefinition'))->getMock();
+        $this->builder = new ContainerBuilder;
         $this->definition = new Definition('twig');
+        $this->definition->setPublic(true);
+        $this->builder->setDefinition('twig', $this->definition);
+
         $this->pass = new TwigEnvironmentPass();
     }
 
     public function testPassWithTwoExtensionsWithPriority()
     {
-        $serviceIds = array(
-            'test_extension_1' => array(
-                array('priority' => 100),
-            ),
-            'test_extension_2' => array(
-                array('priority' => 200),
-            ),
-        );
+        $definition = new Definition('test_extension_1');
+        $definition->addTag('twig.extension', ['priority' => 100]);
+        $this->builder->setDefinition('test_extension_1', $definition);
 
-        $this->builder->expects($this->once())
-            ->method('hasDefinition')
-            ->with('twig')
-            ->will($this->returnValue(true));
-        $this->builder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with('twig.extension')
-            ->will($this->returnValue($serviceIds));
-        $this->builder->expects($this->once())
-            ->method('getDefinition')
-            ->with('twig')
-            ->will($this->returnValue($this->definition));
+        $definition = new Definition('test_extension_2');
+        $definition->addTag('twig.extension', ['priority' => 200]);
+        $this->builder->setDefinition('test_extension_2', $definition);
 
         $this->pass->process($this->builder);
         $calls = $this->definition->getMethodCalls();

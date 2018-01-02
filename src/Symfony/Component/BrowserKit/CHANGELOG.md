@@ -16,7 +16,7 @@ CHANGELOG
 -----
 
  * [BC BREAK] `Client::followRedirect()` won't redirect responses with
-   a non-3xx Status Code and `Location` header anymore, as per 
+   a non-3xx Status Code and `Location` header anymore, as per
    http://tools.ietf.org/html/rfc2616#section-14.30
 
  * added `Client::getInternalRequest()` and `Client::getInternalResponse()` to

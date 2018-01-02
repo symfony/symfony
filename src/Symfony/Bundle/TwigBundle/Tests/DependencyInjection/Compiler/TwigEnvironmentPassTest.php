@@ -33,7 +33,7 @@ class TwigEnvironmentPassTest extends TestCase
 
     protected function setUp()
     {
-        $this->builder = new ContainerBuilder;
+        $this->builder = new ContainerBuilder();
         $this->definition = new Definition('twig');
         $this->definition->setPublic(true);
         $this->builder->setDefinition('twig', $this->definition);
@@ -44,11 +44,11 @@ class TwigEnvironmentPassTest extends TestCase
     public function testPassWithTwoExtensionsWithPriority()
     {
         $definition = new Definition('test_extension_1');
-        $definition->addTag('twig.extension', ['priority' => 100]);
+        $definition->addTag('twig.extension', array('priority' => 100));
         $this->builder->setDefinition('test_extension_1', $definition);
 
         $definition = new Definition('test_extension_2');
-        $definition->addTag('twig.extension', ['priority' => 200]);
+        $definition->addTag('twig.extension', array('priority' => 200));
         $this->builder->setDefinition('test_extension_2', $definition);
 
         $this->pass->process($this->builder);

@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Validator;
 
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Traverse;
@@ -648,6 +649,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $called = false;
         $entity = new Entity();
         $entity->firstName = 'Bernhard';
+        $entity->data = array('firstName' => 'Bernhard');
 
         $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity, &$called) {
             $called = true;
@@ -656,6 +658,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
 
         $this->metadata->addConstraint(new Callback($callback));
         $this->metadata->addPropertyConstraint('firstName', new Callback($callback));
+        $this->metadata->addPropertyConstraint('data', new Collection(array('firstName' => new Expression('value == this.firstName'))));
 
         $this->validator->validate($entity);
 

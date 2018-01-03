@@ -34,7 +34,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     private $prefix;
 
     /**
-     * Constructing new Memcached session handler.
+     * Constructor.
      *
      * List of available options:
      *  * prefix: The prefix to use for the memcached keys in order to avoid collision

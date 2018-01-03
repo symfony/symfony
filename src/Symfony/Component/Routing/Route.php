@@ -34,7 +34,7 @@ class Route implements \Serializable
     private $compiled;
 
     /**
-     * Constructing new route.
+     * Constructor.
      *
      * Available options:
      *

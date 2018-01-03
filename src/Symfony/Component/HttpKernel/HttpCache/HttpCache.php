@@ -36,7 +36,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private $traces = array();
 
     /**
-     * Constructing new HTTP cache.
+     * Constructor.
      *
      * The available options are:
      *

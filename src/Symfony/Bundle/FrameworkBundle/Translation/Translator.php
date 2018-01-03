@@ -46,7 +46,7 @@ class Translator extends BaseTranslator implements WarmableInterface
     private $resources = array();
 
     /**
-     * Constructing new translator.
+     * Constructor.
      *
      * Available options:
      *

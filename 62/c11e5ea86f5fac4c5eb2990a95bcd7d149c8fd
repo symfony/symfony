@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-01-03T16:45:15Z
+
+@nicolas-grekas updated to fallback on relative when host is empty. Also squashed and rebased.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-01-03T17:13:17Z
+
+Travis' failure is timeout related on one of the jobs... amending & pushing again.

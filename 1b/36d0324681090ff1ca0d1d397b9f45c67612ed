@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-03T08:58:11Z
+
+Come to think of it now - we could just also force-wrap the second argument into an array so the currently failing syntax also works. Don't see a reason why not.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-03T10:44:13Z
+
+@nicolas-grekas before I rebase - what's your take on just force-wrapping the array. I think it's harmless convenience and it makes the exception obsolete.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-03T10:49:01Z
+
+Alternative ways to write configuration create dead end for user experience (people need to learn two ways of doing things, so they can just read config from different people)
+which means it's not as obvious as it seems to me
+the exception is for 3.4
+the discussion about the new syntax is for master for sure
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-03T11:25:09Z
+
+Rebased.

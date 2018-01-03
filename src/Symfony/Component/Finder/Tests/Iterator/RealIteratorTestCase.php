@@ -54,6 +54,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         file_put_contents(self::toAbsolute('test.php'), str_repeat(' ', 800));
         file_put_contents(self::toAbsolute('test.py'), str_repeat(' ', 2000));
 
+        touch(self::toAbsolute('atime.php'), strtotime('2005-10-15'), date('U'));
         touch(self::toAbsolute('foo/bar.tmp'), strtotime('2005-10-15'));
         touch(self::toAbsolute('test.php'), strtotime('2005-10-15'));
     }

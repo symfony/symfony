@@ -16,6 +16,13 @@ use Symfony\Component\Finder\Comparator\DateComparator;
 
 class DateRangeFilterIteratorTest extends RealIteratorTestCase
 {
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+
+        self::$files[] = self::toAbsolute('atime.php');
+    }
+
     /**
      * @dataProvider getAcceptData
      */
@@ -45,6 +52,7 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
             '.foo/.bar',
             'foo bar',
             '.foo/bar',
+            'atime.php',
         );
 
         $since2MonthsAgo = array(
@@ -60,15 +68,41 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
             '.foo/bar',
         );
 
+        $accessedSince2MonthsAgo = array(
+            '.git',
+            'test.py',
+            'foo',
+            'toto',
+            'toto/.git',
+            '.bar',
+            '.foo',
+            '.foo/.bar',
+            'foo bar',
+            '.foo/bar',
+            'atime.php',
+        );
+
         $untilLastMonth = array(
+            'atime.php',
+            'foo/bar.tmp',
+            'test.php',
+        );
+
+        $accessedUntilLastMonth = array(
             'foo/bar.tmp',
             'test.php',
         );
 
         return array(
-            array(array(new DateComparator('since 20 years ago')), $this->toAbsolute($since20YearsAgo)),
-            array(array(new DateComparator('since 2 months ago')), $this->toAbsolute($since2MonthsAgo)),
-            array(array(new DateComparator('until last month')), $this->toAbsolute($untilLastMonth)),
+            array(array(new DateComparator('since 20 years ago', DateComparator::TIME_TYPE_ACCESSED)), $this->toAbsolute($since20YearsAgo)),
+            array(array(new DateComparator('since 20 years ago', DateComparator::TIME_TYPE_CHANGED)), $this->toAbsolute($since20YearsAgo)),
+            array(array(new DateComparator('since 20 years ago', DateComparator::TIME_TYPE_MODIFIED)), $this->toAbsolute($since20YearsAgo)),
+            array(array(new DateComparator('since 2 months ago', DateComparator::TIME_TYPE_ACCESSED)), $this->toAbsolute($accessedSince2MonthsAgo)),
+            array(array(new DateComparator('since 2 months ago', DateComparator::TIME_TYPE_CHANGED)), $this->toAbsolute($since20YearsAgo)),
+            array(array(new DateComparator('since 2 months ago', DateComparator::TIME_TYPE_MODIFIED)), $this->toAbsolute($since2MonthsAgo)),
+            array(array(new DateComparator('until last month', DateComparator::TIME_TYPE_ACCESSED)), $this->toAbsolute($accessedUntilLastMonth)),
+            array(array(new DateComparator('until last month', DateComparator::TIME_TYPE_CHANGED)), $this->toAbsolute(array())),
+            array(array(new DateComparator('until last month', DateComparator::TIME_TYPE_MODIFIED)), $this->toAbsolute($untilLastMonth)),
         );
     }
 }

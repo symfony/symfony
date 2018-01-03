@@ -46,8 +46,15 @@ class DateRangeFilterIterator extends \FilterIterator
             return false;
         }
 
-        $filedate = $fileinfo->getMTime();
         foreach ($this->comparators as $compare) {
+            if ($compare->getTimeType() === $compare::TIME_TYPE_ACCESSED) {
+                $filedate = $fileinfo->getATime();
+            } elseif ($compare->getTimeType() === $compare::TIME_TYPE_CHANGED) {
+                $filedate = $fileinfo->getCTime();
+            } else {
+                $filedate = $fileinfo->getMTime();
+            }
+
             if (!$compare->test($filedate)) {
                 return false;
             }

@@ -136,13 +136,104 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      *
+     * @deprecated since 4.1, to be removed in 5.0
      * @see strtotime
      * @see DateRangeFilterIterator
      * @see DateComparator
      */
     public function date($date)
     {
-        $this->dates[] = new Comparator\DateComparator($date);
+        $this->dateModified($date);
+
+        return $this;
+    }
+
+    /**
+     * Adds tests for file dates (last accessed).
+     *
+     * Accessed date is the last time the file was:
+     *
+     *   read
+     *   written
+     *   permissions changed
+     *   moved
+     *   renamed
+     *
+     * The date must be something that strtotime() is able to parse:
+     *
+     *   $finder->dateAccessed('since yesterday');
+     *   $finder->dateAccessed('until 2 days ago');
+     *   $finder->dateAccessed('> now - 2 hours');
+     *   $finder->dateAccessed('>= 2005-10-15');
+     *
+     * @param string $date A date range string
+     *
+     * @return $this
+     *
+     * @see strtotime
+     * @see DateRangeFilterIterator
+     * @see DateComparator
+     */
+    public function dateAccessed($date)
+    {
+        $this->dates[] = new Comparator\DateComparator($date, Comparator\DateComparator::TIME_TYPE_ACCESSED);
+
+        return $this;
+    }
+
+    /**
+     * Adds tests for file dates (last changed).
+     *
+     * Changed date is the last time the file was:
+     *
+     *   written
+     *   permissions changed
+     *   moved
+     *   renamed
+     *
+     * The date must be something that strtotime() is able to parse:
+     *
+     *   $finder->dateChanged('since yesterday');
+     *   $finder->dateChanged('until 2 days ago');
+     *   $finder->dateChanged('> now - 2 hours');
+     *   $finder->dateChanged('>= 2005-10-15');
+     *
+     * @param string $date A date range string
+     *
+     * @return $this
+     *
+     * @see strtotime
+     * @see DateRangeFilterIterator
+     * @see DateComparator
+     */
+    public function dateChanged($date)
+    {
+        $this->dates[] = new Comparator\DateComparator($date, Comparator\DateComparator::TIME_TYPE_CHANGED);
+
+        return $this;
+    }
+
+    /**
+     * Adds tests for file dates (last modified).
+     *
+     * The date must be something that strtotime() is able to parse:
+     *
+     *   $finder->dateModified('since yesterday');
+     *   $finder->dateModified('until 2 days ago');
+     *   $finder->dateModified('> now - 2 hours');
+     *   $finder->dateModified('>= 2005-10-15');
+     *
+     * @param string $date A date range string
+     *
+     * @return $this
+     *
+     * @see strtotime
+     * @see DateRangeFilterIterator
+     * @see DateComparator
+     */
+    public function dateModified($date)
+    {
+        $this->dates[] = new Comparator\DateComparator($date, Comparator\DateComparator::TIME_TYPE_MODIFIED);
 
         return $this;
     }

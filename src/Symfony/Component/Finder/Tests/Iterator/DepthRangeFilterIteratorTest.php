@@ -40,6 +40,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             'toto',
             '.foo',
             '.bar',
+            'atime.php',
             'foo bar',
         );
 
@@ -54,6 +55,7 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             '.foo',
             '.foo/.bar',
             '.bar',
+            'atime.php',
             'foo bar',
             '.foo/bar',
         );

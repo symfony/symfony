@@ -18,12 +18,20 @@ namespace Symfony\Component\Finder\Comparator;
  */
 class DateComparator extends Comparator
 {
+    const TIME_TYPE_MODIFIED = 'M';
+    const TIME_TYPE_CHANGED = 'C';
+    const TIME_TYPE_ACCESSED = 'A';
+
+    /** @var string */
+    private $timeType;
+
     /**
-     * @param string $test A comparison string
+     * @param string $test     A comparison string
+     * @param string $timeType The type of file time to compare
      *
      * @throws \InvalidArgumentException If the test is not understood
      */
-    public function __construct(string $test)
+    public function __construct($test, $timeType = self::TIME_TYPE_MODIFIED)
     {
         if (!preg_match('#^\s*(==|!=|[<>]=?|after|since|before|until)?\s*(.+?)\s*$#i', $test, $matches)) {
             throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a date test.', $test));
@@ -45,7 +53,16 @@ class DateComparator extends Comparator
             $operator = '<';
         }
 
+        $this->timeType = $timeType;
         $this->setOperator($operator);
         $this->setTarget($target);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimeType()
+    {
+        return $this->timeType;
     }
 }

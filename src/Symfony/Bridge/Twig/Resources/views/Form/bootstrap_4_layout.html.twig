@@ -169,6 +169,10 @@
     </{{ element|default('div') }}>
 {%- endblock form_row %}
 
+{% block submit_row -%}
+    {{- form_widget(form) -}}
+{%- endblock submit_row %}
+
 {# Errors #}
 
 {% block form_errors -%}

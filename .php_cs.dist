@@ -12,6 +12,9 @@ return PhpCsFixer\Config::create()
         'php_unit_no_expectation_annotation' => false, // part of `PHPUnitXYMigration:risky` ruleset, to be enabled when PHPUnit 4.x support will be dropped, as we don't want to rewrite exceptions handling twice
         'array_syntax' => array('syntax' => 'long'),
         'protected_to_private' => false,
+        // rule disabled due to https://bugs.php.net/bug.php?id=60573 bug;
+        // to be re-enabled (by dropping next line, rule is part of @Symfony already) on branch that requires PHP 5.4+
+        'self_accessor' => false,
     ))
     ->setRiskyAllowed(true)
     ->setFinder(
@@ -34,5 +37,9 @@ return PhpCsFixer\Config::create()
             ->notPath('Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom/_name_entry_label.html.php')
             // explicit heredoc test
             ->notPath('Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Resources/views/translation.html.php')
+            // explicit trigger_error tests
+            ->notPath('Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/default.phpt')
+            ->notPath('Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak.phpt')
+            ->notPath('Symfony/Component/Debug/Tests/DebugClassLoaderTest.php')
     )
 ;

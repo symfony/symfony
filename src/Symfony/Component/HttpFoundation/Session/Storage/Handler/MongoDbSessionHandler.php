@@ -34,6 +34,8 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     private $options;
 
     /**
+     * Constructor.
+     *
      * List of available options:
      *  * database: The name of the database [required]
      *  * collection: The name of the collection [required]

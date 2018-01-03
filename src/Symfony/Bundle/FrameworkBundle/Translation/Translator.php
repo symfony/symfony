@@ -48,6 +48,8 @@ class Translator extends BaseTranslator implements WarmableInterface
     private $resources = array();
 
     /**
+     * Constructor.
+     *
      * Available options:
      *
      *   * cache_dir: The cache directory (or null to disable caching)

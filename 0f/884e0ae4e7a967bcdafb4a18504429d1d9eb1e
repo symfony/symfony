@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by keradus at 2018-01-02T00:58:58Z
+
+AppVeyor report unrelated
+fabbot report unrelated
+
+---------------------------------------------------------------------------
+
+by keradus at 2018-01-03T12:14:24Z
+
+changes to constructors done
+
+also, FriendsOfPHP/PHP-CS-Fixer#3359 was merged (but not released yet).
+
+so 2.7 branch will pass whole PHP CS Fixer for the first time ;)

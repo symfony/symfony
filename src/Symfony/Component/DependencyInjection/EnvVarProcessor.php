@@ -85,71 +85,66 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             throw new RuntimeException(sprintf('Non-scalar env var "%s" cannot be cast to %s.', $name, $prefix));
         }
 
-        if ('string' === $prefix) {
-            return (string) $env;
-        }
+        switch ($prefix) {
+            case 'string':
+                return (string) $env;
 
-        if ('bool' === $prefix) {
-            return (bool) self::phpize($env);
-        }
+            case 'bool':
+                return (bool) self::phpize($env);
 
-        if ('int' === $prefix) {
-            if (!is_numeric($env = self::phpize($env))) {
-                throw new RuntimeException(sprintf('Non-numeric env var "%s" cannot be cast to int.', $name));
-            }
-
-            return (int) $env;
-        }
-
-        if ('float' === $prefix) {
-            if (!is_numeric($env = self::phpize($env))) {
-                throw new RuntimeException(sprintf('Non-numeric env var "%s" cannot be cast to float.', $name));
-            }
-
-            return (float) $env;
-        }
-
-        if ('const' === $prefix) {
-            if (!defined($env)) {
-                throw new RuntimeException(sprintf('Env var "%s" maps to undefined constant "%s".', $name, $env));
-            }
-
-            return constant($name);
-        }
-
-        if ('base64' === $prefix) {
-            return base64_decode($env);
-        }
-
-        if ('json' === $prefix) {
-            $env = json_decode($env, true);
-
-            if (JSON_ERROR_NONE !== json_last_error()) {
-                throw new RuntimeException(sprintf('Invalid JSON in env var "%s": '.json_last_error_msg(), $name));
-            }
-
-            if (!is_array($env)) {
-                throw new RuntimeException(sprintf('Invalid JSON env var "%s": array expected, %s given.', $name, gettype($env)));
-            }
-
-            return $env;
-        }
-
-        if ('resolve' === $prefix) {
-            return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($name) {
-                if (!isset($match[1])) {
-                    return '%';
-                }
-                $value = $this->container->getParameter($match[1]);
-                if (!is_scalar($value)) {
-                    throw new RuntimeException(sprintf('Parameter "%s" found when resolving env var "%s" must be scalar, "%s" given.', $match[1], $name, gettype($value)));
+            case 'int':
+                if (!is_numeric($env = self::phpize($env))) {
+                    throw new RuntimeException(sprintf('Non-numeric env var "%s" cannot be cast to int.', $name));
                 }
 
-                return $value;
-            }, $env);
-        }
+                return (int) $env;
 
-        throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));
+            case 'float':
+                if (!is_numeric($env = self::phpize($env))) {
+                    throw new RuntimeException(sprintf('Non-numeric env var "%s" cannot be cast to float.', $name));
+                }
+
+                return (float) $env;
+
+            case 'const':
+                if (!defined($env)) {
+                    throw new RuntimeException(sprintf('Env var "%s" maps to undefined constant "%s".', $name, $env));
+                }
+
+                return constant($name);
+
+            case 'base64':
+                return base64_decode($env);
+
+            case 'json':
+                $env = json_decode($env, true);
+
+                if (JSON_ERROR_NONE !== json_last_error()) {
+                    throw new RuntimeException(sprintf('Invalid JSON in env var "%s": '.json_last_error_msg(), $name));
+                }
+
+                if (!is_array($env)) {
+                    throw new RuntimeException(sprintf('Invalid JSON env var "%s": array expected, %s given.', $name, gettype($env)));
+                }
+
+                return $env;
+
+            case 'resolve':
+                return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($name) {
+                    if (!isset($match[1])) {
+                        return '%';
+                    }
+                    $value = $this->container->getParameter($match[1]);
+                    if (!is_scalar($value)) {
+                        throw new RuntimeException(sprintf('Parameter "%s" found when resolving env var "%s" must be scalar, "%s" given.', $match[1], $name, gettype($value)));
+                    }
+
+                    return $value;
+                }, $env);
+
+            default:
+                throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));
+        }
     }
 
     private static function phpize($value)

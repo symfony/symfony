@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-30T21:27:29Z
+
+👍 , but why not 3.4?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-31T15:46:54Z
+
+> 👍 , but why not 3.4?
+
+no objection for me, 4.0 was the target of https://github.com/symfony/symfony/pull/25133.
+The trait could also give these hints only if `class_exists(Flex::class)`, not sure it's worth it though, let me know wdyt.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-31T16:29:54Z
+
+As a general rule of thumb, almost all PRs that target 4.0 should really target 3.4: both versions share the same bugs (with rare exceptions.)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-01T17:46:46Z
+
+rebased
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-01T22:35:15Z
+
+Note that symfony-standard exists in 3.4, these suggestions would be wrong there.

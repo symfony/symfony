@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @method Request|null getRequest() A Request instance
+ * @method Request|null  getRequest()  A Request instance
  * @method Response|null getResponse() A Response instance
  */
 class Client extends BaseClient

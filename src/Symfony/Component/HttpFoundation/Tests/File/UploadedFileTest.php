@@ -208,7 +208,7 @@ class UploadedFileTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a size in the constructor is deprecated since 4.1 and will be removed in 5.0. Use getSize() instead.
+     * @expectedDeprecation Passing a size in the constructor is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.
      */
     public function testConstructDeprecatedSize()
     {

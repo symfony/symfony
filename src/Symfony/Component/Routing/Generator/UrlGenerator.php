@@ -181,63 +181,62 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         $schemeAuthority = '';
-        if ($host = $this->context->getHost()) {
-            $scheme = $this->context->getScheme();
+        $host = $this->context->getHost();
+        $scheme = $this->context->getScheme();
 
-            if ($requiredSchemes) {
-                if (!in_array($scheme, $requiredSchemes, true)) {
-                    $referenceType = self::ABSOLUTE_URL;
-                    $scheme = current($requiredSchemes);
-                }
-            } elseif (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme !== $req) {
-                // We do this for BC; to be removed if _scheme is not supported anymore
+        if ($requiredSchemes) {
+            if (!in_array($scheme, $requiredSchemes, true)) {
                 $referenceType = self::ABSOLUTE_URL;
-                $scheme = $req;
+                $scheme = current($requiredSchemes);
             }
+        } elseif (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme !== $req) {
+            // We do this for BC; to be removed if _scheme is not supported anymore
+            $referenceType = self::ABSOLUTE_URL;
+            $scheme = $req;
+        }
 
-            if ($hostTokens) {
-                $routeHost = '';
-                foreach ($hostTokens as $token) {
-                    if ('variable' === $token[0]) {
-                        if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#i', $mergedParams[$token[3]])) {
-                            $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
+        if ($hostTokens) {
+            $routeHost = '';
+            foreach ($hostTokens as $token) {
+                if ('variable' === $token[0]) {
+                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#i', $mergedParams[$token[3]])) {
+                        $message = sprintf('Parameter "%s" for route "%s" must match "%s" ("%s" given) to generate a corresponding URL.', $token[3], $name, $token[2], $mergedParams[$token[3]]);
 
-                            if ($this->strictRequirements) {
-                                throw new InvalidParameterException($message);
-                            }
-
-                            if ($this->logger) {
-                                $this->logger->error($message);
-                            }
-
-                            return;
+                        if ($this->strictRequirements) {
+                            throw new InvalidParameterException($message);
                         }
 
-                        $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
-                    } else {
-                        $routeHost = $token[1].$routeHost;
-                    }
-                }
+                        if ($this->logger) {
+                            $this->logger->error($message);
+                        }
 
-                if ($routeHost !== $host) {
-                    $host = $routeHost;
-                    if (self::ABSOLUTE_URL !== $referenceType) {
-                        $referenceType = self::NETWORK_PATH;
+                        return;
                     }
+
+                    $routeHost = $token[1].$mergedParams[$token[3]].$routeHost;
+                } else {
+                    $routeHost = $token[1].$routeHost;
                 }
             }
 
-            if (self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) {
-                $port = '';
-                if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
-                    $port = ':'.$this->context->getHttpPort();
-                } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
-                    $port = ':'.$this->context->getHttpsPort();
+            if ($routeHost !== $host) {
+                $host = $routeHost;
+                if (self::ABSOLUTE_URL !== $referenceType) {
+                    $referenceType = self::NETWORK_PATH;
                 }
-
-                $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
-                $schemeAuthority .= $host.$port;
             }
+        }
+
+        if ((self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) && !empty($host)) {
+            $port = '';
+            if ('http' === $scheme && 80 != $this->context->getHttpPort()) {
+                $port = ':'.$this->context->getHttpPort();
+            } elseif ('https' === $scheme && 443 != $this->context->getHttpsPort()) {
+                $port = ':'.$this->context->getHttpsPort();
+            }
+
+            $schemeAuthority = self::NETWORK_PATH === $referenceType ? '//' : "$scheme://";
+            $schemeAuthority .= $host.$port;
         }
 
         if (self::RELATIVE_PATH === $referenceType) {

@@ -36,6 +36,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private $traces = array();
 
     /**
+     * Constructor.
+     *
      * The available options are:
      *
      *   * debug:                 If true, the traces are added as a HTTP header to ease debugging

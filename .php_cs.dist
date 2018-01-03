@@ -36,5 +36,9 @@ return PhpCsFixer\Config::create()
             ->notPath('Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom/_name_entry_label.html.php')
             // explicit heredoc test
             ->notPath('Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Resources/views/translation.html.php')
+            // explicit trigger_error tests
+            ->notPath('Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/default.phpt')
+            ->notPath('Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak.phpt')
+            ->notPath('Symfony/Component/Debug/Tests/DebugClassLoaderTest.php')
     )
 ;

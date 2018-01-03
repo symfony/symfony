@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-01-03T07:43:34Z
+
+In [other parts of Symfony](https://github.com/symfony/symfony/blob/2b257d7c94ae89a777d6b7956e315a3d5ac4fe21/src/Symfony/Component/Process/PhpExecutableFinder.php#L42) we have this:
+
+```php
+in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg'))
+```
+
+Should we use the same here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-03T10:31:17Z
+
+@javiereguiluz cli-server means HTML should be used

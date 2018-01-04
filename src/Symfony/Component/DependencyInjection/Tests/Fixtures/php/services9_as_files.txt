@@ -276,15 +276,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
+    private $buildParameters;
     private $parameters;
     private $targetDirs = array();
 
-    public function __construct()
+    public function __construct(array $buildParameters = array())
     {
         $dir = $this->targetDirs[0] = \dirname(__DIR__);
         for ($i = 1; $i <= 5; ++$i) {
             $this->targetDirs[$i] = $dir = \dirname($dir);
         }
+        $this->buildParameters = $buildParameters;
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = array();
@@ -382,6 +384,9 @@ class ProjectServiceContainer extends Container
 
     public function getParameter($name)
     {
+        if (isset($this->buildParameters[$name])) {
+            return $this->buildParameters[$name];
+        }
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             $name = $this->normalizeParameterName($name);
 
@@ -398,6 +403,9 @@ class ProjectServiceContainer extends Container
 
     public function hasParameter($name)
     {
+        if (isset($this->buildParameters[$name])) {
+            return true;
+        }
         $name = $this->normalizeParameterName($name);
 
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);
@@ -414,6 +422,9 @@ class ProjectServiceContainer extends Container
             $parameters = $this->parameters;
             foreach ($this->loadedDynamicParameters as $name => $loaded) {
                 $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
+            }
+            foreach ($this->buildParameters as $name => $value) {
+                $parameters[$name] = $value;
             }
             $this->parameterBag = new FrozenParameterBag($parameters);
         }
@@ -485,6 +496,10 @@ if (!\class_exists(ProjectServiceContainer::class, false)) {
     \class_alias(\Container%s\ProjectServiceContainer::class, ProjectServiceContainer::class, false);
 }
 
-return new \Container%s\ProjectServiceContainer();
+return new \Container%s\ProjectServiceContainer(array(
+    'container.build_hash' => '%s',
+    'container.build_id' => '%s',
+    'container.build_time' => %d,
+));
 
 )

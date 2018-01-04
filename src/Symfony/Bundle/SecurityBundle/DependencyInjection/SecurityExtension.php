@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
@@ -425,6 +426,10 @@ class SecurityExtension extends Extension
 
         // Anonymous
         if (isset($firewall['anonymous'])) {
+            if (null === $firewall['anonymous']['secret']) {
+                $firewall['anonymous']['secret'] = new Parameter('container.build_hash');
+            }
+
             $listenerId = 'security.authentication.listener.anonymous.'.$id;
             $container
                 ->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.anonymous'))

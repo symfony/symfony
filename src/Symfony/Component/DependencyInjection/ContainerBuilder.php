@@ -1190,6 +1190,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $value = $this->doGet((string) $value, $value->getInvalidBehavior(), $inlineServices);
         } elseif ($value instanceof Definition) {
             $value = $this->createService($value, $inlineServices);
+        } elseif ($value instanceof Parameter) {
+            $value = $this->getParameter((string) $value);
         } elseif ($value instanceof Expression) {
             $value = $this->getExpressionLanguage()->evaluate($value, array('container' => $this));
         }

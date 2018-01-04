@@ -239,7 +239,7 @@ class MainConfiguration implements ConfigurationInterface
             ->arrayNode('anonymous')
                 ->canBeUnset()
                 ->children()
-                    ->scalarNode('secret')->defaultValue(uniqid('', true))->end()
+                    ->scalarNode('secret')->defaultNull()->end()
                 ->end()
             ->end()
             ->arrayNode('switch_user')

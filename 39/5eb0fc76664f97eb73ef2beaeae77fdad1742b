@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-18T07:45:56Z
+
+@romainneutron as our CSP expert, would you agree with this change? Thanks!
+
+@ostrolucky adding new listeners always impacts performance. Can't this header removal be done in the existing `onKernelException` ... or better, can this CSP header not added at all for exceptions in the first place? Thanks!
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-18T09:12:30Z
+
+There must be CSP header removal, because we don't have control over not adding it, it's done in userspace.
+It can't be done in onKernelException, because that event is triggered before onKernelResponse, so header would be re-added after ExceptionListener is long done.
+
+What can be done to avoid unnecessarily adding new listener is to add this listener from inside onKernelException, but that will require access to EventDispatcher in this listener. Let me know if you would like that more, or there is better way.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-12-18T09:35:39Z
+
+@ostrolucky you can have access to the EventDispatcher. It is passed as third argument to the listener when calling it.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-12-18T09:36:48Z
+
+However, if the listener is added dynamically, don't forget to remove it dynamically too (to reset state properly for reused kernel).
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-18T21:07:46Z
+
+@stof Unfortunately I can't do that. According to BC promise I can't add arguments to public method :slightly_frowning_face:
+
+edit: but added it via func_get_arg. Better?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-19T10:01:09Z
+
+Can anybody think of a simpler solution to this issue? The func_get_arg, the listeners, etc. look a bit complicated (but maybe this is the simplest solution possible).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-19T10:06:14Z
+
+`func_get_arg()` is the way to go I think. Should it trigger a deprecation notice in 4.1 to really add the dispatcher as optional arg in 5.0?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-20T10:26:24Z
+
+I would suggest to make the class final in 4.1 (can be done now)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-20T10:28:33Z
+
+The code looks good to me.
+@ostrolucky do you think you could add a test case for it?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-20T10:37:35Z
+
+Sure. What kind of test?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-20T10:38:24Z
+
+eg one that check that whe appropriate, the header is removed, and the event listener is not left in place?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-21T15:41:16Z
+
+status: needs review

@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-04T11:01:49Z
+
+PR ready (fabbot failure is false positive.)
+This adds build metadata to dumped containers, that then can be and is referenced by bundles that need build time related entropy.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-04T12:36:23Z
+
+(failure caused by bug in Composer, see https://github.com/composer/composer/pull/6973)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-01-04T14:04:23Z
+
+Could be retried now with the new release then :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-04T14:28:00Z
+
+PR green (deps=high failure will be fixed by merging to upper branches)

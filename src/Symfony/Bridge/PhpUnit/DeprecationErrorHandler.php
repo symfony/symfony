@@ -121,6 +121,11 @@ class DeprecationErrorHandler
                     $msg = $parsedMsg['deprecation'];
                     $class = $parsedMsg['class'];
                     $method = $parsedMsg['method'];
+                    // If the deprecation has been triggered via
+                    // \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest()
+                    // then we need to use the serialized information to
+                    // determine if the error has been triggered from vendor
+                    // code.
                     $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode || (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = $inVendors($parsedMsg['triggering_file']));
                 } else {
                     $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];

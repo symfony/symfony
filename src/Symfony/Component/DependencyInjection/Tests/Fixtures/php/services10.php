@@ -68,6 +68,7 @@ class ProjectServiceContainer extends Container
 
     public function getParameter($name)
     {
+        $name = (string) $name;
         if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters))) {
             $name = $this->normalizeParameterName($name);
 
@@ -84,6 +85,7 @@ class ProjectServiceContainer extends Container
 
     public function hasParameter($name)
     {
+        $name = (string) $name;
         $name = $this->normalizeParameterName($name);
 
         return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || array_key_exists($name, $this->parameters);

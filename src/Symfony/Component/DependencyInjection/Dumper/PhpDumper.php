@@ -1294,6 +1294,7 @@ EOF;
 
     public function getParameter($name)
     {
+        $name = (string) $name;
         if (isset($this->buildParameters[$name])) {
             return $this->buildParameters[$name];
         }
@@ -1313,6 +1314,7 @@ EOF;
 
     public function hasParameter($name)
     {
+        $name = (string) $name;
         if (isset($this->buildParameters[$name])) {
             return true;
         }

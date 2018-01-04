@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-04T16:22:37Z
+
+can you rebase on 3.4 please ?
+
+---------------------------------------------------------------------------
+
+by alexpott at 2018-01-04T16:31:49Z
+
+Rebased on 3.4. I can't work out how to write a test for this because atm all the weak vendor stuff is tested via phpt tests and a fake vendor.

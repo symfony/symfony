@@ -215,7 +215,7 @@ trait ControllerTrait
     protected function isGranted($attributes, $subject = null)
     {
         if (!$this->container->has('security.authorization_checker')) {
-            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require security".');
+            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
         }
 
         return $this->container->get('security.authorization_checker')->isGranted($attributes, $subject);
@@ -261,7 +261,7 @@ trait ControllerTrait
         }
 
         if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available. Try running "composer require twig".');
+            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
         }
 
         return $this->container->get('twig')->render($view, $parameters);
@@ -285,7 +285,7 @@ trait ControllerTrait
         } elseif ($this->container->has('twig')) {
             $content = $this->container->get('twig')->render($view, $parameters);
         } else {
-            throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available. Try running "composer require twig".');
+            throw new \LogicException('You can not use the "render" method if the Templating Component or the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
         }
 
         if (null === $response) {
@@ -323,7 +323,7 @@ trait ControllerTrait
                 $twig->display($view, $parameters);
             };
         } else {
-            throw new \LogicException('You can not use the "stream" method if the Templating Component or the Twig Bundle are not available. Try running "composer require twig".');
+            throw new \LogicException('You can not use the "stream" method if the Templating Component or the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
         }
 
         if (null === $response) {
@@ -373,7 +373,7 @@ trait ControllerTrait
     protected function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
     {
         if (!class_exists(AccessDeniedException::class)) {
-            throw new \LogicException('You can not use the "createAccessDeniedException" method if the Security component is not available. Try running "composer require security".');
+            throw new \LogicException('You can not use the "createAccessDeniedException" method if the Security component is not available. Try running "composer require symfony/security-bundle".');
         }
 
         return new AccessDeniedException($message, $previous);
@@ -422,7 +422,7 @@ trait ControllerTrait
     protected function getDoctrine()
     {
         if (!$this->container->has('doctrine')) {
-            throw new \LogicException('The DoctrineBundle is not registered in your application. Try running "composer require doctrine".');
+            throw new \LogicException('The DoctrineBundle is not registered in your application. Try running "composer require symfony/orm-pack".');
         }
 
         return $this->container->get('doctrine');
@@ -442,7 +442,7 @@ trait ControllerTrait
     protected function getUser()
     {
         if (!$this->container->has('security.token_storage')) {
-            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require security".');
+            throw new \LogicException('The SecurityBundle is not registered in your application. Try running "composer require symfony/security-bundle".');
         }
 
         if (null === $token = $this->container->get('security.token_storage')->getToken()) {

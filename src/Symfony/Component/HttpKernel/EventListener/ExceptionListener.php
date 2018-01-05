@@ -43,19 +43,15 @@ class ExceptionListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    public function logKernelException(GetResponseForExceptionEvent $event)
-    {
-        $exception = $event->getException();
-        $request = $event->getRequest();
-
-        $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
-    }
-
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-        $request = $this->duplicateRequest($exception, $event->getRequest());
+        $request = $event->getRequest();
         $eventDispatcher = func_num_args() > 2 ? func_get_arg(2) : null;
+
+        $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
+
+        $request = $this->duplicateRequest($exception, $request);
 
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
@@ -91,10 +87,7 @@ class ExceptionListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::EXCEPTION => array(
-                array('logKernelException', 2048),
-                array('onKernelException', -128),
-            ),
+            KernelEvents::EXCEPTION => array('onKernelException', -128),
         );
     }
 

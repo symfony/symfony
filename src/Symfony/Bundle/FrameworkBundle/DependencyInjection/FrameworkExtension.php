@@ -165,6 +165,8 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.trusted_hosts', $config['trusted_hosts']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
+        $container->setParameter('framework.exception_listener.http_log_levels', $config['http_exception_log_levels']);
+
         if (!$container->hasParameter('debug.file_link_format')) {
             if (!$container->hasParameter('templating.helper.code.file_link_format')) {
                 $links = array(

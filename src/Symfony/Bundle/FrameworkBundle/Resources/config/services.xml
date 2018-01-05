@@ -71,5 +71,13 @@
         </service>
 
         <service id="services_resetter" class="Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter" public="true" />
+
+        <service id="exception_logger" class="Symfony\Component\HttpKernel\EventListener\LoggingExceptionListener">
+            <tag name="kernel.event_subscriber" />
+            <tag name="monolog.logger" channel="request" />
+            <argument type="service" id="logger" on-invalid="null" />
+            <argument>%framework.exception_listener.http_log_levels%</argument>
+        </service>
+
     </services>
 </container>

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,22 +23,24 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1 and will be removed in 5.0, use "%s" or "%s" instead.', ExceptionListener::class, RenderControllerExceptionListener::class, LoggingExceptionListener::class), E_USER_DEPRECATED);
+
 /**
  * ExceptionListener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 4.1, use RenderControllerExceptionListener or LoggingExceptionListener instead
  */
 class ExceptionListener implements EventSubscriberInterface
 {
     protected $controller;
     protected $logger;
-    protected $httpStatusCodeLogLevel;
 
-    public function __construct($controller, LoggerInterface $logger = null, array $httpStatusCodeLogLevel = array())
+    public function __construct($controller, LoggerInterface $logger = null)
     {
         $this->controller = $controller;
         $this->logger = $logger;
-        $this->httpStatusCodeLogLevel = $httpStatusCodeLogLevel;
     }
 
     public function logKernelException(GetResponseForExceptionEvent $event)
@@ -97,21 +98,6 @@ class ExceptionListener implements EventSubscriberInterface
         );
     }
 
-    protected function getExceptionLogLevel(\Exception $exception): string
-    {
-        $logLevel = LogLevel::CRITICAL;
-        if ($exception instanceof HttpExceptionInterface) {
-            $statusCode = $exception->getStatusCode();
-            if (isset($this->httpStatusCodeLogLevel[$statusCode])) {
-                $logLevel = $this->httpStatusCodeLogLevel[$statusCode];
-            } elseif ($statusCode >= 400 && $statusCode < 500) {
-                $logLevel = LogLevel::WARNING;
-            }
-        }
-
-        return $logLevel;
-    }
-
     /**
      * Logs an exception.
      *
@@ -121,7 +107,11 @@ class ExceptionListener implements EventSubscriberInterface
     protected function logException(\Exception $exception, $message)
     {
         if (null !== $this->logger) {
-            $this->logger->log($this->getExceptionLogLevel($exception), $message, array('exception' => $exception));
+            if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
+                $this->logger->critical($message, array('exception' => $exception));
+            } else {
+                $this->logger->error($message, array('exception' => $exception));
+            }
         }
     }
 

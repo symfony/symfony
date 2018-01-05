@@ -123,12 +123,11 @@
             <argument type="service" id="workflow.registry" />
         </service>
 
-        <service id="twig.exception_listener" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
+        <service id="twig.exception_listener" class="Symfony\Component\HttpKernel\EventListener\RenderControllerExceptionListener">
             <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
-            <argument>%twig.exception_listener.http_log_levels%</argument>
         </service>
 
         <service id="twig.controller.exception" class="Symfony\Bundle\TwigBundle\Controller\ExceptionController" public="true">

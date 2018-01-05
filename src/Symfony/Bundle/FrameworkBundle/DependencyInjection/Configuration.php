@@ -101,6 +101,7 @@ class Configuration implements ConfigurationInterface
         $this->addPhpErrorsSection($rootNode);
         $this->addWebLinkSection($rootNode);
         $this->addLockSection($rootNode);
+        $this->addHttpExceptionLogLevels($rootNode);
 
         return $treeBuilder;
     }
@@ -898,6 +899,45 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('web_link')
                     ->info('web links configuration')
                     ->{!class_exists(FullStack::class) && class_exists(HttpHeaderSerializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addHttpExceptionLogLevels(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('http_exception_log_levels')
+                    ->info('The override log levels for http exceptions')
+                    ->example(array('403' => 'NOTICE', '404' => 'INFO'))
+                    ->useAttributeAsKey('http_exception_log_levels')
+                    ->prototype('variable')->end()
+                    ->validate()
+                        ->always(function ($v) {
+                            $map = array();
+                            foreach ($v as $status => $level) {
+                                if (!(is_int($status) && $status >= 100 && $status <= 599)) {
+                                    throw new InvalidConfigurationException(sprintf(
+                                        'The configured status code "%s" in framework.http_exception_log_levels is not a valid http status code.',
+                                         $status
+                                    ));
+                                }
+
+                                $levelConstant = 'Psr\Log\LogLevel::'.$level;
+                                if (!defined($levelConstant)) {
+                                    throw new InvalidConfigurationException(sprintf(
+                                        'The configured log level "%s" in framework.http_exception_log_levels is invalid as it is not defined in Psr\\Log\\LogLevel.',
+                                         $level
+                                    ));
+                                }
+
+                                $map[$status] = constant($levelConstant);
+                            }
+
+                            return $map;
+                        })
+                    ->end()
                 ->end()
             ->end()
         ;

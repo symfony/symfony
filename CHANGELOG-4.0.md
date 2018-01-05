@@ -7,6 +7,37 @@ in 4.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v4.0.0...v4.0.1
 
+* 4.0.3 (2018-01-05)
+
+ * bug #25685 Use triggering file to determine weak vendors if when the test is run in a separate process (alexpott)
+ * bug #25671 Remove randomness from dumped containers (nicolas-grekas)
+ * bug #25532 [HttpKernel] Disable CSP header on exception pages (ostrolucky)
+ * bug #25678 [WebProfilerBundle] set the var in the right scope (Jochen Mandl)
+ * bug #25491 [Routing] Use the default host even if context is empty (sroze)
+ * bug #25672 [WebServerBundle] use interface_exists instead of class_exists (kbond)
+ * bug #25662 Dumper shouldn't use html format for phpdbg / cli-server (jhoff)
+ * bug #25529 [Validator] Fix access to root object when using composite constraint (ostrolucky)
+ * bug #25404 [Form] Remove group options without data on debug:form command (yceruto)
+ * bug #25430 Fixes for Oracle in PdoSessionHandler (elislenio)
+ * bug #25117 [FrameworkBundle] Make cache:clear "atomic" and consistent with cache:warmup (hkdobrev)
+ * bug #25583 [HttpKernel] Call Response->setPrivate() instead of sending raw header() when session is started (Toflar)
+ * bug #25601 [TwigBundle/Brige] catch missing requirements to throw meaningful exceptions (nicolas-grekas)
+ * bug #25547 [DX][DependencyInjection] Suggest to write an implementation if the interface cannot be autowired (sroze)
+ * bug #25599 Add application/ld+json format associated to json (vincentchalamon)
+ * bug #25623 [HttpFoundation] Fix false-positive ConflictingHeadersException (nicolas-grekas)
+ * bug #25624 [WebServerBundle] Fix escaping of php binary with arguments (nicolas-grekas)
+ * bug #25604 Add check for SecurityBundle in createAccessDeniedException (FGM)
+ * bug #25591 [HttpKernel] fix cleaning legacy containers (nicolas-grekas)
+ * bug #25526 [WebProfilerBundle] Fix panel break when stopwatch component is not installed. (umulmrum, javiereguiluz)
+ * bug #25606 Updating message to inform the user how to install the component (weaverryan)
+ * bug #25571 [SecurityBundle] allow auto_wire for SessionAuthenticationStrategy class (xavren)
+ * bug #25567 [Process] Fix setting empty env vars (nicolas-grekas)
+ * bug #25407 [Console] Commands with an alias should not be recognized as ambiguous (Simperfit)
+ * bug #25523 [WebServerBundle] fix a bug where require would not require the good file because of env (Simperfit)
+ * bug #25559 [Process] Dont use getenv(), it returns arrays and can introduce subtle breaks accros PHP versions (nicolas-grekas)
+ * bug #25552 [WebProfilerBundle] Let fetch() cast URL to string (ro0NL)
+ * bug #25521 [Console] fix a bug when you are passing a default value and passing -n would output the index (Simperfit)
+
 * 4.0.2 (2017-12-15)
 
  * bug #25489 [FrameworkBundle] remove esi/ssi renderers if inactive (dmaicher)

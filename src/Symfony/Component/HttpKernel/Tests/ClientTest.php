@@ -94,9 +94,14 @@ class ClientTest extends TestCase
         $this->assertEquals('foo', $domResponse->getContent());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
+     */
     public function testUploadedFile()
     {
         $source = tempnam(sys_get_temp_dir(), 'source');
+        file_put_contents($source, '');
         $target = sys_get_temp_dir().'/sf.moved.file';
         @unlink($target);
 
@@ -105,7 +110,7 @@ class ClientTest extends TestCase
 
         $files = array(
             array('tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => null, 'error' => UPLOAD_ERR_OK),
-            new UploadedFile($source, 'original', 'mime/original', null, UPLOAD_ERR_OK, true),
+            new UploadedFile($source, 'original', 'mime/original', 0, UPLOAD_ERR_OK, true),
         );
 
         $file = null;
@@ -120,7 +125,7 @@ class ClientTest extends TestCase
 
             $this->assertEquals('original', $file->getClientOriginalName());
             $this->assertEquals('mime/original', $file->getClientMimeType());
-            $this->assertTrue($file->isValid());
+            $this->assertEquals($file->getSize(), 0);
         }
 
         $file->move(dirname($target), basename($target));
@@ -153,13 +158,17 @@ class ClientTest extends TestCase
 
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->setConstructorArgs(array($source, 'original', 'mime/original', null, UPLOAD_ERR_OK, true))
-            ->setMethods(array('getSize'))
+            ->setConstructorArgs(array($source, 'original', 'mime/original', UPLOAD_ERR_OK, true))
+            ->setMethods(array('getSize', 'getClientSize'))
             ->getMock()
         ;
-
-        $file->expects($this->once())
+        /* should be modified when the getClientSize will be removed */
+        $file->expects($this->any())
             ->method('getSize')
+            ->will($this->returnValue(INF))
+        ;
+        $file->expects($this->any())
+            ->method('getClientSize')
             ->will($this->returnValue(INF))
         ;
 

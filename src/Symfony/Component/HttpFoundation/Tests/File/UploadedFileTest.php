@@ -40,7 +40,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            null,
             UPLOAD_ERR_OK
         );
 
@@ -57,7 +56,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/.unknownextension',
             'original.gif',
             null,
-            null,
             UPLOAD_ERR_OK
         );
 
@@ -70,7 +68,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            null,
             null
         );
 
@@ -83,7 +80,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/jpeg',
-            null,
             null
         );
 
@@ -96,7 +92,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            null,
             null
         );
 
@@ -109,7 +104,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            null,
             null
         );
 
@@ -122,7 +116,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            null,
             null
         );
 
@@ -138,7 +131,6 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            null,
             UPLOAD_ERR_OK
         );
 
@@ -158,7 +150,6 @@ class UploadedFileTest extends TestCase
             $path,
             'original.gif',
             'image/gif',
-            null,
             UPLOAD_ERR_OK,
             true
         );
@@ -177,9 +168,7 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             '../../original.gif',
-            'image/gif',
-            null,
-            null
+            'image/gif'
         );
 
         $this->assertEquals('original.gif', $file->getClientOriginalName());
@@ -190,9 +179,7 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
-            'image/gif',
-            null,
-            null
+            'image/gif'
         );
 
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
@@ -208,7 +195,7 @@ class UploadedFileTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a size in the constructor is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.
+     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
      */
     public function testConstructDeprecatedSize()
     {
@@ -217,7 +204,24 @@ class UploadedFileTest extends TestCase
             'original.gif',
             'image/gif',
             filesize(__DIR__.'/Fixtures/test.gif'),
-            null
+            UPLOAD_ERR_OK,
+            false
+        );
+
+        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
+     */
+    public function testConstructDeprecatedSizeWhenPassingOnlyThe4Needed()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif')
         );
 
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
@@ -227,8 +231,7 @@ class UploadedFileTest extends TestCase
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
-            'original.gif',
-            null
+            'original.gif'
         );
 
         $this->assertEquals('gif', $file->getExtension());
@@ -239,7 +242,6 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
-            null,
             null,
             UPLOAD_ERR_OK,
             true
@@ -256,7 +258,6 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
-            null,
             null,
             $error
         );
@@ -280,7 +281,6 @@ class UploadedFileTest extends TestCase
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
-            null,
             null,
             UPLOAD_ERR_OK
         );

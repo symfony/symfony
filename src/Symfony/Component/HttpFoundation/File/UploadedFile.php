@@ -27,7 +27,6 @@ class UploadedFile extends File
     private $test = false;
     private $originalName;
     private $mimeType;
-    private $size;
     private $error;
 
     /**
@@ -47,7 +46,6 @@ class UploadedFile extends File
      * @param string      $path         The full temporary path to the file
      * @param string      $originalName The original file name of the uploaded file
      * @param string|null $mimeType     The type of the file as provided by PHP; null defaults to application/octet-stream
-     * @param int|null    $size         The file size provided by the uploader
      * @param int|null    $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants); null defaults to UPLOAD_ERR_OK
      * @param bool        $test         Whether the test mode is active
      *                                  Local files are used in test mode hence the code should not enforce HTTP uploads
@@ -55,14 +53,17 @@ class UploadedFile extends File
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct(string $path, string $originalName, string $mimeType = null, int $size = null, int $error = null, bool $test = false)
+    public function __construct(string $path, string $originalName, string $mimeType = null, int $error = null, $test = false)
     {
         $this->originalName = $this->getName($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
-        $this->size = $size;
-        if (null !== $size) {
-            @trigger_error('Passing a size in the constructor is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.', E_USER_DEPRECATED);
+
+        if (4 < func_num_args() ? !is_bool($test) : null !== $error && @filesize($path) === $error) {
+            @trigger_error(sprintf('Passing a size as 4th argument to the constructor of "%s" is deprecated since Symfony 4.1 and will be unsupported in 5.0.', __CLASS__), E_USER_DEPRECATED);
+            $error = $test;
+            $test = 5 < func_num_args() ? func_get_arg(5) : false;
         }
+
         $this->error = $error ?: UPLOAD_ERR_OK;
         $this->test = $test;
 
@@ -152,7 +153,7 @@ class UploadedFile extends File
     {
         @trigger_error(sprintf('"%s" is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.', __METHOD__), E_USER_DEPRECATED);
 
-        return $this->size;
+        return $this->getSize();
     }
 
     /**

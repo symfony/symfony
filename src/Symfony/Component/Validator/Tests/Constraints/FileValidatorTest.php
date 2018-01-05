@@ -83,7 +83,8 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidUploadedfile()
     {
-        $file = new UploadedFile($this->path, 'originalName', null, null, null, true);
+        file_put_contents($this->path, '1');
+        $file = new UploadedFile($this->path, 'originalName', null, null, true);
         $this->validator->validate($file, new File());
 
         $this->assertNoViolation();
@@ -411,7 +412,8 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
      */
     public function testUploadedFileError($error, $message, array $params = array(), $maxSize = null)
     {
-        $file = new UploadedFile('/path/to/file', 'originalName', 'mime', null, $error);
+        touch('/tmp/file');
+        $file = new UploadedFile('/tmp/file', 'originalName', 'mime', $error);
 
         $constraint = new File(array(
             $message => 'myMessage',

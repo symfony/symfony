@@ -29,6 +29,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     private $flashName;
     private $attributeName;
     private $data = array();
+    private $hasBeenStarted;
 
     /**
      * @param SessionStorageInterface $storage    A SessionStorageInterface instance
@@ -145,6 +146,16 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      *
      * @internal
      */
+    public function hasBeenStarted()
+    {
+        return $this->hasBeenStarted;
+    }
+
+    /**
+     * @return bool
+     *
+     * @internal
+     */
     public function isEmpty()
     {
         foreach ($this->data as &$data) {
@@ -227,7 +238,7 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     public function registerBag(SessionBagInterface $bag)
     {
-        $this->storage->registerBag(new SessionBagProxy($bag, $this->data));
+        $this->storage->registerBag(new SessionBagProxy($bag, $this->data, $this->hasBeenStarted));
     }
 
     /**
@@ -257,6 +268,6 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
      */
     private function getAttributeBag()
     {
-        return $this->storage->getBag($this->attributeName)->getBag();
+        return $this->getBag($this->attributeName);
     }
 }

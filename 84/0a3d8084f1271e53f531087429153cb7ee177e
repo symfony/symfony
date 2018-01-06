@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-06T15:23:18Z
+
+good idea (but patch is wrong :P)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-06T15:25:08Z
+
+Here is the correct one (please rebase on 3.3)
+```diff
+--- a/src/Symfony/Bridge/PhpUnit/bin/simple-phpunit
++++ b/src/Symfony/Bridge/PhpUnit/bin/simple-phpunit
+@@ -76,7 +76,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
+     passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"~3.4-beta5@dev|^4.0-beta5@dev\"");
+     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
+     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
+-    $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));
++    $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-suggest --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));
+     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
+     if ($exit) {
+         exit($exit);
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-01-06T15:57:34Z
+
+Done.

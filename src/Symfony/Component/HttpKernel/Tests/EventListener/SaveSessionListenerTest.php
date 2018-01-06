@@ -19,6 +19,9 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\SaveSessionListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+/**
+ * @group legacy
+ */
 class SaveSessionListenerTest extends TestCase
 {
     public function testOnlyTriggeredOnMasterRequest()

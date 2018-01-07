@@ -29,7 +29,7 @@ interface NormalizerInterface
      * @param string $format  Format the normalization result will be encoded as
      * @param array  $context Context options for the normalizer
      *
-     * @return array|scalar
+     * @return array|string|int|float|bool
      *
      * @throws InvalidArgumentException   Occurs when the object given is not an attempted type for the normalizer
      * @throws CircularReferenceException Occurs when the normalizer detects a circular reference when no circular

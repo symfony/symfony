@@ -1,0 +1,173 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-22T15:38:30Z
+
+Well, `string` is already covered by `scalar`. So not worth it IMO.
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-22T15:41:24Z
+
+No its not. PHP Docblock does not cover it if you provide a method which will return `string`.
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-22T15:52:44Z
+
+Simple test with this.
+
+![image](https://user-images.githubusercontent.com/883543/34303969-0944458c-e738-11e7-82d5-6469885c26a0.png)
+
+As seen it tries to get wrong scalar.
+Even the fix with a backslash does not work.
+
+![image](https://user-images.githubusercontent.com/883543/34303993-2399e64e-e738-11e7-9de1-da33a73acbc1.png)
+
+Seems like automatic parsing of php docblock is not working with "pseudo" types like `scalar`
+Since docblock only works with `scalar` or any existing php class/type. The pseudo type `scalar` will only work with non namespaced classes.
+
+-- Edit:
+
+Also `scalar` is not even in the list of valid types of php docblock
+https://docs.phpdoc.org/guides/types.html
+
+So as a consequence there should be all scalar types listed instead.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-12-22T19:53:01Z
+
+AFAIK scalar is not a valid phpdoc type indeed, only the ones supported as argument typehints are.
+Should be merged in 3.3.
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-22T20:29:51Z
+
+> AFAIK scalar is not a valid phpdoc type indeed, only the ones supported as argument typehints are.
+Should be merged in 3.3.
+
+I changed the PR to simply accept all scalar types instead of only adding string
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T20:38:42Z
+
+https://github.com/phpDocumentor/phpDocumentor2/issues/694
+
+It looks like scalar is fine, even phpstan supports it.
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-22T21:39:58Z
+
+> It looks like scalar is fine, even phpstan supports it.
+
+Which does not make any sense. Because the linked docs itself does say nothing about `scalar` as a valid type.
+
+Even if phpDocumentor is accepting scalar as valid type. The underlying docs does not.
+https://docs.phpdoc.org/references/phpdoc/types.html
+
+So I think rather than supporting a document generation script. The types listed on `@param` should be compatible with the docs given from phpdoc.org itself.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T21:43:20Z
+
+I would instead suggest to send a PR to fix the doc...
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-22T22:04:32Z
+
+Well, will do this as well.
+https://github.com/phpDocumentor/phpDocumentor2/pull/1923
+
+But the PR at the docs does not fix problems with current parsing systems e.g. PHPStorm, Eclipse and I guess many other that rely on the current docs of phpdoc, which does not list scalar as a valid type, I see no harm in maybe listing both as backward compatibility.
+
+Prior the type was set to `mixed` which wasn't a problem for a long time.
+So I think taking it both in would not harm anyone. So you can take it on a Milestone to remove it afterwards. Because the current state is only showing many people warnings where there is none.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T22:09:28Z
+
+The issue is that "scalar" is used in more places than the currently patched one. Which means to be consistent, we should update all places, then we should add a rule to enforce not using scalar - because otherwise it will come back again easily. That's a lot of overhead to add to our processes for a docblock. I don't think it's worth it. I would prefer the optimistic way and assume this works fine - or will very soon if not already the case (did you find any practical case where scalar is not supported?)
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-22T22:30:38Z
+
+> Which means to be consistent, we should update all places, then we should add a rule to enforce not using scalar - because otherwise it will come back again easily.
+
+Understandable.
+
+> did you find any practical case where scalar is not supported?
+
+See above screenshots. Current version of IntelliJ (PHPStorm)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T22:35:14Z
+
+sorry I missed that, too bad, the most used IDE...
+then would you mind opening an issue on https://github.com/FriendsOfPHP/PHP-CS-Fixer/ so that they can add a rule to turn scalar into the full list,
+and also update this PR to change all places where scalar is used?
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-22T23:08:23Z
+
+Based on the sarcastic answer it looks like you have no interest in further discussing this matter.
+
+If, for some reason, I am wrong, I will update the PR to fully replace `scalar` doctype with the correct list of valid scalar php scalar types and create a possible cs-fixer pr as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T23:15:25Z
+
+wait, what, no! my answer was not sarcastic at all!
+it was honest, you made your point and I ended up agreeing with you.
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-22T23:21:05Z
+
+Then I misunderstood.
+Will update the PR and look into cs-fixer (this might take a while tho)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T23:29:31Z
+
+thanks :) sorry for the misunderstanding also
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-23T11:33:00Z
+
+I added the PR for PHP-CS-Fixer to convert `scalar` into a list of scalar types.
+Should hopefully be merged soon ;)
+
+---------------------------------------------------------------------------
+
+by icanhazstring at 2017-12-28T14:17:21Z
+
+> then would you mind opening an issue on https://github.com/FriendsOfPHP/PHP-CS-Fixer/ so that they can add a rule to turn scalar into the full list,
+
+@nicolas-grekas about the php-cs-fixer PR. Should the new rule already be added into the `@Symfony` RuleSet since we changing stuff here already from `scalar` to each proper type? Currently I added it right away.
+
+https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/3341/files#diff-1e418beac3b4a9cf60ecd4ca4e2975a8
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-12-28T20:16:08Z
+
+it shall, as this rule was already agreed in this PR.
+a fixer for this rule shall be enabled, as if one would violate the rule later, in some new PR, having the fixer automate the job for you, one don't need to look over if one is reintroducing `scalar` usage or not
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-07T09:21:46Z
+
+@icanhazstring I also think this should be added to the Symfony rule set yes.

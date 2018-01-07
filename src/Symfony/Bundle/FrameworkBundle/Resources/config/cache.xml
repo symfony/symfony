@@ -11,7 +11,7 @@
             <tag name="cache.pool" clearer="cache.app_clearer" reset="reset" />
         </service>
 
-        <service id="cache.app.simple" class="Symfony\Component\Cache\Simple\Psr6Cache" public="true">
+        <service id="cache.app.simple" class="Symfony\Component\Cache\Simple\Psr6Cache">
             <argument type="service" id="cache.app" />
         </service>
 

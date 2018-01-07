@@ -72,6 +72,12 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
             'foo3' => [false, 'foo3', 'getFoo3Service', false],
             'foo4' => ['privates', 'foo4', NULL, 'BOOM'],
             'foo5' => ['services', 'foo5', NULL, false],
+        ], [
+            'foo1' => '?',
+            'foo2' => '?',
+            'foo3' => '?',
+            'foo4' => '?',
+            'foo5' => '?',
         ]);
 
         return $instance;

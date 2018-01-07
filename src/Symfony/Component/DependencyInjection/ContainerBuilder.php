@@ -1234,13 +1234,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 return $count;
             });
         } elseif ($value instanceof ServiceLocatorArgument) {
-            $refs = [];
+            $refs = $types = [];
             foreach ($value->getValues() as $k => $v) {
                 if ($v) {
                     $refs[$k] = [$v];
+                    $types[$k] = $v instanceof TypedReference ? $v->getType() : '?';
                 }
             }
-            $value = new ServiceLocator(\Closure::fromCallable([$this, 'resolveServices']), $refs);
+            $value = new ServiceLocator(\Closure::fromCallable([$this, 'resolveServices']), $refs, $types);
         } elseif ($value instanceof Reference) {
             $value = $this->doGet((string) $value, $value->getInvalidBehavior(), $inlineServices, $isConstructorArgument);
         } elseif ($value instanceof Definition) {

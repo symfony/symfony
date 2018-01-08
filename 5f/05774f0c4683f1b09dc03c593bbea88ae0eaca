@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-01-08T16:20:11Z
+
+Well, solving a complain about one page being uncachable by keeping it uncachable for a different reason does not seem to solve it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-08T17:01:06Z
+
+@stof at least this would make it explicit about *why* this is not cached, and also would prevent messing up with users' Cache-Control headers. So far better IMHO.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-01-08T17:06:58Z
+
+Yup, @nicolas-grekas' point was my reasoning behind it. Note that Travis' error is unrelated.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-01-08T18:05:57Z
+
+Looks good to me then

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-01-04T16:55:14Z
+
+Ping. Values or variables? Will change in ExpressionLanguage accordingly.
+
+Vote by reacting with:
+👍 variables
+👎 values
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-04T17:02:48Z
+
+I'm good with values also. Any other opinion?
+(rebase needed)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-01-04T18:10:48Z
+
+Rebased.
+
+More options for naming :
+1. `context` - used by Twig, hoa/ruler
+1. `parameters` - used by ControllerTrait::render
+1. `environment` - used in various places, most notably in Psr/LoggerInterface
+
+Vote by reacting with:
+
+👍: variables
+👎: values
+😆 : context
+🎉 : parameters
+❤️ : environment

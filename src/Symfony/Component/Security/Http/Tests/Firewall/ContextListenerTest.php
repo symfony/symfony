@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\User;
@@ -281,6 +282,18 @@ class ContextListenerTest extends TestCase
         $this->handleEventWithPreviousSession(new TokenStorage(), array(new NotSupportingUserProvider(), new NotSupportingUserProvider()));
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testRuntimeExceptionIsThrownIfAllSupportingUserProvidersTriedWhenTheUserIsInvalid()
+    {
+        $tokenStorage = new TokenStorage();
+        $refreshedUser = new User('trigger_invalid', 'baz');
+        $this->handleEventWithPreviousSession($tokenStorage, array(new SupportingUserProvider($refreshedUser), new SupportingUserProvider($refreshedUser)));
+
+        $this->assertNull($tokenStorage->getToken());
+    }
+
     protected function runSessionOnKernelResponse($newToken, $original = null)
     {
         $session = new Session(new MockArraySessionStorage());
@@ -362,6 +375,10 @@ class SupportingUserProvider implements UserProviderInterface
 
         if (null === $this->refreshedUser) {
             throw new UsernameNotFoundException();
+        }
+
+        if ('trigger_invalid' === $this->refreshedUser->getUsername()) {
+            throw new InvalidArgumentException();
         }
 
         return $this->refreshedUser;

@@ -23,24 +23,22 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1 and will be removed in 5.0, use "%s" or "%s" instead.', ExceptionListener::class, RenderControllerExceptionListener::class, LoggingExceptionListener::class), E_USER_DEPRECATED);
-
 /**
  * ExceptionListener.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @deprecated since Symfony 4.1, use RenderControllerExceptionListener or LoggingExceptionListener instead
  */
 class ExceptionListener implements EventSubscriberInterface
 {
     protected $controller;
     protected $logger;
+    private $isBCExceptionLoggingEnabled;
 
-    public function __construct($controller, LoggerInterface $logger = null)
+    public function __construct($controller, LoggerInterface $logger = null/*, bool $isBCExceptionLoggingEnabled = true*/)
     {
         $this->controller = $controller;
         $this->logger = $logger;
+        $this->isBCExceptionLoggingEnabled = (func_num_args() >= 3) ? (bool) func_get_arg(2) : true;
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event)
@@ -49,14 +47,21 @@ class ExceptionListener implements EventSubscriberInterface
         $request = $event->getRequest();
         $eventDispatcher = func_num_args() > 2 ? func_get_arg(2) : null;
 
-        $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
+        if ($this->isBCExceptionLoggingEnabled) {
+            $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
+        }
 
         $request = $this->duplicateRequest($exception, $request);
 
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
         } catch (\Exception $e) {
-            $this->logException($e, sprintf('Exception thrown when handling an exception (%s: %s at %s line %s)', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()));
+            $message = sprintf('Exception thrown when handling an exception (%s: %s at %s line %s)', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine());
+            if ($this->isBCExceptionLoggingEnabled) {
+                $this->logException($e, $message);
+            } elseif (null !== $this->logger) {
+                $this->logger->critical($message, array('exception' => $e));
+            }
 
             $wrapper = $e;
 
@@ -96,9 +101,13 @@ class ExceptionListener implements EventSubscriberInterface
      *
      * @param \Exception $exception The \Exception instance
      * @param string     $message   The error message to log
+     *
+     * @deprecated since Symfony 4.1, to be removed in 5.0. Use LoggingExceptionListener instead to log exceptions.
      */
     protected function logException(\Exception $exception, $message)
     {
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.1 and will be removed in 5.0. Use %s instead.', __METHOD__, LoggingExceptionListener::class), E_USER_DEPRECATED);
+
         if (null !== $this->logger) {
             if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
                 $this->logger->critical($message, array('exception' => $exception));
@@ -127,5 +136,15 @@ class ExceptionListener implements EventSubscriberInterface
         $request->setMethod('GET');
 
         return $request;
+    }
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0.
+     *
+     * @internal
+     */
+    public function isLoggingExceptions(): bool
+    {
+        return $this->isBCExceptionLoggingEnabled;
     }
 }

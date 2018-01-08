@@ -77,6 +77,7 @@
             <tag name="monolog.logger" channel="request" />
             <argument type="service" id="logger" on-invalid="null" />
             <argument>%framework.exception_listener.http_log_levels%</argument>
+            <argument type="service" id="twig.exception_listener" on-invalid="null" />
         </service>
 
     </services>

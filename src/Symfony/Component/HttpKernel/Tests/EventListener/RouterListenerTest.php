@@ -172,7 +172,7 @@ class RouterListenerTest extends TestCase
         $dispatcher->addSubscriber(new RouterListener($requestMatcher, $requestStack, new RequestContext()));
         $dispatcher->addSubscriber(new ExceptionListener(function () {
             return new Response('Exception handled', 400);
-        }));
+        }, null, false));
 
         $kernel = new HttpKernel($dispatcher, new ControllerResolver(), $requestStack, new ArgumentResolver());
 

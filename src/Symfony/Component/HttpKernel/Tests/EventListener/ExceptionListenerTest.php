@@ -22,7 +22,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Logger;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * ExceptionListenerTest.
@@ -33,10 +32,26 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ExceptionListenerTest extends TestCase
 {
+    public function provider()
+    {
+        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
+            return array(array(null, null));
+        }
+
+        $request = new Request();
+        $exception = new \Exception('foo');
+        $event = new GetResponseForExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
+        $event2 = new GetResponseForExceptionEvent(new TestKernelThatThrowsException(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
+
+        return array(
+            array($event, $event2),
+        );
+    }
+
     public function testConstruct()
     {
         $logger = new TestLogger();
-        $l = new ExceptionListener('foo', $logger);
+        $l = new ExceptionListener('foo', $logger, false);
 
         $_logger = new \ReflectionProperty(get_class($l), 'logger');
         $_logger->setAccessible(true);
@@ -52,9 +67,24 @@ class ExceptionListenerTest extends TestCase
      */
     public function testHandleWithoutLogger($event, $event2)
     {
+        $this->doTestHandleWithoutLogger($event, $event2);
+    }
+
+    /**
+     * @dataProvider provider
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\EventListener\ExceptionListener::logException() method is deprecated since Symfony 4.1 and will be removed in 5.0. Use Symfony\Component\HttpKernel\EventListener\LoggingExceptionListener instead.
+     */
+    public function testBcHandleWithoutLogger($event, $event2)
+    {
+        $this->doTestHandleWithoutLogger($event, $event2, true);
+    }
+
+    public function doTestHandleWithoutLogger($event, $event2, $bc = false)
+    {
         $this->iniSet('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
-        $l = new ExceptionListener('foo');
+        $l = new ExceptionListener('foo', null, $bc);
         $l->onKernelException($event);
 
         $this->assertEquals(new Response('foo'), $event->getResponse());
@@ -72,6 +102,23 @@ class ExceptionListenerTest extends TestCase
      * @dataProvider provider
      */
     public function testHandleWithLogger($event, $event2)
+    {
+        $logger = new TestLogger();
+        $l = new ExceptionListener('foo', $logger, false);
+        $l->onKernelException($event);
+
+        $this->assertEquals(new Response('foo'), $event->getResponse());
+        foreach ($logger->getLogs() as $logs) {
+            $this->assertCount(0, $logs);
+        }
+    }
+
+    /**
+     * @dataProvider provider
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\EventListener\ExceptionListener::logException() method is deprecated since Symfony 4.1 and will be removed in 5.0. Use Symfony\Component\HttpKernel\EventListener\LoggingExceptionListener instead.
+     */
+    public function testBcHandleWithLogger($event, $event2)
     {
         $logger = new TestLogger();
 
@@ -92,25 +139,23 @@ class ExceptionListenerTest extends TestCase
         $this->assertCount(3, $logger->getLogs('critical'));
     }
 
-    public function provider()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            return array(array(null, null));
-        }
-
-        $request = new Request();
-        $exception = new \Exception('foo');
-        $event = new GetResponseForExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
-        $event2 = new GetResponseForExceptionEvent(new TestKernelThatThrowsException(), $request, HttpKernelInterface::MASTER_REQUEST, $exception);
-
-        return array(
-            array($event, $event2),
-        );
-    }
-
     public function testSubRequestFormat()
     {
-        $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
+        $this->doTestSubRequestFormat();
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\EventListener\ExceptionListener::logException() method is deprecated since Symfony 4.1 and will be removed in 5.0. Use Symfony\Component\HttpKernel\EventListener\LoggingExceptionListener instead.
+     */
+    public function testBcSubRequestFormat()
+    {
+        $this->doTestSubRequestFormat(true);
+    }
+
+    public function doTestSubRequestFormat($bc = false)
+    {
+        $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock(), $bc);
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
@@ -129,13 +174,27 @@ class ExceptionListenerTest extends TestCase
 
     public function testCSPHeaderIsRemoved()
     {
+        $this->doTestCSPHeaderIsRemoved();
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\HttpKernel\EventListener\ExceptionListener::logException() method is deprecated since Symfony 4.1 and will be removed in 5.0. Use Symfony\Component\HttpKernel\EventListener\LoggingExceptionListener instead.
+     */
+    public function testBcCSPHeaderIsRemoved()
+    {
+        $this->doTestCSPHeaderIsRemoved(true);
+    }
+
+    public function doTestCSPHeaderIsRemoved($bc = false)
+    {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         }));
 
-        $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
+        $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock(), $bc);
 
         $dispatcher->addSubscriber($listener);
 
@@ -153,40 +212,23 @@ class ExceptionListenerTest extends TestCase
         $this->assertFalse($dispatcher->hasListeners(KernelEvents::RESPONSE), 'CSP removal listener has been removed');
     }
 
-    public function testHttp4xxLogLevel()
+    /**
+     * @dataProvider provider
+     */
+    public function testHandleWithLoggerWithoutBcWithSecondException($event, $event2)
     {
         $logger = new TestLogger();
-        $l = new ExceptionListener('foo', $logger);
-        $exception = new \Exception('foo');
-        $event = new GetResponseForExceptionEvent(new TestKernelThatThrowsHttp4xxException(), Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
+        $l = new ExceptionListener('foo', $logger, false);
+
         try {
-            $l->onKernelException($event);
-            $this->fail('NotFoundHttpException expected');
-        } catch (NotFoundHttpException $e) {
-            $this->assertSame('4xx', $e->getMessage());
+            $l->onKernelException($event2);
+            $this->fail('RuntimeException expected');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('bar', $e->getMessage());
             $this->assertSame('foo', $e->getPrevious()->getMessage());
         }
 
-        $this->assertEquals(1, $logger->countErrors());
-        $this->assertCount(1, $logger->getLogs('warning'));
-    }
-
-    public function testHttpLogLevelOverride()
-    {
-        $logger = new TestLogger();
-        $l = new ExceptionListener('foo', $logger, array(404 => 'notice'));
-        $exception = new \Exception('foo');
-        $event = new GetResponseForExceptionEvent(new TestKernelThatThrowsHttp4xxException(), Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
-        try {
-            $l->onKernelException($event);
-            $this->fail('NotFoundHttpException expected');
-        } catch (NotFoundHttpException $e) {
-            $this->assertSame('4xx', $e->getMessage());
-            $this->assertSame('foo', $e->getPrevious()->getMessage());
-        }
-
-        $this->assertEquals(1, $logger->countErrors());
-        $this->assertCount(1, $logger->getLogs('notice'));
+        $this->assertCount(1, $logger->getLogs('critical'));
     }
 }
 
@@ -211,13 +253,5 @@ class TestKernelThatThrowsException implements HttpKernelInterface
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         throw new \RuntimeException('bar');
-    }
-}
-
-class TestKernelThatThrowsHttp4xxException implements HttpKernelInterface
-{
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
-    {
-        throw new NotFoundHttpException('4xx');
     }
 }

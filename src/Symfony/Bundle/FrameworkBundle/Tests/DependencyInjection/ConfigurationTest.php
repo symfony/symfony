@@ -249,6 +249,7 @@ class ConfigurationTest extends TestCase
                     ),
                 ),
             ),
+            'http_exception_log_levels' => array(),
         );
     }
 }

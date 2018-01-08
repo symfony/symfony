@@ -23,15 +23,28 @@ class LoggingExceptionListener implements EventSubscriberInterface
 {
     protected $logger;
     protected $httpStatusCodeLogLevel;
+    private $isDisabled;
 
-    public function __construct(LoggerInterface $logger = null, array $httpStatusCodeLogLevel = array())
+    public function __construct(LoggerInterface $logger = null, array $httpStatusCodeLogLevel = array()/*, ExceptionListener $exceptionListener = null */)
     {
         $this->logger = $logger ?: new NullLogger();
         $this->httpStatusCodeLogLevel = $httpStatusCodeLogLevel;
+
+        if (func_num_args() >= 3) {
+            $exceptionListener = func_get_arg(2);
+            $this->isDisabled = ($exceptionListener instanceof ExceptionListener) ? $exceptionListener->isLoggingExceptions() : false;
+            if ($this->isDisabled) {
+                $this->logger->debug('Logging disabled for backwards compatibility, ExceptionListener is already logging exceptions.');
+            }
+        }
     }
 
     public function logKernelException(GetResponseForExceptionEvent $event)
     {
+        if ($this->isDisabled) {
+            return;
+        }
+
         $exception = $event->getException();
         $level = $this->getExceptionLogLevel($exception);
         $message = sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine());

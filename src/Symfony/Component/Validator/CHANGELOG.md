@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Deprecated the `checkDNS` and `dnsMessage` options of the `Url` constraint. They will be removed in 5.0.
+ * added a `values` option to the `Expression` constraint
 
 4.0.0
 -----

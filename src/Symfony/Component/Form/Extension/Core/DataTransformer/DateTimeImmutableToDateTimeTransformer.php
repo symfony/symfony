@@ -30,7 +30,7 @@ class DateTimeImmutableToDateTimeTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException If the given value is not a \DateTimeImmutable
      */
-    public function transform($value): ?\DateTime
+    public function transform($value)
     {
         if (null === $value) {
             return null;
@@ -52,7 +52,7 @@ class DateTimeImmutableToDateTimeTransformer implements DataTransformerInterface
      *
      * @throws TransformationFailedException If the given value is not a \DateTime
      */
-    public function reverseTransform($value): ?\DateTimeImmutable
+    public function reverseTransform($value)
     {
         if (null === $value) {
             return null;

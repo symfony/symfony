@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2018-01-03T14:49:11Z
+
+Travis failure looks unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-03T16:20:41Z
+
+Thanks for the fix, looks legit. I think for a full fledged implementation, we should borrow from `ResourceCheckerConfigCache::safelyUnserialize()`.
+The currently proposed logic is not robust enough AFAIK.
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2018-01-05T08:27:18Z
+
+@nicolas-grekas Implemented in 23e6feec0a4418baf8432f2c6d515fb6b241f36f.

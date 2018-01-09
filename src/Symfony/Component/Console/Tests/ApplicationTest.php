@@ -16,6 +16,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\Console\Exception\NamespaceNotFoundException;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -56,6 +57,7 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/BarBucCommand.php';
         require_once self::$fixturesPath.'/FooSubnamespaced1Command.php';
         require_once self::$fixturesPath.'/FooSubnamespaced2Command.php';
+        require_once self::$fixturesPath.'/FooWithoutAliasCommand.php';
         require_once self::$fixturesPath.'/TestTiti.php';
         require_once self::$fixturesPath.'/TestToto.php';
     }
@@ -275,10 +277,10 @@ class ApplicationTest extends TestCase
         $expectedMsg = "The namespace \"f\" is ambiguous.\nDid you mean one of these?\n    foo\n    foo1";
 
         if (method_exists($this, 'expectException')) {
-            $this->expectException(CommandNotFoundException::class);
+            $this->expectException(NamespaceNotFoundException::class);
             $this->expectExceptionMessage($expectedMsg);
         } else {
-            $this->setExpectedException(CommandNotFoundException::class, $expectedMsg);
+            $this->setExpectedException(NamespaceNotFoundException::class, $expectedMsg);
         }
 
         $application->findNamespace('f');
@@ -293,7 +295,7 @@ class ApplicationTest extends TestCase
     }
 
     /**
-     * @expectedException        \Symfony\Component\Console\Exception\CommandNotFoundException
+     * @expectedException        \Symfony\Component\Console\Exception\NamespaceNotFoundException
      * @expectedExceptionMessage There are no commands defined in the "bar" namespace.
      */
     public function testFindInvalidNamespace()
@@ -457,6 +459,29 @@ class ApplicationTest extends TestCase
         $application->find($name);
     }
 
+    public function testCanRunAlternativeCommandName()
+    {
+        $application = new Application();
+        $application->add(new \FooWithoutAliasCommand());
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $tester->setInputs(array('y'));
+        $tester->run(array('command' => 'foos'), array('decorated' => false));
+        $this->assertSame("Command \"foos\" is not defined.\n\nDo you want to run \"foo\" instead? [y/n] called\n", $tester->getDisplay(true));
+    }
+
+    public function testDontRunAlternativeCommandName()
+    {
+        $application = new Application();
+        $application->add(new \FooWithoutAliasCommand());
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $tester->setInputs(array('n'));
+        $exitCode = $tester->run(array('command' => 'foos'), array('decorated' => false));
+        $this->assertSame(1, $exitCode);
+        $this->assertSame("Command \"foos\" is not defined.\n\nDo you want to run \"foo\" instead? [y/n] ", $tester->getDisplay(true));
+    }
+
     public function provideInvalidCommandNamesSingle()
     {
         return array(
@@ -486,10 +511,10 @@ class ApplicationTest extends TestCase
         // Namespace + plural
         try {
             $application->find('foo2:bar');
-            $this->fail('->find() throws a CommandNotFoundException if command does not exist, with alternatives');
+            $this->fail('->find() throws a NamespaceNotFoundException if command does not exist, with alternatives');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
-            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\NamespaceNotFoundException', $e, '->find() throws a NamespaceNotFoundException if command does not exist, with alternatives');
+            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws a NamespaceNotFoundException if command does not exist, with alternatives');
             $this->assertRegExp('/foo1/', $e->getMessage());
         }
 
@@ -563,26 +588,26 @@ class ApplicationTest extends TestCase
 
         try {
             $application->find('Unknown-namespace:Unknown-command');
-            $this->fail('->find() throws a CommandNotFoundException if namespace does not exist');
+            $this->fail('->find() throws a NamespaceNotFoundException if namespace does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if namespace does not exist');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\NamespaceNotFoundException', $e, '->find() throws a NamespaceNotFoundException if namespace does not exist');
             $this->assertSame(array(), $e->getAlternatives());
-            $this->assertEquals('There are no commands defined in the "Unknown-namespace" namespace.', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, without alternatives');
+            $this->assertEquals('There are no commands defined in the "Unknown-namespace" namespace.', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, without alternatives');
         }
 
         try {
             $application->find('foo2:command');
-            $this->fail('->find() throws a CommandNotFoundException if namespace does not exist');
+            $this->fail('->find() throws a NamespaceNotFoundException if namespace does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if namespace does not exist');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\NamespaceNotFoundException', $e, '->find() throws a NamespaceNotFoundException if namespace does not exist');
             $this->assertCount(3, $e->getAlternatives());
             $this->assertContains('foo', $e->getAlternatives());
             $this->assertContains('foo1', $e->getAlternatives());
             $this->assertContains('foo3', $e->getAlternatives());
-            $this->assertRegExp('/There are no commands defined in the "foo2" namespace./', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative');
-            $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo"');
-            $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo1"');
-            $this->assertRegExp('/foo3/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo3"');
+            $this->assertRegExp('/There are no commands defined in the "foo2" namespace./', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, with alternative');
+            $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, with alternative : "foo"');
+            $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, with alternative : "foo1"');
+            $this->assertRegExp('/foo3/', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, with alternative : "foo3"');
         }
     }
 

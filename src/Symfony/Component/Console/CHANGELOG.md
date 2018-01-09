@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added option to run suggested command if command is not found and only 1 alternative is available
+
 4.0.0
 -----
 
@@ -8,8 +13,8 @@ CHANGELOG
  * removed `QuestionHelper::setInputStream()/getInputStream()`
  * removed `Application::getTerminalWidth()/getTerminalHeight()` and 
   `Application::setTerminalDimensions()/getTerminalDimensions()`
-* removed `ConsoleExceptionEvent`
-* removed `ConsoleEvents::EXCEPTION`
+ * removed `ConsoleExceptionEvent`
+ * removed `ConsoleEvents::EXCEPTION`
 
 3.4.0
 -----

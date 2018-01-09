@@ -7,11 +7,31 @@ Config
  * Implementing `ParentNodeDefinitionInterface` without the `getChildNodeDefinitions()` method
    is deprecated and will be unsupported in 5.0.
 
+Console
+-------
+ * The `Application::findNamespace` method throws an instance of `NamespaceNotFoundException` instead `CommandNotFoundException`. All catch statements should be updated to cater for both exceptions, E.G
+ 
+   Before:
+   ```php
+   try {
+        $app->run();
+   } catch (CommandNotFoundException $e) {
+   }
+   ```
+ 
+   After:
+   ```php
+   try {
+        $app->run();
+   } catch (NamespaceNotFoundException | CommandNotFoundException $e) {
+   }
+   ```
+
 EventDispatcher
 ---------------
 
  * The `TraceableEventDispatcherInterface` has been deprecated and will be removed in 5.0.
-
+ 
 HttpFoundation
 --------------
 

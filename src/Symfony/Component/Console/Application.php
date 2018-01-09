@@ -585,6 +585,11 @@ class Application
         // if no commands matched or we just matched namespaces
         if (empty($commands) || count(preg_grep('{^'.$expr.'$}i', $commands)) < 1) {
             if (false !== $pos = strrpos($name, ':')) {
+                $command = $this->findCommandWithParameterInName($name);
+
+                if($command !== null) {
+                    return $command;
+                }
                 // check if a namespace exists and contains commands
                 $this->findNamespace(substr($name, 0, $pos));
             }
@@ -636,6 +641,30 @@ class Application
         }
 
         return $this->get($exact ? $name : reset($commands));
+    }
+
+    /**
+     * Find a command with a parameter by name
+     * 
+     * @param string $name A command name
+     *
+     * @return Command A Command instance
+     */
+    private function findCommandWithParameterInName($name) 
+    {
+        $allCommands = array_keys($this->commands);
+
+        // Get the name of the command before the options
+        $extractedName = explode(' ', $name)[0];
+
+        foreach($allCommands as $command) {
+            // Change the parameters of the command to [^:]*
+            $expr = preg_replace('/\{[^:{}]*\}/', '[^:]*', $command);
+
+            if(preg_match('/^'.$expr.'$/', $extractedName)) {
+                return $this->get($command);
+            }
+        } 
     }
 
     /**

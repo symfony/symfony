@@ -587,7 +587,7 @@ class Application
             if (false !== $pos = strrpos($name, ':')) {
                 $command = $this->findCommandWithParameterInName($name);
 
-                if($command !== null) {
+                if (null !== $command) {
                     return $command;
                 }
                 // check if a namespace exists and contains commands
@@ -644,27 +644,27 @@ class Application
     }
 
     /**
-     * Find a command with a parameter by name
-     * 
+     * Find a command with a parameter by name.
+     *
      * @param string $name A command name
      *
      * @return Command A Command instance
      */
-    private function findCommandWithParameterInName($name) 
+    private function findCommandWithParameterInName($name)
     {
         $allCommands = array_keys($this->commands);
 
         // Get the name of the command before the options
         $extractedName = explode(' ', $name)[0];
 
-        foreach($allCommands as $command) {
+        foreach ($allCommands as $command) {
             // Change the parameters of the command to [^:]*
             $expr = preg_replace('/\{[^:{}]*\}/', '[^:]*', $command);
 
-            if(preg_match('/^'.$expr.'$/', $extractedName)) {
+            if (preg_match('/^'.$expr.'$/', $extractedName)) {
                 return $this->get($command);
             }
-        } 
+        }
     }
 
     /**

@@ -677,7 +677,7 @@ class ApplicationTest extends TestCase
 
         $this->assertSame($foo, $result);
     }
-    
+
     public function testFindCommandWithExactAndParameterNameDifferentOrder()
     {
         $foo = new \FooCommand();

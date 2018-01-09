@@ -62,7 +62,7 @@ class UndefinedCallableHandler
         }
 
         // Twig will append the source context to the message, so that it will end up being like "[...] Unknown filter "%s" in foo.html.twig on line 123."
-        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown filter "%s".', $name, self::$filterComponents[$name]));
+        throw new SyntaxError(sprintf('Unknown filter "%s". Did you forget to run "composer require symfony/%s"?', $name, self::$filterComponents[$name]));
     }
 
     public static function onUndefinedFunction($name)
@@ -71,6 +71,6 @@ class UndefinedCallableHandler
             return false;
         }
 
-        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown function "%s".', $name, self::$functionComponents[$name]));
+        throw new SyntaxError(sprintf('Unknown function "%s". Did you forget to run "composer require symfony/%s"?', $name, self::$functionComponents[$name]));
     }
 }

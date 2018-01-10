@@ -123,7 +123,7 @@
 {% block form_label -%}
     {%- if compound is defined and compound -%}
         {%- set element = 'legend' -%}
-        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-legend')|trim}) -%}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
     {%- else -%}
         {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
     {%- endif -%}

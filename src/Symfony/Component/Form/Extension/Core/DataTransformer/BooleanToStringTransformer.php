@@ -24,12 +24,16 @@ class BooleanToStringTransformer implements DataTransformerInterface
 {
     private $trueValue;
 
+    private $falseValues;
+
     /**
      * @param string $trueValue The value emitted upon transform if the input is true
+     * @param array $falseValues
      */
-    public function __construct(string $trueValue)
+    public function __construct(string $trueValue, array $falseValues = array(null))
     {
         $this->trueValue = $trueValue;
+        $this->falseValues = $falseValues;
     }
 
     /**
@@ -65,7 +69,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (null === $value) {
+        if (in_array($value, $this->falseValues, true)) {
             return false;
         }
 

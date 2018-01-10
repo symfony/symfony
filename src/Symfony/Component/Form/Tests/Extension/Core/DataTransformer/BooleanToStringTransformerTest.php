@@ -71,7 +71,7 @@ class BooleanToStringTransformerTest extends TestCase
 
     public function testCustomFalseValues()
     {
-        $customFalseTransformer = new BooleanToStringTransformer(self::TRUE_VALUE, ['0', 'myFalse', true]);
+        $customFalseTransformer = new BooleanToStringTransformer(self::TRUE_VALUE, array('0', 'myFalse', true));
         $this->assertFalse($customFalseTransformer->reverseTransform('myFalse'));
         $this->assertFalse($customFalseTransformer->reverseTransform('0'));
         $this->assertFalse($customFalseTransformer->reverseTransform(true));

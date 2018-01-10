@@ -171,7 +171,7 @@ class CheckboxTypeTest extends BaseTypeTest
 
         foreach ($falseValuesToTest as $falseValue) {
             $form = $this->factory->create(static::TESTED_TYPE, null, array(
-                'false_values' => array($falseValue)
+                'false_values' => array($falseValue),
             ));
             $form->submit($falseValue);
             $this->assertFalse($form->getData());

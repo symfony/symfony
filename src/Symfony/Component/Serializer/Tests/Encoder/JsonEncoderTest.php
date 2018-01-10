@@ -65,6 +65,44 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($expected, $this->serializer->serialize($arr, 'json'), 'Context should not be persistent');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
+    public function testEncodeNotUtf8WithoutPartialOnError()
+    {
+        $arr = array(
+            'utf8' => 'Hello World!',
+            'notUtf8' => "\xb0\xd0\xb5\xd0",
+        );
+
+        $this->encoder->encode($arr, 'json');
+    }
+
+    public function testEncodeNotUtf8WithPartialOnError()
+    {
+        $context = array('json_encode_options' => JSON_PARTIAL_OUTPUT_ON_ERROR);
+
+        $arr = array(
+            'utf8' => 'Hello World!',
+            'notUtf8' => "\xb0\xd0\xb5\xd0",
+        );
+
+        $result = $this->encoder->encode($arr, 'json', $context);
+        $jsonLastError = json_last_error();
+
+        $this->assertSame(JSON_ERROR_UTF8, $jsonLastError);
+        $this->assertEquals('{"utf8":"Hello World!","notUtf8":null}', $result);
+
+        $this->assertEquals('0', $this->serializer->serialize(NAN, 'json', $context));
+    }
+
+    public function testDecodeFalseString()
+    {
+        $result = $this->encoder->decode('false', 'json');
+        $this->assertSame(JSON_ERROR_NONE, json_last_error());
+        $this->assertFalse($result);
+    }
+
     protected function getJsonSource()
     {
         return '{"foo":"foo","bar":["a","b"],"baz":{"key":"val","key2":"val","A B":"bar","item":[{"title":"title1"},{"title":"title2"}],"Barry":{"FooBar":{"Baz":"Ed","@id":1}}},"qux":"1"}';

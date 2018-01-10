@@ -7,6 +7,26 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.40 (2018-01-05)
+
+ * bug #25532 [HttpKernel] Disable CSP header on exception pages (ostrolucky)
+ * bug #25491 [Routing] Use the default host even if context is empty (sroze)
+ * bug #25662 Dumper shouldn't use html format for phpdbg / cli-server (jhoff)
+ * bug #25529 [Validator] Fix access to root object when using composite constraint (ostrolucky)
+ * bug #25430 Fixes for Oracle in PdoSessionHandler (elislenio)
+ * bug #25599 Add application/ld+json format associated to json (vincentchalamon)
+ * bug #25407 [Console] Commands with an alias should not be recognized as ambiguous (Simperfit)
+ * bug #25521 [Console] fix a bug when you are passing a default value and passing -n would output the index (Simperfit)
+ * bug #25489 [FrameworkBundle] remove esi/ssi renderers if inactive (dmaicher)
+ * bug #25427 Preserve percent-encoding in URLs when performing redirects in the UrlMatcher (mpdude)
+ * bug #25480 [FrameworkBundle] add missing validation options to XSD file (xabbuh)
+ * bug #25487 [Console] Fix a bug when passing a letter that could be an alias (Simperfit)
+ * bug #25233 [TwigBridge][Form] Fix hidden currency element with Bootstrap 3 theme (julienfalque)
+ * bug #25408 [Debug] Fix catching fatal errors in case of nested error handlers (nicolas-grekas)
+ * bug #25330 [HttpFoundation] Support 0 bit netmask in IPv6 (`::/0`) (stephank)
+ * bug #25410 [HttpKernel] Fix logging of post-terminate errors/exceptions (nicolas-grekas)
+ * bug #25323 [ExpressionLanguage] throw an SyntaxError instead of an undefined index notice (Simperfit)
+
 * 2.7.39 (2017-12-04)
 
  * bug #25278 Fix for missing whitespace control modifier in form layout (kubawerlos)

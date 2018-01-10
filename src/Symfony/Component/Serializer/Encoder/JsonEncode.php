@@ -55,7 +55,8 @@ class JsonEncode implements EncoderInterface
 
         $encodedJson = json_encode($data, $context['json_encode_options']);
 
-        if (JSON_ERROR_NONE !== $this->lastError = json_last_error()) {
+        $this->lastError = json_last_error();
+        if (JSON_ERROR_NONE !== $this->lastError && (false === $encodedJson || \PHP_VERSION_ID < 50500 || !($context['json_encode_options'] & JSON_PARTIAL_OUTPUT_ON_ERROR))) {
             throw new UnexpectedValueException(json_last_error_msg());
         }
 

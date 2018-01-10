@@ -177,6 +177,8 @@ class ContextListenerTest extends TestCase
     public function provideInvalidToken()
     {
         return array(
+            array('foo'),
+            array('O:8:"NotFound":0:{}'),
             array(serialize(new \__PHP_Incomplete_Class())),
             array(serialize(null)),
             array(null),

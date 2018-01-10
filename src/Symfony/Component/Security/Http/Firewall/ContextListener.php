@@ -43,6 +43,8 @@ class ContextListener implements ListenerInterface
     private $registered;
     private $trustResolver;
 
+    private static $unserializeExceptionCode = 0x37313bc;
+
     public function __construct(TokenStorageInterface $tokenStorage, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {
         if (empty($contextKey)) {
@@ -82,7 +84,7 @@ class ContextListener implements ListenerInterface
             return;
         }
 
-        $token = unserialize($token);
+        $token = $this->safelyUnserialize($token);
 
         if (null !== $this->logger) {
             $this->logger->debug('Read existing security token from the session.', array('key' => $this->sessionKey));
@@ -175,5 +177,44 @@ class ContextListener implements ListenerInterface
         }
 
         throw new \RuntimeException(sprintf('There is no user provider for user "%s".', get_class($user)));
+    }
+
+    private function safelyUnserialize($serializedToken)
+    {
+        $e = $token = null;
+        $prevUnserializeHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
+        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) use (&$prevErrorHandler) {
+            if (__FILE__ === $file) {
+                throw new \UnexpectedValueException($msg, self::$unserializeExceptionCode);
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($type, $msg, $file, $line, $context) : false;
+        });
+
+        try {
+            $token = unserialize($serializedToken);
+        } catch (\Error $e) {
+        } catch (\Exception $e) {
+        }
+        restore_error_handler();
+        ini_set('unserialize_callback_func', $prevUnserializeHandler);
+        if ($e) {
+            if (!$e instanceof \UnexpectedValueException || self::$unserializeExceptionCode !== $e->getCode()) {
+                throw $e;
+            }
+            if ($this->logger) {
+                $this->logger->warning('Failed to unserialize the security token from the session.', array('key' => $this->sessionKey, 'received' => $serializedToken, 'exception' => $e));
+            }
+        }
+
+        return $token;
+    }
+
+    /**
+     * @internal
+     */
+    public static function handleUnserializeCallback($class)
+    {
+        throw new \UnexpectedValueException('Class not found: '.$class, self::$unserializeExceptionCode);
     }
 }

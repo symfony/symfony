@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-13T22:24:30Z
+
+Could you add some unit tests please?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-20T06:10:16Z
+
+@diversantvlz Could you please add some unit test ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-20T10:30:30Z
+
+Shouldn't we also check if the `JSON_PARTIAL_OUTPUT_ON_ERROR` flag is set?
+This needs a test case for sure :)
+Also, why removing the call to `JsonEncoder::getLastErrorMessage()`?
+
+---------------------------------------------------------------------------
+
+by diversantvlz at 2017-12-20T11:36:00Z
+
+Options argument in json_encode is a bit mask. To understand if a flag is installed, additional calculations must be made.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-21T16:24:22Z
+
+@diversantvlz Do you want me to help you adding a test ?
+
+---------------------------------------------------------------------------
+
+by diversantvlz at 2017-12-21T21:19:45Z
+
+@Simperfit Yes, why not. I would be thankful. I do not have enough time for this task, i can do it the next week.
+It would be nice to test for something like:
+
+```php
+//for decode
+json_decode('false') === false && json_last_error() === JSON_ERROR_NONE;
+
+//for encode
+$arr = array(
+   'utf8' => 'Hello World!',
+   'notUtf8' => "\xb0\xd0\xb5\xd0"
+);
+
+json_encode($arr) === false && json_last_error() === JSON_ERROR_UTF8;
+json_encode($arr , JSON_PARTIAL_OUTPUT_ON_ERROR)  === '{"utf8":  "Hello World!", "notUtf8": null}' &&  json_last_error() === JSON_ERROR_UTF8;
+```
+
+---------------------------------------------------------------------------
+
+by diversantvlz at 2018-01-09T20:47:17Z
+
+@nicolas-grekas @dunglas Review test case please.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-10T08:44:47Z
+
+Thanks @diversantvlz FYI, I reverted the change on JsonDecode because it just shouldn't change, partial jsons is only a feature of JsonEncode.
+I also fixed the code-style in the tests, and reverted a few other unrelated changes (like the not calling `JsonEncoder::getLastErrorMessage()` but constructing the message inline? - I guess these must be some bad merge/rebase.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-10T09:05:09Z
+
+Logic now fixed to work as expected on PHP 5.4 & 5.3.
+PR ready.
+
+Status: reviewed

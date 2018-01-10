@@ -33,9 +33,9 @@ class SymfonyTestsListenerTrait
     private $skippedFile = false;
     private $wasSkipped = array();
     private $isSkipped = array();
-    private $expectedDeprecations = array();
-    private $gatheredDeprecations = array();
-    private $previousErrorHandler;
+    private static $expectedDeprecations = array();
+    private static $gatheredDeprecations = array();
+    private static $previousErrorHandler;
     private $testsWithWarnings;
     private $reportUselessTests;
     private $error;
@@ -214,14 +214,8 @@ class SymfonyTestsListenerTrait
                 $test->getTestResultObject()->addError($test, new $AssertionFailedError('`@expectedDeprecation` annotations are not allowed at the class level.'), 0);
             }
             if (isset($annotations['method']['expectedDeprecation'])) {
-                if (!in_array('legacy', $groups, true)) {
-                    $this->error = new $AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.');
-                }
-
-                $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything(false);
-
-                $this->expectedDeprecations = $annotations['method']['expectedDeprecation'];
-                $this->previousErrorHandler = set_error_handler(array($this, 'handleError'));
+                static::$expectedDeprecations = $annotations['method']['expectedDeprecation'];
+                static::$previousErrorHandler = set_error_handler(array(__CLASS__, 'handleError'));
             }
         }
     }
@@ -239,14 +233,20 @@ class SymfonyTestsListenerTrait
             $Test = 'PHPUnit_Util_Test';
             $BaseTestRunner = 'PHPUnit_Runner_BaseTestRunner';
             $Warning = 'PHPUnit_Framework_Warning';
+            $AssertionFailedError = 'PHPUnit_Framework_AssertionFailedError';
         } else {
             $Test = 'PHPUnit\Util\Test';
             $BaseTestRunner = 'PHPUnit\Runner\BaseTestRunner';
             $Warning = 'PHPUnit\Framework\Warning';
+            $AssertionFailedError = 'PHPUnit\Framework\AssertionFailedError';
         }
         $className = get_class($test);
         $classGroups = $Test::getGroups($className);
         $groups = $Test::getGroups($className, $test->getName(false));
+
+        if (static::$expectedDeprecations && !in_array('legacy', $groups, true)) {
+            $this->error = new $AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.');
+        }
 
         if (null !== $this->reportUselessTests) {
             $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything($this->reportUselessTests);
@@ -259,6 +259,7 @@ class SymfonyTestsListenerTrait
         }
 
         if ($this->runsInSeparateProcess) {
+            $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything(false);
             $deprecations = file_get_contents($this->runsInSeparateProcess);
             unlink($this->runsInSeparateProcess);
             putenv('SYMFONY_DEPRECATIONS_SERIALIZE');
@@ -273,9 +274,9 @@ class SymfonyTestsListenerTrait
             $this->runsInSeparateProcess = false;
         }
 
-        if ($this->expectedDeprecations) {
+        if (static::$expectedDeprecations) {
             if (!in_array($test->getStatus(), array($BaseTestRunner::STATUS_SKIPPED, $BaseTestRunner::STATUS_INCOMPLETE), true)) {
-                $test->addToAssertionCount(count($this->expectedDeprecations));
+                $test->addToAssertionCount(count(static::$expectedDeprecations));
             }
 
             restore_error_handler();
@@ -283,7 +284,7 @@ class SymfonyTestsListenerTrait
             if (!$errored && !in_array($test->getStatus(), array($BaseTestRunner::STATUS_SKIPPED, $BaseTestRunner::STATUS_INCOMPLETE, $BaseTestRunner::STATUS_FAILURE, $BaseTestRunner::STATUS_ERROR), true)) {
                 try {
                     $prefix = "@expectedDeprecation:\n";
-                    $test->assertStringMatchesFormat($prefix.'%A  '.implode("\n%A  ", $this->expectedDeprecations)."\n%A", $prefix.'  '.implode("\n  ", $this->gatheredDeprecations)."\n");
+                    $test->assertStringMatchesFormat($prefix.'%A  '.implode("\n%A  ", static::$expectedDeprecations)."\n%A", $prefix.'  '.implode("\n  ", static::$gatheredDeprecations)."\n");
                 } catch (AssertionFailedError $e) {
                     $test->getTestResultObject()->addFailure($test, $e, $time);
                 } catch (\PHPUnit_Framework_AssertionFailedError $e) {
@@ -291,8 +292,8 @@ class SymfonyTestsListenerTrait
                 }
             }
 
-            $this->expectedDeprecations = $this->gatheredDeprecations = array();
-            $this->previousErrorHandler = null;
+            static::$expectedDeprecations = static::$gatheredDeprecations = array();
+            static::$previousErrorHandler = null;
         }
         if (!$this->runsInSeparateProcess && -2 < $this->state && ($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
             if (in_array('time-sensitive', $groups, true)) {
@@ -304,10 +305,10 @@ class SymfonyTestsListenerTrait
         }
     }
 
-    public function handleError($type, $msg, $file, $line, $context = array())
+    public static function handleError($type, $msg, $file, $line, $context = array())
     {
         if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
-            $h = $this->previousErrorHandler;
+            $h = static::$previousErrorHandler;
 
             return $h ? $h($type, $msg, $file, $line, $context) : false;
         }
@@ -320,7 +321,7 @@ class SymfonyTestsListenerTrait
         if (error_reporting()) {
             $msg = 'Unsilenced deprecation: '.$msg;
         }
-        $this->gatheredDeprecations[] = $msg;
+        static::$gatheredDeprecations[] = $msg;
     }
 
     /**
@@ -339,4 +340,18 @@ class SymfonyTestsListenerTrait
 
         return $r->getValue($test);
     }
+
+    /**
+     * Sets an expected deprecation message.
+     *
+     * @param $msg
+     *   Deprecation message to expect.
+     */
+    public static function setExpectedDeprecation($msg) {
+        if (!static::$previousErrorHandler) {
+            static::$previousErrorHandler = set_error_handler(array(__CLASS__, 'handleError'));
+        }
+        static::$expectedDeprecations[] = $msg;
+    }
+
 }

@@ -375,7 +375,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             $this->gcCalled = false;
 
             // delete the session records that have expired
-            $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol < :time - $this->timeCol";
+            $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol < :time - CAST($this->timeCol AS SIGNED)";
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);

@@ -32,7 +32,7 @@ class SaveSessionListenerTest extends TestCase
         $listener->onKernelResponse($event);
     }
 
-    public function testSessionSavedAndResponsePrivate()
+    public function testSessionSaved()
     {
         $listener = new SaveSessionListener();
         $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
@@ -45,9 +45,5 @@ class SaveSessionListenerTest extends TestCase
         $request->setSession($session);
         $response = new Response();
         $listener->onKernelResponse(new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
-
-        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
-        $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
-        $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
     }
 }

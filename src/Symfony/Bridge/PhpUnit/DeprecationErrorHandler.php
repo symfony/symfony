@@ -228,7 +228,7 @@ class DeprecationErrorHandler
                         uasort($deprecations[$group], $cmp);
 
                         foreach ($deprecations[$group] as $msg => $notices) {
-                            echo "\n  ", $msg, "\n";
+                            echo "\n  ", $notices['count'], 'x: ', $msg, "\n";
 
                             arsort($notices);
 

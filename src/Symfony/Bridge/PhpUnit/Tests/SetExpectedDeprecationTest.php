@@ -17,5 +17,4 @@ class SetExpectedDeprecationTest extends TestCase
         SymfonyTestsListenerTrait::setExpectedDeprecation('Test abc');
         @trigger_error('Test abc', E_USER_DEPRECATED);
     }
-
 }

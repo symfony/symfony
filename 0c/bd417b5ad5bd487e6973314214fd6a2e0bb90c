@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-08T19:42:33Z
+
+I'm going to split the extra-laziness part for 4.1
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-08T20:40:37Z
+
+Extra-laziness removed, PR is now strictly a bug fix.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-09T07:57:50Z
+
+I finally figured out a decent way to implement this, here we are.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-09T11:09:37Z
+
+> wasStarted argument on the SessionBagProxy as a sort of hidden observable
+
+that's exactly what the `SessionBagProxy` is for (and why it's internal also)
+
+> I'd properly decouple your logic
+
+feel free to submit an alternate PR (but keep in mind this should remain a bug fix, no time for refactorizations.)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-01-09T11:23:54Z
+
+> that's exactly what the SessionBagProxy is for (and why it's internal also)
+
+That's probably a good reason not to refactor 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-09T12:34:03Z
+
+and now green
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-10T08:25:00Z
+
+Minimum version of http-foundation bumped.

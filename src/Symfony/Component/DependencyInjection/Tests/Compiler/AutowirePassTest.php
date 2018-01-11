@@ -12,9 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
+use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -786,5 +789,60 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
 
         $this->assertSame(array(), $container->getDefinition('autowired')->getArguments());
+    }
+
+    public function testAutowireDecorator()
+    {
+        $container = new ContainerBuilder();
+        $container->register(LoggerInterface::class, NullLogger::class);
+        $container->register(Decorated::class, Decorated::class);
+        $container
+            ->register(Decorator::class, Decorator::class)
+            ->setDecoratedService(Decorated::class)
+            ->setAutowired(true)
+        ;
+
+        (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition(Decorator::class);
+        $this->assertSame(Decorator::class.'.inner', (string) $definition->getArgument(1));
+    }
+
+    public function testAutowireDecoratorRenamedId()
+    {
+        $container = new ContainerBuilder();
+        $container->register(LoggerInterface::class, NullLogger::class);
+        $container->register(Decorated::class, Decorated::class);
+        $container
+            ->register(Decorator::class, Decorator::class)
+            ->setDecoratedService(Decorated::class, 'renamed')
+            ->setAutowired(true)
+        ;
+
+        (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition(Decorator::class);
+        $this->assertSame('renamed', (string) $definition->getArgument(1));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\AutowiringFailedException
+     * @expectedExceptionMessage Cannot autowire service "Symfony\Component\DependencyInjection\Tests\Compiler\NonAutowirableDecorator": argument "$decorated1" of method "__construct()" references interface "Symfony\Component\DependencyInjection\Tests\Compiler\DecoratorInterface" but no such service exists. You should maybe alias this interface to one of these existing services: "Symfony\Component\DependencyInjection\Tests\Compiler\NonAutowirableDecorator", "Symfony\Component\DependencyInjection\Tests\Compiler\NonAutowirableDecorator.inner". Did you create a class that implements this interface?
+     */
+    public function testDoNotAutowireDecoratorWhenSeveralArgumentOfTheType()
+    {
+        $container = new ContainerBuilder();
+        $container->register(LoggerInterface::class, NullLogger::class);
+        $container->register(Decorated::class, Decorated::class);
+        $container
+            ->register(NonAutowirableDecorator::class, NonAutowirableDecorator::class)
+            ->setDecoratedService(Decorated::class)
+            ->setAutowired(true)
+        ;
+
+        (new DecoratorServicePass())->process($container);
+        (new AutowirePass())->process($container);
     }
 }

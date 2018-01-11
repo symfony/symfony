@@ -40,5 +40,7 @@ return PhpCsFixer\Config::create()
             ->notPath('Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/default.phpt')
             ->notPath('Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/weak.phpt')
             ->notPath('Symfony/Component/Debug/Tests/DebugClassLoaderTest.php')
+            // invalid annotations on purpose
+            ->notPath('Symfony/Component/DependencyInjection/Tests/Fixtures/includes/autowiring_classes.php')
     )
 ;

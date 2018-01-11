@@ -346,8 +346,7 @@ class SymfonyTestsListenerTrait
     /**
      * Sets an expected deprecation message.
      *
-     * @param $msg
-     *   Deprecation message to expect
+     * @param string $msg Deprecation message to expect
      */
     public static function expectDeprecation($msg)
     {

@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Core\Exception;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AccessDeniedException extends \RuntimeException
+class AccessDeniedException extends RuntimeException
 {
     private $attributes = array();
     private $subject;

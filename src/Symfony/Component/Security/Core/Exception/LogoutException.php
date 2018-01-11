@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Core\Exception;
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
-class LogoutException extends \RuntimeException
+class LogoutException extends RuntimeException
 {
     public function __construct(string $message = 'Logout Exception', \Exception $previous = null)
     {

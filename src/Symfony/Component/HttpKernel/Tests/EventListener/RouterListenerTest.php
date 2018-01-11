@@ -159,7 +159,7 @@ class RouterListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
-    public function testSubRequestWithBadHost()
+    public function testRequestWithBadHost()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $request = Request::create('http://bad host %22/');

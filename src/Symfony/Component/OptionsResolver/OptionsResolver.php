@@ -883,7 +883,7 @@ class OptionsResolver implements Options
             $invalidValues = array_filter( // Filter out valid values, keeping invalid values in the resulting array
                 $value,
                 function ($value) use ($type) {
-                    return (function_exists($isFunction = 'is_'.$type) && !$isFunction($value)) || !$value instanceof $type;
+                    return !self::isValueValidType($type, $value);
                 }
             );
 
@@ -896,7 +896,7 @@ class OptionsResolver implements Options
             return false;
         }
 
-        if ((function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type) {
+        if (self::isValueValidType($type, $value)) {
             return true;
         }
 
@@ -1072,5 +1072,10 @@ class OptionsResolver implements Options
         }
 
         return implode(', ', $values);
+    }
+
+    private static function isValueValidType($type, $value)
+    {
+        return (function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type;
     }
 }

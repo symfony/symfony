@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * support for adding expected deprecations via `SymfonyTestsListenerTrait::expectDeprecation()`
+
 4.0.0
 -----
 

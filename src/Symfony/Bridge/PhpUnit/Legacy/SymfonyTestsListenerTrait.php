@@ -244,8 +244,11 @@ class SymfonyTestsListenerTrait
         $classGroups = $Test::getGroups($className);
         $groups = $Test::getGroups($className, $test->getName(false));
 
-        if (static::$expectedDeprecations && !in_array('legacy', $groups, true)) {
-            $this->error = new $AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.');
+        if (static::$expectedDeprecations) {
+            $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything(false);
+            if (!in_array('legacy', $groups, true)) {
+                $this->error = new $AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.');
+            }
         }
 
         if (null !== $this->reportUselessTests) {
@@ -259,7 +262,6 @@ class SymfonyTestsListenerTrait
         }
 
         if ($this->runsInSeparateProcess) {
-            $test->getTestResultObject()->beStrictAboutTestsThatDoNotTestAnything(false);
             $deprecations = file_get_contents($this->runsInSeparateProcess);
             unlink($this->runsInSeparateProcess);
             putenv('SYMFONY_DEPRECATIONS_SERIALIZE');
@@ -347,7 +349,7 @@ class SymfonyTestsListenerTrait
      * @param $msg
      *   Deprecation message to expect
      */
-    public static function setExpectedDeprecation($msg)
+    public static function expectDeprecation($msg)
     {
         if (!static::$previousErrorHandler) {
             static::$previousErrorHandler = set_error_handler(array(__CLASS__, 'handleError'));

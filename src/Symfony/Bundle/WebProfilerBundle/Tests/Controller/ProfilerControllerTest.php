@@ -14,6 +14,8 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
+use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,7 +52,7 @@ class ProfilerControllerTest extends TestCase
     /**
      * @dataProvider getOpenFileCases
      */
-    public function testOpeningDisallowedPaths($path, $isAllowed)
+    public function testOpeningDisallowedPaths($path, $isAllowed, $blacklistRegexp = null)
     {
         $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
@@ -59,7 +61,7 @@ class ProfilerControllerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array(), 'bottom', null, __DIR__.'/../..');
+        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array(), 'bottom', null, __DIR__.'/../..', $blacklistRegexp);
 
         try {
             $response = $controller->openAction(Request::create('/_wdt/open', Request::METHOD_GET, array('file' => $path)));
@@ -72,14 +74,32 @@ class ProfilerControllerTest extends TestCase
 
     public function getOpenFileCases()
     {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.root_dir', __DIR__);
+        $extension = new WebProfilerExtension();
+        $extension->load(array(), $container);
+        $backlistRegexp = $container->getParameter('web_profiler.open_blacklist_regexp');
+
         return array(
-            array('README.md', true),
-            array('composer.json', true),
+            array('README.md', false),
+            array('composer.json', false),
             array('Controller/ProfilerController.php', true),
             array('.gitignore', false),
             array('../TwigBundle/README.md', false),
             array('Controller/../README.md', false),
             array('Controller/./ProfilerController.php', false),
+            array('app/config/parameters.php', false, $backlistRegexp),
+            array('/config/services.php', false, $backlistRegexp),
+            array('var//anything', false, $backlistRegexp),
+            array('VAR/anything', false, $backlistRegexp),
+            array('app/Resources/views/base.html.twig', true, $backlistRegexp),
+            array('app/Resources/SomeBundle/views/some.html.twig', true, $backlistRegexp),
+            array('foo/bar.php', true),
+            array('foo/bar.php', true, $backlistRegexp),
+            array('foo/bar.php.twig', true),
+            array('foo/bar.php.twig', true, $backlistRegexp),
+            array('foo/bar.baz', false),
+            array('foo/bar.baz', false, $backlistRegexp),
         );
     }
 

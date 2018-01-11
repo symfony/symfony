@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by wimleers at 2018-01-10T17:48:27Z
+
+I ran into this in Drupal 8 — thanks to @alexpott for filing this PR!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-10T17:52:25Z
+
+Why is this needed? The count displays the sum of all below messages, which can be big, so it looks useful to me, don't you?
+
+---------------------------------------------------------------------------
+
+by alexpott at 2018-01-10T18:11:49Z
+
+Well changing the message resulted in a developer hitting a brick wall. Changing error messages even to just remove a fullstop is a bit unexpected. Maybe we could reverse the count so it comes first?
+
+---------------------------------------------------------------------------
+
+by alexpott at 2018-01-10T18:12:29Z
+
+Also I'm not really sure how useful the overall count actually is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-10T18:33:51Z
+
+> Also I'm not really sure how useful the overall count actually is.
+
+I can answer that: it's a rough measure of progress when upgrading - can even be encouraging to see that number decrease :)
+
+---------------------------------------------------------------------------
+
+by alexpott at 2018-01-10T18:54:17Z
+
+I've moved the number of times to the front so we preserve the YAY the number is going down but the urge to rtrim the deprecation message is gone.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-10T19:20:28Z
+
+Shouldn't this go into the `3.3` branch then?

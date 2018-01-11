@@ -346,13 +346,13 @@ class SymfonyTestsListenerTrait
     /**
      * Sets an expected deprecation message.
      *
-     * @param string $msg Deprecation message to expect
+     * @param string $message Deprecation message to expect
      */
-    public static function expectDeprecation($msg)
+    public static function expectDeprecation($message)
     {
         if (!static::$previousErrorHandler) {
             static::$previousErrorHandler = set_error_handler(array(__CLASS__, 'handleError'));
         }
-        static::$expectedDeprecations[] = $msg;
+        static::$expectedDeprecations[] = $message;
     }
 }

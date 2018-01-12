@@ -40,6 +40,11 @@ Translation
  * The `FileDumper::setBackup()` method has been removed.
  * The `TranslationWriter::disableBackup()` method has been removed.
 
+TwigBundle
+----------
+
+ * The default value (`false`) of the `twig.strict_variables` configuration option has been changed to `%kernel.debug%`.
+
 Validator
 --------
 

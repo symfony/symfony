@@ -688,8 +688,8 @@ class ProcessTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage The process has been signaled
+     * @expectedException \Symfony\Component\Process\Exception\ProcessSignaledException
+     * @expectedExceptionMessage The process has been signaled with signal "9".
      */
     public function testProcessThrowsExceptionWhenExternallySignaled()
     {

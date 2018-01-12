@@ -17,8 +17,10 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\NotDenormalizableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Exception\UnexpectedValuesException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
@@ -35,6 +37,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     const ENABLE_MAX_DEPTH = 'enable_max_depth';
     const DEPTH_KEY_PATTERN = 'depth_%s::%s';
     const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
+    const COLLECT_ALL_ERRORS = 'collect_all_errors';
 
     private $propertyTypeExtractor;
     private $typesCache = array();
@@ -228,10 +231,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         return \class_exists($type) || (\interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = array(), array &$accumulatingContext = array())
     {
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
@@ -257,16 +257,46 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            $value = $this->validateAndDenormalize($class, $attribute, $value, $format, $context);
+            try {
+                $value = $this->validateAndDenormalize($class, $attribute, $value, $format, $context, $accumulatingContext);
+            } catch (NotDenormalizableValueException $exception) {
+                if (isset($context[self::COLLECT_ALL_ERRORS]) && $context[self::COLLECT_ALL_ERRORS]) {
+                    $accumulatingContext[$attribute][] = $exception->getMessage();
+
+                    continue;
+                }
+
+                throw $exception;
+            } catch (UnexpectedValuesException $exception) {
+                $accumulatingContext[$attribute] = $exception->getUnexpectedValueErrors();
+                continue;
+            }
+
+            if (null === $value) {
+                continue;
+            }
+
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $context);
             } catch (InvalidArgumentException $e) {
-                throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
+                $exception = new NotDenormalizableValueException($e->getMessage(), $attribute, $e);
+
+                if (isset($context[self::COLLECT_ALL_ERRORS]) && $context[self::COLLECT_ALL_ERRORS]) {
+                    $accumulatingContext[$attribute][] = $exception->getMessage();
+
+                    continue;
+                }
+
+                throw $exception;
             }
         }
 
         if (!empty($extraAttributes)) {
             throw new ExtraAttributesException($extraAttributes);
+        }
+
+        if (!empty($accumulatingContext)) {
+            throw new UnexpectedValuesException($accumulatingContext);
         }
 
         return $object;
@@ -293,7 +323,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @throws NotNormalizableValueException
      * @throws LogicException
      */
-    private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context)
+    private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context, array &$accumulatingContext)
     {
         if (null === $types = $this->getTypes($currentClass, $attribute)) {
             return $data;
@@ -332,7 +362,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
                 $childContext = $this->createChildContext($context, $attribute);
                 if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
-                    return $this->serializer->denormalize($data, $class, $format, $childContext);
+                    try {
+                        return $this->serializer->denormalize($data, $class, $format, $childContext, $accumulatingContext);
+                    } catch (NotDenormalizableValueException | InvalidArgumentException $e) {
+                        if (isset($context[self::COLLECT_ALL_ERRORS]) && $context[self::COLLECT_ALL_ERRORS]) {
+                            $accumulatingContext[$attribute][] = $e->getMessage();
+
+                            continue;
+                        }
+
+                        throw $e;
+                    }
                 }
             }
 
@@ -355,7 +395,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             return $data;
         }
 
-        throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), \gettype($data)));
+        throw new NotDenormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be one of "%s" ("%s" given).', $attribute, $currentClass, implode('", "', array_keys($expectedTypes)), \gettype($data)), $attribute);
     }
 
     /**

@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Encoder\ContextAwareEncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\NotDenormalizableValueException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -165,7 +166,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
     /**
      * {@inheritdoc}
      *
-     * @throws NotNormalizableValueException
+     * @throws NotDenormalizableValueException
      */
     public function denormalize($data, $type, $format = null, array $context = array())
     {
@@ -177,7 +178,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $normalizer->denormalize($data, $type, $format, $context);
         }
 
-        throw new NotNormalizableValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $type));
+        throw new NotDenormalizableValueException(sprintf('Could not denormalize object of type %s, no supporting normalizer found.', $type));
     }
 
     /**

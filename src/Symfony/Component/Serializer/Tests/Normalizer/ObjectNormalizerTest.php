@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Exception\UnexpectedValuesException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
@@ -726,6 +727,42 @@ class ObjectNormalizerTest extends TestCase
         $serializer->denormalize(array('inners' => array('a' => array('foo' => 1))), ObjectOuter::class);
     }
 
+    public function testRejectInvalidKeys()
+    {
+        $extractor = new PropertyInfoExtractor(array(), array(new PhpDocExtractor(), new ReflectionExtractor()));
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer(array(new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer));
+
+        try {
+            $serializer->denormalize(
+                array(
+                    'inner' => array('baz' => '1'),
+                    'inners' => array('a' => array('foo' => 1)),
+                    'date' => 'wrong date',
+                ),
+                ObjectOuter::class,
+                null,
+                array(ObjectNormalizer::COLLECT_ALL_ERRORS => true)
+            );
+        } catch (UnexpectedValuesException $exception) {
+            $errors = $exception->getUnexpectedValueErrors();
+
+            $this->assertCount(3, $errors);
+
+            $this->assertSame('The type of the "baz" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectInner" must be one of "int" ("string" given).', $errors['inner']['baz'][0]);
+
+            $this->assertSame('The type of the key "a" must be "int" ("string" given).', $errors['inners'][0]);
+            $this->assertSame('The type of the "inners" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectOuter" must be one of "Symfony\Component\Serializer\Tests\Normalizer\ObjectInner[]" ("array" given).', $errors['inners'][1]);
+
+            $this->assertSame('DateTimeImmutable::__construct(): Failed to parse time string (wrong date) at position 0 (w): The timezone could not be found in the database', $errors['date'][0]);
+            $this->assertSame('The type of the "date" attribute for class "Symfony\Component\Serializer\Tests\Normalizer\ObjectOuter" must be one of "DateTimeInterface" ("string" given).', $errors['date'][1]);
+
+            return;
+        }
+
+        $this->fail(sprintf('Expected exception %s not thrown.', UnexpectedValuesException::class));
+    }
+
     public function testDoNotRejectInvalidTypeOnDisableTypeEnforcementContextOption()
     {
         $extractor = new PropertyInfoExtractor(array(), array(new PhpDocExtractor()));
@@ -787,7 +824,7 @@ class ObjectNormalizerTest extends TestCase
             array(
                 'foo' => 'foo',
                 'baz' => true,
-                'object' => array('foo' => 'innerFoo', 'bar' => 'innerBar'),
+                'object' => array('foo' => 'innerFoo', 'bar' => 'innerBar', 'baz' => null),
             ),
             $serializer->normalize($objectDummy, null, $context)
         );
@@ -1095,6 +1132,21 @@ class ObjectInner
 {
     public $foo;
     public $bar;
+
+    /**
+     * @var null|int
+     */
+    public $baz;
+
+    public function getBaz(): ?int
+    {
+        return $this->baz;
+    }
+
+    public function setBaz(int $baz): void
+    {
+        $this->baz = $baz;
+    }
 }
 
 class FormatAndContextAwareNormalizer extends ObjectNormalizer

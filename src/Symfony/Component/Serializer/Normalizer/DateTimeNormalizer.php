@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\NotDenormalizableValueException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
 /**
@@ -71,8 +72,6 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
     /**
      * {@inheritdoc}
-     *
-     * @throws NotNormalizableValueException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
@@ -92,7 +91,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
 
             $dateTimeErrors = \DateTime::class === $class ? \DateTime::getLastErrors() : \DateTimeImmutable::getLastErrors();
 
-            throw new NotNormalizableValueException(sprintf(
+            throw new NotDenormalizableValueException(sprintf(
                 'Parsing datetime string "%s" using format "%s" resulted in %d errors:'."\n".'%s',
                 $data,
                 $dateTimeFormat,
@@ -104,7 +103,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface, 
         try {
             return \DateTime::class === $class ? new \DateTime($data, $timezone) : new \DateTimeImmutable($data, $timezone);
         } catch (\Exception $e) {
-            throw new NotNormalizableValueException($e->getMessage(), $e->getCode(), $e);
+            throw new NotDenormalizableValueException($e->getMessage(), null, $e);
         }
     }
 

@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\NotDenormalizableValueException;
 
 /**
  * Normalizes an {@see \SplFileInfo} object to a data URI.
@@ -87,12 +87,12 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
      * @see https://gist.github.com/bgrins/6194623
      *
      * @throws InvalidArgumentException
-     * @throws NotNormalizableValueException
+     * @throws NotDenormalizableValueException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         if (!preg_match('/^data:([a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}\/[a-z0-9][a-z0-9\!\#\$\&\-\^\_\+\.]{0,126}(;[a-z0-9\-]+\=[a-z0-9\-]+)?)?(;base64)?,[a-z0-9\!\$\&\\\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i', $data)) {
-            throw new NotNormalizableValueException('The provided "data:" URI is not valid.');
+            throw new NotDenormalizableValueException('The provided "data:" URI is not valid.');
         }
 
         try {
@@ -105,7 +105,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
                     return new \SplFileObject($data);
             }
         } catch (\RuntimeException $exception) {
-            throw new NotNormalizableValueException($exception->getMessage(), $exception->getCode(), $exception);
+            throw new NotDenormalizableValueException($exception->getMessage(), null, $exception);
         }
 
         throw new InvalidArgumentException(sprintf('The class parameter "%s" is not supported. It must be one of "SplFileInfo", "SplFileObject" or "Symfony\Component\HttpFoundation\File\File".', $class));

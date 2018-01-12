@@ -6,27 +6,6 @@ Config
 
  * Added the `getChildNodeDefinitions()` method to `ParentNodeDefinitionInterface`.
  
-Console
--------
-
- * The `NamespaceNotFoundException` doesn't extend `CommandNotFoundException` anymore. All catch statements should be updated to cater for both exceptions, E.G
- 
-   Before:
-   ```php
-   try {
-        $app->run();
-   } catch (CommandNotFoundException $e) {
-   }
-   ```
- 
-   After:
-   ```php
-   try {
-        $app->run();
-   } catch (NamespaceNotFoundException | CommandNotFoundException $e) {
-   }
-   ```
-
 EventDispatcher
 ---------------
 

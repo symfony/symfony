@@ -167,7 +167,7 @@ class RouterListenerTest extends TestCase
 
         $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
 
-        $listener = new RouterListener($requestMatcher, new RequestContext(), null, $this->requestStack);
+        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
         $listener->onKernelRequest($event);
     }
 }

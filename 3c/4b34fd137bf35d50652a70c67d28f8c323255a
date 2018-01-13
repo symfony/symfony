@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-11T08:03:31Z
+
+> this could have the new side effect
+
+it cannot: the code example you give is not affected at all: the fatal error handler is called as a shutdown function, never between your lines.
+
+---------------------------------------------------------------------------
+
+by dbu at 2018-01-11T08:22:46Z
+
+> it cannot: the code example you give is not affected at all: the fatal error handler is called as a shutdown function, never between your lines.
+
+i guess you are right. if shutdown is triggered while in the inner part, the end of the doStuff method won't be executed anyways.

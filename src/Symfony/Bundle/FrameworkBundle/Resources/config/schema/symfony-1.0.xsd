@@ -103,6 +103,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="session">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="storage-id" type="xsd:string" />
         <xsd:attribute name="handler-id" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />

@@ -106,6 +106,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             array('VISA', '4111111111111111'),
             array('VISA', '4012888888881881'),
             array('VISA', '4222222222222'),
+            array('VISA', '4917610000000000003'),
             array(array('AMEX', 'VISA'), '4111111111111111'),
             array(array('AMEX', 'VISA'), '378282246310005'),
             array(array('JCB', 'MASTERCARD'), '5105105105105100'),

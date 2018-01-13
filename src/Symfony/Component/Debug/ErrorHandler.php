@@ -596,6 +596,8 @@ class ErrorHandler
 
         $handler = self::$reservedMemory = null;
         $handlers = array();
+        $previousHandler = null;
+        $sameHandlerLimit = 10;
 
         while (!is_array($handler) || !$handler[0] instanceof self) {
             $handler = set_exception_handler('var_dump');
@@ -605,7 +607,14 @@ class ErrorHandler
                 break;
             }
             restore_exception_handler();
-            array_unshift($handlers, $handler);
+
+            if ($handler !== $previousHandler) {
+                array_unshift($handlers, $handler);
+                $previousHandler = $handler;
+            } elseif (0 === --$sameHandlerLimit) {
+                $handler = null;
+                break;
+            }
         }
         foreach ($handlers as $h) {
             set_exception_handler($h);

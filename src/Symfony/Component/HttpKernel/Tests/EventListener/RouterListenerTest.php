@@ -155,4 +155,19 @@ class RouterListenerTest extends TestCase
             array(array(), 'Matched route "n/a".'),
         );
     }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     */
+    public function testRequestWithBadHost()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $request = Request::create('http://bad host %22/');
+        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
+
+        $listener = new RouterListener($requestMatcher, new RequestContext(), null, $this->requestStack);
+        $listener->onKernelRequest($event);
+    }
 }

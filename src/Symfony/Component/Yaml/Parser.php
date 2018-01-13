@@ -397,41 +397,22 @@ class Parser
 
                     foreach ($this->lines as $line) {
                         try {
-                            if (isset($line[0]) && ('"' === $line[0] || "'" === $line[0])) {
-                                $parsedLine = $line;
-                            } else {
-                                $parsedLine = Inline::parse($line, $flags, $this->refs);
-                            }
-
-                            // There is a special case where an empty array
-                            // followed by a comment causes us to try to parse
-                            // the value as a multi-line string. In this
-                            // instance, return the empty array
-                            if (array() === $parsedLine) {
-                                return $parsedLine;
-                            }
-
-                            if (!is_string($parsedLine)) {
-                                $parseError = true;
-                                break;
-                            }
-
-                            if ('' === trim($parsedLine)) {
+                            if ('' === trim($line)) {
                                 $value .= "\n";
                             } elseif (!$previousLineWasNewline && !$previousLineWasTerminatedWithBackslash) {
                                 $value .= ' ';
                             }
 
-                            if ('' !== trim($parsedLine) && '\\' === substr($parsedLine, -1)) {
-                                $value .= ltrim(substr($parsedLine, 0, -1));
-                            } elseif ('' !== trim($parsedLine)) {
-                                $value .= trim($parsedLine);
+                            if ('' !== trim($line) && '\\' === substr($line, -1)) {
+                                $value .= ltrim(substr($line, 0, -1));
+                            } elseif ('' !== trim($line)) {
+                                $value .= trim($line);
                             }
 
-                            if ('' === trim($parsedLine)) {
+                            if ('' === trim($line)) {
                                 $previousLineWasNewline = true;
                                 $previousLineWasTerminatedWithBackslash = false;
-                            } elseif ('\\' === substr($parsedLine, -1)) {
+                            } elseif ('\\' === substr($line, -1)) {
                                 $previousLineWasNewline = false;
                                 $previousLineWasTerminatedWithBackslash = true;
                             } else {

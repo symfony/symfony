@@ -407,7 +407,7 @@ class Parser
                             // followed by a comment causes us to try to parse
                             // the value as a multi-line string. In this
                             // instance, return the empty array
-                            if ([] === $parsedLine) {
+                            if (array() === $parsedLine) {
                                 return $parsedLine;
                             }
 

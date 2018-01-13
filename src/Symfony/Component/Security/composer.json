@@ -22,7 +22,6 @@
         "symfony/http-kernel": "~3.3",
         "symfony/polyfill-php56": "~1.0",
         "symfony/polyfill-php70": "~1.0",
-        "symfony/polyfill-util": "~1.0",
         "symfony/property-access": "~2.8|~3.0"
     },
     "replace": {

@@ -776,19 +776,21 @@ EOT;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
-    public function testEmptyArrayFollowedByCommentEmbeddedInMapping()
+    public function testNonStringFollowedByCommentEmbeddedInMapping()
     {
         $yaml = <<<'EOT'
 a:
     b:
         {}
 # comment
-    d: e
+    d:
+        1.1
+# another comment
 EOT;
         $expected = array(
             'a' => array(
                 'b' => array(),
-                'd' => 'e',
+                'd' => 1.1,
             ),
         );
 

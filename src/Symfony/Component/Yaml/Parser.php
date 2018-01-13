@@ -397,7 +397,24 @@ class Parser
 
                     foreach ($this->lines as $line) {
                         try {
-                            $parsedLine = $line;
+                            if (isset($line[0]) && ('"' === $line[0] || "'" === $line[0])) {
+                                $parsedLine = $line;
+                            } else {
+                                $parsedLine = Inline::parse($line, $flags, $this->refs);
+                            }
+
+                            // There is a special case where an empty array
+                            // followed by a comment causes us to try to parse
+                            // the value as a multi-line string. In this
+                            // instance, return the empty array
+                            if ([] === $parsedLine) {
+                                return $parsedLine;
+                            }
+
+                            if (!is_string($parsedLine)) {
+                                $parseError = true;
+                                break;
+                            }
 
                             if ('' === trim($parsedLine)) {
                                 $value .= "\n";

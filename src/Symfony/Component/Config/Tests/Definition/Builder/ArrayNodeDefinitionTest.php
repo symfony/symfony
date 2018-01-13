@@ -207,6 +207,37 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertTrue($this->getField($enabledNode, 'defaultValue'));
     }
 
+    public function testNodeThatCanBeEnabledIsDisabledByDefault()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node->canBeEnabled();
+
+        $this->assertTrue($this->getField($node, 'addDefaults'));
+        $this->assertEquals(array('enabled' => false), $this->getField($node, 'falseEquivalent'));
+        $this->assertEquals(array('enabled' => true), $this->getField($node, 'trueEquivalent'));
+        $this->assertEquals(array('enabled' => true), $this->getField($node, 'nullEquivalent'));
+
+        $nodeChildren = $this->getField($node, 'children');
+        $this->assertArrayHasKey('enabled', $nodeChildren);
+
+        $enabledNode = $nodeChildren['enabled'];
+        $this->assertTrue($this->getField($enabledNode, 'default'));
+        $this->assertFalse($this->getField($enabledNode, 'defaultValue'));
+    }
+
+    public function testEnableableNodeIsDisabledForEmptyConfiguration()
+    {
+        $processor = new Processor();
+        $node = new ArrayNodeDefinition('root');
+        $node->canBeEnabled();
+
+        $this->assertEquals(
+            array('enabled' => false),
+            $processor->process($node->getNode(), array()),
+                'An enableable node is disabled by default'
+        );
+    }
+
     public function testIgnoreExtraKeys()
     {
         $node = new ArrayNodeDefinition('root');

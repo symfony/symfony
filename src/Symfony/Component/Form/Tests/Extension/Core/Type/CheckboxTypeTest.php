@@ -165,24 +165,32 @@ class CheckboxTypeTest extends BaseTypeTest
         $this->assertEquals($checked, $view->vars['checked']);
     }
 
-    public function testCustomFalseValues()
-    {
-        $falseValuesToTest = array('', 'false', '0');
-
-        foreach ($falseValuesToTest as $falseValue) {
-            $form = $this->factory->create(static::TESTED_TYPE, null, array(
-                'false_values' => array($falseValue),
-            ));
-            $form->submit($falseValue);
-            $this->assertFalse($form->getData());
-        }
-    }
-
     public function provideCustomModelTransformerData()
     {
         return array(
             array('checked', true),
             array('unchecked', false),
+        );
+    }
+
+    /**
+     * @dataProvider provideCustomFalseValues
+     */
+    public function testCustomFalseValues($falseValue)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'false_values' => array($falseValue),
+        ));
+        $form->submit($falseValue);
+        $this->assertFalse($form->getData());
+    }
+
+    public function provideCustomFalseValues()
+    {
+        return array(
+            array(''),
+            array('false'),
+            array('0'),
         );
     }
 

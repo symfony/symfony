@@ -776,6 +776,25 @@ EOT;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    public function testEmptyArrayFollowedByCommentEmbeddedInMapping()
+    {
+        $yaml = <<<'EOT'
+a:
+    b:
+        {}
+# comment
+    d: e
+EOT;
+        $expected = array(
+            'a' => array(
+                'b' => array(),
+                'd' => 'e',
+            ),
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */

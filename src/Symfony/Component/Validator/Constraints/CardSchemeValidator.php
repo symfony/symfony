@@ -78,9 +78,9 @@ class CardSchemeValidator extends ConstraintValidator
             '/^5[1-5][0-9]{14}$/',
             '/^2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12})$/',
         ),
-        // All Visa card numbers start with a 4. New cards have 16 digits. Old cards have 13.
+        // All Visa card numbers start with a 4 and have a length of 13, 16, or 19 digits.
         'VISA' => array(
-            '/^4([0-9]{12}|[0-9]{15})$/',
+            '/^4([0-9]{12}|[0-9]{15}|[0-9]{18})$/',
         ),
     );
 

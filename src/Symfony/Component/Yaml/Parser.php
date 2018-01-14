@@ -428,8 +428,7 @@ class Parser
                     if (!$parseError) {
                         try {
                             return Inline::parse(trim($value));
-                        }
-                        catch (ParseException $e) {
+                        } catch (ParseException $e) {
                             // fall-through to the ParseException thrown below
                         }
                     }

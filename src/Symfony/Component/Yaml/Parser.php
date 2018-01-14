@@ -390,47 +390,39 @@ class Parser
 
                 // try to parse the value as a multi-line string as a last resort
                 if (0 === $this->currentLineNb) {
-                    $parseError = false;
                     $previousLineWasNewline = false;
                     $previousLineWasTerminatedWithBackslash = false;
                     $value = '';
 
                     foreach ($this->lines as $line) {
-                        try {
-                            if ('' === trim($line)) {
-                                $value .= "\n";
-                            } elseif (!$previousLineWasNewline && !$previousLineWasTerminatedWithBackslash) {
-                                $value .= ' ';
-                            }
+                        if ('' === trim($line)) {
+                            $value .= "\n";
+                        } elseif (!$previousLineWasNewline && !$previousLineWasTerminatedWithBackslash) {
+                            $value .= ' ';
+                        }
 
-                            if ('' !== trim($line) && '\\' === substr($line, -1)) {
-                                $value .= ltrim(substr($line, 0, -1));
-                            } elseif ('' !== trim($line)) {
-                                $value .= trim($line);
-                            }
+                        if ('' !== trim($line) && '\\' === substr($line, -1)) {
+                            $value .= ltrim(substr($line, 0, -1));
+                        } elseif ('' !== trim($line)) {
+                            $value .= trim($line);
+                        }
 
-                            if ('' === trim($line)) {
-                                $previousLineWasNewline = true;
-                                $previousLineWasTerminatedWithBackslash = false;
-                            } elseif ('\\' === substr($line, -1)) {
-                                $previousLineWasNewline = false;
-                                $previousLineWasTerminatedWithBackslash = true;
-                            } else {
-                                $previousLineWasNewline = false;
-                                $previousLineWasTerminatedWithBackslash = false;
-                            }
-                        } catch (ParseException $e) {
-                            $parseError = true;
-                            break;
+                        if ('' === trim($line)) {
+                            $previousLineWasNewline = true;
+                            $previousLineWasTerminatedWithBackslash = false;
+                        } elseif ('\\' === substr($line, -1)) {
+                            $previousLineWasNewline = false;
+                            $previousLineWasTerminatedWithBackslash = true;
+                        } else {
+                            $previousLineWasNewline = false;
+                            $previousLineWasTerminatedWithBackslash = false;
                         }
                     }
 
-                    if (!$parseError) {
-                        try {
-                            return Inline::parse(trim($value));
-                        } catch (ParseException $e) {
-                            // fall-through to the ParseException thrown below
-                        }
+                    try {
+                        return Inline::parse(trim($value));
+                    } catch (ParseException $e) {
+                        // fall-through to the ParseException thrown below
                     }
                 }
 

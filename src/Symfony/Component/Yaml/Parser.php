@@ -426,7 +426,12 @@ class Parser
                     }
 
                     if (!$parseError) {
-                        return Inline::parse(trim($value));
+                        try {
+                            return Inline::parse(trim($value));
+                        }
+                        catch (ParseException $e) {
+                            // fall-through to the ParseException thrown below
+                        }
                     }
                 }
 

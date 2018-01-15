@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by pierredup at 2018-01-15T13:02:14Z
+
+Travis HHVM failure seems unrelated
+
+---------------------------------------------------------------------------
+
+by pierredup at 2018-01-15T13:47:27Z
+
+I think `assertStringMatchesFormatFile` is cleaner as it's not necessary to track the exception line anymore. I have implemented the suggested changes

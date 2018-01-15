@@ -503,7 +503,7 @@ class Request
             $cookies[] = $k.'='.$v;
         }
 
-        if (0 !== count($cookies)) {
+        if (!empty($cookies)) {
             $cookieHeader = 'Cookie: '.implode('; ', $cookies)."\r\n";
         }
 

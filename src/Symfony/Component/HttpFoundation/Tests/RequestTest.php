@@ -45,18 +45,18 @@ class RequestTest extends TestCase
 
     public function testGetUser()
     {
-        $request = Request::create('http://user_test:password_test@test.com/');
+        $request = Request::create('http://user:password@test.com');
         $user = $request->getUser();
 
-        $this->assertEquals('user_test', $user);
+        $this->assertEquals('user', $user);
     }
 
     public function testGetPassword()
     {
-        $request = Request::create('http://user_test:password_test@test.com/');
+        $request = Request::create('http://user:password@test.com');
         $password = $request->getPassword();
 
-        $this->assertEquals('password_test', $password);
+        $this->assertEquals('password', $password);
     }
 
     public function testIsNoCache()

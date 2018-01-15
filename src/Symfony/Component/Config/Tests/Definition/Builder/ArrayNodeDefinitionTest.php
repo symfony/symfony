@@ -207,34 +207,17 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertTrue($this->getField($enabledNode, 'defaultValue'));
     }
 
-    public function testNodeThatCanBeEnabledIsDisabledByDefault()
+    public function testEnableableNodeIsDisabledForEmptyConfigurationWhenNormalized()
     {
-        $node = new ArrayNodeDefinition('root');
-        $node->canBeEnabled();
+        $config = [];
 
-        $this->assertTrue($this->getField($node, 'addDefaults'));
-        $this->assertEquals(array('enabled' => false), $this->getField($node, 'falseEquivalent'));
-        $this->assertEquals(array('enabled' => true), $this->getField($node, 'trueEquivalent'));
-        $this->assertEquals(array('enabled' => true), $this->getField($node, 'nullEquivalent'));
-
-        $nodeChildren = $this->getField($node, 'children');
-        $this->assertArrayHasKey('enabled', $nodeChildren);
-
-        $enabledNode = $nodeChildren['enabled'];
-        $this->assertTrue($this->getField($enabledNode, 'default'));
-        $this->assertFalse($this->getField($enabledNode, 'defaultValue'));
-    }
-
-    public function testEnableableNodeIsDisabledForEmptyConfiguration()
-    {
-        $processor = new Processor();
         $node = new ArrayNodeDefinition('root');
         $node->canBeEnabled();
 
         $this->assertEquals(
             array('enabled' => false),
-            $processor->process($node->getNode(), array()),
-                'An enableable node is disabled by default'
+            $node->getNode()->normalize($config),
+            'An enableable node is disabled by default'
         );
     }
 
@@ -271,6 +254,7 @@ class ArrayNodeDefinitionTest extends TestCase
             array(array('enabled' => true, 'foo' => 'baz'), array(array('foo' => 'baz')), 'any configuration enables an enableable node'),
             array(array('enabled' => false, 'foo' => 'baz'), array(array('foo' => 'baz', 'enabled' => false)), 'An enableable node can be disabled'),
             array(array('enabled' => false, 'foo' => 'bar'), array(false), 'false disables an enableable node'),
+            array(array('enabled' => false, 'foo' => 'bar'), array(), 'enableable node is disabled by default'),
         );
     }
 

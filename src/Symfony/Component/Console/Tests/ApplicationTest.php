@@ -1626,7 +1626,7 @@ class ApplicationTest extends TestCase
         }
     }
 
-    private function replaceExceptionLine(string $file)
+    private function replaceExceptionLine($file)
     {
         return str_replace('{line}', $this->exceptionLine, file_get_contents($file));
     }

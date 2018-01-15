@@ -227,7 +227,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 ->ifArray()
                 ->then(function ($v) {
                     if (!isset($v['enabled'])) {
-                        $v['enabled'] = empty($v) ? false : true;
+                        $v['enabled'] = !empty($v);
                     }
 
                     return $v;

@@ -61,6 +61,8 @@ class CheckboxType extends AbstractType
             'compound' => false,
             'false_values' => array(null),
         ));
+
+        $resolver->setAllowedTypes('false_values', 'array');
     }
 
     /**

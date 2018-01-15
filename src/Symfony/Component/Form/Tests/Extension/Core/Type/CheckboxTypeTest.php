@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class CheckboxTypeTest extends BaseTypeTest
 {
@@ -192,6 +193,15 @@ class CheckboxTypeTest extends BaseTypeTest
             array('false'),
             array('0'),
         );
+    }
+
+    public function testDontAllowNonArrayFalseValues()
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessageRegExp('/"false_values" with value "invalid" is expected to be of type "array"/');
+        $this->factory->create(static::TESTED_TYPE, null, array(
+            'false_values' => 'invalid',
+        ));
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

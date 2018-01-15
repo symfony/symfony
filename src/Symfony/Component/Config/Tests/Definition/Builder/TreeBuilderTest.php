@@ -146,7 +146,7 @@ class TreeBuilderTest extends TestCase
         $this->assertFalse($children['enabled']->getDefaultValue());
 
         $processor = new Processor();
-        $result = $processor->process($tree, []);
+        $result = $processor->process($tree, array());
 
         $this->assertEquals(array('enabled' => false), $result);
     }

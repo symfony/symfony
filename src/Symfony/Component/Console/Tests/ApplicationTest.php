@@ -41,6 +41,13 @@ class ApplicationTest extends TestCase
 {
     protected static $fixturesPath;
 
+    private $exceptionLine;
+
+    public function setUp()
+    {
+        $this->exceptionLine = null;
+    }
+
     public static function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/Fixtures/');
@@ -723,25 +730,27 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         putenv('COLUMNS=120');
         $application->register('foo')->setCode(function () {
+            $this->exceptionLine = __LINE__ + 1;
             throw new \Exception('エラーメッセージ');
         });
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'capture_stderr_separately' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception_doublewidth1.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertEquals($this->replaceExceptionLine(self::$fixturesPath.'/application_renderexception_doublewidth1.txt'), $tester->getErrorOutput(true), '->renderException() renders a pretty exceptions with previous exceptions');
 
         $tester->run(array('command' => 'foo'), array('decorated' => true, 'capture_stderr_separately' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception_doublewidth1decorated.txt', $tester->getErrorOutput(true), '->renderException() renders a pretty exceptions with previous exceptions');
+        $this->assertEquals($this->replaceExceptionLine(self::$fixturesPath.'/application_renderexception_doublewidth1decorated.txt'), $tester->getErrorOutput(true), '->renderException() renders a pretty exceptions with previous exceptions');
 
         $application = new Application();
         $application->setAutoExit(false);
         putenv('COLUMNS=32');
         $application->register('foo')->setCode(function () {
+            $this->exceptionLine = __LINE__ + 1;
             throw new \Exception('コマンドの実行中にエラーが発生しました。');
         });
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'), array('decorated' => false, 'capture_stderr_separately' => true));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception_doublewidth2.txt', $tester->getErrorOutput(true), '->renderException() wraps messages when they are bigger than the terminal');
+        $this->assertEquals($this->replaceExceptionLine(self::$fixturesPath.'/application_renderexception_doublewidth2.txt'), $tester->getErrorOutput(true), '->renderException() wraps messages when they are bigger than the terminal');
         putenv('COLUMNS=120');
     }
 
@@ -751,12 +760,13 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         putenv('COLUMNS=22');
         $application->register('foo')->setCode(function () {
+            $this->exceptionLine = __LINE__ + 1;
             throw new \Exception('dont break here <info>!</info>');
         });
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception_escapeslines.txt', $tester->getDisplay(true), '->renderException() escapes lines containing formatting');
+        $this->assertEquals($this->replaceExceptionLine(self::$fixturesPath.'/application_renderexception_escapeslines.txt'), $tester->getDisplay(true), '->renderException() escapes lines containing formatting');
         putenv('COLUMNS=120');
     }
 
@@ -768,12 +778,13 @@ class ApplicationTest extends TestCase
             ->method('getTerminalWidth')
             ->will($this->returnValue(120));
         $application->register('foo')->setCode(function () {
+            $this->exceptionLine = __LINE__ + 1;
             throw new \InvalidArgumentException("\n\nline 1 with extra spaces        \nline 2\n\nline 4\n");
         });
         $tester = new ApplicationTester($application);
 
         $tester->run(array('command' => 'foo'), array('decorated' => false));
-        $this->assertStringEqualsFile(self::$fixturesPath.'/application_renderexception_linebreaks.txt', $tester->getDisplay(true), '->renderException() keep multiple line breaks');
+        $this->assertEquals($this->replaceExceptionLine(self::$fixturesPath.'/application_renderexception_linebreaks.txt'), $tester->getDisplay(true), '->renderException() keep multiple line breaks');
     }
 
     public function testRun()
@@ -1613,6 +1624,11 @@ class ApplicationTest extends TestCase
         } catch (\Error $e) {
             $this->assertSame($e->getMessage(), 'Class \'UnknownClass\' not found');
         }
+    }
+
+    private function replaceExceptionLine(string $file)
+    {
+        return str_replace('{line}', $this->exceptionLine, file_get_contents($file));
     }
 
     protected function tearDown()

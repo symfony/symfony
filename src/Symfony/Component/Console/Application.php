@@ -225,18 +225,18 @@ class Application
             // the command name MUST be the first element of the input
             $command = $this->find($name);
         } catch (\Throwable $e) {
-            if (null !== $this->dispatcher) {
-                $event = new ConsoleErrorEvent($input, $output, $e);
-                $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+            if (!($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException) || 1 !== count($alternatives = $e->getAlternatives()) || !$input->isInteractive()) {
+                if (null !== $this->dispatcher) {
+                    $event = new ConsoleErrorEvent($input, $output, $e);
+                    $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
 
-                if (0 === $event->getExitCode()) {
-                    return 0;
+                    if (0 === $event->getExitCode()) {
+                        return 0;
+                    }
+
+                    $e = $event->getError();
                 }
 
-                $e = $event->getError();
-            }
-
-            if (!($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException) || 1 !== count($alternatives = $e->getAlternatives()) || !$input->isInteractive()) {
                 throw $e;
             }
 
@@ -244,6 +244,13 @@ class Application
             $question = new ConfirmationQuestion(sprintf("<error>Command \"%s\" is not defined.</error>\n\nDo you want to run \"%s\" instead? [y/n] ", $name, $alternative), false);
 
             if (!(new QuestionHelper())->ask($input, $output, $question)) {
+                if (null !== $this->dispatcher) {
+                    $event = new ConsoleErrorEvent($input, $output, $e);
+                    $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+
+                    return $event->getExitCode();
+                }
+
                 return 1;
             }
 

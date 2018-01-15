@@ -5,12 +5,12 @@ Config
 ------
 
  * Added the `getChildNodeDefinitions()` method to `ParentNodeDefinitionInterface`.
- 
+
 EventDispatcher
 ---------------
 
  * The `TraceableEventDispatcherInterface` has been removed.
- 
+
 HttpFoundation
 --------------
 

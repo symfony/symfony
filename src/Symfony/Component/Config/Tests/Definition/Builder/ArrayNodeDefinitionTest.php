@@ -209,7 +209,7 @@ class ArrayNodeDefinitionTest extends TestCase
 
     public function testEnableableNodeIsDisabledForEmptyConfigurationWhenNormalized()
     {
-        $config = [];
+        $config = array();
 
         $node = new ArrayNodeDefinition('root');
         $node->canBeEnabled();

@@ -50,6 +50,8 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/Foo3Command.php';
         require_once self::$fixturesPath.'/Foo4Command.php';
         require_once self::$fixturesPath.'/Foo5Command.php';
+        require_once self::$fixturesPath.'/Foo7Command.php';
+        require_once self::$fixturesPath.'/Foo8Command.php';
         require_once self::$fixturesPath.'/FooSameCaseUppercaseCommand.php';
         require_once self::$fixturesPath.'/FooSameCaseLowercaseCommand.php';
         require_once self::$fixturesPath.'/FoobarCommand.php';
@@ -636,6 +638,58 @@ class ApplicationTest extends TestCase
         $application->add(new \FooCommand());
         $application->add(new \Foo4Command());
         $application->find('foo::bar');
+    }
+
+    public function testFindWithParameterName()
+    {
+        $foo = new \Foo7Command();
+
+        $application = new Application();
+        $application->add($foo);
+
+        $result = $application->find('foo:a_random_string a_random_option');
+
+        $this->assertSame($foo, $result);
+    }
+
+    public function testFindWithTwoParametersInName()
+    {
+        $foo = new \Foo8Command();
+
+        $application = new Application();
+        $application->add($foo);
+
+        $result = $application->find('foo:stringA:stringB a_random_option');
+
+        $this->assertSame($foo, $result);
+    }
+
+    public function testFindCommandWithExactAndParameterName()
+    {
+        $foo = new \FooCommand();
+        $foo7 = new \Foo7Command();
+
+        $application = new Application();
+        $application->add($foo7);
+        $application->add($foo);
+
+        $result = $application->find('foo:bar');
+
+        $this->assertSame($foo, $result);
+    }
+
+    public function testFindCommandWithExactAndParameterNameDifferentOrder()
+    {
+        $foo = new \FooCommand();
+        $foo7 = new \Foo7Command();
+
+        $application = new Application();
+        $application->add($foo);
+        $application->add($foo7);
+
+        $result = $application->find('foo:bar');
+
+        $this->assertSame($foo, $result);
     }
 
     public function testSetCatchExceptions()

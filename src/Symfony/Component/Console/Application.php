@@ -163,10 +163,18 @@ class Application
                 $exitCode = 1;
             }
         } finally {
+            // if the exception handler changed, keep it
+            // otherwise, unregister $renderException
             if (!$phpHandler) {
+                if (set_exception_handler($renderException) === $renderException) {
+                    restore_exception_handler();
+                }
                 restore_exception_handler();
             } elseif (!$debugHandler) {
-                $phpHandler[0]->setExceptionHandler(null);
+                $finalHandler = $phpHandler[0]->setExceptionHandler(null);
+                if ($finalHandler !== $renderException) {
+                    $phpHandler[0]->setExceptionHandler($finalHandler);
+                }
             }
         }
 

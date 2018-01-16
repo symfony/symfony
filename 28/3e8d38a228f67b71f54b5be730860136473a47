@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-01-16T13:49:24Z
+
+The corresponding change was part of 3.4, so this should be merged into 3.4 (no need to merge in 2.7, as the assertion is not asserting the path in 2.7)

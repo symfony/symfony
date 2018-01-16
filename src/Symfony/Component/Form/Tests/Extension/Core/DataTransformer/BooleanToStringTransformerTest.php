@@ -84,4 +84,10 @@ class BooleanToStringTransformerTest extends TestCase
     {
         new BooleanToStringTransformer('0', array(null, '0'));
     }
+
+    public function testBeStrictOnTrueInFalseValueCheck()
+    {
+        $transformer = new BooleanToStringTransformer('0', array(null, false));
+        $this->assertInstanceOf(BooleanToStringTransformer::class, $transformer);
+    }
 }

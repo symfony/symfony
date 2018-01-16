@@ -18,41 +18,25 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class TwigEnvironmentPassTest extends TestCase
 {
-    /**
-     * @var ContainerBuilder
-     */
-    private $builder;
-    /**
-     * @var Definition
-     */
-    private $definition;
-    /**
-     * @var TwigEnvironmentPass
-     */
-    private $pass;
-
-    protected function setUp()
-    {
-        $this->builder = new ContainerBuilder();
-        $this->definition = new Definition('twig');
-        $this->definition->setPublic(true);
-        $this->builder->setDefinition('twig', $this->definition);
-
-        $this->pass = new TwigEnvironmentPass();
-    }
 
     public function testPassWithTwoExtensionsWithPriority()
     {
+        $twigDefinition = new Definition('twig');
+        $twigDefinition->setPublic(true);
+        $builder = new ContainerBuilder();
+        $builder->setDefinition('twig', $twigDefinition);
+        $pass = new TwigEnvironmentPass();
+
         $definition = new Definition('test_extension_1');
         $definition->addTag('twig.extension', array('priority' => 100));
-        $this->builder->setDefinition('test_extension_1', $definition);
+        $builder->setDefinition('test_extension_1', $definition);
 
         $definition = new Definition('test_extension_2');
         $definition->addTag('twig.extension', array('priority' => 200));
-        $this->builder->setDefinition('test_extension_2', $definition);
+        $builder->setDefinition('test_extension_2', $definition);
 
-        $this->pass->process($this->builder);
-        $calls = $this->definition->getMethodCalls();
+        $pass->process($builder);
+        $calls = $twigDefinition->getMethodCalls();
         $this->assertCount(2, $calls);
         $this->assertEquals('addExtension', $calls[0][0]);
         $this->assertEquals('addExtension', $calls[1][0]);

@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -98,15 +99,17 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
             }
         }
 
-        if ($this->options['post_only']) {
-            $username = trim(ParameterBagUtils::getParameterBagValue($request->request, $this->options['username_parameter']));
-            $password = ParameterBagUtils::getParameterBagValue($request->request, $this->options['password_parameter']);
-        } else {
-            $username = trim(ParameterBagUtils::getRequestParameterValue($request, $this->options['username_parameter']));
-            $password = ParameterBagUtils::getRequestParameterValue($request, $this->options['password_parameter']);
+        $requestBag = $this->options['post_only'] ? $request->request : $request;
+        $username = ParameterBagUtils::getParameterBagValue($requestBag, $this->options['username_parameter']);
+        $password = ParameterBagUtils::getParameterBagValue($requestBag, $this->options['password_parameter']);
+
+        if (!\is_string($username) || (\is_object($username) && !\method_exists($username, '__toString'))) {
+            throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['username_parameter'], \gettype($username)));
         }
 
-        if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
+        $username = trim($username);
+
+        if (\strlen($username) > Security::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Invalid username.');
         }
 

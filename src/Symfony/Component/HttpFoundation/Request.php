@@ -531,9 +531,21 @@ class Request
             return trigger_error($e, E_USER_ERROR);
         }
 
+        $cookieHeader = '';
+        $cookies = array();
+
+        foreach ($this->cookies as $k => $v) {
+            $cookies[] = $k.'='.$v;
+        }
+
+        if (!empty($cookies)) {
+            $cookieHeader = 'Cookie: '.implode('; ', $cookies)."\r\n";
+        }
+
         return
             sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n".
-            $this->headers."\r\n".
+            $this->headers.
+            $cookieHeader."\r\n".
             $content;
     }
 

@@ -23,7 +23,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 {
     // Midnight of last day of 9999 to prevent 5 digit years from being transformed
-    const MAX_TIMESTAMP = 253370674800;
+    const MAX_TIMESTAMP = 253402214400;
 
     private $dateFormat;
     private $timeFormat;

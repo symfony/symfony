@@ -166,7 +166,11 @@ class Application
             if (!$phpHandler) {
                 restore_exception_handler();
             } elseif (!$debugHandler) {
-                $phpHandler[0]->setExceptionHandler(null);
+                $finalHandler = $phpHandler[0]->setExceptionHandler(null);
+                // if the Command changed the exception handler, keep it
+                if ($finalHandler !== $renderException) {
+                    $phpHandler[0]->setExceptionHandler($finalHandler);
+                }
             }
         }
 

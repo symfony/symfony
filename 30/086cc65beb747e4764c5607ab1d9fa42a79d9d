@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-01T17:55:05Z
+
+Agreed, given the default value is `string|null` it makes sense to have the same as return type. Should target 2.8, probably impacts `choice()` and `askHidden()` as well.
+
+---------------------------------------------------------------------------
+
+by keradus at 2018-01-01T21:03:11Z
+
+and `QuestionHelper::ask` is returning `mixed`, not `null|string` :(
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-01T21:42:14Z
+
+right, `Question` can take a normalizer and/or validator, both can return anything. I'm for using `mixed` for all of them
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-01-06T16:09:12Z
+
+Updated. For 2.7
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-07T09:14:07Z
+
+ I'm a bit sad that this will hide the intend - because only strings are returned as answers usually...
+Maybe we should change "Question" to make it accept `string|null` as $default (with a deprecation first), and document this as `string|null` now.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-01-07T09:27:53Z
+
+I see, same here :) but practically i dont mind really. `ask()` implies you get an answer / a variable. In general i enforce stringish with a return type / type declaration on my side. That is `getAnswer($io): string` or `?string` :-)
+
+---------------------------------------------------------------------------
+
+by keradus at 2018-01-07T15:00:26Z
+
+you, sure, but most of the ecosystem, with change `string->mixed`, shall start checking the returned type before start using it, sad and a lot of work.
+:+1: for @nicolas-grekas proposal, but indeed deprecation is needed.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-01-07T15:04:45Z
+
+The counter effect is also true, people using mixed defaults today without any real reason to forbid that.
+
+>  with change string->mixed, shall start checking the returned type before start using it, sad and a lot of work.
+
+It returns mixed today already, so `@return mixed` for now at least helps those who forgot the check because of wrongly `@return string`.
+
+PR intended as a bug fix, not a new feature. I see `string $default = null` is reasonable.. but it's not on my list currently :)

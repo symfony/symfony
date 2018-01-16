@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-02T19:22:17Z
+
+I think we should do the same with the provided password.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-11T12:44:39Z
+
+@chalasr tests are failing
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-11T12:50:44Z
+
+@xabbuh done. Objects implementing `__toString()` do work for both username and password before this PR, and the UsernamePasswordToken `$credentials` argument (password) [allows for `mixed`](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Authentication/Token/UsernamePasswordToken.php#L26), should we care?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-11T13:26:55Z
+
+@chalasr I also wonder if not passing credentials at all must be supported here.
+
+---------------------------------------------------------------------------
+
+by acasademont at 2018-01-12T16:08:29Z
+
+Thanks for the patch! I was going to submit the same issue ;)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-12T16:31:58Z
+
+@xabbuh I think so, password part reverted and `__toString` handling added for username.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-15T11:06:48Z
+
+Ready

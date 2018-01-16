@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class TwigEnvironmentPassTest extends TestCase
 {
-
     public function testPassWithTwoExtensionsWithPriority()
     {
         $twigDefinition = new Definition('twig');

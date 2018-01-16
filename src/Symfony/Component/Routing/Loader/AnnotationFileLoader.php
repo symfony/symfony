@@ -108,21 +108,21 @@ class AnnotationFileLoader extends FileLoader
 
             if (T_CLASS === $token[0]) {
                 // Skip usage of ::class constant and anonymous classes
-                $isValidClass = true;
+                $skipClassToken = false;
                 for ($j = $i - 1; $j > 0; --$j) {
                     if (!isset($tokens[$j][1])) {
                         break;
                     }
 
                     if (T_DOUBLE_COLON === $tokens[$j][0] || T_NEW === $tokens[$j][0]) {
-                        $isValidClass = false;
+                        $skipClassToken = true;
                         break;
                     } elseif (!in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
                         break;
                     }
                 }
 
-                if ($isValidClass) {
+                if (!$skipClassToken) {
                     $class = true;
                 }
             }

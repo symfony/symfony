@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-15T10:19:37Z
+
+Sorry for not picking the session before. If it's the behaviour we want (and I believe yes), I can help with changing the tests to reflect that @nicolas-grekas.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-12-15T10:25:03Z
+
+@nicolas-grekas can you check why deps=high and deps=low are failing here ?
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-15T11:34:14Z
+
+Travis is 💚 and AppVeyor's issues are not related.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-16T00:40:31Z
+
+I really want to help fix the session issue... but this strikes me as weird:
+
+1) It's weird that the `session` config key has a special case specifically for CSRF.
+
+2) If I require `symfony/security`, won't I have CSRF? And so won't my sessions suddenly be enabled?
+
+3) It IS convenient that libraries could require security-csrf as a way to auto-enable sessions, but that seems like a hack.
+
+Sorry to not be on board... I'm just not convinced yet...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-18T07:42:05Z
+
+Without knowing the internals of this, I agree with Ryan that requiring security-csrf just to auto-enable sessions look like a hack.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-18T07:45:09Z
+
+This is not the main purpose of this PR. It's main purpose is enabling CSRF protection when security-csrf is installed.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-19T02:40:19Z
+
+> This is not the main purpose of this PR. It's main purpose is enabling CSRF protection when security-csrf is installed.
+
+@nicolas-grekas Ok - fair enough then - it makes more sense looking at it through that lense. But, what about this:
+
+> If I require symfony/security, won't I have CSRF? And so won't my sessions suddenly be enabled?
+
+Is that not a problem?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-19T06:19:19Z
+
+There is a discussion somewhere about discouraging to use this meta repo. Should remove the issue.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-19T19:09:52Z
+
+> There is a discussion somewhere about discouraging to use this meta repo. Should remove the issue.
+
+@nicolas-grekas Hmm, ok... I'm going to be really annoying 😇. Should we remove the `security` alias then? What package should we tell users to install when they're starting with security (and we don't know yet if they are building a pure API or a form login)?
+
+Another issue is that simply *enabling* the session means that it will store sessions into the `var/cache/dev/sessions` directory (see https://github.com/symfony/symfony/blob/5f72ecff1534b9a677a3b2016dc2ddd0bfda5b21/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Configuration.php#L405-L417). But that's not what we want - we want them to use the default Flex config, which sets `handler_id` to null and thus allows PHP to handle storage).
+
+I don't see the smooth solution yet :/.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-12-21T01:10:56Z
+
+I'm here to complicate things more :). The SecurityBundle has a dependency on all of `symfony/security` :). So the idea of only installing the piece you need (e.g. `security-guard`) is a non-starter (as well as my issue above about session configuration).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-22T21:31:54Z
+
+OK, if this is not obvious, this PR should not be merged :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-07T10:40:47Z
+
+Reopening as I think this should be merged when #25699 will be.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-01-07T21:05:33Z
+
++1 to reopen! But I think the logic should be changed: we should never automatically (in the Configuration class) enable the session... because it will default to trying to write to a var/cache directory that may not exist (so the user will get an error).
+
+Could we auto-enable csrf if the code exists AND if the session was enabled by the user?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-08T19:26:17Z
+
+> Could we auto-enable csrf if the code exists AND if the session was enabled by the user?
+
+here we are :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-10T17:16:39Z
+
+Just removed 2nd commit, which belongs to another PR.

@@ -76,4 +76,12 @@ class BooleanToStringTransformerTest extends TestCase
         $this->assertFalse($customFalseTransformer->reverseTransform('0'));
         $this->assertFalse($customFalseTransformer->reverseTransform(true));
     }
+
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
+    public function testTrueValueContainedInFalseValues()
+    {
+        new BooleanToStringTransformer('0', array(null, '0'));
+    }
 }

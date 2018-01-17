@@ -1,0 +1,163 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-03T14:32:16Z
+
+Travis failure is unrelated
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-05T10:21:53Z
+
+@sroze AFAIK it will return null if no normalizer supports it.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-12-05T10:50:50Z
+
+@Simperfit , @sroze : Actually you'll get [a `Could not denormalize object of type \DateTime, no supporting normalizer found` exception.](https://github.com/symfony/symfony/blob/3ce9c29ae44692555d15983c7537187f5566e9ce/src/Symfony/Component/Serializer/Serializer.php#L175)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-05T11:38:31Z
+
+even if it’s null ?
+Le mar. 5 déc. 2017 à 11:51, Maxime Steinhausser <notifications@github.com>
+a écrit :
+
+> @Simperfit <https://github.com/simperfit> , @sroze
+> <https://github.com/sroze> : Actually you'll get a Could not denormalize
+> object of type \DateTime, no supporting normalizer found exception.
+>
+> —
+> You are receiving this because you were mentioned.
+>
+>
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25287#issuecomment-349267957>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8hmKipIiAjyAs1w9u9spR-fo2I07ks5s9SAcgaJpZM4Qzu3l>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-12-05T16:13:29Z
+
+IIRC: as a nullable nested attribute on an object when using the `ObjectNormalizer`, when encountering `null` it should return `null`.
+But in case you directly call `$this->serializer->denormalize(null, '\DateTime', $format, $context)` (in your own serializer/denormalizer aware denormalizer for instance), you'll get this exception with your changes.
+That's probably fine, as we never account for `null` as $data in any denormalizer AFAIK, but it's kind of disturbing having an exception about no denormalizer found for `\DateTime` while there is one, but just won't support `null`.
+Shouldn't we throw an `UnexpectedValueException` from `denormalize` on `null` or empty string instead?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-05T18:11:59Z
+
+@ogizanagi I kind of agree with you, @dunglas WDYT ?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-09T08:30:17Z
+
+PR Modified to now throw on empty strings and null values.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-10T15:00:59Z
+
+Why why does this normalizer lie in supportsDenormalization if it doesn't support null/empty string?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-10T15:03:47Z
+
+Because if we add a test it will throw an invalid message.
+Le dim. 10 déc. 2017 à 16:01, Gabriel Ostrolucký <notifications@github.com>
+a écrit :
+
+> Why why does this normalizer lie in supportsDenormalization if it doesn't
+> support null/empty string?
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25287#issuecomment-350554256>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8vCdjpPvAIwTUCFsyWSWTFq9J1XFks5s-_I8gaJpZM4Qzu3l>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-10T15:24:15Z
+
+It's kind of right, isn't it? It says no supporting denormalizer has been found, which is true. This denormalizer does not support null.
+
+That message could be improved, but that's different problem.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-12-10T15:29:36Z
+
+None of the denormalizers supports null actually AFAIK. IMHO, it's confusing getting a "No denormalizer found" exception when explicitly asking for `\DateTime` and knowing I have a `DateTimeNormalizer` registered. Here it's calling `denormalize` on null which is wrong, hence the `UnexpectedValueException` makes more sense to me.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-10T15:33:33Z
+
+> it's confusing getting a "No denormalizer found"
+
+It is, but that's not a problem of this normalizer, that's a thing to be fixed in Serializer.
+
+If denormalizers are not allowed to decide if they support denormalization based on a value passed, that's serious flaw in DenormalizerInterface
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-13T09:10:41Z
+
+I suggest we return null for null input. It would be consistent with [JMS serializer](https://github.com/schmittjoh/serializer/blob/62c7ff6d61f8692eac8be024c542b3d9d0ab8c8a/src/JMS/Serializer/Handler/DateHandler.php#L151).
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T04:51:15Z
+
+@ostrolucky I don't know if we have to be consistent with JMS. I think returning an error is better for DX because you may have a bug at some point and passing null instead of the right value, this shows you that something is wrong.
+
+If you are returning null it could lead to unwanted behaviour since this should not be able to return null.
+
+I agree that something has to be done in the denormalizer (supports method) but this is IMO the best way to deal with this.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-16T10:58:50Z
+
+Forcing developer to implement his own denormalizer just to return null for null input and messing with order of denormalizers in serializer is bad DX. It's also bad DX to work around the root problem (not fixing message in Serializer), so when developer implements supportsDenormalization with check based on value, he will get weird message again.
+
+How about this then: Allow to specify target of denormalization to be `?DateTime::class` alongside `DateTime::class`. Now it's clear output of denormalization is allowed to be null.
+
+> don't know if we have to be consistent with JMS
+
+We don't have to do it same way, but we should take more inspiration from it. JMS is much more mature PHP serializer. We don't have to throw exception and hope for the best that developers won't mind it too much. We can learn from history of others. Right now we are dealing with problems which were already solved long ago. We shouldn't have to do that. JMS datetime denormalizer returns null for null input since 2012. It also allows to [specify what to do with nulls in scope of whole Serialization context, via Context setting](https://github.com/schmittjoh/serializer/blob/1fcacaac61eba44f3ca8784d811746c437f1cdd1/src/JMS/Serializer/Context.php#L193).
+
+But that's outside the scope of this PR. For now my request is to at least give developer option to not crash denormalization if input in this denormalizer is null. Seems returning null is expected behaviour from user who posted linked issue too, after all.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-21T16:17:25Z
+
+So @ogizanagi what do you think ?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-12-21T17:55:27Z
+
+> Forcing developer to implement his own denormalizer just to return null for null input and messing with order of denormalizers in serializer is bad DX.
+
+There might be a little misunderstanding here: no need for the developper to implement his own denormalizers just for handling `null` properties. That's calling `denormalize` on `null` which is wrong in the current state of the serializer and core denormalizers implementations.
+And it's probably motivated by a simple reason: **it'd be a noop** (`null` stays `null`, no need to denormalize anything).
+
+High-level denormalizers like the ObjectNormalizer are clever enough [to not call `denormalize` on `null`](https://github.com/symfony/symfony/blob/07766b39052b6ba294dc6ddf85e38ee61a8e0bcb/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L292-L294). And if you write your own high-level denormalizer-aware denormalizer for your objects with nested properties to denormalize, you'll save a useless call to `$this->denormalizer->denormalize` for a given field if the data you get for it is `null`.
+
+Low-level denormalizers in core like the DateTime ones never accounted for `null` as `$data`.
+
+So to sum-up: I think this patch is fine regarding the current state of the serializer and core denormalizers. Handling `null` to return `null` inside `denormalize` would be a paradigm-shift so it'll need its own issue & discussion and each core denormalizers would need to be updated.
+Or it'll might be fine to just update `Serializer::denormalize()` to return `null` on `$data` being `null`.

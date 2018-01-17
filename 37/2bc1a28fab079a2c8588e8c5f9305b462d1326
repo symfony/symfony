@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-01T15:14:20Z
+
+your previous contrib was for 2.7, you submitted against master, but described as 4.0
+what's the right choice?
+
+---------------------------------------------------------------------------
+
+by TeLiXj at 2017-12-01T16:04:38Z
+
+It was on 2.7 branch but fabpot merged it into 3.4/4.0 branch. Now it's the same, only for 3.4/4.0 branches
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-07T08:30:15Z
+
+Isn't the real issue that we try to display `false` in the first place?
+
+---------------------------------------------------------------------------
+
+by TeLiXj at 2017-12-08T10:50:49Z
+
+@xabbuh what do you mean?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-08T11:31:53Z
+
+```twig
+<button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+```
+
+Here we always display the `label` variable. Why do we do that even when it is `false`.
+
+---------------------------------------------------------------------------
+
+by TeLiXj at 2017-12-08T11:47:50Z
+
+Print false is same as print nothing because this I only check for label false one time.
+If you don't print label when it's false (as you suggest) we have two options with the current code: check 2 times if label is false or execute previous ifs for nothing and finally ask if it's false. Maybe both are clear but less "microefficient".
+We are writting more than the real impact of this change :)

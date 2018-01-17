@@ -135,7 +135,7 @@ class XliffFileLoader implements LoaderInterface
             if ($tmpfile) {
                 copy($location, $tmpfile);
                 $parts = explode('/', str_replace('\\', '/', $tmpfile));
-            }else {
+            } else {
                 array_shift($parts);
                 $locationstart = 'phar:///';
             }

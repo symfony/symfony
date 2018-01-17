@@ -216,12 +216,14 @@
 {%- endblock range_widget %}
 
 {%- block button_widget -%}
-    {%- if label is not same as(false) and label is empty -%}
+    {%- if label is empty -%}
         {%- if label_format is not empty -%}
             {% set label = label_format|replace({
                 '%name%': name,
                 '%id%': id,
             }) %}
+        {%- elseif label is same as(false) -%}
+            {% set translation_domain = false %}
         {%- else -%}
             {% set label = name|humanize %}
         {%- endif -%}

@@ -884,7 +884,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $propertyPathInstance = new PropertyPath($propertyPath);
-        if (isset($item)) {
+        if (isset($item) && $item->get() instanceof PropertyPathInterface) {
             $item->set($propertyPathInstance);
             $this->cacheItemPool->save($item);
         }

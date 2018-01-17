@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2018-01-16T17:44:10Z
+
+AppVeyor build failure looks unrelated.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-01-17T05:59:32Z
+
+The HHVM job on Travis hangs, but the others are green. I doubt that I have introduced changes that break the HHVM build.

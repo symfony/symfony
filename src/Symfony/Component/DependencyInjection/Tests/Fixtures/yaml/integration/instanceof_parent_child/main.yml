@@ -9,3 +9,4 @@ services:
 
     parent_service:
         class: stdClass
+        public: true

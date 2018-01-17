@@ -35,12 +35,12 @@ class StaticPrefixCollection
      */
     private $matchStart = 0;
 
-    public function __construct($prefix = '')
+    public function __construct(string $prefix = '')
     {
         $this->prefix = $prefix;
     }
 
-    public function getPrefix()
+    public function getPrefix(): string
     {
         return $this->prefix;
     }
@@ -48,7 +48,7 @@ class StaticPrefixCollection
     /**
      * @return mixed[]|StaticPrefixCollection[]
      */
-    public function getItems()
+    public function getItems(): array
     {
         return $this->items;
     }
@@ -59,7 +59,7 @@ class StaticPrefixCollection
      * @param string $prefix
      * @param mixed  $route
      */
-    public function addRoute($prefix, $route)
+    public function addRoute(string $prefix, $route)
     {
         $prefix = '/' === $prefix ? $prefix : rtrim($prefix, '/');
         $this->guardAgainstAddingNotAcceptedRoutes($prefix);
@@ -108,7 +108,7 @@ class StaticPrefixCollection
      *
      * @return null|StaticPrefixCollection
      */
-    private function groupWithItem($item, $prefix, $route)
+    private function groupWithItem($item, string $prefix, $route)
     {
         $itemPrefix = $item instanceof self ? $item->prefix : $item[0];
         $commonPrefix = $this->detectCommonPrefix($prefix, $itemPrefix);
@@ -132,12 +132,8 @@ class StaticPrefixCollection
 
     /**
      * Checks whether a prefix can be contained within the group.
-     *
-     * @param string $prefix
-     *
-     * @return bool Whether a prefix could belong in a given group
      */
-    private function accepts($prefix)
+    private function accepts(string $prefix): bool
     {
         return '' === $this->prefix || 0 === strpos($prefix, $this->prefix);
     }
@@ -145,12 +141,9 @@ class StaticPrefixCollection
     /**
      * Detects whether there's a common prefix relative to the group prefix and returns it.
      *
-     * @param string $prefix
-     * @param string $anotherPrefix
-     *
      * @return false|string A common prefix, longer than the base/group prefix, or false when none available
      */
-    private function detectCommonPrefix($prefix, $anotherPrefix)
+    private function detectCommonPrefix(string $prefix, string $anotherPrefix)
     {
         $baseLength = strlen($this->prefix);
         $commonLength = $baseLength;
@@ -176,7 +169,7 @@ class StaticPrefixCollection
     /**
      * Optimizes the tree by inlining items from groups with less than 3 items.
      */
-    public function optimizeGroups()
+    public function optimizeGroups(): void
     {
         $index = -1;
 
@@ -199,7 +192,7 @@ class StaticPrefixCollection
         }
     }
 
-    private function shouldBeInlined()
+    private function shouldBeInlined(): bool
     {
         if (count($this->items) >= 3) {
             return false;
@@ -223,11 +216,9 @@ class StaticPrefixCollection
     /**
      * Guards against adding incompatible prefixes in a group.
      *
-     * @param string $prefix
-     *
      * @throws \LogicException when a prefix does not belong in a group
      */
-    private function guardAgainstAddingNotAcceptedRoutes($prefix)
+    private function guardAgainstAddingNotAcceptedRoutes(string $prefix)
     {
         if (!$this->accepts($prefix)) {
             $message = sprintf('Could not add route with prefix %s to collection with prefix %s', $prefix, $this->prefix);

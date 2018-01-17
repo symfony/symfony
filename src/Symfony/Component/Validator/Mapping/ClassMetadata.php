@@ -109,12 +109,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
      */
     private $reflClass;
 
-    /**
-     * Constructs a metadata for the given class.
-     *
-     * @param string $class
-     */
-    public function __construct($class)
+    public function __construct(string $class)
     {
         $this->name = $class;
         // class name without namespace

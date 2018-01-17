@@ -77,13 +77,8 @@ class RouterController
 
     /**
      * Returns the routing traces associated to the given request.
-     *
-     * @param RequestDataCollector $request
-     * @param string               $method
-     *
-     * @return array
      */
-    private function getTraces(RequestDataCollector $request, $method)
+    private function getTraces(RequestDataCollector $request, string $method): array
     {
         $traceRequest = Request::create(
             $request->getPathInfo(),

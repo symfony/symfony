@@ -20,8 +20,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class ResolveClassPass implements CompilerPassInterface
 {
-    private $changes = array();
-
     /**
      * {@inheritdoc}
      */
@@ -35,22 +33,8 @@ class ResolveClassPass implements CompilerPassInterface
                 if ($definition instanceof ChildDefinition && !class_exists($id)) {
                     throw new InvalidArgumentException(sprintf('Service definition "%s" has a parent but no class, and its name looks like a FQCN. Either the class is missing or you want to inherit it from the parent service. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class.', $id));
                 }
-                $this->changes[strtolower($id)] = $id;
                 $definition->setClass($id);
             }
         }
-    }
-
-    /**
-     * @internal
-     *
-     * @deprecated since 3.3, to be removed in 4.0.
-     */
-    public function getChanges()
-    {
-        $changes = $this->changes;
-        $this->changes = array();
-
-        return $changes;
     }
 }

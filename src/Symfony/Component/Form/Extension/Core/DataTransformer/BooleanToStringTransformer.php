@@ -27,7 +27,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
     /**
      * @param string $trueValue The value emitted upon transform if the input is true
      */
-    public function __construct($trueValue)
+    public function __construct(string $trueValue)
     {
         $this->trueValue = $trueValue;
     }

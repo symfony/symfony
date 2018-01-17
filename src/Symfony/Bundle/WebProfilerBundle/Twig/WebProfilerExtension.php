@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Twig;
 
-use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Twig\Environment;
@@ -26,11 +25,6 @@ use Twig\TwigFunction;
  */
 class WebProfilerExtension extends ProfilerExtension
 {
-    /**
-     * @var ValueExporter
-     */
-    private $valueExporter;
-
     /**
      * @var HtmlDumper
      */
@@ -69,12 +63,8 @@ class WebProfilerExtension extends ProfilerExtension
      */
     public function getFunctions()
     {
-        $profilerDump = function (Environment $env, $value, $maxDepth = 0) {
-            return $value instanceof Data ? $this->dumpData($env, $value, $maxDepth) : twig_escape_filter($env, $this->dumpValue($value));
-        };
-
         return array(
-            new TwigFunction('profiler_dump', $profilerDump, array('is_safe' => array('html'), 'needs_environment' => true)),
+            new TwigFunction('profiler_dump', array($this, 'dumpData'), array('is_safe' => array('html'), 'needs_environment' => true)),
             new TwigFunction('profiler_dump_log', array($this, 'dumpLog'), array('is_safe' => array('html'), 'needs_environment' => true)),
         );
     }
@@ -109,20 +99,6 @@ class WebProfilerExtension extends ProfilerExtension
         }
 
         return '<span class="dump-inline">'.strtr($message, $replacements).'</span>';
-    }
-
-    /**
-     * @deprecated since 3.2, to be removed in 4.0. Use the dumpData() method instead.
-     */
-    public function dumpValue($value)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.2 and will be removed in 4.0. Use the dumpData() method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        if (null === $this->valueExporter) {
-            $this->valueExporter = new ValueExporter();
-        }
-
-        return $this->valueExporter->exportValue($value);
     }
 
     /**

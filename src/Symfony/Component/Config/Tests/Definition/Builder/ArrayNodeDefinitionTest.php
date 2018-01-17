@@ -54,6 +54,7 @@ class ArrayNodeDefinitionTest extends TestCase
             array('defaultValue', array(array())),
             array('addDefaultChildrenIfNoneSet', array()),
             array('requiresAtLeastOneElement', array()),
+            array('cannotBeEmpty', array()),
             array('useAttributeAsKey', array('foo')),
         );
     }
@@ -298,8 +299,8 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Using Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition::cannotBeEmpty() at path "root" has no effect, consider requiresAtLeastOneElement() instead. In 4.0 both methods will behave the same.
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The path "root" should have at least 1 element(s) defined.
      */
     public function testCannotBeEmpty()
     {
@@ -326,8 +327,8 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation ->cannotBeEmpty() is not applicable to concrete nodes at path "root". In 4.0 it will throw an exception.
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
+     * @expectedExceptionMessage ->cannotBeEmpty() is not applicable to concrete nodes at path "root"
      */
     public function testCannotBeEmptyOnConcreteNode()
     {

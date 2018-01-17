@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsVariadicsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
 
 /**
@@ -151,6 +152,36 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass->process($container);
 
         $this->assertEquals(array(new Reference('bar'), 'qwerty', new Reference('foo')), $definition->getArguments());
+    }
+
+    public function testVariadics()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(NamedArgumentsVariadicsDummy::class, NamedArgumentsVariadicsDummy::class);
+        $definition->setArguments(
+            array(
+                '$class' => new \stdClass(),
+                '$variadics' => array(
+                    new Reference('foo'),
+                    new Reference('bar'),
+                    new Reference('baz'),
+                ),
+            )
+        );
+
+        $pass = new ResolveNamedArgumentsPass();
+        $pass->process($container);
+
+        $this->assertEquals(
+            array(
+                0 => new \stdClass(),
+                1 => new Reference('foo'),
+                2 => new Reference('bar'),
+                3 => new Reference('baz'),
+            ),
+            $definition->getArguments()
+        );
     }
 }
 

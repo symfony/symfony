@@ -14,7 +14,6 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
-use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ResolveChildDefinitionsPassTest extends TestCase
@@ -325,32 +324,6 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testProcessMergeAutowiringTypes()
-    {
-        $container = new ContainerBuilder();
-
-        $container
-            ->register('parent')
-            ->addAutowiringType('Foo')
-        ;
-
-        $container
-            ->setDefinition('child', new ChildDefinition('parent'))
-            ->addAutowiringType('Bar')
-        ;
-
-        $this->process($container);
-
-        $childDef = $container->getDefinition('child');
-        $this->assertEquals(array('Foo', 'Bar'), $childDef->getAutowiringTypes());
-
-        $parentDef = $container->getDefinition('parent');
-        $this->assertSame(array('Foo'), $parentDef->getAutowiringTypes());
-    }
-
     public function testProcessResolvesAliases()
     {
         $container = new ContainerBuilder();
@@ -395,14 +368,6 @@ class ResolveChildDefinitionsPassTest extends TestCase
         $this->process($container);
 
         $this->assertFalse($container->getDefinition('child1')->isAutoconfigured());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testAliasExistsForBackwardsCompatibility()
-    {
-        $this->assertInstanceOf(ResolveChildDefinitionsPass::class, new ResolveDefinitionTemplatesPass());
     }
 
     protected function process(ContainerBuilder $container)

@@ -106,28 +106,20 @@ class ParameterBagTest extends TestCase
         $this->assertFalse($bag->has('bar'), '->has() returns false if a parameter is not defined');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "BAR" instead of "bar" is deprecated since Symfony 3.4.
-     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "Foo" instead of "foo" is deprecated since Symfony 3.4.
-     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "FOO" instead of "foo" is deprecated since Symfony 3.4.
-     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "Foo" instead of "foo" is deprecated since Symfony 3.4.
-     */
     public function testMixedCase()
     {
         $bag = new ParameterBag(array(
             'foo' => 'foo',
             'bar' => 'bar',
+            'BAR' => 'baz',
         ));
 
         $bag->remove('BAR');
-        $this->assertEquals(array('foo' => 'foo'), $bag->all(), '->remove() converts key to lowercase before removing');
+        $this->assertEquals(array('foo' => 'foo', 'bar' => 'bar'), $bag->all());
 
         $bag->set('Foo', 'baz1');
-        $this->assertEquals('baz1', $bag->get('foo'), '->set() converts the key to lowercase');
-        $this->assertEquals('baz1', $bag->get('FOO'), '->get() converts the key to lowercase');
-
-        $this->assertTrue($bag->has('Foo'), '->has() converts the key to lowercase');
+        $this->assertEquals('foo', $bag->get('foo'));
+        $this->assertEquals('baz1', $bag->get('Foo'));
     }
 
     public function testResolveValue()

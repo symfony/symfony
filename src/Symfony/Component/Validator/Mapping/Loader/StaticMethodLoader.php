@@ -28,7 +28,7 @@ class StaticMethodLoader implements LoaderInterface
      *
      * @param string $methodName The name of the static method to call
      */
-    public function __construct($methodName = 'loadValidatorMetadata')
+    public function __construct(string $methodName = 'loadValidatorMetadata')
     {
         $this->methodName = $methodName;
     }

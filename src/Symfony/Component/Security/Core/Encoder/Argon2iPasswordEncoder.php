@@ -22,7 +22,7 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
 {
     public static function isSupported()
     {
-        if (\PHP_VERSION_ID >= 70200 && \defined('PASSWORD_ARGON2I')) {
+        if (\defined('PASSWORD_ARGON2I')) {
             return true;
         }
 

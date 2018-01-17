@@ -55,13 +55,16 @@ class UploadedFile extends File
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null, $test = false)
+    public function __construct(string $path, string $originalName, string $mimeType = null, int $size = null, int $error = null, bool $test = false)
     {
         $this->originalName = $this->getName($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
+        if (null !== $size) {
+            @trigger_error('Passing a size in the constructor is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.', E_USER_DEPRECATED);
+        }
         $this->error = $error ?: UPLOAD_ERR_OK;
-        $this->test = (bool) $test;
+        $this->test = $test;
 
         parent::__construct($path, UPLOAD_ERR_OK === $this->error);
     }
@@ -141,10 +144,14 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @return int|null The file size
+     * @deprecated since 4.1 will be removed in 5.0 use getSize() instead.
+     *
+     * @return int|null The file sizes
      */
     public function getClientSize()
     {
+        @trigger_error(sprintf('"%s" is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.', __METHOD__), E_USER_DEPRECATED);
+
         return $this->size;
     }
 

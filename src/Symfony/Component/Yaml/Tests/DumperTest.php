@@ -77,35 +77,6 @@ EOF;
         $this->assertEquals($expected, $dumper->dump($this->array, 4, 0));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testSetIndentation()
-    {
-        $this->dumper->setIndentation(7);
-
-        $expected = <<<'EOF'
-'': bar
-foo: '#bar'
-'foo''bar': {  }
-bar:
-       - 1
-       - foo
-foobar:
-       foo: bar
-       bar:
-              - 1
-              - foo
-       foobar:
-              foo: bar
-              bar:
-                     - 1
-                     - foo
-
-EOF;
-        $this->assertEquals($expected, $this->dumper->dump($this->array, 4, 0));
-    }
-
     public function testSpecifications()
     {
         $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));
@@ -213,16 +184,6 @@ EOF;
         $this->assertEquals('{ foo: !php/object \'O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}\', bar: 1 }', $dump, '->dump() is able to dump objects');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testObjectSupportEnabledPassingTrue()
-    {
-        $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, true);
-
-        $this->assertEquals('{ foo: !php/object \'O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}\', bar: 1 }', $dump, '->dump() is able to dump objects');
-    }
-
     public function testObjectSupportDisabledButNoExceptions()
     {
         $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1));
@@ -236,33 +197,6 @@ EOF;
     public function testObjectSupportDisabledWithExceptions()
     {
         $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
-    }
-
-    /**
-     * @group legacy
-     * @expectedException \Symfony\Component\Yaml\Exception\DumpException
-     */
-    public function testObjectSupportDisabledWithExceptionsPassingTrue()
-    {
-        $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, true);
-    }
-
-    public function testEmptyArray()
-    {
-        $dump = $this->dumper->dump(array());
-        $this->assertEquals('{  }', $dump);
-
-        $dump = $this->dumper->dump(array(), 0, 0, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
-        $this->assertEquals('[]', $dump);
-
-        $dump = $this->dumper->dump(array(), 9, 0, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
-        $this->assertEquals('[]', $dump);
-
-        $dump = $this->dumper->dump(new \ArrayObject(), 0, 0, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_OBJECT_AS_MAP);
-        $this->assertEquals('{  }', $dump);
-
-        $dump = $this->dumper->dump(new \stdClass(), 0, 0, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_OBJECT_AS_MAP);
-        $this->assertEquals('{  }', $dump);
     }
 
     /**

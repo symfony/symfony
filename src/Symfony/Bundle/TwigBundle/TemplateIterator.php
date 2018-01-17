@@ -31,7 +31,7 @@ class TemplateIterator implements \IteratorAggregate
      * @param string          $rootDir The directory where global templates can be stored
      * @param array           $paths   Additional Twig paths to warm
      */
-    public function __construct(KernelInterface $kernel, $rootDir, array $paths = array())
+    public function __construct(KernelInterface $kernel, string $rootDir, array $paths = array())
     {
         $this->kernel = $kernel;
         $this->rootDir = $rootDir;

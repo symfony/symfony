@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\Reference;
 class InlineServiceDefinitionsPass extends AbstractRecursivePass implements RepeatablePassInterface
 {
     private $cloningIds = array();
-    private $inlinedServiceIds = array();
 
     /**
      * {@inheritdoc}
@@ -32,22 +31,6 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
         // no-op for BC
-    }
-
-    /**
-     * Returns an array of all services inlined by this pass.
-     *
-     * The key is the inlined service id and its value is the list of services it was inlined into.
-     *
-     * @deprecated since version 3.4, to be removed in 4.0.
-     *
-     * @return array
-     */
-    public function getInlinedServiceIds()
-    {
-        @trigger_error('Calling InlineServiceDefinitionsPass::getInlinedServiceIds() is deprecated since Symfony 3.4 and will be removed in 4.0.', E_USER_DEPRECATED);
-
-        return $this->inlinedServiceIds;
     }
 
     /**
@@ -78,7 +61,6 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         }
 
         $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
-        $this->inlinedServiceIds[$id][] = $this->currentId;
 
         if ($definition->isShared()) {
             return $definition;
@@ -110,7 +92,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
             return true;
         }
 
-        if ($definition->isDeprecated() || $definition->isPublic() || $definition->isPrivate() || $definition->isLazy()) {
+        if ($definition->isDeprecated() || $definition->isPublic() || $definition->isLazy()) {
             return false;
         }
 

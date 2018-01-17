@@ -37,7 +37,7 @@ class Logger extends AbstractLogger
     private $formatter;
     private $handle;
 
-    public function __construct($minLevel = null, $output = 'php://stderr', callable $formatter = null)
+    public function __construct(string $minLevel = null, $output = 'php://stderr', callable $formatter = null)
     {
         if (null === $minLevel) {
             $minLevel = LogLevel::WARNING;
@@ -80,14 +80,7 @@ class Logger extends AbstractLogger
         fwrite($this->handle, $formatter($level, $message, $context));
     }
 
-    /**
-     * @param string $level
-     * @param string $message
-     * @param array  $context
-     *
-     * @return string
-     */
-    private function format($level, $message, array $context)
+    private function format(string $level, string $message, array $context): string
     {
         if (false !== strpos($message, '{')) {
             $replacements = array();

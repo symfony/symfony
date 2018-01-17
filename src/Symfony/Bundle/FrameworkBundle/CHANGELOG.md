@@ -1,6 +1,37 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Allowed to pass an optional `LoggerInterface $logger` instance to the `Router`
+ * Added a new `parameter_bag` service with related autowiring aliases to access parameters as-a-service
+ * Allowed the `Router` to work with any PSR-11 container
+ * added option in workflow dump command to label graph with a custom label
+
+4.0.0
+-----
+
+ * The default `type` option of the `framework.workflows.*` configuration entries is `state_machine`
+ * removed `AddConsoleCommandPass`, `AddConstraintValidatorsPass`,
+   `AddValidatorInitializersPass`, `CompilerDebugDumpPass`,  `ConfigCachePass`,
+   `ControllerArgumentValueResolverPass`, `FormPass`, `PropertyInfoPass`,
+   `RoutingResolverPass`, `SerializerPass`, `ValidateWorkflowsPass`
+ * made  `Translator::__construct()` `$defaultLocale` argument required
+ * removed `SessionListener`, `TestSessionListener`
+ * Removed `cache:clear` warmup part along with the `--no-optional-warmers` option
+ * Removed core form types services registration when unnecessary
+ * Removed `framework.serializer.cache` option and `serializer.mapping.cache.apc`, `serializer.mapping.cache.doctrine.apc` services
+ * Removed `ConstraintValidatorFactory`
+ * Removed class parameters related to routing
+ * Removed absolute template paths support in the template name parser
+ * Removed support of the `KERNEL_DIR` environment variable with `KernelTestCase::getKernelClass()`.
+ * Removed the `KernelTestCase::getPhpUnitXmlDir()` and `KernelTestCase::getPhpUnitCliConfigArgument()` methods.
+ * Removed the "framework.validation.cache" configuration option. Configure the "cache.validator" service under "framework.cache.pools" instead.
+ * Removed `PhpStringTokenParser`, use `Symfony\Component\Translation\Extractor\PhpStringTokenParser` instead.
+ * Removed `PhpExtractor`, use `Symfony\Component\Translation\Extractor\PhpExtractor` instead.
+ * Removed the `use_strict_mode` session option, it's is now enabled by default
+
 3.4.0
 -----
 

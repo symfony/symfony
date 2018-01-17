@@ -10,4 +10,3 @@ security:
         main:
             form_login: false
             http_basic: ~
-            logout_on_user_change: true

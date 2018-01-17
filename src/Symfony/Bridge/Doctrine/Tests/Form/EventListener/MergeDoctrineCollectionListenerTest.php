@@ -78,37 +78,4 @@ class MergeDoctrineCollectionListenerTest extends TestCase
 
         $this->assertTrue($this->collection->isEmpty());
     }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyChildClassOnSubmitCallParent()
-    {
-        $form = $this->getBuilder('name')
-            ->setData($this->collection)
-            ->addEventSubscriber(new TestClassExtendingMergeDoctrineCollectionListener())
-            ->getForm();
-        $submittedData = array();
-        $event = new FormEvent($form, $submittedData);
-
-        $this->dispatcher->dispatch(FormEvents::SUBMIT, $event);
-
-        $this->assertTrue($this->collection->isEmpty());
-        $this->assertTrue(TestClassExtendingMergeDoctrineCollectionListener::$onBindCalled);
-    }
-}
-
-/**
- * @group legacy
- */
-class TestClassExtendingMergeDoctrineCollectionListener extends MergeDoctrineCollectionListener
-{
-    public static $onBindCalled = false;
-
-    public function onBind(FormEvent $event)
-    {
-        self::$onBindCalled = true;
-
-        parent::onBind($event);
-    }
 }

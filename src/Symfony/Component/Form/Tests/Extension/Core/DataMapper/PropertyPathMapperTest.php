@@ -52,13 +52,9 @@ class PropertyPathMapperTest extends TestCase
     }
 
     /**
-     * @param FormConfigInterface $config
-     * @param bool                $synchronized
-     * @param bool                $submitted
-     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
+    private function getForm(FormConfigInterface $config, bool $synchronized = true, bool $submitted = true)
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->setConstructorArgs(array($config))

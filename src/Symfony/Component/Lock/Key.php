@@ -22,12 +22,9 @@ final class Key
     private $expiringTime;
     private $state = array();
 
-    /**
-     * @param string $resource
-     */
-    public function __construct($resource)
+    public function __construct(string $resource)
     {
-        $this->resource = (string) $resource;
+        $this->resource = $resource;
     }
 
     public function __toString()
@@ -35,39 +32,22 @@ final class Key
         return $this->resource;
     }
 
-    /**
-     * @param string $stateKey
-     *
-     * @return bool
-     */
-    public function hasState($stateKey)
+    public function hasState(string $stateKey): bool
     {
         return isset($this->state[$stateKey]);
     }
 
-    /**
-     * @param string $stateKey
-     * @param mixed  $state
-     */
-    public function setState($stateKey, $state)
+    public function setState(string $stateKey, $state): void
     {
         $this->state[$stateKey] = $state;
     }
 
-    /**
-     * @param string $stateKey
-     */
-    public function removeState($stateKey)
+    public function removeState(string $stateKey): void
     {
         unset($this->state[$stateKey]);
     }
 
-    /**
-     * @param $stateKey
-     *
-     * @return mixed
-     */
-    public function getState($stateKey)
+    public function getState(string $stateKey)
     {
         return $this->state[$stateKey];
     }

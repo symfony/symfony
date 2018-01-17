@@ -61,23 +61,6 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Pass voters to the decorated AccessDecisionManager instead.
-     */
-    public function setVoters(array $voters)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Pass voters to the decorated AccessDecisionManager instead.', __METHOD__), E_USER_DEPRECATED);
-
-        if (!method_exists($this->manager, 'setVoters')) {
-            return;
-        }
-
-        $this->voters = $voters;
-        $this->manager->setVoters($voters);
-    }
-
-    /**
      * @return string
      */
     public function getStrategy()

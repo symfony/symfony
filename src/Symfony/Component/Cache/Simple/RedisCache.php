@@ -22,7 +22,7 @@ class RedisCache extends AbstractCache
      * @param string                                          $namespace
      * @param int                                             $defaultLifetime
      */
-    public function __construct($redisClient, $namespace = '', $defaultLifetime = 0)
+    public function __construct($redisClient, string $namespace = '', int $defaultLifetime = 0)
     {
         $this->init($redisClient, $namespace, $defaultLifetime);
     }

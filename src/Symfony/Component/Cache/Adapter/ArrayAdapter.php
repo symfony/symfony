@@ -30,7 +30,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, Resettable
      * @param int  $defaultLifetime
      * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
      */
-    public function __construct($defaultLifetime = 0, $storeSerialized = true)
+    public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true)
     {
         $this->storeSerialized = $storeSerialized;
         $this->createCacheItem = \Closure::bind(

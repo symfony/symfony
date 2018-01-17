@@ -23,7 +23,7 @@ class YearTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function format(\DateTime $dateTime, $length)
+    public function format(\DateTime $dateTime, int $length): string
     {
         if (2 === $length) {
             return $dateTime->format('y');
@@ -35,7 +35,7 @@ class YearTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function getReverseMatchingRegExp($length)
+    public function getReverseMatchingRegExp(int $length): string
     {
         return 2 === $length ? '\d{2}' : '\d{4}';
     }
@@ -43,7 +43,7 @@ class YearTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function extractDateOptions($matched, $length)
+    public function extractDateOptions(string $matched, int $length): array
     {
         return array(
             'year' => (int) $matched,

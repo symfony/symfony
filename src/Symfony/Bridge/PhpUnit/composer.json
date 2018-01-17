@@ -40,7 +40,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.4-dev"
+            "dev-master": "4.1-dev"
         },
         "thanks": {
             "name": "phpunit/phpunit",

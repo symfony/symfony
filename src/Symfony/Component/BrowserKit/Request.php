@@ -33,7 +33,7 @@ class Request
      * @param array  $server     An array of server parameters
      * @param string $content    The raw body data
      */
-    public function __construct($uri, $method, array $parameters = array(), array $files = array(), array $cookies = array(), array $server = array(), $content = null)
+    public function __construct(string $uri, string $method, array $parameters = array(), array $files = array(), array $cookies = array(), array $server = array(), string $content = null)
     {
         $this->uri = $uri;
         $this->method = $method;

@@ -34,12 +34,12 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
      * @param string              $loginPath  The path to the login form
      * @param bool                $useForward Whether to forward or redirect to the login form
      */
-    public function __construct(HttpKernelInterface $kernel, HttpUtils $httpUtils, $loginPath, $useForward = false)
+    public function __construct(HttpKernelInterface $kernel, HttpUtils $httpUtils, string $loginPath, bool $useForward = false)
     {
         $this->httpKernel = $kernel;
         $this->httpUtils = $httpUtils;
         $this->loginPath = $loginPath;
-        $this->useForward = (bool) $useForward;
+        $this->useForward = $useForward;
     }
 
     /**

@@ -251,24 +251,11 @@ class ContextListenerTest extends TestCase
         $listener->handle($event);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Refreshing a deauthenticated user is deprecated as of 3.4 and will trigger a logout in 4.0.
-     */
-    public function testIfTokenIsDeauthenticatedTriggersDeprecations()
-    {
-        $tokenStorage = new TokenStorage();
-        $refreshedUser = new User('foobar', 'baz');
-        $this->handleEventWithPreviousSession($tokenStorage, array(new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)));
-
-        $this->assertSame($refreshedUser, $tokenStorage->getToken()->getUser());
-    }
-
     public function testIfTokenIsDeauthenticated()
     {
         $tokenStorage = new TokenStorage();
         $refreshedUser = new User('foobar', 'baz');
-        $this->handleEventWithPreviousSession($tokenStorage, array(new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)), null, true);
+        $this->handleEventWithPreviousSession($tokenStorage, array(new NotSupportingUserProvider(), new SupportingUserProvider($refreshedUser)));
 
         $this->assertNull($tokenStorage->getToken());
     }
@@ -344,7 +331,7 @@ class ContextListenerTest extends TestCase
         return $session;
     }
 
-    private function handleEventWithPreviousSession(TokenStorageInterface $tokenStorage, $userProviders, UserInterface $user = null, $logoutOnUserChange = false)
+    private function handleEventWithPreviousSession(TokenStorageInterface $tokenStorage, $userProviders, UserInterface $user = null)
     {
         $user = $user ?: new User('foo', 'bar');
         $session = new Session(new MockArraySessionStorage());
@@ -355,7 +342,6 @@ class ContextListenerTest extends TestCase
         $request->cookies->set('MOCKSESSID', true);
 
         $listener = new ContextListener($tokenStorage, $userProviders, 'context_key');
-        $listener->setLogoutOnUserChange($logoutOnUserChange);
         $listener->handle(new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST));
     }
 }

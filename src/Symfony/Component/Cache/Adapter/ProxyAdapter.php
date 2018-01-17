@@ -30,12 +30,7 @@ class ProxyAdapter implements AdapterInterface, PruneableInterface, ResettableIn
     private $createCacheItem;
     private $poolHash;
 
-    /**
-     * @param CacheItemPoolInterface $pool
-     * @param string                 $namespace
-     * @param int                    $defaultLifetime
-     */
-    public function __construct(CacheItemPoolInterface $pool, $namespace = '', $defaultLifetime = 0)
+    public function __construct(CacheItemPoolInterface $pool, string $namespace = '', int $defaultLifetime = 0)
     {
         $this->pool = $pool;
         $this->poolHash = $poolHash = spl_object_hash($pool);

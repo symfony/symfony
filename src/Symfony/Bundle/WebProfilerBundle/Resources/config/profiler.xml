@@ -12,7 +12,6 @@
             <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument>%data_collector.templates%</argument>
-            <argument>%web_profiler.debug_toolbar.position%</argument>
             <argument type="service" id="web_profiler.csp.handler" />
             <argument>%kernel.project_dir%</argument>
         </service>

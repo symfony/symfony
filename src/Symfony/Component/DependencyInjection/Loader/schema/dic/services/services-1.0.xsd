@@ -117,7 +117,6 @@
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
-      <xsd:element name="autowiring-type" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="bind" type="bind" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
     <xsd:attribute name="id" type="xsd:string" />
@@ -207,7 +206,6 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="name" type="xsd:string" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
-    <xsd:attribute name="strict" type="boolean" />
     <xsd:attribute name="tag" type="xsd:string" />
   </xsd:complexType>
 
@@ -233,7 +231,6 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="index" type="xsd:integer" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
-    <xsd:attribute name="strict" type="boolean" />
     <xsd:attribute name="tag" type="xsd:string" />
   </xsd:complexType>
 

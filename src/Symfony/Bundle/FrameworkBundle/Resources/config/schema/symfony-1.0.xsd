@@ -202,6 +202,7 @@
         <xsd:attribute name="static-method" type="xsd:boolean" />
         <xsd:attribute name="translation-domain" type="xsd:string" />
         <xsd:attribute name="strict-email" type="xsd:boolean" />
+        <xsd:attribute name="email-validation-mode" type="email-validation-mode" />
     </xsd:complexType>
 
     <xsd:complexType name="file_mapping">
@@ -209,6 +210,14 @@
             <xsd:element name="path" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:simpleType name="email-validation-mode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="html5" />
+            <xsd:enumeration value="loose" />
+            <xsd:enumeration value="strict" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:complexType name="annotations">
         <xsd:attribute name="cache" type="xsd:string" />

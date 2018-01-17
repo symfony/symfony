@@ -23,7 +23,6 @@ class Compiler
 {
     private $passConfig;
     private $log = array();
-    private $loggingFormatter;
     private $serviceReferenceGraph;
 
     public function __construct()
@@ -53,66 +52,21 @@ class Compiler
     }
 
     /**
-     * Returns the logging formatter which can be used by compilation passes.
-     *
-     * @return LoggingFormatter
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Use the ContainerBuilder::log() method instead.
-     */
-    public function getLoggingFormatter()
-    {
-        if (null === $this->loggingFormatter) {
-            @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the ContainerBuilder::log() method instead.', __METHOD__), E_USER_DEPRECATED);
-
-            $this->loggingFormatter = new LoggingFormatter();
-        }
-
-        return $this->loggingFormatter;
-    }
-
-    /**
      * Adds a pass to the PassConfig.
      *
      * @param CompilerPassInterface $pass     A compiler pass
      * @param string                $type     The type of the pass
      * @param int                   $priority Used to sort the passes
      */
-    public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION/*, int $priority = 0*/)
+    public function addPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0)
     {
-        if (func_num_args() >= 3) {
-            $priority = func_get_arg(2);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a third `int $priority = 0` argument in version 4.0. Not defining it is deprecated since Symfony 3.2.', __METHOD__), E_USER_DEPRECATED);
-                }
-            }
-
-            $priority = 0;
-        }
-
         $this->passConfig->addPass($pass, $type, $priority);
-    }
-
-    /**
-     * Adds a log message.
-     *
-     * @param string $string The log message
-     *
-     * @deprecated since version 3.3, to be removed in 4.0. Use the ContainerBuilder::log() method instead.
-     */
-    public function addLogMessage($string)
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the ContainerBuilder::log() method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->log[] = $string;
     }
 
     /**
      * @final
      */
-    public function log(CompilerPassInterface $pass, $message)
+    public function log(CompilerPassInterface $pass, string $message)
     {
         if (false !== strpos($message, "\n")) {
             $message = str_replace("\n", "\n".get_class($pass).': ', trim($message));

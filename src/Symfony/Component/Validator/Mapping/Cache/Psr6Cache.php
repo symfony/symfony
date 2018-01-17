@@ -63,12 +63,8 @@ class Psr6Cache implements CacheInterface
 
     /**
      * Replaces backslashes by dots in a class name.
-     *
-     * @param string $class
-     *
-     * @return string
      */
-    private function escapeClassName($class)
+    private function escapeClassName(string $class): string
     {
         return str_replace('\\', '.', $class);
     }

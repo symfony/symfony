@@ -27,7 +27,7 @@ class TimezoneTransformer extends Transformer
      *
      * @throws NotImplementedException When time zone is different than UTC or GMT (Etc/GMT)
      */
-    public function format(\DateTime $dateTime, $length)
+    public function format(\DateTime $dateTime, int $length): string
     {
         $timeZone = substr($dateTime->getTimezone()->getName(), 0, 3);
 
@@ -63,7 +63,7 @@ class TimezoneTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function getReverseMatchingRegExp($length)
+    public function getReverseMatchingRegExp(int $length): string
     {
         return 'GMT[+-]\d{2}:?\d{2}';
     }
@@ -71,7 +71,7 @@ class TimezoneTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function extractDateOptions($matched, $length)
+    public function extractDateOptions(string $matched, int $length): array
     {
         return array(
             'timezone' => self::getEtcTimeZoneId($matched),

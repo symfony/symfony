@@ -33,7 +33,7 @@ class BinaryNode extends Node
         'not in' => '!in_array',
     );
 
-    public function __construct($operator, Node $left, Node $right)
+    public function __construct(string $operator, Node $left, Node $right)
     {
         parent::__construct(
             array('left' => $left, 'right' => $right),

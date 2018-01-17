@@ -247,9 +247,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         return $formatData;
     }
 
-    /**
-     * @requires PHP 5.5.10
-     */
     public function testFormatUtcAndGmtAreSplit()
     {
         $pattern = "yyyy.MM.dd 'at' HH:mm:ss zzz";
@@ -322,7 +319,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     /**
      * @dataProvider formatTimezoneProvider
-     * @requires PHP 5.5.10
      */
     public function testFormatTimezone($pattern, $timezone, $expected)
     {
@@ -334,7 +330,7 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function formatTimezoneProvider()
     {
-        $cases = array(
+        return array(
             array('z', 'GMT', 'GMT'),
             array('zz', 'GMT', 'GMT'),
             array('zzz', 'GMT', 'GMT'),
@@ -373,20 +369,13 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
             array('zzzzz', 'Etc/Zulu', 'Coordinated Universal Time'),
             array('zzzzz', 'Etc/UCT', 'Coordinated Universal Time'),
             array('zzzzz', 'Etc/Greenwich', 'Greenwich Mean Time'),
+
+            array('z', 'GMT+03:00', 'GMT+3'),
+            array('zz', 'GMT+03:00', 'GMT+3'),
+            array('zzz', 'GMT+03:00', 'GMT+3'),
+            array('zzzz', 'GMT+03:00', 'GMT+03:00'),
+            array('zzzzz', 'GMT+03:00', 'GMT+03:00'),
         );
-
-        if (!defined('HHVM_VERSION')) {
-            // these timezones are not considered valid in HHVM
-            $cases = array_merge($cases, array(
-                array('z', 'GMT+03:00', 'GMT+3'),
-                array('zz', 'GMT+03:00', 'GMT+3'),
-                array('zzz', 'GMT+03:00', 'GMT+3'),
-                array('zzzz', 'GMT+03:00', 'GMT+03:00'),
-                array('zzzzz', 'GMT+03:00', 'GMT+03:00'),
-            ));
-        }
-
-        return $cases;
     }
 
     public function testFormatWithGmtTimezone()
@@ -427,9 +416,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
         );
     }
 
-    /**
-     * @requires PHP 5.5.10
-     */
     public function testFormatWithDateTimeZoneGmt()
     {
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT'), IntlDateFormatter::GREGORIAN, 'zzz');
@@ -439,10 +425,6 @@ abstract class AbstractIntlDateFormatterTest extends TestCase
 
     public function testFormatWithDateTimeZoneGmtOffset()
     {
-        if (defined('HHVM_VERSION_ID') || \PHP_VERSION_ID <= 50509) {
-            $this->markTestSkipped('DateTimeZone GMT offsets are supported since 5.5.10. See https://github.com/facebook/hhvm/issues/5875 for HHVM.');
-        }
-
         $formatter = $this->getDateFormatter('en', IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, new \DateTimeZone('GMT+03:00'), IntlDateFormatter::GREGORIAN, 'zzzz');
 
         $this->assertEquals('GMT+03:00', $formatter->format(0));

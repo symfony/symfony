@@ -71,10 +71,7 @@ class PhpFileLoaderTest extends TestCase
         yield array('instanceof');
         yield array('prototype');
         yield array('child');
-
-        if (\PHP_VERSION_ID >= 70000) {
-            yield array('php7');
-        }
+        yield array('php7');
     }
 
     /**

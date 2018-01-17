@@ -23,7 +23,7 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
 {
     private $resolverServiceId;
 
-    public function __construct($resolverServiceId = 'argument_resolver.service')
+    public function __construct(string $resolverServiceId = 'argument_resolver.service')
     {
         $this->resolverServiceId = $resolverServiceId;
     }

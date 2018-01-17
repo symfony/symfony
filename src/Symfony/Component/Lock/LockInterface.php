@@ -56,4 +56,16 @@ interface LockInterface
      * @throws LockReleasingException If the lock can not be released
      */
     public function release();
+
+    /**
+     * @return bool
+     */
+    public function isExpired();
+
+    /**
+     * Returns the remaining lifetime.
+     *
+     * @return float|null Remaining lifetime in seconds. Null when the lock won't expire.
+     */
+    public function getRemainingLifetime();
 }

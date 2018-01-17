@@ -43,12 +43,7 @@ abstract class AbstractFileExtractor
         return $files;
     }
 
-    /**
-     * @param string $file
-     *
-     * @return \SplFileInfo
-     */
-    private function toSplFileInfo($file)
+    private function toSplFileInfo(string $file): \SplFileInfo
     {
         return ($file instanceof \SplFileInfo) ? $file : new \SplFileInfo($file);
     }

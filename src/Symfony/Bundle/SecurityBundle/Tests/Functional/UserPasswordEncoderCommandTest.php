@@ -229,28 +229,6 @@ EOTXT
         ), array('interactive' => false));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing null as the first argument of "Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand::__construct" is deprecated since Symfony 3.3 and will be removed in 4.0. If the command was registered by convention, make it a service instead.
-     */
-    public function testLegacy()
-    {
-        $application = new ConsoleApplication();
-        $application->add(new UserPasswordEncoderCommand());
-
-        $passwordEncoderCommand = $application->find('security:encode-password');
-        self::bootKernel(array('test_case' => 'PasswordEncode'));
-        $passwordEncoderCommand->setContainer(self::$kernel->getContainer());
-
-        $tester = new CommandTester($passwordEncoderCommand);
-        $tester->execute(array(
-            'command' => 'security:encode-password',
-            'password' => 'password',
-        ), array('interactive' => false));
-
-        $this->assertContains('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $tester->getDisplay());
-    }
-
     protected function setUp()
     {
         putenv('COLUMNS='.(119 + strlen(PHP_EOL)));

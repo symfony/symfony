@@ -43,12 +43,12 @@ class ProfilerListener implements EventSubscriberInterface
      * @param bool                         $onlyException      True if the profiler only collects data when an exception occurs, false otherwise
      * @param bool                         $onlyMasterRequests True if the profiler only collects data when the request is a master request, false otherwise
      */
-    public function __construct(Profiler $profiler, RequestStack $requestStack, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false)
+    public function __construct(Profiler $profiler, RequestStack $requestStack, RequestMatcherInterface $matcher = null, bool $onlyException = false, bool $onlyMasterRequests = false)
     {
         $this->profiler = $profiler;
         $this->matcher = $matcher;
-        $this->onlyException = (bool) $onlyException;
-        $this->onlyMasterRequests = (bool) $onlyMasterRequests;
+        $this->onlyException = $onlyException;
+        $this->onlyMasterRequests = $onlyMasterRequests;
         $this->profiles = new \SplObjectStorage();
         $this->parents = new \SplObjectStorage();
         $this->requestStack = $requestStack;
@@ -121,7 +121,7 @@ class ProfilerListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::RESPONSE => array('onKernelResponse', -100),
-            KernelEvents::EXCEPTION => 'onKernelException',
+            KernelEvents::EXCEPTION => array('onKernelException', 2048),
             KernelEvents::TERMINATE => array('onKernelTerminate', -1024),
         );
     }

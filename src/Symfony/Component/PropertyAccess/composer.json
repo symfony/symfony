@@ -16,12 +16,11 @@
         }
     ],
     "require": {
-        "php": "^5.5.9|>=7.0.8",
-        "symfony/polyfill-php70": "~1.0",
-        "symfony/inflector": "~3.1|~4.0"
+        "php": "^7.1.3",
+        "symfony/inflector": "~3.4|~4.0"
     },
     "require-dev": {
-        "symfony/cache": "~3.1|~4.0"
+        "symfony/cache": "~3.4|~4.0"
     },
     "suggest": {
         "psr/cache-implementation": "To cache access methods."
@@ -35,7 +34,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.4-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

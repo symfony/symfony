@@ -32,9 +32,9 @@ interface FormRendererInterface
      * @param mixed    $themes           The theme(s). The type of these themes
      *                                   is open to the implementation.
      * @param bool     $useDefaultThemes If true, will use default themes specified
-     *                                   in the renderer, will be added to the interface in 4.0
+     *                                   in the renderer
      */
-    public function setTheme(FormView $view, $themes /*, $useDefaultThemes = true */);
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true);
 
     /**
      * Renders a named block of the form theme.

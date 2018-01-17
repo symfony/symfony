@@ -4,6 +4,7 @@ services:
             NonExistent: ~
             $quz: quz
             $factory: factory
+        public: true
 
     bar:
         class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar

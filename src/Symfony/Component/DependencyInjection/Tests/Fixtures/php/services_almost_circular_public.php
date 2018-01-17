@@ -19,9 +19,14 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     private $parameters;
     private $targetDirs = array();
 
+    /**
+     * @internal but protected for BC on cache:clear
+     */
+    protected $privates = array();
+
     public function __construct()
     {
-        $this->services = array();
+        $this->services = $this->privates = array();
         $this->methodMap = array(
             'bar' => 'getBarService',
             'bar3' => 'getBar3Service',
@@ -39,13 +44,10 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         $this->aliases = array();
     }
 
-    public function getRemovedIds()
+    public function reset()
     {
-        return array(
-            'Psr\\Container\\ContainerInterface' => true,
-            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
-            'bar2' => true,
-        );
+        $this->privates = array();
+        parent::reset();
     }
 
     public function compile()
@@ -58,11 +60,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
         return true;
     }
 
-    public function isFrozen()
+    public function getRemovedIds()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return true;
+        return array(
+            'Psr\\Container\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'bar2' => true,
+        );
     }
 
     /**
@@ -74,7 +78,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $this->services['bar'] = $instance = new \BarCircular();
 
-        $instance->addFoobar(${($_ = isset($this->services['foobar']) ? $this->services['foobar'] : $this->getFoobarService()) && false ?: '_'});
+        $instance->addFoobar(($this->services['foobar'] ?? $this->getFoobarService()));
 
         return $instance;
     }
@@ -88,7 +92,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $this->services['bar3'] = $instance = new \BarCircular();
 
-        $a = ${($_ = isset($this->services['foobar3']) ? $this->services['foobar3'] : $this->services['foobar3'] = new \FoobarCircular()) && false ?: '_'};
+        $a = ($this->services['foobar3'] ?? $this->services['foobar3'] = new \FoobarCircular());
 
         $instance->addFoobar($a, $a);
 
@@ -102,7 +106,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getBar5Service()
     {
-        $a = ${($_ = isset($this->services['foo5']) ? $this->services['foo5'] : $this->getFoo5Service()) && false ?: '_'};
+        $a = ($this->services['foo5'] ?? $this->getFoo5Service());
 
         if (isset($this->services['bar5'])) {
             return $this->services['bar5'];
@@ -122,7 +126,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getFooService()
     {
-        $a = ${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->getBarService()) && false ?: '_'};
+        $a = ($this->services['bar'] ?? $this->getBarService());
 
         if (isset($this->services['foo'])) {
             return $this->services['foo'];
@@ -142,7 +146,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
 
         $this->services['foo2'] = $instance = new \FooCircular($a);
 
-        $a->addFoobar(${($_ = isset($this->services['foobar2']) ? $this->services['foobar2'] : $this->getFoobar2Service()) && false ?: '_'});
+        $a->addFoobar(($this->services['foobar2'] ?? $this->getFoobar2Service()));
 
         return $instance;
     }
@@ -156,7 +160,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $instance = new \stdClass();
 
-        $instance->foobar = ${($_ = isset($this->services['foobar4']) ? $this->services['foobar4'] : $this->getFoobar4Service()) && false ?: '_'};
+        $instance->foobar = ($this->services['foobar4'] ?? $this->getFoobar4Service());
 
         return $instance;
     }
@@ -170,7 +174,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $this->services['foo5'] = $instance = new \stdClass();
 
-        $instance->bar = ${($_ = isset($this->services['bar5']) ? $this->services['bar5'] : $this->getBar5Service()) && false ?: '_'};
+        $instance->bar = ($this->services['bar5'] ?? $this->getBar5Service());
 
         return $instance;
     }
@@ -182,7 +186,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getFoobarService()
     {
-        $a = ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->getFooService()) && false ?: '_'};
+        $a = ($this->services['foo'] ?? $this->getFooService());
 
         if (isset($this->services['foobar'])) {
             return $this->services['foobar'];
@@ -198,7 +202,7 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected function getFoobar2Service()
     {
-        $a = ${($_ = isset($this->services['foo2']) ? $this->services['foo2'] : $this->getFoo2Service()) && false ?: '_'};
+        $a = ($this->services['foo2'] ?? $this->getFoo2Service());
 
         if (isset($this->services['foobar2'])) {
             return $this->services['foobar2'];

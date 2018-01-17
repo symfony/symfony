@@ -13,9 +13,7 @@ namespace Symfony\Component\Console\Tester;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**
@@ -30,13 +28,11 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 class ApplicationTester
 {
+    use TesterTrait;
+
     private $application;
     private $input;
     private $statusCode;
-    /**
-     * @var OutputInterface
-     */
-    private $output;
     private $captureStreamsIndependently = false;
 
     public function __construct(Application $application)
@@ -64,6 +60,13 @@ class ApplicationTester
         $this->input = new ArrayInput($input);
         if (isset($options['interactive'])) {
             $this->input->setInteractive($options['interactive']);
+        }
+
+        $shellInteractive = getenv('SHELL_INTERACTIVE');
+
+        if ($this->inputs) {
+            $this->input->setStream(self::createStream($this->inputs));
+            putenv('SHELL_INTERACTIVE=1');
         }
 
         $this->captureStreamsIndependently = array_key_exists('capture_stderr_separately', $options) && $options['capture_stderr_separately'];
@@ -97,27 +100,11 @@ class ApplicationTester
             $streamProperty->setValue($this->output, fopen('php://memory', 'w', false));
         }
 
-        return $this->statusCode = $this->application->run($this->input, $this->output);
-    }
+        $this->statusCode = $this->application->run($this->input, $this->output);
 
-    /**
-     * Gets the display returned by the last execution of the application.
-     *
-     * @param bool $normalize Whether to normalize end of lines to \n or not
-     *
-     * @return string The display
-     */
-    public function getDisplay($normalize = false)
-    {
-        rewind($this->output->getStream());
+        putenv($shellInteractive ? "SHELL_INTERACTIVE=$shellInteractive" : 'SHELL_INTERACTIVE');
 
-        $display = stream_get_contents($this->output->getStream());
-
-        if ($normalize) {
-            $display = str_replace(PHP_EOL, "\n", $display);
-        }
-
-        return $display;
+        return $this->statusCode;
     }
 
     /**
@@ -142,35 +129,5 @@ class ApplicationTester
         }
 
         return $display;
-    }
-
-    /**
-     * Gets the input instance used by the last execution of the application.
-     *
-     * @return InputInterface The current input instance
-     */
-    public function getInput()
-    {
-        return $this->input;
-    }
-
-    /**
-     * Gets the output instance used by the last execution of the application.
-     *
-     * @return OutputInterface The current output instance
-     */
-    public function getOutput()
-    {
-        return $this->output;
-    }
-
-    /**
-     * Gets the status code returned by the last execution of the application.
-     *
-     * @return int The status code
-     */
-    public function getStatusCode()
-    {
-        return $this->statusCode;
     }
 }

@@ -11,8 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
@@ -23,7 +25,7 @@ use Symfony\Component\Workflow\Marking;
  *
  * @final since version 3.4
  */
-class WorkflowDumpCommand extends ContainerAwareCommand
+class WorkflowDumpCommand extends Command
 {
     protected static $defaultName = 'workflow:dump';
 
@@ -36,6 +38,7 @@ class WorkflowDumpCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
+                new InputOption('label', 'l', InputArgument::OPTIONAL, 'Labels a graph'),
             ))
             ->setDescription('Dump a workflow')
             ->setHelp(<<<'EOF'
@@ -72,6 +75,11 @@ EOF
             $marking->mark($place);
         }
 
-        $output->writeln($dumper->dump($workflow->getDefinition(), $marking));
+        $options = array();
+        $label = $input->getOption('label');
+        if (null !== $label && '' !== trim($label)) {
+            $options = array('graph' => array('label' => $label));
+        }
+        $output->writeln($dumper->dump($workflow->getDefinition(), $marking, $options));
     }
 }

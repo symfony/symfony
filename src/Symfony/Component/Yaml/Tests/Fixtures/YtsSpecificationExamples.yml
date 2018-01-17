@@ -518,16 +518,6 @@ php: |
     'hexadecimal' => 0xC
   )
 ---
-test: Decimal Integer
-deprecated: true
-spec: 2.19
-yaml: |
-  decimal: +12,345
-php: |
-  array(
-    'decimal' => 12345.0,
-  )
----
 # FIX: spec shows parens around -inf and NaN
 test: Floating point
 spec: 2.20
@@ -544,16 +534,6 @@ php: |
     'negative infinity' => log(0),
     'not a number' => -log(0),
     'float as whole number' => (float) 1
-  )
----
-test: Fixed Floating point
-deprecated: true
-spec: 2.20
-yaml: |
-  fixed: 1,230.15
-php: |
-  array(
-    'fixed' => 1230.15,
   )
 ---
 test: Timestamps
@@ -928,13 +908,12 @@ documents: 2
 
 ---
 test: Explicit typing
-deprecated: Using the non-specific tag "!" is deprecated since Symfony 3.4 as its behavior will change in 4.0.
 yaml: |
    integer: 12
-   also int: ! "12"
+   no int: ! 12
    string: !!str 12
 php: |
-   array( 'integer' => 12, 'also int' => 12, 'string' => '12' )
+   array( 'integer' => 12, 'no int' => '12', 'string' => '12' )
 ---
 test: Private types
 todo: true
@@ -1530,24 +1509,6 @@ php: |
      'octal' => 12,
      'hexadecimal' => 12
    )
----
-test: Decimal
-deprecated: true
-yaml: |
-   decimal: +12,345
-php: |
-   array(
-     'decimal' => 12345.0,
-   )
----
-test: Fixed Float
-deprecated: true
-yaml: |
-   fixed: 1,230.15
-php: |
-  array(
-    'fixed' => 1230.15,
-  )
 ---
 test: Float
 yaml: |

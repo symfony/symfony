@@ -630,12 +630,7 @@ class Finder implements \IteratorAggregate, \Countable
         return iterator_count($this->getIterator());
     }
 
-    /**
-     * @param $dir
-     *
-     * @return \Iterator
-     */
-    private function searchInDirectory($dir)
+    private function searchInDirectory(string $dir): \Iterator
     {
         if (static::IGNORE_VCS_FILES === (static::IGNORE_VCS_FILES & $this->ignore)) {
             $this->exclude = array_merge($this->exclude, self::$vcsPatterns);

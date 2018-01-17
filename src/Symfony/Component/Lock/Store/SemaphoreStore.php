@@ -13,7 +13,6 @@ namespace Symfony\Component\Lock\Store;
 
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\Exception\NotSupportedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\StoreInterface;
 
@@ -27,23 +26,13 @@ class SemaphoreStore implements StoreInterface
     /**
      * Returns whether or not the store is supported.
      *
-     * @param bool|null $blocking when not null, checked again the blocking mode
-     *
      * @return bool
      *
      * @internal
      */
-    public static function isSupported($blocking = null)
+    public static function isSupported()
     {
-        if (!extension_loaded('sysvsem')) {
-            return false;
-        }
-
-        if (false === $blocking && \PHP_VERSION_ID < 50601) {
-            return false;
-        }
-
-        return true;
+        return extension_loaded('sysvsem');
     }
 
     public function __construct()
@@ -76,16 +65,7 @@ class SemaphoreStore implements StoreInterface
         }
 
         $resource = sem_get(crc32($key));
-
-        if (\PHP_VERSION_ID < 50601) {
-            if (!$blocking) {
-                throw new NotSupportedException(sprintf('The store "%s" does not supports non blocking locks.', get_class($this)));
-            }
-
-            $acquired = sem_acquire($resource);
-        } else {
-            $acquired = sem_acquire($resource, !$blocking);
-        }
+        $acquired = sem_acquire($resource, !$blocking);
 
         if (!$acquired) {
             throw new LockConflictedException();

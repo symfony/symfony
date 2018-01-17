@@ -35,7 +35,7 @@ class ExceptionController
      * @param Environment $twig
      * @param bool        $debug Show error (false) or exception (true) pages by default
      */
-    public function __construct(Environment $twig, $debug)
+    public function __construct(Environment $twig, bool $debug)
     {
         $this->twig = $twig;
         $this->debug = $debug;

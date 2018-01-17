@@ -27,7 +27,7 @@ class TypedReference extends Reference
      * @param string $requiringClass  The class of the service that requires the referenced type
      * @param int    $invalidBehavior The behavior when the service does not exist
      */
-    public function __construct($id, $type, $requiringClass = '', $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
+    public function __construct(string $id, string $type, string $requiringClass = '', int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
         parent::__construct($id, $invalidBehavior);
         $this->type = $type;

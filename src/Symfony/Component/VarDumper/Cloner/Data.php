@@ -166,18 +166,6 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * @return array The raw data structure
-     *
-     * @deprecated since version 3.3. Use array or object access instead.
-     */
-    public function getRawData()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.3 and will be removed in 4.0. Use the array or object access instead.', __METHOD__));
-
-        return $this->data;
-    }
-
-    /**
      * Returns a depth limited clone of $this.
      *
      * @param int $maxDepth The max dumped depth level

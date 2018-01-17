@@ -20,13 +20,9 @@ class PhpFilesCache extends AbstractCache implements PruneableInterface
     use PhpFilesTrait;
 
     /**
-     * @param string      $namespace
-     * @param int         $defaultLifetime
-     * @param string|null $directory
-     *
      * @throws CacheException if OPcache is not enabled
      */
-    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
+    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $directory = null)
     {
         if (!static::isSupported()) {
             throw new CacheException('OPcache is not enabled');

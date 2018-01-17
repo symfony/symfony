@@ -56,7 +56,6 @@ class JsonDecodeTest extends TestCase
     }
 
     /**
-     * @requires function json_last_error_msg
      * @dataProvider decodeProviderException
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */

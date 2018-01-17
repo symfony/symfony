@@ -27,9 +27,9 @@ final class PhpDocTypeHelper
     /**
      * Creates a {@see Type} from a PHPDoc type.
      *
-     * @return Type
+     * @return Type[]
      */
-    public function getTypes(DocType $varType)
+    public function getTypes(DocType $varType): array
     {
         $types = array();
         $nullable = false;
@@ -73,17 +73,12 @@ final class PhpDocTypeHelper
 
     /**
      * Creates a {@see Type} from a PHPDoc type.
-     *
-     * @param string $docType
-     * @param bool   $nullable
-     *
-     * @return Type|null
      */
-    private function createType($docType, $nullable)
+    private function createType(string $docType, bool $nullable): ?Type
     {
         // Cannot guess
         if (!$docType || 'mixed' === $docType) {
-            return;
+            return null;
         }
 
         if ($collection = '[]' === substr($docType, -2)) {
@@ -110,14 +105,7 @@ final class PhpDocTypeHelper
         return new Type($phpType, $nullable, $class);
     }
 
-    /**
-     * Normalizes the type.
-     *
-     * @param string $docType
-     *
-     * @return string
-     */
-    private function normalizeType($docType)
+    private function normalizeType(string $docType): string
     {
         switch ($docType) {
             case 'integer':
@@ -141,14 +129,7 @@ final class PhpDocTypeHelper
         }
     }
 
-    /**
-     * Gets an array containing the PHP type and the class.
-     *
-     * @param string $docType
-     *
-     * @return array
-     */
-    private function getPhpTypeAndClass($docType)
+    private function getPhpTypeAndClass(string $docType): array
     {
         if (in_array($docType, Type::$builtinTypes)) {
             return array($docType, null);

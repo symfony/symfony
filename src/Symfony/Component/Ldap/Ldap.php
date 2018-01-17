@@ -70,7 +70,7 @@ final class Ldap implements LdapInterface
      *
      * @return static
      */
-    public static function create($adapter, array $config = array())
+    public static function create($adapter, array $config = array()): Ldap
     {
         if (!isset(self::$adapterMap[$adapter])) {
             throw new DriverNotFoundException(sprintf(

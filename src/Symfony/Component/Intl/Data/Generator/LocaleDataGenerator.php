@@ -34,9 +34,9 @@ class LocaleDataGenerator
     private $scriptDataProvider;
     private $regionDataProvider;
 
-    public function __construct($dirName, LanguageDataProvider $languageDataProvider, ScriptDataProvider $scriptDataProvider, RegionDataProvider $regionDataProvider)
+    public function __construct(string $dirName, LanguageDataProvider $languageDataProvider, ScriptDataProvider $scriptDataProvider, RegionDataProvider $regionDataProvider)
     {
-        $this->dirName = (string) $dirName;
+        $this->dirName = $dirName;
         $this->languageDataProvider = $languageDataProvider;
         $this->scriptDataProvider = $scriptDataProvider;
         $this->regionDataProvider = $regionDataProvider;

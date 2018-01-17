@@ -13,7 +13,6 @@ $container->loadFromExtension('security', array(
                 'catch_exceptions' => false,
                 'token_provider' => 'token_provider_id',
             ),
-            'logout_on_user_change' => true,
         ),
     ),
 ));

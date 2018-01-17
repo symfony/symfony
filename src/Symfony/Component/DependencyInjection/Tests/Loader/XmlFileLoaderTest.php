@@ -185,7 +185,7 @@ class XmlFileLoaderTest extends TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services5.xml');
         $services = $container->getDefinitions();
-        $this->assertCount(7, $services, '->load() attributes unique ids to anonymous services');
+        $this->assertCount(6, $services, '->load() attributes unique ids to anonymous services');
 
         // anonymous service as an argument
         $args = $services['foo']->getArguments();
@@ -214,16 +214,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals('BuzClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
         $this->assertFalse($inner->isPublic());
 
-        // "wild" service
-        $service = $container->findTaggedServiceIds('biz_tag');
-        $this->assertCount(1, $service);
-
-        foreach ($service as $id => $tag) {
-            $service = $container->getDefinition($id);
-        }
-        $this->assertEquals('BizClass', $service->getClass(), '->load() uses the same configuration as for the anonymous ones');
-        $this->assertTrue($service->isPublic());
-
         // anonymous services are shared when using decoration definitions
         $container->compile();
         $services = $container->getDefinitions();
@@ -233,8 +223,8 @@ class XmlFileLoaderTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Top-level anonymous services are deprecated since Symfony 3.4, the "id" attribute will be required in version 4.0 in %sservices_without_id.xml at line 5.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Top-level services must have "id" attribute, none found in
      */
     public function testLoadAnonymousServicesWithoutId()
     {
@@ -458,9 +448,6 @@ class XmlFileLoaderTest extends TestCase
         if (extension_loaded('suhosin') && false === strpos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
             $this->markTestSkipped('To run this test, add "phar" to the "suhosin.executor.include.whitelist" settings in your php.ini file.');
         }
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('HHVM makes this test conflict with those run in separate processes.');
-        }
 
         require_once self::$fixturesPath.'/includes/ProjectWithXsdExtensionInPhar.phar';
 
@@ -590,18 +577,6 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame('configureBar', $barConfigurator[1]);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testType()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services22.xml');
-
-        $this->assertEquals(array('Bar', 'Baz'), $container->getDefinition('foo')->getAutowiringTypes());
-    }
-
     public function testAutowire()
     {
         $container = new ContainerBuilder();
@@ -642,17 +617,15 @@ class XmlFileLoaderTest extends TestCase
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Using the attribute "class" is deprecated for the service "bar" which is defined as an alias %s.
-     * @expectedDeprecation Using the element "tag" is deprecated for the service "bar" which is defined as an alias %s.
-     * @expectedDeprecation Using the element "factory" is deprecated for the service "bar" which is defined as an alias %s.
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid attribute "class" defined for alias "bar" in
      */
     public function testAliasDefinitionContainsUnsupportedElements()
     {
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
 
-        $loader->load('legacy_invalid_alias_definition.xml');
+        $loader->load('invalid_alias_definition.xml');
 
         $this->assertTrue($container->has('bar'));
     }
@@ -772,6 +745,21 @@ class XmlFileLoaderTest extends TestCase
 
         $this->assertTrue($container->getDefinition('use_defaults_settings')->isAutoconfigured());
         $this->assertFalse($container->getDefinition('override_defaults_settings_to_false')->isAutoconfigured());
+    }
+
+    public function testCaseSensitivity()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_case.xml');
+        $container->compile();
+
+        $this->assertTrue($container->has('bar'));
+        $this->assertTrue($container->has('BAR'));
+        $this->assertFalse($container->has('baR'));
+        $this->assertNotSame($container->get('BAR'), $container->get('bar'));
+        $this->assertSame($container->get('BAR')->arguments->bar, $container->get('bar'));
+        $this->assertSame($container->get('BAR')->bar, $container->get('bar'));
     }
 
     public function testBindings()

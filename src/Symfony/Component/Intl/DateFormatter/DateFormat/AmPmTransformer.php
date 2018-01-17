@@ -23,7 +23,7 @@ class AmPmTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function format(\DateTime $dateTime, $length)
+    public function format(\DateTime $dateTime, int $length): string
     {
         return $dateTime->format('A');
     }
@@ -31,7 +31,7 @@ class AmPmTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function getReverseMatchingRegExp($length)
+    public function getReverseMatchingRegExp(int $length): string
     {
         return 'AM|PM';
     }
@@ -39,7 +39,7 @@ class AmPmTransformer extends Transformer
     /**
      * {@inheritdoc}
      */
-    public function extractDateOptions($matched, $length)
+    public function extractDateOptions(string $matched, int $length): array
     {
         return array(
             'marker' => $matched,

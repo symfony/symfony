@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Deprecated the `checkDNS` and `dnsMessage` options of the `Url` constraint. They will be removed in 5.0.
+ * added a `values` option to the `Expression` constraint
+
+4.0.0
+-----
+
+ * Setting the `strict` option of the `Choice` constraint to anything but `true`
+   is not supported anymore.
+ * removed the `DateTimeValidator::PATTERN` constant
+ * removed the `AbstractConstraintValidatorTest` class
+ * removed support for setting the `checkDNS` option of the `Url` constraint to `true`
+
 3.4.0
 -----
 

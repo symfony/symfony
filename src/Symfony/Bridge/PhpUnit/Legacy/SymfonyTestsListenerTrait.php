@@ -52,15 +52,9 @@ class SymfonyTestsListenerTrait
             Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
         }
 
-        $warn = false;
         foreach ($mockedNamespaces as $type => $namespaces) {
             if (!is_array($namespaces)) {
                 $namespaces = array($namespaces);
-            }
-            if (is_int($type)) {
-                // @deprecated BC with v2.8 to v3.0
-                $type = 'time-sensitive';
-                $warn = true;
             }
             if ('time-sensitive' === $type) {
                 foreach ($namespaces as $ns) {
@@ -77,9 +71,6 @@ class SymfonyTestsListenerTrait
             $this->state = -2;
         } else {
             self::$globallyEnabled = true;
-            if ($warn) {
-                echo "Clock-mocked namespaces for SymfonyTestsListener need to be nested in a \"time-sensitive\" key. This will be enforced in Symfony 4.0.\n";
-            }
         }
     }
 
@@ -309,22 +300,6 @@ class SymfonyTestsListenerTrait
             }
             if (in_array('dns-sensitive', $groups, true)) {
                 DnsMock::withMockedHosts(array());
-            }
-        }
-
-        if (($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase) && 0 === strpos($test->getName(), 'testLegacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $groups, true)) {
-            $result = $test->getTestResultObject();
-
-            if (method_exists($result, 'addWarning')) {
-                $result->addWarning($test, new $Warning('Using the "testLegacy" prefix to mark tests as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
-            }
-        }
-
-        if (($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase) && strpos($className, '\Legacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $classGroups, true)) {
-            $result = $test->getTestResultObject();
-
-            if (method_exists($result, 'addWarning')) {
-                $result->addWarning($test, new $Warning('Using the "Legacy" prefix to mark all tests of a class as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
             }
         }
     }

@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-11-01T13:28:14Z
+
+Can you explain the use case for having priorities on extensions? I do understand the need for loaders, but I fail to see why we would need them for extensions.
+
+---------------------------------------------------------------------------
+
+by Brunty at 2017-11-01T14:02:29Z
+
+@fabpot I was recently working on something and needed to overload a filter - I was lucky in that where I was registering it, it was after the previous one being registered (so as per docs here: https://twig.symfony.com/doc/2.x/advanced.html#overloading) but figured that might not always be the case.
+
+---------------------------------------------------------------------------
+
+by Brunty at 2017-11-18T10:48:39Z
+
+@ro0NL will add a changelog entry now, what version should it go under?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-18T10:54:03Z
+
+4.0.0 but there's a 4.4.0 entry already, i think it's a typo :)
+
+---------------------------------------------------------------------------
+
+by Brunty at 2017-11-18T10:54:40Z
+
+@ro0NL I'll add a 4.0.0 section, want me to correct the 4.4.0 one to 4.0.0?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-18T10:56:49Z
+
+think so. affects master only anyway.
+
+---------------------------------------------------------------------------
+
+by Brunty at 2017-11-18T10:58:19Z
+
+@ro0NL - added changelog entry for you

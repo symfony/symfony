@@ -486,6 +486,15 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setAllowedTypes('foo', 'string');
     }
 
+    public function testResolveTypedArray()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'string[]');
+        $options = $this->resolver->resolve(array('foo' => array('bar', 'baz')));
+
+        $this->assertSame(array('foo' => array('bar', 'baz')), $options);
+    }
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
      */

@@ -763,7 +763,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         if ($this->cacheItemPool) {
             $item = $this->cacheItemPool->getItem(self::CACHE_PREFIX_PROPERTY_PATH.$propertyPath);
-            if ($item->isHit()) {
+            if ($item->isHit() && $item->get() instanceof PropertyPathInterface) {
                 return $this->propertyPathCache[$propertyPath] = $item->get();
             }
         }

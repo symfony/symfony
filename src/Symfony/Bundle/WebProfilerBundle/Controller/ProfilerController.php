@@ -35,6 +35,7 @@ class ProfilerController
     private $toolbarPosition;
     private $cspHandler;
     private $baseDir;
+    private $blacklistRegexp;
 
     /**
      * @param UrlGeneratorInterface        $generator       The URL Generator
@@ -44,8 +45,9 @@ class ProfilerController
      * @param string                       $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
      * @param ContentSecurityPolicyHandler $cspHandler      The Content-Security-Policy handler
      * @param string                       $baseDir         The project root directory
+     * @param string|null                  $blacklistRegexp A regexp to forbid opening some files in the browser
      */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, $toolbarPosition = 'bottom', ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, $toolbarPosition = 'bottom', ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null, $blacklistRegexp = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
@@ -54,6 +56,7 @@ class ProfilerController
         $this->toolbarPosition = $toolbarPosition;
         $this->cspHandler = $cspHandler;
         $this->baseDir = $baseDir;
+        $this->blacklistRegexp = sprintf('{%s}i', $blacklistRegexp ?: '/\.|(?<!\.php|\.twig)$');
     }
 
     /**
@@ -385,8 +388,8 @@ class ProfilerController
 
         $filename = $this->baseDir.DIRECTORY_SEPARATOR.$file;
 
-        if (preg_match("'(^|[/\\\\])\.'", $file) || !is_readable($filename)) {
-            throw new NotFoundHttpException(sprintf('The file "%s" cannot be opened.', $file));
+        if (preg_match($this->blacklistRegexp, preg_replace("'//+'", '/', '/'.str_replace(DIRECTORY_SEPARATOR, '/', $file)))) {
+            throw new NotFoundHttpException(sprintf('The file "%s" cannot be opened in the browser.', $file));
         }
 
         return new Response($this->twig->render('@WebProfiler/Profiler/open.html.twig', array(

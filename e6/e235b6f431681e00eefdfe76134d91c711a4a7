@@ -1,0 +1,150 @@
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-13T13:58:42Z
+
+@ostrolucky those code snippets are the result of an hour of research convincing me that this is the only viable implementation. Every other attempt at solving the issue resulted in test cases breaking because, at its core, all of PHP simply cannot support 5 digit years. The `DateTimeToStringTransformer` being patched here actually turned out to be the only loophole that has *not yet been patched to conform to strict 4-digit years by regexp or other means*. The reason it was not breaking here and thus causing invalid results is that `IntlDateTransformer` appears to be the **only** PHP facility capable of parsing 5-digit years, and the original author of this class never foresaw that, expecting it to crash like all other functions.
+
+The problem in this very specific case is that there's no *earlier* detection mechanism. The Intl extension is out of our control, and this is the localized transformer class. It may be parsing Klingon Star Dates for all we know. What we do know is that it'll get unreliable once we put it in a `\DateTime` class, yet we cannot detect it there anymore - it'll just be 2007 instead of 20107.
+
+So no, I do not believe there is a better alternative than the current fix. All others, like regexping, will boil down to slower implementations to the same effect - we have to act on the timestamp coming out of Intl. Integer comparison is just fastest.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-01-13T15:27:58Z
+
+Here you go https://3v4l.org/qK9BQ
+
+Support for such dates should be now just a matter of using this snippet [here](https://github.com/ostrolucky/symfony/blob/b354d6ca8451aebe889366b4e3f6b8c0b9a87256/src/Symfony/Component/Form/Extension/Core/DataTransformer/DateTimeToLocalizedStringTransformer.php#L128-L134)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-14T09:03:45Z
+
+That snippet does not solve the issue, and that is that the `DateTimeToLocalizedStringTransformer` needs to strip the time in a specific timezone aware fashion. Believe me, it's so trivial it was just about my first attempt, and it breaks 3 unit tests concerning DST-specific overflows:
+```
+$dateTime = new \DateTime(gmdate('Y-m-d', $timestamp), new \DateTimeZone($this->outputTimezone));
+```
+Does not equal the much cleaner:
+```
+$dateTime = \DateTime::createFromFormat('U', $timestamp, new \DateTimeZone($this->outputTimezone));
+$dateTime->setTime(0, 0, 0);
+```
+Because `gmdate` inherently corrects for DST.
+
+I'm not contesting there are other, prettier ways to fundamentally fix the behavior, but it would be a far more invasive change than what's being done now, and that's a bad idea imo to just fix a simple bug in 2.7.
+
+Please keep in mind that all other DateTime transformers are already implicitly broken for 5+ digit years, and that the DateValidator and related classes do a regexp check to ensure the year consists of 4 digits. There is no point in doing a better fix here than what I proposed. There is no functional difference between doing a timestamp-compare with a well-defined and -commented constant, or doing a `preg_match('/(\d{4})-(\d{2})-(\d{2})/', ...)` which we do elsewhere in this very code. The timestamp compare is just much faster and cleaner.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-01-15T01:21:58Z
+
+Ok how about this? Passes the unit tests and still preserves 5 digit year
+
+```diff
+@@ -125,16 +125,16 @@
+         }
+
+         try {
+-            if ($dateOnly) {
+-                // we only care about year-month-date, which has been delivered as a timestamp pointing to UTC midnight
+-                $dateTime = new \DateTime(gmdate('Y-m-d', $timestamp), new \DateTimeZone($this->outputTimezone));
+-            } else {
+-                // read timestamp into DateTime object - the formatter delivers a timestamp
+-                $dateTime = new \DateTime(sprintf('@%s', $timestamp));
+-            }
++            $dateTime = new \DateTime(sprintf('@%s', $timestamp));
++            $timezone = new \DateTimeZone($this->outputTimezone);
+             // set timezone separately, as it would be ignored if set via the constructor,
+             // see http://php.net/manual/en/datetime.construct.php
+-            $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
++            $dateTime->setTimezone($timezone);
++
++            if ($dateOnly) {
++                // supplied timestamp in UTC midnight has been shifted by timezone, we need to revert that
++                $dateTime->sub(\DateInterval::createFromDateString($timezone->getOffset($dateTime).' seconds'));
++            }
+         } catch (\Exception $e) {
+             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+         }
+```
+
+> other DateTime transformers are already implicitly broken for 5+ digit years
+
+That's kinda right. That might be battles for another pull requests if someone creates issue for them similarly as has been created for this one.
+
+>  DateValidator and related classes do a regexp check to ensure the year consists of 4 digits
+
+DateValidator skips the check if it receives DateTimeInterface instance already. That poses another problem, but again, that's a battle for different time
+
+IMO suporting > 4 digit years might be useful in science and we should strive to support it if we can. There is also no limit on year digits for HTML5 date input, Firefox lets me input there whichever year I want, so there shouldn't be such artificial limit in backend either.
+
+There aren't much requests for such support (for now) but giving up right away by throwing exception is not a way. This PR might be good opportunity to start supporting it and lead the way for future support.
+
+edit: found this relevant wiki article https://en.wikipedia.org/wiki/Year_10,000_problem, this problem is interesting
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-15T09:36:27Z
+
+> That might be battles for another pull requests if someone creates issue for them similarly as has been created for this one.
+
+But it would be a functional change, so `master` instead of `2.7`   😉   The core point of this PR is to fix 2 pretty nasty bugs if you enter `20107-03-12` in a date field:
+- If the validation of the form fails the field is then rerendered with `2007-03-12` filled in, likely not noticed by the user, causing corruption on fixing the other validation errors.
+- If the validation passes the form field contains `2007-03-12`, which will then happily be persisted in the database and cause corruption.
+
+I don't think we disagree on any of the core points, I think we definitely should support 5 and even 6 digit years in Symfony. But right now we don't and functionality is broken. This PR fixes the data corruption in 2.7 in the least invasive way possible. The fundamental fixes should go in master.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-15T09:43:21Z
+
+Btw this line from that Wikipedia link is interesting:
+
+> ISO 8601 specifies that years be written with four digits, but allows for extension to five or more digits, with prior agreement between the parties exchanging the information.
+
+Limiting to 4 digits is technically adhering to standards right now.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-01-15T09:56:31Z
+
+> But it would be a functional change, so master instead of 2.7 😉
+
+Not really. If someone raises bug report about date input mangled by transformer (as was the issue this PR fixes), we can fix that by supporting > 4 digits.
+
+> The core point of this PR is to fix 2 pretty nasty bugs if you enter 20107-03-12 in a date field:
+
+My patch fixes those
+
+> ISO 8601 specifies that years be written with four digits, but allows for extension to five or more digits, with prior agreement between the parties exchanging the information.
+
+My interpretation is that year is written with four digits initially, but you are free to add more of them. Like HTML 5 date input does.
+
+But ok, this should be agreed on in RFC
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-15T10:06:53Z
+
+this looks reasonable to me
+
+@ogizanagi @HeahDude What do you think?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2018-01-15T13:20:33Z
+
+Sounds reasonable for me too. A proper support for 5 and greater digits should have a dedicated feature PR.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-01-15T17:53:26Z
+
+I agree. Let's do this (and create a new issue for handling 5+ digits)
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-15T20:01:03Z
+
+Already done at https://github.com/symfony/symfony/issues/25790 :smile:

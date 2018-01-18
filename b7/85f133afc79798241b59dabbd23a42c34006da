@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-18T13:53:08Z
+
+Fixes the scenario in prod mode with both the exception and error handlers pre-set, awesome! :heart:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-18T22:09:52Z
+
+HHVM failure fixed by adding a new exclusion group, to allow easily reproducing the issue while https://github.com/facebook/hhvm/issues/8107 is open.

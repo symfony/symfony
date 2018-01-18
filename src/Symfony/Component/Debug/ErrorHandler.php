@@ -149,10 +149,13 @@ class ErrorHandler
             $handler = $prev[0];
             $replace = false;
         }
-        if ($replace || !$prev) {
-            $handler->setExceptionHandler(set_exception_handler(array($handler, 'handleException')));
-        } else {
+        if (!$replace && $prev) {
             restore_error_handler();
+        }
+        if (is_array($prev = set_exception_handler(array($handler, 'handleException'))) && $prev[0] === $handler) {
+            restore_exception_handler();
+        } else {
+            $handler->setExceptionHandler($prev);
         }
 
         $handler->throwAt($levels & $handler->thrownErrors, true);

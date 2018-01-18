@@ -481,16 +481,20 @@ class XmlFileLoader extends FileLoader
         $imports = '';
         foreach ($schemaLocations as $namespace => $location) {
             $parts = explode('/', $location);
+            $locationstart = 'file:///';
             if (0 === stripos($location, 'phar://')) {
                 $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
                 if ($tmpfile) {
                     copy($location, $tmpfile);
                     $tmpfiles[] = $tmpfile;
                     $parts = explode('/', str_replace('\\', '/', $tmpfile));
+                } else {
+                    array_shift($parts);
+                    $locationstart = 'phar:///';
                 }
             }
             $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
-            $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+            $location = $locationstart.$drive.implode('/', array_map('rawurlencode', $parts));
 
             $imports .= sprintf('  <xsd:import namespace="%s" schemaLocation="%s" />'."\n", $namespace, $location);
         }

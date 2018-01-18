@@ -110,9 +110,5 @@
         "files": [ "src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
     },
     "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.7-dev"
-        }
-    }
+    "version": "2.7.x-dev"
 }

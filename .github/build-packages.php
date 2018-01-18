@@ -39,11 +39,12 @@ foreach ($dirs as $k => $dir) {
     }
     passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
 
-    if (!isset($package->extra->{'branch-alias'}->{'dev-master'})) {
-        echo "Missing \"dev-master\" branch-alias in composer.json extra.\n";
+    if ($v = isset($package->extra->{'branch-alias'}->{'dev-master'})) {
+        $package->version = str_replace('-dev', '.x-dev', $package->extra->{'branch-alias'}->{'dev-master'});
+    } elseif (!isset($package->version)) {
+        echo "Missing \"version\" or \"extra.branch-alias.dev-master\" in composer.json.\n";
         exit(1);
     }
-    $package->version = str_replace('-dev', '.x-dev', $package->extra->{'branch-alias'}->{'dev-master'});
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 
@@ -52,7 +53,7 @@ foreach ($dirs as $k => $dir) {
     $versions = file_get_contents('https://packagist.org/p/'.$package->name.'.json');
     $versions = json_decode($versions)->packages->{$package->name};
 
-    if ($package->version === str_replace('-dev', '.x-dev', $versions->{'dev-master'}->extra->{'branch-alias'}->{'dev-master'})) {
+    if ($v && $package->version === str_replace('-dev', '.x-dev', $versions->{'dev-master'}->extra->{'branch-alias'}->{'dev-master'})) {
         unset($versions->{'dev-master'});
     }
 

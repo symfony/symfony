@@ -283,7 +283,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             ->beforeNormalization()
                 ->ifArray()
                 ->then(function ($v) {
-                    $v['enabled'] = isset($v['enabled']) ? $v['enabled'] : true;
+                    if (!isset($v['enabled'])) {
+                        $v['enabled'] = !empty($v);
+                    }
 
                     return $v;
                 })

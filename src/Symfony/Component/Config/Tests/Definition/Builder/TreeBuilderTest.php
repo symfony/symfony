@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Tests\Fixtures\Builder\NodeBuilder as CustomNodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
@@ -130,5 +131,23 @@ class TreeBuilderTest extends TestCase
 
         $this->assertInternalType('array', $tree->getExample());
         $this->assertEquals('example', $children['child']->getExample());
+    }
+
+    public function testRootNodeThatCanBeEnabledIsDisabledByDefault()
+    {
+        $builder = new TreeBuilder();
+
+        $builder->root('test')
+            ->canBeEnabled();
+
+        $tree = $builder->buildTree();
+        $children = $tree->getChildren();
+
+        $this->assertFalse($children['enabled']->getDefaultValue());
+
+        $processor = new Processor();
+        $result = $processor->process($tree, array());
+
+        $this->assertEquals(array('enabled' => false), $result);
     }
 }

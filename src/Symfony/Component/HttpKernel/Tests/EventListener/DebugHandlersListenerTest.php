@@ -29,8 +29,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * DebugHandlersListenerTest.
- *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class DebugHandlersListenerTest extends TestCase
@@ -131,5 +129,27 @@ class DebugHandlersListenerTest extends TestCase
             ->method('renderException');
 
         $xHandler(new \Exception());
+    }
+
+    public function testReplaceExistingExceptionHandler()
+    {
+        $userHandler = function () {};
+        $listener = new DebugHandlersListener($userHandler);
+        $eHandler = new ErrorHandler();
+        $eHandler->setExceptionHandler('var_dump');
+
+        $exception = null;
+        set_exception_handler(array($eHandler, 'handleException'));
+        try {
+            $listener->configure();
+        } catch (\Exception $exception) {
+        }
+        restore_exception_handler();
+
+        if (null !== $exception) {
+            throw $exception;
+        }
+
+        $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
     }
 }

@@ -82,7 +82,11 @@ class ExtensionPass implements CompilerPassInterface
 
         if ($container->getParameter('kernel.debug')) {
             $container->getDefinition('twig.extension.profiler')->addTag('twig.extension');
-            $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
+
+            // only register if the improved version from DebugBundle is *not* present
+            if (!$container->has('twig.extension.dump')) {
+                $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
+            }
         }
 
         $twigLoader = $container->getDefinition('twig.loader.native_filesystem');

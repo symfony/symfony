@@ -91,7 +91,7 @@ interface StyleInterface
      * @param string|null   $default
      * @param callable|null $validator
      *
-     * @return string
+     * @return mixed
      */
     public function ask($question, $default = null, $validator = null);
 
@@ -101,7 +101,7 @@ interface StyleInterface
      * @param string        $question
      * @param callable|null $validator
      *
-     * @return string
+     * @return mixed
      */
     public function askHidden($question, $validator = null);
 
@@ -122,7 +122,7 @@ interface StyleInterface
      * @param array           $choices
      * @param string|int|null $default
      *
-     * @return string
+     * @return mixed
      */
     public function choice($question, array $choices, $default = null);
 

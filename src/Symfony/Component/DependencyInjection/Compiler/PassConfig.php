@@ -30,8 +30,8 @@ class PassConfig
 
     private $mergePass;
     private $afterRemovingPasses = array();
-    private $beforeOptimizationPasses = array();
-    private $beforeRemovingPasses = array();
+    private $beforeOptimizationPasses;
+    private $beforeRemovingPasses;
     private $optimizationPasses;
     private $removingPasses;
 

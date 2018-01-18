@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-18T10:59:23Z
+
+I wonder if we did that for other classes that extend classes coming from optional dependencies in the past. And if not, why should we do that now for this particular class only?

@@ -169,6 +169,24 @@ class DateTimeNormalizerTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     * @expectedExceptionMessage The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.
+     */
+    public function testDenormalizeNullThrowsException()
+    {
+        $this->normalizer->denormalize(null, \DateTimeInterface::class);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     * @expectedExceptionMessage The data is either an empty string or null, you should pass a string that can be parsed with the passed format or a valid DateTime string.
+     */
+    public function testDenormalizeEmptyStringThrowsException()
+    {
+        $this->normalizer->denormalize('', \DateTimeInterface::class);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
     public function testDenormalizeFormatMismatchThrowsException()
     {

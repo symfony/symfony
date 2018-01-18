@@ -74,6 +74,10 @@
     {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
     {% if 'checkbox-inline' in parent_label_class %}
         {{- form_label(form, null, { widget: parent() }) -}}
+    {% elseif 'form-check-inline' in parent_label_class %}
+        <div class="form-check{{ not valid ? ' form-control is-invalid' }} form-check-inline">
+            {{- form_label(form, null, { widget: parent() }) -}}
+        </div>
     {% else -%}
         <div class="form-check{{ not valid ? ' form-control is-invalid' }}">
             {{- form_label(form, null, { widget: parent() }) -}}

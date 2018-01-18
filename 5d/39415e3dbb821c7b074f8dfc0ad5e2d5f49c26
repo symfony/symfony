@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-18T11:59:16Z
+
+see https://travis-ci.org/symfony/symfony/builds/330317516 for the confirmation that this fixes the builds for `master`

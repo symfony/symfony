@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-18T09:42:47Z
+
+Verified the fix locally by doing `set_error_handler('var_dump');` in `app.php`, seems to work now :+1:
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-18T09:56:02Z
+
+Small update: `set_exception_handler('var_dump');` gives me
+
+```
+/home/ivanderberg/projects/mijn/www/vendor/symfony/debug/ErrorHandler.php:541:
+object(Symfony\Component\Debug\Exception\FatalErrorException)[3806]
+  protected 'message' => string 'Error: Uncaught ArgumentCountError: Too few arguments to function Symfony\Component\Debug\ErrorHandler::handleError(), 1 passed and exactly 4 expected in /home/ivanderberg/projects/mijn/www/vendor/symfony/debug/ErrorHandler.php:369
+Stack trace:
+#0 [internal function]: Symfony\Component\Debug\ErrorHandler->handleError(Object(TypeError))
+#1 {main}
+  thrown' (length=356)
+  private 'string' (Exception) => string '' (length=0)
+  protected 'code' => int 0
+  protected 'file' => string '/home/ivanderberg/projects/mijn/www/vendor/symfony/debug/ErrorHandler.php' (length=73)
+  protected 'line' => int 369
+  private 'trace' (Exception) =>
+    array (size=0)
+      empty
+  private 'previous' (Exception) => null
+  protected 'severity' => int 1
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-18T10:03:57Z
+
+Fixed thanks!

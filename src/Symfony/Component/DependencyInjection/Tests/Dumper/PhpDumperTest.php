@@ -371,6 +371,23 @@ class PhpDumperTest extends TestCase
         $this->assertSame('world', $container->getParameter('hello'));
     }
 
+    public function testDumpedCsvEnvParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(foo)', 'foo,bar');
+        $container->setParameter('hello', '%env(csv:foo)%');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_csv_env.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_CsvParameters')));
+
+        require self::$fixturesPath.'/php/services_csv_env.php';
+        $container = new \Symfony_DI_PhpDumper_Test_CsvParameters();
+        $this->assertSame(array('foo', 'bar'), $container->getParameter('hello'));
+    }
+
     public function testCustomEnvParameters()
     {
         $container = new ContainerBuilder();

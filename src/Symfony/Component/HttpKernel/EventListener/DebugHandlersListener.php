@@ -125,9 +125,13 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
         if ($this->exceptionHandler) {
             if ($handler instanceof ErrorHandler) {
-                $h = $handler->setExceptionHandler('var_dump') ?: $this->exceptionHandler;
-                $handler->setExceptionHandler($h);
-                $handler = is_array($h) ? $h[0] : null;
+                $h = $handler->setExceptionHandler('var_dump');
+                if (is_array($h) && $h[0] instanceof ExceptionHandler) {
+                    $handler->setExceptionHandler($h);
+                    $handler = $h[0];
+                } else {
+                    $handler->setExceptionHandler($this->exceptionHandler);
+                }
             }
             if ($handler instanceof ExceptionHandler) {
                 $handler->setHandler($this->exceptionHandler);

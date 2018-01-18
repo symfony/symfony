@@ -195,7 +195,7 @@ install:
           elif [[ $deps = low ]]; then
               echo "$COMPONENTS" | parallel --gnu -j10% "tfold {} 'cd {} && $COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT_X'"
           elif [[ $PHP = hhvm* ]]; then
-              $PHPUNIT --exclude-group benchmark,intl-data
+              $PHPUNIT --exclude-group no-hhvm,benchmark,intl-data
           else
               echo "$COMPONENTS" | parallel --gnu "tfold {} $PHPUNIT_X {}"
               tfold tty-group $PHPUNIT --group tty

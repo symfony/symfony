@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+* added `MissingConstructorArgumentsException` new exception for deserialization failure
+  of objects that needs data insertion in constructor
+* added an optional `default_constructor_arguments` option of context to specify a default data in
+  case the object is not initializable by its constructor because of data missing
+
 4.0.0
 -----
 

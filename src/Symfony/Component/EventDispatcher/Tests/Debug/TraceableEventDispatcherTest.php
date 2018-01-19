@@ -155,35 +155,26 @@ class TraceableEventDispatcherTest extends TestCase
 
     public function testItReturnsNoOrphanedEventsWhenCreated()
     {
-        // GIVEN
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        // WHEN
         $events = $tdispatcher->getOrphanedEvents();
-        // THEN
         $this->assertEmpty($events);
     }
 
     public function testItReturnsOrphanedEventsAfterDispatch()
     {
-        // GIVEN
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
         $tdispatcher->dispatch('foo');
-        // WHEN
         $events = $tdispatcher->getOrphanedEvents();
-        // THEN
         $this->assertCount(1, $events);
         $this->assertEquals(array('foo'), $events);
     }
 
     public function testItDoesNotReturnHandledEvents()
     {
-        // GIVEN
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
         $tdispatcher->addListener('foo', function () {});
         $tdispatcher->dispatch('foo');
-        // WHEN
         $events = $tdispatcher->getOrphanedEvents();
-        // THEN
         $this->assertEmpty($events);
     }
 

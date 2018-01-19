@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-02T09:11:58Z
+
+The BC break should be removed, as we have a policy of not doing hard BC break: any future BC break needs to be announced with a runtime deprecation notice in 3.4.
+So, the addition to the interface must be reverted, and another way should be found.
+
+Which makes me wonder BTW: do we need TraceableEventDispatcherInterface at all? Is it really something we want ppl to be able to implement on their own? If no, then let's just deprecate it.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-02T09:20:48Z
+
+I think we could deprecate the interface
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2017-10-02T17:45:05Z
+
+@stof @nicolas-grekas
+Deprecated `TraceableEventDispatcherInterface`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:34:14Z
+
+Moving to 4.1. Rebase on master might be needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2017-10-14T00:00:27Z
+
+Rebased, updated changelogs and `TraceableEventDispatcherInterface` deprecation notice with new target version.
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2017-10-22T22:46:11Z
+
+@stof could you check updated code?
+
+Tests failure looks unrelated.
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2017-10-26T20:57:05Z
+
+Thanks @ro0NL for review.
+Fixed everything you catched, including separate `TraceableEventDispatcher` check to not break code relying on `TraceableEventDispatcherInterface`.
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2017-11-01T00:25:51Z
+
+rebased
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-07T14:41:04Z
+
+deprecations will have to be documented in the `UPGRADE-4.1.md` and `UPGRADE-5.0.md`(to be created) files
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2017-12-03T17:44:45Z
+
+Rebased, deprecations documented in `UPGRADE`.
+
+---------------------------------------------------------------------------
+
+by kejwmen at 2017-12-28T02:59:17Z
+
+Thanks @xabbuh, I wasn't aware of that.
+
+Rebased and corrected.

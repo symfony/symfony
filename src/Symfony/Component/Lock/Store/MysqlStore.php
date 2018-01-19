@@ -54,7 +54,7 @@ class MysqlStore implements StoreInterface
         }
 
         $this->connection = $connection;
-        $this->waitTimeout = (int) $waitTimeout;
+        $this->waitTimeout = $waitTimeout;
     }
 
     /**
@@ -130,9 +130,9 @@ class MysqlStore implements StoreInterface
 
         $storedKey = $key->getState(__CLASS__);
 
-        $releaseStmt = $this->connection->prepare('DO RELEASE_LOCK(:key)');
-        $releaseStmt->bindValue(':key', $storedKey, \PDO::PARAM_STR);
-        $releaseStmt->execute();
+        $stmt = $this->connection->prepare('DO RELEASE_LOCK(:key)');
+        $stmt->bindValue(':key', $storedKey, \PDO::PARAM_STR);
+        $stmt->execute();
 
         $key->removeState(__CLASS__);
     }
@@ -142,6 +142,17 @@ class MysqlStore implements StoreInterface
      */
     public function exists(Key $key)
     {
-        return $key->hasState(__CLASS__);
+        if (!$key->hasState(__CLASS__)) {
+            return false;
+        }
+
+        $storedKey = $key->getState(__CLASS__);
+
+        $stmt = $this->connection->prepare('SELECT IF(IS_USED_LOCK(:key) = CONNECTION_ID(), 1, 0)');
+        $stmt->bindValue(':key', $storedKey, \PDO::PARAM_STR);
+        $stmt->setFetchMode(\PDO::FETCH_COLUMN, 0);
+        $stmt->execute();
+
+        return '1' === $stmt->fetchColumn();
     }
 }

@@ -15,7 +15,6 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * InMemoryFactory creates services for the memory provider.
@@ -29,17 +28,13 @@ class InMemoryFactory implements UserProviderFactoryInterface
     {
         $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
         $defaultPassword = new Parameter('container.build_id');
+        $users = array();
 
         foreach ($config['users'] as $username => $user) {
-            $userId = $id.'_'.$username;
-
-            $container
-                ->setDefinition($userId, new ChildDefinition('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, null !== $user['password'] ? (string) $user['password'] : $defaultPassword, $user['roles']))
-            ;
-
-            $definition->addMethodCall('createUser', array(new Reference($userId)));
+            $users[$username] = array('password' => null !== $user['password'] ? (string) $user['password'] : $defaultPassword, 'roles' => $user['roles']);
         }
+
+        $definition->addArgument($users);
     }
 
     public function getKey()

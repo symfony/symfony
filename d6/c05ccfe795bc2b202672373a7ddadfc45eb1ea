@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-03T14:19:15Z
+
+I will use this one !
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-29T22:03:05Z
+
+I'm "-0": I don't see the benefit of this. Naming methods helps the reader, and is not a strong requirement.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-12-29T23:08:14Z
+
+> Naming methods helps the reader
+
+naming classes too :)
+
+this allows me, the class author, to write IMHO pure event listeners and let users configure as usual. That is win-win.

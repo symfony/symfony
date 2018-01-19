@@ -1,3 +1,5 @@
 framework:
+    assets:
+        enabled: true
     templating:
         engines: [php, twig]

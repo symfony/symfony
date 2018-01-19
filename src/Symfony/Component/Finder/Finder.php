@@ -136,14 +136,13 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return $this
      *
-     * @deprecated since 4.1, to be removed in 5.0
      * @see strtotime
      * @see DateRangeFilterIterator
      * @see DateComparator
      */
     public function date($date)
     {
-        $this->dateModified($date);
+        $this->dates[] = new Comparator\DateComparator($date, Comparator\DateComparator::TIME_TYPE_MODIFIED);
 
         return $this;
     }
@@ -209,31 +208,6 @@ class Finder implements \IteratorAggregate, \Countable
     public function dateChanged($date)
     {
         $this->dates[] = new Comparator\DateComparator($date, Comparator\DateComparator::TIME_TYPE_CHANGED);
-
-        return $this;
-    }
-
-    /**
-     * Adds tests for file dates (last modified).
-     *
-     * The date must be something that strtotime() is able to parse:
-     *
-     *   $finder->dateModified('since yesterday');
-     *   $finder->dateModified('until 2 days ago');
-     *   $finder->dateModified('> now - 2 hours');
-     *   $finder->dateModified('>= 2005-10-15');
-     *
-     * @param string $date A date range string
-     *
-     * @return $this
-     *
-     * @see strtotime
-     * @see DateRangeFilterIterator
-     * @see DateComparator
-     */
-    public function dateModified($date)
-    {
-        $this->dates[] = new Comparator\DateComparator($date, Comparator\DateComparator::TIME_TYPE_MODIFIED);
 
         return $this;
     }

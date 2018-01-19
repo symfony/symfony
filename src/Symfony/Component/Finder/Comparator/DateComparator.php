@@ -22,7 +22,6 @@ class DateComparator extends Comparator
     const TIME_TYPE_CHANGED = 'C';
     const TIME_TYPE_ACCESSED = 'A';
 
-    /** @var string */
     private $timeType;
 
     /**
@@ -31,7 +30,7 @@ class DateComparator extends Comparator
      *
      * @throws \InvalidArgumentException If the test is not understood
      */
-    public function __construct($test, $timeType = self::TIME_TYPE_MODIFIED)
+    public function __construct(string $test, string $timeType = self::TIME_TYPE_MODIFIED)
     {
         if (!preg_match('#^\s*(==|!=|[<>]=?|after|since|before|until)?\s*(.+?)\s*$#i', $test, $matches)) {
             throw new \InvalidArgumentException(sprintf('Don\'t understand "%s" as a date test.', $test));
@@ -61,7 +60,7 @@ class DateComparator extends Comparator
     /**
      * @return string
      */
-    public function getTimeType()
+    public function getTimeType(): string
     {
         return $this->timeType;
     }

@@ -138,10 +138,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(array('atime.php', 'foo/bar.tmp', 'test.php')), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();
-        $this->assertSame($finder, $finder->files()->dateModified('until last month'));
-        $this->assertIterator($this->toAbsolute(array('atime.php', 'foo/bar.tmp', 'test.php')), $finder->in(self::$tmpDir)->getIterator());
-
-        $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->files()->dateAccessed('until last month'));
         $this->assertIterator($this->toAbsolute(array('foo/bar.tmp', 'test.php')), $finder->in(self::$tmpDir)->getIterator());
 

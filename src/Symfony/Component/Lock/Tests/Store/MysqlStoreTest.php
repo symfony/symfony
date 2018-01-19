@@ -88,8 +88,20 @@ class MysqlStoreTest extends AbstractStoreTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Lock\Exception\LockAcquiringException
-     * @expectedExceptionMessage Lock already acquired with the same MySQL connection.
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage "Symfony\Component\Lock\Store\MysqlStore" requires a positive wait timeout, "-1" given. For infine wait, acquire a "blocking" lock.
+     */
+    public function testOnlyPositiveWaitTimeoutIsSupported()
+    {
+        $connection = $this->createMock(\PDO::class);
+        $connection->method('getAttribute')->willReturn('mysql');
+
+        return new MysqlStore($connection, -1);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Lock\Exception\LockConflictedException
+     * @expectedExceptionMessage Lock already acquired with by same connection.
      */
     public function testWaitTheSameResourceOnTheSameConnectionIsNotSupported()
     {

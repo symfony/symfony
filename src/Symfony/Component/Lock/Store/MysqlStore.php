@@ -33,9 +33,9 @@ class MysqlStore implements StoreInterface
 
     /**
      * @param \PDO|Connection $connection
-     * @param int             $waitTimeout Time in seconds to wait for a lock to be released. A negative value means infinite.
+     * @param int             $waitTimeout Time in seconds to wait for a lock to be released, for non-blocking lock.
      */
-    public function __construct($connection, $waitTimeout = -1)
+    public function __construct($connection, $waitTimeout = 0)
     {
         if ($connection instanceof \PDO) {
             if ('mysql' !== $driver = $connection->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
@@ -49,8 +49,12 @@ class MysqlStore implements StoreInterface
             throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance, "%s" given.', __CLASS__, is_object($connection) ? get_class($connection) : gettype($connection)));
         }
 
+        if ($waitTimeout < 0) {
+            throw new InvalidArgumentException(sprintf('"%s" requires a positive wait timeout, "%d" given. For infine wait, acquire a "blocking" lock.', __CLASS__, $waitTimeout));
+        }
+
         $this->connection = $connection;
-        $this->waitTimeout = $waitTimeout;
+        $this->waitTimeout = (int) $waitTimeout;
     }
 
     /**
@@ -77,7 +81,7 @@ class MysqlStore implements StoreInterface
         }
 
         // no timeout for impatient
-        $timeout = $blocking ? $this->waitTimeout : 0;
+        $timeout = $blocking ? -1 : $this->waitTimeout;
 
         // Hash the key to guarantee it contains between 1 and 64 characters
         $storedKey = hash('sha256', $key);
@@ -93,8 +97,8 @@ class MysqlStore implements StoreInterface
         // -1: Already locked by the same session
         $success = $stmt->fetchColumn();
 
-        if ($blocking && '-1' === $success) {
-            throw new LockAcquiringException('Lock already acquired with the same MySQL connection.');
+        if ('-1' === $success) {
+            throw new LockConflictedException('Lock already acquired with by same connection.');
         }
 
         if ('1' !== $success) {

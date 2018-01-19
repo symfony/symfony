@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-19T20:40:52Z
+
+In your example, the `foo` value is lost. Shouldn't we provide defaults for each constructor parameter instead (like we can do in the DI component to build services)? It will allow to only fill the missing parameters instead of discarding all data provided by the using.
+
+---------------------------------------------------------------------------
+
+by Nek- at 2017-12-20T19:44:01Z
+
+@dunglas updated following your advice :).
+
+---------------------------------------------------------------------------
+
+by Nek- at 2017-12-21T15:34:04Z
+
+@dunglas this is good now :).
+
+---------------------------------------------------------------------------
+
+by Nek- at 2017-12-21T15:35:25Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Nek- at 2018-01-08T08:52:27Z
+
+ping @dunglas  😄
+
+---------------------------------------------------------------------------
+
+by Nek- at 2018-01-15T06:44:10Z
+
+@sroze that's absolutely relevant. I made the naming changes. 👍
+
+---------------------------------------------------------------------------
+
+by Taluu at 2018-01-16T02:10:30Z
+
+Supporting a callback in the option with the data could help to instantiate value object or entity objects with required params that can't be set to their default value could be awesome.

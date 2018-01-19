@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-29T19:54:05Z
+
+I consider that the `csv` name describes this processor perfectly 👍  `array` or `simple_array` would be confusing in this case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-29T20:30:58Z
+
+(fixture needs an update to make tests green)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-29T20:32:35Z
+
+I don't get how to make the test green. The base64 test is green and it's almost the same. Do you have a hint?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-03T10:41:55Z
+
+@dunglas fabbot failure here
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-03T10:42:34Z
+
+OH, in fact this CS fix has already been done on master AFAIK, so please just rebase to relaunch tests.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-01-06T15:59:45Z
+
+Can we rename to `csv_row` instead of `csv`? Someone might think this should parse csv string with newlines into array of arrays and submit bug reports. `csv_row` is less ambiguous and more future proof.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-07T10:14:23Z
+
+@ostrolucky "csv_row" looks like noisy boilerplate to me. Native's `str_getcsv` doesn't have "row" in its name btw.

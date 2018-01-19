@@ -31,7 +31,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
         $users = array();
 
         foreach ($config['users'] as $username => $user) {
-            $users[$username] = array('password' => (string) $user['password'], 'roles' => $user['roles']);
+            $users[$username] = array('password' => null !== $user['password'] ? (string) $user['password'] : $defaultPassword, 'roles' => $user['roles']);
         }
 
         $definition->addArgument($users);

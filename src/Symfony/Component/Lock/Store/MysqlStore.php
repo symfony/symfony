@@ -101,11 +101,7 @@ class MysqlStore implements StoreInterface
             throw new LockConflictedException();
         }
 
-        // store the release statement in the state
-        $releaseStmt = $this->connection->prepare('DO RELEASE_LOCK(:key)');
-        $releaseStmt->bindValue(':key', $storedKey, \PDO::PARAM_STR);
-
-        $key->setState(__CLASS__, $releaseStmt);
+        $key->setState(__CLASS__, $storedKey);
     }
 
     /**
@@ -114,7 +110,7 @@ class MysqlStore implements StoreInterface
     public function putOffExpiration(Key $key, $ttl)
     {
         // the GET_LOCK locks forever, until the session terminates.
-        $stmt = $this->connection->exec('SET SESSION wait_timeout=GREATEST(@@wait_timeout, :ttl)');
+        $stmt = $this->connection->prepare('SET SESSION wait_timeout=GREATEST(@@wait_timeout, :ttl)');
         $stmt->bindValue(':ttl', $ttl, \PDO::PARAM_INT);
         $stmt->execute();
     }
@@ -128,7 +124,10 @@ class MysqlStore implements StoreInterface
             return;
         }
 
-        $releaseStmt = $key->getState(__CLASS__);
+        $storedKey = $key->getState(__CLASS__);
+
+        $releaseStmt = $this->connection->prepare('DO RELEASE_LOCK(:key)');
+        $releaseStmt->bindValue(':key', $storedKey, \PDO::PARAM_STR);
         $releaseStmt->execute();
 
         $key->removeState(__CLASS__);

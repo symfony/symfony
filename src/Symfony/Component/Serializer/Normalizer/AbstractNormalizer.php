@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -36,6 +37,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     const GROUPS = 'groups';
     const ATTRIBUTES = 'attributes';
     const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
+    const DEFAULT_CONSTRUCTOR_ARGUMENTS = 'default_constructor_arguments';
 
     /**
      * @var int
@@ -308,6 +310,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * @return object
      *
      * @throws RuntimeException
+     * @throws MissingConstructorArgumentsException
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
@@ -353,10 +356,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                     // Don't run set for a parameter passed to the constructor
                     $params[] = $parameterData;
                     unset($data[$key]);
+                } elseif (isset($context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key])) {
+                    $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
-                    throw new RuntimeException(
+                    throw new MissingConstructorArgumentsException(
                         sprintf(
                             'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
                             $class,

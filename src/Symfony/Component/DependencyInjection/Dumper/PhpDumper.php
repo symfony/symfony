@@ -146,14 +146,14 @@ class PhpDumper extends Dumper
         if (!empty($options['file']) && is_dir($dir = dirname($options['file']))) {
             // Build a regexp where the first root dirs are mandatory,
             // but every other sub-dir is optional up to the full path in $dir
-            // Mandate at least 2 root dirs and not more that 5 optional dirs.
+            // Mandate at least one parent dir and not more that 5 optional dirs.
 
             $dir = explode(DIRECTORY_SEPARATOR, realpath($dir));
             $i = count($dir);
 
             if (3 <= $i) {
                 $regex = '';
-                $lastOptionalDir = $i > 8 ? $i - 5 : 3;
+                $lastOptionalDir = $i > 7 ? $i - 5 : 2;
                 $this->targetDirMaxMatches = $i - $lastOptionalDir;
 
                 while (--$i >= $lastOptionalDir) {
@@ -164,7 +164,7 @@ class PhpDumper extends Dumper
                     $regex = preg_quote(DIRECTORY_SEPARATOR.$dir[$i], '#').$regex;
                 } while (0 < --$i);
 
-                $this->targetDirRegex = '#'.preg_quote($dir[0], '#').$regex.'#';
+                $this->targetDirRegex = '#(?<!\w)'.preg_quote($dir[0], '#').$regex.'#';
             }
         }
 

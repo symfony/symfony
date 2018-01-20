@@ -43,6 +43,7 @@ class Container implements ResettableContainerInterface
     protected $services = array();
     protected $fileMap = array();
     protected $methodMap = array();
+    protected $factories = array();
     protected $aliases = array();
     protected $loading = array();
     protected $resolving = array();
@@ -220,6 +221,9 @@ class Container implements ResettableContainerInterface
         if ('service_container' === $id) {
             return $this;
         }
+        if (isset($this->factories[$id])) {
+            return $this->factories[$id]();
+        }
 
         if (isset($this->loading[$id])) {
             throw new ServiceCircularReferenceException($id, array_keys($this->loading));
@@ -289,7 +293,7 @@ class Container implements ResettableContainerInterface
      */
     public function reset()
     {
-        $this->services = array();
+        $this->services = $this->factories = array();
     }
 
     /**

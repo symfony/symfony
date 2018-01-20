@@ -46,10 +46,12 @@ class ProjectServiceContainer extends Container
 
         $this->aliases = array();
 
-        include_once $this->targetDirs[1].'/includes/HotPath/I1.php';
-        include_once $this->targetDirs[1].'/includes/HotPath/P1.php';
-        include_once $this->targetDirs[1].'/includes/HotPath/T1.php';
-        include_once $this->targetDirs[1].'/includes/HotPath/C1.php';
+        $this->privates['service_container'] = function () {
+            include_once $this->targetDirs[1].'/includes/HotPath/I1.php';
+            include_once $this->targetDirs[1].'/includes/HotPath/P1.php';
+            include_once $this->targetDirs[1].'/includes/HotPath/T1.php';
+            include_once $this->targetDirs[1].'/includes/HotPath/C1.php';
+        };
     }
 
     public function getRemovedIds()

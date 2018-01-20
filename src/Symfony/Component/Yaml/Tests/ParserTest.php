@@ -797,6 +797,21 @@ EOT;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    public function testMultiLineStringLastResortParsing()
+    {
+        $yaml = <<<'EOT'
+test:
+  You can have things that don't look like strings here
+  true
+  yes you can
+EOT;
+        $expected = array(
+            'test' => 'You can have things that don\'t look like strings here true yes you can',
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */

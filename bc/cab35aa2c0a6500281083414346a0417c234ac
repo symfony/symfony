@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-01-20T09:26:23Z
+
+I'm not sure if it's possible to do it, but it'd be great if PHP could detect this automatically to avoid having to add the `\` explicitly for each function call that we want to optimize. Maybe @nikic could think of a solution for this 🙏  Thanks!
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2018-01-20T09:50:59Z
+
+@javiereguiluz it's not possible because PHP works on a per-file basis when doing optimizations (because the cached OP codes have to stay valid if other files changes), this means PHP can't know if you didn't defined a function with the same name in the current namespace.
+
+I personally think allowing to call root namespace functions without prefixing them with `\` should never have been allowed like it's done for classes (this is preventing things like functions autoloading to append). But it can't be changed now without a massive BC break.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2018-01-20T14:55:45Z
+
+An alternative solution is to have use statements:
+
+```php
+// No optimisation
+is_array($x);
+
+// Optimisation with the FQFN
+\is_array($x);
+
+// Optimisation with the use statement:
+use function is_array;
+
+is_array($x);
+```
+
+There is also a PHP-CS-Fixer rule `native_function_invocation` for the former but not yet for the later. That said there's a config in PhpStorm (Editor > General > Auto Import) where you can configure this
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-20T15:37:56Z
+
+Wouldn't it make sense to add the backslash in front of every php function? I'm sure you can get even more performance out of it
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-01-20T15:43:35Z
+
+@iltar no ... because this optimization only applies to a selected number of PHP functions.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2018-01-20T15:57:00Z
+
+@iltar to me it makes sense if you are using a backlash everywhere e.g. `\Exception` instead of `use Exception; [...] Exception`, but as @javiereguiluz said currrently this is done only to a handful of them because the optimisation doesn't apply to all of them.
+
+I would be for adding a use statement (for functions as well) for all of them, but not everyone may share that opinion :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-20T16:13:57Z
+
+Any resources on where it's defined for which functions this is and why only for those? I failed finding those.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-20T16:18:56Z
+
+@iltar https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3048
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-01-20T16:35:48Z
+
+>> Wouldn't it make sense to add the backslash in front of every php function? I'm sure you can get even more performance out of it
+
+> @iltar no ... because this optimization only applies to a selected number of PHP functions.
+
+Does it do any harm if the backslash is there for every PHP function?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-20T16:36:28Z
+
+> Does it do any harm if the backslash is there for every PHP function?
+
+yes: turning PHP into brainf*ck :)
+
+---------------------------------------------------------------------------
+
+by nikic at 2018-01-20T16:54:59Z
+
+While only some functions have a direct opcode implementation, fully qualifying internal function calls is also faster in general. If the function can be resolved statically, PHP will specialize for an internal function call and will specialize for by-value (or by-reference) sending of the function arguments.
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-20T17:30:35Z
+
+Maybe a bit off-topic for this PR, but I would love to have an opt-in setting for a complete file to pull all functions and constants from of the global namespace, unless specified otherwise.

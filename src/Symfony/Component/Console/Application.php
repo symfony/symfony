@@ -874,6 +874,7 @@ class Application
         }
 
         $event = new ConsoleCommandEvent($command, $input, $output);
+        $e = null;
 
         try {
             $this->dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
@@ -886,13 +887,18 @@ class Application
         } catch (\Throwable $e) {
             $event = new ConsoleErrorEvent($input, $output, $e, $command);
             $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);
+            $e = $event->getError();
 
-            if (0 !== $exitCode = $event->getExitCode()) {
-                throw $event->getError();
+            if (0 === $exitCode = $event->getExitCode()) {
+                $e = null;
             }
-        } finally {
-            $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
-            $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+        }
+
+        $event = new ConsoleTerminateEvent($command, $input, $output, $exitCode);
+        $this->dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+
+        if (null !== $e) {
+            throw $e;
         }
 
         return $event->getExitCode();

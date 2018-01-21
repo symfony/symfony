@@ -15,9 +15,14 @@ namespace Symfony\Component\Config\Definition\Builder;
  * An interface that must be implemented by nodes which can have children.
  *
  * @author Victor Berchet <victor@suumit.com>
+ *
+ * @method NodeDefinition[] getChildNodeDefinitions() should be implemented since 4.1
  */
 interface ParentNodeDefinitionInterface
 {
+    /**
+     * @return NodeBuilder
+     */
     public function children();
 
     public function append(NodeDefinition $node);

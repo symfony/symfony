@@ -62,7 +62,7 @@ interface WorkflowInterface
      *
      * @return Marking The new Marking
      *
-     * @throws BlockedTransitionException If the transition is not applicable
+     * @throws BlockedTransitionException   If the transition is not applicable
      * @throws UndefinedTransitionException If the transition does not exist
      */
     public function apply($subject, string $transitionName);

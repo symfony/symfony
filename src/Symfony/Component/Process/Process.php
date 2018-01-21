@@ -291,7 +291,9 @@ class Process implements \IteratorAggregate
 
         $envPairs = array();
         foreach ($env as $k => $v) {
-            $envPairs[] = $k.'='.$v;
+            if (false !== $v) {
+                $envPairs[] = $k.'='.$v;
+            }
         }
 
         if (!is_dir($this->cwd)) {

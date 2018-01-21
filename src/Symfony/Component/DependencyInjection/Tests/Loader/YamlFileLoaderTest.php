@@ -31,6 +31,8 @@ class YamlFileLoaderTest extends TestCase
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
         require_once self::$fixturesPath.'/includes/foo.php';
         require_once self::$fixturesPath.'/includes/ProjectExtension.php';
+        require_once self::$fixturesPath.'/includes/FooExtension.php';
+        require_once self::$fixturesPath.'/includes/FooConfiguration.php';
     }
 
     /**
@@ -205,6 +207,19 @@ class YamlFileLoaderTest extends TestCase
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if the tag is not valid');
             $this->assertStringStartsWith('There is no extension able to load the configuration for "foobarfoobar" (in', $e->getMessage(), '->load() throws an InvalidArgumentException if the tag is not valid');
         }
+    }
+
+    public function testNullableExtension()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \FooExtension());
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('extension_nullable.yml');
+        $container->compile();
+
+        $isEnabled = $container->getParameter('foo_extension_enabled');
+
+        $this->assertTrue($isEnabled);
     }
 
     public function testSupports()

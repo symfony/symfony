@@ -42,9 +42,6 @@
         "symfony/property-access": "For using the 2.4 Validator API",
         "symfony/expression-language": "For using the 2.4 Expression validator"
     },
-    "conflict": {
-        "egulias/email-validator": ">=2.0"
-    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" },
         "exclude-from-classmap": [

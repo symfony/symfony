@@ -26,6 +26,16 @@ class FileTest extends TestCase
 
         $this->assertSame($bytes, $file->maxSize);
         $this->assertSame($binaryFormat, $file->binaryFormat);
+        $this->assertTrue($file->__isset('maxSize'));
+    }
+
+    public function testMagicIsset()
+    {
+        $file = new File(array('maxSize' => 1));
+
+        $this->assertTrue($file->__isset('maxSize'));
+        $this->assertTrue($file->__isset('groups'));
+        $this->assertFalse($file->__isset('toto'));
     }
 
     /**

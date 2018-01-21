@@ -296,13 +296,13 @@ class Request
      * The information contained in the URI always take precedence
      * over the other information (server and parameters).
      *
-     * @param string $uri        The URI
-     * @param string $method     The HTTP method
-     * @param array  $parameters The query (GET) or request (POST) parameters
-     * @param array  $cookies    The request cookies ($_COOKIE)
-     * @param array  $files      The request files ($_FILES)
-     * @param array  $server     The server parameters ($_SERVER)
-     * @param string $content    The raw body data
+     * @param string          $uri        The URI
+     * @param string          $method     The HTTP method
+     * @param array           $parameters The query (GET) or request (POST) parameters
+     * @param array           $cookies    The request cookies ($_COOKIE)
+     * @param array           $files      The request files ($_FILES)
+     * @param array           $server     The server parameters ($_SERVER)
+     * @param string|resource $content    The raw body data
      *
      * @return static
      */

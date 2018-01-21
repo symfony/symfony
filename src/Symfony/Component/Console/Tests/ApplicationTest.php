@@ -1553,6 +1553,34 @@ class ApplicationTest extends TestCase
         }
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage foo
+     */
+    public function testThrowingErrorListener()
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->addListener('console.error', function (ConsoleErrorEvent $event) {
+            throw new \RuntimeException('foo');
+        });
+
+        $dispatcher->addListener('console.command', function () {
+            throw new \RuntimeException('bar');
+        });
+
+        $application = new Application();
+        $application->setDispatcher($dispatcher);
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+    }
+
     protected function tearDown()
     {
         putenv('SHELL_VERBOSITY');

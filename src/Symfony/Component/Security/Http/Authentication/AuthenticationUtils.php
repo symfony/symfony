@@ -71,11 +71,9 @@ class AuthenticationUtils
     }
 
     /**
-     * @return Request
-     *
      * @throws \LogicException
      */
-    private function getRequest()
+    private function getRequest(): Request
     {
         $request = $this->requestStack->getCurrentRequest();
 

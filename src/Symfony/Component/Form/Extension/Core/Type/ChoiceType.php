@@ -37,11 +37,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceType extends AbstractType
 {
-    /**
-     * Caches created choice lists.
-     *
-     * @var ChoiceListFactoryInterface
-     */
     private $choiceListFactory;
 
     public function __construct(ChoiceListFactoryInterface $choiceListFactory = null)
@@ -351,10 +346,6 @@ class ChoiceType extends AbstractType
 
     /**
      * Adds the sub fields for an expanded choice field.
-     *
-     * @param FormBuilderInterface $builder     The form builder
-     * @param array                $choiceViews The choice view objects
-     * @param array                $options     The build options
      */
     private function addSubForms(FormBuilderInterface $builder, array $choiceViews, array $options)
     {
@@ -375,14 +366,9 @@ class ChoiceType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param                      $name
-     * @param                      $choiceView
-     * @param array                $options
-     *
      * @return mixed
      */
-    private function addSubForm(FormBuilderInterface $builder, $name, ChoiceView $choiceView, array $options)
+    private function addSubForm(FormBuilderInterface $builder, string $name, ChoiceView $choiceView, array $options)
     {
         $choiceOpts = array(
             'value' => $choiceView->value,

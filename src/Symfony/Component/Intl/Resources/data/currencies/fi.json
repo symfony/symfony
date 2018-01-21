@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.67",
     "Names": {
         "ADP": [
             "ADP",
@@ -261,6 +261,10 @@
             "CLP",
             "Chilen peso"
         ],
+        "CNH": [
+            "CNH",
+            "Kiinan juan (offshore)"
+        ],
         "CNX": [
             "CNX",
             "Kiinan kansanpankin dollari"
@@ -279,7 +283,7 @@
         ],
         "CRC": [
             "CRC",
-            "Costa Rican colon"
+            "Costa Rican colón"
         ],
         "CSD": [
             "CSD",
@@ -799,11 +803,11 @@
         ],
         "PLN": [
             "PLN",
-            "Puolan zloty"
+            "Puolan złoty"
         ],
         "PLZ": [
             "PLZ",
-            "Puolan zloty (1950–1995)"
+            "Puolan złoty (1950–1995)"
         ],
         "PTE": [
             "PTE",
@@ -919,7 +923,7 @@
         ],
         "SVC": [
             "SVC",
-            "El Salvadorin colon"
+            "El Salvadorin colón"
         ],
         "SYP": [
             "SYP",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.1",
     "Names": {
         "aa": "afarski",
         "ab": "abhaski",
@@ -149,6 +149,7 @@
         "fr": "francuski",
         "fr_CA": "kanadski francuski",
         "fr_CH": "švicarski francuski",
+        "frc": "kajunski francuski",
         "frm": "srednjofrancuski",
         "fro": "starofrancuski",
         "frr": "sjevernofrizijski",
@@ -202,7 +203,7 @@
         "id": "indonezijski",
         "ie": "interligua",
         "ig": "igbo",
-        "ii": "sichuan yi",
+        "ii": "sichuan ji",
         "ik": "inupiaq",
         "ilo": "iloko",
         "inh": "ingušetski",
@@ -275,6 +276,7 @@
         "ln": "lingala",
         "lo": "laoski",
         "lol": "mongo",
+        "lou": "lujzijanski kreolski",
         "loz": "lozi",
         "lrc": "sjevernolurski",
         "lt": "litavski",

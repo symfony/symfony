@@ -15,7 +15,7 @@
 
 {%- block form_widget_compound -%}
     <div {{ block('widget_container_attributes') }}>
-        {%- if form.parent is empty -%}
+        {%- if form is rootform -%}
             {{ form_errors(form) }}
         {%- endif -%}
         {{- block('form_rows') -}}
@@ -216,12 +216,14 @@
 {%- endblock range_widget %}
 
 {%- block button_widget -%}
-    {%- if label is not same as(false) and label is empty -%}
+    {%- if label is empty -%}
         {%- if label_format is not empty -%}
             {% set label = label_format|replace({
                 '%name%': name,
                 '%id%': id,
             }) %}
+        {%- elseif label is same as(false) -%}
+            {% set translation_domain = false %}
         {%- else -%}
             {% set label = name|humanize %}
         {%- endif -%}
@@ -347,9 +349,9 @@
         {% if not child.rendered %}
             {{- form_row(child) -}}
         {% endif %}
-    {%- endfor %}
+    {%- endfor -%}
 
-    {% if not form.methodRendered and form.parent is null %}
+    {% if not form.methodRendered and form is rootform %}
         {%- do form.setMethodRendered() -%}
         {% set method = method|upper %}
         {%- if method in ["GET", "POST"] -%}
@@ -361,7 +363,7 @@
         {%- if form_method != method -%}
             <input type="hidden" name="_method" value="{{ method }}" />
         {%- endif -%}
-    {% endif %}
+    {% endif -%}
 {% endblock form_rest %}
 
 {# Support #}

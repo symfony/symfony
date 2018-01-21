@@ -29,9 +29,6 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
-    /**
-     * @var StreamOutput
-     */
     private $stderr;
 
     /**
@@ -39,7 +36,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      * @param bool|null                     $decorated Whether to decorate messages (null for auto-guessing)
      * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      */
-    public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
+    public function __construct(int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = null, OutputFormatterInterface $formatter = null)
     {
         parent::__construct($this->openOutputStream(), $verbosity, $decorated, $formatter);
 

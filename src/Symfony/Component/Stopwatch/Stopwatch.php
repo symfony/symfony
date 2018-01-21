@@ -36,7 +36,7 @@ class Stopwatch
     /**
      * @param bool $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
-    public function __construct($morePrecision = false)
+    public function __construct(bool $morePrecision = false)
     {
         $this->morePrecision = $morePrecision;
         $this->reset();
@@ -171,6 +171,6 @@ class Stopwatch
      */
     public function reset()
     {
-        $this->sections = $this->activeSections = array('__root__' => new Section('__root__', $this->morePrecision));
+        $this->sections = $this->activeSections = array('__root__' => new Section(null, $this->morePrecision));
     }
 }

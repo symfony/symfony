@@ -24,18 +24,14 @@ interface StoreInterface
     /**
      * Stores the resource if it's not locked by someone else.
      *
-     * @param Key $key key to lock
-     *
      * @throws LockConflictedException
      */
     public function save(Key $key);
 
     /**
-     * Waits a key becomes free, then stores the resource.
+     * Waits until a key becomes free, then stores the resource.
      *
      * If the store does not support this feature it should throw a NotSupportedException.
-     *
-     * @param Key $key key to lock
      *
      * @throws LockConflictedException
      * @throws NotSupportedException
@@ -47,7 +43,6 @@ interface StoreInterface
      *
      * If the store does not support this feature it should throw a NotSupportedException.
      *
-     * @param Key   $key key to lock
      * @param float $ttl amount of second to keep the lock in the store
      *
      * @throws LockConflictedException
@@ -57,15 +52,11 @@ interface StoreInterface
 
     /**
      * Removes a resource from the storage.
-     *
-     * @param Key $key key to remove
      */
     public function delete(Key $key);
 
     /**
      * Returns whether or not the resource exists in the storage.
-     *
-     * @param Key $key key to remove
      *
      * @return bool
      */

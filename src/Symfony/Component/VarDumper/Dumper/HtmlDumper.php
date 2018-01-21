@@ -56,7 +56,7 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function __construct($output = null, $charset = null, $flags = 0)
+    public function __construct($output = null, string $charset = null, int $flags = 0)
     {
         AbstractDumper::__construct($output, $charset, $flags);
         $this->dumpId = 'sf-dump-'.mt_rand();
@@ -163,6 +163,13 @@ function toggle(a, recursive) {
         newClass = 'sf-dump-compact';
     } else {
         return false;
+    }
+
+    if (doc.createEvent && s.dispatchEvent) {
+        var event = doc.createEvent('Event');
+        event.initEvent('sf-dump-expanded' === newClass ? 'sfbeforedumpexpand' : 'sfbeforedumpcollapse', true, false);
+
+        s.dispatchEvent(event);
     }
 
     a.lastChild.innerHTML = arrow;
@@ -383,8 +390,9 @@ return function (root, x) {
                 x += elt.parentNode.getAttribute('data-depth')/1;
             }
             elt.setAttribute('data-depth', x);
-            if (elt.className ? 'sf-dump-expanded' !== elt.className : (x > options.maxDepth)) {
-                elt.className = 'sf-dump-expanded';
+            var className = elt.className;
+            elt.className = 'sf-dump-expanded';
+            if (className ? 'sf-dump-expanded' !== className : (x > options.maxDepth)) {
                 toggle(a);
             }
         } else if (/\bsf-dump-ref\b/.test(elt.className) && (a = elt.getAttribute('href'))) {
@@ -831,7 +839,8 @@ EOHTML
             $attr['href'] = $href;
         }
         if (isset($attr['href'])) {
-            $v = sprintf('<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $v);
+            $target = isset($attr['file']) ? '' : ' target="_blank"';
+            $v = sprintf('<a href="%s"%s rel="noopener noreferrer">%s</a>', esc($this->utf8Encode($attr['href'])), $target, $v);
         }
         if (isset($attr['lang'])) {
             $v = sprintf('<code class="%s">%s</code>', esc($attr['lang']), $v);

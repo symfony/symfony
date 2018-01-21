@@ -22,7 +22,7 @@ class RouteConfigurator
     use Traits\AddTrait;
     use Traits\RouteTrait;
 
-    public function __construct(RouteCollection $collection, Route $route, $name = '')
+    public function __construct(RouteCollection $collection, Route $route, string $name = '')
     {
         $this->collection = $collection;
         $this->route = $route;

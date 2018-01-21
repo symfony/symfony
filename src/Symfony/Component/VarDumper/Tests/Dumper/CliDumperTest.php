@@ -129,6 +129,36 @@ EOTXT
         $this->assertSame($expected, $dump);
     }
 
+    public function testDumpWithCommaFlagsAndExceptionCodeExcerpt()
+    {
+        $dumper = new CliDumper(null, null, CliDumper::DUMP_TRAILING_COMMA);
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $ex = new \RuntimeException('foo');
+
+        $dump = $dumper->dump($cloner->cloneVar($ex)->withRefHandles(false), true);
+
+        $this->assertStringMatchesFormat(<<<'EOTXT'
+RuntimeException {
+  #message: "foo"
+  #code: 0
+  #file: "%ACliDumperTest.php"
+  #line: %d
+  trace: {
+    %ACliDumperTest.php:%d {
+      › 
+      › $ex = new \RuntimeException('foo');
+      › 
+    }
+    %A
+  }
+}
+
+EOTXT
+            , $dump);
+    }
+
     public function provideDumpWithCommaFlagTests()
     {
         $expected = <<<'EOTXT'

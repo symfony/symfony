@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Loader\FileLoader;
 
 /**
@@ -27,7 +28,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix',
     );
     private $yamlParser;
 
@@ -58,7 +59,7 @@ class YamlFileLoader extends FileLoader
         }
 
         try {
-            $parsedConfig = $this->yamlParser->parseFile($path);
+            $parsedConfig = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
             throw new \InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $path), 0, $e);
         }
@@ -168,6 +169,10 @@ class YamlFileLoader extends FileLoader
         $subCollection->addDefaults($defaults);
         $subCollection->addRequirements($requirements);
         $subCollection->addOptions($options);
+
+        if (isset($config['name_prefix'])) {
+            $subCollection->addNamePrefix($config['name_prefix']);
+        }
 
         $collection->addCollection($subCollection);
     }

@@ -60,7 +60,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * ("auto_start", is not supported as it tells PHP to start a session before
      * PHP starts to execute user-land code. Setting during runtime has no effect).
      *
-     * cache_limiter, "private_no_expire" (use "0" to prevent headers from being sent entirely).
+     * cache_limiter, "" (use "0" to prevent headers from being sent entirely).
      * cache_expire, "0"
      * cookie_domain, ""
      * cookie_httponly, ""
@@ -97,7 +97,7 @@ class NativeSessionStorage implements SessionStorageInterface
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {
         $options += array(
-            'cache_limiter' => 'private_no_expire',
+            'cache_limiter' => '',
             'cache_expire' => 0,
             'use_cookies' => 1,
             'lazy_write' => 1,
@@ -341,7 +341,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function setOptions(array $options)
     {
-        if (headers_sent()) {
+        if (headers_sent() || \PHP_SESSION_ACTIVE === session_status()) {
             return;
         }
 
@@ -394,10 +394,6 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \InvalidArgumentException('Must be instance of AbstractProxy; implement \SessionHandlerInterface; or be null.');
         }
 
-        if (headers_sent($file, $line)) {
-            throw new \RuntimeException(sprintf('Failed to set the session handler because headers have already been sent by "%s" at line %d.', $file, $line));
-        }
-
         // Wrap $saveHandler in proxy and prevent double wrapping of proxy
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);
@@ -405,6 +401,10 @@ class NativeSessionStorage implements SessionStorageInterface
             $saveHandler = new SessionHandlerProxy(new StrictSessionHandler(new \SessionHandler()));
         }
         $this->saveHandler = $saveHandler;
+
+        if (headers_sent() || \PHP_SESSION_ACTIVE === session_status()) {
+            return;
+        }
 
         if ($this->saveHandler instanceof SessionHandlerProxy) {
             session_set_save_handler($this->saveHandler->getHandler(), false);

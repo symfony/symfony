@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "ADP": [
             "ADP",
@@ -219,7 +219,7 @@
         ],
         "BYN": [
             "BYN",
-            "Beyaz Rusya Rublesi"
+            "Belarus Rublesi"
         ],
         "BYR": [
             "BYR",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "Şili Pesosu"
+        ],
+        "CNH": [
+            "CNH",
+            "Çin Yuanı (offshore)"
         ],
         "CNX": [
             "CNX",

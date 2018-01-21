@@ -18,13 +18,17 @@ class ProjectServiceContainer extends Container
 {
     private $parameters;
     private $targetDirs = array();
-    private $privates = array();
+
+    /**
+     * @internal but protected for BC on cache:clear
+     */
+    protected $privates = array();
 
     public function __construct()
     {
         $dir = __DIR__;
         for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = dirname($dir);
+            $this->targetDirs[$i] = $dir = \dirname($dir);
         }
         $this->parameters = $this->getDefaultParameters();
 

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.96",
     "Names": {
         "aa": "Afar",
         "ab": "Abchasisch",
@@ -318,6 +318,7 @@
         "ln": "Lingala",
         "lo": "Laotisch",
         "lol": "Mongo",
+        "lou": "Kreol (Louisiana)",
         "loz": "Lozi",
         "lrc": "Nördliches Luri",
         "lt": "Litauisch",

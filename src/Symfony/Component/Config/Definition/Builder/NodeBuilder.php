@@ -61,7 +61,7 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Creates a child scalar node.
      *
-     * @param string $name the name of the node
+     * @param string $name The name of the node
      *
      * @return ScalarNodeDefinition The child node
      */
@@ -85,7 +85,7 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Creates a child integer node.
      *
-     * @param string $name the name of the node
+     * @param string $name The name of the node
      *
      * @return IntegerNodeDefinition The child node
      */
@@ -97,7 +97,7 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Creates a child float node.
      *
-     * @param string $name the name of the node
+     * @param string $name The name of the node
      *
      * @return FloatNodeDefinition The child node
      */

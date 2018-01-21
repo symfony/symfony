@@ -28,22 +28,16 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 {
     /**
      * @internal
-     *
-     * @var string[]
      */
     public static $defaultMutatorPrefixes = array('add', 'remove', 'set');
 
     /**
      * @internal
-     *
-     * @var string[]
      */
     public static $defaultAccessorPrefixes = array('is', 'can', 'get');
 
     /**
      * @internal
-     *
-     * @var string[]
      */
     public static $defaultArrayMutatorPrefixes = array('add', 'remove');
 

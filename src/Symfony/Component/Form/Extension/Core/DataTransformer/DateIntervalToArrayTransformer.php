@@ -46,13 +46,13 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
      * @param string[] $fields The date fields
      * @param bool     $pad    Whether to use padding
      */
-    public function __construct(array $fields = null, $pad = false)
+    public function __construct(array $fields = null, bool $pad = false)
     {
         if (null === $fields) {
             $fields = array('years', 'months', 'days', 'hours', 'minutes', 'seconds', 'invert');
         }
         $this->fields = $fields;
-        $this->pad = (bool) $pad;
+        $this->pad = $pad;
     }
 
     /**

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.96",
     "Names": {
         "ADP": [
             "ADP",
@@ -155,7 +155,7 @@
         ],
         "BOB": [
             "BOB",
-            "Bolivanischer Boliviano"
+            "Bolivianischer Boliviano"
         ],
         "BOL": [
             "BOL",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "Chilenischer Peso"
+        ],
+        "CNH": [
+            "CNH",
+            "Renminbi Yuan (Off–Shore)"
         ],
         "CNX": [
             "CNX",

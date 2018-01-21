@@ -24,9 +24,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class FormType extends BaseType
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)

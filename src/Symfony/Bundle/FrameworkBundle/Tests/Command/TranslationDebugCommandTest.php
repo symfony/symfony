@@ -64,6 +64,21 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertRegExp('/unused/', $tester->getDisplay());
     }
 
+    public function testDebugDefaultRootDirectory()
+    {
+        $this->fs->remove($this->translationDir);
+        $this->fs = new Filesystem();
+        $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
+        $this->fs->mkdir($this->translationDir.'/translations');
+        $this->fs->mkdir($this->translationDir.'/templates');
+
+        $tester = $this->createCommandTester(array('foo' => 'foo'), array('bar' => 'bar'));
+        $tester->execute(array('locale' => 'en'));
+
+        $this->assertRegExp('/missing/', $tester->getDisplay());
+        $this->assertRegExp('/unused/', $tester->getDisplay());
+    }
+
     public function testDebugCustomDirectory()
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
@@ -100,6 +115,8 @@ class TranslationDebugCommandTest extends TestCase
         $this->translationDir = sys_get_temp_dir().'/'.uniqid('sf2_translation', true);
         $this->fs->mkdir($this->translationDir.'/Resources/translations');
         $this->fs->mkdir($this->translationDir.'/Resources/views');
+        $this->fs->mkdir($this->translationDir.'/translations');
+        $this->fs->mkdir($this->translationDir.'/templates');
     }
 
     protected function tearDown()
@@ -174,7 +191,7 @@ class TranslationDebugCommandTest extends TestCase
             ->method('getContainer')
             ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock()));
 
-        $command = new TranslationDebugCommand($translator, $loader, $extractor);
+        $command = new TranslationDebugCommand($translator, $loader, $extractor, $this->translationDir.'/translations', $this->translationDir.'/templates');
 
         $application = new Application($kernel);
         $application->add($command);

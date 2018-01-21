@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.31.86",
+    "Version": "2.1.37.1",
     "Names": {
         "AD": "Andorra",
         "AE": "Emirats Arabs Unids",
@@ -30,7 +30,7 @@
         "BM": "Bermudas",
         "BN": "Brunei",
         "BO": "Bolivia",
-        "BR": "Brasila",
+        "BR": "Brasilia",
         "BS": "Bahamas",
         "BT": "Bhutan",
         "BW": "Botswana",
@@ -233,8 +233,8 @@
         "VA": "Citad dal Vatican",
         "VC": "Saint Vincent e las Grenadinas",
         "VE": "Venezuela",
-        "VG": "Inslas Verginas Britannicas",
-        "VI": "Inslas Verginas Americanas",
+        "VG": "Inslas Virginas Britannicas",
+        "VI": "Inslas Virginas Americanas",
         "VN": "Vietnam",
         "VU": "Vanuatu",
         "WF": "Wallis e Futuna",

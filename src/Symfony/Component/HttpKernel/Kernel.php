@@ -60,25 +60,23 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
     private $projectDir;
     private $warmupDir;
+    private $requestStackSize = 0;
+    private $resetServices = false;
 
-    const VERSION = '4.0.0-DEV';
-    const VERSION_ID = 40000;
+    const VERSION = '4.1.0-DEV';
+    const VERSION_ID = 40100;
     const MAJOR_VERSION = 4;
-    const MINOR_VERSION = 0;
+    const MINOR_VERSION = 1;
     const RELEASE_VERSION = 0;
     const EXTRA_VERSION = 'DEV';
 
-    const END_OF_MAINTENANCE = '07/2018';
-    const END_OF_LIFE = '01/2019';
+    const END_OF_MAINTENANCE = '01/2019';
+    const END_OF_LIFE = '07/2019';
 
-    /**
-     * @param string $environment The environment
-     * @param bool   $debug       Whether to enable debugging or not
-     */
-    public function __construct($environment, $debug)
+    public function __construct(string $environment, bool $debug)
     {
         $this->environment = $environment;
-        $this->debug = (bool) $debug;
+        $this->debug = $debug;
         $this->rootDir = $this->getRootDir();
         $this->name = $this->getName();
 
@@ -95,6 +93,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
         $this->booted = false;
         $this->container = null;
+        $this->requestStackSize = 0;
+        $this->resetServices = false;
     }
 
     /**
@@ -103,7 +103,19 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
     public function boot()
     {
         if (true === $this->booted) {
+            if (!$this->requestStackSize && $this->resetServices) {
+                if ($this->container->has('services_resetter')) {
+                    $this->container->get('services_resetter')->reset();
+                }
+                $this->resetServices = false;
+            }
+
             return;
+        }
+        if ($this->debug && !isset($_ENV['SHELL_VERBOSITY']) && !isset($_SERVER['SHELL_VERBOSITY'])) {
+            putenv('SHELL_VERBOSITY=3');
+            $_ENV['SHELL_VERBOSITY'] = 3;
+            $_SERVER['SHELL_VERBOSITY'] = 3;
         }
 
         // init bundles
@@ -161,6 +173,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         $this->container = null;
+        $this->requestStackSize = 0;
+        $this->resetServices = false;
     }
 
     /**
@@ -168,17 +182,15 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        if (false === $this->booted) {
-            if ($this->debug && !isset($_SERVER['SHELL_VERBOSITY'])) {
-                putenv('SHELL_VERBOSITY=3');
-                $_ENV['SHELL_VERBOSITY'] = 3;
-                $_SERVER['SHELL_VERBOSITY'] = 3;
-            }
+        $this->boot();
+        ++$this->requestStackSize;
+        $this->resetServices = true;
 
-            $this->boot();
+        try {
+            return $this->getHttpKernel()->handle($request, $type, $catch);
+        } finally {
+            --$this->requestStackSize;
         }
-
-        return $this->getHttpKernel()->handle($request, $type, $catch);
     }
 
     /**
@@ -243,7 +255,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 throw new \RuntimeException(sprintf('"%s" resource is hidden by a resource from the "%s" derived bundle. Create a "%s" file to override the bundle resource.',
                     $file,
                     $resourceBundle,
-                    $dir.'/'.$bundles[0]->getName().$overridePath
+                    $dir.'/'.$bundle->getName().$overridePath
                 ));
             }
 
@@ -401,8 +413,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      * The extension point similar to the Bundle::build() method.
      *
      * Use this method to register compiler passes and manipulate the container during the building process.
-     *
-     * @param ContainerBuilder $container
      */
     protected function build(ContainerBuilder $container)
     {
@@ -441,13 +451,23 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $class = $this->getContainerClass();
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
         $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $this->debug);
-        $fresh = true;
-        if (!$cache->isFresh()) {
+        if ($fresh = $cache->isFresh()) {
+            // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
+            $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
+            try {
+                $this->container = include $cache->getPath();
+            } finally {
+                error_reporting($errorLevel);
+            }
+            $fresh = \is_object($this->container);
+        }
+        if (!$fresh) {
             if ($this->debug) {
                 $collectedLogs = array();
-                $previousHandler = set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
+                $previousHandler = defined('PHPUNIT_COMPOSER_INSTALL');
+                $previousHandler = $previousHandler ?: set_error_handler(function ($type, $message, $file, $line) use (&$collectedLogs, &$previousHandler) {
                     if (E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) {
-                        return $previousHandler ? $previousHandler($type, $message, $file, $line) : false;
+                        return $previousHandler ? $previousHandler($type & ~E_WARNING, $message, $file, $line) : E_WARNING === $type;
                     }
 
                     if (isset($collectedLogs[$message])) {
@@ -474,14 +494,20 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                         'count' => 1,
                     );
                 });
+            } else {
+                $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
             }
 
             try {
                 $container = null;
                 $container = $this->buildContainer();
                 $container->compile();
+
+                $oldContainer = file_exists($cache->getPath()) && is_object($oldContainer = include $cache->getPath()) ? new \ReflectionClass($oldContainer) : false;
             } finally {
-                if ($this->debug) {
+                if (!$this->debug) {
+                    error_reporting($errorLevel);
+                } elseif (true !== $previousHandler) {
                     restore_error_handler();
 
                     file_put_contents($cacheDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));
@@ -489,14 +515,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
                 }
             }
 
-            $oldContainer = file_exists($cache->getPath()) && is_object($oldContainer = @include $cache->getPath()) ? new \ReflectionClass($oldContainer) : false;
-
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-
-            $fresh = false;
+            $this->container = require $cache->getPath();
         }
 
-        $this->container = require $cache->getPath();
         $this->container->set('kernel', $this);
 
         if ($fresh) {
@@ -504,7 +526,17 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         if ($oldContainer && get_class($this->container) !== $oldContainer->name) {
-            (new Filesystem())->remove(dirname($oldContainer->getFileName()));
+            // Because concurrent requests might still be using them,
+            // old container files are not removed immediately,
+            // but on a next dump of the container.
+            $oldContainerDir = dirname($oldContainer->getFileName());
+            foreach (glob(dirname($oldContainerDir).'/*.legacy') as $legacyContainer) {
+                if ($oldContainerDir.'.legacy' !== $legacyContainer && @unlink($legacyContainer)) {
+                    (new Filesystem())->remove(substr($legacyContainer, 0, -7));
+                }
+            }
+
+            touch($oldContainerDir.'.legacy');
         }
 
         if ($this->container->has('cache_warmer')) {
@@ -654,9 +686,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $fs = new Filesystem();
 
         foreach ($content as $file => $code) {
-            $fs->dumpFile($dir.$file, $code, null);
+            $fs->dumpFile($dir.$file, $code);
             @chmod($dir.$file, 0666 & ~umask());
         }
+        @unlink(dirname($dir.$file).'.legacy');
 
         $cache->write($rootCode, $container->getResources());
     }

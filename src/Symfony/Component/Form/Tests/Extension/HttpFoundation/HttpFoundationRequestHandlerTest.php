@@ -51,4 +51,9 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
     {
         return new UploadedFile(__DIR__.'/../../Fixtures/foo'.$suffix, 'foo'.$suffix);
     }
+
+    protected function getInvalidFile()
+    {
+        return 'file:///etc/passwd';
+    }
 }

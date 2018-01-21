@@ -536,7 +536,7 @@ class TimeTypeTest extends BaseTypeTest
         ));
 
         $view = $form->createView();
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testPassDefaultPlaceholderToViewIfNotRequired()

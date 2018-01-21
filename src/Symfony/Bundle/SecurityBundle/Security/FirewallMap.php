@@ -28,7 +28,7 @@ class FirewallMap implements FirewallMapInterface
     private $map;
     private $contexts;
 
-    public function __construct(ContainerInterface $container, $map)
+    public function __construct(ContainerInterface $container, iterable $map)
     {
         $this->container = $container;
         $this->map = $map;

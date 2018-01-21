@@ -25,11 +25,11 @@ interface NormalizerInterface
     /**
      * Normalizes an object into a set of arrays/scalars.
      *
-     * @param object $object  object to normalize
-     * @param string $format  format the normalization result will be encoded as
+     * @param object $object  Object to normalize
+     * @param string $format  Format the normalization result will be encoded as
      * @param array  $context Context options for the normalizer
      *
-     * @return array|scalar
+     * @return array|string|int|float|bool
      *
      * @throws InvalidArgumentException   Occurs when the object given is not an attempted type for the normalizer
      * @throws CircularReferenceException Occurs when the normalizer detects a circular reference when no circular

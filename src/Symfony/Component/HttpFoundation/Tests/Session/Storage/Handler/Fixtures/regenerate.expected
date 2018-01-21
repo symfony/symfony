@@ -18,7 +18,7 @@ close
 Array
 (
     [0] => Content-Type: text/plain; charset=utf-8
-    [1] => Cache-Control: private, max-age=10800
+    [1] => Cache-Control: max-age=10800, private, must-revalidate
     [2] => Set-Cookie: sid=random_session_id; path=/; secure; HttpOnly
 )
 shutdown

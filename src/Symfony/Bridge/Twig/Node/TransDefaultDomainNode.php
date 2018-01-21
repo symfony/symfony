@@ -20,7 +20,7 @@ use Twig\Node\Node;
  */
 class TransDefaultDomainNode extends Node
 {
-    public function __construct(AbstractExpression $expr, $lineno = 0, $tag = null)
+    public function __construct(AbstractExpression $expr, int $lineno = 0, string $tag = null)
     {
         parent::__construct(array('expr' => $expr), array(), $lineno, $tag);
     }

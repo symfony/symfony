@@ -136,7 +136,7 @@ class Process implements \IteratorAggregate
      *
      * @throws RuntimeException When proc_open is not installed
      */
-    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60)
+    public function __construct($commandline, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60)
     {
         if (!function_exists('proc_open')) {
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
@@ -194,7 +194,7 @@ class Process implements \IteratorAggregate
      *
      * @final since version 3.3
      */
-    public function run(callable $callback = null, array $env = array())
+    public function run(callable $callback = null, array $env = array()): int
     {
         $this->start($callback, $env);
 
@@ -269,18 +269,13 @@ class Process implements \IteratorAggregate
         if ($this->env) {
             $env += $this->env;
         }
-
-        $envBackup = array();
-        foreach ($env as $k => $v) {
-            $envBackup[$k] = getenv($k);
-            putenv(false === $v || null === $v ? $k : "$k=$v");
-        }
+        $env += $this->getDefaultEnv();
 
         $options = array('suppress_errors' => true);
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             $options['bypass_shell'] = true;
-            $commandline = $this->prepareWindowsCommandLine($commandline, $envBackup);
+            $commandline = $this->prepareWindowsCommandLine($commandline, $env);
         } elseif (!$this->useFileHandles && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = array('pipe', 'w');
@@ -294,15 +289,16 @@ class Process implements \IteratorAggregate
             $ptsWorkaround = fopen(__FILE__, 'r');
         }
 
+        $envPairs = array();
+        foreach ($env as $k => $v) {
+            $envPairs[] = $k.'='.$v;
+        }
+
         if (!is_dir($this->cwd)) {
             throw new RuntimeException('The provided cwd does not exist.');
         }
 
-        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, null, $options);
-
-        foreach ($envBackup as $k => $v) {
-            putenv(false === $v ? $k : "$k=$v");
-        }
+        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $envPairs, $options);
 
         if (!is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
@@ -853,10 +849,8 @@ class Process implements \IteratorAggregate
      * Adds a line to the STDOUT stream.
      *
      * @internal
-     *
-     * @param string $line The line to append
      */
-    public function addOutput($line)
+    public function addOutput(string $line)
     {
         $this->lastOutputTime = microtime(true);
 
@@ -869,10 +863,8 @@ class Process implements \IteratorAggregate
      * Adds a line to the STDERR stream.
      *
      * @internal
-     *
-     * @param string $line The line to append
      */
-    public function addErrorOutput($line)
+    public function addErrorOutput(string $line)
     {
         $this->lastOutputTime = microtime(true);
 
@@ -980,16 +972,9 @@ class Process implements \IteratorAggregate
         if ('\\' === DIRECTORY_SEPARATOR && $tty) {
             throw new RuntimeException('TTY mode is not supported on Windows platform.');
         }
-        if ($tty) {
-            static $isTtySupported;
 
-            if (null === $isTtySupported) {
-                $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', array(array('file', '/dev/tty', 'r'), array('file', '/dev/tty', 'w'), array('file', '/dev/tty', 'w')), $pipes);
-            }
-
-            if (!$isTtySupported) {
-                throw new RuntimeException('TTY mode requires /dev/tty to be read/writable.');
-            }
+        if ($tty && !self::isTtySupported()) {
+            throw new RuntimeException('TTY mode requires /dev/tty to be read/writable.');
         }
 
         $this->tty = (bool) $tty;
@@ -1113,7 +1098,7 @@ class Process implements \IteratorAggregate
      *
      * This content will be passed to the underlying process standard input.
      *
-     * @param resource|scalar|\Traversable|null $input The content
+     * @param string|int|float|bool|resource|\Traversable|null $input The content
      *
      * @return self The current Process instance
      *
@@ -1174,6 +1159,20 @@ class Process implements \IteratorAggregate
     }
 
     /**
+     * Returns whether TTY is supported on the current operating system.
+     */
+    public static function isTtySupported(): bool
+    {
+        static $isTtySupported;
+
+        if (null === $isTtySupported) {
+            $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', array(array('file', '/dev/tty', 'r'), array('file', '/dev/tty', 'w'), array('file', '/dev/tty', 'w')), $pipes);
+        }
+
+        return $isTtySupported;
+    }
+
+    /**
      * Returns whether PTY is supported on the current operating system.
      *
      * @return bool
@@ -1195,10 +1194,8 @@ class Process implements \IteratorAggregate
 
     /**
      * Creates the descriptors needed by the proc_open.
-     *
-     * @return array
      */
-    private function getDescriptors()
+    private function getDescriptors(): array
     {
         if ($this->input instanceof \Iterator) {
             $this->input->rewind();
@@ -1301,7 +1298,7 @@ class Process implements \IteratorAggregate
      *
      * @throws LogicException in case output has been disabled or process is not started
      */
-    private function readPipesForOutput($caller, $blocking = false)
+    private function readPipesForOutput(string $caller, bool $blocking = false)
     {
         if ($this->outputDisabled) {
             throw new LogicException('Output has been disabled.');
@@ -1315,13 +1312,9 @@ class Process implements \IteratorAggregate
     /**
      * Validates and returns the filtered timeout.
      *
-     * @param int|float|null $timeout
-     *
-     * @return float|null
-     *
      * @throws InvalidArgumentException if the given timeout is a negative number
      */
-    private function validateTimeout($timeout)
+    private function validateTimeout(?float $timeout): ?float
     {
         $timeout = (float) $timeout;
 
@@ -1340,7 +1333,7 @@ class Process implements \IteratorAggregate
      * @param bool $blocking Whether to use blocking calls or not
      * @param bool $close    Whether to close file handles or not
      */
-    private function readPipes($blocking, $close)
+    private function readPipes(bool $blocking, bool $close)
     {
         $result = $this->processPipes->readAndWrite($blocking, $close);
 
@@ -1359,7 +1352,7 @@ class Process implements \IteratorAggregate
      *
      * @return int The exitcode
      */
-    private function close()
+    private function close(): int
     {
         $this->processPipes->close();
         if (is_resource($this->process)) {
@@ -1417,7 +1410,7 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException In case --enable-sigchild is activated and the process can't be killed
      * @throws RuntimeException In case of failure
      */
-    private function doSignal($signal, $throwException)
+    private function doSignal(int $signal, bool $throwException): bool
     {
         if (null === $pid = $this->getPid()) {
             if ($throwException) {
@@ -1461,7 +1454,7 @@ class Process implements \IteratorAggregate
         return true;
     }
 
-    private function prepareWindowsCommandLine($cmd, array &$envBackup)
+    private function prepareWindowsCommandLine(string $cmd, array &$env)
     {
         $uid = uniqid('', true);
         $varCount = 0;
@@ -1474,7 +1467,7 @@ class Process implements \IteratorAggregate
                     [^"%!^]*+
                 )++
             ) | [^"]*+ )"/x',
-            function ($m) use (&$envBackup, &$varCache, &$varCount, $uid) {
+            function ($m) use (&$env, &$varCache, &$varCount, $uid) {
                 if (!isset($m[1])) {
                     return $m[0];
                 }
@@ -1492,9 +1485,7 @@ class Process implements \IteratorAggregate
                 $value = '"'.preg_replace('/(\\\\*)"/', '$1$1\\"', $value).'"';
                 $var = $uid.++$varCount;
 
-                putenv("$var=$value");
-
-                $envBackup[$var] = false;
+                $env[$var] = $value;
 
                 return $varCache[$m[0]] = '!'.$var.'!';
             },
@@ -1512,11 +1503,9 @@ class Process implements \IteratorAggregate
     /**
      * Ensures the process is running or terminated, throws a LogicException if the process has a not started.
      *
-     * @param string $functionName The function name that was called
-     *
      * @throws LogicException if the process has not run
      */
-    private function requireProcessIsStarted($functionName)
+    private function requireProcessIsStarted(string $functionName)
     {
         if (!$this->isStarted()) {
             throw new LogicException(sprintf('Process must be started before calling %s.', $functionName));
@@ -1526,11 +1515,9 @@ class Process implements \IteratorAggregate
     /**
      * Ensures the process is terminated, throws a LogicException if the process has a status different than `terminated`.
      *
-     * @param string $functionName The function name that was called
-     *
      * @throws LogicException if the process is not yet terminated
      */
-    private function requireProcessIsTerminated($functionName)
+    private function requireProcessIsTerminated(string $functionName)
     {
         if (!$this->isTerminated()) {
             throw new LogicException(sprintf('Process must be terminated before calling %s.', $functionName));
@@ -1539,12 +1526,8 @@ class Process implements \IteratorAggregate
 
     /**
      * Escapes a string to be used as a shell argument.
-     *
-     * @param string $argument The argument that will be escaped
-     *
-     * @return string The escaped argument
      */
-    private function escapeArgument($argument)
+    private function escapeArgument(string $argument): string
     {
         if ('\\' !== DIRECTORY_SEPARATOR) {
             return "'".str_replace("'", "'\\''", $argument)."'";
@@ -1561,5 +1544,24 @@ class Process implements \IteratorAggregate
         $argument = preg_replace('/(\\\\+)$/', '$1$1', $argument);
 
         return '"'.str_replace(array('"', '^', '%', '!', "\n"), array('""', '"^^"', '"^%"', '"^!"', '!LF!'), $argument).'"';
+    }
+
+    private function getDefaultEnv()
+    {
+        $env = array();
+
+        foreach ($_SERVER as $k => $v) {
+            if (is_string($v) && false !== $v = getenv($k)) {
+                $env[$k] = $v;
+            }
+        }
+
+        foreach ($_ENV as $k => $v) {
+            if (is_string($v)) {
+                $env[$k] = $v;
+            }
+        }
+
+        return $env;
     }
 }

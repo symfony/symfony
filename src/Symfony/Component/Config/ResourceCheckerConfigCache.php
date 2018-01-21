@@ -37,7 +37,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      * @param string                              $file             The absolute cache path
      * @param iterable|ResourceCheckerInterface[] $resourceCheckers The ResourceCheckers to use for the freshness check
      */
-    public function __construct($file, $resourceCheckers = array())
+    public function __construct(string $file, iterable $resourceCheckers = array())
     {
         $this->file = $file;
         $this->resourceCheckers = $resourceCheckers;
@@ -68,7 +68,11 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             return false;
         }
 
-        if (!$this->resourceCheckers) {
+        if ($this->resourceCheckers instanceof \Traversable && !$this->resourceCheckers instanceof \Countable) {
+            $this->resourceCheckers = iterator_to_array($this->resourceCheckers);
+        }
+
+        if (!count($this->resourceCheckers)) {
             return true; // shortcut - if we don't have any checkers we don't need to bother with the meta file at all
         }
 
@@ -117,7 +121,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         $mode = 0666;
         $umask = umask();
         $filesystem = new Filesystem();
-        $filesystem->dumpFile($this->file, $content, null);
+        $filesystem->dumpFile($this->file, $content);
         try {
             $filesystem->chmod($this->file, $mode, $umask);
         } catch (IOException $e) {
@@ -125,7 +129,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         }
 
         if (null !== $metadata) {
-            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata), null);
+            $filesystem->dumpFile($this->getMetaFile(), serialize($metadata));
             try {
                 $filesystem->chmod($this->getMetaFile(), $mode, $umask);
             } catch (IOException $e) {
@@ -154,7 +158,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         $meta = false;
         $signalingException = new \UnexpectedValueException();
         $prevUnserializeHandler = ini_set('unserialize_callback_func', '');
-        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) use (&$prevErrorHandler, $signalingException) {
+        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = array()) use (&$prevErrorHandler, $signalingException) {
             if (E_WARNING === $type && 'Class __PHP_Incomplete_Class has no unserializer' === $msg) {
                 throw $signalingException;
             }

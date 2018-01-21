@@ -25,19 +25,9 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  */
 class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInterface
 {
-    /**
-     * @var LocaleDataProvider
-     */
     private $localeProvider;
 
-    /**
-     * Creates a new currency bundle.
-     *
-     * @param string                     $path
-     * @param BundleEntryReaderInterface $reader
-     * @param LocaleDataProvider         $localeProvider
-     */
-    public function __construct($path, BundleEntryReaderInterface $reader, LocaleDataProvider $localeProvider)
+    public function __construct(string $path, BundleEntryReaderInterface $reader, LocaleDataProvider $localeProvider)
     {
         parent::__construct($path, $reader);
 

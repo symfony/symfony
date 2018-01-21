@@ -52,18 +52,18 @@ class RequestTest extends TestCase
 
     public function testGetUser()
     {
-        $request = Request::create('http://user_test:password_test@test.com/');
+        $request = Request::create('http://user:password@test.com');
         $user = $request->getUser();
 
-        $this->assertEquals('user_test', $user);
+        $this->assertEquals('user', $user);
     }
 
     public function testGetPassword()
     {
-        $request = Request::create('http://user_test:password_test@test.com/');
+        $request = Request::create('http://user:password@test.com');
         $password = $request->getPassword();
 
-        $this->assertEquals('password_test', $password);
+        $this->assertEquals('password', $password);
     }
 
     public function testIsNoCache()
@@ -372,6 +372,7 @@ class RequestTest extends TestCase
             array('js', array('application/javascript', 'application/x-javascript', 'text/javascript')),
             array('css', array('text/css')),
             array('json', array('application/json', 'application/x-json')),
+            array('jsonld', array('application/ld+json')),
             array('xml', array('text/xml', 'application/xml', 'application/x-xml')),
             array('rdf', array('application/rdf+xml')),
             array('atom', array('application/atom+xml')),
@@ -968,6 +969,26 @@ class RequestTest extends TestCase
         $request->getClientIps();
     }
 
+    /**
+     * @dataProvider getClientIpsWithConflictingHeadersProvider
+     */
+    public function testGetClientIpsOnlyXHttpForwardedForTrusted($httpForwarded, $httpXForwardedFor)
+    {
+        $request = new Request();
+
+        $server = array(
+            'REMOTE_ADDR' => '88.88.88.88',
+            'HTTP_FORWARDED' => $httpForwarded,
+            'HTTP_X_FORWARDED_FOR' => $httpXForwardedFor,
+        );
+
+        Request::setTrustedProxies(array('88.88.88.88'), Request::HEADER_X_FORWARDED_FOR);
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertSame(array_reverse(explode(',', $httpXForwardedFor)), $request->getClientIps());
+    }
+
     public function getClientIpsWithConflictingHeadersProvider()
     {
         //        $httpForwarded                   $httpXForwardedFor
@@ -1486,8 +1507,18 @@ class RequestTest extends TestCase
         $request = new Request();
 
         $request->headers->set('Accept-language', 'zh, en-us; q=0.8, en; q=0.6');
+        $request->cookies->set('Foo', 'Bar');
 
-        $this->assertContains('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $request->__toString());
+        $asString = (string) $request;
+
+        $this->assertContains('Accept-Language: zh, en-us; q=0.8, en; q=0.6', $asString);
+        $this->assertContains('Cookie: Foo=Bar', $asString);
+
+        $request->cookies->set('Another', 'Cookie');
+
+        $asString = (string) $request;
+
+        $this->assertContains('Cookie: Foo=Bar; Another=Cookie', $asString);
     }
 
     public function testIsMethod()

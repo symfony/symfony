@@ -30,7 +30,7 @@ class ExceptionController
     protected $debug;
     protected $profiler;
 
-    public function __construct(Profiler $profiler = null, Environment $twig, $debug)
+    public function __construct(Profiler $profiler = null, Environment $twig, bool $debug)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;

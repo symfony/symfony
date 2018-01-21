@@ -35,7 +35,7 @@ class DumpDataCollectorTest extends TestCase
         $this->assertSame(1, $collector->getDumpsCount());
 
         $dump = $collector->getDumps('html');
-        $this->assertTrue(isset($dump[0]['data']));
+        $this->assertArrayHasKey('data', $dump[0]);
         $dump[0]['data'] = preg_replace('/^.*?<pre/', '<pre', $dump[0]['data']);
         $dump[0]['data'] = preg_replace('/sf-dump-\d+/', 'sf-dump', $dump[0]['data']);
 

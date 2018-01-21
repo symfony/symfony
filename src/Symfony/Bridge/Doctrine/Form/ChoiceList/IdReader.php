@@ -24,29 +24,10 @@ use Symfony\Component\Form\Exception\RuntimeException;
  */
 class IdReader
 {
-    /**
-     * @var ObjectManager
-     */
     private $om;
-
-    /**
-     * @var ClassMetadata
-     */
     private $classMetadata;
-
-    /**
-     * @var bool
-     */
     private $singleId;
-
-    /**
-     * @var bool
-     */
     private $intId;
-
-    /**
-     * @var string
-     */
     private $idField;
 
     /**

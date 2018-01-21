@@ -27,7 +27,7 @@ class FileTypeFilterIterator extends \FilterIterator
      * @param \Iterator $iterator The Iterator to filter
      * @param int       $mode     The mode (self::ONLY_FILES or self::ONLY_DIRECTORIES)
      */
-    public function __construct(\Iterator $iterator, $mode)
+    public function __construct(\Iterator $iterator, int $mode)
     {
         $this->mode = $mode;
 

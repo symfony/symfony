@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Allowed to pass an optional `LoggerInterface $logger` instance to the `Router`
+ * Added a new `parameter_bag` service with related autowiring aliases to access parameters as-a-service
+ * Allowed the `Router` to work with any PSR-11 container
+ * added option in workflow dump command to label graph with a custom label
+
 4.0.0
 -----
 
@@ -27,6 +35,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Added `translator.default_path` option and parameter
  * Session `use_strict_mode` is now enabled by default and the corresponding option has been deprecated
  * Made the `cache:clear` command to *not* clear "app" PSR-6 cache pools anymore,
    but to still clear "system" ones; use the `cache:pool:clear` command to clear "app" pools instead
@@ -66,10 +75,10 @@ CHANGELOG
    `Symfony\Component\EventDispatcher\EventDispatcherInterface` as
     first argument
  * `RouterDebugCommand::__construct()` now takes an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument
  * `RouterMatchCommand::__construct()` now takes an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument
  * `TranslationDebugCommand::__construct()` now takes an instance of
    `Symfony\Component\Translation\TranslatorInterface` as

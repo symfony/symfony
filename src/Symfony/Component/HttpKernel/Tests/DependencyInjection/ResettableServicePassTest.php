@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
-use Symfony\Component\HttpKernel\EventListener\ServiceResetListener;
+use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ClearableService;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
@@ -24,14 +24,14 @@ class ResettableServicePassTest extends TestCase
             ->setPublic(true)
             ->addTag('kernel.reset', array('method' => 'clear'));
 
-        $container->register(ServiceResetListener::class)
+        $container->register('services_resetter', ServicesResetter::class)
             ->setPublic(true)
             ->setArguments(array(null, array()));
-        $container->addCompilerPass(new ResettableServicePass('kernel.reset'));
+        $container->addCompilerPass(new ResettableServicePass());
 
         $container->compile();
 
-        $definition = $container->getDefinition(ServiceResetListener::class);
+        $definition = $container->getDefinition('services_resetter');
 
         $this->assertEquals(
             array(
@@ -57,9 +57,9 @@ class ResettableServicePassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register(ResettableService::class)
             ->addTag('kernel.reset');
-        $container->register(ServiceResetListener::class)
+        $container->register('services_resetter', ServicesResetter::class)
             ->setArguments(array(null, array()));
-        $container->addCompilerPass(new ResettableServicePass('kernel.reset'));
+        $container->addCompilerPass(new ResettableServicePass());
 
         $container->compile();
     }
@@ -67,22 +67,12 @@ class ResettableServicePassTest extends TestCase
     public function testCompilerPassWithoutResetters()
     {
         $container = new ContainerBuilder();
-        $container->register(ServiceResetListener::class)
+        $container->register('services_resetter', ServicesResetter::class)
             ->setArguments(array(null, array()));
         $container->addCompilerPass(new ResettableServicePass());
 
         $container->compile();
 
-        $this->assertFalse($container->has(ServiceResetListener::class));
-    }
-
-    public function testCompilerPassWithoutListener()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new ResettableServicePass());
-
-        $container->compile();
-
-        $this->assertFalse($container->has(ServiceResetListener::class));
+        $this->assertFalse($container->has('services_resetter'));
     }
 }

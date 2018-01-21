@@ -2,6 +2,54 @@
 
 {# Widgets #}
 
+{% block money_widget -%}
+    {% if not valid %}
+        {% set group_class = ' form-control is-invalid' %}
+        {% set valid = true %}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock money_widget %}
+
+{% block datetime_widget -%}
+    {%- if widget != 'single_text' and not valid -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set valid = true %}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock datetime_widget %}
+
+{% block date_widget -%}
+    {%- if widget != 'single_text' and not valid -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set valid = true %}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock date_widget %}
+
+{% block time_widget -%}
+    {%- if widget != 'single_text' and not valid -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set valid = true %}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock time_widget %}
+
+{% block dateinterval_widget -%}
+    {%- if widget != 'single_text' and not valid -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set valid = true %}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock dateinterval_widget %}
+
+{% block percent_widget -%}
+    <div class="input-group{{ not valid ? ' form-control is-invalid' }}">
+        {% set valid = true %}
+        {{- block('form_widget_simple') -}}
+        <span class="input-group-addon">%</span>
+    </div>
+{%- endblock percent_widget %}
+
 {% block form_widget_simple -%}
     {% if type is not defined or type != 'hidden' %}
         {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control' ~ (type|default('') == 'file' ? '-file' : ''))|trim}) -%}
@@ -11,7 +59,7 @@
 
 {%- block widget_attributes -%}
     {%- if not valid %}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' is-invalid')|trim}) %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) %}
     {% endif -%}
     {{ parent() }}
 {%- endblock widget_attributes -%}
@@ -23,11 +71,15 @@
 
 {% block checkbox_widget -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
-    {%- set attr = attr|merge({class: attr.class|default('form-check-input')}) -%}
-    {%- if 'checkbox-inline' in parent_label_class -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
+    {% if 'checkbox-inline' in parent_label_class %}
         {{- form_label(form, null, { widget: parent() }) -}}
-    {%- else -%}
-        <div class="form-check">
+    {% elseif 'form-check-inline' in parent_label_class %}
+        <div class="form-check{{ not valid ? ' form-control is-invalid' }} form-check-inline">
+            {{- form_label(form, null, { widget: parent() }) -}}
+        </div>
+    {% else -%}
+        <div class="form-check{{ not valid ? ' form-control is-invalid' }}">
             {{- form_label(form, null, { widget: parent() }) -}}
         </div>
     {%- endif -%}
@@ -35,11 +87,11 @@
 
 {% block radio_widget -%}
     {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
-    {%- set attr = attr|merge({class: attr.class|default('form-check-input')}) -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
     {%- if 'radio-inline' in parent_label_class -%}
         {{- form_label(form, null, { widget: parent() }) -}}
     {%- else -%}
-        <div class="form-check">
+        <div class="form-check{{ not valid ? ' form-control is-invalid' }}">
             {{- form_label(form, null, { widget: parent() }) -}}
         </div>
     {%- endif -%}
@@ -55,12 +107,15 @@
             }) -}}
         {% endfor -%}
     {%- else -%}
+        {%- if not valid -%}
+            {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) %}
+        {%- endif -%}
         <div {{ block('widget_container_attributes') }}>
             {%- for child in form %}
                 {{- form_widget(child, {
                     parent_label_class: label_attr.class|default(''),
                     translation_domain: choice_translation_domain,
-                    valid: valid,
+                    valid: true,
                 }) -}}
             {% endfor -%}
         </div>
@@ -70,11 +125,12 @@
 {# Labels #}
 
 {% block form_label -%}
-    {%- if expanded is defined and expanded -%}
+    {%- if compound is defined and compound -%}
         {%- set element = 'legend' -%}
         {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-legend')|trim}) -%}
+    {%- else -%}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
     {%- endif -%}
-    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
     {{- parent() -}}
 {%- endblock form_label %}
 
@@ -107,7 +163,7 @@
 {# Rows #}
 
 {% block form_row -%}
-    {%- if expanded is defined and expanded -%}
+    {%- if compound is defined and compound -%}
         {%- set element = 'fieldset' -%}
     {%- endif -%}
     <{{ element|default('div') }} class="form-group">
@@ -121,7 +177,7 @@
 
 {% block form_errors -%}
     {%- if errors|length > 0 -%}
-    <div class="{% if form.parent %}invalid-feedback{% else %}alert alert-danger{% endif %}">
+    <div class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %}">
         <ul class="list-unstyled mb-0">
             {%- for error in errors -%}
                 <li>{{ error.message }}</li>

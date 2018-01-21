@@ -32,6 +32,9 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
     public function open($savePath, $sessionName)
     {
         $this->sessionName = $sessionName;
+        if (!headers_sent() && !ini_get('session.cache_limiter') && '0' !== ini_get('session.cache_limiter')) {
+            header(sprintf('Cache-Control: max-age=%d, private, must-revalidate', 60 * (int) ini_get('session.cache_expire')));
+        }
 
         return true;
     }
@@ -139,7 +142,7 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
             if ($sessionCookieFound) {
                 header_remove('Set-Cookie');
                 foreach ($otherCookies as $h) {
-                    header('Set-Cookie:'.$h, false);
+                    header($h, false);
                 }
             } else {
                 setcookie($this->sessionName, '', 0, ini_get('session.cookie_path'), ini_get('session.cookie_domain'), ini_get('session.cookie_secure'), ini_get('session.cookie_httponly'));

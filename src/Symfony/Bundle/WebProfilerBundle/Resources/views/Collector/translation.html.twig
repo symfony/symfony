@@ -199,9 +199,9 @@
         <tbody>
         {% for message in messages %}
             <tr>
-                <td class="font-normal text-small">{{ message.locale }}</td>
+                <td class="font-normal text-small nowrap">{{ message.locale }}</td>
                 <td class="font-normal text-small text-bold nowrap">{{ message.domain }}</td>
-                <td class="font-normal text-small">{{ message.count }}</td>
+                <td class="font-normal text-small nowrap">{{ message.count }}</td>
                 <td>
                     <span class="nowrap">{{ message.id }}</span>
 

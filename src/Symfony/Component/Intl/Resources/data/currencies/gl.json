@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.1",
     "Names": {
         "ADP": [
             "ADP",
@@ -38,7 +38,7 @@
             "Peso arxentino"
         ],
         "AUD": [
-            "$A",
+            "A$",
             "Dólar australiano"
         ],
         "AWG": [
@@ -118,7 +118,7 @@
             "Cruzeiro brasileiro (1990–1993)"
         ],
         "BRL": [
-            "$R",
+            "R$",
             "Real brasileiro"
         ],
         "BRN": [
@@ -154,7 +154,7 @@
             "Dólar belizense"
         ],
         "CAD": [
-            "$CA",
+            "CA$",
             "Dólar canadense"
         ],
         "CDF": [
@@ -172,6 +172,10 @@
         "CLP": [
             "CLP",
             "Peso chileno"
+        ],
+        "CNH": [
+            "CNH",
+            "Iuán chinés (extracontinental)"
         ],
         "CNY": [
             "CN¥",

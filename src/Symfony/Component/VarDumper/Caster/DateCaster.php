@@ -72,7 +72,7 @@ class DateCaster
     public static function castTimeZone(\DateTimeZone $timeZone, array $a, Stub $stub, $isNested, $filter)
     {
         $location = $timeZone->getLocation();
-        $formatted = (new \Datetime('now', $timeZone))->format($location ? 'e (P)' : 'P');
+        $formatted = (new \DateTime('now', $timeZone))->format($location ? 'e (P)' : 'P');
         $title = $location && extension_loaded('intl') ? \Locale::getDisplayRegion('-'.$location['country_code']) : '';
 
         $z = array(Caster::PREFIX_VIRTUAL.'timezone' => new ConstStub($formatted, $title));

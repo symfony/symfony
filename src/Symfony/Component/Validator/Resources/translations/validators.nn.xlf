@@ -20,15 +20,15 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>Verdien du valgte er ikkje gyldig.</target>
+                <target>Verdien du valde er ikkje gyldig.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>Du må velge minst {{ limit }} valg.</target>
+                <target>Du må gjere minst {{ limit }} val.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>Du kan maksimalt gjere {{ limit }} valg.</target>
+                <target>Du kan maksimalt gjere {{ limit }} val.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Dette feltet var ikke forventet.</target>
+                <target>Dette feltet var ikke forventa.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
-                <target>Fila kunne ikkje finnes.</target>
+                <target>Fila er ikkje funnen.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable.</source>
@@ -64,11 +64,11 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Fila er for stor ({{ size }} {{ suffix }}). Tillatt maksimal størrelse er {{ limit }} {{ suffix }}.</target>
+                <target>Fila er for stor ({{ size }} {{ suffix }}). Maksimal storleik er {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>Mime-typen av fila er ugyldig ({{ type }}). Tillatte mime-typar er {{ types }}.</target>
+                <target>Mime-typen av fila er ugyldig ({{ type }}). Tillatne mime-typar er {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -88,11 +88,11 @@
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
-                <target>Verdien må ikkje vere blank.</target>
+                <target>Verdien kan ikkje vere blank.</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>Verdien må ikkje vere tom (null).</target>
+                <target>Verdien kan ikkje vere tom (null).</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
@@ -104,7 +104,7 @@
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
-                <target>Verdien er ikkje gyldig tidseining.</target>
+                <target>Verdien er ikkje ei gyldig tidseining.</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
@@ -116,7 +116,7 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Fila er for stor. Den maksimale storleik er {{ limit }} {{ suffix }}.</target>
+                <target>Fila er for stor. Den maksimale storleiken er {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
@@ -160,7 +160,7 @@
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>Biletbreidda er for stor, ({{ width }} pikslar). Tillatt maksimumsbreidde er {{ max_width }} pikslar.</target>
+                <target>Biletbreidda er for stor, ({{ width }} pikslar). Tillaten maksimumsbreidde er {{ max_width }} pikslar.</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
@@ -168,7 +168,7 @@
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>Bilethøgda er for stor, ({{ height }} pikslar). Tillatt maksimumshøgde er {{ max_height }} pikslar.</target>
+                <target>Bilethøgda er for stor, ({{ height }} pikslar). Tillaten maksimumshøgde er {{ max_height }} pikslar.</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
@@ -184,7 +184,7 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>Fila vart kun delvis opplasta.</target>
+                <target>Fila vart berre delvis lasta opp.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
@@ -220,7 +220,7 @@
             </trans-unit>
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
-                <target>Korttypen er ikkje støtta eller ugyldig kortnummer.</target>
+                <target>Korttypen er ikkje støtta, eller kortnummeret er ugyldig.</target>
             </trans-unit>
         </body>
     </file>

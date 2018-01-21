@@ -64,6 +64,13 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $this->assertSame('foo', $this->container->getAlias('bar')->__toString());
     }
 
+    public function testBindingsShouldBeResolved()
+    {
+        list($boundValue) = $this->container->getDefinition('foo')->getBindings()['$baz']->getValues();
+
+        $this->assertSame($this->container->getParameterBag()->resolveValue('%env(BAZ)%'), $boundValue);
+    }
+
     private function createContainerBuilder()
     {
         $containerBuilder = new ContainerBuilder();
@@ -84,6 +91,7 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $fooDefinition->addMethodCall('%foo.method%', array('%foo.arg1%', '%foo.arg2%'));
         $fooDefinition->setProperty('%foo.property.name%', '%foo.property.value%');
         $fooDefinition->setFile('%foo.file%');
+        $fooDefinition->setBindings(array('$baz' => '%env(BAZ)%'));
 
         $containerBuilder->setAlias('%alias.id%', 'foo');
 

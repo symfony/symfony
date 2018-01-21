@@ -36,11 +36,9 @@ class ImportConfigurator
     /**
      * Sets the prefix to add to the path of all child routes.
      *
-     * @param string $prefix
-     *
      * @return $this
      */
-    final public function prefix($prefix)
+    final public function prefix(string $prefix)
     {
         $this->route->addPrefix($prefix);
 

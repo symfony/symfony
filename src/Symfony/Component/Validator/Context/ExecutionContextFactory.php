@@ -23,14 +23,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ExecutionContextFactory implements ExecutionContextFactoryInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
-
-    /**
-     * @var string|null
-     */
     private $translationDomain;
 
     /**
@@ -41,7 +34,7 @@ class ExecutionContextFactory implements ExecutionContextFactoryInterface
      *                                               use for translating
      *                                               violation messages
      */
-    public function __construct(TranslatorInterface $translator, $translationDomain = null)
+    public function __construct(TranslatorInterface $translator, string $translationDomain = null)
     {
         $this->translator = $translator;
         $this->translationDomain = $translationDomain;

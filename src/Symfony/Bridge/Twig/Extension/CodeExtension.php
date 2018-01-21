@@ -31,7 +31,7 @@ class CodeExtension extends AbstractExtension
      * @param string                   $rootDir        The project root directory
      * @param string                   $charset        The charset
      */
-    public function __construct($fileLinkFormat, $rootDir, $charset)
+    public function __construct($fileLinkFormat, string $rootDir, string $charset)
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->rootDir = str_replace('/', DIRECTORY_SEPARATOR, dirname($rootDir)).DIRECTORY_SEPARATOR;
@@ -196,7 +196,7 @@ class CodeExtension extends AbstractExtension
      * @param string $file An absolute file path
      * @param int    $line The line number
      *
-     * @return string A link of false
+     * @return string|false A link or false
      */
     public function getFileLink($file, $line)
     {

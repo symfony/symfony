@@ -32,11 +32,6 @@ class TokenStream
     private $tokens = array();
 
     /**
-     * @var bool
-     */
-    private $frozen = false;
-
-    /**
      * @var Token[]
      */
     private $used = array();
@@ -49,7 +44,7 @@ class TokenStream
     /**
      * @var Token|null
      */
-    private $peeked = null;
+    private $peeked;
 
     /**
      * @var bool
@@ -75,8 +70,6 @@ class TokenStream
      */
     public function freeze()
     {
-        $this->frozen = true;
-
         return $this;
     }
 

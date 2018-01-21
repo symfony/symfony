@@ -49,8 +49,8 @@ foreach ($dirs as $k => $dir) {
 
     $packages[$package->name][$package->version] = $package;
 
-    $versions = file_get_contents('https://packagist.org/packages/'.$package->name.'.json');
-    $versions = json_decode($versions)->package->versions;
+    $versions = file_get_contents('https://packagist.org/p/'.$package->name.'.json');
+    $versions = json_decode($versions)->packages->{$package->name};
 
     if ($package->version === str_replace('-dev', '.x-dev', $versions->{'dev-master'}->extra->{'branch-alias'}->{'dev-master'})) {
         unset($versions->{'dev-master'});

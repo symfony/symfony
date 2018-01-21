@@ -24,7 +24,7 @@ class CheckArgumentsValidityPass extends AbstractRecursivePass
 {
     private $throwExceptions;
 
-    public function __construct($throwExceptions = true)
+    public function __construct(bool $throwExceptions = true)
     {
         $this->throwExceptions = $throwExceptions;
     }

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.1",
     "Scripts": [
         "Adlm",
         "Afak",
@@ -42,6 +42,7 @@
         "Geok",
         "Geor",
         "Glag",
+        "Gonm",
         "Goth",
         "Gran",
         "Grek",
@@ -188,6 +189,7 @@
         "Sind",
         "Sinh",
         "Sora",
+        "Soyo",
         "Sund",
         "Sylo",
         "Syrc",
@@ -217,6 +219,7 @@
         "Xpeo",
         "Xsux",
         "Yiii",
+        "Zanb",
         "Zinh",
         "Zmth",
         "Zsye",

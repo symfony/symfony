@@ -20,9 +20,9 @@ use Twig\Node\Node;
  */
 class FormThemeNode extends Node
 {
-    public function __construct(Node $form, Node $resources, $lineno, $tag = null, $only = false)
+    public function __construct(Node $form, Node $resources, int $lineno, string $tag = null, bool $only = false)
     {
-        parent::__construct(array('form' => $form, 'resources' => $resources), array('only' => (bool) $only), $lineno, $tag);
+        parent::__construct(array('form' => $form, 'resources' => $resources), array('only' => $only), $lineno, $tag);
     }
 
     public function compile(Compiler $compiler)

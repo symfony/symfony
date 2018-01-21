@@ -22,9 +22,15 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
 {
     public static function isSupported()
     {
-        return (\PHP_VERSION_ID >= 70200 && \defined('PASSWORD_ARGON2I'))
-            || \function_exists('sodium_crypto_pwhash_str')
-            || \extension_loaded('libsodium');
+        if (\defined('PASSWORD_ARGON2I')) {
+            return true;
+        }
+
+        if (\class_exists('ParagonIE_Sodium_Compat') && \method_exists('ParagonIE_Sodium_Compat', 'crypto_pwhash_is_available')) {
+            return \ParagonIE_Sodium_Compat::crypto_pwhash_is_available();
+        }
+
+        return \function_exists('sodium_crypto_pwhash_str') || \extension_loaded('libsodium');
     }
 
     /**

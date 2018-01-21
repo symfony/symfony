@@ -37,7 +37,7 @@ class FragmentHandler
      * @param FragmentRendererInterface[] $renderers    An array of FragmentRendererInterface instances
      * @param bool                        $debug        Whether the debug mode is enabled or not
      */
-    public function __construct(RequestStack $requestStack, array $renderers = array(), $debug = false)
+    public function __construct(RequestStack $requestStack, array $renderers = array(), bool $debug = false)
     {
         $this->requestStack = $requestStack;
         foreach ($renderers as $renderer) {

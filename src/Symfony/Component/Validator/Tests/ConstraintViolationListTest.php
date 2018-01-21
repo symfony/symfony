@@ -89,16 +89,16 @@ class ConstraintViolationListTest extends TestCase
         $this->list[] = $violation;
 
         $this->assertSame($violation, $this->list[0]);
-        $this->assertTrue(isset($this->list[0]));
+        $this->assertArrayHasKey(0, $this->list);
 
         unset($this->list[0]);
 
-        $this->assertFalse(isset($this->list[0]));
+        $this->assertArrayNotHasKey(0, $this->list);
 
         $this->list[10] = $violation;
 
         $this->assertSame($violation, $this->list[10]);
-        $this->assertTrue(isset($this->list[10]));
+        $this->assertArrayHasKey(10, $this->list);
     }
 
     public function testToString()

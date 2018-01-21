@@ -79,11 +79,11 @@ class CheckDefinitionValidityPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
      */
-    public function testDynamicServiceName()
+    public function testDynamicPublicServiceName()
     {
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
-        $container->register("foo.$env", 'class');
+        $container->register("foo.$env", 'class')->setPublic(true);
 
         $this->process($container);
     }
@@ -91,13 +91,25 @@ class CheckDefinitionValidityPassTest extends TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvParameterException
      */
-    public function testDynamicAliasName()
+    public function testDynamicPublicAliasName()
     {
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
-        $container->setAlias("foo.$env", 'class');
+        $container->setAlias("foo.$env", 'class')->setPublic(true);
 
         $this->process($container);
+    }
+
+    public function testDynamicPrivateName()
+    {
+        $container = new ContainerBuilder();
+        $env = $container->getParameterBag()->get('env(BAR)');
+        $container->register("foo.$env", 'class');
+        $container->setAlias("bar.$env", 'class');
+
+        $this->process($container);
+
+        $this->addToAssertionCount(1);
     }
 
     protected function process(ContainerBuilder $container)

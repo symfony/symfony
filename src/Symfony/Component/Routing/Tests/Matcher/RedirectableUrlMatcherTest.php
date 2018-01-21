@@ -98,4 +98,14 @@ class RedirectableUrlMatcherTest extends TestCase
         ;
         $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'), $matcher->match('/foo/baz'));
     }
+
+    public function testRedirectPreservesUrlEncoding()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo:bar/'));
+
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher->expects($this->once())->method('redirect')->with('/foo%3Abar/')->willReturn(array());
+        $matcher->match('/foo%3Abar');
+    }
 }

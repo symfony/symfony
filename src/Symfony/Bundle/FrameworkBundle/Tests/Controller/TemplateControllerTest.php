@@ -23,21 +23,23 @@ class TemplateControllerTest extends TestCase
     public function testTwig()
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->willReturn('bar');
+        $twig->expects($this->exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController($twig);
 
         $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
+        $this->assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
     public function testTemplating()
     {
         $templating = $this->getMockBuilder(EngineInterface::class)->getMock();
-        $templating->expects($this->once())->method('render')->willReturn('bar');
+        $templating->expects($this->exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController(null, $templating);
 
         $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
+        $this->assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
     /**
@@ -49,5 +51,6 @@ class TemplateControllerTest extends TestCase
         $controller = new TemplateController();
 
         $controller->templateAction('mytemplate')->getContent();
+        $controller('mytemplate')->getContent();
     }
 }

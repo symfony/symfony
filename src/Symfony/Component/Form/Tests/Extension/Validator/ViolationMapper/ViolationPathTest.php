@@ -96,7 +96,7 @@ class ViolationPathTest extends TestCase
         $path = new ViolationPath($string);
 
         $this->assertSame($slicedPath, $path->__toString());
-        $this->assertSame(count($entries), count($path->getElements()));
+        $this->assertCount(count($entries), $path->getElements());
         $this->assertSame(count($entries), $path->getLength());
 
         foreach ($entries as $index => $entry) {

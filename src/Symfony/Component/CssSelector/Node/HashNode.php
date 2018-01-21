@@ -26,28 +26,18 @@ class HashNode extends AbstractNode
     private $selector;
     private $id;
 
-    /**
-     * @param NodeInterface $selector
-     * @param string        $id
-     */
-    public function __construct(NodeInterface $selector, $id)
+    public function __construct(NodeInterface $selector, string $id)
     {
         $this->selector = $selector;
         $this->id = $id;
     }
 
-    /**
-     * @return NodeInterface
-     */
-    public function getSelector()
+    public function getSelector(): NodeInterface
     {
         return $this->selector;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }

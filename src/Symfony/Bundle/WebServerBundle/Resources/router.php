@@ -30,7 +30,7 @@ if (is_file($_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$_SERVER['SCRIPT_NAME'
     return false;
 }
 
-$script = getenv('APP_FRONT_CONTROLLER') ?: 'index.php';
+$script = isset($_ENV['APP_FRONT_CONTROLLER']) ? $_ENV['APP_FRONT_CONTROLLER'] : 'index.php';
 
 $_SERVER = array_merge($_SERVER, $_ENV);
 $_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$script;

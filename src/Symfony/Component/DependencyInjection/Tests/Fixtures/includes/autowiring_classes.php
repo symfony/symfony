@@ -90,6 +90,13 @@ class J
     }
 }
 
+class K
+{
+    public function __construct(IInterface $i)
+    {
+    }
+}
+
 interface CollisionInterface
 {
 }
@@ -296,6 +303,10 @@ class SetterInjectionParent
 class NotWireable
 {
     public function setNotAutowireable(NotARealClass $n)
+    {
+    }
+
+    public function setNotAutowireableBecauseOfATypo(lesTilleuls $sam)
     {
     }
 

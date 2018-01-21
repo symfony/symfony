@@ -73,11 +73,6 @@ final class PhpDocTypeHelper
 
     /**
      * Creates a {@see Type} from a PHPDoc type.
-     *
-     * @param string $docType
-     * @param bool   $nullable
-     *
-     * @return Type|null
      */
     private function createType(string $docType, bool $nullable): ?Type
     {

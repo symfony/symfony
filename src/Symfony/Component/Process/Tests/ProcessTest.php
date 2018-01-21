@@ -117,9 +117,14 @@ class ProcessTest extends TestCase
         $p = $this->getProcess(array(self::$phpBin, __DIR__.'/NonStopableProcess.php', 30));
         $p->start();
 
-        while (false === strpos($p->getOutput(), 'received')) {
+        while ($p->isRunning() && false === strpos($p->getOutput(), 'received')) {
             usleep(1000);
         }
+
+        if (!$p->isRunning()) {
+            throw new \LogicException('Process is not running: '.$p->getErrorOutput());
+        }
+
         $start = microtime(true);
         $p->stop(0.1);
 
@@ -562,7 +567,7 @@ class ProcessTest extends TestCase
     {
         $process = $this->getProcess('echo foo');
         $process->run();
-        $this->assertTrue(strlen($process->getOutput()) > 0);
+        $this->assertGreaterThan(0, strlen($process->getOutput()));
     }
 
     public function testGetExitCodeIsNullOnStart()
@@ -988,10 +993,9 @@ class ProcessTest extends TestCase
     }
 
     /**
-     * @dataProvider provideWrongSignal
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      */
-    public function testWrongSignal($signal)
+    public function testWrongSignal()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('POSIX signals do not work on Windows');
@@ -1000,21 +1004,13 @@ class ProcessTest extends TestCase
         $process = $this->getProcessForCode('sleep(38);');
         $process->start();
         try {
-            $process->signal($signal);
+            $process->signal(-4);
             $this->fail('A RuntimeException must have been thrown');
         } catch (RuntimeException $e) {
             $process->stop(0);
         }
 
         throw $e;
-    }
-
-    public function provideWrongSignal()
-    {
-        return array(
-            array(-4),
-            array('Céphalopodes'),
-        );
     }
 
     public function testDisableOutputDisablesTheOutput()
@@ -1216,7 +1212,7 @@ class ProcessTest extends TestCase
     {
         $input = new InputStream();
 
-        $process = $this->getProcessForCode('echo \'ping\'; stream_copy_to_stream(STDIN, STDOUT);');
+        $process = $this->getProcessForCode('echo \'ping\'; echo fread(STDIN, 4); echo fread(STDIN, 4);');
         $process->setInput($input);
 
         $process->start(function ($type, $data) use ($input) {
@@ -1397,6 +1393,7 @@ class ProcessTest extends TestCase
     public function testEnvBackupDoesNotDeleteExistingVars()
     {
         putenv('existing_var=foo');
+        $_ENV['existing_var'] = 'foo';
         $process = $this->getProcess('php -r "echo getenv(\'new_test_var\');"');
         $process->setEnv(array('existing_var' => 'bar', 'new_test_var' => 'foo'));
         $process->inheritEnvironmentVariables();
@@ -1406,20 +1403,27 @@ class ProcessTest extends TestCase
         $this->assertSame('foo', $process->getOutput());
         $this->assertSame('foo', getenv('existing_var'));
         $this->assertFalse(getenv('new_test_var'));
+
+        putenv('existing_var');
+        unset($_ENV['existing_var']);
     }
 
     public function testEnvIsInherited()
     {
-        $process = $this->getProcessForCode('echo serialize($_SERVER);', null, array('BAR' => 'BAZ'));
+        $process = $this->getProcessForCode('echo serialize($_SERVER);', null, array('BAR' => 'BAZ', 'EMPTY' => ''));
 
         putenv('FOO=BAR');
+        $_ENV['FOO'] = 'BAR';
 
         $process->run();
 
-        $expected = array('BAR' => 'BAZ', 'FOO' => 'BAR');
+        $expected = array('BAR' => 'BAZ', 'EMPTY' => '', 'FOO' => 'BAR');
         $env = array_intersect_key(unserialize($process->getOutput()), $expected);
 
         $this->assertEquals($expected, $env);
+
+        putenv('FOO');
+        unset($_ENV['FOO']);
     }
 
     public function testGetCommandLine()
@@ -1456,7 +1460,7 @@ Array
 )
 
 EOTXT;
-        $this->assertSame($expected, $p->getOutput());
+        $this->assertSame($expected, str_replace('Standard input code', '-', $p->getOutput()));
     }
 
     public function provideEscapeArgument()

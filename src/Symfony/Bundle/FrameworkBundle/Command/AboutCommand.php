@@ -90,7 +90,7 @@ EOT
             array('Xdebug', extension_loaded('xdebug') ? 'true' : 'false'),
         );
 
-        if ($dotenv = self::getDotEnvVars()) {
+        if ($dotenv = self::getDotenvVars()) {
             $rows = array_merge($rows, array(
                 new TableSeparator(),
                 array('<info>Environment (.env)</>'),
@@ -129,7 +129,7 @@ EOT
         return false !== $date && new \DateTime() > $date->modify('last day of this month 23:59:59');
     }
 
-    private static function getDotEnvVars(): array
+    private static function getDotenvVars(): array
     {
         $vars = array();
         foreach (explode(',', getenv('SYMFONY_DOTENV_VARS')) as $name) {

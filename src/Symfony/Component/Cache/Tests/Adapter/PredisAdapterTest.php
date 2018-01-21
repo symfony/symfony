@@ -44,6 +44,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
             'persistent_id' => null,
             'read_timeout' => 0,
             'retry_interval' => 0,
+            'lazy' => false,
             'database' => '1',
             'password' => null,
         );

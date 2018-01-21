@@ -24,15 +24,9 @@ class DateIntervalNormalizer implements NormalizerInterface, DenormalizerInterfa
 {
     const FORMAT_KEY = 'dateinterval_format';
 
-    /**
-     * @var string
-     */
     private $format;
 
-    /**
-     * @param string $format
-     */
-    public function __construct($format = 'P%yY%mM%dDT%hH%iM%sS')
+    public function __construct(string $format = 'P%yY%mM%dDT%hH%iM%sS')
     {
         $this->format = $format;
     }

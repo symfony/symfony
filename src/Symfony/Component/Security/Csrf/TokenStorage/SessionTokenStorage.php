@@ -23,31 +23,19 @@ class SessionTokenStorage implements TokenStorageInterface
 {
     /**
      * The namespace used to store values in the session.
-     *
-     * @var string
      */
     const SESSION_NAMESPACE = '_csrf';
 
-    /**
-     * The user session from which the session ID is returned.
-     *
-     * @var SessionInterface
-     */
     private $session;
-
-    /**
-     * @var string
-     */
     private $namespace;
 
     /**
      * Initializes the storage with a Session object and a session namespace.
      *
-     * @param SessionInterface $session   The user session
-     * @param string           $namespace The namespace under which the token
-     *                                    is stored in the session
+     * @param SessionInterface $session   The user session from which the session ID is returned
+     * @param string           $namespace The namespace under which the token is stored in the session
      */
-    public function __construct(SessionInterface $session, $namespace = self::SESSION_NAMESPACE)
+    public function __construct(SessionInterface $session, string $namespace = self::SESSION_NAMESPACE)
     {
         $this->session = $session;
         $this->namespace = $namespace;

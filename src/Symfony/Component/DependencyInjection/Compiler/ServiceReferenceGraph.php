@@ -64,6 +64,9 @@ class ServiceReferenceGraph
      */
     public function clear()
     {
+        foreach ($this->nodes as $node) {
+            $node->clear();
+        }
         $this->nodes = array();
     }
 

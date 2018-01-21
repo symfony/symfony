@@ -37,7 +37,7 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
      * @param string                    $phpArrayFile     The PHP file where metadata are cached
      * @param CacheItemPoolInterface    $fallbackPool     The pool where runtime-discovered metadata are cached
      */
-    public function __construct(ValidatorBuilderInterface $validatorBuilder, $phpArrayFile, CacheItemPoolInterface $fallbackPool)
+    public function __construct(ValidatorBuilderInterface $validatorBuilder, string $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {
         parent::__construct($phpArrayFile, $fallbackPool);
         $this->validatorBuilder = $validatorBuilder;
@@ -91,7 +91,7 @@ class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
             if ($loader instanceof XmlFileLoader || $loader instanceof YamlFileLoader) {
                 $supportedLoaders[] = $loader;
             } elseif ($loader instanceof LoaderChain) {
-                $supportedLoaders = array_merge($supportedLoaders, $this->extractSupportedLoaders($loader->getDelegatedLoaders()));
+                $supportedLoaders = array_merge($supportedLoaders, $this->extractSupportedLoaders($loader->getLoaders()));
             }
         }
 

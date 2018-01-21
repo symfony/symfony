@@ -22,21 +22,17 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  */
 class GenrbCompiler implements BundleCompilerInterface
 {
-    /**
-     * @var string The path to the "genrb" executable
-     */
     private $genrb;
 
     /**
      * Creates a new compiler based on the "genrb" executable.
      *
      * @param string $genrb   Optional. The path to the "genrb" executable
-     * @param string $envVars Optional. Environment variables to be loaded when
-     *                        running "genrb".
+     * @param string $envVars Optional. Environment variables to be loaded when running "genrb".
      *
      * @throws RuntimeException if the "genrb" cannot be found
      */
-    public function __construct($genrb = 'genrb', $envVars = '')
+    public function __construct(string $genrb = 'genrb', string $envVars = '')
     {
         exec('which '.$genrb, $output, $status);
 

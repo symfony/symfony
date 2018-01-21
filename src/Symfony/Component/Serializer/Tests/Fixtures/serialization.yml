@@ -10,3 +10,11 @@
       max_depth: 2
     bar:
       max_depth: 3
+'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummy':
+  discriminator_map:
+    type_property: type
+    mapping:
+      first: 'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummyFirstChild'
+      second: 'Symfony\Component\Serializer\Tests\Fixtures\AbstractDummySecondChild'
+  attributes:
+    foo: ~

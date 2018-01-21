@@ -25,14 +25,14 @@ use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class Workflow
+class Workflow implements WorkflowInterface
 {
     private $definition;
     private $markingStore;
     private $dispatcher;
     private $name;
 
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
+    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, string $name = 'unnamed')
     {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
@@ -41,13 +41,7 @@ class Workflow
     }
 
     /**
-     * Returns the object's Marking.
-     *
-     * @param object $subject A subject
-     *
-     * @return Marking The Marking
-     *
-     * @throws LogicException
+     * {@inheritdoc}
      */
     public function getMarking($subject)
     {
@@ -85,12 +79,7 @@ class Workflow
     }
 
     /**
-     * Returns true if the transition is enabled.
-     *
-     * @param object $subject        A subject
-     * @param string $transitionName A transition
-     *
-     * @return bool true if the transition is enabled
+     * {@inheritdoc}
      */
     public function can($subject, $transitionName)
     {
@@ -118,15 +107,7 @@ class Workflow
     }
 
     /**
-     * Fire a transition.
-     *
-     * @param object $subject        A subject
-     * @param string $transitionName A transition
-     *
-     * @return Marking The new Marking
-     *
-     * @throws BlockedTransitionException   If the transition is not applicable
-     * @throws UndefinedTransitionException If the transition does not exist
+     * {@inheritdoc}
      */
     public function apply($subject, string $transitionName): Marking
     {
@@ -177,11 +158,7 @@ class Workflow
     }
 
     /**
-     * Returns all enabled transitions.
-     *
-     * @param object $subject A subject
-     *
-     * @return Transition[] All enabled transitions
+     * {@inheritdoc}
      */
     public function getEnabledTransitions($subject)
     {
@@ -197,13 +174,16 @@ class Workflow
         return $enabled;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return $this->name;
     }
 
     /**
-     * @return Definition
+     * {@inheritdoc}
      */
     public function getDefinition()
     {
@@ -211,7 +191,7 @@ class Workflow
     }
 
     /**
-     * @return MarkingStoreInterface
+     * {@inheritdoc}
      */
     public function getMarkingStore()
     {

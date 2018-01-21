@@ -22,19 +22,8 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
 {
-    /**
-     * @var PropertyInfoExtractorInterface
-     */
     private $propertyInfoExtractor;
-
-    /**
-     * @var CacheItemPoolInterface
-     */
     private $cacheItemPool;
-
-    /**
-     * @var array
-     */
     private $arrayCache = array();
 
     public function __construct(PropertyInfoExtractorInterface $propertyInfoExtractor, CacheItemPoolInterface $cacheItemPool)
@@ -94,12 +83,9 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
     /**
      * Retrieves the cached data if applicable or delegates to the decorated extractor.
      *
-     * @param string $method
-     * @param array  $arguments
-     *
      * @return mixed
      */
-    private function extract($method, array $arguments)
+    private function extract(string $method, array $arguments)
     {
         try {
             $serializedArguments = serialize($arguments);

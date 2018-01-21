@@ -31,7 +31,7 @@ class PropertyInfoPass implements CompilerPassInterface
     private $descriptionExtractorTag;
     private $accessExtractorTag;
 
-    public function __construct($propertyInfoService = 'property_info', $listExtractorTag = 'property_info.list_extractor', $typeExtractorTag = 'property_info.type_extractor', $descriptionExtractorTag = 'property_info.description_extractor', $accessExtractorTag = 'property_info.access_extractor')
+    public function __construct(string $propertyInfoService = 'property_info', string $listExtractorTag = 'property_info.list_extractor', string $typeExtractorTag = 'property_info.type_extractor', string $descriptionExtractorTag = 'property_info.description_extractor', string $accessExtractorTag = 'property_info.access_extractor')
     {
         $this->propertyInfoService = $propertyInfoService;
         $this->listExtractorTag = $listExtractorTag;

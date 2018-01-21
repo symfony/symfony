@@ -126,10 +126,13 @@
         </service>
 
         <service id="translation.reader" class="Symfony\Component\Translation\Reader\TranslationReader" />
+        <service id="Symfony\Component\Translation\Reader\TranslationReaderInterface" alias="translation.reader" />
 
         <service id="translation.extractor" class="Symfony\Component\Translation\Extractor\ChainExtractor" />
+        <service id="Symfony\Component\Translation\Extractor\ExtractorInterface" alias="translation.extractor" />
 
         <service id="translation.writer" class="Symfony\Component\Translation\Writer\TranslationWriter" />
+        <service id="Symfony\Component\Translation\Writer\TranslationWriterInterface" alias="translation.writer" />
 
         <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer">
             <tag name="container.service_subscriber" id="translator" />

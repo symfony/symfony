@@ -21,23 +21,17 @@ class MoFileLoader extends FileLoader
     /**
      * Magic used for validating the format of a MO file as well as
      * detecting if the machine used to create that file was little endian.
-     *
-     * @var float
      */
     const MO_LITTLE_ENDIAN_MAGIC = 0x950412de;
 
     /**
      * Magic used for validating the format of a MO file as well as
      * detecting if the machine used to create that file was big endian.
-     *
-     * @var float
      */
     const MO_BIG_ENDIAN_MAGIC = 0xde120495;
 
     /**
      * The size of the header of a MO file in bytes.
-     *
-     * @var int Number of bytes
      */
     const MO_HEADER_SIZE = 28;
 
@@ -140,11 +134,8 @@ class MoFileLoader extends FileLoader
      * Reads an unsigned long from stream respecting endianness.
      *
      * @param resource $stream
-     * @param bool     $isBigEndian
-     *
-     * @return int
      */
-    private function readLong($stream, $isBigEndian)
+    private function readLong($stream, bool $isBigEndian): int
     {
         $result = unpack($isBigEndian ? 'N1' : 'V1', fread($stream, 4));
         $result = current($result);

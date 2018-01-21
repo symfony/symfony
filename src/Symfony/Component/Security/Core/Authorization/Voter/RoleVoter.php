@@ -23,10 +23,7 @@ class RoleVoter implements VoterInterface
 {
     private $prefix;
 
-    /**
-     * @param string $prefix The role prefix
-     */
-    public function __construct($prefix = 'ROLE_')
+    public function __construct(string $prefix = 'ROLE_')
     {
         $this->prefix = $prefix;
     }

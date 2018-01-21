@@ -157,20 +157,20 @@ class LanguageDataGenerator extends AbstractDataGenerator
         return array(
             'Version' => $rootBundle['Version'],
             'Languages' => $this->languageCodes,
-            'Aliases' => $metadataBundle['languageAlias'],
+            'Aliases' => array_map(function (\ResourceBundle $bundle) {
+                return $bundle['replacement'];
+            }, iterator_to_array($metadataBundle['alias']['language'])),
             'Alpha2ToAlpha3' => $this->generateAlpha2ToAlpha3Mapping($metadataBundle),
         );
     }
 
     private function generateAlpha2ToAlpha3Mapping(ArrayAccessibleResourceBundle $metadataBundle)
     {
-        // Data structure has changed in ICU 5.5 from "languageAlias" to "alias->language"
-        $aliases = $metadataBundle['languageAlias'] ?: $metadataBundle['alias']['language'];
+        $aliases = iterator_to_array($metadataBundle['alias']['language']);
         $alpha2ToAlpha3 = array();
 
         foreach ($aliases as $alias => $language) {
-            // $language is a string before ICU 5.5
-            $language = is_string($language) ? $language : $language['replacement'];
+            $language = $language['replacement'];
             if (2 === strlen($language) && 3 === strlen($alias)) {
                 if (isset(self::$preferredAlpha2ToAlpha3Mapping[$language])) {
                     // Validate to prevent typos
@@ -184,7 +184,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
                     }
 
                     $alpha3 = self::$preferredAlpha2ToAlpha3Mapping[$language];
-                    $alpha2 = is_string($aliases[$alpha3]) ? $aliases[$alpha3] : $aliases[$alpha3]['replacement'];
+                    $alpha2 = $aliases[$alpha3]['replacement'];
 
                     if ($language !== $alpha2) {
                         throw new RuntimeException(

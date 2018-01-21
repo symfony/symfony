@@ -32,7 +32,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->append($child);
 
         $this->assertCount(3, $this->getField($parent, 'children'));
-        $this->assertTrue(in_array($child, $this->getField($parent, 'children')));
+        $this->assertContains($child, $this->getField($parent, 'children'));
     }
 
     /**
@@ -208,6 +208,20 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertTrue($this->getField($enabledNode, 'defaultValue'));
     }
 
+    public function testEnableableNodeIsDisabledForEmptyConfigurationWhenNormalized()
+    {
+        $config = array();
+
+        $node = new ArrayNodeDefinition('root');
+        $node->canBeEnabled();
+
+        $this->assertEquals(
+            array('enabled' => false),
+            $node->getNode()->normalize($config),
+            'An enableable node is disabled by default'
+        );
+    }
+
     public function testIgnoreExtraKeys()
     {
         $node = new ArrayNodeDefinition('root');
@@ -283,6 +297,7 @@ class ArrayNodeDefinitionTest extends TestCase
             array(array('enabled' => true, 'foo' => 'baz'), array(array('foo' => 'baz')), 'any configuration enables an enableable node'),
             array(array('enabled' => false, 'foo' => 'baz'), array(array('foo' => 'baz', 'enabled' => false)), 'An enableable node can be disabled'),
             array(array('enabled' => false, 'foo' => 'bar'), array(false), 'false disables an enableable node'),
+            array(array('enabled' => false, 'foo' => 'bar'), array(), 'enableable node is disabled by default'),
         );
     }
 
@@ -296,6 +311,20 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode()->finalize(array(1));
 
         $this->addToAssertionCount(1);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The path "root" should have at least 1 element(s) defined.
+     */
+    public function testCannotBeEmpty()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->cannotBeEmpty()
+            ->integerPrototype();
+
+        $node->getNode()->finalize(array());
     }
 
     public function testSetDeprecated()
@@ -313,15 +342,13 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The path "root" should have at least 1 element(s) defined.
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
+     * @expectedExceptionMessage ->cannotBeEmpty() is not applicable to concrete nodes at path "root"
      */
-    public function testCannotBeEmpty()
+    public function testCannotBeEmptyOnConcreteNode()
     {
         $node = new ArrayNodeDefinition('root');
-        $node
-            ->cannotBeEmpty()
-            ->integerPrototype();
+        $node->cannotBeEmpty();
 
         $node->getNode()->finalize(array());
     }

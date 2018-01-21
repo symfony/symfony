@@ -1,6 +1,40 @@
 UPGRADE FROM 3.x to 4.0
 =======================
 
+Symfony Framework
+-----------------
+
+The first step to upgrade a Symfony 3.x application to 4.x is to update the
+file and directory structure of your application:
+
+| Symfony 3.x                         | Symfony 4.x
+| ----------------------------------- | --------------------------------
+| `app/config/`                       | `config/`
+| `app/config/*.yml`                  | `config/*.yaml` and `config/packages/*.yaml`
+| `app/config/parameters.yml.dist`    | `config/services.yaml` and `.env.dist`
+| `app/config/parameters.yml`         | `config/services.yaml` and `.env`
+| `app/Resources/<BundleName>/views/` | `templates/bundles/<BundleName>/`
+| `app/Resources/`                    | `src/Resources/`
+| `app/Resources/assets/`             | `assets/`
+| `app/Resources/translations/`       | `translations/`
+| `app/Resources/views/`              | `templates/`
+| `src/AppBundle/`                    | `src/`
+| `var/logs/`                         | `var/log/`
+| `web/`                              | `public/`
+| `web/app.php`                       | `public/index.php`
+| `web/app_dev.php`                   | `public/index.php`
+
+Then, upgrade the contents of your console script and your front controller:
+
+* `bin/console`: https://github.com/symfony/recipes/blob/master/symfony/console/3.3/bin/console
+* `public/index.php`: https://github.com/symfony/recipes/blob/master/symfony/framework-bundle/3.3/public/index.php
+
+Lastly, read the following article to add Symfony Flex to your application and
+upgrade the configuration files: https://symfony.com/doc/current/setup/flex.html
+
+If you use Symfony components instead of the whole framework, you can find below
+the upgrading instructions for each individual bundle and component.
+
 ClassLoader
 -----------
 
@@ -323,7 +357,7 @@ Form
    ```php
    class MyTimezoneType extends AbstractType
    {
-       public function. getParent()
+       public function getParent()
        {
            return TimezoneType::class;
        }
@@ -501,11 +535,11 @@ FrameworkBundle
     first argument.
 
  * `RouterDebugCommand::__construct()` now requires an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument.
 
  * `RouterMatchCommand::__construct()` now requires an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument.
 
  * `TranslationDebugCommand::__construct()` now requires an instance of
@@ -593,16 +627,10 @@ HttpKernel
        # ...
 
        # explicit commands registration
-       AppBundle\Command:
+       AppBundle\Command\:
            resource: '../../src/AppBundle/Command/*'
            tags: ['console.command']
    ```
-
- * Removed the `kernel.root_dir` parameter. Use the `kernel.project_dir` parameter
-   instead.
-
- * Removed the `Kernel::getRootDir()` method. Use the `Kernel::getProjectDir()`
-   method instead.
 
  * The `Extension::addClassesToCompile()` and `Extension::getClassesToCompile()` methods have been removed.
 

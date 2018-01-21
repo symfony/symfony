@@ -33,10 +33,7 @@ class CachePruneCommandTest extends TestCase
         $tester->execute(array());
     }
 
-    /**
-     * @return RewindableGenerator
-     */
-    private function getRewindableGenerator()
+    private function getRewindableGenerator(): RewindableGenerator
     {
         return new RewindableGenerator(function () {
             yield 'foo_pool' => $this->getPruneableInterfaceMock();
@@ -44,10 +41,7 @@ class CachePruneCommandTest extends TestCase
         }, 2);
     }
 
-    /**
-     * @return RewindableGenerator
-     */
-    private function getEmptyRewindableGenerator()
+    private function getEmptyRewindableGenerator(): RewindableGenerator
     {
         return new RewindableGenerator(function () {
             return new \ArrayIterator(array());
@@ -96,13 +90,7 @@ class CachePruneCommandTest extends TestCase
         return $pruneable;
     }
 
-    /**
-     * @param KernelInterface     $kernel
-     * @param RewindableGenerator $generator
-     *
-     * @return CommandTester
-     */
-    private function getCommandTester(KernelInterface $kernel, RewindableGenerator $generator)
+    private function getCommandTester(KernelInterface $kernel, RewindableGenerator $generator): CommandTester
     {
         $application = new Application($kernel);
         $application->add(new CachePoolPruneCommand($generator));

@@ -39,7 +39,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($voters = array(), $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
+    public function __construct(iterable $voters = array(), string $strategy = self::STRATEGY_AFFIRMATIVE, bool $allowIfAllAbstainDecisions = false, bool $allowIfEqualGrantedDeniedDecisions = true)
     {
         $strategyMethod = 'decide'.ucfirst($strategy);
         if (!is_callable(array($this, $strategyMethod))) {
@@ -48,8 +48,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
 
         $this->voters = $voters;
         $this->strategy = $strategyMethod;
-        $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
-        $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
+        $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
+        $this->allowIfEqualGrantedDeniedDecisions = $allowIfEqualGrantedDeniedDecisions;
     }
 
     /**

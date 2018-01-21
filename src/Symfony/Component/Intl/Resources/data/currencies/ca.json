@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.22",
     "Names": {
         "ADP": [
             "ADP",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "peso xilè"
+        ],
+        "CNH": [
+            "CNH",
+            "iuan xinès extracontinental"
         ],
         "CNY": [
             "¥",

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Symfony\Component\Cache\Traits\RedisProxy;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception\LockExpiredException;
@@ -24,14 +25,6 @@ use Symfony\Component\Lock\StoreInterface;
  */
 class RedisStore implements StoreInterface
 {
-    private static $defaultConnectionOptions = array(
-        'class' => null,
-        'persistent' => 0,
-        'persistent_id' => null,
-        'timeout' => 30,
-        'read_timeout' => 0,
-        'retry_interval' => 0,
-    );
     private $redis;
     private $initialTtl;
 
@@ -39,9 +32,9 @@ class RedisStore implements StoreInterface
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient
      * @param float                                           $initialTtl  the expiration delay of locks in seconds
      */
-    public function __construct($redisClient, $initialTtl = 300.0)
+    public function __construct($redisClient, float $initialTtl = 300.0)
     {
-        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\Client) {
+        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\Client && !$redisClient instanceof RedisProxy) {
             throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, is_object($redisClient) ? get_class($redisClient) : gettype($redisClient)));
         }
 
@@ -131,15 +124,11 @@ class RedisStore implements StoreInterface
     /**
      * Evaluates a script in the corresponding redis client.
      *
-     * @param string $script
-     * @param string $resource
-     * @param array  $args
-     *
      * @return mixed
      */
-    private function evaluate($script, $resource, array $args)
+    private function evaluate(string $script, string $resource, array $args)
     {
-        if ($this->redis instanceof \Redis || $this->redis instanceof \RedisCluster) {
+        if ($this->redis instanceof \Redis || $this->redis instanceof \RedisCluster || $this->redis instanceof RedisProxy) {
             return $this->redis->eval($script, array_merge(array($resource), $args), 1);
         }
 
@@ -156,12 +145,8 @@ class RedisStore implements StoreInterface
 
     /**
      * Retrieves an unique token for the given key.
-     *
-     * @param Key $key
-     *
-     * @return string
      */
-    private function getToken(Key $key)
+    private function getToken(Key $key): string
     {
         if (!$key->hasState(__CLASS__)) {
             $token = base64_encode(random_bytes(32));

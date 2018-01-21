@@ -207,11 +207,9 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * @param string $css
-     *
      * @return SelectorNode[]
      */
-    private function parseSelectors($css)
+    private function parseSelectors(string $css)
     {
         foreach ($this->shortcutParsers as $shortcut) {
             $tokens = $shortcut->parse($css);

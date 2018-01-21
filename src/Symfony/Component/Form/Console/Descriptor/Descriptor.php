@@ -98,6 +98,8 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         $this->overriddenOptions = array_filter($this->overriddenOptions);
+        $this->parentOptions = array_filter($this->parentOptions);
+        $this->extensionOptions = array_filter($this->extensionOptions);
         $this->requiredOptions = $optionsResolver->getRequiredOptions();
 
         $this->parents = array_keys($this->parents);

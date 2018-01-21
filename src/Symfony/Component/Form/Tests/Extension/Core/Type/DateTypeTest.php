@@ -678,7 +678,7 @@ class DateTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['date_pattern']));
+        $this->assertArrayNotHasKey('date_pattern', $view->vars);
     }
 
     public function testDatePatternFormatWithQuotedStrings()
@@ -826,7 +826,7 @@ class DateTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDontPassHtml5TypeIfNotHtml5Format()
@@ -837,7 +837,7 @@ class DateTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function testDontPassHtml5TypeIfNotSingleText()
@@ -847,7 +847,7 @@ class DateTypeTest extends BaseTypeTest
         ))
             ->createView();
 
-        $this->assertFalse(isset($view->vars['type']));
+        $this->assertArrayNotHasKey('type', $view->vars);
     }
 
     public function provideCompoundWidgets()

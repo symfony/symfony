@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvide
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Parameter;
 
 /**
  * InMemoryFactory creates services for the memory provider.
@@ -27,17 +27,14 @@ class InMemoryFactory implements UserProviderFactoryInterface
     public function create(ContainerBuilder $container, $id, $config)
     {
         $definition = $container->setDefinition($id, new ChildDefinition('security.user.provider.in_memory'));
+        $defaultPassword = new Parameter('container.build_id');
+        $users = array();
 
         foreach ($config['users'] as $username => $user) {
-            $userId = $id.'_'.$username;
-
-            $container
-                ->setDefinition($userId, new ChildDefinition('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, (string) $user['password'], $user['roles']))
-            ;
-
-            $definition->addMethodCall('createUser', array(new Reference($userId)));
+            $users[$username] = array('password' => null !== $user['password'] ? (string) $user['password'] : $defaultPassword, 'roles' => $user['roles']);
         }
+
+        $definition->addArgument($users);
     }
 
     public function getKey()
@@ -55,7 +52,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
                     ->normalizeKeys(false)
                     ->prototype('array')
                         ->children()
-                            ->scalarNode('password')->defaultValue(uniqid('', true))->end()
+                            ->scalarNode('password')->defaultNull()->end()
                             ->arrayNode('roles')
                                 ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
                                 ->prototype('scalar')->end()

@@ -230,13 +230,8 @@ class RouteCompiler implements RouteCompilerInterface
 
     /**
      * Determines the longest static prefix possible for a route.
-     *
-     * @param Route $route
-     * @param array $tokens
-     *
-     * @return string The leading static part of a route's path
      */
-    private static function determineStaticPrefix(Route $route, array $tokens)
+    private static function determineStaticPrefix(Route $route, array $tokens): string
     {
         if ('text' !== $tokens[0][0]) {
             return ($route->hasDefault($tokens[0][3]) || '/' === $tokens[0][1]) ? '' : $tokens[0][1];
@@ -252,14 +247,9 @@ class RouteCompiler implements RouteCompilerInterface
     }
 
     /**
-     * Returns the next static character in the Route pattern that will serve as a separator.
-     *
-     * @param string $pattern The route pattern
-     * @param bool   $useUtf8 Whether the character is encoded in UTF-8 or not
-     *
-     * @return string The next static character that functions as separator (or empty string when none available)
+     * Returns the next static character in the Route pattern that will serve as a separator (or the empty string when none available)
      */
-    private static function findNextSeparator($pattern, $useUtf8)
+    private static function findNextSeparator(string $pattern, bool $useUtf8): string
     {
         if ('' == $pattern) {
             // return empty string if pattern is empty or false (false which can be returned by substr)
@@ -285,7 +275,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @return string The regexp pattern for a single token
      */
-    private static function computeRegexp(array $tokens, $index, $firstOptional)
+    private static function computeRegexp(array $tokens, int $index, int $firstOptional): string
     {
         $token = $tokens[$index];
         if ('text' === $token[0]) {

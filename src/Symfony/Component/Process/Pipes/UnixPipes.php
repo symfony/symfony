@@ -22,18 +22,15 @@ use Symfony\Component\Process\Process;
  */
 class UnixPipes extends AbstractPipes
 {
-    /** @var bool */
     private $ttyMode;
-    /** @var bool */
     private $ptyMode;
-    /** @var bool */
     private $haveReadSupport;
 
-    public function __construct($ttyMode, $ptyMode, $input, $haveReadSupport)
+    public function __construct(?bool $ttyMode, bool $ptyMode, $input, bool $haveReadSupport)
     {
-        $this->ttyMode = (bool) $ttyMode;
-        $this->ptyMode = (bool) $ptyMode;
-        $this->haveReadSupport = (bool) $haveReadSupport;
+        $this->ttyMode = $ttyMode;
+        $this->ptyMode = $ptyMode;
+        $this->haveReadSupport = $haveReadSupport;
 
         parent::__construct($input);
     }
@@ -102,7 +99,7 @@ class UnixPipes extends AbstractPipes
         unset($r[0]);
 
         // let's have a look if something changed in streams
-        if (($r || $w) && false === $n = @stream_select($r, $w, $e, 0, $blocking ? Process::TIMEOUT_PRECISION * 1E6 : 0)) {
+        if (($r || $w) && false === @stream_select($r, $w, $e, 0, $blocking ? Process::TIMEOUT_PRECISION * 1E6 : 0)) {
             // if a system call has been interrupted, forget about it, let's try again
             // otherwise, an error occurred, let's reset pipes
             if (!$this->hasSystemCallBeenInterrupted()) {

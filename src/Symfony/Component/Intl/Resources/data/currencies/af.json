@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "AED": [
             "AED",
@@ -120,6 +120,10 @@
         "CLP": [
             "CLP",
             "Chileense peso"
+        ],
+        "CNH": [
+            "CNH",
+            "Chinese joean"
         ],
         "CNY": [
             "CN¥",

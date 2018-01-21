@@ -296,9 +296,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     }
 
     /**
-     * Get the provider key (i.e. the name of the active firewall).
+     * Get the logout URL.
      *
-     * @return string The provider key
+     * @return string The logout URL
      */
     public function getLogoutUrl()
     {

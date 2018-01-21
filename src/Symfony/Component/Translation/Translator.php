@@ -74,14 +74,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $configCacheFactory;
 
     /**
-     * @param string                         $locale    The locale
-     * @param MessageFormatterInterface|null $formatter The message formatter
-     * @param string|null                    $cacheDir  The directory to use for the cache
-     * @param bool                           $debug     Use cache in debug mode ?
-     *
      * @throws InvalidArgumentException If a locale contains invalid characters
      */
-    public function __construct($locale, MessageFormatterInterface $formatter = null, $cacheDir = null, $debug = false)
+    public function __construct(?string $locale, MessageFormatterInterface $formatter = null, string $cacheDir = null, bool $debug = false)
     {
         $this->setLocale($locale);
 
@@ -430,8 +425,6 @@ EOF
     /**
      * Provides the ConfigCache factory implementation, falling back to a
      * default implementation if necessary.
-     *
-     * @return ConfigCacheFactoryInterface $configCacheFactory
      */
     private function getConfigCacheFactory(): ConfigCacheFactoryInterface
     {

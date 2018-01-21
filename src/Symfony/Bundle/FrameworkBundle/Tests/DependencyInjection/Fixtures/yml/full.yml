@@ -14,7 +14,7 @@ framework:
         only_exceptions: true
         enabled: false
     router:
-        resource:     '%kernel.root_dir%/config/routing.xml'
+        resource:     '%kernel.project_dir%/config/routing.xml'
         type:         xml
     session:
         storage_id:      session.storage.native
@@ -42,7 +42,8 @@ framework:
     translator:
         enabled:  true
         fallback: fr
-        paths: ['%kernel.root_dir%/Fixtures/translations']
+        default_path: '%kernel.project_dir%/translations'
+        paths: ['%kernel.project_dir%/Fixtures/translations']
     validation:
         enabled: true
     annotations:

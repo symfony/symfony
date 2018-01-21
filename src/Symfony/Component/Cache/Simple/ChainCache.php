@@ -50,7 +50,7 @@ class ChainCache implements CacheInterface, PruneableInterface, ResettableInterf
         $this->miss = new \stdClass();
         $this->caches = array_values($caches);
         $this->cacheCount = count($this->caches);
-        $this->defaultLifetime = 0 < $defaultLifetime ? (int) $defaultLifetime : null;
+        $this->defaultLifetime = 0 < $defaultLifetime ? $defaultLifetime : null;
     }
 
     /**

@@ -43,6 +43,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
 use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
@@ -75,6 +76,14 @@ class FrameworkBundle extends Bundle
     {
         parent::build($container);
 
+        $hotPathEvents = array(
+            KernelEvents::REQUEST,
+            KernelEvents::CONTROLLER,
+            KernelEvents::CONTROLLER_ARGUMENTS,
+            KernelEvents::RESPONSE,
+            KernelEvents::FINISH_REQUEST,
+        );
+
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -82,10 +91,10 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new ProfilerPass());
         // must be registered before removing private services as some might be listeners/subscribers
         // but as late as possible to get resolved parameters
-        $container->addCompilerPass(new RegisterListenersPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass((new RegisterListenersPass())->setHotPathEvents($hotPathEvents), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new TemplatingPass());
         $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class, PassConfig::TYPE_BEFORE_REMOVING);
-        $container->addCompilerPass(new AddAnnotationsCachedReaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new AddAnnotationsCachedReaderPass(), PassConfig::TYPE_AFTER_REMOVING, -255);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
         $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class);
         $this->addCompilerPassIfExists($container, TranslatorPass::class);

@@ -47,7 +47,7 @@ class GuardAuthenticationListener implements ListenerInterface
      * @param iterable|AuthenticatorInterface[] $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      * @param LoggerInterface                   $logger                A LoggerInterface instance
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, $guardAuthenticators, LoggerInterface $logger = null)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, string $providerKey, $guardAuthenticators, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -62,8 +62,6 @@ class GuardAuthenticationListener implements ListenerInterface
 
     /**
      * Iterates over each authenticator to see if each wants to authenticate the request.
-     *
-     * @param GetResponseEvent $event
      */
     public function handle(GetResponseEvent $event)
     {
@@ -166,8 +164,6 @@ class GuardAuthenticationListener implements ListenerInterface
 
     /**
      * Should be called if this listener will support remember me.
-     *
-     * @param RememberMeServicesInterface $rememberMeServices
      */
     public function setRememberMeServices(RememberMeServicesInterface $rememberMeServices)
     {
@@ -177,11 +173,6 @@ class GuardAuthenticationListener implements ListenerInterface
     /**
      * Checks to see if remember me is supported in the authenticator and
      * on the firewall. If it is, the RememberMeServicesInterface is notified.
-     *
-     * @param AuthenticatorInterface $guardAuthenticator
-     * @param Request                $request
-     * @param TokenInterface         $token
-     * @param Response               $response
      */
     private function triggerRememberMe(AuthenticatorInterface $guardAuthenticator, Request $request, TokenInterface $token, Response $response = null)
     {

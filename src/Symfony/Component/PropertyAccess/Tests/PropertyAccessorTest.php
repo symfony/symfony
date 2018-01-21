@@ -15,14 +15,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\PropertyAccess\Tests\Fixtures\ReturnTyped;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
-use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 
 class PropertyAccessorTest extends TestCase
@@ -633,25 +631,5 @@ class PropertyAccessorTest extends TestCase
         };');
 
         return $obj;
-    }
-
-    /**
-     * @expectedException \TypeError
-     */
-    public function testThrowTypeErrorInsideSetterCall()
-    {
-        $object = new TestClassTypeErrorInsideCall();
-
-        $this->propertyAccessor->setValue($object, 'property', 'foo');
-    }
-
-    /**
-     * @expectedException \TypeError
-     */
-    public function testDoNotDiscardReturnTypeError()
-    {
-        $object = new ReturnTyped();
-
-        $this->propertyAccessor->setValue($object, 'foos', array(new \DateTime()));
     }
 }

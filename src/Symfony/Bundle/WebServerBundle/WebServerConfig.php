@@ -22,7 +22,7 @@ class WebServerConfig
     private $env;
     private $router;
 
-    public function __construct($documentRoot, $env, $address = null, $router = null)
+    public function __construct(string $documentRoot, string $env, string $address = null, string $router = null)
     {
         if (!is_dir($documentRoot)) {
             throw new \InvalidArgumentException(sprintf('The document root directory "%s" does not exist.', $documentRoot));
@@ -32,7 +32,7 @@ class WebServerConfig
             throw new \InvalidArgumentException(sprintf('Unable to find the front controller under "%s" (none of these files exist: %s).', $documentRoot, implode(', ', $this->getFrontControllerFileNames($env))));
         }
 
-        putenv('APP_FRONT_CONTROLLER='.$file);
+        $_ENV['APP_FRONT_CONTROLLER'] = $file;
 
         $this->documentRoot = $documentRoot;
         $this->env = $env;

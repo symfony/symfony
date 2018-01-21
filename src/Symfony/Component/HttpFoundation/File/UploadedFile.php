@@ -24,41 +24,10 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
  */
 class UploadedFile extends File
 {
-    /**
-     * Whether the test mode is activated.
-     *
-     * Local files are used in test mode hence the code should not enforce HTTP uploads.
-     *
-     * @var bool
-     */
     private $test = false;
-
-    /**
-     * The original name of the uploaded file.
-     *
-     * @var string
-     */
     private $originalName;
-
-    /**
-     * The mime type provided by the uploader.
-     *
-     * @var string
-     */
     private $mimeType;
-
-    /**
-     * The file size provided by the uploader.
-     *
-     * @var int|null
-     */
     private $size;
-
-    /**
-     * The UPLOAD_ERR_XXX constant provided by the uploader.
-     *
-     * @var int
-     */
     private $error;
 
     /**
@@ -76,22 +45,26 @@ class UploadedFile extends File
      * Calling any other method on an non-valid instance will cause an unpredictable result.
      *
      * @param string      $path         The full temporary path to the file
-     * @param string      $originalName The original file name
+     * @param string      $originalName The original file name of the uploaded file
      * @param string|null $mimeType     The type of the file as provided by PHP; null defaults to application/octet-stream
-     * @param int|null    $size         The file size
+     * @param int|null    $size         The file size provided by the uploader
      * @param int|null    $error        The error constant of the upload (one of PHP's UPLOAD_ERR_XXX constants); null defaults to UPLOAD_ERR_OK
      * @param bool        $test         Whether the test mode is active
+     *                                  Local files are used in test mode hence the code should not enforce HTTP uploads
      *
      * @throws FileException         If file_uploads is disabled
      * @throws FileNotFoundException If the file does not exist
      */
-    public function __construct($path, $originalName, $mimeType = null, $size = null, $error = null, $test = false)
+    public function __construct(string $path, string $originalName, string $mimeType = null, int $size = null, int $error = null, bool $test = false)
     {
         $this->originalName = $this->getName($originalName);
         $this->mimeType = $mimeType ?: 'application/octet-stream';
         $this->size = $size;
+        if (null !== $size) {
+            @trigger_error('Passing a size in the constructor is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.', E_USER_DEPRECATED);
+        }
         $this->error = $error ?: UPLOAD_ERR_OK;
-        $this->test = (bool) $test;
+        $this->test = $test;
 
         parent::__construct($path, UPLOAD_ERR_OK === $this->error);
     }
@@ -171,10 +144,14 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @return int|null The file size
+     * @deprecated since 4.1 will be removed in 5.0 use getSize() instead.
+     *
+     * @return int|null The file sizes
      */
     public function getClientSize()
     {
+        @trigger_error(sprintf('"%s" is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.', __METHOD__), E_USER_DEPRECATED);
+
         return $this->size;
     }
 

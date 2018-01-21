@@ -74,8 +74,8 @@ class ServerBagTest extends TestCase
 
         // Username and passwords should not be set as the header is bogus
         $headers = $bag->getHeaders();
-        $this->assertFalse(isset($headers['PHP_AUTH_USER']));
-        $this->assertFalse(isset($headers['PHP_AUTH_PW']));
+        $this->assertArrayNotHasKey('PHP_AUTH_USER', $headers);
+        $this->assertArrayNotHasKey('PHP_AUTH_PW', $headers);
     }
 
     public function testHttpBasicAuthWithPhpCgiRedirect()
@@ -118,8 +118,8 @@ class ServerBagTest extends TestCase
 
         // Username and passwords should not be set as the header is bogus
         $headers = $bag->getHeaders();
-        $this->assertFalse(isset($headers['PHP_AUTH_USER']));
-        $this->assertFalse(isset($headers['PHP_AUTH_PW']));
+        $this->assertArrayNotHasKey('PHP_AUTH_USER', $headers);
+        $this->assertArrayNotHasKey('PHP_AUTH_PW', $headers);
     }
 
     public function testHttpDigestAuthWithPhpCgiRedirect()

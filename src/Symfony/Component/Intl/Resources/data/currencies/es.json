@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.22",
     "Names": {
         "ADP": [
             "ADP",
@@ -75,7 +75,7 @@
         ],
         "AZN": [
             "AZN",
-            "manat azerí"
+            "manat azerbaiyano"
         ],
         "BAD": [
             "BAD",
@@ -83,7 +83,7 @@
         ],
         "BAM": [
             "BAM",
-            "marco convertible de Bosnia-Herzegovina"
+            "marco convertible de Bosnia y Herzegovina"
         ],
         "BBD": [
             "BBD",
@@ -225,6 +225,10 @@
             "CLP",
             "peso chileno"
         ],
+        "CNH": [
+            "CNH",
+            "yuan chino (extracontinental)"
+        ],
         "CNY": [
             "CNY",
             "yuan"
@@ -351,7 +355,7 @@
         ],
         "GBP": [
             "GBP",
-            "libra británica"
+            "libra esterlina"
         ],
         "GEK": [
             "GEK",
@@ -926,7 +930,7 @@
             "chelín ugandés"
         ],
         "USD": [
-            "$",
+            "US$",
             "dólar estadounidense"
         ],
         "USN": [
@@ -975,7 +979,7 @@
         ],
         "XAF": [
             "XAF",
-            "franco CFA BEAC"
+            "franco CFA de África Central"
         ],
         "XCD": [
             "XCD",
@@ -995,7 +999,7 @@
         ],
         "XOF": [
             "XOF",
-            "franco CFA BCEAO"
+            "franco CFA de África Occidental"
         ],
         "XPF": [
             "CFPF",
@@ -1039,7 +1043,7 @@
         ],
         "ZMW": [
             "ZMW",
-            "kuacha zambiano"
+            "kwacha zambiano"
         ],
         "ZRN": [
             "ZRN",

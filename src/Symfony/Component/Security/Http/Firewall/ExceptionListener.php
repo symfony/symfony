@@ -52,7 +52,7 @@ class ExceptionListener
     private $httpUtils;
     private $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null, $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, string $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, string $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null, bool $stateless = false)
     {
         $this->tokenStorage = $tokenStorage;
         $this->accessDeniedHandler = $accessDeniedHandler;

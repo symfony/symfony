@@ -25,9 +25,9 @@ interface EncoderInterface
      *
      * @param mixed  $data    Data to encode
      * @param string $format  Format name
-     * @param array  $context options that normalizers/encoders have access to
+     * @param array  $context Options that normalizers/encoders have access to
      *
-     * @return scalar
+     * @return string|int|float|bool
      *
      * @throws UnexpectedValueException
      */
@@ -36,7 +36,7 @@ interface EncoderInterface
     /**
      * Checks whether the serializer can encode to given format.
      *
-     * @param string $format format name
+     * @param string $format Format name
      *
      * @return bool
      */

@@ -26,14 +26,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class CoreExtension extends AbstractExtension
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
-
-    /**
-     * @var ChoiceListFactoryInterface
-     */
     private $choiceListFactory;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)

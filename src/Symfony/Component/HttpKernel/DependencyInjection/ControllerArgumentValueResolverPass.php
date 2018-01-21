@@ -28,7 +28,7 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
     private $argumentResolverService;
     private $argumentValueResolverTag;
 
-    public function __construct($argumentResolverService = 'argument_resolver', $argumentValueResolverTag = 'controller.argument_value_resolver')
+    public function __construct(string $argumentResolverService = 'argument_resolver', string $argumentValueResolverTag = 'controller.argument_value_resolver')
     {
         $this->argumentResolverService = $argumentResolverService;
         $this->argumentValueResolverTag = $argumentValueResolverTag;

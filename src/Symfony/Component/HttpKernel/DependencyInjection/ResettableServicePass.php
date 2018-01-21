@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\HttpKernel\EventListener\ServiceResetListener;
 
 /**
  * @author Alexander M. Turek <me@derrabus.de>
@@ -26,10 +25,7 @@ class ResettableServicePass implements CompilerPassInterface
 {
     private $tagName;
 
-    /**
-     * @param string $tagName
-     */
-    public function __construct($tagName = 'kernel.reset')
+    public function __construct(string $tagName = 'kernel.reset')
     {
         $this->tagName = $tagName;
     }
@@ -39,7 +35,7 @@ class ResettableServicePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has(ServiceResetListener::class)) {
+        if (!$container->has('services_resetter')) {
             return;
         }
 
@@ -57,13 +53,14 @@ class ResettableServicePass implements CompilerPassInterface
         }
 
         if (empty($services)) {
-            $container->removeDefinition(ServiceResetListener::class);
+            $container->removeAlias('services_resetter');
+            $container->removeDefinition('services_resetter');
 
             return;
         }
 
-        $container->findDefinition(ServiceResetListener::class)
-            ->replaceArgument(0, new IteratorArgument($services))
-            ->replaceArgument(1, $methods);
+        $container->findDefinition('services_resetter')
+            ->setArgument(0, new IteratorArgument($services))
+            ->setArgument(1, $methods);
     }
 }

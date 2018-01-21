@@ -23,7 +23,7 @@ class UnauthorizedHttpException extends HttpException
      * @param int        $code      The internal exception code
      * @param array      $headers
      */
-    public function __construct($challenge, $message = null, \Exception $previous = null, $code = 0, array $headers = array())
+    public function __construct(string $challenge, string $message = null, \Exception $previous = null, ?int $code = 0, array $headers = array())
     {
         $headers['WWW-Authenticate'] = $challenge;
 

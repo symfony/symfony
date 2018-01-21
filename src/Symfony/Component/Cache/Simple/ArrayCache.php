@@ -36,7 +36,7 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInte
      */
     public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true)
     {
-        $this->defaultLifetime = (int) $defaultLifetime;
+        $this->defaultLifetime = $defaultLifetime;
         $this->storeSerialized = $storeSerialized;
     }
 

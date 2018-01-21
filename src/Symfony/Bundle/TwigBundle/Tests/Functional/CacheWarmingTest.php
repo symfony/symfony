@@ -9,12 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Tests;
+namespace Symfony\Bundle\TwigBundle\Tests\Functional;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 
 class CacheWarmingTest extends TestCase
@@ -99,11 +100,16 @@ class CacheWarmingKernel extends Kernel
                 $container->loadFromExtension('framework', array(
                     'secret' => '$ecret',
                     'templating' => array('engines' => array('twig')),
-                    'router' => array('resource' => '%kernel.root_dir%/Resources/config/empty_routing.yml'),
+                    'router' => array('resource' => '%kernel.project_dir%/Resources/config/empty_routing.yml'),
                     'form' => array('enabled' => false),
                 ));
             });
         }
+    }
+
+    public function getProjectDir()
+    {
+        return __DIR__;
     }
 
     public function getCacheDir()

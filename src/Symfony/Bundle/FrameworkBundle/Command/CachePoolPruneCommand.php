@@ -31,7 +31,7 @@ final class CachePoolPruneCommand extends Command
     /**
      * @param iterable|PruneableInterface[] $pools
      */
-    public function __construct($pools)
+    public function __construct(iterable $pools)
     {
         parent::__construct();
 

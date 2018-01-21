@@ -20,9 +20,6 @@ use Symfony\Component\Templating\EngineInterface;
  */
 class TemplatingRendererEngine extends AbstractRendererEngine
 {
-    /**
-     * @var EngineInterface
-     */
     private $engine;
 
     public function __construct(EngineInterface $engine, array $defaultThemes = array())

@@ -18,18 +18,23 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
 {
     private $parameters;
     private $targetDirs = array();
-    private $privates = array();
+
+    /**
+     * @internal but protected for BC on cache:clear
+     */
+    protected $privates = array();
 
     public function __construct()
     {
         $dir = __DIR__;
         for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = dirname($dir);
+            $this->targetDirs[$i] = $dir = \dirname($dir);
         }
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = $this->privates = array();
         $this->methodMap = array(
+            'bar' => 'getBarService',
             'test' => 'getTestService',
         );
 
@@ -58,6 +63,16 @@ class Symfony_DI_PhpDumper_Test_EnvParameters extends Container
             'Psr\\Container\\ContainerInterface' => true,
             'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
         );
+    }
+
+    /**
+     * Gets the public 'bar' shared service.
+     *
+     * @return \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+     */
+    protected function getBarService()
+    {
+        return $this->services['bar'] = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Bar($this->getEnv('QUZ'));
     }
 
     /**

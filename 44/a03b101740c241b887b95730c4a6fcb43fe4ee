@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by AmsTaFFix at 2017-11-15T10:06:17Z
+
+tests failed, but i did nothing that can break them...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-15T11:26:40Z
+
+For 2.7?
+
+---------------------------------------------------------------------------
+
+by AmsTaFFix at 2017-11-15T11:31:12Z
+
+maybe, but i found it on 3.3 and make it for 3.3. If i should change branch or something else, i can do it. (It's my first request in that repository.)

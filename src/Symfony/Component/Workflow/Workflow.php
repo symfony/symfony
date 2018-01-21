@@ -87,12 +87,7 @@ class Workflow implements WorkflowInterface
     }
 
     /**
-     * Returns transition blockers explaining why a transition cannot be made.
-     *
-     * @param object $subject        A subject
-     * @param string $transitionName A transition
-     *
-     * @return TransitionBlockerList Empty if the transition is possible
+     * {@inheritdoc}
      */
     public function buildTransitionBlockerList($subject, string $transitionName): TransitionBlockerList
     {

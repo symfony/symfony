@@ -1,0 +1,115 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-07T21:00:59Z
+
+Wait wut? It passes on *some* versions of php??? I thought it wouldn't pass at all...
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-11-07T21:41:43Z
+
+Nop, just that [some version of PHP are skipped for pull-requests](https://github.com/symfony/symfony/blob/master/.travis.yml#L101-L105). See the logs of the [successful ones](https://travis-ci.org/symfony/symfony/jobs/298749694).
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-07T21:48:45Z
+
+Thanks @sroze , things make sense again thanks to you!
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-08T22:11:07Z
+
+Ok so now the build only fails on 7.2... with deps=low
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-08T23:00:17Z
+
+Could it be become of the `phpunit-bridge` vendor interfering? I can see it being installed : https://travis-ci.org/symfony/symfony/jobs/299336081#L942
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2017-11-10T15:34:22Z
+
+As a bug fix, it should be merged on 3.3: https://symfony.com/roadmap?version=3.3#checker
+
+Should not be?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-10T15:43:04Z
+
+That's correct, let me rebase.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-11-16T17:03:29Z
+
+Tests are failing probably because
+
+> the script used to run tests is installing the latest version of the PHPUnit Bridge, which does not yet have this feature.
+
+See https://github.com/symfony/symfony/pull/24867#issuecomment-343112567
+
+I'm afraid there is nothing I can do about that. Is there hope to get this merged nonetheless?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-12-07T20:54:01Z
+
+Not sure it's that string you were thinking about @nicolas-grekas : here is the change : https://github.com/php/php-src/commit/3ed8b7a87b5383f9ba99a0bbcea6e9fe7a070946 , and it does not change from `-`, but from `php://stdin`.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-12-09T14:35:40Z
+
+Ok so now I am sure, tried the code with:
+
+```
+docker run -it -v $PWD:/tmp/sf php:7.2-cli-alpine3.6 /bin/sh
+cd /tmp/sf
+curl -ssL https://phar.phpunit.de/phpunit.phar > phpunit
+chmod +x phpunit
+phpunit src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler/
+```
+
+And then confirmed with some `var_dump` statements.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-12-09T15:48:05Z
+
+I just confirmed the tests pass on 5.5 by using
+
+```
+docker run -it -v $PWD:/tmp/sf melkorm/php-5.5-cli-with-extensions /bin/sh
+php -d memory_limit=-1 /usr/local/bin/composer update
+curl -ssL https://phar.phpunit.de/phpunit-4.8.9.phar>phpunit
+chmod +x phpunit
+./phpunit src/Symfony/Bridge/PhpUnit/Tests/DeprecationErrorHandler
+```
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-12-16T16:06:48Z
+
+fabbot seems stuck, let's close and reopen
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-12-20T18:04:41Z
+
+Please review again
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-01-02T16:52:23Z
+
+ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-01-05T18:41:17Z
+
+I added a script to regenerate the phar, so that it's easier to understand or maintain.

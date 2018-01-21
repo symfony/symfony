@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-09T08:12:08Z
+
+Rebase needed (we don't merge PRs when they contain merge commit)
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2017-10-09T08:30:34Z
+
+Tests are failing on Form Component which I did not change. Is it a known issue?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-09T13:06:40Z
+
+We will also need to update the `UPGRADE-3.4.md` (explain that implementing the interface without the added method is deprecated) and `UPGRADE-4.0.md` (mention the added method) files.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2017-10-10T16:29:29Z
+
+Twig and VarDumper failure don't seem to be related to my PR. Are failures expected?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-10T16:37:27Z
+
+The Twig failure should be fixable by rebasing on the latest `3.4` branch and the VarDumper tests are currently failing on the `3.4` branch too.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-24T12:10:15Z
+
+Moving to 4.1 as 3.4 is now in beta, thus closed for new feats.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2017-10-25T08:31:52Z
+
+Failures do not seem linked to my changes.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2017-10-30T09:11:49Z
+
+Rebased after merge of deprecation and removal of `TreeBuilder::$builder`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-08T15:02:13Z
+
+@bburnichon please rebase: we don't merge PR with merge commits.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2018-01-08T15:07:59Z
+
+Sorry I did update via github interface.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-01-11T09:50:44Z
+
+I like this feature, but I wonder if *"path separator"* is the best name for this option. Path is strongly related to "file paths". Maybe "name separator" or "key separator" or "children separator" etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-11T09:53:23Z
+
+@javiereguiluz "path" is the correct term, already used a lot in the component:
+```
+$ grep path src/Symfony/Component/Config/ -ri | wc -l
+219
+```

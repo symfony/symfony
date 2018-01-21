@@ -49,8 +49,12 @@ class TransitionBlocker
     public static function createNotDefined(string $transitionName, string $workflowName): self
     {
         $message = sprintf('Transition "%s" is not defined in workflow "%s".', $transitionName, $workflowName);
+        $parameters = array(
+            'transitionName' => $transitionName,
+            'workflowName' => $workflowName,
+        );
 
-        return new static($message, self::REASON_TRANSITION_NOT_DEFINED);
+        return new static($message, self::REASON_TRANSITION_NOT_DEFINED, $parameters);
     }
 
     /**
@@ -64,8 +68,11 @@ class TransitionBlocker
     public static function createNotApplicable(string $transitionName): self
     {
         $message = sprintf('Transition "%s" cannot be made, because the subject is not in the required place.', $transitionName);
+        $parameters = array(
+            'transitionName' => $transitionName,
+        );
 
-        return new static($message, self::REASON_TRANSITION_NOT_APPLICABLE);
+        return new static($message, self::REASON_TRANSITION_NOT_APPLICABLE, $parameters);
     }
 
     /**
@@ -81,8 +88,11 @@ class TransitionBlocker
     public static function createUnknownReason(string $transitionName): self
     {
         $message = sprintf('Transition "%s" cannot be made, because of unknown reason.', $transitionName);
+        $parameters = array(
+            'transitionName' => $transitionName,
+        );
 
-        return new static($message, self::REASON_TRANSITION_UNKNOWN);
+        return new static($message, self::REASON_TRANSITION_UNKNOWN, $parameters);
     }
 
     public function getMessage(): string

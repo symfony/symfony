@@ -273,6 +273,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
     public function read($sessionId)
     {
         try {
+            if (null === $this->pdo) {
+                $this->connect($this->dsn);
+            }
+
             return $this->doRead($sessionId);
         } catch (\PDOException $e) {
             $this->rollback();

@@ -321,6 +321,13 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertInstanceOf('\PDO', $method->invoke($storage));
     }
 
+    public function testConnectWithDsn()
+    {
+        $storage = new PdoSessionHandler('sqlite::memory:');
+        $this->expectExceptionMessage('General error: 1 no such table');
+        $storage->read('test');
+    }
+
     private function createStream($content)
     {
         $stream = tmpfile();

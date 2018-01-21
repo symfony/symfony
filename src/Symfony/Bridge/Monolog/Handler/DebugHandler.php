@@ -22,6 +22,29 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  */
 class DebugHandler extends TestHandler implements DebugLoggerInterface
 {
+    private $skip = true;
+
+    public function __construct($level = Logger::DEBUG, $bubble = true)
+    {
+        parent::__construct($level, $bubble);
+
+        if (func_num_args() >= 3) {
+            $this->skip = (bool) func_get_arg(2) && 'cli' === PHP_SAPI;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isHandling(array $record)
+    {
+        if ($this->skip) {
+            return false;
+        }
+
+        return parent::isHandling($record);
+    }
+
     /**
      * {@inheritdoc}
      */

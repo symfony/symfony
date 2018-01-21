@@ -331,7 +331,9 @@ class Process implements \IteratorAggregate
         } else {
             $envPairs = array();
             foreach ($env as $k => $v) {
-                $envPairs[] = $k.'='.$v;
+                if (false !== $v) {
+                    $envPairs[] = $k.'='.$v;
+                }
             }
         }
 

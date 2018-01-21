@@ -443,7 +443,8 @@ YAML;
         $data = array(
             'data' => array(
                 'single_line' => 'foo bar baz',
-                'multi_line' => "foo\nline with trailing spaces:\n  \nbar\r\ninteger like line:\n123456789\nempty line:\n\nbaz",
+                'multi_line' => "foo\nline with trailing spaces:\n  \nbar\ninteger like line:\n123456789\nempty line:\n\nbaz",
+                'multi_line_with_carriage_return' => "foo\nbar\r\nbaz",
                 'nested_inlined_multi_line_string' => array(
                     'inlined_multi_line' => "foo\nbar\r\nempty line:\n\nbaz",
                 ),
@@ -451,6 +452,11 @@ YAML;
         );
 
         $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block.yml'), $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
+    public function testCarriageReturnIsMaintainedWhenDumpingAsMultiLineLiteralBlock()
+    {
+        $this->assertSame("- \"a\\r\\nb\\nc\"\n", $this->dumper->dump(array("a\r\nb\nc"), 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
     /**

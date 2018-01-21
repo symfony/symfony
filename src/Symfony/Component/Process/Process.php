@@ -1000,7 +1000,7 @@ class Process
     /**
      * Sets the environment variables.
      *
-     * An environment variable value should be a string.
+     * Each environment variable value should be a string.
      * If it is an array, the variable is ignored.
      *
      * That happens in PHP when 'argv' is registered into

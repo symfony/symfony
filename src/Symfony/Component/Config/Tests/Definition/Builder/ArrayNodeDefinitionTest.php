@@ -207,20 +207,6 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertTrue($this->getField($enabledNode, 'defaultValue'));
     }
 
-    public function testEnableableNodeIsDisabledForEmptyConfigurationWhenNormalized()
-    {
-        $config = array();
-
-        $node = new ArrayNodeDefinition('root');
-        $node->canBeEnabled();
-
-        $this->assertEquals(
-            array('enabled' => false),
-            $node->getNode()->normalize($config),
-            'An enableable node is disabled by default'
-        );
-    }
-
     public function testIgnoreExtraKeys()
     {
         $node = new ArrayNodeDefinition('root');
@@ -296,7 +282,6 @@ class ArrayNodeDefinitionTest extends TestCase
             array(array('enabled' => true, 'foo' => 'baz'), array(array('foo' => 'baz')), 'any configuration enables an enableable node'),
             array(array('enabled' => false, 'foo' => 'baz'), array(array('foo' => 'baz', 'enabled' => false)), 'An enableable node can be disabled'),
             array(array('enabled' => false, 'foo' => 'bar'), array(false), 'false disables an enableable node'),
-            array(array('enabled' => false, 'foo' => 'bar'), array(), 'enableable node is disabled by default'),
         );
     }
 

@@ -1183,9 +1183,9 @@ EOF;
     }
 
 EOF;
-            if (!$this->asFiles) {
-                $code = preg_replace('/^.*buildParameters.*\n.*\n.*\n/m', '', $code);
-            }
+        if (!$this->asFiles) {
+            $code = preg_replace('/^.*buildParameters.*\n.*\n.*\n/m', '', $code);
+        }
 
         if ($dynamicPhp) {
             $loadedDynamicParameters = $this->exportParameters(array_combine(array_keys($dynamicPhp), array_fill(0, count($dynamicPhp), false)), '', 8);

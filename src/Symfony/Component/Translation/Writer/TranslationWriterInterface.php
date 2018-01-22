@@ -31,12 +31,12 @@ interface TranslationWriterInterface
      * @throws InvalidArgumentException
      */
     public function write(MessageCatalogue $catalogue, $format, $options = array());
-    
+
     /**
      * Disables dumper backup.
      */
     public function disableBackup();
-    
+
     /**
      * Obtains the list of supported formats.
      *

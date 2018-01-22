@@ -309,16 +309,76 @@ class ArgvInputTest extends TestCase
         $this->assertEquals('foo', $input->getFirstArgument(), '->getFirstArgument() returns the first argument from the raw input');
     }
 
+    public function testFailingHasParameterOptionTest1()
+    {
+        $input = new ArgvInput(array('cli.php', '-etest'));
+
+        // CONTROL: We should not be calling 'bind' in the hasParameterOption test;
+        // this is here temporarily to demonstrate that -etest is interpreted as --example=test
+        $input->bind(new InputDefinition(array(new InputOption('example', 'e', InputOption::VALUE_REQUIRED))));
+        // [A]
+        $this->assertEquals(array('example' => 'test'), $input->getOptions(), 'CONTROL: the short option "e" has value "test".');
+
+        // [B] Failing test: $input has '-etest', which is the same as --example=test,
+        // but 'hasParameterOption' thinks that there is a '-s', because it interprets
+        // the short option as the combination of '-e -t -e -s -t'. This is incorrect,
+        // but hasParameterOption cannot use the InputDefinition, so it does not know this.
+        $this->assertFalse($input->hasParameterOption('-s'), '->hasParameterOption() returns true if the given short option is in the raw input');
+    }
+
+    public function testFailingHasParameterOptionTest2()
+    {
+        $input = new ArgvInput(array('cli.php', '-fh'));
+        // [C] Historically, the test below was not supported. This is the use-case
+        // that #24987 aimed to fix.
+        $this->assertTrue($input->hasParameterOption('-f'), '->hasParameterOption() returns true if the given short option is in the raw input');
+        // [D] Another example of a use-case that #24987 aimed to fix. However, the
+        // implemented solution is not accurate, because hasParameterOption does
+        // not know if the previous short option, -f, takes a value or not. If
+        // -f takes a value, then -fh does NOT include -h. Otherwise it does.
+        $this->assertTrue($input->hasParameterOption('-h'), '->hasParameterOption() returns true if the given short option is in the raw input');
+        // [E] Historically, this test would pass; however, it is a bit odd. Does
+        // it mean "commandline contains both -f AND -h"? If so, should this
+        // also pass for 'cli.php -f -h'?
+        // It seems like it would be reasonable to not support this use-case,
+        // and require folks to use $input->hasParameterOption('-f') && $input->hasParameterOption('-h')
+        $this->assertTrue($input->hasParameterOption('-fh'), '->hasParameterOption() returns true if the given short option is in the raw input');
+        // [F] Failing test: If -fh is supported, then -hf should also work.
+        // It seems reasonable to not support this (or '-fh').
+        $this->assertTrue($input->hasParameterOption('-hf'), '->hasParameterOption() returns true if the given short option is in the raw input');
+    }
+
+    public function testFailingHasParameterOptionTest3()
+    {
+        $input = new ArgvInput(array('cli.php', '-f', '-h'));
+        // [G] As discussed above, if hasParameterOption('-fh') is supported for
+        // 'cli.php -f -h', then it seems it should also be supported
+        // for 'cli.php -f -h'.
+        // It seems reasonable to not support this.
+        $this->assertTrue($input->hasParameterOption('-fh'), '->hasParameterOption() returns true if the given short option is in the raw input');
+    }
+
+    public function testFailingHasParameterOptionTest4()
+    {
+        $input = new ArgvInput(array('cli.php', '-e=test'));
+
+        // CONTROL: We should not be calling 'bind' in the hasParameterOption test;
+        // this is here temporarily to demonstrate that -etest is interpreted as --example=test
+        $input->bind(new InputDefinition(array(new InputOption('example', 'e', InputOption::VALUE_REQUIRED))));
+        // [H]
+        $this->assertEquals(array('example' => '=test'), $input->getOptions(), 'CONTROL: the short option "e" has value "test".');
+
+        // [I] Failing test: $input has '-e=test', which is the same as --example="=test",
+        // but 'getParameterOption' gets confused by the '=' and thinks that the value is
+        // only 'test'. This is always wrong, regardless of whether the short option has
+        // a value or not.
+        $this->assertEquals('=test', $input->getParameterOption('-e'), '->getParameterOption() returns the value of the given short option in the raw input');
+    }
+
     public function testHasParameterOption()
     {
         $input = new ArgvInput(array('cli.php', '-f', 'foo'));
         $this->assertTrue($input->hasParameterOption('-f'), '->hasParameterOption() returns true if the given short option is in the raw input');
-
-        $input = new ArgvInput(array('cli.php', '-fh'));
-        $this->assertTrue($input->hasParameterOption('-fh'), '->hasParameterOption() returns true if the given short option is in the raw input');
-
-        $input = new ArgvInput(array('cli.php', '-e=test'));
-        $this->assertFalse($input->hasParameterOption('-s'), '->hasParameterOption() returns true if the given short option is in the raw input');
 
         $input = new ArgvInput(array('cli.php', '--foo', 'foo'));
         $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if the given short option is in the raw input');

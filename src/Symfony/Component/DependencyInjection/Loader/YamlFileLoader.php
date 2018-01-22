@@ -425,6 +425,10 @@ class YamlFileLoader extends FileLoader
                 continue;
             }
 
+            if (null === $values) {
+                $values = array('enabled' => null);
+            }
+
             if (!is_array($values)) {
                 $values = array();
             }

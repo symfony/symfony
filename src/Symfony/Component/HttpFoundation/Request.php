@@ -130,7 +130,7 @@ class Request
     public $headers;
 
     /**
-     * @var null|string|resource
+     * @var string|resource|false|null
      */
     protected $content;
 
@@ -213,7 +213,7 @@ class Request
      * @param array                $cookies    The COOKIE parameters
      * @param array                $files      The FILES parameters
      * @param array                $server     The SERVER parameters
-     * @param null|string|resource $content    The raw body data
+     * @param string|resource|null $content    The raw body data
      */
     public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
@@ -231,7 +231,7 @@ class Request
      * @param array                $cookies    The COOKIE parameters
      * @param array                $files      The FILES parameters
      * @param array                $server     The SERVER parameters
-     * @param null|string|resource $content    The raw body data
+     * @param string|resource|null $content    The raw body data
      */
     public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
@@ -300,7 +300,7 @@ class Request
      * @param array                $cookies    The request cookies ($_COOKIE)
      * @param array                $files      The request files ($_FILES)
      * @param array                $server     The server parameters ($_SERVER)
-     * @param null|string|resource $content    The raw body data
+     * @param string|resource|null $content    The raw body data
      *
      * @return static
      */

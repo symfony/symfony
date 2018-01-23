@@ -12,23 +12,15 @@
 namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
+use Symfony\Component\Routing\Matcher\Dumper\StaticUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
-use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\Matcher\StaticUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-/**
- * @group legacy
- */
-class PhpMatcherDumperTest extends TestCase
+class StaticUrlMatcherDumperTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private $matcherClass;
-
     /**
      * @var string
      */
@@ -38,8 +30,7 @@ class PhpMatcherDumperTest extends TestCase
     {
         parent::setUp();
 
-        $this->matcherClass = uniqid('ProjectUrlMatcher');
-        $this->dumpPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_matcher.'.$this->matcherClass.'.php';
+        $this->dumpPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_matcher.'.uniqid('StaticUrlMatcher').'.php';
     }
 
     protected function tearDown()
@@ -49,36 +40,12 @@ class PhpMatcherDumperTest extends TestCase
         @unlink($this->dumpPath);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
-    {
-        $collection = new RouteCollection();
-        $collection->add('secure', new Route(
-            '/secure',
-            array(),
-            array(),
-            array(),
-            '',
-            array('https')
-        ));
-        $dumper = new PhpMatcherDumper($collection);
-        $dumper->dump();
-    }
-
     public function testRedirectPreservesUrlEncoding()
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo:bar/'));
 
-        $class = $this->generateDumpedMatcher($collection, true);
-
-        $matcher = $this->getMockBuilder($class)
-                        ->setMethods(array('redirect'))
-                        ->setConstructorArgs(array(new RequestContext()))
-                        ->getMock();
-
+        $matcher = $this->generateDumpedMatcher($collection);
         $matcher->expects($this->once())->method('redirect')->with('/foo%3Abar/', 'foo')->willReturn(array());
 
         $matcher->match('/foo%3Abar');
@@ -87,12 +54,12 @@ class PhpMatcherDumperTest extends TestCase
     /**
      * @dataProvider getRouteCollections
      */
-    public function testDump(RouteCollection $collection, $fixture, $options = array())
+    public function testDump(RouteCollection $collection, $fixture)
     {
         $basePath = __DIR__.'/../../Fixtures/dumper/';
 
-        $dumper = new PhpMatcherDumper($collection);
-        $this->assertStringEqualsFile($basePath.$fixture, $dumper->dump($options), '->dump() correctly dumps routes as optimized PHP code.');
+        $dumper = new StaticUrlMatcherDumper($collection);
+        $this->assertStringEqualsFile($basePath.$fixture, $dumper->dump());
     }
 
     public function getRouteCollections()
@@ -422,41 +389,39 @@ class PhpMatcherDumperTest extends TestCase
         $trailingSlashCollection->add('regex_not_trailing_slash_POST_method', new Route('/not-trailing/regex/post-method/{param}', array(), array(), array(), '', array(), array('POST')));
 
         return array(
-           array(new RouteCollection(), 'url_matcher0.php', array()),
-           array($collection, 'url_matcher1.php', array()),
-           array($redirectCollection, 'url_matcher2.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
-           array($rootprefixCollection, 'url_matcher3.php', array()),
-           array($headMatchCasesCollection, 'url_matcher4.php', array()),
-           array($groupOptimisedCollection, 'url_matcher5.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
-           array($trailingSlashCollection, 'url_matcher6.php', array()),
-           array($trailingSlashCollection, 'url_matcher7.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
+           array(new RouteCollection(), 'static_url_matcher0.php'),
+           array($collection, 'static_url_matcher1.php'),
+           array($redirectCollection, 'static_url_matcher2.php'),
+           array($rootprefixCollection, 'static_url_matcher3.php'),
+           array($headMatchCasesCollection, 'static_url_matcher4.php'),
+           array($groupOptimisedCollection, 'static_url_matcher5.php'),
+           array($trailingSlashCollection, 'static_url_matcher6.php'),
+           array($trailingSlashCollection, 'static_url_matcher7.php'),
         );
     }
 
     /**
      * @param $dumper
      */
-    private function generateDumpedMatcher(RouteCollection $collection, $redirectableStub = false)
+    private function generateDumpedMatcher(RouteCollection $collection)
     {
-        $options = array('class' => $this->matcherClass);
-
-        if ($redirectableStub) {
-            $options['base_class'] = '\Symfony\Component\Routing\Tests\Matcher\Dumper\RedirectableUrlMatcherStub';
-        }
-
-        $dumper = new PhpMatcherDumper($collection);
-        $code = $dumper->dump($options);
+        $dumper = new StaticUrlMatcherDumper($collection);
+        $code = $dumper->dump();
 
         file_put_contents($this->dumpPath, $code);
-        include $this->dumpPath;
+        $dumpedRoutes = require $this->dumpPath;
 
-        return $this->matcherClass;
+        return $this->getMockBuilder(TestStaticUrlMatcher::class)
+            ->setConstructorArgs(array($dumpedRoutes, new RequestContext()))
+            ->setMethods(array('redirect'))
+            ->getMock();
     }
 }
 
-abstract class RedirectableUrlMatcherStub extends UrlMatcher implements RedirectableUrlMatcherInterface
+class TestStaticUrlMatcher extends StaticUrlMatcher implements RedirectableUrlMatcherInterface
 {
     public function redirect($path, $route, $scheme = null)
     {
+        return array();
     }
 }

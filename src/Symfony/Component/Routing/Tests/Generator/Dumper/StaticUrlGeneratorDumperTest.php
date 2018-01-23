@@ -15,13 +15,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
+use Symfony\Component\Routing\Generator\Dumper\StaticUrlGeneratorDumper;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Generator\StaticUrlGenerator;
 
-/**
- * @group legacy
- */
-class PhpGeneratorDumperTest extends TestCase
+class StaticUrlGeneratorDumperTest extends TestCase
 {
     /**
      * @var RouteCollection
@@ -29,7 +27,7 @@ class PhpGeneratorDumperTest extends TestCase
     private $routeCollection;
 
     /**
-     * @var PhpGeneratorDumper
+     * @var StaticUrlGeneratorDumper
      */
     private $generatorDumper;
 
@@ -48,9 +46,9 @@ class PhpGeneratorDumperTest extends TestCase
         parent::setUp();
 
         $this->routeCollection = new RouteCollection();
-        $this->generatorDumper = new PhpGeneratorDumper($this->routeCollection);
-        $this->testTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.'.$this->getName().'.php';
-        $this->largeTestTmpFilepath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_generator.'.$this->getName().'.large.php';
+        $this->generatorDumper = new StaticUrlGeneratorDumper($this->routeCollection);
+        $this->testTmpFilepath = sys_get_temp_dir().'/php_generator.'.$this->getName().'.php';
+        $this->largeTestTmpFilepath = sys_get_temp_dir().'/php_generator.'.$this->getName().'.large.php';
         @unlink($this->testTmpFilepath);
         @unlink($this->largeTestTmpFilepath);
     }
@@ -72,9 +70,8 @@ class PhpGeneratorDumperTest extends TestCase
         $this->routeCollection->add('Test2', new Route('/testing2'));
 
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
-        include $this->testTmpFilepath;
 
-        $projectUrlGenerator = new \ProjectUrlGenerator(new RequestContext('/app.php'));
+        $projectUrlGenerator = new StaticUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php'));
 
         $absoluteUrlWithParameter = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), UrlGeneratorInterface::ABSOLUTE_URL);
         $absoluteUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), UrlGeneratorInterface::ABSOLUTE_URL);
@@ -95,13 +92,10 @@ class PhpGeneratorDumperTest extends TestCase
         }
         $this->routeCollection->add('Test2', new Route('/testing2'));
 
-        file_put_contents($this->largeTestTmpFilepath, $this->generatorDumper->dump(array(
-            'class' => 'ProjectLargeUrlGenerator',
-        )));
+        file_put_contents($this->largeTestTmpFilepath, $this->generatorDumper->dump());
         $this->routeCollection = $this->generatorDumper = null;
-        include $this->largeTestTmpFilepath;
 
-        $projectUrlGenerator = new \ProjectLargeUrlGenerator(new RequestContext('/app.php'));
+        $projectUrlGenerator = new StaticUrlGenerator(require $this->largeTestTmpFilepath, new RequestContext('/app.php'));
 
         $absoluteUrlWithParameter = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), UrlGeneratorInterface::ABSOLUTE_URL);
         $absoluteUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), UrlGeneratorInterface::ABSOLUTE_URL);
@@ -119,10 +113,9 @@ class PhpGeneratorDumperTest extends TestCase
      */
     public function testDumpWithoutRoutes()
     {
-        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'WithoutRoutesUrlGenerator')));
-        include $this->testTmpFilepath;
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
-        $projectUrlGenerator = new \WithoutRoutesUrlGenerator(new RequestContext('/app.php'));
+        $projectUrlGenerator = new StaticUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php'));
 
         $projectUrlGenerator->generate('Test', array());
     }
@@ -134,10 +127,9 @@ class PhpGeneratorDumperTest extends TestCase
     {
         $this->routeCollection->add('Test', new Route('/test'));
 
-        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'NonExistingRoutesUrlGenerator')));
-        include $this->testTmpFilepath;
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
-        $projectUrlGenerator = new \NonExistingRoutesUrlGenerator(new RequestContext());
+        $projectUrlGenerator = new StaticUrlGenerator(require $this->testTmpFilepath, new RequestContext());
         $url = $projectUrlGenerator->generate('NonExisting', array());
     }
 
@@ -145,10 +137,9 @@ class PhpGeneratorDumperTest extends TestCase
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}', array('foo' => 'bar')));
 
-        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'DefaultRoutesUrlGenerator')));
-        include $this->testTmpFilepath;
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
-        $projectUrlGenerator = new \DefaultRoutesUrlGenerator(new RequestContext());
+        $projectUrlGenerator = new StaticUrlGenerator(require $this->testTmpFilepath, new RequestContext());
         $url = $projectUrlGenerator->generate('Test', array());
 
         $this->assertEquals('/testing', $url);
@@ -158,10 +149,9 @@ class PhpGeneratorDumperTest extends TestCase
     {
         $this->routeCollection->add('Test1', new Route('/testing', array(), array(), array(), '', array('ftp', 'https')));
 
-        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'SchemeUrlGenerator')));
-        include $this->testTmpFilepath;
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
-        $projectUrlGenerator = new \SchemeUrlGenerator(new RequestContext('/app.php'));
+        $projectUrlGenerator = new StaticUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php'));
 
         $absoluteUrl = $projectUrlGenerator->generate('Test1', array(), UrlGeneratorInterface::ABSOLUTE_URL);
         $relativeUrl = $projectUrlGenerator->generate('Test1', array(), UrlGeneratorInterface::ABSOLUTE_PATH);
@@ -169,7 +159,7 @@ class PhpGeneratorDumperTest extends TestCase
         $this->assertEquals('ftp://localhost/app.php/testing', $absoluteUrl);
         $this->assertEquals('ftp://localhost/app.php/testing', $relativeUrl);
 
-        $projectUrlGenerator = new \SchemeUrlGenerator(new RequestContext('/app.php', 'GET', 'localhost', 'https'));
+        $projectUrlGenerator = new StaticUrlGenerator(require $this->testTmpFilepath, new RequestContext('/app.php', 'GET', 'localhost', 'https'));
 
         $absoluteUrl = $projectUrlGenerator->generate('Test1', array(), UrlGeneratorInterface::ABSOLUTE_URL);
         $relativeUrl = $projectUrlGenerator->generate('Test1', array(), UrlGeneratorInterface::ABSOLUTE_PATH);

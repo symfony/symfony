@@ -11,11 +11,15 @@
 
 namespace Symfony\Component\Routing\Generator\Dumper;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1 and will be removed in 5.0. Use StaticUrlGeneratorDumper instead.', PhpGeneratorDumper::class), E_USER_DEPRECATED);
+
 /**
  * PhpGeneratorDumper creates a PHP class able to generate URLs for a given set of routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @deprecated since Symfony 4.1, to be removed in 5.0. Use StaticUrlGeneratorDumper instead.
  */
 class PhpGeneratorDumper extends GeneratorDumper
 {

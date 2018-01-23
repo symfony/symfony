@@ -14,6 +14,7 @@ namespace Symfony\Component\Process;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Pipes\PipesInterface;
@@ -389,7 +390,7 @@ class Process implements \IteratorAggregate
         }
 
         if ($this->processInformation['signaled'] && $this->processInformation['termsig'] !== $this->latestSignal) {
-            throw new RuntimeException(sprintf('The process has been signaled with signal "%s".', $this->processInformation['termsig']));
+            throw new ProcessSignaledException($this);
         }
 
         return $this->exitcode;

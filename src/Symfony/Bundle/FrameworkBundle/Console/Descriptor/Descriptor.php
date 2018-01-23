@@ -110,9 +110,10 @@ abstract class Descriptor implements DescriptorInterface
     protected function renderTable(Table $table, $decorated = false)
     {
         if (!$decorated) {
-            $table->getStyle()->setCellRowFormat('%s');
-            $table->getStyle()->setCellRowContentFormat('%s');
-            $table->getStyle()->setCellHeaderFormat('%s');
+            $tableStyle = $table->getStyle();
+            $tableStyle->setCellRowFormat('%s');
+            $tableStyle->setCellRowContentFormat('%s');
+            $tableStyle->setCellHeaderFormat('%s');
         }
 
         $table->render();

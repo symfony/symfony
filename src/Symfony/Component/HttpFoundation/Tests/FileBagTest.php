@@ -31,14 +31,10 @@ class FileBagTest extends TestCase
         new FileBag(array('file' => 'foo'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
-     */
     public function testShouldConvertsUploadedFiles()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 0);
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
 
         $bag = new FileBag(array('file' => array(
             'name' => basename($tmpFile),
@@ -62,26 +58,6 @@ class FileBagTest extends TestCase
         )));
 
         $this->assertNull($bag->get('file'));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
-     */
-    public function testShouldNotTriggerDeprecationWhenPassingSize()
-    {
-        $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 0);
-
-        $bag = new FileBag(array('file' => array(
-            'name' => basename($tmpFile),
-            'type' => 'text/plain',
-            'tmp_name' => $tmpFile,
-            'error' => 0,
-            'size' => 123456,
-        )));
-
-        $this->assertEquals($file, $bag->get('file'));
     }
 
     public function testShouldRemoveEmptyUploadedFilesForMultiUpload()
@@ -110,14 +86,10 @@ class FileBagTest extends TestCase
         $this->assertSame(array('file1' => null), $bag->get('files'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
-     */
     public function testShouldConvertUploadedFilesWithPhpBug()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 0);
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
 
         $bag = new FileBag(array(
             'child' => array(
@@ -143,14 +115,10 @@ class FileBagTest extends TestCase
         $this->assertEquals($file, $files['child']['file']);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
-     */
     public function testShouldConvertNestedUploadedFilesWithPhpBug()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 0);
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
 
         $bag = new FileBag(array(
             'child' => array(
@@ -176,14 +144,10 @@ class FileBagTest extends TestCase
         $this->assertEquals($file, $files['child']['sub']['file']);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
-     */
     public function testShouldNotConvertNestedUploadedFiles()
     {
         $tmpFile = $this->createTempFile();
-        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain', 0);
+        $file = new UploadedFile($tmpFile, basename($tmpFile), 'text/plain');
         $bag = new FileBag(array('image' => array('file' => $file)));
 
         $files = $bag->all();
@@ -192,7 +156,10 @@ class FileBagTest extends TestCase
 
     protected function createTempFile()
     {
-        return tempnam(sys_get_temp_dir().'/form_test', 'FormTest');
+        $tempFile = tempnam(sys_get_temp_dir().'/form_test', 'FormTest');
+        file_put_contents($tempFile, '1');
+
+        return $tempFile;
     }
 
     protected function setUp()

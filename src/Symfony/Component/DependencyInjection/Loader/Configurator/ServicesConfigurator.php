@@ -29,13 +29,17 @@ class ServicesConfigurator extends AbstractConfigurator
     private $container;
     private $loader;
     private $instanceof;
+    private $anonymousHash;
+    private $anonymousCount;
 
-    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof)
+    public function __construct(ContainerBuilder $container, PhpFileLoader $loader, array &$instanceof, string $path = null, int &$anonymousCount = 0)
     {
         $this->defaults = new Definition();
         $this->container = $container;
         $this->loader = $loader;
         $this->instanceof = &$instanceof;
+        $this->anonymousHash = ContainerBuilder::hash($path ?: mt_rand());
+        $this->anonymousCount = &$anonymousCount;
         $instanceof = array();
     }
 
@@ -59,14 +63,28 @@ class ServicesConfigurator extends AbstractConfigurator
 
     /**
      * Registers a service.
+     *
+     * @param string|null $id    The service id, or null to create an anonymous service
+     * @param string|null $class The class of the service, or null when $id is also the class name
      */
-    final public function set(string $id, string $class = null): ServiceConfigurator
+    final public function set(?string $id, string $class = null): ServiceConfigurator
     {
         $defaults = $this->defaults;
         $allowParent = !$defaults->getChanges() && empty($this->instanceof);
 
         $definition = new Definition();
-        $definition->setPublic($defaults->isPublic());
+
+        if (null === $id) {
+            if (!$class) {
+                throw new \LogicException('Anonymous services must have a class name.');
+            }
+
+            $id = sprintf('%d_%s', ++$this->anonymousCount, preg_replace('/^.*\\\\/', '', $class).'~'.$this->anonymousHash);
+            $definition->setPublic(false);
+        } else {
+            $definition->setPublic($defaults->isPublic());
+        }
+
         $definition->setAutowired($defaults->isAutowired());
         $definition->setAutoconfigured($defaults->isAutoconfigured());
         $definition->setBindings($defaults->getBindings());

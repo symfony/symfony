@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPrunerPass;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
@@ -24,7 +25,7 @@ class CachePoolPrunerPassTest extends TestCase
     public function testCompilerPassReplacesCommandArgument()
     {
         $container = new ContainerBuilder();
-        $container->register('cache.command.pool_pruner')->addArgument(array());
+        $container->register(CachePoolPruneCommand::class)->addArgument(array());
         $container->register('pool.foo', FilesystemAdapter::class)->addTag('cache.pool');
         $container->register('pool.bar', PhpFilesAdapter::class)->addTag('cache.pool');
 
@@ -35,7 +36,7 @@ class CachePoolPrunerPassTest extends TestCase
             'pool.foo' => new Reference('pool.foo'),
             'pool.bar' => new Reference('pool.bar'),
         );
-        $argument = $container->getDefinition('cache.command.pool_pruner')->getArgument(0);
+        $argument = $container->getDefinition(CachePoolPruneCommand::class)->getArgument(0);
 
         $this->assertInstanceOf(IteratorArgument::class, $argument);
         $this->assertEquals($expected, $argument->getValues());
@@ -51,7 +52,7 @@ class CachePoolPrunerPassTest extends TestCase
         $container
             ->expects($this->atLeastOnce())
             ->method('hasDefinition')
-            ->with('cache.command.pool_pruner')
+            ->with(CachePoolPruneCommand::class)
             ->will($this->returnValue(false));
 
         $container
@@ -73,7 +74,7 @@ class CachePoolPrunerPassTest extends TestCase
     public function testCompilerPassThrowsOnInvalidDefinitionClass()
     {
         $container = new ContainerBuilder();
-        $container->register('cache.command.pool_pruner')->addArgument(array());
+        $container->register(CachePoolPruneCommand::class)->addArgument(array());
         $container->register('pool.not-found', NotFound::class)->addTag('cache.pool');
 
         $pass = new CachePoolPrunerPass();

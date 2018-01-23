@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Parser;
 
@@ -29,6 +30,10 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
 
     public function __construct(Dumper $dumper = null, Parser $parser = null, array $defaultContext = array())
     {
+        if (!class_exists(Dumper::class)) {
+            throw new RuntimeException('The YamlEncoder class requires the "Yaml" component. Install "symfony/yaml" to use it.');
+        }
+
         $this->dumper = $dumper ?: new Dumper();
         $this->parser = $parser ?: new Parser();
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);

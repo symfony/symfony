@@ -75,8 +75,6 @@ class IntlDateFormatter
 
     /**
      * Patterns used to format the date when no pattern is provided.
-     *
-     * @var array
      */
     private $defaultDateFormats = array(
         self::NONE => '',
@@ -88,8 +86,6 @@ class IntlDateFormatter
 
     /**
      * Patterns used to format the time when no pattern is provided.
-     *
-     * @var array
      */
     private $defaultTimeFormats = array(
         self::FULL => 'h:mm:ss a zzzz',
@@ -98,14 +94,7 @@ class IntlDateFormatter
         self::SHORT => 'h:mm a',
     );
 
-    /**
-     * @var int
-     */
     private $datetype;
-
-    /**
-     * @var int
-     */
     private $timetype;
 
     /**
@@ -129,8 +118,6 @@ class IntlDateFormatter
     private $timeZoneId;
 
     /**
-     * Constructor.
-     *
      * @param string $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      * @param int    $datetype Type of date formatting, one of the format type constants
      * @param int    $timetype Type of time formatting, one of the format type constants
@@ -145,7 +132,7 @@ class IntlDateFormatter
      * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
      * @throws MethodArgumentValueNotImplementedException When $calendar different than GREGORIAN is passed
      */
-    public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
+    public function __construct(?string $locale, int $datetype, int $timetype, $timezone = null, ?int $calendar = self::GREGORIAN, string $pattern = null)
     {
         if ('en' !== $locale && null !== $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
@@ -169,7 +156,7 @@ class IntlDateFormatter
      * @param int    $datetype Type of date formatting, one of the format type constants
      * @param int    $timetype Type of time formatting, one of the format type constants
      * @param string $timezone Timezone identifier
-     * @param int    $calendar calendar to use for formatting or parsing; default is Gregorian
+     * @param int    $calendar Calendar to use for formatting or parsing; default is Gregorian
      *                         One of the calendar constants
      * @param string $pattern  Optional pattern to use when formatting
      *

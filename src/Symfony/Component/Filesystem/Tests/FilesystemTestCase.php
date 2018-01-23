@@ -92,7 +92,7 @@ class FilesystemTestCase extends TestCase
     }
 
     /**
-     * @param int    $expectedFilePerms expected file permissions as three digits (i.e. 755)
+     * @param int    $expectedFilePerms Expected file permissions as three digits (i.e. 755)
      * @param string $filePath
      */
     protected function assertFilePermissions($expectedFilePerms, $filePath)

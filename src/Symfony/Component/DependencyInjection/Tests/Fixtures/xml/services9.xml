@@ -138,6 +138,12 @@
     </service>
     <service id="bar2" class="stdClass" public="true"/>
     <service id="BAR2" class="stdClass" public="true"/>
+    <service id="tagged_iterator_foo" class="Bar" public="false">
+      <tag name="foo"/>
+    </service>
+    <service id="tagged_iterator" class="Bar" public="true">
+      <argument type="tagged" tag="foo"/>
+    </service>
     <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
     <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
     <service id="alias_for_foo" alias="foo" public="true"/>

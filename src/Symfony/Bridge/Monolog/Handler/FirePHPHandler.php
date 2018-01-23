@@ -22,9 +22,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FirePHPHandler extends BaseFirePHPHandler
 {
-    /**
-     * @var array
-     */
     private $headers = array();
 
     /**

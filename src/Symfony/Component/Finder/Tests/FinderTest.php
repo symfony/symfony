@@ -424,6 +424,20 @@ class FinderTest extends Iterator\RealIteratorTestCase
         count($finder);
     }
 
+    public function testHasResults()
+    {
+        $finder = $this->buildFinder();
+        $finder->in(__DIR__);
+        $this->assertTrue($finder->hasResults());
+    }
+
+    public function testNoResults()
+    {
+        $finder = $this->buildFinder();
+        $finder->in(__DIR__)->name('DoesNotExist');
+        $this->assertFalse($finder->hasResults());
+    }
+
     /**
      * @dataProvider getContainsTestData
      */

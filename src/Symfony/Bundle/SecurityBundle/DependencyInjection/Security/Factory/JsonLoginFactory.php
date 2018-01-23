@@ -19,8 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
  * JsonLoginFactory creates services for JSON login authentication.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @experimental in version 3.3
  */
 class JsonLoginFactory extends AbstractFactory
 {
@@ -30,7 +28,6 @@ class JsonLoginFactory extends AbstractFactory
         $this->addOption('password_path', 'password');
         $this->defaultFailureHandlerOptions = array();
         $this->defaultSuccessHandlerOptions = array();
-        $this->options['require_previous_session'] = false;
     }
 
     /**

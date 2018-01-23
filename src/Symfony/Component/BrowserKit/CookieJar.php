@@ -20,11 +20,6 @@ class CookieJar
 {
     protected $cookieJar = array();
 
-    /**
-     * Sets a cookie.
-     *
-     * @param Cookie $cookie A Cookie instance
-     */
     public function set(Cookie $cookie)
     {
         $this->cookieJar[$cookie->getDomain()][$cookie->getPath()][$cookie->getName()] = $cookie;

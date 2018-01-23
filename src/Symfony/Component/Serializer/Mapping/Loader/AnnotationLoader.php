@@ -12,10 +12,12 @@
 namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
@@ -25,14 +27,8 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
  */
 class AnnotationLoader implements LoaderInterface
 {
-    /**
-     * @var Reader
-     */
     private $reader;
 
-    /**
-     * @param Reader $reader
-     */
     public function __construct(Reader $reader)
     {
         $this->reader = $reader;
@@ -48,6 +44,15 @@ class AnnotationLoader implements LoaderInterface
         $loaded = false;
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        foreach ($this->reader->getClassAnnotations($reflectionClass) as $annotation) {
+            if ($annotation instanceof DiscriminatorMap) {
+                $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
+                    $annotation->getTypeProperty(),
+                    $annotation->getMapping()
+                ));
+            }
+        }
 
         foreach ($reflectionClass->getProperties() as $property) {
             if (!isset($attributesMetadata[$property->name])) {

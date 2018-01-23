@@ -12,8 +12,6 @@
 namespace Symfony\Component\HttpKernel\Exception;
 
 /**
- * TooManyRequestsHttpException.
- *
  * @author Ben Ramsey <ben@benramsey.com>
  *
  * @see http://tools.ietf.org/html/rfc6585
@@ -21,18 +19,16 @@ namespace Symfony\Component\HttpKernel\Exception;
 class TooManyRequestsHttpException extends HttpException
 {
     /**
-     * Constructor.
-     *
      * @param int|string $retryAfter The number of seconds or HTTP-date after which the request may be retried
      * @param string     $message    The internal exception message
      * @param \Exception $previous   The previous exception
      * @param int        $code       The internal exception code
+     * @param array      $headers
      */
-    public function __construct($retryAfter = null, $message = null, \Exception $previous = null, $code = 0)
+    public function __construct($retryAfter = null, string $message = null, \Exception $previous = null, ?int $code = 0, array $headers = array())
     {
-        $headers = array();
         if ($retryAfter) {
-            $headers = array('Retry-After' => $retryAfter);
+            $headers['Retry-After'] = $retryAfter;
         }
 
         parent::__construct(429, $message, $previous, $headers, $code);

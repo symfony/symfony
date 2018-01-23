@@ -19,15 +19,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
- * This class contains the configuration information.
- *
- * This information is for the following tags:
- *
- *   * security.config
- *   * security.acl
- *
- * This information is solely responsible for how the different configuration
- * sections are normalized, and merged.
+ * SecurityExtension configuration structure.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -36,12 +28,6 @@ class MainConfiguration implements ConfigurationInterface
     private $factories;
     private $userProviderFactories;
 
-    /**
-     * Constructor.
-     *
-     * @param array $factories
-     * @param array $userProviderFactories
-     */
     public function __construct(array $factories, array $userProviderFactories)
     {
         $this->factories = $factories;
@@ -106,7 +92,6 @@ class MainConfiguration implements ConfigurationInterface
             ->end()
         ;
 
-        $this->addAclSection($rootNode);
         $this->addEncodersSection($rootNode);
         $this->addProvidersSection($rootNode);
         $this->addFirewallsSection($rootNode, $this->factories);
@@ -114,46 +99,6 @@ class MainConfiguration implements ConfigurationInterface
         $this->addRoleHierarchySection($rootNode);
 
         return $tb;
-    }
-
-    private function addAclSection(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            ->children()
-                ->arrayNode('acl')
-                    ->children()
-                        ->scalarNode('connection')
-                            ->defaultNull()
-                            ->info('any name configured in doctrine.dbal section')
-                        ->end()
-                        ->arrayNode('cache')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('id')->end()
-                                ->scalarNode('prefix')->defaultValue('sf2_acl_')->end()
-                            ->end()
-                        ->end()
-                        ->scalarNode('provider')->end()
-                        ->arrayNode('tables')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('class')->defaultValue('acl_classes')->end()
-                                ->scalarNode('entry')->defaultValue('acl_entries')->end()
-                                ->scalarNode('object_identity')->defaultValue('acl_object_identities')->end()
-                                ->scalarNode('object_identity_ancestors')->defaultValue('acl_object_identity_ancestors')->end()
-                                ->scalarNode('security_identity')->defaultValue('acl_security_identities')->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('voter')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->booleanNode('allow_if_object_identity_unavailable')->defaultTrue()->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
     }
 
     private function addRoleHierarchySection(ArrayNodeDefinition $rootNode)
@@ -252,6 +197,11 @@ class MainConfiguration implements ConfigurationInterface
             ->scalarNode('provider')->end()
             ->booleanNode('stateless')->defaultFalse()->end()
             ->scalarNode('context')->cannotBeEmpty()->end()
+            ->booleanNode('logout_on_user_change')
+                ->defaultTrue()
+                ->info('When true, it will trigger a logout for the user if something has changed. Note: No-Op option since 4.0. Will always be true.')
+                ->setDeprecated('The "%path%.%node%" configuration key has been deprecated in Symfony 4.1 and will be removed in 5.0.')
+            ->end()
             ->arrayNode('logout')
                 ->treatTrueLike(array())
                 ->canBeUnset()
@@ -290,7 +240,7 @@ class MainConfiguration implements ConfigurationInterface
             ->arrayNode('anonymous')
                 ->canBeUnset()
                 ->children()
-                    ->scalarNode('secret')->defaultValue(uniqid('', true))->end()
+                    ->scalarNode('secret')->defaultNull()->end()
                 ->end()
             ->end()
             ->arrayNode('switch_user')
@@ -299,6 +249,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('provider')->end()
                     ->scalarNode('parameter')->defaultValue('_switch_user')->end()
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
+                    ->booleanNode('stateless')->defaultValue(false)->end()
                 ->end()
             ->end()
         ;

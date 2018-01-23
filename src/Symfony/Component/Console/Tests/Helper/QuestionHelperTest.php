@@ -83,6 +83,10 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $question->setMultiselect(true);
 
         $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, 0);
+        // We are supposed to get the default value since we are not in interactive mode
+        $this->assertEquals('Superman', $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream, true), $this->createOutputInterface(), $question));
     }
 
     public function testAsk()
@@ -151,6 +155,45 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
         $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
         $this->assertEquals('AsseticBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
+    public function testAutocompleteWithTrailingBackslash()
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        $inputStream = $this->getInputStream('E');
+
+        $dialog = new QuestionHelper();
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new Question('');
+        $expectedCompletion = 'ExampleNamespace\\';
+        $question->setAutocompleterValues(array($expectedCompletion));
+
+        $output = $this->createOutputInterface();
+        $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output, $question);
+
+        $outputStream = $output->getStream();
+        rewind($outputStream);
+        $actualOutput = stream_get_contents($outputStream);
+
+        // Shell control (esc) sequences are not so important: we only care that
+        // <hl> tag is interpreted correctly and replaced
+        $irrelevantEscSequences = array(
+            "\0337" => '', // Save cursor position
+            "\0338" => '', // Restore cursor position
+            "\033[K" => '', // Clear line from cursor till the end
+        );
+
+        $importantActualOutput = strtr($actualOutput, $irrelevantEscSequences);
+
+        // Remove colors (e.g. "\033[30m", "\033[31;41m")
+        $importantActualOutput = preg_replace('/\033\[\d+(;\d+)?m/', '', $importantActualOutput);
+
+        $this->assertEquals($expectedCompletion, $importantActualOutput);
     }
 
     public function testAskHiddenResponse()
@@ -461,6 +504,39 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         new ChoiceQuestion('Question', array(), 'irrelevant');
     }
 
+    public function testTraversableAutocomplete()
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        // Acm<NEWLINE>
+        // Ac<BACKSPACE><BACKSPACE>s<TAB>Test<NEWLINE>
+        // <NEWLINE>
+        // <UP ARROW><UP ARROW><NEWLINE>
+        // <UP ARROW><UP ARROW><UP ARROW><UP ARROW><UP ARROW><TAB>Test<NEWLINE>
+        // <DOWN ARROW><NEWLINE>
+        // S<BACKSPACE><BACKSPACE><DOWN ARROW><DOWN ARROW><NEWLINE>
+        // F00<BACKSPACE><BACKSPACE>oo<TAB><NEWLINE>
+        $inputStream = $this->getInputStream("Acm\nAc\177\177s\tTest\n\n\033[A\033[A\n\033[A\033[A\033[A\033[A\033[A\tTest\n\033[B\nS\177\177\033[B\033[B\nF00\177\177oo\t\n");
+
+        $dialog = new QuestionHelper();
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new Question('Please select a bundle', 'FrameworkBundle');
+        $question->setAutocompleterValues(new AutocompleteValues(array('irrelevant' => 'AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle')));
+
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('AsseticBundleTest', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('FrameworkBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('SecurityBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('FooBundleTest', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('AcmeDemoBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('AsseticBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);
@@ -490,5 +566,20 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         exec('stty 2>&1', $output, $exitcode);
 
         return 0 === $exitcode;
+    }
+}
+
+class AutocompleteValues implements \IteratorAggregate
+{
+    private $values;
+
+    public function __construct(array $values)
+    {
+        $this->values = $values;
+    }
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->values);
     }
 }

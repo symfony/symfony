@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\Validator\Validator\TraceableValidator;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
@@ -31,10 +32,7 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
     public function __construct(TraceableValidator $validator)
     {
         $this->validator = $validator;
-        $this->data = array(
-            'calls' => array(),
-            'violations_count' => 0,
-        );
+        $this->reset();
     }
 
     /**
@@ -45,6 +43,14 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
         // Everything is collected once, on kernel terminate.
     }
 
+    public function reset()
+    {
+        $this->data = array(
+            'calls' => $this->cloneVar(array()),
+            'violations_count' => 0,
+        );
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -52,16 +58,22 @@ class ValidatorDataCollector extends DataCollector implements LateDataCollectorI
     {
         $collected = $this->validator->getCollectedData();
         $this->data['calls'] = $this->cloneVar($collected);
-        $this->data['violations_count'] += array_reduce($collected, function ($previous, $item) {
-            return $previous += count($item['violations']);
+        $this->data['violations_count'] = array_reduce($collected, function ($previous, $item) {
+            return $previous + count($item['violations']);
         }, 0);
     }
 
+    /**
+     * @return Data
+     */
     public function getCalls()
     {
         return $this->data['calls'];
     }
 
+    /**
+     * @return int
+     */
     public function getViolationsCount()
     {
         return $this->data['violations_count'];

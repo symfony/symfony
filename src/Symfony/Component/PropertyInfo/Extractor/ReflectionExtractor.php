@@ -28,38 +28,21 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 {
     /**
      * @internal
-     *
-     * @var string[]
      */
     public static $defaultMutatorPrefixes = array('add', 'remove', 'set');
 
     /**
      * @internal
-     *
-     * @var string[]
      */
     public static $defaultAccessorPrefixes = array('is', 'can', 'get');
 
     /**
      * @internal
-     *
-     * @var string[]
      */
     public static $defaultArrayMutatorPrefixes = array('add', 'remove');
 
-    /**
-     * @var string[]
-     */
     private $mutatorPrefixes;
-
-    /**
-     * @var string[]
-     */
     private $accessorPrefixes;
-
-    /**
-     * @var string[]
-     */
     private $arrayMutatorPrefixes;
 
     /**
@@ -155,11 +138,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     }
 
     /**
-     * Tries to extract type information from mutators.
-     *
-     * @param string $class
-     * @param string $property
-     *
      * @return Type[]|null
      */
     private function extractFromMutator(string $class, string $property): ?array
@@ -187,9 +165,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * Tries to extract type information from accessors.
      *
-     * @param string $class
-     * @param string $property
-     *
      * @return Type[]|null
      */
     private function extractFromAccessor(string $class, string $property): ?array
@@ -210,13 +185,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    /**
-     * Extracts data from the PHP 7 reflection type.
-     *
-     * @param \ReflectionType $reflectionType
-     *
-     * @return Type
-     */
     private function extractFromReflectionType(\ReflectionType $reflectionType): Type
     {
         $phpTypeOrClass = $reflectionType->getName();
@@ -235,14 +203,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return $type;
     }
 
-    /**
-     * Does the class have the given public property?
-     *
-     * @param string $class
-     * @param string $property
-     *
-     * @return bool
-     */
     private function isPublicProperty(string $class, string $property): bool
     {
         try {
@@ -261,11 +221,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      *
      * Returns an array with a the instance of \ReflectionMethod as first key
      * and the prefix of the method as second or null if not found.
-     *
-     * @param string $class
-     * @param string $property
-     *
-     * @return array|null
      */
     private function getAccessorMethod(string $class, string $property): ?array
     {
@@ -290,17 +245,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     }
 
     /**
-     * Gets the mutator method.
-     *
      * Returns an array with a the instance of \ReflectionMethod as first key
      * and the prefix of the method as second or null if not found.
-     *
-     * @param string $class
-     * @param string $property
-     *
-     * @return array
      */
-    private function getMutatorMethod(string $class, string $property)
+    private function getMutatorMethod(string $class, string $property): ?array
     {
         $ucProperty = ucfirst($property);
         $ucSingulars = (array) Inflector::singularize($ucProperty);
@@ -327,17 +275,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 }
             }
         }
+
+        return null;
     }
 
-    /**
-     * Extracts a property name from a method name.
-     *
-     * @param string                $methodName
-     * @param \ReflectionProperty[] $reflectionProperties
-     *
-     * @return string
-     */
-    private function getPropertyName(string $methodName, array $reflectionProperties)
+    private function getPropertyName(string $methodName, array $reflectionProperties): ?string
     {
         $pattern = implode('|', array_merge($this->accessorPrefixes, $this->mutatorPrefixes));
 
@@ -356,5 +298,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
             return $matches[2];
         }
+
+        return null;
     }
 }

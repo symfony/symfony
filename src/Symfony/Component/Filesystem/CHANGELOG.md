@@ -5,6 +5,12 @@ CHANGELOG
 -----
 
  * removed `LockHandler`
+ * Support for passing relative paths to `Filesystem::makePathRelative()` has been removed.
+
+3.4.0
+-----
+
+ * support for passing relative paths to `Filesystem::makePathRelative()` is deprecated and will be removed in 4.0
 
 3.3.0
 -----

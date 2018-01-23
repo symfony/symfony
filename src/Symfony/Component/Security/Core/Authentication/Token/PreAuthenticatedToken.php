@@ -22,14 +22,12 @@ class PreAuthenticatedToken extends AbstractToken
     private $providerKey;
 
     /**
-     * Constructor.
-     *
      * @param string|object   $user        The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string
      * @param mixed           $credentials The user credentials
      * @param string          $providerKey The provider key
      * @param (Role|string)[] $roles       An array of roles
      */
-    public function __construct($user, $credentials, $providerKey, array $roles = array())
+    public function __construct($user, $credentials, string $providerKey, array $roles = array())
     {
         parent::__construct($roles);
 

@@ -26,9 +26,6 @@ class AutoExpireFlashBagTest extends TestCase
      */
     private $bag;
 
-    /**
-     * @var array
-     */
     protected $array = array();
 
     protected function setUp()
@@ -152,5 +149,13 @@ class AutoExpireFlashBagTest extends TestCase
     public function testClear()
     {
         $this->assertEquals(array('notice' => array('A previous flash message')), $this->bag->clear());
+    }
+
+    public function testDoNotRemoveTheNewFlashesWhenDisplayingTheExistingOnes()
+    {
+        $this->bag->add('success', 'Something');
+        $this->bag->all();
+
+        $this->assertEquals(array('new' => array('success' => array('Something')), 'display' => array()), $this->array);
     }
 }

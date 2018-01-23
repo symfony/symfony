@@ -27,13 +27,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ServerStatusCommand extends Command
 {
+    protected static $defaultName = 'server:status';
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('server:status')
             ->setDefinition(array(
                 new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'The value to display (one of port, host, or address)'),

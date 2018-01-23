@@ -486,6 +486,15 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setAllowedTypes('foo', 'string');
     }
 
+    public function testResolveTypedArray()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'string[]');
+        $options = $this->resolver->resolve(array('foo' => array('bar', 'baz')));
+
+        $this->assertSame(array('foo' => array('bar', 'baz')), $options);
+    }
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
      */
@@ -498,6 +507,65 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setDefault('bar', 'baz');
 
         $this->resolver->resolve();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "DateTime[]".
+     */
+    public function testResolveFailsIfInvalidTypedArray()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[]');
+
+        $this->resolver->resolve(array('foo' => array(new \DateTime())));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value "bar" is expected to be of type "int[]", but is of type "string".
+     */
+    public function testResolveFailsWithNonArray()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[]');
+
+        $this->resolver->resolve(array('foo' => 'bar'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[]", but is of type "integer|stdClass|array|DateTime[]".
+     */
+    public function testResolveFailsIfTypedArrayContainsInvalidTypes()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[]');
+        $values = range(1, 5);
+        $values[] = new \stdClass();
+        $values[] = array();
+        $values[] = new \DateTime();
+        $values[] = 123;
+
+        $this->resolver->resolve(array('foo' => $values));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value array is expected to be of type "int[][]", but is of type "double[][]".
+     */
+    public function testResolveFailsWithCorrectLevelsButWrongScalar()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'int[][]');
+
+        $this->resolver->resolve(
+            array(
+                'foo' => array(
+                    array(1.2),
+                ),
+            )
+        );
     }
 
     /**
@@ -566,6 +634,32 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setAllowedTypes('foo', '\stdClass');
 
         $this->assertNotEmpty($this->resolver->resolve());
+    }
+
+    public function testResolveSucceedsIfTypedArray()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->setAllowedTypes('foo', array('null', 'DateTime[]'));
+
+        $data = array(
+            'foo' => array(
+                new \DateTime(),
+                new \DateTime(),
+            ),
+        );
+        $result = $this->resolver->resolve($data);
+        $this->assertEquals($data, $result);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveFailsIfNotInstanceOfClass()
+    {
+        $this->resolver->setDefault('foo', 'bar');
+        $this->resolver->setAllowedTypes('foo', '\stdClass');
+
+        $this->resolver->resolve();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1419,12 +1513,12 @@ class OptionsResolverTest extends TestCase
         });
 
         $this->resolver->setDefault('lazy2', function (Options $options) {
-            Assert::assertTrue(isset($options['default1']));
-            Assert::assertTrue(isset($options['default2']));
-            Assert::assertTrue(isset($options['required']));
-            Assert::assertTrue(isset($options['lazy1']));
-            Assert::assertTrue(isset($options['lazy2']));
-            Assert::assertFalse(isset($options['defined']));
+            Assert::assertArrayHasKey('default1', $options);
+            Assert::assertArrayHasKey('default2', $options);
+            Assert::assertArrayHasKey('required', $options);
+            Assert::assertArrayHasKey('lazy1', $options);
+            Assert::assertArrayHasKey('lazy2', $options);
+            Assert::assertArrayNotHasKey('defined', $options);
 
             Assert::assertSame(0, $options['default1']);
             Assert::assertSame(42, $options['default2']);

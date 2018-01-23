@@ -9,8 +9,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * Symfony_DI_PhpDumper_Test_Uninitialized_Reference.
- *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  *
@@ -20,11 +18,12 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
 {
     private $parameters;
     private $targetDirs = array();
-    private $privates = array();
 
     /**
-     * Constructor.
+     * @internal but protected for BC on cache:clear
      */
+    protected $privates = array();
+
     public function __construct()
     {
         $this->services = $this->privates = array();
@@ -37,29 +36,30 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
         $this->aliases = array();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function reset()
     {
         $this->privates = array();
         parent::reset();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function compile()
     {
         throw new LogicException('You cannot compile a dumped container that was already compiled.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCompiled()
     {
         return true;
+    }
+
+    public function getRemovedIds()
+    {
+        return array(
+            'Psr\\Container\\ContainerInterface' => true,
+            'Symfony\\Component\\DependencyInjection\\ContainerInterface' => true,
+            'foo2' => true,
+            'foo3' => true,
+        );
     }
 
     /**

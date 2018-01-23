@@ -209,7 +209,7 @@ class EventDispatcher implements EventDispatcherInterface
             if ($event->isPropagationStopped()) {
                 break;
             }
-            call_user_func($listener, $event, $eventName, $this);
+            \call_user_func($listener, $event, $eventName, $this);
         }
     }
 
@@ -225,7 +225,7 @@ class EventDispatcher implements EventDispatcherInterface
 
         foreach ($this->listeners[$eventName] as $priority => $listeners) {
             foreach ($listeners as $k => $listener) {
-                if (is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure) {
+                if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure) {
                     $listener[0] = $listener[0]();
                     $this->listeners[$eventName][$priority][$k] = $listener;
                 }

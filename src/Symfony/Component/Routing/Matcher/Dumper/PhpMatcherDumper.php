@@ -63,16 +63,11 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * {$options['class']}.
- *
  * This class has been auto-generated
  * by the Symfony Routing Component.
  */
 class {$options['class']} extends {$options['base_class']}
 {
-    /**
-     * Constructor.
-     */
     public function __construct(RequestContext \$context)
     {
         \$this->context = \$context;
@@ -101,10 +96,10 @@ EOF;
         $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections), "\n");
 
         return <<<EOF
-    public function match(\$pathinfo)
+    public function match(\$rawPathinfo)
     {
         \$allow = array();
-        \$pathinfo = rawurldecode(\$pathinfo);
+        \$pathinfo = rawurldecode(\$rawPathinfo);
         \$trimmedPathinfo = rtrim(\$pathinfo, '/');
         \$context = \$this->context;
         \$request = \$this->request;
@@ -158,6 +153,12 @@ EOF;
             } else {
                 $code .= $groupCode;
             }
+        }
+
+        if ('' === $code) {
+            $code .= "        if ('/' === \$pathinfo) {\n";
+            $code .= "            throw new Symfony\Component\Routing\Exception\NoConfigurationException();\n";
+            $code .= "        }\n";
         }
 
         return $code;
@@ -361,7 +362,7 @@ EOF;
         if ($hasTrailingSlash) {
             $code .= <<<EOF
             if (substr(\$pathinfo, -1) !== '/') {
-                return array_replace(\$ret, \$this->redirect(\$pathinfo.'/', '$name'));
+                return array_replace(\$ret, \$this->redirect(\$rawPathinfo.'/', '$name'));
             }
 
 
@@ -376,7 +377,7 @@ EOF;
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$scheme])) {
-                return array_replace(\$ret, \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes)));
+                return array_replace(\$ret, \$this->redirect(\$rawPathinfo, '$name', key(\$requiredSchemes)));
             }
 
 

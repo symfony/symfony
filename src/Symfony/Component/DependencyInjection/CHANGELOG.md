@@ -1,9 +1,58 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added support for variadics in named arguments
+ * added PSR-11 `ContainerBagInterface` and its `ContainerBag` implementation to access parameters as-a-service
+
 4.0.0
 -----
 
+ * Relying on service auto-registration while autowiring is not supported anymore.
+   Explicitly inject your dependencies or create services whose ids are
+   their fully-qualified class name.
+
+   Before:
+
+   ```php
+   namespace App\Controller;
+
+   use App\Mailer;
+
+   class DefaultController
+   {
+       public function __construct(Mailer $mailer) {
+           // ...
+       }
+
+       // ...
+   }
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+   ```
+
+   After:
+
+   ```php
+   // same PHP code
+   ```
+   ```yml
+   services:
+       App\Controller\DefaultController:
+           autowire: true
+
+       # or
+       # App\Controller\DefaultController:
+       #     arguments: { $mailer: "@App\Mailer" }
+
+       App\Mailer:
+           autowire: true
+    ```
  * removed autowiring services based on the types they implement
  * added a third `$methodName` argument to the `getProxyFactoryCode()` method
    of the `DumperInterface`
@@ -22,6 +71,7 @@ CHANGELOG
  * removed support for setting and accessing private services in `Container`
  * removed support for setting pre-defined services in `Container`
  * removed support for case insensitivity of parameter names
+ * removed `AutowireExceptionPass` and `AutowirePass::getAutowiringExceptions()`, use `Definition::addError()` and the `DefinitionErrorExceptionPass` instead
 
 3.4.0
 -----
@@ -35,6 +85,9 @@ CHANGELOG
  * deprecated support for top-level anonymous services in XML
  * deprecated case insensitivity of parameter names
  * deprecated the `ResolveDefinitionTemplatesPass` class in favor of `ResolveChildDefinitionsPass`
+ * added `TaggedIteratorArgument` with YAML (`!tagged foo`) and XML (`<service type="tagged"/>`) support
+ * deprecated `AutowireExceptionPass` and `AutowirePass::getAutowiringExceptions()`, use `Definition::addError()` and the `DefinitionErrorExceptionPass` instead
+
 
 3.3.0
 -----

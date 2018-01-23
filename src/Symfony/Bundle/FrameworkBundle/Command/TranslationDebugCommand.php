@@ -46,14 +46,18 @@ class TranslationDebugCommand extends Command
     private $translator;
     private $reader;
     private $extractor;
+    private $defaultTransPath;
+    private $defaultViewsPath;
 
-    public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor)
+    public function __construct(TranslatorInterface $translator, TranslationReaderInterface $reader, ExtractorInterface $extractor, string $defaultTransPath = null, string $defaultViewsPath = null)
     {
         parent::__construct();
 
         $this->translator = $translator;
         $this->reader = $reader;
         $this->extractor = $extractor;
+        $this->defaultTransPath = $defaultTransPath;
+        $this->defaultViewsPath = $defaultViewsPath;
     }
 
     /**
@@ -117,20 +121,34 @@ EOF
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
 
-        // Define Root Path to App folder
-        $transPaths = array($kernel->getRootDir().'/Resources/');
+        // Define Root Paths
+        $transPaths = array($kernel->getRootDir().'/Resources/translations');
+        if ($this->defaultTransPath) {
+            $transPaths[] = $this->defaultTransPath;
+        }
+        $viewsPaths = array($kernel->getRootDir().'/Resources/views');
+        if ($this->defaultViewsPath) {
+            $viewsPaths[] = $this->defaultViewsPath;
+        }
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {
             try {
                 $bundle = $kernel->getBundle($input->getArgument('bundle'));
-                $transPaths = array(
-                    $bundle->getPath().'/Resources/',
-                    sprintf('%s/Resources/%s/', $kernel->getRootDir(), $bundle->getName()),
-                );
+                $transPaths = array($bundle->getPath().'/Resources/translations');
+                if ($this->defaultTransPath) {
+                    $transPaths[] = $this->defaultTransPath.'/'.$bundle->getName();
+                }
+                $transPaths[] = sprintf('%s/Resources/%s/translations', $kernel->getRootDir(), $bundle->getName());
+                $viewsPaths = array($bundle->getPath().'/Resources/views');
+                if ($this->defaultViewsPath) {
+                    $viewsPaths[] = $this->defaultViewsPath.'/bundles/'.$bundle->getName();
+                }
+                $viewsPaths[] = sprintf('%s/Resources/%s/views', $kernel->getRootDir(), $bundle->getName());
             } catch (\InvalidArgumentException $e) {
                 // such a bundle does not exist, so treat the argument as path
-                $transPaths = array($input->getArgument('bundle').'/Resources/');
+                $transPaths = array($input->getArgument('bundle').'/Resources/translations');
+                $viewsPaths = array($input->getArgument('bundle').'/Resources/views');
 
                 if (!is_dir($transPaths[0])) {
                     throw new \InvalidArgumentException(sprintf('"%s" is neither an enabled bundle nor a directory.', $transPaths[0]));
@@ -138,13 +156,21 @@ EOF
             }
         } elseif ($input->getOption('all')) {
             foreach ($kernel->getBundles() as $bundle) {
-                $transPaths[] = $bundle->getPath().'/Resources/';
-                $transPaths[] = sprintf('%s/Resources/%s/', $kernel->getRootDir(), $bundle->getName());
+                $transPaths[] = $bundle->getPath().'/Resources/translations';
+                if ($this->defaultTransPath) {
+                    $transPaths[] = $this->defaultTransPath.'/'.$bundle->getName();
+                }
+                $transPaths[] = sprintf('%s/Resources/%s/translations', $kernel->getRootDir(), $bundle->getName());
+                $viewsPaths[] = $bundle->getPath().'/Resources/views';
+                if ($this->defaultViewsPath) {
+                    $viewsPaths[] = $this->defaultViewsPath.'/bundles/'.$bundle->getName();
+                }
+                $viewsPaths[] = sprintf('%s/Resources/%s/views', $kernel->getRootDir(), $bundle->getName());
             }
         }
 
         // Extract used messages
-        $extractedCatalogue = $this->extractMessages($locale, $transPaths);
+        $extractedCatalogue = $this->extractMessages($locale, $viewsPaths);
 
         // Load defined messages
         $currentCatalogue = $this->loadCurrentMessages($locale, $transPaths);
@@ -217,7 +243,7 @@ EOF
         $io->table($headers, $rows);
     }
 
-    private function formatState($state)
+    private function formatState($state): string
     {
         if (self::MESSAGE_MISSING === $state) {
             return '<error> missing </error>';
@@ -234,7 +260,7 @@ EOF
         return $state;
     }
 
-    private function formatStates(array $states)
+    private function formatStates(array $states): string
     {
         $result = array();
         foreach ($states as $state) {
@@ -244,12 +270,12 @@ EOF
         return implode(' ', $result);
     }
 
-    private function formatId($id)
+    private function formatId(string $id): string
     {
         return sprintf('<fg=cyan;options=bold>%s</>', $id);
     }
 
-    private function sanitizeString($string, $length = 40)
+    private function sanitizeString(string $string, int $length = 40): string
     {
         $string = trim(preg_replace('/\s+/', ' ', $string));
 
@@ -264,17 +290,10 @@ EOF
         return $string;
     }
 
-    /**
-     * @param string $locale
-     * @param array  $transPaths
-     *
-     * @return MessageCatalogue
-     */
-    private function extractMessages($locale, $transPaths)
+    private function extractMessages(string $locale, array $transPaths): MessageCatalogue
     {
         $extractedCatalogue = new MessageCatalogue($locale);
         foreach ($transPaths as $path) {
-            $path = $path.'views';
             if (is_dir($path)) {
                 $this->extractor->extract($path, $extractedCatalogue);
             }
@@ -283,17 +302,10 @@ EOF
         return $extractedCatalogue;
     }
 
-    /**
-     * @param string $locale
-     * @param array  $transPaths
-     *
-     * @return MessageCatalogue
-     */
-    private function loadCurrentMessages($locale, $transPaths)
+    private function loadCurrentMessages(string $locale, array $transPaths): MessageCatalogue
     {
         $currentCatalogue = new MessageCatalogue($locale);
         foreach ($transPaths as $path) {
-            $path = $path.'translations';
             if (is_dir($path)) {
                 $this->reader->read($path, $currentCatalogue);
             }
@@ -303,12 +315,9 @@ EOF
     }
 
     /**
-     * @param string $locale
-     * @param array  $transPaths
-     *
      * @return MessageCatalogue[]
      */
-    private function loadFallbackCatalogues($locale, $transPaths)
+    private function loadFallbackCatalogues(string $locale, array $transPaths): array
     {
         $fallbackCatalogues = array();
         if ($this->translator instanceof Translator || $this->translator instanceof DataCollectorTranslator || $this->translator instanceof LoggingTranslator) {
@@ -319,7 +328,6 @@ EOF
 
                 $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
                 foreach ($transPaths as $path) {
-                    $path = $path.'translations';
                     if (is_dir($path)) {
                         $this->reader->read($path, $fallbackCatalogue);
                     }

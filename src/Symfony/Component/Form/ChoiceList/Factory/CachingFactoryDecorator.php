@@ -22,9 +22,6 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface
 {
-    /**
-     * @var ChoiceListFactoryInterface
-     */
     private $decoratedFactory;
 
     /**
@@ -89,11 +86,6 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         }
     }
 
-    /**
-     * Decorates the given factory.
-     *
-     * @param ChoiceListFactoryInterface $decoratedFactory The decorated factory
-     */
     public function __construct(ChoiceListFactoryInterface $decoratedFactory)
     {
         $this->decoratedFactory = $decoratedFactory;

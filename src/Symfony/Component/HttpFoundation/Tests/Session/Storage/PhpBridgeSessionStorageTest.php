@@ -64,20 +64,19 @@ class PhpBridgeSessionStorageTest extends TestCase
     {
         $storage = $this->getStorage();
 
-        $this->assertFalse($storage->getSaveHandler()->isActive());
+        $this->assertNotSame(\PHP_SESSION_ACTIVE, session_status());
         $this->assertFalse($storage->isStarted());
 
         session_start();
         $this->assertTrue(isset($_SESSION));
-        // in PHP 5.4 we can reliably detect a session started
-        $this->assertTrue($storage->getSaveHandler()->isActive());
+        $this->assertSame(\PHP_SESSION_ACTIVE, session_status());
         // PHP session might have started, but the storage driver has not, so false is correct here
         $this->assertFalse($storage->isStarted());
 
         $key = $storage->getMetadataBag()->getStorageKey();
-        $this->assertFalse(isset($_SESSION[$key]));
+        $this->assertArrayNotHasKey($key, $_SESSION);
         $storage->start();
-        $this->assertTrue(isset($_SESSION[$key]));
+        $this->assertArrayHasKey($key, $_SESSION);
     }
 
     public function testClear()

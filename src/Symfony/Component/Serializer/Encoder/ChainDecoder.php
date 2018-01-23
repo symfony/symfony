@@ -57,14 +57,9 @@ class ChainDecoder implements ContextAwareDecoderInterface
     /**
      * Gets the decoder supporting the format.
      *
-     * @param string $format
-     * @param array  $context
-     *
-     * @return DecoderInterface
-     *
      * @throws RuntimeException if no decoder is found
      */
-    private function getDecoder($format, array $context)
+    private function getDecoder(string $format, array $context): DecoderInterface
     {
         if (isset($this->decoderByFormat[$format])
             && isset($this->decoders[$this->decoderByFormat[$format]])

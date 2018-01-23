@@ -74,9 +74,6 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             if ($optionalBehavior = '?' === $type[0]) {
                 $type = substr($type, 1);
                 $optionalBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-            } elseif ($optionalBehavior = '!' === $type[0]) {
-                $type = substr($type, 1);
-                $optionalBehavior = ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE;
             }
             if (is_int($key)) {
                 $key = $type;
@@ -97,7 +94,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $this->currentId));
         }
 
-        $value->addTag('container.service_subscriber.locator', array('id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap)));
+        $value->addTag('container.service_subscriber.locator', array('id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId)));
 
         return parent::processValue($value);
     }

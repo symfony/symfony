@@ -22,6 +22,9 @@
     "require-dev": {
         "symfony/http-foundation": "~3.4|~4.0"
     },
+    "conflict": {
+        "symfony/http-foundation": "<3.4"
+    },
     "suggest": {
         "symfony/http-foundation": "For using the class SessionTokenStorage."
     },
@@ -34,7 +37,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

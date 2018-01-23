@@ -11,6 +11,7 @@ framework:
         pools:
             cache.pool1:
                 public: true
+                clearer: cache.system_clearer
             cache.pool2:
                 public: true
                 clearer: ~

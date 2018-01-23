@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Tests\DependencyInjection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -43,7 +42,7 @@ class FormPassTest extends TestCase
 
         $container->compile();
 
-        $this->assertFalse($container->hasDefinition(DebugCommand::class));
+        $this->assertFalse($container->hasDefinition('console.command.form_debug'));
     }
 
     public function testAddTaggedTypes()
@@ -72,13 +71,13 @@ class FormPassTest extends TestCase
         $container = $this->createContainerBuilder();
 
         $container->setDefinition('form.extension', $this->createExtensionDefinition());
-        $container->setDefinition(DebugCommand::class, $this->createDebugCommandDefinition());
+        $container->setDefinition('console.command.form_debug', $this->createDebugCommandDefinition());
         $container->register('my.type1', __CLASS__.'_Type1')->addTag('form.type')->setPublic(true);
         $container->register('my.type2', __CLASS__.'_Type2')->addTag('form.type')->setPublic(true);
 
         $container->compile();
 
-        $cmdDefinition = $container->getDefinition(DebugCommand::class);
+        $cmdDefinition = $container->getDefinition('console.command.form_debug');
 
         $this->assertEquals(
             array(

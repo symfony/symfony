@@ -40,7 +40,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             UPLOAD_ERR_OK
         );
 
@@ -57,7 +57,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/.unknownextension',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/.unknownextension'),
+            null,
             UPLOAD_ERR_OK
         );
 
@@ -70,7 +70,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             null
         );
 
@@ -83,7 +83,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/jpeg',
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             null
         );
 
@@ -96,7 +96,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             null
         );
 
@@ -109,7 +109,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             null
         );
 
@@ -122,7 +122,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             null
         );
 
@@ -138,7 +138,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             UPLOAD_ERR_OK
         );
 
@@ -158,7 +158,7 @@ class UploadedFileTest extends TestCase
             $path,
             'original.gif',
             'image/gif',
-            filesize($path),
+            null,
             UPLOAD_ERR_OK,
             true
         );
@@ -178,7 +178,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             '../../original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             null
         );
 
@@ -191,7 +191,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             'image/gif',
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             null
         );
 
@@ -204,6 +204,23 @@ class UploadedFileTest extends TestCase
         );
 
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing a size in the constructor is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.
+     */
+    public function testConstructDeprecatedSize()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            filesize(__DIR__.'/Fixtures/test.gif'),
+            null
+        );
+
+        $this->assertEquals(filesize(__DIR__.'/Fixtures/test.gif'), $file->getSize());
     }
 
     public function testGetExtension()
@@ -223,7 +240,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             UPLOAD_ERR_OK,
             true
         );
@@ -240,7 +257,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             $error
         );
 
@@ -264,7 +281,7 @@ class UploadedFileTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            filesize(__DIR__.'/Fixtures/test.gif'),
+            null,
             UPLOAD_ERR_OK
         );
 

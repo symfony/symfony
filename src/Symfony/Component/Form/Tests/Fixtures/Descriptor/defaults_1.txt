@@ -1,27 +1,21 @@
 
-[33mBuilt-in form types (Symfony\Component\Form\Extension\Core\Type)[39m
-[33m----------------------------------------------------------------[39m
+Built-in form types (Symfony\Component\Form\Extension\Core\Type)
+----------------------------------------------------------------
 
- BirthdayType, ButtonType, CheckboxType, ChoiceType, CollectionType
- CountryType, CurrencyType, DateIntervalType, DateTimeType, DateType
- EmailType, FileType, FormType, HiddenType, IntegerType
- LanguageType, LocaleType, MoneyType, NumberType, PasswordType
- PercentType, RadioType, RangeType, RepeatedType, ResetType
- SearchType, SubmitType, TextType, TextareaType, TimeType
- TimezoneType, UrlType
+ FormType
 
-[33mService form types[39m
-[33m------------------[39m
+Service form types
+------------------
 
  * Symfony\Bridge\Doctrine\Form\Type\EntityType
 
-[33mType extensions[39m
-[33m---------------[39m
+Type extensions
+---------------
 
  * Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension
 
-[33mType guessers[39m
-[33m-------------[39m
+Type guessers
+-------------
 
  * Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser
 

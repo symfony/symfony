@@ -22,7 +22,7 @@ table th { background-color: #E0E0E0; font-weight: bold; text-align: left; }
 .hidden { display: none; }
 .nowrap { white-space: nowrap; }
 .newline { display: block; }
-.break-long-words { -ms-word-break: break-all; word-break: break-all; word-break: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto; }
+.break-long-words { word-wrap: break-word; overflow-wrap: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto; min-width: 0; }
 .text-small { font-size: 12px !important; }
 .text-muted { color: #999; }
 .text-bold { font-weight: bold; }
@@ -105,7 +105,7 @@ header .container { display: flex; justify-content: space-between; }
 .trace-line a { color: #222; }
 .trace-line .icon { opacity: .4; position: absolute; left: 10px; top: 11px; }
 .trace-line .icon svg { height: 16px; width: 16px; }
-.trace-line-header { padding-left: 36px; }
+.trace-line-header { padding-left: 36px; padding-right: 10px; }
 
 .trace-file-path, .trace-file-path a { color: #222; font-size: 13px; }
 .trace-class { color: #B0413E; }

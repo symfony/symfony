@@ -93,8 +93,6 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      * Registers a new mime type guesser.
      *
      * When guessing, this guesser is preferred over previously registered ones.
-     *
-     * @param MimeTypeGuesserInterface $guesser
      */
     public function register(MimeTypeGuesserInterface $guesser)
     {

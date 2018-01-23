@@ -19,6 +19,11 @@ use Symfony\Component\Yaml\Yaml;
 
 class InlineTest extends TestCase
 {
+    protected function setUp()
+    {
+        Inline::initialize(0, 0);
+    }
+
     /**
      * @dataProvider getTestsForParse
      */
@@ -54,6 +59,7 @@ class InlineTest extends TestCase
             array('!php/const PHP_INT_MAX', PHP_INT_MAX),
             array('[!php/const PHP_INT_MAX]', array(PHP_INT_MAX)),
             array('{ foo: !php/const PHP_INT_MAX }', array('foo' => PHP_INT_MAX)),
+            array('!php/const NULL', null),
         );
     }
 
@@ -223,7 +229,7 @@ class InlineTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage A reference must contain at least one character.
+     * @expectedExceptionMessage A reference must contain at least one character at line 1.
      */
     public function testParseUnquotedAsterisk()
     {
@@ -232,7 +238,7 @@ class InlineTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage A reference must contain at least one character.
+     * @expectedExceptionMessage A reference must contain at least one character at line 1.
      */
     public function testParseUnquotedAsteriskFollowedByAComment()
     {
@@ -241,11 +247,16 @@ class InlineTest extends TestCase
 
     /**
      * @dataProvider getReservedIndicators
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
     public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
     {
+        if (method_exists($this, 'expectExceptionMessage')) {
+            $this->expectException(ParseException::class);
+            $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
+        } else {
+            $this->setExpectedException(ParseException::class, sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
+        }
+
         Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
     }
 
@@ -256,11 +267,16 @@ class InlineTest extends TestCase
 
     /**
      * @dataProvider getScalarIndicators
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
     public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)
     {
+        if (method_exists($this, 'expectExceptionMessage')) {
+            $this->expectException(ParseException::class);
+            $this->expectExceptionMessage(sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
+        } else {
+            $this->setExpectedException(ParseException::class, sprintf('cannot start a plain scalar; you need to quote the scalar at line 1 (near "%sfoo").', $indicator));
+        }
+
         Inline::parse(sprintf('{ foo: %sfoo }', $indicator));
     }
 
@@ -629,7 +645,7 @@ class InlineTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Malformed inline YAML string: {this, is not, supported}.
+     * @expectedExceptionMessage Malformed inline YAML string: {this, is not, supported} at line 1.
      */
     public function testNotSupportedMissingValue()
     {

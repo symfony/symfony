@@ -2,7 +2,7 @@
     "Names": {
         "af": "i-Afrikaans",
         "af_NA": "i-Afrikaans (i-Namibia)",
-        "af_ZA": "i-Afrikaans (i-South Africa)",
+        "af_ZA": "i-Afrikaans (iNingizimu Afrika)",
         "ak": "isi-Akan",
         "ak_GH": "isi-Akan (i-Ghana)",
         "am": "isi-Amharic",
@@ -193,7 +193,7 @@
         "en_VI": "i-English (i-U.S. Virgin Islands)",
         "en_VU": "i-English (i-Vanuatu)",
         "en_WS": "i-English (i-Samoa)",
-        "en_ZA": "i-English (i-South Africa)",
+        "en_ZA": "i-English (iNingizimu Afrika)",
         "en_ZM": "i-English (i-Zambia)",
         "en_ZW": "i-English (iZimbabwe)",
         "eo": "isi-Esperanto",
@@ -515,6 +515,8 @@
         "ta_SG": "isi-Tamil (i-Singapore)",
         "te": "isi-Telugu",
         "te_IN": "isi-Telugu (i-India)",
+        "tg": "isi-Tajik",
+        "tg_TJ": "isi-Tajik (i-Tajikistan)",
         "th": "isi-Thai",
         "th_TH": "isi-Thai (i-Thailand)",
         "ti": "isi-Tigrinya",
@@ -525,6 +527,8 @@
         "tr": "isi-Turkish",
         "tr_CY": "isi-Turkish (i-Cyprus)",
         "tr_TR": "isi-Turkish (i-Turkey)",
+        "tt": "isi-Tatar",
+        "tt_RU": "isi-Tatar (i-Russia)",
         "ug": "isi-Uighur",
         "ug_CN": "isi-Uighur (i-China)",
         "uk": "isi-Ukrainian",
@@ -543,6 +547,8 @@
         "uz_UZ": "isi-Uzbek (i-Uzbekistan)",
         "vi": "isi-Vietnamese",
         "vi_VN": "isi-Vietnamese (i-Vietnam)",
+        "wo": "isi-Wolof",
+        "wo_SN": "isi-Wolof (i-Senegal)",
         "yi": "isi-Yiddish",
         "yo": "isi-Yoruba",
         "yo_BJ": "isi-Yoruba (i-Benin)",
@@ -563,6 +569,6 @@
         "zh_SG": "isi-Chinese (i-Singapore)",
         "zh_TW": "isi-Chinese (i-Taiwan)",
         "zu": "isiZulu",
-        "zu_ZA": "isiZulu (i-South Africa)"
+        "zu_ZA": "isiZulu (iNingizimu Afrika)"
     }
 }

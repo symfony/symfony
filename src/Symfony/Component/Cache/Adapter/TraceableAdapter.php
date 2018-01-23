@@ -12,6 +12,8 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
+use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\ResettableInterface;
 
 /**
  * An adapter that collects data about all cache calls.
@@ -20,7 +22,7 @@ use Psr\Cache\CacheItemInterface;
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TraceableAdapter implements AdapterInterface
+class TraceableAdapter implements AdapterInterface, PruneableInterface, ResettableInterface
 {
     protected $pool;
     private $calls = array();
@@ -163,6 +165,38 @@ class TraceableAdapter implements AdapterInterface
         $event = $this->start(__FUNCTION__);
         try {
             return $event->result = $this->pool->commit();
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prune()
+    {
+        if (!$this->pool instanceof PruneableInterface) {
+            return false;
+        }
+        $event = $this->start(__FUNCTION__);
+        try {
+            return $event->result = $this->pool->prune();
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        if (!$this->pool instanceof ResettableInterface) {
+            return;
+        }
+        $event = $this->start(__FUNCTION__);
+        try {
+            $this->pool->reset();
         } finally {
             $event->end = microtime(true);
         }

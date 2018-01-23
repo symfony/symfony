@@ -26,12 +26,13 @@ class ValidValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Valid');
         }
 
-        $violations = $this->context->getValidator()->validate($value, null, array($this->context->getGroup()));
-
-        foreach ($violations as $violation) {
-            $this->context->buildViolation($violation->getMessage(), $violation->getParameters())
-                ->atPath($violation->getPropertyPath())
-                ->addViolation();
+        if (null === $value) {
+            return;
         }
+
+        $this->context
+            ->getValidator()
+            ->inContext($this->context)
+            ->validate($value, null, array($this->context->getGroup()));
     }
 }

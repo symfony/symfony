@@ -32,6 +32,8 @@ digraph sc {
   node_BAR [label="BAR\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_bar2 [label="bar2\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_BAR2 [label="BAR2\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_tagged_iterator_foo [label="tagged_iterator_foo\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_tagged_iterator [label="tagged_iterator\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo2 [label="foo2\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo3 [label="foo3\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foobaz [label="foobaz\n\n", shape=record, fillcolor="#ff9999", style="filled"];

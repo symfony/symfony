@@ -35,7 +35,7 @@
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
-        "phpdocumentor/type-resolver": "<0.2.0",
+        "phpdocumentor/type-resolver": "<0.2.1",
         "symfony/dependency-injection": "<3.4"
     },
     "suggest": {
@@ -53,7 +53,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

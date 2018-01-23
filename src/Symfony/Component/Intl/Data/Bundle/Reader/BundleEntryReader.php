@@ -28,22 +28,15 @@ use Symfony\Component\Intl\Data\Util\RecursiveArrayAccess;
  */
 class BundleEntryReader implements BundleEntryReaderInterface
 {
-    /**
-     * @var BundleReaderInterface
-     */
     private $reader;
 
     /**
      * A mapping of locale aliases to locales.
-     *
-     * @var array
      */
     private $localeAliases = array();
 
     /**
      * Creates an entry reader based on the given resource bundle reader.
-     *
-     * @param BundleReaderInterface $reader A resource bundle reader to use
      */
     public function __construct(BundleReaderInterface $reader)
     {

@@ -27,7 +27,7 @@
 
         <service id="data_collector.events" class="Symfony\Component\HttpKernel\DataCollector\EventDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/events.html.twig" id="events" priority="290" />
-            <argument type="service" id="event_dispatcher" on-invalid="ignore" />
+            <argument type="service" id="debug.event_dispatcher" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.logger" class="Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector">

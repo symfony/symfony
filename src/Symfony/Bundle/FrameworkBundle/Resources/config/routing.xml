@@ -52,7 +52,8 @@
 
         <service id="router.default" class="Symfony\Bundle\FrameworkBundle\Routing\Router">
             <tag name="monolog.logger" channel="router" />
-            <argument type="service" id="service_container" />
+            <tag name="container.service_subscriber" id="routing.loader" />
+            <argument type="service" id="Psr\Container\ContainerInterface" />
             <argument>%router.resource%</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
@@ -67,6 +68,7 @@
                 <argument key="matcher_cache_class">%router.cache_class_prefix%UrlMatcher</argument>
             </argument>
             <argument type="service" id="router.request_context" on-invalid="ignore" />
+            <argument type="service" id="parameter_bag" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
@@ -77,6 +79,7 @@
         <service id="Symfony\Component\Routing\RouterInterface" alias="router" />
         <service id="Symfony\Component\Routing\Generator\UrlGeneratorInterface" alias="router" />
         <service id="Symfony\Component\Routing\Matcher\UrlMatcherInterface" alias="router" />
+        <service id="Symfony\Component\Routing\RequestContextAwareInterface" alias="router" />
 
         <service id="router.request_context" class="Symfony\Component\Routing\RequestContext">
             <argument>%router.request_context.base_url%</argument>
@@ -101,6 +104,19 @@
             <argument type="service" id="request_stack" />
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument>%kernel.project_dir%</argument>
+            <argument>%kernel.debug%</argument>
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Controller\RedirectController" public="true">
+            <argument type="service" id="router" />
+            <argument>%request_listener.http_port%</argument>
+            <argument>%request_listener.https_port%</argument>
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" public="true">
+            <argument type="service" id="twig" on-invalid="ignore" />
+            <argument type="service" id="templating" on-invalid="ignore" />
         </service>
     </services>
 </container>

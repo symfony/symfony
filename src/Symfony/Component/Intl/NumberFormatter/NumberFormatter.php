@@ -150,8 +150,6 @@ class NumberFormatter
 
     /**
      * Default values for the en locale.
-     *
-     * @var array
      */
     private $attributes = array(
         self::FRACTION_DIGITS => 0,
@@ -161,15 +159,11 @@ class NumberFormatter
 
     /**
      * Holds the initialized attributes code.
-     *
-     * @var array
      */
     private $initializedAttributes = array();
 
     /**
      * The supported styles to the constructor $styles argument.
-     *
-     * @var array
      */
     private static $supportedStyles = array(
         'CURRENCY' => self::CURRENCY,
@@ -178,8 +172,6 @@ class NumberFormatter
 
     /**
      * Supported attributes to the setAttribute() $attr argument.
-     *
-     * @var array
      */
     private static $supportedAttributes = array(
         'FRACTION_DIGITS' => self::FRACTION_DIGITS,
@@ -191,8 +183,6 @@ class NumberFormatter
      * The available rounding modes for setAttribute() usage with
      * NumberFormatter::ROUNDING_MODE. NumberFormatter::ROUND_DOWN
      * and NumberFormatter::ROUND_UP does not have a PHP only equivalent.
-     *
-     * @var array
      */
     private static $roundingModes = array(
         'ROUND_HALFEVEN' => self::ROUND_HALFEVEN,
@@ -209,8 +199,6 @@ class NumberFormatter
      * modes in PHP's round() function.
      *
      * @see http://www.php.net/manual/en/function.round.php
-     *
-     * @var array
      */
     private static $phpRoundingMap = array(
         self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
@@ -222,8 +210,6 @@ class NumberFormatter
      * The list of supported rounding modes which aren't available modes in
      * PHP's round() function, but there's an equivalent. Keys are rounding
      * modes, values does not matter.
-     *
-     * @var array
      */
     private static $customRoundingList = array(
         self::ROUND_CEILING => true,
@@ -234,8 +220,6 @@ class NumberFormatter
 
     /**
      * The maximum value of the integer type in 32 bit platforms.
-     *
-     * @var int
      */
     private static $int32Max = 2147483647;
 
@@ -257,8 +241,6 @@ class NumberFormatter
     );
 
     /**
-     * Constructor.
-     *
      * @param string $locale  The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      * @param int    $style   Style of the formatting, one of the format style constants.
      *                        The only supported styles are NumberFormatter::DECIMAL
@@ -275,7 +257,7 @@ class NumberFormatter
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
-    public function __construct($locale = 'en', $style = null, $pattern = null)
+    public function __construct(?string $locale = 'en', int $style = null, $pattern = null)
     {
         if ('en' !== $locale && null !== $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
@@ -357,7 +339,7 @@ class NumberFormatter
     /**
      * Format a number.
      *
-     * @param int|float $value the value to format
+     * @param int|float $value The value to format
      * @param int       $type  Type of the formatting, one of the format type constants.
      *                         Only type NumberFormatter::TYPE_DEFAULT is currently supported.
      *
@@ -518,9 +500,9 @@ class NumberFormatter
     /**
      * Parse a number.
      *
-     * @param string $value    the value to parse
+     * @param string $value    The value to parse
      * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default.
-     * @param int    $position offset to begin the parsing on return this value will hold the offset at which the parsing ended
+     * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
      * @return int|float|false The parsed value of false on error
      *
@@ -571,7 +553,7 @@ class NumberFormatter
      * @param int $attr  An attribute specifier, one of the numeric attribute constants.
      *                   The only currently supported attributes are NumberFormatter::FRACTION_DIGITS,
      *                   NumberFormatter::GROUPING_USED and NumberFormatter::ROUNDING_MODE.
-     * @param int $value the attribute value
+     * @param int $value The attribute value
      *
      * @return bool true on success or false on failure
      *

@@ -24,13 +24,7 @@ class TokenStream
     private $position = 0;
     private $expression;
 
-    /**
-     * Constructor.
-     *
-     * @param array  $tokens     An array of tokens
-     * @param string $expression
-     */
-    public function __construct(array $tokens, $expression = '')
+    public function __construct(array $tokens, string $expression = '')
     {
         $this->tokens = $tokens;
         $this->current = $tokens[0];
@@ -52,11 +46,11 @@ class TokenStream
      */
     public function next()
     {
+        ++$this->position;
+
         if (!isset($this->tokens[$this->position])) {
             throw new SyntaxError('Unexpected end of expression', $this->current->cursor, $this->expression);
         }
-
-        ++$this->position;
 
         $this->current = $this->tokens[$this->position];
     }

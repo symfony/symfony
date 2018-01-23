@@ -20,7 +20,7 @@
 {% block button_widget -%}
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' button')|trim}) %}
     {{- parent() -}}
-{%- endblock %}
+{%- endblock button_widget %}
 
 {% block money_widget -%}
     <div class="row collapse">
@@ -228,7 +228,7 @@
     {# remove the checkbox-inline and radio-inline class, it's only useful for embed labels #}
     {% set label_attr = label_attr|merge({class: label_attr.class|default('')|replace({'checkbox-inline': '', 'radio-inline': ''})|trim}) %}
     {{- block('form_label') -}}
-{%- endblock %}
+{%- endblock choice_label %}
 
 {% block checkbox_label -%}
     {{- block('checkbox_radio_label') -}}
@@ -318,11 +318,11 @@
 
 {% block form_errors -%}
     {% if errors|length > 0 -%}
-        {% if form.parent %}<small class="error">{% else %}<div data-alert class="alert-box alert">{% endif %}
+        {% if form is not rootform %}<small class="error">{% else %}<div data-alert class="alert-box alert">{% endif %}
         {%- for error in errors -%}
             {{ error.message }}
             {% if not loop.last %}, {% endif %}
         {%- endfor -%}
-        {% if form.parent %}</small>{% else %}</div>{% endif %}
+        {% if form is not rootform %}</small>{% else %}</div>{% endif %}
     {%- endif %}
 {%- endblock form_errors %}

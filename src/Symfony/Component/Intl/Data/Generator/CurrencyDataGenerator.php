@@ -26,35 +26,21 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
 class CurrencyDataGenerator extends AbstractDataGenerator
 {
     const UNKNOWN_CURRENCY_ID = 'XXX';
-
     const EUROPEAN_COMPOSITE_UNIT_ID = 'XBA';
-
     const EUROPEAN_MONETARY_UNIT_ID = 'XBB';
-
     const EUROPEAN_UNIT_OF_ACCOUNT_XBC_ID = 'XBC';
-
     const EUROPEAN_UNIT_OF_ACCOUNT_XBD_ID = 'XBD';
-
     const TESTING_CURRENCY_CODE_ID = 'XTS';
-
     const ADB_UNIT_OF_ACCOUNT_ID = 'XUA';
-
     const GOLD_ID = 'XAU';
-
     const SILVER_ID = 'XAG';
-
     const PLATINUM_ID = 'XPT';
-
     const PALLADIUM_ID = 'XPD';
-
     const SUCRE_ID = 'XSU';
-
     const SPECIAL_DRAWING_RIGHTS_ID = 'XDR';
 
     /**
      * Monetary units excluded from generation.
-     *
-     * @var array
      */
     private static $blacklist = array(
         self::UNKNOWN_CURRENCY_ID => true,
@@ -162,8 +148,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     }
 
     /**
-     * @param ArrayAccessibleResourceBundle $rootBundle
-     *
      * @return array
      */
     private function generateSymbolNamePairs(ArrayAccessibleResourceBundle $rootBundle)

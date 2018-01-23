@@ -13,12 +13,15 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\TypedReference;
+
+require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class ResolveBindingsPassTest extends TestCase
 {
@@ -78,5 +81,18 @@ class ResolveBindingsPassTest extends TestCase
 
         $this->assertEquals(array($typedRef), $container->getDefinition('def1')->getArguments());
         $this->assertEquals(array(new Reference('foo')), $container->getDefinition('def2')->getArguments());
+    }
+
+    public function testScalarSetter()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->autowire('foo', ScalarSetter::class);
+        $definition->setBindings(array('$defaultLocale' => 'fr'));
+
+        (new AutowireRequiredMethodsPass())->process($container);
+        (new ResolveBindingsPass())->process($container);
+
+        $this->assertEquals(array(array('setDefaultLocale', array('fr'))), $definition->getMethodCalls());
     }
 }

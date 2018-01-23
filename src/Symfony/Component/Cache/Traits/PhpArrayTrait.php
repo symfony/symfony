@@ -22,9 +22,10 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 trait PhpArrayTrait
 {
+    use ProxyTrait;
+
     private $file;
     private $values;
-    private $fallbackPool;
     private $zendDetectUnicode;
 
     /**
@@ -119,7 +120,7 @@ EOF;
 
         $cleared = @unlink($this->file) || !file_exists($this->file);
 
-        return $this->fallbackPool->clear() && $cleared;
+        return $this->pool->clear() && $cleared;
     }
 
     /**

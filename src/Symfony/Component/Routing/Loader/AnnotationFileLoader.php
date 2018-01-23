@@ -27,11 +27,6 @@ class AnnotationFileLoader extends FileLoader
     protected $loader;
 
     /**
-     * Constructor.
-     *
-     * @param FileLocatorInterface  $locator A FileLocator instance
-     * @param AnnotationClassLoader $loader  An AnnotationClassLoader instance
-     *
      * @throws \RuntimeException
      */
     public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
@@ -116,22 +111,22 @@ class AnnotationFileLoader extends FileLoader
             }
 
             if (T_CLASS === $token[0]) {
-                // Skip usage of ::class constant
-                $isClassConstant = false;
+                // Skip usage of ::class constant and anonymous classes
+                $skipClassToken = false;
                 for ($j = $i - 1; $j > 0; --$j) {
                     if (!isset($tokens[$j][1])) {
                         break;
                     }
 
-                    if (T_DOUBLE_COLON === $tokens[$j][0]) {
-                        $isClassConstant = true;
+                    if (T_DOUBLE_COLON === $tokens[$j][0] || T_NEW === $tokens[$j][0]) {
+                        $skipClassToken = true;
                         break;
                     } elseif (!in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
                         break;
                     }
                 }
 
-                if (!$isClassConstant) {
+                if (!$skipClassToken) {
                     $class = true;
                 }
             }

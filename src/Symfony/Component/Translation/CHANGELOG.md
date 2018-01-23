@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * The `FileDumper::setBackup()` method is deprecated and will be removed in 5.0.
+ * The `TranslationWriter::disableBackup()` method is deprecated and will be removed in 5.0.
+
 4.0.0
 -----
 
@@ -20,6 +26,8 @@ CHANGELOG
  * Added `TranslationWriterInterface`
  * Deprecated `TranslationWriter::writeTranslations` in favor of `TranslationWriter::write`
  * added support for adding custom message formatter and decoupling the default one.
+ * Added `PhpExtractor`
+ * Added `PhpStringTokenParser`
 
 3.2.0
 -----

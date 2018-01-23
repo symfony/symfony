@@ -71,7 +71,7 @@ trait MemcachedTrait
      *
      * @return \Memcached
      *
-     * @throws \ErrorEception When invalid options or servers are provided
+     * @throws \ErrorException When invalid options or servers are provided
      */
     public static function createConnection($servers, array $options = array())
     {
@@ -130,7 +130,7 @@ trait MemcachedTrait
             }
 
             // set client's options
-            unset($options['persistent_id'], $options['username'], $options['password'], $options['weight']);
+            unset($options['persistent_id'], $options['username'], $options['password'], $options['weight'], $options['lazy']);
             $options = array_change_key_case($options, CASE_UPPER);
             $client->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
             $client->setOption(\Memcached::OPT_NO_BLOCK, true);

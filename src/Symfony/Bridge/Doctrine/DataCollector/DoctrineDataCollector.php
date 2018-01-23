@@ -28,6 +28,10 @@ class DoctrineDataCollector extends DataCollector
     private $registry;
     private $connections;
     private $managers;
+
+    /**
+     * @var DebugStack[]
+     */
     private $loggers = array();
 
     public function __construct(ManagerRegistry $registry)
@@ -63,6 +67,16 @@ class DoctrineDataCollector extends DataCollector
             'connections' => $this->connections,
             'managers' => $this->managers,
         );
+    }
+
+    public function reset()
+    {
+        $this->data = array();
+
+        foreach ($this->loggers as $logger) {
+            $logger->queries = array();
+            $logger->currentQuery = 0;
+        }
     }
 
     public function getManagers()
@@ -151,19 +165,15 @@ class DoctrineDataCollector extends DataCollector
      * The return value is an array with the sanitized value and a boolean
      * indicating if the original value was kept (allowing to use the sanitized
      * value to explain the query).
-     *
-     * @param mixed $var
-     *
-     * @return array
      */
-    private function sanitizeParam($var)
+    private function sanitizeParam($var): array
     {
         if (is_object($var)) {
             $className = get_class($var);
 
             return method_exists($var, '__toString') ?
-                array(sprintf('Object(%s): "%s"', $className, $var->__toString()), false) :
-                array(sprintf('Object(%s)', $className), false);
+                array(sprintf('/* Object(%s): */"%s"', $className, $var->__toString()), false) :
+                array(sprintf('/* Object(%s) */', $className), false);
         }
 
         if (is_array($var)) {
@@ -179,7 +189,7 @@ class DoctrineDataCollector extends DataCollector
         }
 
         if (is_resource($var)) {
-            return array(sprintf('Resource(%s)', get_resource_type($var)), false);
+            return array(sprintf('/* Resource(%s) */', get_resource_type($var)), false);
         }
 
         return array($var, true);

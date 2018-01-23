@@ -23,24 +23,11 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      */
     const CACHE_KEY_VAR = 'cache_key';
 
-    /**
-     * @var array
-     */
     protected $defaultThemes;
-
-    /**
-     * @var array
-     */
     protected $themes = array();
-
-    /**
-     * @var array
-     */
+    protected $useDefaultThemes = array();
     protected $resources = array();
 
-    /**
-     * @var array
-     */
     private $resourceHierarchyLevels = array();
 
     /**
@@ -57,12 +44,13 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function setTheme(FormView $view, $themes)
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true)
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
         // Do not cast, as casting turns objects into arrays of properties
         $this->themes[$cacheKey] = is_array($themes) ? $themes : array($themes);
+        $this->useDefaultThemes[$cacheKey] = (bool) $useDefaultThemes;
 
         // Unset instead of resetting to an empty array, in order to allow
         // implementations (like TwigRendererEngine) to check whether $cacheKey
@@ -139,13 +127,13 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *
      * @see getResourceForBlockHierarchy()
      *
-     * @param string   $cacheKey           the cache key used for storing the
+     * @param string   $cacheKey           The cache key used for storing the
      *                                     resource
-     * @param FormView $view               the form view for finding the applying
+     * @param FormView $view               The form view for finding the applying
      *                                     themes
-     * @param array    $blockNameHierarchy the block hierarchy, with the most
+     * @param array    $blockNameHierarchy The block hierarchy, with the most
      *                                     specific block name at the end
-     * @param int      $hierarchyLevel     the level in the block hierarchy that
+     * @param int      $hierarchyLevel     The level in the block hierarchy that
      *                                     should be loaded
      *
      * @return bool True if the resource could be loaded, false otherwise

@@ -10,11 +10,10 @@ security:
         secure:
             stateless: true
             http_basic: true
-            http_digest:
-                secret: TheSecret
             form_login: true
             anonymous: true
-            switch_user: true
+            switch_user:
+                stateless: true
             x509: true
             remote_user: true
             logout: true

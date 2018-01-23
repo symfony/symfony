@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\GroupDummyChild;
 use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
@@ -63,6 +64,35 @@ class PropertyNormalizerTest extends TestCase
         );
         $this->assertEquals('foo', $obj->foo);
         $this->assertEquals('bar', $obj->getBar());
+    }
+
+    public function testNormalizeWithParentClass()
+    {
+        $group = new GroupDummyChild();
+        $group->setBaz('baz');
+        $group->setFoo('foo');
+        $group->setBar('bar');
+        $group->setKevin('Kevin');
+        $group->setCoopTilleuls('coop');
+        $this->assertEquals(
+            array('foo' => 'foo', 'bar' => 'bar', 'kevin' => 'Kevin',
+                  'coopTilleuls' => 'coop', 'fooBar' => null, 'symfony' => null, 'baz' => 'baz', ),
+            $this->normalizer->normalize($group, 'any')
+        );
+    }
+
+    public function testDenormalizeWithParentClass()
+    {
+        $obj = $this->normalizer->denormalize(
+            array('foo' => 'foo', 'bar' => 'bar', 'kevin' => 'Kevin', 'baz' => 'baz'),
+            GroupDummyChild::class,
+            'any'
+        );
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertEquals('bar', $obj->getBar());
+        $this->assertEquals('Kevin', $obj->getKevin());
+        $this->assertEquals('baz', $obj->getBaz());
+        $this->assertNull($obj->getSymfony());
     }
 
     public function testConstructorDenormalize()
@@ -147,12 +177,14 @@ class PropertyNormalizerTest extends TestCase
             'bar' => 'bar',
         ), $this->normalizer->normalize($obj, null, array(PropertyNormalizer::GROUPS => array('c'))));
 
-        // The PropertyNormalizer is not able to hydrate properties from parent classes
+        // The PropertyNormalizer is also able to hydrate properties from parent classes
         $this->assertEquals(array(
             'symfony' => 'symfony',
             'foo' => 'foo',
             'fooBar' => 'fooBar',
             'bar' => 'bar',
+            'kevin' => 'kevin',
+            'coopTilleuls' => 'coopTilleuls',
         ), $this->normalizer->normalize($obj, null, array(PropertyNormalizer::GROUPS => array('a', 'c'))));
     }
 
@@ -409,6 +441,11 @@ class PropertyNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testInheritedPropertiesSupport()
+    {
+        $this->assertTrue($this->normalizer->supportsNormalization(new PropertyChildDummy()));
+    }
 }
 
 class PropertyDummy
@@ -476,4 +513,13 @@ class PropertyCamelizedDummy
 class StaticPropertyDummy
 {
     private static $property = 'value';
+}
+
+class PropertyParentDummy
+{
+    private $foo = 'bar';
+}
+
+class PropertyChildDummy extends PropertyParentDummy
+{
 }

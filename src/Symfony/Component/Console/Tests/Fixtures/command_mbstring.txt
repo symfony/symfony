@@ -1,7 +1,7 @@
 <comment>Usage:</comment>
-  descriptor:åèä [options] [--] <argument_åèä>
-  descriptor:åèä -o|--option_name <argument_name>
-  descriptor:åèä <argument_name>
+  descriptor:åèä [options] [--] \<argument_åèä>
+  descriptor:åèä -o|--option_name \<argument_name>
+  descriptor:åèä \<argument_name>
 
 <comment>Arguments:</comment>
   <info>argument_åèä</info>   

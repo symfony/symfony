@@ -28,8 +28,6 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
     /**
      * Process the Container to replace aliases with service definitions.
      *
-     * @param ContainerBuilder $container
-     *
      * @throws InvalidArgumentException if the service definition does not exist
      */
     public function process(ContainerBuilder $container)

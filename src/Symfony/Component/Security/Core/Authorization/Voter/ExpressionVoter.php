@@ -30,13 +30,6 @@ class ExpressionVoter implements VoterInterface
     private $trustResolver;
     private $roleHierarchy;
 
-    /**
-     * Constructor.
-     *
-     * @param ExpressionLanguage                   $expressionLanguage
-     * @param AuthenticationTrustResolverInterface $trustResolver
-     * @param RoleHierarchyInterface|null          $roleHierarchy
-     */
     public function __construct(ExpressionLanguage $expressionLanguage, AuthenticationTrustResolverInterface $trustResolver, RoleHierarchyInterface $roleHierarchy = null)
     {
         $this->expressionLanguage = $expressionLanguage;

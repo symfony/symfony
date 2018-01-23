@@ -23,14 +23,8 @@ use Symfony\Component\Security\Core\Security;
  */
 class AuthenticationUtils
 {
-    /**
-     * @var RequestStack
-     */
     private $requestStack;
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
@@ -77,11 +71,9 @@ class AuthenticationUtils
     }
 
     /**
-     * @return Request
-     *
      * @throws \LogicException
      */
-    private function getRequest()
+    private function getRequest(): Request
     {
         $request = $this->requestStack->getCurrentRequest();
 

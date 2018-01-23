@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
@@ -31,21 +32,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     const REQUIREMENT_MISMATCH = 1;
     const ROUTE_MATCH = 2;
 
-    /**
-     * @var RequestContext
-     */
     protected $context;
-
-    /**
-     * @var array
-     */
     protected $allow = array();
-
-    /**
-     * @var RouteCollection
-     */
     protected $routes;
-
     protected $request;
     protected $expressionLanguage;
 
@@ -54,12 +43,6 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected $expressionLanguageProviders = array();
 
-    /**
-     * Constructor.
-     *
-     * @param RouteCollection $routes  A RouteCollection instance
-     * @param RequestContext  $context The context
-     */
     public function __construct(RouteCollection $routes, RequestContext $context)
     {
         $this->routes = $routes;
@@ -91,6 +74,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
         if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {
             return $ret;
+        }
+
+        if (0 === count($this->routes) && '/' === $pathinfo) {
+            throw new NoConfigurationException();
         }
 
         throw 0 < count($this->allow)
@@ -125,6 +112,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      *
      * @return array An array of parameters
      *
+     * @throws NoConfigurationException  If no routing configuration could be found
      * @throws ResourceNotFoundException If the resource could not be found
      * @throws MethodNotAllowedException If the resource was found but the request method is not allowed
      */

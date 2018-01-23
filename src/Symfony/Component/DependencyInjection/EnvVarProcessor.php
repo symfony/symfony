@@ -15,6 +15,9 @@ use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
+/**
+ * @author Nicolas Grekas <p@tchwork.com>
+ */
 class EnvVarProcessor implements EnvVarProcessorInterface
 {
     private $container;
@@ -33,6 +36,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             'base64' => 'string',
             'bool' => 'bool',
             'const' => 'bool|int|float|string|array',
+            'csv' => 'array',
             'file' => 'string',
             'float' => 'float',
             'int' => 'int',
@@ -64,10 +68,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             if (null === $env = $getEnv($name)) {
                 return;
             }
-        } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
-            $env = $_SERVER[$name];
         } elseif (isset($_ENV[$name])) {
             $env = $_ENV[$name];
+        } elseif (isset($_SERVER[$name]) && 0 !== strpos($name, 'HTTP_')) {
+            $env = $_SERVER[$name];
         } elseif (false === ($env = getenv($name)) || null === $env) { // null is a possible value because of thread safety issues
             if (!$this->container->hasParameter("env($name)")) {
                 throw new EnvNotFoundException($name);
@@ -119,7 +123,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('json' === $prefix) {
-            $env = json_decode($env, true, JSON_BIGINT_AS_STRING);
+            $env = json_decode($env, true);
 
             if (JSON_ERROR_NONE !== json_last_error()) {
                 throw new RuntimeException(sprintf('Invalid JSON in env var "%s": '.json_last_error_msg(), $name));
@@ -144,6 +148,10 @@ class EnvVarProcessor implements EnvVarProcessorInterface
 
                 return $value;
             }, $env);
+        }
+
+        if ('csv' === $prefix) {
+            return str_getcsv($env);
         }
 
         throw new RuntimeException(sprintf('Unsupported env var prefix "%s".', $prefix));

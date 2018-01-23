@@ -28,7 +28,8 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/expression-language": "~3.4|~4.0",
-        "symfony/security-core": "~3.4|~4.0"
+        "symfony/security-core": "~3.4|~4.0",
+        "symfony/validator": "~3.4|~4.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Workflow\\": "" }
@@ -36,7 +37,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

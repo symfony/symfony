@@ -12,7 +12,7 @@
             <argument type="service" id="security.csrf.token_manager" />
             <argument>%form.type_extension.csrf.enabled%</argument>
             <argument>%form.type_extension.csrf.field_name%</argument>
-            <argument type="service" id="translator" />
+            <argument type="service" id="translator" on-invalid="null" />
             <argument>%validator.translation_domain%</argument>
             <argument type="service" id="form.server_params" />
         </service>

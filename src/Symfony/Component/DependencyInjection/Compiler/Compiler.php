@@ -66,7 +66,7 @@ class Compiler
     /**
      * @final
      */
-    public function log(CompilerPassInterface $pass, $message)
+    public function log(CompilerPassInterface $pass, string $message)
     {
         if (false !== strpos($message, "\n")) {
             $message = str_replace("\n", "\n".get_class($pass).': ', trim($message));
@@ -87,8 +87,6 @@ class Compiler
 
     /**
      * Run the Compiler and process all Passes.
-     *
-     * @param ContainerBuilder $container
      */
     public function compile(ContainerBuilder $container)
     {
@@ -115,6 +113,8 @@ class Compiler
             }
 
             throw $e;
+        } finally {
+            $this->getServiceReferenceGraph()->clear();
         }
     }
 }

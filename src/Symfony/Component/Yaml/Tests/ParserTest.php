@@ -30,6 +30,8 @@ class ParserTest extends TestCase
     protected function tearDown()
     {
         $this->parser = null;
+
+        chmod(__DIR__.'/Fixtures/not_readable.yml', 0644);
     }
 
     /**
@@ -1420,6 +1422,49 @@ EOT;
         $this->assertSame(array('foo' => 'bar baz foobar foo', 'bar' => 'baz'), $this->parser->parse($yaml));
     }
 
+    public function testMultiLineQuotedStringWithTrailingBackslash()
+    {
+        $yaml = <<<YAML
+foobar:
+    "foo\
+    bar"
+YAML;
+
+        $this->assertSame(array('foobar' => 'foobar'), $this->parser->parse($yaml));
+    }
+
+    public function testCommentCharactersInMultiLineQuotedStrings()
+    {
+        $yaml = <<<YAML
+foo:
+    foobar: 'foo
+      #bar'
+    bar: baz
+YAML;
+        $expected = array(
+            'foo' => array(
+                'foobar' => 'foo #bar',
+                'bar' => 'baz',
+            ),
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function testBlankLinesInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+foobar: 'foo
+
+    bar'
+YAML;
+        $expected = array(
+            'foobar' => "foo\nbar",
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     public function testParseMultiLineUnquotedString()
     {
         $yaml = <<<EOT
@@ -1557,6 +1602,10 @@ YAML
 - !quz {foo: bar, quz: !bar {one: bar}}
 YAML
             ),
+            'spaces-around-tag-value-in-sequence' => array(
+                array(new TaggedValue('foo', 'bar')),
+                '[ !foo bar ]',
+            ),
         );
     }
 
@@ -1594,7 +1643,7 @@ YAML
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage The built-in tag "!!foo" is not implemented.
+     * @expectedExceptionMessage The built-in tag "!!foo" is not implemented at line 1 (near "!!foo").
      */
     public function testExceptionWhenUsingUnsuportedBuiltInTags()
     {
@@ -1667,7 +1716,7 @@ INI;
         $parser = new Parser();
 
         $tests = array();
-        $files = $parser->parse(file_get_contents(__DIR__.'/Fixtures/'.$testsFile));
+        $files = $parser->parseFile(__DIR__.'/Fixtures/'.$testsFile);
         foreach ($files as $file) {
             $yamls = file_get_contents(__DIR__.'/Fixtures/'.$file.'.yml');
 
@@ -1744,6 +1793,222 @@ YAML;
         );
 
         $this->assertSame($expected, $this->parser->parse($yaml, Yaml::PARSE_CONSTANT));
+    }
+
+    public function testMergeKeysWhenMappingsAreParsedAsObjects()
+    {
+        $yaml = <<<YAML
+foo: &FOO
+    bar: 1
+bar: &BAR
+    baz: 2
+    <<: *FOO
+baz:
+    baz_foo: 3
+    <<:
+        baz_bar: 4
+foobar:
+    bar: ~
+    <<: [*FOO, *BAR]
+YAML;
+        $expected = (object) array(
+            'foo' => (object) array(
+                'bar' => 1,
+            ),
+            'bar' => (object) array(
+                'baz' => 2,
+                'bar' => 1,
+            ),
+            'baz' => (object) array(
+                'baz_foo' => 3,
+                'baz_bar' => 4,
+            ),
+            'foobar' => (object) array(
+                'bar' => null,
+                'baz' => 2,
+            ),
+        );
+
+        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+    }
+
+    public function testFilenamesAreParsedAsStringsWithoutFlag()
+    {
+        $file = __DIR__.'/Fixtures/index.yml';
+
+        $this->assertSame($file, $this->parser->parse($file));
+    }
+
+    public function testParseFile()
+    {
+        $this->assertInternalType('array', $this->parser->parseFile(__DIR__.'/Fixtures/index.yml'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessageRegExp #^File ".+/Fixtures/nonexistent.yml" does not exist\.$#
+     */
+    public function testParsingNonExistentFilesThrowsException()
+    {
+        $this->parser->parseFile(__DIR__.'/Fixtures/nonexistent.yml');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessageRegExp #^File ".+/Fixtures/not_readable.yml" cannot be read\.$#
+     */
+    public function testParsingNotReadableFilesThrowsException()
+    {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('chmod is not supported on Windows');
+        }
+
+        $file = __DIR__.'/Fixtures/not_readable.yml';
+        chmod($file, 0200);
+
+        $this->parser->parseFile($file);
+    }
+
+    public function testParseReferencesOnMergeKeys()
+    {
+        $yaml = <<<YAML
+mergekeyrefdef:
+    a: foo
+    <<: &quux
+        b: bar
+        c: baz
+mergekeyderef:
+    d: quux
+    <<: *quux
+YAML;
+        $expected = array(
+            'mergekeyrefdef' => array(
+                'a' => 'foo',
+                'b' => 'bar',
+                'c' => 'baz',
+            ),
+            'mergekeyderef' => array(
+                'd' => 'quux',
+                'b' => 'bar',
+                'c' => 'baz',
+            ),
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function testParseReferencesOnMergeKeysWithMappingsParsedAsObjects()
+    {
+        $yaml = <<<YAML
+mergekeyrefdef:
+    a: foo
+    <<: &quux
+        b: bar
+        c: baz
+mergekeyderef:
+    d: quux
+    <<: *quux
+YAML;
+        $expected = (object) array(
+            'mergekeyrefdef' => (object) array(
+                'a' => 'foo',
+                'b' => 'bar',
+                'c' => 'baz',
+            ),
+            'mergekeyderef' => (object) array(
+                'd' => 'quux',
+                'b' => 'bar',
+                'c' => 'baz',
+            ),
+        );
+
+        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Reference "foo" does not exist
+     */
+    public function testEvalRefException()
+    {
+        $yaml = <<<EOE
+foo: { &foo { a: Steve, <<: *foo} }
+EOE;
+        $this->parser->parse($yaml);
+    }
+
+    /**
+     * @dataProvider indentedMappingData
+     */
+    public function testParseIndentedMappings($yaml, $expected)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function indentedMappingData()
+    {
+        $tests = array();
+
+        $yaml = <<<YAML
+foo:
+  - bar: "foobar"
+    # A comment
+    baz: "foobaz"
+YAML;
+        $expected = array(
+            'foo' => array(
+                array(
+                    'bar' => 'foobar',
+                    'baz' => 'foobaz',
+                ),
+            ),
+        );
+        $tests['comment line is first line in indented block'] = array($yaml, $expected);
+
+        $yaml = <<<YAML
+foo:
+    - bar:
+        # comment
+        baz: [1, 2, 3]
+YAML;
+        $expected = array(
+            'foo' => array(
+                array(
+                    'bar' => array(
+                        'baz' => array(1, 2, 3),
+                    ),
+                ),
+            ),
+        );
+        $tests['mapping value on new line starting with a comment line'] = array($yaml, $expected);
+
+        $yaml = <<<YAML
+foo:
+  -
+    bar: foobar
+YAML;
+        $expected = array(
+            'foo' => array(
+                array(
+                    'bar' => 'foobar',
+                ),
+            ),
+        );
+        $tests['mapping in sequence starting on a new line'] = array($yaml, $expected);
+
+        $yaml = <<<YAML
+foo:
+
+    bar: baz
+YAML;
+        $expected = array(
+            'foo' => array(
+                'bar' => 'baz',
+            ),
+        );
+        $tests['blank line at the beginning of an indented mapping value'] = array($yaml, $expected);
+
+        return $tests;
     }
 }
 

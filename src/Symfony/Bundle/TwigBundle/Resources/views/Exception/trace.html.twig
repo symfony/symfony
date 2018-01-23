@@ -1,4 +1,4 @@
-<div class="trace-line-header {{ trace.file|default(false) ? 'sf-toggle' }}" data-toggle-selector="#trace-html-{{ prefix }}-{{ i }}" data-toggle-initial="{{ _display_code_snippet ? 'display' }}">
+<div class="trace-line-header break-long-words {{ trace.file|default(false) ? 'sf-toggle' }}" data-toggle-selector="#trace-html-{{ prefix }}-{{ i }}" data-toggle-initial="{{ _display_code_snippet ? 'display' }}">
     {% if trace.file|default(false) %}
         <span class="icon icon-close">{{ include('@Twig/images/icon-minus-square.svg') }}</span>
         <span class="icon icon-open">{{ include('@Twig/images/icon-plus-square.svg') }}</span>

@@ -8,7 +8,11 @@
         <defaults public="false" />
 
         <service id="cache.app" parent="cache.adapter.filesystem" public="true">
-            <tag name="cache.pool" clearer="cache.app_clearer" />
+            <tag name="cache.pool" clearer="cache.app_clearer" reset="reset" />
+        </service>
+
+        <service id="cache.app.simple" class="Symfony\Component\Cache\Simple\Psr6Cache">
+            <argument type="service" id="cache.app" />
         </service>
 
         <service id="cache.system" parent="cache.adapter.system" public="true">
@@ -29,7 +33,7 @@
 
         <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\AdapterInterface" abstract="true">
             <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache" />
-            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="cache.pool" clearer="cache.system_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument>0</argument> <!-- default lifetime -->
@@ -90,7 +94,7 @@
         </service>
 
         <service id="cache.adapter.memcached" class="Symfony\Component\Cache\Adapter\MemcachedAdapter" abstract="true">
-            <tag name="cache.pool" provider="cache.default_memcached_provider" clearer="cache.default_clearer" />
+            <tag name="cache.pool" provider="cache.default_memcached_provider" clearer="cache.default_clearer" reset="reset" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Memcached connection service -->
             <argument /> <!-- namespace -->
@@ -101,11 +105,15 @@
         </service>
 
         <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer">
-            <tag name="kernel.cache_clearer" />
+            <argument type="collection" />
         </service>
+
+        <service id="cache.system_clearer" parent="cache.default_clearer" public="true" />
 
         <service id="cache.global_clearer" parent="cache.default_clearer" public="true" />
         <service id="cache.app_clearer" alias="cache.default_clearer" public="true" />
         <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app" />
+        <service id="Psr\SimpleCache\CacheInterface" alias="cache.app.simple" />
+        <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="cache.app" />
     </services>
 </container>

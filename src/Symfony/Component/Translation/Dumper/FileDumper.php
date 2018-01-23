@@ -46,15 +46,16 @@ abstract class FileDumper implements DumperInterface
      * Sets backup flag.
      *
      * @param bool
+     *
+     * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     public function setBackup($backup)
     {
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.1 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
+
         if (false !== $backup) {
             throw new \LogicException('The backup feature is no longer supported.');
         }
-
-        // the method is only present to not break BC
-        // to be deprecated in 4.1
     }
 
     /**
@@ -100,13 +101,8 @@ abstract class FileDumper implements DumperInterface
 
     /**
      * Gets the relative file path using the template.
-     *
-     * @param string $domain The domain
-     * @param string $locale The locale
-     *
-     * @return string The relative file path
      */
-    private function getRelativePath($domain, $locale)
+    private function getRelativePath(string $domain, string $locale): string
     {
         return strtr($this->relativePathTemplate, array(
             '%domain%' => $domain,

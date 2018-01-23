@@ -24,15 +24,13 @@ class RememberMeToken extends AbstractToken
     private $providerKey;
 
     /**
-     * Constructor.
-     *
      * @param UserInterface $user
      * @param string        $providerKey
      * @param string        $secret      A secret used to make sure the token is created by the app and not by a malicious client
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserInterface $user, $providerKey, $secret)
+    public function __construct(UserInterface $user, string $providerKey, string $secret)
     {
         parent::__construct($user->getRoles());
 

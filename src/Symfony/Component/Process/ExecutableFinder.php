@@ -23,8 +23,6 @@ class ExecutableFinder
 
     /**
      * Replaces default suffixes of executable.
-     *
-     * @param array $suffixes
      */
     public function setSuffixes(array $suffixes)
     {

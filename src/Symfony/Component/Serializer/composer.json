@@ -31,6 +31,7 @@
         "phpdocumentor/reflection-docblock": "^3.0|^4.0"
     },
     "conflict": {
+        "phpdocumentor/type-resolver": "<0.2.1",
         "symfony/dependency-injection": "<3.4",
         "symfony/property-access": "<3.4",
         "symfony/property-info": "<3.4",
@@ -55,7 +56,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

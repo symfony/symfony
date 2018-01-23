@@ -26,7 +26,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     private $logger;
     private $containerPathPrefix;
 
-    public function __construct($logger = null, $containerPathPrefix = null)
+    public function __construct($logger = null, string $containerPathPrefix = null)
     {
         if (null !== $logger && $logger instanceof DebugLoggerInterface) {
             $this->logger = $logger;
@@ -41,6 +41,17 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         // everything is done as late as possible
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        if ($this->logger instanceof DebugLoggerInterface) {
+            $this->logger->clear();
+        }
+        $this->data = array();
     }
 
     /**
@@ -149,6 +160,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     private function sanitizeLogs($logs)
     {
         $sanitizedLogs = array();
+        $silencedLogs = array();
 
         foreach ($logs as $log) {
             if (!$this->isSilencedOrDeprecationErrorLog($log)) {

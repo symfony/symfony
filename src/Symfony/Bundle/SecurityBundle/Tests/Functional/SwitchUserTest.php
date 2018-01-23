@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 
 class SwitchUserTest extends WebTestCase
@@ -48,6 +49,18 @@ class SwitchUserTest extends WebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
+    }
+
+    public function testSwitchUserStateless()
+    {
+        $client = $this->createClient(array('test_case' => 'JsonLogin', 'root_config' => 'switchuser_stateless.yml'));
+        $client->request('POST', '/chk', array(), array(), array('HTTP_X_SWITCH_USER' => 'dunglas', 'CONTENT_TYPE' => 'application/json'), '{"user": {"login": "user_can_switch", "password": "test"}}');
+        $response = $client->getResponse();
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(array('message' => 'Welcome @dunglas!'), json_decode($response->getContent(), true));
+        $this->assertSame('dunglas', $client->getProfile()->getCollector('security')->getUser());
     }
 
     public function getTestParameters()

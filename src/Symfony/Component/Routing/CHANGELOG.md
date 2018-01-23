@@ -10,6 +10,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Added `NoConfigurationException`.
  * Added the possibility to define a prefix for all routes of a controller via @Route(name="prefix_")
  * Added support for prioritized routing loaders.
  * Add matched and default parameters to redirect responses

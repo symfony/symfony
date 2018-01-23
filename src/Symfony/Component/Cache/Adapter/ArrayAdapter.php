@@ -14,12 +14,13 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ArrayTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
+class ArrayAdapter implements AdapterInterface, LoggerAwareInterface, ResettableInterface
 {
     use ArrayTrait;
 
@@ -29,7 +30,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
      * @param int  $defaultLifetime
      * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
      */
-    public function __construct($defaultLifetime = 0, $storeSerialized = true)
+    public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true)
     {
         $this->storeSerialized = $storeSerialized;
         $this->createCacheItem = \Closure::bind(

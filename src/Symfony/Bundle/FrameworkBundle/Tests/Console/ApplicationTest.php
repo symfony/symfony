@@ -160,7 +160,7 @@ class ApplicationTest extends TestCase
         $output = $tester->getDisplay();
 
         $this->assertSame(0, $tester->getStatusCode());
-        $this->assertContains('Some commands could not be registered.', $output);
+        $this->assertContains('Some commands could not be registered:', $output);
         $this->assertContains('throwing', $output);
         $this->assertContains('fine', $output);
     }

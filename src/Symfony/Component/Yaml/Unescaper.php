@@ -120,10 +120,6 @@ class Unescaper
 
     /**
      * Get the UTF-8 character for the given code point.
-     *
-     * @param int $c The unicode code point
-     *
-     * @return string The corresponding UTF-8 character
      */
     private static function utf8chr(int $c): string
     {

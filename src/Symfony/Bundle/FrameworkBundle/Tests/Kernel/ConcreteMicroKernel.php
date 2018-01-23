@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
 
+use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -77,6 +78,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
     {
+        $c->register('logger', NullLogger::class);
         $c->loadFromExtension('framework', array(
             'secret' => '$ecret',
         ));

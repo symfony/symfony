@@ -68,10 +68,12 @@
         <service id="data_collector.twig" class="Symfony\Bridge\Twig\DataCollector\TwigDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/twig.html.twig" id="twig" priority="257" />
             <argument type="service" id="twig.profile" />
+            <argument type="service" id="twig" />
         </service>
 
         <service id="twig.extension.trans" class="Symfony\Bridge\Twig\Extension\TranslationExtension">
-            <argument type="service" id="translator" />
+            <argument type="service" id="translator" on-invalid="null" />
+            <tag name="twig.extension" />
         </service>
 
         <service id="twig.extension.assets" class="Symfony\Bridge\Twig\Extension\AssetExtension">

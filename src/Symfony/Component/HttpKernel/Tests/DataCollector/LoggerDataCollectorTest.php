@@ -19,7 +19,10 @@ class LoggerDataCollectorTest extends TestCase
 {
     public function testCollectWithUnexpectedFormat()
     {
-        $logger = $this->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')->getMock();
+        $logger = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
+            ->setMethods(array('countErrors', 'getLogs', 'clear'))
+            ->getMock();
         $logger->expects($this->once())->method('countErrors')->will($this->returnValue('foo'));
         $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue(array()));
 
@@ -43,7 +46,10 @@ class LoggerDataCollectorTest extends TestCase
      */
     public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null)
     {
-        $logger = $this->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')->getMock();
+        $logger = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
+            ->setMethods(array('countErrors', 'getLogs', 'clear'))
+            ->getMock();
         $logger->expects($this->once())->method('countErrors')->will($this->returnValue($nb));
         $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue($logs));
 
@@ -68,6 +74,18 @@ class LoggerDataCollectorTest extends TestCase
         if (isset($expectedPriorities)) {
             $this->assertSame($expectedPriorities, $c->getPriorities()->getValue(true));
         }
+    }
+
+    public function testReset()
+    {
+        $logger = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Log\DebugLoggerInterface')
+            ->setMethods(array('countErrors', 'getLogs', 'clear'))
+            ->getMock();
+        $logger->expects($this->once())->method('clear');
+
+        $c = new LoggerDataCollector($logger);
+        $c->reset();
     }
 
     public function getCollectTestData()

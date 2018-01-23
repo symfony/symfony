@@ -38,9 +38,6 @@ class RouteCollectionBuilder
     private $methods;
     private $resources = array();
 
-    /**
-     * @param LoaderInterface $loader
-     */
     public function __construct(LoaderInterface $loader = null)
     {
         $this->loader = $loader;
@@ -79,10 +76,10 @@ class RouteCollectionBuilder
             foreach ($collection->getResources() as $resource) {
                 $builder->addResource($resource);
             }
-
-            // mount into this builder
-            $this->mount($prefix, $builder);
         }
+
+        // mount into this builder
+        $this->mount($prefix, $builder);
 
         return $builder;
     }
@@ -318,10 +315,10 @@ class RouteCollectionBuilder
 
                 $routeCollection->addCollection($subCollection);
             }
+        }
 
-            foreach ($this->resources as $resource) {
-                $routeCollection->addResource($resource);
-            }
+        foreach ($this->resources as $resource) {
+            $routeCollection->addResource($resource);
         }
 
         return $routeCollection;
@@ -329,10 +326,8 @@ class RouteCollectionBuilder
 
     /**
      * Generates a route name based on details of this route.
-     *
-     * @return string
      */
-    private function generateRouteName(Route $route)
+    private function generateRouteName(Route $route): string
     {
         $methods = implode('_', $route->getMethods()).'_';
 

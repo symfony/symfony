@@ -62,6 +62,8 @@ class IpUtilsTest extends TestCase
             array(false, '2a01:198:603:0:396e:4789:8e99:890f', '::1'),
             array(true, '0:0:0:0:0:0:0:1', '::1'),
             array(false, '0:0:603:0:396e:4789:8e99:0001', '::1'),
+            array(true, '0:0:603:0:396e:4789:8e99:0001', '::/0'),
+            array(true, '0:0:603:0:396e:4789:8e99:0001', '2a01:198:603:0::/0'),
             array(true, '2a01:198:603:0:396e:4789:8e99:890f', array('::1', '2a01:198:603:0::/65')),
             array(true, '2a01:198:603:0:396e:4789:8e99:890f', array('2a01:198:603:0::/65', '::1')),
             array(false, '2a01:198:603:0:396e:4789:8e99:890f', array('::1', '1a01:198:603:0::/65')),
@@ -81,5 +83,22 @@ class IpUtilsTest extends TestCase
         }
 
         IpUtils::checkIp('2a01:198:603:0:396e:4789:8e99:890f', '2a01:198:603:0::/65');
+    }
+
+    /**
+     * @dataProvider invalidIpAddressData
+     */
+    public function testInvalidIpAddressesDoNotMatch($requestIp, $proxyIp)
+    {
+        $this->assertFalse(IpUtils::checkIp4($requestIp, $proxyIp));
+    }
+
+    public function invalidIpAddressData()
+    {
+        return array(
+            'invalid proxy wildcard' => array('192.168.20.13', '*'),
+            'invalid proxy missing netmask' => array('192.168.20.13', '0.0.0.0'),
+            'invalid request IP with invalid proxy wildcard' => array('0.0.0.0', '*'),
+        );
     }
 }

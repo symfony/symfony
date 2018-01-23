@@ -17,11 +17,9 @@ namespace Symfony\Component\Intl\Exception;
 class MethodNotImplementedException extends NotImplementedException
 {
     /**
-     * Constructor.
-     *
      * @param string $methodName The name of the method
      */
-    public function __construct($methodName)
+    public function __construct(string $methodName)
     {
         parent::__construct(sprintf('The %s() is not implemented.', $methodName));
     }

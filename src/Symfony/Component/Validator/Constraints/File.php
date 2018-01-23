@@ -59,6 +59,9 @@ class File extends Constraint
 
     protected $maxSize;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($options = null)
     {
         parent::__construct($options);
@@ -86,6 +89,15 @@ class File extends Constraint
         }
 
         return parent::__get($option);
+    }
+
+    public function __isset($option)
+    {
+        if ('maxSize' === $option) {
+            return true;
+        }
+
+        return parent::__isset($option);
     }
 
     private function normalizeBinaryFormat($maxSize)

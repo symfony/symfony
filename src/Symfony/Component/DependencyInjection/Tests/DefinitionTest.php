@@ -371,4 +371,13 @@ class DefinitionTest extends TestCase
         $def->setAutoconfigured(true);
         $this->assertTrue($def->isAutoconfigured());
     }
+
+    public function testAddError()
+    {
+        $def = new Definition('stdClass');
+        $this->assertEmpty($def->getErrors());
+        $def->addError('First error');
+        $def->addError('Second error');
+        $this->assertSame(array('First error', 'Second error'), $def->getErrors());
+    }
 }

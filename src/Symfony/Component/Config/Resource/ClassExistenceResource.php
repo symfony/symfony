@@ -32,12 +32,10 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
      * @param string    $resource The fully-qualified class name
      * @param bool|null $exists   Boolean when the existency check has already been done
      */
-    public function __construct($resource, $exists = null)
+    public function __construct(string $resource, bool $exists = null)
     {
         $this->resource = $resource;
-        if (null !== $exists) {
-            $this->exists = (bool) $exists;
-        }
+        $this->exists = $exists;
     }
 
     /**

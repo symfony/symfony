@@ -23,10 +23,6 @@ interface DataCollectorInterface
 {
     /**
      * Collects data for the given Request and Response.
-     *
-     * @param Request    $request   A Request instance
-     * @param Response   $response  A Response instance
-     * @param \Exception $exception An Exception instance
      */
     public function collect(Request $request, Response $response, \Exception $exception = null);
 
@@ -36,4 +32,9 @@ interface DataCollectorInterface
      * @return string The collector name
      */
     public function getName();
+
+    /**
+     * Resets this data collector to its initial state.
+     */
+    public function reset();
 }

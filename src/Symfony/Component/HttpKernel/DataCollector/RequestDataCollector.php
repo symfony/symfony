@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,13 +21,10 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * RequestDataCollector.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface
 {
-    /** @var \SplObjectStorage */
     protected $controllers;
 
     public function __construct()
@@ -81,6 +79,13 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $responseCookies[$cookie->getName()] = $cookie;
         }
 
+        $dotenvVars = array();
+        foreach (explode(',', getenv('SYMFONY_DOTENV_VARS')) as $name) {
+            if ('' !== $name && false !== $value = getenv($name)) {
+                $dotenvVars[$name] = $value;
+            }
+        }
+
         $this->data = array(
             'method' => $request->getMethod(),
             'format' => $request->getRequestFormat(),
@@ -103,6 +108,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'path_info' => $request->getPathInfo(),
             'controller' => 'n/a',
             'locale' => $request->getLocale(),
+            'dotenv_vars' => $dotenvVars,
         );
 
         if (isset($this->data['request_headers']['php-auth-pw'])) {
@@ -131,21 +137,24 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             unset($this->controllers[$request]);
         }
 
-        if (null !== $session && $session->isStarted()) {
-            if ($request->attributes->has('_redirected')) {
-                $this->data['redirect'] = $session->remove('sf_redirect');
-            }
+        if ($request->attributes->has('_redirected') && $redirectCookie = $request->cookies->get('sf_redirect')) {
+            $this->data['redirect'] = json_decode($redirectCookie, true);
 
-            if ($response->isRedirect()) {
-                $session->set('sf_redirect', array(
+            $response->headers->clearCookie('sf_redirect');
+        }
+
+        if ($response->isRedirect()) {
+            $response->headers->setCookie(new Cookie(
+                'sf_redirect',
+                json_encode(array(
                     'token' => $response->headers->get('x-debug-token'),
                     'route' => $request->attributes->get('_route', 'n/a'),
                     'method' => $request->getMethod(),
                     'controller' => $this->parseController($request->attributes->get('_controller')),
                     'status_code' => $statusCode,
                     'status_text' => Response::$statusTexts[(int) $statusCode],
-                ));
-            }
+                ))
+            ));
         }
 
         $this->data['identifier'] = $this->data['route'] ?: (is_array($this->data['controller']) ? $this->data['controller']['class'].'::'.$this->data['controller']['method'].'()' : $this->data['controller']);
@@ -154,6 +163,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     public function lateCollect()
     {
         $this->data = $this->cloneVar($this->data);
+    }
+
+    public function reset()
+    {
+        $this->data = array();
+        $this->controllers = new \SplObjectStorage();
     }
 
     public function getMethod()
@@ -251,6 +266,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return $this->data['locale'];
     }
 
+    public function getDotenvVars()
+    {
+        return new ParameterBag($this->data['dotenv_vars']->getValue());
+    }
+
     /**
      * Gets the route name.
      *
@@ -309,11 +329,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if (!$event->isMasterRequest() || !$event->getRequest()->hasSession() || !$event->getRequest()->getSession()->isStarted()) {
+        if (!$event->isMasterRequest()) {
             return;
         }
 
-        if ($event->getRequest()->getSession()->has('sf_redirect')) {
+        if ($event->getRequest()->cookies->has('sf_redirect')) {
             $event->getRequest()->attributes->set('_redirected', true);
         }
     }

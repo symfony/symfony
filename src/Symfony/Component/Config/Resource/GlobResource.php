@@ -29,15 +29,13 @@ class GlobResource implements \IteratorAggregate, SelfCheckingResourceInterface,
     private $hash;
 
     /**
-     * Constructor.
-     *
      * @param string $prefix    A directory prefix
      * @param string $pattern   A glob pattern
      * @param bool   $recursive Whether directories should be scanned recursively or not
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($prefix, $pattern, $recursive)
+    public function __construct(?string $prefix, string $pattern, bool $recursive)
     {
         $this->prefix = realpath($prefix) ?: (file_exists($prefix) ? $prefix : false);
         $this->pattern = $pattern;

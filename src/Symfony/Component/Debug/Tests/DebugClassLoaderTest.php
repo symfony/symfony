@@ -240,7 +240,7 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
-    public function testExtendedDeprecatedMethod()
+    public function testExtendedDeprecatedMethodDoesntTriggerAnyNotice()
     {
         set_error_handler(function () { return false; });
         $e = error_reporting(0);
@@ -254,12 +254,7 @@ class DebugClassLoaderTest extends TestCase
         $lastError = error_get_last();
         unset($lastError['file'], $lastError['line']);
 
-        $xError = array(
-            'type' => E_USER_DEPRECATED,
-            'message' => 'The "Symfony\Component\Debug\Tests\Fixtures\AnnotatedClass::deprecatedMethod()" method is deprecated since version 3.4. You should not extend it from "Test\Symfony\Component\Debug\Tests\ExtendsAnnotatedClass".',
-        );
-
-        $this->assertSame($xError, $lastError);
+        $this->assertSame(array('type' => E_USER_NOTICE, 'message' => ''), $lastError);
     }
 
     public function testInternalsUse()

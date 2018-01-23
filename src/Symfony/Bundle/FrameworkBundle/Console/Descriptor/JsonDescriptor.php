@@ -180,9 +180,6 @@ class JsonDescriptor extends Descriptor
     /**
      * Writes data as json.
      *
-     * @param array $data
-     * @param array $options
-     *
      * @return array|string
      */
     private function writeData(array $data, array $options)
@@ -192,8 +189,6 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param Route $route
-     *
      * @return array
      */
     protected function getRouteData(Route $route)
@@ -212,13 +207,7 @@ class JsonDescriptor extends Descriptor
         );
     }
 
-    /**
-     * @param Definition $definition
-     * @param bool       $omitTags
-     *
-     * @return array
-     */
-    private function getContainerDefinitionData(Definition $definition, $omitTags = false, $showArguments = false)
+    private function getContainerDefinitionData(Definition $definition, bool $omitTags = false, bool $showArguments = false): array
     {
         $data = array(
             'class' => (string) $definition->getClass(),
@@ -272,12 +261,7 @@ class JsonDescriptor extends Descriptor
         return $data;
     }
 
-    /**
-     * @param Alias $alias
-     *
-     * @return array
-     */
-    private function getContainerAliasData(Alias $alias)
+    private function getContainerAliasData(Alias $alias): array
     {
         return array(
             'service' => (string) $alias,
@@ -285,13 +269,7 @@ class JsonDescriptor extends Descriptor
         );
     }
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param string|null              $event
-     *
-     * @return array
-     */
-    private function getEventDispatcherListenersData(EventDispatcherInterface $eventDispatcher, $event = null)
+    private function getEventDispatcherListenersData(EventDispatcherInterface $eventDispatcher, string $event = null): array
     {
         $data = array();
 
@@ -317,13 +295,7 @@ class JsonDescriptor extends Descriptor
         return $data;
     }
 
-    /**
-     * @param callable $callable
-     * @param array    $options
-     *
-     * @return array
-     */
-    private function getCallableData($callable, array $options = array())
+    private function getCallableData($callable, array $options = array()): array
     {
         $data = array();
 

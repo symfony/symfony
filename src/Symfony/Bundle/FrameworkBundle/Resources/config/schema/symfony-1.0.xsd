@@ -29,6 +29,7 @@
             <xsd:element name="property-info" type="property_info" minOccurs="0" maxOccurs="1" />
             <xsd:element name="cache" type="cache" minOccurs="0" maxOccurs="1" />
             <xsd:element name="workflow" type="workflow" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -102,6 +103,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="session">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="storage-id" type="xsd:string" />
         <xsd:attribute name="handler-id" type="xsd:string" />
         <xsd:attribute name="name" type="xsd:string" />
@@ -138,6 +140,7 @@
             <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
 
+        <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="base-path" type="xsd:string" />
         <xsd:attribute name="version-strategy" type="xsd:string" />
         <xsd:attribute name="version" type="xsd:string" />
@@ -197,6 +200,9 @@
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
         <xsd:attribute name="static-method" type="xsd:boolean" />
+        <xsd:attribute name="translation-domain" type="xsd:string" />
+        <xsd:attribute name="strict-email" type="xsd:boolean" />
+        <xsd:attribute name="email-validation-mode" type="email-validation-mode" />
     </xsd:complexType>
 
     <xsd:complexType name="file_mapping">
@@ -204,6 +210,14 @@
             <xsd:element name="path" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:simpleType name="email-validation-mode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="html5" />
+            <xsd:enumeration value="loose" />
+            <xsd:enumeration value="strict" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:complexType name="annotations">
         <xsd:attribute name="cache" type="xsd:string" />
@@ -296,4 +310,19 @@
             <xsd:enumeration value="workflow" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="lock">
+        <xsd:sequence>
+            <xsd:element name="resource" type="lock_resource" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="lock_resource">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="name" type="xsd:string" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
 </xsd:schema>

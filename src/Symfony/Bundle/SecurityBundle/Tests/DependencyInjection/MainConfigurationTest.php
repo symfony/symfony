@@ -20,8 +20,6 @@ class MainConfigurationTest extends TestCase
     /**
      * The minimal, required config needed to not have any required validation
      * issues.
-     *
-     * @var array
      */
     protected static $minimalConfig = array(
         'providers' => array(

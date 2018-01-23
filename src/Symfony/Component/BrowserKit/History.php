@@ -32,8 +32,6 @@ class History
 
     /**
      * Adds a Request to the history.
-     *
-     * @param Request $request A Request instance
      */
     public function add(Request $request)
     {

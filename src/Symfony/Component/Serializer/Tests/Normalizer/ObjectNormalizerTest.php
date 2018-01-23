@@ -203,6 +203,38 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize($data, DummyWithConstructorInexistingObject::class);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException
+     * @expectedExceptionMessage Cannot create an instance of Symfony\Component\Serializer\Tests\Normalizer\DummyValueObject from serialized data because its constructor requires parameter "bar" to be present.
+     */
+    public function testConstructorWithMissingData()
+    {
+        $data = array(
+            'foo' => 10,
+        );
+
+        $normalizer = new ObjectNormalizer();
+
+        $normalizer->denormalize($data, DummyValueObject::class);
+    }
+
+    public function testFillWithEmptyDataWhenMissingData()
+    {
+        $data = array(
+            'foo' => 10,
+        );
+
+        $normalizer = new ObjectNormalizer();
+
+        $result = $normalizer->denormalize($data, DummyValueObject::class, 'json', array(
+            'default_constructor_arguments' => array(
+                DummyValueObject::class => array('foo' => '', 'bar' => ''),
+            ),
+        ));
+
+        $this->assertEquals(new DummyValueObject(10, ''), $result);
+    }
+
     public function testGroupsNormalize()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -683,6 +715,16 @@ class ObjectNormalizerTest extends TestCase
             ),
             $serializer->normalize($objectDummy, null, $context)
         );
+
+        $context = array('attributes' => array('foo', 'baz', 'object'));
+        $this->assertEquals(
+            array(
+                'foo' => 'foo',
+                'baz' => true,
+                'object' => array('foo' => 'innerFoo', 'bar' => 'innerBar'),
+            ),
+            $serializer->normalize($objectDummy, null, $context)
+        );
     }
 
     public function testAttributesContextDenormalize()
@@ -722,6 +764,37 @@ class ObjectNormalizerTest extends TestCase
             'foo' => 'b',
             'inner' => array('foo' => 'foo', 'bar' => 'bar'),
         ), DummyWithConstructorObjectAndDefaultValue::class, null, $context));
+    }
+
+    public function testNormalizeSameObjectWithDifferentAttributes()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory);
+        $serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($serializer);
+
+        $dummy = new ObjectOuter();
+        $dummy->foo = new ObjectInner();
+        $dummy->foo->foo = 'foo.foo';
+        $dummy->foo->bar = 'foo.bar';
+
+        $dummy->bar = new ObjectInner();
+        $dummy->bar->foo = 'bar.foo';
+        $dummy->bar->bar = 'bar.bar';
+
+        $this->assertEquals(array(
+            'foo' => array(
+                'bar' => 'foo.bar',
+            ),
+            'bar' => array(
+                'foo' => 'bar.foo',
+            ),
+        ), $this->normalizer->normalize($dummy, 'json', array(
+            'attributes' => array(
+                'foo' => array('bar'),
+                'bar' => array('foo'),
+            ),
+        )));
     }
 }
 
@@ -982,6 +1055,17 @@ class DummyWithConstructorInexistingObject
 {
     public function __construct($id, Unknown $unknown)
     {
+    }
+}
+class DummyValueObject
+{
+    private $foo;
+    private $bar;
+
+    public function __construct($foo, $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
     }
 }
 

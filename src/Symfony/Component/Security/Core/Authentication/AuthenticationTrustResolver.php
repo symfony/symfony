@@ -23,13 +23,7 @@ class AuthenticationTrustResolver implements AuthenticationTrustResolverInterfac
     private $anonymousClass;
     private $rememberMeClass;
 
-    /**
-     * Constructor.
-     *
-     * @param string $anonymousClass
-     * @param string $rememberMeClass
-     */
-    public function __construct($anonymousClass, $rememberMeClass)
+    public function __construct(string $anonymousClass, string $rememberMeClass)
     {
         $this->anonymousClass = $anonymousClass;
         $this->rememberMeClass = $rememberMeClass;

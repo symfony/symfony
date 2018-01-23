@@ -46,7 +46,7 @@ trait LockableTrait
         if (SemaphoreStore::isSupported()) {
             $store = new SemaphoreStore();
         } else {
-            $store = new FlockStore(sys_get_temp_dir());
+            $store = new FlockStore();
         }
 
         $this->lock = (new Factory($store))->createLock($name ?: $this->getName());

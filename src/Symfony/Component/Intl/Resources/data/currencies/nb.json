@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "ADP": [
             "ADP",
@@ -219,7 +219,7 @@
         ],
         "BYN": [
             "BYN",
-            "hviterussiske rubler"
+            "nye hviterussiske rubler"
         ],
         "BYR": [
             "BYR",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "chilenske pesos"
+        ],
+        "CNH": [
+            "CNH",
+            "kinesiske yuan (offshore)"
         ],
         "CNX": [
             "CNX",
@@ -911,7 +915,7 @@
         ],
         "STD": [
             "STD",
-            "São Tomé og Príncipe-dobra"
+            "saotomesiske dobra"
         ],
         "SUR": [
             "SUR",

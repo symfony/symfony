@@ -35,13 +35,11 @@ class ExpressionFunction
     private $evaluator;
 
     /**
-     * Constructor.
-     *
      * @param string   $name      The function name
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
      */
-    public function __construct($name, callable $compiler, callable $evaluator)
+    public function __construct(string $name, callable $compiler, callable $evaluator)
     {
         $this->name = $name;
         $this->compiler = $compiler;

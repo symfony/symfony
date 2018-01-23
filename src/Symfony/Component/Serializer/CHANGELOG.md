@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+* added `MissingConstructorArgumentsException` new exception for deserialization failure
+  of objects that needs data insertion in constructor
+* added an optional `default_constructor_arguments` option of context to specify a default data in
+  case the object is not initializable by its constructor because of data missing
+
 4.0.0
 -----
 
@@ -18,6 +26,9 @@ CHANGELOG
  * added `AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT` context option
    to disable throwing an `UnexpectedValueException` on a type mismatch
  * added support for serializing `DateInterval` objects
+ * added getter for extra attributes in `ExtraAttributesException`
+ * improved `CsvEncoder` to handle variable nested structures
+ * CSV headers can be passed to the `CsvEncoder` via the `csv_headers` serialization context variable 
 
 3.3.0
 -----

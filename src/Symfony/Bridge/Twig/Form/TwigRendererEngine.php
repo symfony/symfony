@@ -106,9 +106,11 @@ class TwigRendererEngine extends AbstractRendererEngine
 
         // Check the default themes once we reach the root view without success
         if (!$view->parent) {
-            for ($i = count($this->defaultThemes) - 1; $i >= 0; --$i) {
-                $this->loadResourcesFromTheme($cacheKey, $this->defaultThemes[$i]);
-                // CONTINUE LOADING (see doc comment)
+            if (!isset($this->useDefaultThemes[$cacheKey]) || $this->useDefaultThemes[$cacheKey]) {
+                for ($i = count($this->defaultThemes) - 1; $i >= 0; --$i) {
+                    $this->loadResourcesFromTheme($cacheKey, $this->defaultThemes[$i]);
+                    // CONTINUE LOADING (see doc comment)
+                }
             }
         }
 

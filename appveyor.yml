@@ -22,6 +22,7 @@ install:
     - 7z x php_apcu-5.1.8-7.1-ts-vc14-x86.zip -y >nul
     - cd ..
     - copy /Y php.ini-development php.ini-min
+    - echo memory_limit=-1 >> php.ini-min
     - echo serialize_precision=14 >> php.ini-min
     - echo max_execution_time=1200 >> php.ini-min
     - echo date.timezone="America/Los_Angeles" >> php.ini-min
@@ -44,7 +45,7 @@ install:
     - copy /Y .composer\* %APPDATA%\Composer\
     - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
-    - php composer.phar update --no-progress --no-suggest --ansi
+    - php -dmemory_limit=-1 composer.phar update --no-progress --no-suggest --ansi
     - php phpunit install
 
 test_script:

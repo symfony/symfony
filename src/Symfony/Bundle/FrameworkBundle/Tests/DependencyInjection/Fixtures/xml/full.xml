@@ -14,7 +14,7 @@
         <framework:esi enabled="true" />
         <framework:ssi enabled="true" />
         <framework:profiler only-exceptions="true" enabled="false" />
-        <framework:router resource="%kernel.root_dir%/config/routing.xml" type="xml" />
+        <framework:router resource="%kernel.project_dir%/config/routing.xml" type="xml" />
         <framework:session gc-maxlifetime="90000" gc-probability="1" gc-divisor="108" storage-id="session.storage.native" handler-id="session.handler.native_file" name="_SYMFONY" cookie-lifetime="86400" cookie-path="/" cookie-domain="example.com" cookie-secure="true" cookie-httponly="false" use-cookies="true" save-path="/path/to/sessions" />
         <framework:request>
             <framework:format name="csv">
@@ -37,7 +37,7 @@
         </framework:templating>
         <framework:assets version="v1" />
         <framework:translator enabled="true" fallback="fr" logging="true">
-            <framework:path>%kernel.root_dir%/Fixtures/translations</framework:path>
+            <framework:path>%kernel.project_dir%/Fixtures/translations</framework:path>
         </framework:translator>
         <framework:validation enabled="true" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />

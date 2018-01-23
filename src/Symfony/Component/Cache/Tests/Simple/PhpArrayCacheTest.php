@@ -44,6 +44,7 @@ class PhpArrayCacheTest extends CacheTestCase
         'testSetValidData' => 'PhpArrayCache does no validation',
 
         'testDefaultLifeTime' => 'PhpArrayCache does not allow configuring a default lifetime.',
+        'testPrune' => 'PhpArrayCache just proxies',
     );
 
     protected static $file;

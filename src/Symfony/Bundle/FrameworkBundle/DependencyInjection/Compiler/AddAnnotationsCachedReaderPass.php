@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @internal
@@ -29,14 +28,14 @@ class AddAnnotationsCachedReaderPass implements CompilerPassInterface
         // "annotation_reader" at build time don't get any cache
         if ($container->hasDefinition('annotations.cached_reader')) {
             $reader = $container->getDefinition('annotations.cached_reader');
-            $tags = $reader->getTags();
+            $properties = $reader->getProperties();
 
-            if (isset($tags['annotations.cached_reader'][0]['provider'])) {
-                if ($container->hasAlias($provider = $tags['annotations.cached_reader'][0]['provider'])) {
-                    $provider = (string) $container->getAlias($provider);
-                }
+            if (isset($properties['cacheProviderBackup'])) {
+                $provider = $properties['cacheProviderBackup']->getValues()[0];
+                unset($properties['cacheProviderBackup']);
+                $reader->setProperties($properties);
                 $container->set('annotations.cached_reader', null);
-                $container->setDefinition('annotations.cached_reader', $reader->replaceArgument(1, new Reference($provider)));
+                $container->setDefinition('annotations.cached_reader', $reader->replaceArgument(1, $provider));
             }
         }
     }

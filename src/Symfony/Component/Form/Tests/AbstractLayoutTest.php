@@ -58,7 +58,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function assertMatchesXpath($html, $expression, $count = 1)
     {
-        $dom = new \DomDocument('UTF-8');
+        $dom = new \DOMDocument('UTF-8');
         try {
             // Wrap in <root> node so we can load HTML with multiple tags at
             // the top level
@@ -125,7 +125,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     abstract protected function renderEnd(FormView $view, array $vars = array());
 
-    abstract protected function setTheme(FormView $view, array $themes);
+    abstract protected function setTheme(FormView $view, array $themes, $useDefaultThemes = true);
 
     public function testLabel()
     {
@@ -2462,5 +2462,33 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertMatchesXpath($html, '/form//input[@title="Foo"]');
         $this->assertMatchesXpath($html, '/form//input[@placeholder="Bar"]');
+    }
+
+    public function testTel()
+    {
+        $tel = '0102030405';
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TelType', $tel);
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/input
+    [@type="tel"]
+    [@name="name"]
+    [@value="0102030405"]
+'
+        );
+    }
+
+    public function testColor()
+    {
+        $color = '#0000ff';
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ColorType', $color);
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/input
+    [@type="color"]
+    [@name="name"]
+    [@value="#0000ff"]
+'
+        );
     }
 }

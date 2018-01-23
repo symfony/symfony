@@ -47,8 +47,6 @@ class ConsoleFormatter implements FormatterInterface
     private $dumper;
 
     /**
-     * Constructor.
-     *
      * Available options:
      *   * format: The format of the outputted log string. The following placeholders are supported: %datetime%, %start_tag%, %level_name%, %end_tag%, %channel%, %message%, %context%, %extra%;
      *   * date_format: The format of the outputted date string;
@@ -103,12 +101,20 @@ class ConsoleFormatter implements FormatterInterface
         $levelColor = self::$levelColorMap[$record['level']];
 
         if ($this->options['multiline']) {
-            $context = $extra = "\n";
+            $separator = "\n";
         } else {
-            $context = $extra = ' ';
+            $separator = ' ';
         }
-        $context .= $this->dumpData($record['context']);
-        $extra .= $this->dumpData($record['extra']);
+
+        $context = $this->dumpData($record['context']);
+        if ($context) {
+            $context = $separator.$context;
+        }
+
+        $extra = $this->dumpData($record['extra']);
+        if ($extra) {
+            $extra = $separator.$extra;
+        }
 
         $formatted = strtr($this->options['format'], array(
             '%datetime%' => $record['datetime']->format($this->options['date_format']),

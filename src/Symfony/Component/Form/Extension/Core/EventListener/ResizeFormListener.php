@@ -24,36 +24,21 @@ use Symfony\Component\Form\FormInterface;
  */
 class ResizeFormListener implements EventSubscriberInterface
 {
-    /**
-     * @var string
-     */
     protected $type;
-
-    /**
-     * @var array
-     */
     protected $options;
-
-    /**
-     * Whether children could be added to the group.
-     *
-     * @var bool
-     */
     protected $allowAdd;
-
-    /**
-     * Whether children could be removed from the group.
-     *
-     * @var bool
-     */
     protected $allowDelete;
 
-    /**
-     * @var bool|callable
-     */
     private $deleteEmpty;
 
-    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
+    /**
+     * @param string        $type
+     * @param array         $options
+     * @param bool          $allowAdd    Whether children could be added to the group
+     * @param bool          $allowDelete Whether children could be removed from the group
+     * @param bool|callable $deleteEmpty
+     */
+    public function __construct(string $type, array $options = array(), bool $allowAdd = false, bool $allowDelete = false, $deleteEmpty = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
@@ -145,12 +130,12 @@ class ResizeFormListener implements EventSubscriberInterface
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
-        if ($entryFilter = $this->deleteEmpty) {
+        if ($this->deleteEmpty) {
             $previousData = $form->getData();
             /** @var FormInterface $child */
             foreach ($form as $name => $child) {
                 $isNew = !isset($previousData[$name]);
-                $isEmpty = is_callable($entryFilter) ? $entryFilter($child->getData()) : $child->isEmpty();
+                $isEmpty = is_callable($this->deleteEmpty) ? call_user_func($this->deleteEmpty, $child->getData()) : $child->isEmpty();
 
                 // $isNew can only be true if allowAdd is true, so we don't
                 // need to check allowAdd again

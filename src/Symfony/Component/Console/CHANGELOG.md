@@ -14,6 +14,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * added `SHELL_VERBOSITY` env var to control verbosity
  * added `CommandLoaderInterface`, `FactoryCommandLoader` and PSR-11
    `ContainerCommandLoader` for commands lazy-loading
  * added a case-insensitive command name matching fallback

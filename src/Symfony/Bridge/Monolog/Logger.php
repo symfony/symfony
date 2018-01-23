@@ -46,6 +46,16 @@ class Logger extends BaseLogger implements DebugLoggerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        if ($logger = $this->getDebugLogger()) {
+            $logger->clear();
+        }
+    }
+
+    /**
      * Returns a DebugLoggerInterface instance if one is registered with this logger.
      *
      * @return DebugLoggerInterface|null A DebugLoggerInterface instance or null if none is registered

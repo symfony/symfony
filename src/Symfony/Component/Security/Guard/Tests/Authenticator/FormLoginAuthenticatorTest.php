@@ -104,6 +104,11 @@ class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     private $loginUrl;
     private $defaultSuccessRedirectUrl;
 
+    public function supports(Request $request)
+    {
+        return true;
+    }
+
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
     }

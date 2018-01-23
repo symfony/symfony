@@ -30,10 +30,6 @@ abstract class FileLoader extends BaseFileLoader
     protected $isLoadingInstanceof = false;
     protected $instanceof = array();
 
-    /**
-     * @param ContainerBuilder     $container A ContainerBuilder instance
-     * @param FileLocatorInterface $locator   A FileLocator instance
-     */
     public function __construct(ContainerBuilder $container, FileLocatorInterface $locator)
     {
         $this->container = $container;
@@ -60,10 +56,25 @@ abstract class FileLoader extends BaseFileLoader
 
         $classes = $this->findClasses($namespace, $resource, $exclude);
         // prepare for deep cloning
-        $prototype = serialize($prototype);
+        $serializedPrototype = serialize($prototype);
+        $interfaces = array();
+        $singlyImplemented = array();
 
         foreach ($classes as $class) {
-            $this->setDefinition($class, unserialize($prototype));
+            if (interface_exists($class, false)) {
+                $interfaces[] = $class;
+            } else {
+                $this->setDefinition($class, unserialize($serializedPrototype));
+                foreach (class_implements($class, false) as $interface) {
+                    $singlyImplemented[$interface] = isset($singlyImplemented[$interface]) ? false : $class;
+                }
+            }
+        }
+        foreach ($interfaces as $interface) {
+            if (!empty($singlyImplemented[$interface])) {
+                $this->container->setAlias($interface, $singlyImplemented[$interface])
+                    ->setPublic(false);
+            }
         }
     }
 
@@ -133,7 +144,7 @@ abstract class FileLoader extends BaseFileLoader
                 throw new InvalidArgumentException(sprintf('Expected to find class "%s" in file "%s" while importing services from resource "%s", but it was not found! Check the namespace prefix used with the resource.', $class, $path, $pattern));
             }
 
-            if ($r->isInstantiable()) {
+            if ($r->isInstantiable() || $r->isInterface()) {
                 $classes[] = $class;
             }
         }

@@ -21,8 +21,6 @@ final class SecurityEvents
      *   - authentication using a HTTP basic or HTTP digest header.
      *
      * @Event("Symfony\Component\Security\Http\Event\InteractiveLoginEvent")
-     *
-     * @var string
      */
     const INTERACTIVE_LOGIN = 'security.interactive_login';
 
@@ -31,8 +29,6 @@ final class SecurityEvents
      * before exit from an already switched user.
      *
      * @Event("Symfony\Component\Security\Http\Event\SwitchUserEvent")
-     *
-     * @var string
      */
     const SWITCH_USER = 'security.switch_user';
 }

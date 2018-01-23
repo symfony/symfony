@@ -49,7 +49,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  * either as "Y-m-d" string or as timestamp. Internally we still want to
  * use a DateTime object for processing. To convert the data from string/integer
  * to DateTime you can set a normalization transformer by calling
- * addNormTransformer(). The normalized data is then converted to the displayed
+ * addModelTransformer(). The normalized data is then converted to the displayed
  * data as described before.
  *
  * The conversions (1) -> (2) -> (3) use the transform methods of the transformers.
@@ -160,8 +160,6 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Creates a new form based on the given configuration.
-     *
-     * @param FormConfigInterface $config The form configuration
      *
      * @throws LogicException if a data mapper is not provided for a compound form
      */

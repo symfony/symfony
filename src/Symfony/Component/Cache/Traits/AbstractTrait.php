@@ -190,6 +190,17 @@ trait AbstractTrait
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        if ($this->deferred) {
+            $this->commit();
+        }
+        $this->namespaceVersion = '';
+    }
+
+    /**
      * Like the native unserialize() function but throws an exception if anything goes wrong.
      *
      * @param string $value

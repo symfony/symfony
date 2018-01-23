@@ -411,7 +411,7 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
      */
     public function testUploadedFileError($error, $message, array $params = array(), $maxSize = null)
     {
-        $file = new UploadedFile('/path/to/file', 'originalName', 'mime', 0, $error);
+        $file = new UploadedFile('/path/to/file', 'originalName', 'mime', null, $error);
 
         $constraint = new File(array(
             $message => 'myMessage',

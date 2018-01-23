@@ -103,10 +103,10 @@ class LockTest extends TestCase
         $lock = new Lock($key, $store, 10);
 
         $store
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('exists')
             ->with($key)
-            ->willReturn(true);
+            ->will($this->onConsecutiveCalls(true, false));
 
         $this->assertTrue($lock->isAcquired());
     }
@@ -129,6 +129,44 @@ class LockTest extends TestCase
             ->willReturn(false);
 
         $lock->release();
+    }
+
+    public function testReleaseOnDestruction()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $lock = new Lock($key, $store, 10);
+
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(array(true, false))
+        ;
+        $store
+            ->expects($this->once())
+            ->method('delete')
+        ;
+
+        $lock->acquire(false);
+        unset($lock);
+    }
+
+    public function testNoAutoReleaseWhenNotConfigured()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $lock = new Lock($key, $store, 10, false);
+
+        $store
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(array(true, false))
+        ;
+        $store
+            ->expects($this->never())
+            ->method('delete')
+        ;
+
+        $lock->acquire(false);
+        unset($lock);
     }
 
     /**

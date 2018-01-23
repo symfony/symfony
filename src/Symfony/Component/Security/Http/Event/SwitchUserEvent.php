@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Event;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -24,11 +25,13 @@ class SwitchUserEvent extends Event
 {
     private $request;
     private $targetUser;
+    private $token;
 
-    public function __construct(Request $request, UserInterface $targetUser)
+    public function __construct(Request $request, UserInterface $targetUser, TokenInterface $token = null)
     {
         $this->request = $request;
         $this->targetUser = $targetUser;
+        $this->token = $token;
     }
 
     /**
@@ -45,5 +48,18 @@ class SwitchUserEvent extends Event
     public function getTargetUser()
     {
         return $this->targetUser;
+    }
+
+    /**
+     * @return TokenInterface|null
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    public function setToken(TokenInterface $token)
+    {
+        $this->token = $token;
     }
 }

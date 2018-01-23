@@ -33,15 +33,9 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     private $providerKey;
 
     /**
-     * Constructor.
-     *
-     * @param UserCheckerInterface $userChecker                An UserCheckerInterface interface
-     * @param string               $providerKey                A provider key
-     * @param bool                 $hideUserNotFoundExceptions Whether to hide user not found exception or not
-     *
      * @throws \InvalidArgumentException
      */
-    public function __construct(UserCheckerInterface $userChecker, $providerKey, $hideUserNotFoundExceptions = true)
+    public function __construct(UserCheckerInterface $userChecker, string $providerKey, bool $hideUserNotFoundExceptions = true)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -58,7 +52,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     public function authenticate(TokenInterface $token)
     {
         if (!$this->supports($token)) {
-            return;
+            throw new AuthenticationException('The token is not supported by this authentication provider.');
         }
 
         $username = $token->getUsername();
@@ -110,9 +104,6 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     /**
      * Retrieves roles from user and appends SwitchUserRole if original token contained one.
      *
-     * @param UserInterface  $user  The user
-     * @param TokenInterface $token The token
-     *
      * @return array The user roles
      */
     private function getRoles(UserInterface $user, TokenInterface $token)
@@ -145,9 +136,6 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     /**
      * Does additional checks on the user and token (like validating the
      * credentials).
-     *
-     * @param UserInterface         $user  The retrieved UserInterface instance
-     * @param UsernamePasswordToken $token The UsernamePasswordToken token to be authenticated
      *
      * @throws AuthenticationException if the credentials could not be validated
      */

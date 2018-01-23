@@ -24,9 +24,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
     use ClassResolverTrait;
 
-    /**
-     * @var LoaderInterface
-     */
     private $loader;
 
     /**
@@ -34,9 +31,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     private $loadedClasses;
 
-    /**
-     * @param LoaderInterface $loader
-     */
     public function __construct(LoaderInterface $loader)
     {
         $this->loader = $loader;

@@ -1,7 +1,7 @@
 <comment>Usage:</comment>
-  descriptor:command2 [options] [--] <argument_name>
-  descriptor:command2 -o|--option_name <argument_name>
-  descriptor:command2 <argument_name>
+  descriptor:command2 [options] [--] \<argument_name>
+  descriptor:command2 -o|--option_name \<argument_name>
+  descriptor:command2 \<argument_name>
 
 <comment>Arguments:</comment>
   <info>argument_name</info>      

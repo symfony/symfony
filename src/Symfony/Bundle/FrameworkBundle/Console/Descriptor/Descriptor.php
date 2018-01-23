@@ -102,33 +102,21 @@ abstract class Descriptor implements DescriptorInterface
 
     /**
      * Describes an InputArgument instance.
-     *
-     * @param RouteCollection $routes
-     * @param array           $options
      */
     abstract protected function describeRouteCollection(RouteCollection $routes, array $options = array());
 
     /**
      * Describes an InputOption instance.
-     *
-     * @param Route $route
-     * @param array $options
      */
     abstract protected function describeRoute(Route $route, array $options = array());
 
     /**
      * Describes container parameters.
-     *
-     * @param ParameterBag $parameters
-     * @param array        $options
      */
     abstract protected function describeContainerParameters(ParameterBag $parameters, array $options = array());
 
     /**
      * Describes container tags.
-     *
-     * @param ContainerBuilder $builder
-     * @param array            $options
      */
     abstract protected function describeContainerTags(ContainerBuilder $builder, array $options = array());
 
@@ -149,34 +137,21 @@ abstract class Descriptor implements DescriptorInterface
      *
      * Common options are:
      * * tag: filters described services by given tag
-     *
-     * @param ContainerBuilder $builder
-     * @param array            $options
      */
     abstract protected function describeContainerServices(ContainerBuilder $builder, array $options = array());
 
     /**
      * Describes a service definition.
-     *
-     * @param Definition $definition
-     * @param array      $options
      */
     abstract protected function describeContainerDefinition(Definition $definition, array $options = array());
 
     /**
      * Describes a service alias.
-     *
-     * @param Alias                 $alias
-     * @param array                 $options
-     * @param ContainerBuilder|null $builder
      */
     abstract protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null);
 
     /**
      * Describes a container parameter.
-     *
-     * @param string $parameter
-     * @param array  $options
      */
     abstract protected function describeContainerParameter($parameter, array $options = array());
 
@@ -185,9 +160,6 @@ abstract class Descriptor implements DescriptorInterface
      *
      * Common options are:
      * * name: name of listened event
-     *
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param array                    $options
      */
     abstract protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array());
 

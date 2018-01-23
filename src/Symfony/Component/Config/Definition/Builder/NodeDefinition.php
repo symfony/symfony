@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 
@@ -33,20 +34,11 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $nullEquivalent;
     protected $trueEquivalent = true;
     protected $falseEquivalent = false;
-
-    /**
-     * @var NodeParentInterface|null
-     */
+    protected $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR;
     protected $parent;
     protected $attributes = array();
 
-    /**
-     * Constructor.
-     *
-     * @param string                   $name   The name of the node
-     * @param NodeParentInterface|null $parent The parent
-     */
-    public function __construct($name, NodeParentInterface $parent = null)
+    public function __construct(?string $name, NodeParentInterface $parent = null)
     {
         $this->parent = $parent;
         $this->name = $name;
@@ -54,8 +46,6 @@ abstract class NodeDefinition implements NodeParentInterface
 
     /**
      * Sets the parent node.
-     *
-     * @param NodeParentInterface $parent The parent
      *
      * @return $this
      */
@@ -358,4 +348,28 @@ abstract class NodeDefinition implements NodeParentInterface
      * @throws InvalidDefinitionException When the definition is invalid
      */
     abstract protected function createNode();
+
+    /**
+     * Set PathSeparator to use.
+     *
+     * @param string $separator
+     *
+     * @return $this
+     */
+    public function setPathSeparator(string $separator)
+    {
+        if ($this instanceof ParentNodeDefinitionInterface) {
+            if (method_exists($this, 'getChildNodeDefinitions')) {
+                foreach ($this->getChildNodeDefinitions() as $child) {
+                    $child->setPathSeparator($separator);
+                }
+            } else {
+                @trigger_error('Passing a ParentNodeDefinitionInterface without getChildNodeDefinitions() is deprecated since version 4.1 and will be removed in 5.0.', E_USER_DEPRECATED);
+            }
+        }
+
+        $this->pathSeparator = $separator;
+
+        return $this;
+    }
 }

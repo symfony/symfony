@@ -30,12 +30,10 @@ class CacheLoader extends Loader
     protected $dir;
 
     /**
-     * Constructor.
-     *
      * @param LoaderInterface $loader A Loader instance
      * @param string          $dir    The directory where to store the cache files
      */
-    public function __construct(LoaderInterface $loader, $dir)
+    public function __construct(LoaderInterface $loader, string $dir)
     {
         $this->loader = $loader;
         $this->dir = $dir;
@@ -43,8 +41,6 @@ class CacheLoader extends Loader
 
     /**
      * Loads a template.
-     *
-     * @param TemplateReferenceInterface $template A template
      *
      * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
      */

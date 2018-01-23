@@ -25,7 +25,7 @@ class FileLoaderLoadException extends \Exception
      * @param \Exception $previous       A previous exception
      * @param string     $type           The type of resource
      */
-    public function __construct($resource, $sourceResource = null, $code = null, $previous = null, $type = null)
+    public function __construct(string $resource, string $sourceResource = null, int $code = null, \Exception $previous = null, string $type = null)
     {
         $message = '';
         if ($previous) {
@@ -64,7 +64,7 @@ class FileLoaderLoadException extends \Exception
         } elseif (null !== $type) {
             // maybe there is no loader for this specific type
             if ('annotation' === $type) {
-                $message .= ' Make sure annotations are enabled.';
+                $message .= ' Make sure annotations are installed and enabled.';
             } else {
                 $message .= sprintf(' Make sure there is a loader supporting the "%s" type.', $type);
             }

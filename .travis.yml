@@ -16,15 +16,16 @@ addons:
 env:
     global:
         - MIN_PHP=7.1.3
-        - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/versions/7.1/bin/php
+        - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/shims/php
 
 matrix:
     include:
         - php: 7.1.3
         - php: 7.1
           env: deps=high
-        - php: 7.1
+        - php: 7.2
           env: deps=low
+
     fast_finish: true
 
 cache:

@@ -44,3 +44,7 @@ fragment_home:
 fragment_inlined:
     path:     /fragment_inlined
     defaults: { _controller: TestBundle:Fragment:inlined }
+
+array_controller:
+    path:     /array_controller
+    defaults: { _controller: [ArrayController, someAction] }

@@ -22,8 +22,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
     protected $cacheControl = array();
 
     /**
-     * Constructor.
-     *
      * @param array $headers An array of HTTP headers
      */
     public function __construct(array $headers = array())
@@ -48,7 +46,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         $max = max(array_map('strlen', array_keys($headers))) + 1;
         $content = '';
         foreach ($headers as $name => $values) {
-            $name = implode('-', array_map('ucfirst', explode('-', $name)));
+            $name = ucwords($name, '-');
             foreach ($values as $value) {
                 $content .= sprintf("%-{$max}s %s\r\n", $name.':', $value);
             }
@@ -103,11 +101,11 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Returns a header value by name.
      *
-     * @param string $key     The header name
-     * @param mixed  $default The default value
-     * @param bool   $first   Whether to return the first value or all header values
+     * @param string          $key     The header name
+     * @param string|string[] $default The default value
+     * @param bool            $first   Whether to return the first value or all header values
      *
-     * @return string|array The first header value if $first is true, an array of values otherwise
+     * @return string|string[] The first header value or default value if $first is true, an array of values otherwise
      */
     public function get($key, $default = null, $first = true)
     {
@@ -123,7 +121,7 @@ class HeaderBag implements \IteratorAggregate, \Countable
         }
 
         if ($first) {
-            return count($headers[$key]) ? $headers[$key][0] : $default;
+            return \count($headers[$key]) ? $headers[$key][0] : $default;
         }
 
         return $headers[$key];
@@ -132,24 +130,32 @@ class HeaderBag implements \IteratorAggregate, \Countable
     /**
      * Sets a header by name.
      *
-     * @param string       $key     The key
-     * @param string|array $values  The value or an array of values
-     * @param bool         $replace Whether to replace the actual value or not (true by default)
+     * @param string          $key     The key
+     * @param string|string[] $values  The value or an array of values
+     * @param bool            $replace Whether to replace the actual value or not (true by default)
      */
     public function set($key, $values, $replace = true)
     {
         $key = str_replace('_', '-', strtolower($key));
 
-        $values = array_values((array) $values);
+        if (\is_array($values)) {
+            $values = array_values($values);
 
-        if (true === $replace || !isset($this->headers[$key])) {
-            $this->headers[$key] = $values;
+            if (true === $replace || !isset($this->headers[$key])) {
+                $this->headers[$key] = $values;
+            } else {
+                $this->headers[$key] = array_merge($this->headers[$key], $values);
+            }
         } else {
-            $this->headers[$key] = array_merge($this->headers[$key], $values);
+            if (true === $replace || !isset($this->headers[$key])) {
+                $this->headers[$key] = array($values);
+            } else {
+                $this->headers[$key][] = $values;
+            }
         }
 
         if ('cache-control' === $key) {
-            $this->cacheControl = $this->parseCacheControl($values[0]);
+            $this->cacheControl = $this->parseCacheControl(implode(', ', $this->headers[$key]));
         }
     }
 

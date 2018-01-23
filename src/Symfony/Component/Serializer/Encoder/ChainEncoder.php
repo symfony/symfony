@@ -80,14 +80,9 @@ class ChainEncoder implements ContextAwareEncoderInterface
     /**
      * Gets the encoder supporting the format.
      *
-     * @param string $format
-     * @param array  $context
-     *
-     * @return EncoderInterface
-     *
      * @throws RuntimeException if no encoder is found
      */
-    private function getEncoder($format, array $context)
+    private function getEncoder(string $format, array $context): EncoderInterface
     {
         if (isset($this->encoderByFormat[$format])
             && isset($this->encoders[$this->encoderByFormat[$format]])

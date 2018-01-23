@@ -39,6 +39,7 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals($form, $node->getNode('form'));
         $this->assertEquals($resources, $node->getNode('resources'));
+        $this->assertFalse($node->getAttribute('only'));
     }
 
     public function testCompile()
@@ -60,7 +61,17 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"), true);',
+                $this->getVariableGetter('form')
+             ),
+            trim($compiler->compile($node)->getSource())
+        );
+
+        $node = new FormThemeNode($form, $resources, 0, null, true);
+
+        $this->assertEquals(
+            sprintf(
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"), false);',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -72,7 +83,17 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1");',
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", true);',
+                $this->getVariableGetter('form')
+             ),
+            trim($compiler->compile($node)->getSource())
+        );
+
+        $node = new FormThemeNode($form, $resources, 0, null, true);
+
+        $this->assertEquals(
+            sprintf(
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, "tpl1", false);',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -81,6 +102,6 @@ class FormThemeTest extends TestCase
 
     protected function getVariableGetter($name)
     {
-        return sprintf('($context["%s"] ?? null)', $name, $name);
+        return sprintf('($context["%s"] ?? null)', $name);
     }
 }

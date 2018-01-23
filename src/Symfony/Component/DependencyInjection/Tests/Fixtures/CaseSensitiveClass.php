@@ -13,4 +13,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 class CaseSensitiveClass
 {
+    public $identifier;
+
+    public function __construct($identifier = null)
+    {
+        $this->identifier = $identifier;
+    }
 }

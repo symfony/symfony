@@ -16,11 +16,12 @@ use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\AbstractTrait;
+use Symfony\Component\Cache\ResettableInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractCache implements CacheInterface, LoggerAwareInterface
+abstract class AbstractCache implements CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     use AbstractTrait {
         deleteItems as private;
@@ -30,13 +31,9 @@ abstract class AbstractCache implements CacheInterface, LoggerAwareInterface
 
     private $defaultLifetime;
 
-    /**
-     * @param string $namespace
-     * @param int    $defaultLifetime
-     */
-    protected function __construct($namespace = '', $defaultLifetime = 0)
+    protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
-        $this->defaultLifetime = max(0, (int) $defaultLifetime);
+        $this->defaultLifetime = max(0, $defaultLifetime);
         $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).':';
         if (null !== $this->maxIdLength && strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s")', $this->maxIdLength - 24, strlen($namespace), $namespace));

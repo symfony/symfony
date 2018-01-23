@@ -48,7 +48,7 @@ class Collection implements CollectionInterface
             return $count;
         }
 
-        throw new LdapException(sprintf('Error while retrieving entry count: %s', ldap_error($this->connection->getResource())));
+        throw new LdapException(sprintf('Error while retrieving entry count: %s.', ldap_error($this->connection->getResource())));
     }
 
     public function getIterator()
@@ -62,7 +62,7 @@ class Collection implements CollectionInterface
         }
 
         if (false === $current) {
-            throw new LdapException(sprintf('Could not rewind entries array: %s', ldap_error($con)));
+            throw new LdapException(sprintf('Could not rewind entries array: %s.', ldap_error($con)));
         }
 
         yield $this->getSingleEntry($con, $current);
@@ -105,7 +105,7 @@ class Collection implements CollectionInterface
         $attributes = ldap_get_attributes($con, $current);
 
         if (false === $attributes) {
-            throw new LdapException(sprintf('Could not fetch attributes: %s', ldap_error($con)));
+            throw new LdapException(sprintf('Could not fetch attributes: %s.', ldap_error($con)));
         }
 
         $attributes = $this->cleanupAttributes($attributes);
@@ -113,7 +113,7 @@ class Collection implements CollectionInterface
         $dn = ldap_get_dn($con, $current);
 
         if (false === $dn) {
-            throw new LdapException(sprintf('Could not fetch DN: %s', ldap_error($con)));
+            throw new LdapException(sprintf('Could not fetch DN: %s.', ldap_error($con)));
         }
 
         return new Entry($dn, $attributes);

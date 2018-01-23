@@ -16,6 +16,7 @@ use Symfony\Bridge\Twig\Extension\WorkflowExtension;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
+use Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
@@ -38,8 +39,11 @@ class WorkflowExtensionTest extends TestCase
         $workflow = new Workflow($definition);
 
         $registry = new Registry();
-        $registry->add($workflow, new ClassInstanceSupportStrategy(\stdClass::class));
-
+        $addWorkflow = method_exists($registry, 'addWorkflow') ? 'addWorkflow' : 'add';
+        $supportStrategy = class_exists(InstanceOfSupportStrategy::class)
+            ? new InstanceOfSupportStrategy(\stdClass::class)
+            : new ClassInstanceSupportStrategy(\stdClass::class);
+        $registry->$addWorkflow($workflow, $supportStrategy);
         $this->extension = new WorkflowExtension($registry);
     }
 

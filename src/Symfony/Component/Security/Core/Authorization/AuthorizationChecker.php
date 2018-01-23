@@ -30,15 +30,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     private $authenticationManager;
     private $alwaysAuthenticate;
 
-    /**
-     * Constructor.
-     *
-     * @param TokenStorageInterface          $tokenStorage
-     * @param AuthenticationManagerInterface $authenticationManager An AuthenticationManager instance
-     * @param AccessDecisionManagerInterface $accessDecisionManager An AccessDecisionManager instance
-     * @param bool                           $alwaysAuthenticate
-     */
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, $alwaysAuthenticate = false)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, bool $alwaysAuthenticate = false)
     {
         $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;

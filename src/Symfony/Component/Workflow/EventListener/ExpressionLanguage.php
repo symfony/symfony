@@ -12,6 +12,8 @@
 namespace Symfony\Component\Workflow\EventListener;
 
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage as BaseExpressionLanguage;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Workflow\Exception\RuntimeException;
 
 /**
  * Adds some function to the default Symfony Security ExpressionLanguage.
@@ -28,6 +30,18 @@ class ExpressionLanguage extends BaseExpressionLanguage
             return sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object);
         }, function (array $variables, $attributes, $object = null) {
             return $variables['auth_checker']->isGranted($attributes, $object);
+        });
+
+        $this->register('is_valid', function ($object = 'null', $groups = 'null') {
+            return sprintf('0 === count($validator->validate(%s, null, %s))', $object, $groups);
+        }, function (array $variables, $object = null, $groups = null) {
+            if (!$variables['validator'] instanceof ValidatorInterface) {
+                throw new RuntimeException('"is_valid" cannot be used as the Validator component is not installed.');
+            }
+
+            $errors = $variables['validator']->validate($object, null, $groups);
+
+            return 0 === count($errors);
         });
     }
 }

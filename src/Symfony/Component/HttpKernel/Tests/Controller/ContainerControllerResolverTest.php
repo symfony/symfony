@@ -13,6 +13,8 @@ namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
@@ -21,6 +23,10 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     public function testGetControllerService()
     {
         $container = $this->createMockContainer();
+        $container->expects($this->once())
+            ->method('has')
+            ->with('foo')
+            ->will($this->returnValue(true));
         $container->expects($this->once())
             ->method('get')
             ->with('foo')
@@ -88,6 +94,132 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertEquals($invokableController, $controller);
     }
 
+    public function testNonInstantiableController()
+    {
+        $container = $this->createMockContainer();
+        $container->expects($this->once())
+            ->method('has')
+            ->with(NonInstantiableController::class)
+            ->will($this->returnValue(false))
+        ;
+
+        $resolver = $this->createControllerResolver(null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', array(NonInstantiableController::class, 'action'));
+
+        $controller = $resolver->getController($request);
+
+        $this->assertSame(array(NonInstantiableController::class, 'action'), $controller);
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Controller "Symfony\Component\HttpKernel\Tests\Controller\ImpossibleConstructController" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?
+     */
+    public function testNonConstructController()
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $container->expects($this->at(0))
+            ->method('has')
+            ->with(ImpossibleConstructController::class)
+            ->will($this->returnValue(true))
+        ;
+
+        $container->expects($this->at(1))
+            ->method('has')
+            ->with(ImpossibleConstructController::class)
+            ->will($this->returnValue(false))
+        ;
+
+        $container->expects($this->atLeastOnce())
+            ->method('getRemovedIds')
+            ->with()
+            ->will($this->returnValue(array(ImpossibleConstructController::class => true)))
+        ;
+
+        $resolver = $this->createControllerResolver(null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', array(ImpossibleConstructController::class, 'action'));
+
+        $resolver->getController($request);
+    }
+
+    public function testNonInstantiableControllerWithCorrespondingService()
+    {
+        $service = new \stdClass();
+
+        $container = $this->createMockContainer();
+        $container->expects($this->atLeastOnce())
+            ->method('has')
+            ->with(NonInstantiableController::class)
+            ->will($this->returnValue(true))
+        ;
+        $container->expects($this->atLeastOnce())
+            ->method('get')
+            ->with(NonInstantiableController::class)
+            ->will($this->returnValue($service))
+        ;
+
+        $resolver = $this->createControllerResolver(null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', array(NonInstantiableController::class, 'action'));
+
+        $controller = $resolver->getController($request);
+
+        $this->assertSame(array($service, 'action'), $controller);
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?
+     */
+    public function testExceptionWhenUsingRemovedControllerService()
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $container->expects($this->at(0))
+            ->method('has')
+            ->with('app.my_controller')
+            ->will($this->returnValue(false))
+        ;
+
+        $container->expects($this->atLeastOnce())
+            ->method('getRemovedIds')
+            ->with()
+            ->will($this->returnValue(array('app.my_controller' => true)))
+        ;
+
+        $resolver = $this->createControllerResolver(null, $container);
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'app.my_controller');
+        $resolver->getController($request);
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Controller "app.my_controller" cannot be called without a method name. Did you forget an "__invoke" method?
+     */
+    public function testExceptionWhenUsingControllerWithoutAnInvokeMethod()
+    {
+        $container = $this->getMockBuilder(Container::class)->getMock();
+        $container->expects($this->once())
+            ->method('has')
+            ->with('app.my_controller')
+            ->will($this->returnValue(true))
+        ;
+        $container->expects($this->once())
+            ->method('get')
+            ->with('app.my_controller')
+            ->will($this->returnValue(new ImpossibleConstructController('toto', 'controller')))
+        ;
+
+        $resolver = $this->createControllerResolver(null, $container);
+
+        $request = Request::create('/');
+        $request->attributes->set('_controller', 'app.my_controller');
+        $resolver->getController($request);
+    }
+
     /**
      * @dataProvider getUndefinedControllers
      */
@@ -110,9 +242,9 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     public function getUndefinedControllers()
     {
         return array(
-            array('foo', \LogicException::class, '/Unable to parse the controller name "foo"\./'),
+            array('foo', \LogicException::class, '/Controller not found: service "foo" does not exist\./'),
             array('oof::bar', \InvalidArgumentException::class, '/Class "oof" does not exist\./'),
-            array('stdClass', \LogicException::class, '/Unable to parse the controller name "stdClass"\./'),
+            array('stdClass', \LogicException::class, '/Controller not found: service "stdClass" does not exist\./'),
             array(
                 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar',
                 \InvalidArgumentException::class,
@@ -143,6 +275,24 @@ class InvokableController
     }
 
     public function __invoke()
+    {
+    }
+}
+
+abstract class NonInstantiableController
+{
+    public static function action()
+    {
+    }
+}
+
+class ImpossibleConstructController
+{
+    public function __construct($toto, $controller)
+    {
+    }
+
+    public function action()
     {
     }
 }

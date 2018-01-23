@@ -38,34 +38,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     private $docBlocks = array();
 
-    /**
-     * @var DocBlockFactory
-     */
     private $docBlockFactory;
-
-    /**
-     * @var ContextFactory
-     */
     private $contextFactory;
-
-    /**
-     * @var PhpDocTypeHelper
-     */
     private $phpDocTypeHelper;
-
-    /**
-     * @var string[]
-     */
     private $mutatorPrefixes;
-
-    /**
-     * @var string[]
-     */
     private $accessorPrefixes;
-
-    /**
-     * @var string[]
-     */
     private $arrayMutatorPrefixes;
 
     /**
@@ -168,15 +145,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $types[0]));
     }
 
-    /**
-     * Gets the DocBlock for this property.
-     *
-     * @param string $class
-     * @param string $property
-     *
-     * @return array
-     */
-    private function getDocBlock($class, $property)
+    private function getDocBlock(string $class, string $property): array
     {
         $propertyHash = sprintf('%s::%s', $class, $property);
 
@@ -210,36 +179,19 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         return $this->docBlocks[$propertyHash] = $data;
     }
 
-    /**
-     * Gets the DocBlock from a property.
-     *
-     * @param string $class
-     * @param string $property
-     *
-     * @return DocBlock|null
-     */
-    private function getDocBlockFromProperty($class, $property)
+    private function getDocBlockFromProperty(string $class, string $property): ?DocBlock
     {
         // Use a ReflectionProperty instead of $class to get the parent class if applicable
         try {
             $reflectionProperty = new \ReflectionProperty($class, $property);
         } catch (\ReflectionException $e) {
-            return;
+            return null;
         }
 
         return $this->docBlockFactory->create($reflectionProperty, $this->contextFactory->createFromReflector($reflectionProperty));
     }
 
-    /**
-     * Gets DocBlock from accessor or mutator method.
-     *
-     * @param string $class
-     * @param string $ucFirstProperty
-     * @param int    $type
-     *
-     * @return array|null
-     */
-    private function getDocBlockFromMethod($class, $ucFirstProperty, $type)
+    private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type): ?array
     {
         $prefixes = self::ACCESSOR === $type ? $this->accessorPrefixes : $this->mutatorPrefixes;
         $prefix = null;
@@ -265,7 +217,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         if (!isset($reflectionMethod)) {
-            return;
+            return null;
         }
 
         return array($this->docBlockFactory->create($reflectionMethod, $this->contextFactory->createFromReflector($reflectionMethod)), $prefix);

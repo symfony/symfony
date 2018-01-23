@@ -271,6 +271,6 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     protected function getVariableGetter($name)
     {
-        return sprintf('($context["%s"] ?? null)', $name, $name);
+        return sprintf('($context["%s"] ?? null)', $name);
     }
 }

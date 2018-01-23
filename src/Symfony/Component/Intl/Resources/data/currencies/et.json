@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.22",
     "Names": {
         "ADP": [
             "ADP",
@@ -232,6 +232,10 @@
         "CLP": [
             "CLP",
             "Tšiili peeso"
+        ],
+        "CNH": [
+            "CNH",
+            "Hiina jüaan (välismaine turg)"
         ],
         "CNY": [
             "CN¥",
@@ -896,7 +900,7 @@
         ],
         "TWD": [
             "NT$",
-            "Taiwani dollar"
+            "uus Taiwani dollar"
         ],
         "TZS": [
             "TZS",

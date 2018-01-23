@@ -30,8 +30,6 @@ abstract class AbstractSurrogate implements SurrogateInterface
     );
 
     /**
-     * Constructor.
-     *
      * @param array $contentTypes An array of content-type that should be parsed for Surrogate information
      *                            (default: text/html, text/xml, application/xhtml+xml, and application/xml)
      */
@@ -115,8 +113,6 @@ abstract class AbstractSurrogate implements SurrogateInterface
 
     /**
      * Remove the Surrogate from the Surrogate-Control header.
-     *
-     * @param Response $response
      */
     protected function removeFromControl(Response $response)
     {

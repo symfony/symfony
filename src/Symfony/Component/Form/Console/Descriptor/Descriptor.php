@@ -14,12 +14,12 @@ namespace Symfony\Component\Form\Console\Descriptor;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Form\Extension\Core\CoreExtension;
-use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Util\OptionsResolverWrapper;
+use Symfony\Component\OptionsResolver\Debug\OptionsResolverIntrospector;
+use Symfony\Component\OptionsResolver\Exception\NoConfigurationException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -29,7 +29,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class Descriptor implements DescriptorInterface
 {
-    /** @var StyleInterface */
+    /** @var OutputStyle */
     protected $output;
     protected $type;
     protected $ownOptions = array();
@@ -45,7 +45,7 @@ abstract class Descriptor implements DescriptorInterface
      */
     public function describe(OutputInterface $output, $object, array $options = array())
     {
-        $this->output = $output instanceof StyleInterface ? $output : new SymfonyStyle(new ArrayInput(array()), $output);
+        $this->output = $output instanceof OutputStyle ? $output : new SymfonyStyle(new ArrayInput(array()), $output);
 
         switch (true) {
             case null === $object:
@@ -54,28 +54,19 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof ResolvedFormTypeInterface:
                 $this->describeResolvedFormType($object, $options);
                 break;
+            case $object instanceof OptionsResolver:
+                $this->describeOption($object, $options);
+                break;
             default:
                 throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
         }
     }
 
-    abstract protected function describeDefaults(array $options = array());
+    abstract protected function describeDefaults(array $options);
 
     abstract protected function describeResolvedFormType(ResolvedFormTypeInterface $resolvedFormType, array $options = array());
 
-    protected function getCoreTypes()
-    {
-        $coreExtension = new CoreExtension();
-        $coreExtensionRefObject = new \ReflectionObject($coreExtension);
-        $loadTypesRefMethod = $coreExtensionRefObject->getMethod('loadTypes');
-        $loadTypesRefMethod->setAccessible(true);
-        $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-
-        $coreTypes = array_map(function (FormTypeInterface $type) { return get_class($type); }, $coreTypes);
-        sort($coreTypes);
-
-        return $coreTypes;
-    }
+    abstract protected function describeOption(OptionsResolver $optionsResolver, array $options);
 
     protected function collectOptions(ResolvedFormTypeInterface $type)
     {
@@ -107,10 +98,37 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         $this->overriddenOptions = array_filter($this->overriddenOptions);
+        $this->parentOptions = array_filter($this->parentOptions);
+        $this->extensionOptions = array_filter($this->extensionOptions);
         $this->requiredOptions = $optionsResolver->getRequiredOptions();
 
         $this->parents = array_keys($this->parents);
         $this->extensions = array_keys($this->extensions);
+    }
+
+    protected function getOptionDefinition(OptionsResolver $optionsResolver, $option)
+    {
+        $definition = array('required' => $optionsResolver->isRequired($option));
+
+        $introspector = new OptionsResolverIntrospector($optionsResolver);
+
+        $map = array(
+            'default' => 'getDefault',
+            'lazy' => 'getLazyClosures',
+            'allowedTypes' => 'getAllowedTypes',
+            'allowedValues' => 'getAllowedValues',
+            'normalizer' => 'getNormalizer',
+        );
+
+        foreach ($map as $key => $method) {
+            try {
+                $definition[$key] = $introspector->{$method}($option);
+            } catch (NoConfigurationException $e) {
+                // noop
+            }
+        }
+
+        return $definition;
     }
 
     private function getParentOptionsResolver(ResolvedFormTypeInterface $type)

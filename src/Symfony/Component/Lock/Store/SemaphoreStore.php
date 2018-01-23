@@ -96,7 +96,7 @@ class SemaphoreStore implements StoreInterface
      */
     public function putOffExpiration(Key $key, $ttl)
     {
-        // do nothing, the flock locks forever.
+        // do nothing, the semaphore locks forever.
     }
 
     /**

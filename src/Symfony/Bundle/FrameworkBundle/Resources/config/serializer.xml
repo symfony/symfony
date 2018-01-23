@@ -24,12 +24,39 @@
 
         <service id="serializer.property_accessor" alias="property_accessor" />
 
+        <!-- Discriminator Map -->
+        <service id="serializer.mapping.class_discriminator_resolver" class="Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata">
+            <argument type="service" id="serializer.mapping.class_metadata_factory" />
+        </service>
+        <service id="Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface" alias="serializer.mapping.class_discriminator_resolver" />
+
         <!-- Normalizer -->
+        <service id="serializer.normalizer.dateinterval" class="Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-915" />
+        </service>
+
+        <service id="serializer.normalizer.data_uri" class="Symfony\Component\Serializer\Normalizer\DataUriNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-920" />
+        </service>
+
+        <service id="serializer.normalizer.datetime" class="Symfony\Component\Serializer\Normalizer\DateTimeNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-910" />
+        </service>
+
+        <service id="serializer.normalizer.json_serializable" class="Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer">
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-900" />
+        </service>
+
         <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
             <argument>null</argument> <!-- name converter -->
             <argument type="service" id="serializer.property_accessor" />
             <argument type="service" id="property_info" on-invalid="ignore" />
+            <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
 
             <!-- Run after all custom normalizers -->
             <tag name="serializer.normalizer" priority="-1000" />
@@ -52,6 +79,8 @@
             <argument>null</argument>
         </service>
 
+        <service id="Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface" alias="serializer.mapping.class_metadata_factory" />
+
         <!-- Cache -->
         <service id="serializer.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer">
             <argument type="collection" /><!-- Loaders injected by the extension -->
@@ -72,6 +101,14 @@
         </service>
 
         <service id="serializer.encoder.json" class="Symfony\Component\Serializer\Encoder\JsonEncoder">
+            <tag name="serializer.encoder" />
+        </service>
+
+        <service id="serializer.encoder.yaml" class="Symfony\Component\Serializer\Encoder\YamlEncoder">
+            <tag name="serializer.encoder" />
+        </service>
+
+        <service id="serializer.encoder.csv" class="Symfony\Component\Serializer\Encoder\CsvEncoder">
             <tag name="serializer.encoder" />
         </service>
 

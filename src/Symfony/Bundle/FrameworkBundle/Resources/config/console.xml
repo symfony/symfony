@@ -13,91 +13,99 @@
             <tag name="monolog.logger" channel="console" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\AboutCommand">
+        <service id="console.command.about" class="Symfony\Bundle\FrameworkBundle\Command\AboutCommand">
             <tag name="console.command" command="about" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand">
+        <service id="console.command.assets_install" class="Symfony\Bundle\FrameworkBundle\Command\AssetsInstallCommand">
             <argument type="service" id="filesystem" />
             <tag name="console.command" command="assets:install" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand">
+        <service id="console.command.cache_clear" class="Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand">
             <argument type="service" id="cache_clearer" />
             <argument type="service" id="filesystem" />
             <tag name="console.command" command="cache:clear" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand">
+        <service id="console.command.cache_pool_clear" class="Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand">
             <argument type="service" id="cache.global_clearer" />
             <tag name="console.command" command="cache:pool:clear" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand">
+        <service id="console.command.cache_pool_prune" class="Symfony\Bundle\FrameworkBundle\Command\CachePoolPruneCommand">
             <argument type="iterator" />
             <tag name="console.command" command="cache:pool:prune" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand">
+        <service id="console.command.cache_warmup" class="Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand">
             <argument type="service" id="cache_warmer" />
             <tag name="console.command" command="cache:warmup" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand">
+        <service id="console.command.config_debug" class="Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand">
             <tag name="console.command" command="debug:config" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand">
+        <service id="console.command.config_dump_reference" class="Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand">
             <tag name="console.command" command="config:dump-reference" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand">
+        <service id="console.command.container_debug" class="Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand">
             <tag name="console.command" command="debug:container" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand">
+        <service id="console.command.debug_autowiring" class="Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand">
+            <tag name="console.command" command="debug:autowiring" />
+        </service>
+
+        <service id="console.command.event_dispatcher_debug" class="Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand">
             <argument type="service" id="event_dispatcher" />
             <tag name="console.command" command="debug:event-dispatcher" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
+        <service id="console.command.router_debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
             <argument type="service" id="router" />
             <tag name="console.command" command="debug:router" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand">
+        <service id="console.command.router_match" class="Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand">
             <argument type="service" id="router" />
             <tag name="console.command" command="router:match" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand">
+        <service id="console.command.translation_debug" class="Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand">
             <argument type="service" id="translator" />
             <argument type="service" id="translation.reader" />
             <argument type="service" id="translation.extractor" />
+            <argument>%translator.default_path%</argument>
+            <argument /> <!-- %twig.default_path% -->
             <tag name="console.command" command="debug:translation" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand">
+        <service id="console.command.translation_update" class="Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand">
             <argument type="service" id="translation.writer" />
             <argument type="service" id="translation.reader" />
             <argument type="service" id="translation.extractor" />
             <argument>%kernel.default_locale%</argument>
+            <argument>%translator.default_path%</argument>
+            <argument /> <!-- %twig.default_path% -->
             <tag name="console.command" command="translation:update" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand">
+        <service id="console.command.workflow_dump" class="Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand">
             <tag name="console.command" command="workflow:dump" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\XliffLintCommand">
+        <service id="console.command.xliff_lint" class="Symfony\Bundle\FrameworkBundle\Command\XliffLintCommand">
             <tag name="console.command" command="lint:xliff" />
         </service>
 
-        <service id="Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand">
+        <service id="console.command.yaml_lint" class="Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand">
             <tag name="console.command" command="lint:yaml" />
         </service>
 
-        <service id="Symfony\Component\Form\Command\DebugCommand">
+        <service id="console.command.form_debug" class="Symfony\Component\Form\Command\DebugCommand">
             <argument type="service" id="form.registry" />
             <argument type="collection" /> <!-- All form types namespaces are stored here by FormPass -->
             <argument type="collection" /> <!-- All services form types are stored here by FormPass -->

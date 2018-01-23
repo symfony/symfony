@@ -206,6 +206,7 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="name" type="xsd:string" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
+    <xsd:attribute name="tag" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="bind" mixed="true">
@@ -230,6 +231,7 @@
     <xsd:attribute name="key" type="xsd:string" />
     <xsd:attribute name="index" type="xsd:integer" />
     <xsd:attribute name="on-invalid" type="invalid_sequence" />
+    <xsd:attribute name="tag" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="call">
@@ -255,6 +257,7 @@
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="iterator" />
+      <xsd:enumeration value="tagged" />
     </xsd:restriction>
   </xsd:simpleType>
 

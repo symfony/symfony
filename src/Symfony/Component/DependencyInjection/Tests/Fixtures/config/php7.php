@@ -5,7 +5,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
 
 return function (ContainerConfigurator $c) {
-
     $c->parameters()
         ('foo', 'Foo')
         ('bar', 'Bar')
@@ -17,5 +16,4 @@ return function (ContainerConfigurator $c) {
         ('bar', Foo::class)
             ->call('setFoo')
     ;
-
 };

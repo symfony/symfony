@@ -36,7 +36,7 @@ class ExceptionHandler
     private $caughtLength;
     private $fileLinkFormat;
 
-    public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
+    public function __construct(bool $debug = true, string $charset = null, $fileLinkFormat = null)
     {
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
@@ -196,8 +196,6 @@ class ExceptionHandler
     /**
      * Gets the HTML content associated with the given exception.
      *
-     * @param FlattenException $exception A FlattenException instance
-     *
      * @return string The content as a string
      */
     public function getContent(FlattenException $exception)
@@ -275,8 +273,6 @@ EOF;
 
     /**
      * Gets the stylesheet associated with the given exception.
-     *
-     * @param FlattenException $exception A FlattenException instance
      *
      * @return string The stylesheet as a string
      */

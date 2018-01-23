@@ -85,7 +85,7 @@ class WorkflowExtension extends AbstractExtension
      * Returns marked places.
      *
      * @param object $subject        A subject
-     * @param string $placesNameOnly If true, returns only places name. If false returns the raw representation
+     * @param bool   $placesNameOnly If true, returns only places name. If false returns the raw representation
      * @param string $name           A workflow name
      *
      * @return string[]|int[]

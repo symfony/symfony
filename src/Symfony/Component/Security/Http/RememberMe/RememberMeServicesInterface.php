@@ -30,8 +30,6 @@ interface RememberMeServicesInterface
     /**
      * This attribute name can be used by the implementation if it needs to set
      * a cookie on the Request when there is no actual Response, yet.
-     *
-     * @var string
      */
     const COOKIE_ATTR_NAME = '_security_remember_me_cookie';
 
@@ -48,8 +46,6 @@ interface RememberMeServicesInterface
      * make sure to throw an AuthenticationException as this will consequentially
      * result in a call to loginFail() and therefore an invalidation of the cookie.
      *
-     * @param Request $request
-     *
      * @return TokenInterface
      */
     public function autoLogin(Request $request);
@@ -59,9 +55,6 @@ interface RememberMeServicesInterface
      * credentials supplied by the user were missing or otherwise invalid.
      *
      * This method needs to take care of invalidating the cookie.
-     *
-     * @param Request         $request
-     * @param \Exception|null $exception
      */
     public function loginFail(Request $request, \Exception $exception = null);
 
@@ -75,10 +68,6 @@ interface RememberMeServicesInterface
      * Instead, implementations should typically look for a request parameter
      * (such as a HTTP POST parameter) that indicates the browser has explicitly
      * requested for the authentication to be remembered.
-     *
-     * @param Request        $request
-     * @param Response       $response
-     * @param TokenInterface $token
      */
     public function loginSuccess(Request $request, Response $response, TokenInterface $token);
 }

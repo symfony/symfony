@@ -35,6 +35,29 @@ class Yaml
     const DUMP_EMPTY_ARRAY_AS_SEQUENCE = 1024;
 
     /**
+     * Parses a YAML file into a PHP value.
+     *
+     *  Usage:
+     *  <code>
+     *   $array = Yaml::parseFile('config.yml');
+     *   print_r($array);
+     *  </code>
+     *
+     * @param string $filename The path to the YAML file to be parsed
+     * @param int    $flags    A bit field of PARSE_* constants to customize the YAML parser behavior
+     *
+     * @return mixed The YAML converted to a PHP value
+     *
+     * @throws ParseException If the file could not be read or the YAML is not valid
+     */
+    public static function parseFile(string $filename, int $flags = 0)
+    {
+        $yaml = new Parser();
+
+        return $yaml->parseFile($filename, $flags);
+    }
+
+    /**
      * Parses YAML into a PHP value.
      *
      *  Usage:

@@ -30,8 +30,6 @@ abstract class AbstractToken implements TokenInterface
     private $attributes = array();
 
     /**
-     * Constructor.
-     *
      * @param (Role|string)[] $roles An array of roles
      *
      * @throws \InvalidArgumentException

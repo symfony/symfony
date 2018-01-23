@@ -38,11 +38,6 @@ class Packages
         }
     }
 
-    /**
-     * Sets the default package.
-     *
-     * @param PackageInterface $defaultPackage The default package
-     */
     public function setDefaultPackage(PackageInterface $defaultPackage)
     {
         $this->defaultPackage = $defaultPackage;

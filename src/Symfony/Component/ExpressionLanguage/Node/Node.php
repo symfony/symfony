@@ -24,8 +24,6 @@ class Node
     public $attributes = array();
 
     /**
-     * Constructor.
-     *
      * @param array $nodes      An array of nodes
      * @param array $attributes An array of attributes
      */

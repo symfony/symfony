@@ -21,8 +21,6 @@ class PdoCache extends AbstractCache implements PruneableInterface
     protected $maxIdLength = 255;
 
     /**
-     * Constructor.
-     *
      * You can either pass an existing database connection as PDO instance or
      * a Doctrine DBAL Connection or a DSN string that will be used to
      * lazy-connect to the database when the cache is actually used.
@@ -37,16 +35,13 @@ class PdoCache extends AbstractCache implements PruneableInterface
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: array()]
      *
-     * @param \PDO|Connection|string $connOrDsn       A \PDO or Connection instance or DSN string or null
-     * @param string                 $namespace
-     * @param int                    $defaultLifetime
-     * @param array                  $options         An associative array of options
+     * @param \PDO|Connection|string $connOrDsn a \PDO or Connection instance or DSN string or null
      *
      * @throws InvalidArgumentException When first argument is not PDO nor Connection nor string
      * @throws InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
      * @throws InvalidArgumentException When namespace contains invalid characters
      */
-    public function __construct($connOrDsn, $namespace = '', $defaultLifetime = 0, array $options = array())
+    public function __construct($connOrDsn, string $namespace = '', int $defaultLifetime = 0, array $options = array())
     {
         $this->init($connOrDsn, $namespace, $defaultLifetime, $options);
     }

@@ -15,12 +15,13 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\ResettableInterface;
 use Symfony\Component\Cache\Traits\ArrayTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ArrayCache implements CacheInterface, LoggerAwareInterface
+class ArrayCache implements CacheInterface, LoggerAwareInterface, ResettableInterface
 {
     use ArrayTrait {
         ArrayTrait::deleteItem as delete;
@@ -33,9 +34,9 @@ class ArrayCache implements CacheInterface, LoggerAwareInterface
      * @param int  $defaultLifetime
      * @param bool $storeSerialized Disabling serialization can lead to cache corruptions when storing mutable values but increases performance otherwise
      */
-    public function __construct($defaultLifetime = 0, $storeSerialized = true)
+    public function __construct(int $defaultLifetime = 0, bool $storeSerialized = true)
     {
-        $this->defaultLifetime = (int) $defaultLifetime;
+        $this->defaultLifetime = $defaultLifetime;
         $this->storeSerialized = $storeSerialized;
     }
 

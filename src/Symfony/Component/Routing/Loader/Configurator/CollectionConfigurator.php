@@ -24,7 +24,7 @@ class CollectionConfigurator
 
     private $parent;
 
-    public function __construct(RouteCollection $parent, $name)
+    public function __construct(RouteCollection $parent, string $name)
     {
         $this->parent = $parent;
         $this->name = $name;
@@ -40,13 +40,8 @@ class CollectionConfigurator
 
     /**
      * Adds a route.
-     *
-     * @param string $name
-     * @param string $value
-     *
-     * @return RouteConfigurator
      */
-    final public function add($name, $path)
+    final public function add(string $name, string $path): RouteConfigurator
     {
         $this->collection->add($this->name.$name, $route = clone $this->route);
 
@@ -66,11 +61,9 @@ class CollectionConfigurator
     /**
      * Sets the prefix to add to the path of all child routes.
      *
-     * @param string $prefix
-     *
      * @return $this
      */
-    final public function prefix($prefix)
+    final public function prefix(string $prefix)
     {
         $this->route->setPath($prefix);
 

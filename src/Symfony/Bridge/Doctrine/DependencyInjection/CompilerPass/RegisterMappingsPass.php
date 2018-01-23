@@ -69,7 +69,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * only do anything if the parameter is present. (But regardless of the
      * value of that parameter.
      *
-     * @var string
+     * @var string|false
      */
     protected $enabledParameter;
 
@@ -97,8 +97,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     private $aliasMap;
 
     /**
-     * Constructor.
-     *
      * The $managerParameters is an ordered list of container parameters that could provide the
      * name of the manager to register these namespaces and alias on. The first non-empty name
      * is used, the others skipped.
@@ -115,11 +113,11 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *                                                      present to enable the mapping. Set to false
      *                                                      to not do any check, optional.
      * @param string               $configurationPattern    Pattern for the Configuration service name
-     * @param string               $registerAliasMethodName name of Configuration class method to
+     * @param string               $registerAliasMethodName Name of Configuration class method to
      *                                                      register alias
      * @param string[]             $aliasMap                Map of alias to namespace
      */
-    public function __construct($driver, array $namespaces, array $managerParameters, $driverPattern, $enabledParameter = false, $configurationPattern = '', $registerAliasMethodName = '', array $aliasMap = array())
+    public function __construct($driver, array $namespaces, array $managerParameters, string $driverPattern, $enabledParameter = false, string $configurationPattern = '', string $registerAliasMethodName = '', array $aliasMap = array())
     {
         $this->driver = $driver;
         $this->namespaces = $namespaces;
@@ -136,8 +134,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
 
     /**
      * Register mappings and alias with the metadata drivers.
-     *
-     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -169,8 +165,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * Get the service name of the metadata chain driver that the mappings
      * should be registered with.
      *
-     * @param ContainerBuilder $container
-     *
      * @return string The name of the chain driver service
      *
      * @throws InvalidArgumentException if non of the managerParameters has a
@@ -184,7 +178,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     /**
      * Create the service definition for the metadata driver.
      *
-     * @param ContainerBuilder $container passed on in case an extending class
+     * @param ContainerBuilder $container Passed on in case an extending class
      *                                    needs access to the container
      *
      * @return Definition|Reference the metadata driver to add to all chain drivers
@@ -196,8 +190,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
 
     /**
      * Get the service name from the pattern and the configured manager name.
-     *
-     * @param ContainerBuilder $container
      *
      * @return string a service definition name
      *
@@ -214,8 +206,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * The default implementation loops over the managerParameters and returns
      * the first non-empty parameter.
-     *
-     * @param ContainerBuilder $container
      *
      * @return string The name of the active manager
      *
@@ -244,8 +234,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * This default implementation checks if the class has the enabledParameter
      * configured and if so if that parameter is present in the container.
-     *
-     * @param ContainerBuilder $container
      *
      * @return bool whether this compiler pass really should register the mappings
      */

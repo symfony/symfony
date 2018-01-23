@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Deprecate the usage of `add(Workflow $workflow, $supportStrategy)` in `Workflow/Registry`, use `addWorkflow(WorkflowInterface, $supportStrategy)` instead.  
+ * Deprecate the usage of `SupportStrategyInterface`, use `WorkflowSupportStrategyInterface` instead.
+ * The `Workflow` class now implements `WorkflowInterface`.
+ * Deprecated the class `ClassInstanceSupportStrategy` in favor of the class `InstanceOfSupportStrategy`.
+
 4.0.0
 -----
 
@@ -9,6 +17,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Added guard `is_valid()` method support.
  * Added support for `Event::getWorkflowName()` for "announce" events.
  * Added `workflow.completed` events which are fired after a transition is completed.
 

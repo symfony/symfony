@@ -57,16 +57,24 @@ class PassConfig
             new CheckDefinitionValidityPass(),
             new RegisterServiceSubscribersPass(),
             new ResolveNamedArgumentsPass(),
+            new AutowireRequiredMethodsPass(),
             new ResolveBindingsPass(),
-            $autowirePass = new AutowirePass(false),
+            new AutowirePass(false),
+            new ResolveTaggedIteratorArgumentPass(),
             new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
             new CheckReferenceValidityPass(),
-            new CheckArgumentsValidityPass(),
+            new CheckArgumentsValidityPass(false),
         ));
+
+        $this->beforeRemovingPasses = array(
+            -100 => array(
+                new ResolvePrivatesPass(),
+            ),
+        );
 
         $this->removingPasses = array(array(
             new RemovePrivateAliasesPass(),
@@ -74,12 +82,13 @@ class PassConfig
             new RemoveAbstractDefinitionsPass(),
             new RepeatedPass(array(
                 new AnalyzeServiceReferencesPass(),
-                $inlinedServicePass = new InlineServiceDefinitionsPass(),
+                new InlineServiceDefinitionsPass(),
                 new AnalyzeServiceReferencesPass(),
                 new RemoveUnusedDefinitionsPass(),
             )),
-            new AutowireExceptionPass($autowirePass, $inlinedServicePass),
+            new DefinitionErrorExceptionPass(),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
+            new ResolveHotPathPass(),
         ));
     }
 
@@ -184,11 +193,6 @@ class PassConfig
         return $this->mergePass;
     }
 
-    /**
-     * Sets the Merge Pass.
-     *
-     * @param CompilerPassInterface $pass The merge pass
-     */
     public function setMergePass(CompilerPassInterface $pass)
     {
         $this->mergePass = $pass;

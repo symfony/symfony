@@ -50,6 +50,28 @@ class ValidatorDataCollectorTest extends TestCase
         $this->assertCount(2, $call['violations']);
     }
 
+    public function testReset()
+    {
+        $originalValidator = $this->createMock(ValidatorInterface::class);
+        $validator = new TraceableValidator($originalValidator);
+
+        $collector = new ValidatorDataCollector($validator);
+
+        $violations = new ConstraintViolationList(array(
+            $this->createMock(ConstraintViolation::class),
+            $this->createMock(ConstraintViolation::class),
+        ));
+        $originalValidator->method('validate')->willReturn($violations);
+
+        $validator->validate(new \stdClass());
+
+        $collector->lateCollect();
+        $collector->reset();
+
+        $this->assertCount(0, $collector->getCalls());
+        $this->assertSame(0, $collector->getViolationsCount());
+    }
+
     protected function createMock($classname)
     {
         return $this->getMockBuilder($classname)->disableOriginalConstructor()->getMock();

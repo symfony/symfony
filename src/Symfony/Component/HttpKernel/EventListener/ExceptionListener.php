@@ -13,7 +13,9 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -37,14 +39,19 @@ class ExceptionListener implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    public function onKernelException(GetResponseForExceptionEvent $event)
+    public function logKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
         $request = $event->getRequest();
 
         $this->logException($exception, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', get_class($exception), $exception->getMessage(), $exception->getFile(), $exception->getLine()));
+    }
 
-        $request = $this->duplicateRequest($exception, $request);
+    public function onKernelException(GetResponseForExceptionEvent $event)
+    {
+        $exception = $event->getException();
+        $request = $this->duplicateRequest($exception, $event->getRequest());
+        $eventDispatcher = func_num_args() > 2 ? func_get_arg(2) : null;
 
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
@@ -67,12 +74,23 @@ class ExceptionListener implements EventSubscriberInterface
         }
 
         $event->setResponse($response);
+
+        if ($eventDispatcher instanceof EventDispatcherInterface) {
+            $cspRemovalListener = function (FilterResponseEvent $event) use (&$cspRemovalListener, $eventDispatcher) {
+                $event->getResponse()->headers->remove('Content-Security-Policy');
+                $eventDispatcher->removeListener(KernelEvents::RESPONSE, $cspRemovalListener);
+            };
+            $eventDispatcher->addListener(KernelEvents::RESPONSE, $cspRemovalListener, -128);
+        }
     }
 
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::EXCEPTION => array('onKernelException', -128),
+            KernelEvents::EXCEPTION => array(
+                array('logKernelException', 2048),
+                array('onKernelException', -128),
+            ),
         );
     }
 

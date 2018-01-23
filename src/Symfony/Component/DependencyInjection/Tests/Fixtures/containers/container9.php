@@ -4,6 +4,7 @@ require_once __DIR__.'/../includes/classes.php';
 require_once __DIR__.'/../includes/foo.php';
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -47,8 +48,6 @@ $container->getParameterBag()->add(array(
     'foo_class' => 'Bar\FooClass',
     'foo' => 'bar',
 ));
-$container->setAlias('alias_for_foo', 'foo')->setPublic(true);
-$container->setAlias('alias_for_alias', 'alias_for_foo')->setPublic(true);
 $container
     ->register('method_call1', 'Bar\FooClass')
     ->setFile(realpath(__DIR__.'/../includes/foo.php'))
@@ -168,5 +167,17 @@ $container
 ;
 $container->register('bar2', 'stdClass')->setPublic(true);
 $container->register('BAR2', 'stdClass')->setPublic(true);
+$container
+    ->register('tagged_iterator_foo', 'Bar')
+    ->addTag('foo')
+    ->setPublic(false)
+;
+$container
+    ->register('tagged_iterator', 'Bar')
+    ->addArgument(new TaggedIteratorArgument('foo'))
+    ->setPublic(true)
+;
+$container->setAlias('alias_for_foo', 'foo')->setPublic(true);
+$container->setAlias('alias_for_alias', 'alias_for_foo')->setPublic(true);
 
 return $container;

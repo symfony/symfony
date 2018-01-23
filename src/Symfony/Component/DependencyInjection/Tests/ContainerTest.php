@@ -165,6 +165,36 @@ class ContainerTest extends TestCase
         $this->assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The "bar" service is already initialized, you cannot replace it.
+     */
+    public function testSetWithNullOnInitializedPredefinedService()
+    {
+        $sc = new Container();
+        $sc->set('foo', new \stdClass());
+        $sc->set('foo', null);
+        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+
+        $sc = new ProjectServiceContainer();
+        $sc->get('bar');
+        $sc->set('bar', null);
+        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
+    }
+
+    public function testSetWithNullOnUninitializedPredefinedService()
+    {
+        $sc = new Container();
+        $sc->set('foo', new \stdClass());
+        $sc->get('foo', null);
+        $sc->set('foo', null);
+        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+
+        $sc = new ProjectServiceContainer();
+        $sc->set('bar', null);
+        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
+    }
+
     public function testGet()
     {
         $sc = new ProjectServiceContainer();
@@ -231,7 +261,7 @@ class ContainerTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @expectedExceptionMessage You have requested a non-existent service "request".
+     * @expectedExceptionMessage The "request" service is synthetic, it needs to be set at boot time before it can be used.
      */
     public function testGetSyntheticServiceThrows()
     {
@@ -239,6 +269,18 @@ class ContainerTest extends TestCase
 
         $container = new \ProjectServiceContainer();
         $container->get('request');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage The "inlined" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.
+     */
+    public function testGetRemovedServiceThrows()
+    {
+        require_once __DIR__.'/Fixtures/php/services9_compiled.php';
+
+        $container = new \ProjectServiceContainer();
+        $container->get('inlined');
     }
 
     public function testHas()
@@ -362,16 +404,6 @@ class ContainerTest extends TestCase
         $c->get('internal_dependency');
         $c->get('internal');
     }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage You cannot set the pre-defined service "bar".
-     */
-    public function testReplacingAPreDefinedService()
-    {
-        $c = new ProjectServiceContainer();
-        $c->set('bar', new \stdClass());
-    }
 }
 
 class ProjectServiceContainer extends Container
@@ -380,6 +412,7 @@ class ProjectServiceContainer extends Container
     public $__foo_bar;
     public $__foo_baz;
     public $__internal;
+    protected $privates;
     protected $methodMap = array(
         'bar' => 'getBarService',
         'foo_bar' => 'getFooBarService',

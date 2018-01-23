@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -38,8 +39,6 @@ class YamlDumper extends Dumper
     /**
      * Dumps the service container as an YAML string.
      *
-     * @param array $options An array of options
-     *
      * @return string A YAML string representing of the service container
      */
     public function dump(array $options = array())
@@ -55,15 +54,7 @@ class YamlDumper extends Dumper
         return $this->container->resolveEnvPlaceholders($this->addParameters()."\n".$this->addServices());
     }
 
-    /**
-     * Adds a service.
-     *
-     * @param string     $id
-     * @param Definition $definition
-     *
-     * @return string
-     */
-    private function addService($id, $definition)
+    private function addService(string $id, Definition $definition): string
     {
         $code = "    $id:\n";
         if ($class = $definition->getClass()) {
@@ -160,15 +151,7 @@ class YamlDumper extends Dumper
         return $code;
     }
 
-    /**
-     * Adds a service alias.
-     *
-     * @param string $alias
-     * @param Alias  $id
-     *
-     * @return string
-     */
-    private function addServiceAlias($alias, $id)
+    private function addServiceAlias(string $alias, Alias $id): string
     {
         if ($id->isPrivate()) {
             return sprintf("    %s: '@%s'\n", $alias, $id);
@@ -177,12 +160,7 @@ class YamlDumper extends Dumper
         return sprintf("    %s:\n        alias: %s\n        public: %s\n", $alias, $id, $id->isPublic() ? 'true' : 'false');
     }
 
-    /**
-     * Adds services.
-     *
-     * @return string
-     */
-    private function addServices()
+    private function addServices(): string
     {
         if (!$this->container->getDefinitions()) {
             return '';
@@ -204,12 +182,7 @@ class YamlDumper extends Dumper
         return $code;
     }
 
-    /**
-     * Adds parameters.
-     *
-     * @return string
-     */
-    private function addParameters()
+    private function addParameters(): string
     {
         if (!$this->container->getParameterBag()->all()) {
             return '';
@@ -255,6 +228,9 @@ class YamlDumper extends Dumper
             $value = $value->getValues()[0];
         }
         if ($value instanceof ArgumentInterface) {
+            if ($value instanceof TaggedIteratorArgument) {
+                return new TaggedValue('tagged', $value->getTag());
+            }
             if ($value instanceof IteratorArgument) {
                 $tag = 'iterator';
             } else {
@@ -286,15 +262,7 @@ class YamlDumper extends Dumper
         return $value;
     }
 
-    /**
-     * Gets the service call.
-     *
-     * @param string    $id
-     * @param Reference $reference
-     *
-     * @return string
-     */
-    private function getServiceCall($id, Reference $reference = null)
+    private function getServiceCall(string $id, Reference $reference = null): string
     {
         if (null !== $reference) {
             switch ($reference->getInvalidBehavior()) {
@@ -307,14 +275,7 @@ class YamlDumper extends Dumper
         return sprintf('@%s', $id);
     }
 
-    /**
-     * Gets parameter call.
-     *
-     * @param string $id
-     *
-     * @return string
-     */
-    private function getParameterCall($id)
+    private function getParameterCall(string $id): string
     {
         return sprintf('%%%s%%', $id);
     }
@@ -324,15 +285,7 @@ class YamlDumper extends Dumper
         return sprintf('@=%s', $expression);
     }
 
-    /**
-     * Prepares parameters.
-     *
-     * @param array $parameters
-     * @param bool  $escape
-     *
-     * @return array
-     */
-    private function prepareParameters(array $parameters, $escape = true)
+    private function prepareParameters(array $parameters, bool $escape = true): array
     {
         $filtered = array();
         foreach ($parameters as $key => $value) {
@@ -348,14 +301,7 @@ class YamlDumper extends Dumper
         return $escape ? $this->escape($filtered) : $filtered;
     }
 
-    /**
-     * Escapes arguments.
-     *
-     * @param array $arguments
-     *
-     * @return array
-     */
-    private function escape(array $arguments)
+    private function escape(array $arguments): array
     {
         $args = array();
         foreach ($arguments as $k => $v) {

@@ -62,7 +62,7 @@ class Dumper
             $dumpAsMap = Inline::isHash($input);
 
             foreach ($input as $key => $value) {
-                if ($inline >= 1 && Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && is_string($value) && false !== strpos($value, "\n")) {
+                if ($inline >= 1 && Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && is_string($value) && false !== strpos($value, "\n") && false === strpos($value, "\r\n")) {
                     $output .= sprintf("%s%s%s |\n", $prefix, $dumpAsMap ? Inline::dump($key, $flags).':' : '-', '');
 
                     foreach (preg_split('/\n|\r\n/', $value) as $row) {

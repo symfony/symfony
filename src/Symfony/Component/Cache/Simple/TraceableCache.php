@@ -12,13 +12,15 @@
 namespace Symfony\Component\Cache\Simple;
 
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\ResettableInterface;
 
 /**
  * An adapter that collects data about all cache calls.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TraceableCache implements CacheInterface
+class TraceableCache implements CacheInterface, PruneableInterface, ResettableInterface
 {
     private $pool;
     private $miss;
@@ -172,6 +174,38 @@ class TraceableCache implements CacheInterface
         }
         try {
             return $event->result['result'] = $this->pool->deleteMultiple($keys);
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prune()
+    {
+        if (!$this->pool instanceof PruneableInterface) {
+            return false;
+        }
+        $event = $this->start(__FUNCTION__);
+        try {
+            return $event->result = $this->pool->prune();
+        } finally {
+            $event->end = microtime(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        if (!$this->pool instanceof ResettableInterface) {
+            return;
+        }
+        $event = $this->start(__FUNCTION__);
+        try {
+            $this->pool->reset();
         } finally {
             $event->end = microtime(true);
         }

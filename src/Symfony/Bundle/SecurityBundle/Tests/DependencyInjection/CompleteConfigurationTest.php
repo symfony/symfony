@@ -12,18 +12,16 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
 
 abstract class CompleteConfigurationTest extends TestCase
 {
-    private static $containerCache = array();
-
     abstract protected function getLoader(ContainerBuilder $container);
 
     abstract protected function getFileExtension();
@@ -46,12 +44,8 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $expectedProviders = array(
             'security.user.provider.concrete.default',
-            'security.user.provider.concrete.default_foo',
             'security.user.provider.concrete.digest',
-            'security.user.provider.concrete.digest_foo',
             'security.user.provider.concrete.basic',
-            'security.user.provider.concrete.basic_foo',
-            'security.user.provider.concrete.basic_bar',
             'security.user.provider.concrete.service',
             'security.user.provider.concrete.chain',
         );
@@ -111,13 +105,13 @@ abstract class CompleteConfigurationTest extends TestCase
                     'remote_user',
                     'form_login',
                     'http_basic',
-                    'http_digest',
                     'remember_me',
                     'anonymous',
                 ),
                 array(
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
+                    'stateless' => true,
                 ),
             ),
             array(
@@ -165,7 +159,6 @@ abstract class CompleteConfigurationTest extends TestCase
                 'security.authentication.listener.remote_user.secure',
                 'security.authentication.listener.form.secure',
                 'security.authentication.listener.basic.secure',
-                'security.authentication.listener.digest.secure',
                 'security.authentication.listener.rememberme.secure',
                 'security.authentication.listener.anonymous.secure',
                 'security.authentication.switchuser_listener.secure',
@@ -239,7 +232,7 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
-            $this->assertFalse(isset($matcherIds[$matcherId]));
+            $this->assertArrayNotHasKey($matcherId, $matcherIds);
             $matcherIds[$matcherId] = true;
 
             $i = count($matcherIds);
@@ -314,20 +307,16 @@ abstract class CompleteConfigurationTest extends TestCase
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    public function testAcl()
+    public function testArgon2iEncoder()
     {
-        $container = $this->getContainer('container1');
+        if (!Argon2iPasswordEncoder::isSupported()) {
+            $this->markTestSkipped('Argon2i algorithm is not supported.');
+        }
 
-        $this->assertTrue($container->hasDefinition('security.acl.dbal.provider'));
-        $this->assertEquals('security.acl.dbal.provider', (string) $container->getAlias('security.acl.provider'));
-    }
-
-    public function testCustomAclProvider()
-    {
-        $container = $this->getContainer('custom_acl_provider');
-
-        $this->assertFalse($container->hasDefinition('security.acl.dbal.provider'));
-        $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
+        $this->assertSame(array(array('JMS\FooBundle\Entity\User7' => array(
+            'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
+            'arguments' => array(),
+        ))), $this->getContainer('argon2i_encoder')->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
     public function testRememberMeThrowExceptionsDefault()
@@ -361,7 +350,7 @@ abstract class CompleteConfigurationTest extends TestCase
 
     public function testUserPasswordEncoderCommandIsRegistered()
     {
-        $this->assertTrue($this->getContainer('remember_me_options')->has(UserPasswordEncoderCommand::class));
+        $this->assertTrue($this->getContainer('remember_me_options')->has('security.command.user_password_encoder'));
     }
 
     public function testDefaultAccessDecisionManagerStrategyIsAffirmative()
@@ -421,9 +410,6 @@ abstract class CompleteConfigurationTest extends TestCase
     {
         $file = $file.'.'.$this->getFileExtension();
 
-        if (isset(self::$containerCache[$file])) {
-            return self::$containerCache[$file];
-        }
         $container = new ContainerBuilder();
         $security = new SecurityExtension();
         $container->registerExtension($security);
@@ -436,6 +422,6 @@ abstract class CompleteConfigurationTest extends TestCase
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();
 
-        return self::$containerCache[$file] = $container;
+        return $container;
     }
 }

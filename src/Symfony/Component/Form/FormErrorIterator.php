@@ -33,26 +33,17 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
 {
     /**
      * The prefix used for indenting nested error messages.
-     *
-     * @var string
      */
     const INDENTATION = '    ';
 
-    /**
-     * @var FormInterface
-     */
     private $form;
-
-    /**
-     * @var FormError[]|FormErrorIterator[]
-     */
     private $errors;
 
     /**
      * Creates a new iterator.
      *
-     * @param FormInterface $form   The erroneous form
-     * @param array         $errors The form errors
+     * @param FormInterface                   $form   The erroneous form
+     * @param FormError[]|FormErrorIterator[] $errors The form errors
      *
      * @throws InvalidArgumentException If the errors are invalid
      */

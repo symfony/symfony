@@ -24,8 +24,6 @@ class ParseException extends RuntimeException
     private $rawMessage;
 
     /**
-     * Constructor.
-     *
      * @param string          $message    The error message
      * @param int             $parsedLine The line where the error occurred
      * @param string|null     $snippet    The snippet of code near the problem

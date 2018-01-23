@@ -19,7 +19,7 @@
         "php": "^7.1.3",
         "ext-xml": "*",
         "symfony/security": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/dependency-injection": "^3.4.3|^4.0.3",
         "symfony/http-kernel": "~3.4|~4.0"
     },
     "require-dev": {
@@ -32,7 +32,6 @@
         "symfony/form": "~3.4|~4.0",
         "symfony/framework-bundle": "~3.4|~4.0",
         "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/security-acl": "~2.8|~3.0",
         "symfony/translation": "~3.4|~4.0",
         "symfony/twig-bundle": "~3.4|~4.0",
         "symfony/twig-bridge": "~3.4|~4.0",
@@ -41,7 +40,7 @@
         "symfony/var-dumper": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/expression-language": "~3.4|~4.0",
-        "doctrine/doctrine-bundle": "~1.4",
+        "doctrine/doctrine-bundle": "~1.5",
         "twig/twig": "~1.34|~2.4"
     },
     "conflict": {
@@ -49,9 +48,6 @@
         "symfony/event-dispatcher": "<3.4",
         "symfony/framework-bundle": "<3.4",
         "symfony/console": "<3.4"
-    },
-    "suggest": {
-        "symfony/security-acl": "For using the ACL functionality of this bundle"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },
@@ -62,7 +58,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

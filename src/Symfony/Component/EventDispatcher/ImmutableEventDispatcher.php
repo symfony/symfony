@@ -18,18 +18,8 @@ namespace Symfony\Component\EventDispatcher;
  */
 class ImmutableEventDispatcher implements EventDispatcherInterface
 {
-    /**
-     * The proxied dispatcher.
-     *
-     * @var EventDispatcherInterface
-     */
     private $dispatcher;
 
-    /**
-     * Creates an unmodifiable proxy for an event dispatcher.
-     *
-     * @param EventDispatcherInterface $dispatcher The proxied event dispatcher
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;

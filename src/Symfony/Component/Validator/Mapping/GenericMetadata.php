@@ -114,8 +114,6 @@ class GenericMetadata implements MetadataInterface
      *  - {@link TraversalStrategy::IMPLICIT} if $traverse is enabled
      *  - {@link TraversalStrategy::NONE} if $traverse is disabled
      *
-     * @param Constraint $constraint The constraint to add
-     *
      * @return $this
      *
      * @throws ConstraintDefinitionException When trying to add the

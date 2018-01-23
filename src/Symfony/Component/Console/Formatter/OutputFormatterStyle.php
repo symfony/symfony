@@ -61,7 +61,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
      * @param string|null $background The style background color name
      * @param array       $options    The style options
      */
-    public function __construct($foreground = null, $background = null, array $options = array())
+    public function __construct(string $foreground = null, string $background = null, array $options = array())
     {
         if (null !== $foreground) {
             $this->setForeground($foreground);
@@ -172,9 +172,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
-     * Sets multiple style options at once.
-     *
-     * @param array $options
+     * {@inheritdoc}
      */
     public function setOptions(array $options)
     {

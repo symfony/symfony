@@ -178,10 +178,6 @@ table tbody td {
     border-width: 1px 0;
 }
 
-table tbody td {
-    {{ mixins.break_long_words|raw }}
-}
-
 table tbody div {
     margin: .25em 0;
 }
@@ -831,6 +827,8 @@ tr.status-warning td {
 }
 .tab-navigation li .badge.status-warning { background: {{ colors.warning|raw }}; color: #FFF; }
 .tab-navigation li .badge.status-error { background: {{ colors.error|raw }}; color: #FFF; }
+
+.sf-tabs .tab:not(:first-child) { display: none; }
 
 {# Toggles
    ========================================================================= #}

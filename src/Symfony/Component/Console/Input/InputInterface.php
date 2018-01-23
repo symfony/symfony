@@ -24,7 +24,7 @@ interface InputInterface
     /**
      * Returns the first argument from the raw parameters (not parsed).
      *
-     * @return string The value of the first argument or null otherwise
+     * @return string|null The value of the first argument or null otherwise
      */
     public function getFirstArgument();
 
@@ -57,8 +57,6 @@ interface InputInterface
 
     /**
      * Binds the current Input instance with the given arguments and options.
-     *
-     * @param InputDefinition $definition A InputDefinition instance
      */
     public function bind(InputDefinition $definition);
 

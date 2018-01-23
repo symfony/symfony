@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
@@ -30,8 +31,6 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
 {
     /**
      * Processes the ContainerBuilder to validate the Definition.
-     *
-     * @param ContainerBuilder $container
      *
      * @throws RuntimeException When the Definition is invalid
      */
@@ -75,6 +74,22 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                             throw new RuntimeException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s".', $id, $name, $attribute));
                         }
                     }
+                }
+            }
+
+            if ($definition->isPublic() && !$definition->isPrivate()) {
+                $resolvedId = $container->resolveEnvPlaceholders($id, null, $usedEnvs);
+                if (null !== $usedEnvs) {
+                    throw new EnvParameterException(array($resolvedId), null, 'A service name ("%s") cannot contain dynamic values.');
+                }
+            }
+        }
+
+        foreach ($container->getAliases() as $id => $alias) {
+            if ($alias->isPublic() && !$alias->isPrivate()) {
+                $resolvedId = $container->resolveEnvPlaceholders($id, null, $usedEnvs);
+                if (null !== $usedEnvs) {
+                    throw new EnvParameterException(array($resolvedId), null, 'An alias name ("%s") cannot contain dynamic values.');
                 }
             }
         }

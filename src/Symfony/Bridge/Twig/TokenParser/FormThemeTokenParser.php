@@ -27,8 +27,6 @@ class FormThemeTokenParser extends AbstractTokenParser
     /**
      * Parses a token and returns a node.
      *
-     * @param Token $token
-     *
      * @return Node
      */
     public function parse(Token $token)
@@ -37,10 +35,15 @@ class FormThemeTokenParser extends AbstractTokenParser
         $stream = $this->parser->getStream();
 
         $form = $this->parser->getExpressionParser()->parseExpression();
+        $only = false;
 
         if ($this->parser->getStream()->test(Token::NAME_TYPE, 'with')) {
             $this->parser->getStream()->next();
             $resources = $this->parser->getExpressionParser()->parseExpression();
+
+            if ($this->parser->getStream()->nextIf(Token::NAME_TYPE, 'only')) {
+                $only = true;
+            }
         } else {
             $resources = new ArrayExpression(array(), $stream->getCurrent()->getLine());
             do {
@@ -50,7 +53,7 @@ class FormThemeTokenParser extends AbstractTokenParser
 
         $stream->expect(Token::BLOCK_END_TYPE);
 
-        return new FormThemeNode($form, $resources, $lineno, $this->getTag());
+        return new FormThemeNode($form, $resources, $lineno, $this->getTag(), $only);
     }
 
     /**

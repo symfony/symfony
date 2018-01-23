@@ -1,37 +1,6 @@
 {
     "builtin_form_types": [
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\BirthdayType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\ButtonType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\CheckboxType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\ChoiceType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\CollectionType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\CountryType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\CurrencyType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\DateIntervalType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\DateTimeType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\DateType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\EmailType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\FileType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\HiddenType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\IntegerType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\LanguageType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\LocaleType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\MoneyType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\NumberType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\PasswordType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\PercentType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\RadioType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\RangeType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\RepeatedType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\ResetType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\SearchType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\SubmitType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\TextareaType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\TimeType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\TimezoneType",
-        "Symfony\\Component\\Form\\Extension\\Core\\Type\\UrlType"
+        "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType"
     ],
     "service_form_types": [
         "Symfony\\Bridge\\Doctrine\\Form\\Type\\EntityType"

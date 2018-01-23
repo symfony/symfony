@@ -24,7 +24,7 @@ class AddValidatorInitializersPass implements CompilerPassInterface
     private $builderService;
     private $initializerTag;
 
-    public function __construct($builderService = 'validator.builder', $initializerTag = 'validator.initializer')
+    public function __construct(string $builderService = 'validator.builder', string $initializerTag = 'validator.initializer')
     {
         $this->builderService = $builderService;
         $this->initializerTag = $initializerTag;

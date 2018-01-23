@@ -22,14 +22,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConsoleTerminateEvent extends ConsoleEvent
 {
-    /**
-     * The exit code of the command.
-     *
-     * @var int
-     */
     private $exitCode;
 
-    public function __construct(Command $command, InputInterface $input, OutputInterface $output, $exitCode)
+    public function __construct(Command $command, InputInterface $input, OutputInterface $output, int $exitCode)
     {
         parent::__construct($command, $input, $output);
 

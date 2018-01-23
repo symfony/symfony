@@ -34,6 +34,8 @@ CHANGELOG
 3.4.0
 -----
 
+ * added support for parsing YAML files using the `Yaml::parseFile()` or `Parser::parseFile()` method
+
  * the `Dumper`, `Parser`, and `Yaml` classes are marked as final
 
  * Deprecated the `!php/object:` tag which will be replaced by the

@@ -18,26 +18,13 @@ namespace Symfony\Component\Security\Csrf;
  */
 class CsrfToken
 {
-    /**
-     * @var string
-     */
     private $id;
-
-    /**
-     * @var string
-     */
     private $value;
 
-    /**
-     * Constructor.
-     *
-     * @param string $id    The token ID
-     * @param string $value The actual token value
-     */
-    public function __construct($id, $value)
+    public function __construct(string $id, ?string $value)
     {
-        $this->id = (string) $id;
-        $this->value = (string) $value;
+        $this->id = $id;
+        $this->value = $value ?? '';
     }
 
     /**

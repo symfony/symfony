@@ -31,7 +31,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
     private $authenticationManager;
     private $logger;
 
-    public function __construct(TokenStorageInterface $tokenStorage, $secret, LoggerInterface $logger = null, AuthenticationManagerInterface $authenticationManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, string $secret, LoggerInterface $logger = null, AuthenticationManagerInterface $authenticationManager = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->secret = $secret;
@@ -41,8 +41,6 @@ class AnonymousAuthenticationListener implements ListenerInterface
 
     /**
      * Handles anonymous authentication.
-     *
-     * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)
     {

@@ -20,14 +20,9 @@ class Role
 {
     private $role;
 
-    /**
-     * Constructor.
-     *
-     * @param string $role The role name
-     */
-    public function __construct($role)
+    public function __construct(string $role)
     {
-        $this->role = (string) $role;
+        $this->role = $role;
     }
 
     /**

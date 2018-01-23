@@ -6,6 +6,7 @@ framework:
         pools:
             cache.pool1:
                 public: true
+                adapter: cache.system
             cache.pool2:
                 public: true
                 adapter: cache.pool3

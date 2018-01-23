@@ -14,6 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -43,6 +44,42 @@ class ProfilerControllerTest extends TestCase
             array(null),
             // "empty" is also a valid empty token case, see https://github.com/symfony/symfony/issues/10806
             array('empty'),
+        );
+    }
+
+    /**
+     * @dataProvider getOpenFileCases
+     */
+    public function testOpeningDisallowedPaths($path, $isAllowed)
+    {
+        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
+        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
+        $profiler = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array(), null, __DIR__.'/../..');
+
+        try {
+            $response = $controller->openAction(Request::create('/_wdt/open', Request::METHOD_GET, array('file' => $path)));
+            $this->assertEquals(200, $response->getStatusCode());
+            $this->assertTrue($isAllowed);
+        } catch (NotFoundHttpException $e) {
+            $this->assertFalse($isAllowed);
+        }
+    }
+
+    public function getOpenFileCases()
+    {
+        return array(
+            array('README.md', true),
+            array('composer.json', true),
+            array('Controller/ProfilerController.php', true),
+            array('.gitignore', false),
+            array('../TwigBundle/README.md', false),
+            array('Controller/../README.md', false),
+            array('Controller/./ProfilerController.php', false),
         );
     }
 

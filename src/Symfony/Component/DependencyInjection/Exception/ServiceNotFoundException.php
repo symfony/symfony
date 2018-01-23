@@ -24,9 +24,11 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
     private $sourceId;
     private $alternatives;
 
-    public function __construct($id, $sourceId = null, \Exception $previous = null, array $alternatives = array())
+    public function __construct(string $id, string $sourceId = null, \Exception $previous = null, array $alternatives = array(), string $msg = null)
     {
-        if (null === $sourceId) {
+        if (null !== $msg) {
+            // no-op
+        } elseif (null === $sourceId) {
             $msg = sprintf('You have requested a non-existent service "%s".', $id);
         } else {
             $msg = sprintf('The service "%s" has a dependency on a non-existent service "%s".', $sourceId, $id);

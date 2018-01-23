@@ -25,7 +25,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
     private $bag;
     private $resolveArrays;
 
-    public function __construct($resolveArrays = true)
+    public function __construct(bool $resolveArrays = true)
     {
         $this->resolveArrays = $resolveArrays;
     }
@@ -45,7 +45,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
             $aliases = array();
             foreach ($container->getAliases() as $name => $target) {
                 $this->currentId = $name;
-                $aliases[$this->bag->resolveValue($name)] = $this->bag->resolveValue($target);
+                $aliases[$this->bag->resolveValue($name)] = $target;
             }
             $container->setAliases($aliases);
         } catch (ParameterNotFoundException $e) {
@@ -66,6 +66,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
             return $this->resolveArrays || !$v || !is_array($v) ? $v : $value;
         }
         if ($value instanceof Definition) {
+            $value->setBindings($this->processValue($value->getBindings()));
             $changes = $value->getChanges();
             if (isset($changes['class'])) {
                 $value->setClass($this->bag->resolveValue($value->getClass()));

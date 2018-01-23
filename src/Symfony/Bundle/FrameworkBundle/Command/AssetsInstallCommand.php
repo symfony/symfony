@@ -58,6 +58,7 @@ class AssetsInstallCommand extends Command
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
+            ->addOption('no-cleanup', null, InputOption::VALUE_NONE, 'Do not remove the assets of the bundles that no longer exist')
             ->setDescription('Installs bundles web assets under a public directory')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command installs bundle assets into a given
@@ -98,9 +99,7 @@ EOT
             }
         }
 
-        // Create the bundles directory otherwise symlink will fail.
         $bundlesDir = $targetArg.'/bundles/';
-        $this->filesystem->mkdir($bundlesDir, 0777);
 
         $io = new SymfonyStyle($input, $output);
         $io->newLine();
@@ -164,10 +163,14 @@ EOT
             }
         }
         // remove the assets of the bundles that no longer exist
-        $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($bundlesDir);
-        $this->filesystem->remove($dirsToRemove);
+        if (!$input->getOption('no-cleanup') && is_dir($bundlesDir)) {
+            $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($bundlesDir);
+            $this->filesystem->remove($dirsToRemove);
+        }
 
-        $io->table(array('', 'Bundle', 'Method / Error'), $rows);
+        if ($rows) {
+            $io->table(array('', 'Bundle', 'Method / Error'), $rows);
+        }
 
         if (0 !== $exitCode) {
             $io->error('Some errors occurred while installing assets.');
@@ -175,7 +178,7 @@ EOT
             if ($copyUsed) {
                 $io->note('Some assets were installed via copy. If you make changes to these assets you have to run this command again.');
             }
-            $io->success('All assets were successfully installed.');
+            $io->success($rows ? 'All assets were successfully installed.' : 'No assets were provided by any bundle.');
         }
 
         return $exitCode;
@@ -185,13 +188,8 @@ EOT
      * Try to create relative symlink.
      *
      * Falling back to absolute symlink and finally hard copy.
-     *
-     * @param string $originDir
-     * @param string $targetDir
-     *
-     * @return string
      */
-    private function relativeSymlinkWithFallback($originDir, $targetDir)
+    private function relativeSymlinkWithFallback(string $originDir, string $targetDir): string
     {
         try {
             $this->symlink($originDir, $targetDir, true);
@@ -207,13 +205,8 @@ EOT
      * Try to create absolute symlink.
      *
      * Falling back to hard copy.
-     *
-     * @param string $originDir
-     * @param string $targetDir
-     *
-     * @return string
      */
-    private function absoluteSymlinkWithFallback($originDir, $targetDir)
+    private function absoluteSymlinkWithFallback(string $originDir, string $targetDir): string
     {
         try {
             $this->symlink($originDir, $targetDir);
@@ -229,15 +222,12 @@ EOT
     /**
      * Creates symbolic link.
      *
-     * @param string $originDir
-     * @param string $targetDir
-     * @param bool   $relative
-     *
      * @throws IOException if link can not be created
      */
-    private function symlink($originDir, $targetDir, $relative = false)
+    private function symlink(string $originDir, string $targetDir, bool $relative = false)
     {
         if ($relative) {
+            $this->filesystem->mkdir(dirname($targetDir));
             $originDir = $this->filesystem->makePathRelative($originDir, realpath(dirname($targetDir)));
         }
         $this->filesystem->symlink($originDir, $targetDir);
@@ -248,13 +238,8 @@ EOT
 
     /**
      * Copies origin to target.
-     *
-     * @param string $originDir
-     * @param string $targetDir
-     *
-     * @return string
      */
-    private function hardCopy($originDir, $targetDir)
+    private function hardCopy(string $originDir, string $targetDir): string
     {
         $this->filesystem->mkdir($targetDir, 0777);
         // We use a custom iterator to ignore VCS files

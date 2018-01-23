@@ -21,10 +21,25 @@
         </service>
         <service id="Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface" alias="security.authorization_checker" />
 
-        <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" public="true" />
+        <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" public="true">
+            <tag name="kernel.reset" method="setToken" />
+        </service>
         <service id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface" alias="security.token_storage" />
 
-        <service id="security.user_value_resolver" class="Symfony\Bundle\SecurityBundle\SecurityUserValueResolver">
+        <service id="security.helper" class="Symfony\Component\Security\Core\Security">
+            <argument type="service">
+                <service class="Symfony\Component\DependencyInjection\ServiceLocator">
+                    <tag name="container.service_locator" />
+                    <argument type="collection">
+                        <argument key="security.token_storage" type="service" id="security.token_storage" />
+                        <argument key="security.authorization_checker" type="service" id="security.authorization_checker" />
+                    </argument>
+                </service>
+            </argument>
+        </service>
+        <service id="Symfony\Component\Security\Core\Security" alias="security.helper" />
+
+        <service id="security.user_value_resolver" class="Symfony\Component\Security\Http\Controller\UserValueResolver">
             <argument type="service" id="security.token_storage" />
             <tag name="controller.argument_value_resolver" priority="40" />
         </service>
@@ -37,6 +52,7 @@
                 <argument type="service" id="event_dispatcher" />
             </call>
         </service>
+        <service id="Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface" alias="security.authentication.manager" />
 
         <service id="security.authentication.trust_resolver" class="Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver">
             <argument>%security.authentication.trust_resolver.anonymous_class%</argument>
@@ -46,6 +62,7 @@
         <service id="security.authentication.session_strategy" class="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy">
             <argument>%security.authentication.session_strategy.strategy%</argument>
         </service>
+        <service id="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface" alias="security.authentication.session_strategy" />
 
         <service id="security.encoder_factory.generic" class="Symfony\Component\Security\Core\Encoder\EncoderFactory">
             <argument type="collection" />
@@ -147,7 +164,9 @@
 
         <!-- Provisioning -->
         <service id="security.user.provider.in_memory" class="Symfony\Component\Security\Core\User\InMemoryUserProvider" abstract="true" />
-        <service id="security.user.provider.in_memory.user" class="Symfony\Component\Security\Core\User\User" abstract="true" />
+        <service id="security.user.provider.in_memory.user" class="Symfony\Component\Security\Core\User\User" abstract="true">
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.1 and will be removed in 5.0.</deprecated>
+        </service>
 
         <service id="security.user.provider.ldap" class="Symfony\Component\Security\Core\User\LdapUserProvider" abstract="true">
             <argument /> <!-- security.ldap.ldap -->
@@ -166,6 +185,7 @@
             <argument type="service" id="router" on-invalid="null" />
             <argument type="service" id="router" on-invalid="null" />
         </service>
+        <service id="Symfony\Component\Security\Http\HttpUtils" alias="security.http_utils" />
 
 
         <!-- Validator -->

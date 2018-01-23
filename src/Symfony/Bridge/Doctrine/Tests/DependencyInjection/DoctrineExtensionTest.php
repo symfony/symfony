@@ -181,18 +181,14 @@ class DoctrineExtensionTest extends TestCase
             array('doctrine.orm.cache.wincache.class',  array('type' => 'wincache')),
             array('doctrine.orm.cache.zenddata.class',  array('type' => 'zenddata')),
             array('doctrine.orm.cache.redis.class',     array('type' => 'redis'),     array('setRedis')),
-            array('doctrine.orm.cache.memcache.class',  array('type' => 'memcache'),  array('setMemcache')),
             array('doctrine.orm.cache.memcached.class', array('type' => 'memcached'), array('setMemcached')),
         );
     }
 
     /**
-     * @param string $class
-     * @param array  $config
-     *
      * @dataProvider providerBasicDrivers
      */
-    public function testLoadBasicCacheDriver($class, array $config, array $expectedCalls = array())
+    public function testLoadBasicCacheDriver(string $class, array $config, array $expectedCalls = array())
     {
         $container = $this->createContainer();
         $cacheName = 'metadata_cache';
@@ -268,8 +264,6 @@ class DoctrineExtensionTest extends TestCase
     }
 
     /**
-     * @param array $data
-     *
      * @return \Symfony\Component\DependencyInjection\ContainerBuilder
      */
     protected function createContainer(array $data = array())

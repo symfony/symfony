@@ -28,8 +28,6 @@ class HelperSet implements \IteratorAggregate
     private $command;
 
     /**
-     * Constructor.
-     *
      * @param Helper[] $helpers An array of helper
      */
     public function __construct(array $helpers = array())
@@ -85,11 +83,6 @@ class HelperSet implements \IteratorAggregate
         return $this->helpers[$name];
     }
 
-    /**
-     * Sets the command associated with this helper set.
-     *
-     * @param Command $command A Command instance
-     */
     public function setCommand(Command $command = null)
     {
         $this->command = $command;

@@ -24,15 +24,9 @@ class ApplicationDescription
 {
     const GLOBAL_NAMESPACE = '_global';
 
-    /**
-     * @var Application
-     */
     private $application;
-
-    /**
-     * @var null|string
-     */
     private $namespace;
+    private $showHidden;
 
     /**
      * @var array
@@ -49,19 +43,7 @@ class ApplicationDescription
      */
     private $aliases;
 
-    /**
-     * @var bool
-     */
-    private $showHidden;
-
-    /**
-     * Constructor.
-     *
-     * @param Application $application
-     * @param string|null $namespace
-     * @param bool        $showHidden
-     */
-    public function __construct(Application $application, $namespace = null, $showHidden = false)
+    public function __construct(Application $application, string $namespace = null, bool $showHidden = false)
     {
         $this->application = $application;
         $this->namespace = $namespace;
@@ -136,12 +118,7 @@ class ApplicationDescription
         }
     }
 
-    /**
-     * @param array $commands
-     *
-     * @return array
-     */
-    private function sortCommands(array $commands)
+    private function sortCommands(array $commands): array
     {
         $namespacedCommands = array();
         $globalCommands = array();

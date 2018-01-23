@@ -15,10 +15,9 @@
 
         <firewall name="secure" stateless="true">
             <http-basic />
-            <http-digest secret="TheSecret" />
             <form-login />
             <anonymous />
-            <switch-user />
+            <switch-user stateless="true" />
             <x509 />
             <remote-user />
             <user-checker />

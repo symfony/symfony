@@ -22,6 +22,9 @@ abstract class AbstractConfigurator
 {
     const FACTORY = 'unknown';
 
+    /** @internal */
+    protected $definition;
+
     public function __call($method, $args)
     {
         if (method_exists($this, 'set'.$method)) {
@@ -37,7 +40,7 @@ abstract class AbstractConfigurator
      * @param mixed $value
      * @param bool  $allowServices whether Definition and Reference are allowed; by default, only scalars and arrays are
      *
-     * @return mixed the value, optionaly cast to a Definition/Reference
+     * @return mixed the value, optionally cast to a Definition/Reference
      */
     public static function processValue($value, $allowServices = false)
     {
@@ -50,32 +53,14 @@ abstract class AbstractConfigurator
         }
 
         if ($value instanceof ReferenceConfigurator) {
-            static $refCast;
-
-            if (!$refCast) {
-                $refCast = \Closure::bind(function ($value) {
-                    return new Reference($value->id, $value->invalidBehavior);
-                }, null, $value);
-            }
-
-            // cast ReferenceConfigurator to Reference
-            return $refCast($value);
+            return new Reference($value->id, $value->invalidBehavior);
         }
 
         if ($value instanceof InlineServiceConfigurator) {
-            static $defCast;
+            $def = $value->definition;
+            $value->definition = null;
 
-            if (!$defCast) {
-                $defCast = \Closure::bind(function ($value) {
-                    $def = $value->definition;
-                    $value->definition = null;
-
-                    return $def;
-                }, null, $value);
-            }
-
-            // cast InlineServiceConfigurator to Definition
-            return $defCast($value);
+            return $def;
         }
 
         if ($value instanceof self) {

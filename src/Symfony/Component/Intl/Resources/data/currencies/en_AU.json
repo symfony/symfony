@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.62",
+    "Version": "2.1.37.6",
     "Names": {
         "AUD": [
             "$",
@@ -28,6 +28,10 @@
         "CAD": [
             "CAD",
             "Canadian Dollar"
+        ],
+        "CNH": [
+            "CNH",
+            "CNH"
         ],
         "CNY": [
             "CNY",

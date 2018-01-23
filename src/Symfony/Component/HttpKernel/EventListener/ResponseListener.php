@@ -24,15 +24,13 @@ class ResponseListener implements EventSubscriberInterface
 {
     private $charset;
 
-    public function __construct($charset)
+    public function __construct(string $charset)
     {
         $this->charset = $charset;
     }
 
     /**
      * Filters the Response.
-     *
-     * @param FilterResponseEvent $event A FilterResponseEvent instance
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {

@@ -15,7 +15,7 @@
 
 {%- block form_widget_compound -%}
     <div {{ block('widget_container_attributes') }}>
-        {%- if form.parent is empty -%}
+        {%- if form is rootform -%}
             {{ form_errors(form) }}
         {%- endif -%}
         {{- block('form_rows') -}}
@@ -222,6 +222,8 @@
                 '%name%': name,
                 '%id%': id,
             }) %}
+        {%- elseif label is same as(false) -%}
+            {% set translation_domain = false %}
         {%- else -%}
             {% set label = name|humanize %}
         {%- endif -%}
@@ -238,6 +240,16 @@
     {%- set type = type|default('reset') -%}
     {{ block('button_widget') }}
 {%- endblock reset_widget -%}
+
+{%- block tel_widget -%}
+    {%- set type = type|default('tel') -%}
+    {{ block('form_widget_simple') }}
+{%- endblock tel_widget -%}
+
+{%- block color_widget -%}
+    {%- set type = type|default('color') -%}
+    {{ block('form_widget_simple') }}
+{%- endblock color_widget -%}
 
 {# Labels #}
 
@@ -259,7 +271,7 @@
                 {% set label = name|humanize %}
             {%- endif -%}
         {%- endif -%}
-        <label{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</label>
+        <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</{{ element|default('label') }}>
     {%- endif -%}
 {%- endblock form_label -%}
 
@@ -337,9 +349,9 @@
         {% if not child.rendered %}
             {{- form_row(child) -}}
         {% endif %}
-    {%- endfor %}
+    {%- endfor -%}
 
-    {% if not form.methodRendered and form.parent is null %}
+    {% if not form.methodRendered and form is rootform %}
         {%- do form.setMethodRendered() -%}
         {% set method = method|upper %}
         {%- if method in ["GET", "POST"] -%}
@@ -351,7 +363,7 @@
         {%- if form_method != method -%}
             <input type="hidden" name="_method" value="{{ method }}" />
         {%- endif -%}
-    {% endif %}
+    {% endif -%}
 {% endblock form_rest %}
 
 {# Support #}

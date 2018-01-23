@@ -6,7 +6,6 @@ use App\FooService;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype;
 
 return function (ContainerConfigurator $c) {
-
     $s = $c->services();
     $s->instanceof(Prototype\Foo::class)
         ->property('p', 0)
@@ -20,5 +19,4 @@ return function (ContainerConfigurator $c) {
     $s->load(Prototype::class.'\\', '../Prototype')->exclude('../Prototype/*/*');
 
     $s->set('foo', FooService::class);
-
 };

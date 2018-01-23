@@ -24,7 +24,7 @@ abstract class AbstractQuery implements QueryInterface
     protected $query;
     protected $options;
 
-    public function __construct(ConnectionInterface $connection, $dn, $query, array $options = array())
+    public function __construct(ConnectionInterface $connection, string $dn, string $query, array $options = array())
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults(array(

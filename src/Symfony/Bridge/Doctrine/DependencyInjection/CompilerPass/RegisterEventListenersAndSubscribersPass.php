@@ -32,14 +32,12 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
     private $tagPrefix;
 
     /**
-     * Constructor.
-     *
      * @param string $connections     Parameter ID for connections
      * @param string $managerTemplate sprintf() template for generating the event
      *                                manager's service ID for a connection name
      * @param string $tagPrefix       Tag prefix for listeners and subscribers
      */
-    public function __construct($connections, $managerTemplate, $tagPrefix)
+    public function __construct(string $connections, string $managerTemplate, string $tagPrefix)
     {
         $this->connections = $connections;
         $this->managerTemplate = $managerTemplate;
@@ -114,7 +112,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
                     }
                     $instance['event'] = array($instance['event']);
 
-                    if ($lazy = !empty($instance['lazy'])) {
+                    if (!empty($instance['lazy'])) {
                         $this->container->getDefinition($id)->setPublic(true);
                     }
                 }

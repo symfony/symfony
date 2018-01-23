@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "Arab": "arabískt",
         "Armn": "armenskt",
@@ -20,7 +20,7 @@
         "Hant": "hefðbundið",
         "Hebr": "hebreskt",
         "Hira": "hiragana",
-        "Hrkt": "katakana eða hiragana",
+        "Hrkt": "japönsk samstöfuletur",
         "Jamo": "jamo",
         "Jpan": "japanskt",
         "Kana": "katakana",

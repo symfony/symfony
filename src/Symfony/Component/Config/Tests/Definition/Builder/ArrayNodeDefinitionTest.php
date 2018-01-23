@@ -32,7 +32,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->append($child);
 
         $this->assertCount(3, $this->getField($parent, 'children'));
-        $this->assertTrue(in_array($child, $this->getField($parent, 'children')));
+        $this->assertContains($child, $this->getField($parent, 'children'));
     }
 
     /**
@@ -298,6 +298,20 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The path "root" should have at least 1 element(s) defined.
+     */
+    public function testCannotBeEmpty()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node
+            ->cannotBeEmpty()
+            ->integerPrototype();
+
+        $node->getNode()->finalize(array());
+    }
+
     public function testSetDeprecated()
     {
         $node = new ArrayNodeDefinition('root');
@@ -313,15 +327,13 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The path "root" should have at least 1 element(s) defined.
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
+     * @expectedExceptionMessage ->cannotBeEmpty() is not applicable to concrete nodes at path "root"
      */
-    public function testCannotBeEmpty()
+    public function testCannotBeEmptyOnConcreteNode()
     {
         $node = new ArrayNodeDefinition('root');
-        $node
-            ->cannotBeEmpty()
-            ->integerPrototype();
+        $node->cannotBeEmpty();
 
         $node->getNode()->finalize(array());
     }

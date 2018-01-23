@@ -85,7 +85,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
             'baz' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, TestServiceSubscriber::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
         );
 
-        $this->assertEquals($expected, $locator->getArgument(0));
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
     public function testWithAttributes()
@@ -115,7 +115,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
             'baz' => new ServiceClosureArgument(new TypedReference(CustomDefinition::class, CustomDefinition::class, TestServiceSubscriber::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
         );
 
-        $this->assertEquals($expected, $locator->getArgument(0));
+        $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
     /**

@@ -56,22 +56,37 @@ class FormValidator extends ConstraintValidator
             // Validate the data against the constraints defined
             // in the form
             $constraints = $config->getOption('constraints', array());
-            foreach ($constraints as $constraint) {
-                // For the "Valid" constraint, validate the data in all groups
-                if ($constraint instanceof Valid) {
-                    $validator->atPath('data')->validate($form->getData(), $constraint, $groups);
 
-                    continue;
-                }
-
+            if ($groups instanceof GroupSequence) {
+                $validator->atPath('data')->validate($form->getData(), $constraints, $groups);
                 // Otherwise validate a constraint only once for the first
                 // matching group
                 foreach ($groups as $group) {
                     if (in_array($group, $constraint->groups)) {
                         $validator->atPath('data')->validate($form->getData(), $constraint, $group);
+                        if (count($this->context->getViolations()) > 0) {
+                            break;
+                        }
+                    }
+                }
+            } else {
+                foreach ($constraints as $constraint) {
+                    // For the "Valid" constraint, validate the data in all groups
+                    if ($constraint instanceof Valid) {
+                        $validator->atPath('data')->validate($form->getData(), $constraint, $groups);
 
-                        // Prevent duplicate validation
-                        continue 2;
+                        continue;
+                    }
+
+                    // Otherwise validate a constraint only once for the first
+                    // matching group
+                    foreach ($groups as $group) {
+                        if (in_array($group, $constraint->groups)) {
+                            $validator->atPath('data')->validate($form->getData(), $constraint, $group);
+
+                            // Prevent duplicate validation
+                            continue 2;
+                        }
                     }
                 }
             }
@@ -119,8 +134,6 @@ class FormValidator extends ConstraintValidator
 
     /**
      * Returns the validation groups of the given form.
-     *
-     * @param FormInterface $form The form
      *
      * @return array The validation groups
      */

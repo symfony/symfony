@@ -44,8 +44,6 @@ class ArgvInput extends Input
     private $parsed;
 
     /**
-     * Constructor.
-     *
      * @param array|null           $argv       An array of parameters from the CLI (in the argv format)
      * @param InputDefinition|null $definition A InputDefinition instance
      */
@@ -281,6 +279,16 @@ class ArgvInput extends Input
             foreach ($values as $value) {
                 if ($token === $value || 0 === strpos($token, $value.'=')) {
                     return true;
+                }
+
+                if (0 === strpos($token, '-') && 0 !== strpos($token, '--')) {
+                    $noValue = explode('=', $token);
+                    $token = $noValue[0];
+                    $searchableToken = str_replace('-', '', $token);
+                    $searchableValue = str_replace('-', '', $value);
+                    if ('' !== $searchableToken && '' !== $searchableValue && false !== strpos($searchableToken, $searchableValue)) {
+                        return true;
+                    }
                 }
             }
         }

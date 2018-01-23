@@ -1,0 +1,12 @@
+security:
+    encoders:
+        JMS\FooBundle\Entity\User6:
+            algorithm: argon2i
+
+    providers:
+        default: { id: foo }
+
+    firewalls:
+        main:
+            form_login: false
+            http_basic: ~

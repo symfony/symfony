@@ -17,14 +17,12 @@ namespace Symfony\Component\Intl\Exception;
 class MethodArgumentValueNotImplementedException extends NotImplementedException
 {
     /**
-     * Constructor.
-     *
      * @param string $methodName        The method name that raised the exception
      * @param string $argName           The argument name
-     * @param string $argValue          The argument value that is not implemented
+     * @param mixed  $argValue          The argument value that is not implemented
      * @param string $additionalMessage An optional additional message to append to the exception message
      */
-    public function __construct($methodName, $argName, $argValue, $additionalMessage = '')
+    public function __construct(string $methodName, string $argName, $argValue, string $additionalMessage = '')
     {
         $message = sprintf(
             'The %s() method\'s argument $%s value %s behavior is not implemented.%s',

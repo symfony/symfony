@@ -78,4 +78,17 @@ class LoggerTest extends TestCase
         $this->assertEquals('test', $record['message']);
         $this->assertEquals(Logger::INFO, $record['priority']);
     }
+
+    public function testClear()
+    {
+        $handler = new TestHandler();
+        $logger = new Logger('test', array($handler));
+        $logger->pushProcessor(new DebugProcessor());
+
+        $logger->addInfo('test');
+        $logger->clear();
+
+        $this->assertEmpty($logger->getLogs());
+        $this->assertSame(0, $logger->countErrors());
+    }
 }

@@ -25,8 +25,6 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Application.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Application extends BaseApplication
@@ -35,11 +33,6 @@ class Application extends BaseApplication
     private $commandsRegistered = false;
     private $registrationErrors = array();
 
-    /**
-     * Constructor.
-     *
-     * @param KernelInterface $kernel A KernelInterface instance
-     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
@@ -62,9 +55,6 @@ class Application extends BaseApplication
 
     /**
      * Runs the current application.
-     *
-     * @param InputInterface  $input  An Input instance
-     * @param OutputInterface $output An Output instance
      *
      * @return int 0 if everything went fine, or an error code
      */
@@ -194,7 +184,7 @@ class Application extends BaseApplication
             $output = $output->getErrorOutput();
         }
 
-        (new SymfonyStyle($input, $output))->warning('Some commands could not be registered.');
+        (new SymfonyStyle($input, $output))->warning('Some commands could not be registered:');
 
         foreach ($this->registrationErrors as $error) {
             $this->doRenderException($error, $output);

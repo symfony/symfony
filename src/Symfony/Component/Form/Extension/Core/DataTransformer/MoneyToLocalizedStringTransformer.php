@@ -23,7 +23,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
 {
     private $divisor;
 
-    public function __construct($scale = 2, $grouping = true, $roundingMode = self::ROUND_HALF_UP, $divisor = 1)
+    public function __construct(?int $scale = 2, ?bool $grouping = true, ?int $roundingMode = self::ROUND_HALF_UP, ?int $divisor = 1)
     {
         if (null === $grouping) {
             $grouping = true;
@@ -54,12 +54,11 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      */
     public function transform($value)
     {
-        if (null !== $value) {
+        if (null !== $value && 1 !== $this->divisor) {
             if (!is_numeric($value)) {
                 throw new TransformationFailedException('Expected a numeric.');
             }
-
-            $value /= $this->divisor;
+            $value = (string) ($value / $this->divisor);
         }
 
         return parent::transform($value);
@@ -78,9 +77,8 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     public function reverseTransform($value)
     {
         $value = parent::reverseTransform($value);
-
-        if (null !== $value) {
-            $value *= $this->divisor;
+        if (null !== $value && 1 !== $this->divisor) {
+            $value = (float) (string) ($value * $this->divisor);
         }
 
         return $value;

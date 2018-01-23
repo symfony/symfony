@@ -22,14 +22,7 @@ use Symfony\Component\Routing\Route;
  */
 class DumperRoute
 {
-    /**
-     * @var string
-     */
     private $name;
-
-    /**
-     * @var Route
-     */
     private $route;
 
     public function __construct(string $name, Route $route)

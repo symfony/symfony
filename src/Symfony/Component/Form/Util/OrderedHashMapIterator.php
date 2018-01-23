@@ -58,9 +58,9 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * Creates a new iterator.
      *
-     * @param array $elements       the elements of the map, indexed by their
+     * @param array $elements       The elements of the map, indexed by their
      *                              keys
-     * @param array $orderedKeys    the keys of the map in the order in which
+     * @param array $orderedKeys    The keys of the map in the order in which
      *                              they should be iterated
      * @param array $managedCursors An array from which to reference the
      *                              iterator's cursor as long as it is alive.
@@ -118,7 +118,13 @@ class OrderedHashMapIterator implements \Iterator
      */
     public function key()
     {
-        return $this->key;
+        if (null === $this->key) {
+            return null;
+        }
+
+        $array = array($this->key => null);
+
+        return key($array);
     }
 
     /**

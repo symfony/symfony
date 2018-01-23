@@ -17,26 +17,20 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
  * @author Terje Bråten <terje@braten.be>
  */
-class BCryptPasswordEncoder extends BasePasswordEncoder
+class BCryptPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEncoderInterface
 {
     const MAX_PASSWORD_LENGTH = 72;
 
-    /**
-     * @var string
-     */
     private $cost;
 
     /**
-     * Constructor.
-     *
      * @param int $cost The algorithmic cost that should be used
      *
      * @throws \RuntimeException         When no BCrypt encoder is available
      * @throws \InvalidArgumentException if cost is out of range
      */
-    public function __construct($cost)
+    public function __construct(int $cost)
     {
-        $cost = (int) $cost;
         if ($cost < 4 || $cost > 31) {
             throw new \InvalidArgumentException('Cost must be in the range of 4-31.');
         }

@@ -370,6 +370,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->getForm();
 
         $this->expectValidateAt(0, 'data', $object, new GroupSequence(array('group1', 'group2')));
+        $this->expectValidateAt(1, 'data', $object, new GroupSequence(array('group1', 'group2')));
 
         $this->validator->validate($form, new Form());
 
@@ -643,14 +644,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         return $context;
     }
 
-    /**
-     * @param string $name
-     * @param string $dataClass
-     * @param array  $options
-     *
-     * @return FormBuilder
-     */
-    private function getBuilder($name = 'name', $dataClass = null, array $options = array())
+    private function getBuilder(string $name = 'name', string $dataClass = null, array $options = array()): FormBuilder
     {
         $options = array_replace(array(
             'constraints' => array(),

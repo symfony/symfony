@@ -28,29 +28,21 @@ class OptionsResolver implements Options
 {
     /**
      * The names of all defined options.
-     *
-     * @var array
      */
     private $defined = array();
 
     /**
      * The default option values.
-     *
-     * @var array
      */
     private $defaults = array();
 
     /**
      * The names of required options.
-     *
-     * @var array
      */
     private $required = array();
 
     /**
      * The resolved option values.
-     *
-     * @var array
      */
     private $resolved = array();
 
@@ -63,22 +55,16 @@ class OptionsResolver implements Options
 
     /**
      * A list of accepted values for each option.
-     *
-     * @var array
      */
     private $allowedValues = array();
 
     /**
      * A list of accepted types for each option.
-     *
-     * @var array
      */
     private $allowedTypes = array();
 
     /**
      * A list of closures for evaluating lazy options.
-     *
-     * @var array
      */
     private $lazy = array();
 
@@ -86,8 +72,6 @@ class OptionsResolver implements Options
      * A list of lazy options whose closure is currently being called.
      *
      * This list helps detecting circular dependencies between lazy options.
-     *
-     * @var array
      */
     private $calling = array();
 
@@ -98,8 +82,6 @@ class OptionsResolver implements Options
      * necessary in order to avoid inconsistencies during the resolving
      * process. If any option is changed after being read, all evaluated
      * lazy options that depend on this option would become invalid.
-     *
-     * @var bool
      */
     private $locked = false;
 
@@ -792,21 +774,12 @@ class OptionsResolver implements Options
         // Validate the type of the resolved option
         if (isset($this->allowedTypes[$option])) {
             $valid = false;
+            $invalidTypes = array();
 
             foreach ($this->allowedTypes[$option] as $type) {
                 $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
 
-                if (function_exists($isFunction = 'is_'.$type)) {
-                    if ($isFunction($value)) {
-                        $valid = true;
-                        break;
-                    }
-
-                    continue;
-                }
-
-                if ($value instanceof $type) {
-                    $valid = true;
+                if ($valid = $this->verifyTypes($type, $value, $invalidTypes)) {
                     break;
                 }
             }
@@ -818,7 +791,7 @@ class OptionsResolver implements Options
                     $option,
                     $this->formatValue($value),
                     implode('" or "', $this->allowedTypes[$option]),
-                    $this->formatTypeOf($value)
+                    implode('|', array_keys($invalidTypes))
                 ));
             }
         }
@@ -896,6 +869,45 @@ class OptionsResolver implements Options
     }
 
     /**
+     * @param string $type
+     * @param mixed  $value
+     * @param array  &$invalidTypes
+     *
+     * @return bool
+     */
+    private function verifyTypes($type, $value, array &$invalidTypes)
+    {
+        if ('[]' === substr($type, -2) && is_array($value)) {
+            $originalType = $type;
+            $type = substr($type, 0, -2);
+            $invalidValues = array_filter( // Filter out valid values, keeping invalid values in the resulting array
+                $value,
+                function ($value) use ($type) {
+                    return !self::isValueValidType($type, $value);
+                }
+            );
+
+            if (!$invalidValues) {
+                return true;
+            }
+
+            $invalidTypes[$this->formatTypeOf($value, $originalType)] = true;
+
+            return false;
+        }
+
+        if (self::isValueValidType($type, $value)) {
+            return true;
+        }
+
+        if (!$invalidTypes) {
+            $invalidTypes[$this->formatTypeOf($value, null)] = true;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns whether a resolved option with the given name exists.
      *
      * @param string $option The option name
@@ -963,13 +975,35 @@ class OptionsResolver implements Options
      * parameters should usually not be included in messages aimed at
      * non-technical people.
      *
-     * @param mixed $value The value to return the type of
-     *
-     * @return string The type of the value
+     * @param mixed  $value The value to return the type of
      */
-    private function formatTypeOf($value)
+    private function formatTypeOf($value, ?string $type): string
     {
-        return is_object($value) ? get_class($value) : gettype($value);
+        $suffix = '';
+
+        if (null !== $type && '[]' === substr($type, -2)) {
+            $suffix = '[]';
+            $type = substr($type, 0, -2);
+            while ('[]' === substr($type, -2)) {
+                $type = substr($type, 0, -2);
+                $value = array_shift($value);
+                if (!is_array($value)) {
+                    break;
+                }
+                $suffix .= '[]';
+            }
+
+            if (is_array($value)) {
+                $subTypes = array();
+                foreach ($value as $val) {
+                    $subTypes[$this->formatTypeOf($val, null)] = true;
+                }
+
+                return implode('|', array_keys($subTypes)).$suffix;
+            }
+        }
+
+        return (is_object($value) ? get_class($value) : gettype($value)).$suffix;
     }
 
     /**
@@ -980,10 +1014,8 @@ class OptionsResolver implements Options
      * in double quotes (").
      *
      * @param mixed $value The value to format as string
-     *
-     * @return string The string representation of the passed value
      */
-    private function formatValue($value)
+    private function formatValue($value): string
     {
         if (is_object($value)) {
             return get_class($value);
@@ -1022,18 +1054,19 @@ class OptionsResolver implements Options
      * Each of the values is converted to a string using
      * {@link formatValue()}. The values are then concatenated with commas.
      *
-     * @param array $values A list of values
-     *
-     * @return string The string representation of the value list
-     *
      * @see formatValue()
      */
-    private function formatValues(array $values)
+    private function formatValues(array $values): string
     {
         foreach ($values as $key => $value) {
             $values[$key] = $this->formatValue($value);
         }
 
         return implode(', ', $values);
+    }
+
+    private static function isValueValidType($type, $value)
+    {
+        return (function_exists($isFunction = 'is_'.$type) && $isFunction($value)) || $value instanceof $type;
     }
 }

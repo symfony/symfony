@@ -153,8 +153,6 @@ EOF
     /**
      * Validates input arguments and options.
      *
-     * @param InputInterface $input
-     *
      * @throws \InvalidArgumentException
      */
     protected function validateInput(InputInterface $input)
@@ -223,9 +221,8 @@ EOF
     {
         $serviceIds = $builder->getServiceIds();
         $foundServiceIds = array();
-        $name = strtolower($name);
         foreach ($serviceIds as $serviceId) {
-            if (false === strpos($serviceId, $name)) {
+            if (false === stripos($serviceId, $name)) {
                 continue;
             }
             $foundServiceIds[] = $serviceId;
@@ -244,7 +241,18 @@ EOF
             return false;
         }
 
-        // see if the class exists (only need to trigger autoload once)
-        return class_exists($serviceId) || interface_exists($serviceId, false);
+        // if the id has a \, assume it is a class
+        if (false !== strpos($serviceId, '\\')) {
+            return true;
+        }
+
+        try {
+            new \ReflectionClass($serviceId);
+
+            return true;
+        } catch (\ReflectionException $e) {
+            // the service id is not a valid class/interface
+            return false;
+        }
     }
 }

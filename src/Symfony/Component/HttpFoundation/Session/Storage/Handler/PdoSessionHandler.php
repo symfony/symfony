@@ -216,7 +216,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 // - trailing space removal
                 // - case-insensitivity
                 // - language processing like é == e
-                $sql = "CREATE TABLE $this->table ($this->idCol VARBINARY(128) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol MEDIUMINT NOT NULL, $this->timeCol INTEGER UNSIGNED NOT NULL) COLLATE utf8_bin, ENGINE = InnoDB";
+                $sql = "CREATE TABLE $this->table ($this->idCol VARBINARY(128) NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol MEDIUMINT NOT NULL, $this->timeCol INTEGER NOT NULL) COLLATE utf8_bin, ENGINE = InnoDB";
                 break;
             case 'sqlite':
                 $sql = "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER NOT NULL, $this->timeCol INTEGER NOT NULL)";
@@ -375,7 +375,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             $this->gcCalled = false;
 
             // delete the session records that have expired
-            $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol < :time - $this->timeCol";
+            $sql = "DELETE FROM $this->table WHERE $this->lifetimeCol < :time - CAST($this->timeCol AS SIGNED)";
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':time', time(), \PDO::PARAM_INT);

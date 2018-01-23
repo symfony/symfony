@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2018-01-12T11:57:03Z
+
+The failing job does not seem to be related to my PR: https://travis-ci.org/symfony/symfony/jobs/328083230#L3297
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2018-01-17T11:44:10Z
+
+@nicolas-grekas @stof I did the changes you requested.
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2018-01-22T13:45:43Z
+
+@nicolas-grekas done.
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2018-01-22T16:26:07Z
+
+@nicolas-grekas Code updated.

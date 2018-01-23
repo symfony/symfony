@@ -52,9 +52,8 @@ class PropertyPathMapperTest extends TestCase
     }
 
     /**
-     * @param FormConfigInterface $config
-     * @param bool                $synchronized
-     * @param bool                $submitted
+     * @param bool $synchronized
+     * @param bool $submitted
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */

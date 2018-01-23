@@ -193,10 +193,7 @@ class QuestionHelper extends Helper
     /**
      * Autocompletes a question.
      *
-     * @param OutputInterface $output
-     * @param Question        $question
-     * @param resource        $inputStream
-     * @param array           $autocomplete
+     * @param resource $inputStream
      *
      * @return string
      */
@@ -312,8 +309,7 @@ class QuestionHelper extends Helper
     /**
      * Gets a hidden response from user.
      *
-     * @param OutputInterface $output      An Output instance
-     * @param resource        $inputStream The handler resource
+     * @param resource $inputStream The handler resource
      *
      * @return string The answer
      *
@@ -373,9 +369,7 @@ class QuestionHelper extends Helper
     /**
      * Validates an attempt.
      *
-     * @param callable        $interviewer A callable that will ask for a question and return the result
-     * @param OutputInterface $output      An Output instance
-     * @param Question        $question    A Question instance
+     * @param callable $interviewer A callable that will ask for a question and return the result
      *
      * @return mixed The validated response
      *

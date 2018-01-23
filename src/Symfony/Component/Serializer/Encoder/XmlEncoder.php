@@ -172,8 +172,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * @param \DOMNode $node
-     * @param string   $val
+     * @param string $val
      *
      * @return bool
      */
@@ -191,8 +190,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * @param \DOMNode $node
-     * @param string   $val
+     * @param string $val
      *
      * @return bool
      */
@@ -205,8 +203,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * @param \DOMNode $node
-     * @param string   $val
+     * @param string $val
      *
      * @return bool
      */
@@ -219,7 +216,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * @param \DOMNode             $node
      * @param \DOMDocumentFragment $fragment
      *
      * @return bool
@@ -362,7 +358,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Parse the data and convert it to DOMElements.
      *
-     * @param \DOMNode     $parentNode
      * @param array|object $data
      * @param string|null  $xmlRootNodeName
      *
@@ -431,7 +426,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Selects the type of node to create and appends it to the parent.
      *
-     * @param \DOMNode     $parentNode
      * @param array|object $data
      * @param string       $nodeName
      * @param string       $key
@@ -468,8 +462,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Tests the value being passed and decide what sort of element to create.
      *
-     * @param \DOMNode $node
-     * @param mixed    $val
+     * @param mixed $val
      *
      * @return bool
      *

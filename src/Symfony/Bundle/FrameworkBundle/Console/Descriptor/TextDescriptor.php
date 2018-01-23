@@ -435,7 +435,6 @@ class TextDescriptor extends Descriptor
 
     /**
      * @param string $content
-     * @param array  $options
      */
     private function writeText($content, array $options = array())
     {

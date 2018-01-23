@@ -113,18 +113,17 @@ class XmlUtils
      *
      * The following rules applies during the conversion:
      *
-     *  * Each tag is converted to a key value or an array
-     *    if there is more than one "value"
+     * * Each tag is converted to a key value or an array
+     *   if there is more than one "value"
      *
-     *  * The content of a tag is set under a "value" key (<foo>bar</foo>)
-     *    if the tag also has some nested tags
+     * * The content of a tag is set under a "value" key (<foo>bar</foo>)
+     *   if the tag also has some nested tags
      *
-     *  * The attributes are converted to keys (<foo foo="bar"/>)
+     * * The attributes are converted to keys (<foo foo="bar"/>)
      *
-     *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
+     * * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
-     * @param \DOMElement $element     A \DOMElement instance
-     * @param bool        $checkPrefix Check prefix in an element or an attribute name
+     * @param bool $checkPrefix Check prefix in an element or an attribute name
      *
      * @return array A PHP array
      */

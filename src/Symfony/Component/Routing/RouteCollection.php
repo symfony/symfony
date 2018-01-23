@@ -69,8 +69,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     /**
      * Adds a route.
      *
-     * @param string $name  The route name
-     * @param Route  $route A Route instance
+     * @param string $name The route name
      */
     public function add($name, Route $route)
     {

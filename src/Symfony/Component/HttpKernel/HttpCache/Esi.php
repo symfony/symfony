@@ -75,8 +75,6 @@ class Esi implements SurrogateInterface
     /**
      * Checks that at least one surrogate has ESI/1.0 capability.
      *
-     * @param Request $request A Request instance
-     *
      * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
      *
      * @deprecated since version 2.6, to be removed in 3.0. Use hasSurrogateCapability() instead
@@ -101,8 +99,6 @@ class Esi implements SurrogateInterface
 
     /**
      * Adds ESI/1.0 capability to the given Request.
-     *
-     * @param Request $request A Request instance
      *
      * @deprecated since version 2.6, to be removed in 3.0. Use addSurrogateCapability() instead
      */
@@ -141,8 +137,6 @@ class Esi implements SurrogateInterface
 
     /**
      * Checks that the Response needs to be parsed for ESI tags.
-     *
-     * @param Response $response A Response instance
      *
      * @return bool true if the Response needs to be parsed, false otherwise
      *
@@ -247,10 +241,9 @@ class Esi implements SurrogateInterface
     /**
      * Handles an ESI from the cache.
      *
-     * @param HttpCache $cache        An HttpCache instance
-     * @param string    $uri          The main URI
-     * @param string    $alt          An alternative URI
-     * @param bool      $ignoreErrors Whether to ignore errors or not
+     * @param string $uri          The main URI
+     * @param string $alt          An alternative URI
+     * @param bool   $ignoreErrors Whether to ignore errors or not
      *
      * @return string
      *

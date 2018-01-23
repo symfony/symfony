@@ -48,7 +48,6 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * Creates a validator for the given context.
      *
-     * @param ExecutionContextInterface           $context            The execution context
      * @param MetadataFactoryInterface            $metadataFactory    The factory for
      *                                                                fetching the metadata
      *                                                                of validated objects
@@ -765,22 +764,20 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * If any of the constraints generates a violation, subsequent groups in the
      * group sequence are skipped.
      *
-     * @param mixed                     $value             The validated value
-     * @param object|null               $object            The current object
-     * @param string                    $cacheKey          The key for caching
-     *                                                     the validated value
-     * @param MetadataInterface         $metadata          The metadata of the
-     *                                                     value
-     * @param string                    $propertyPath      The property path leading
-     *                                                     to the value
-     * @param int                       $traversalStrategy The strategy used for
-     *                                                     traversing the value
-     * @param GroupSequence             $groupSequence     The group sequence
-     * @param string|null               $cascadedGroup     The group that should
-     *                                                     be passed to cascaded
-     *                                                     objects instead of
-     *                                                     the group sequence
-     * @param ExecutionContextInterface $context           The execution context
+     * @param mixed             $value             The validated value
+     * @param object|null       $object            The current object
+     * @param string            $cacheKey          The key for caching
+     *                                             the validated value
+     * @param MetadataInterface $metadata          The metadata of the
+     *                                             value
+     * @param string            $propertyPath      The property path leading
+     *                                             to the value
+     * @param int               $traversalStrategy The strategy used for
+     *                                             traversing the value
+     * @param string|null       $cascadedGroup     The group that should
+     *                                             be passed to cascaded
+     *                                             objects instead of
+     *                                             the group sequence
      */
     private function stepThroughGroupSequence($value, $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, $traversalStrategy, GroupSequence $groupSequence, $cascadedGroup, ExecutionContextInterface $context)
     {
@@ -825,12 +822,11 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * Validates a node's value against all constraints in the given group.
      *
-     * @param mixed                     $value    The validated value
-     * @param string                    $cacheKey The key for caching the
-     *                                            validated value
-     * @param MetadataInterface         $metadata The metadata of the value
-     * @param string                    $group    The group to validate
-     * @param ExecutionContextInterface $context  The execution context
+     * @param mixed             $value    The validated value
+     * @param string            $cacheKey The key for caching the
+     *                                    validated value
+     * @param MetadataInterface $metadata The metadata of the value
+     * @param string            $group    The group to validate
      */
     private function validateInGroup($value, $cacheKey, MetadataInterface $metadata, $group, ExecutionContextInterface $context)
     {

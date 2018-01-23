@@ -33,11 +33,8 @@ class ContainerAwareHttpKernel extends HttpKernel
     protected $container;
 
     /**
-     * @param EventDispatcherInterface    $dispatcher         An EventDispatcherInterface instance
-     * @param ContainerInterface          $container          A ContainerInterface instance
-     * @param ControllerResolverInterface $controllerResolver A ControllerResolverInterface instance
-     * @param RequestStack                $requestStack       A stack for master/sub requests
-     * @param bool                        $triggerDeprecation Whether or not to trigger the deprecation warning for the ContainerAwareHttpKernel
+     * @param RequestStack $requestStack       A stack for master/sub requests
+     * @param bool         $triggerDeprecation Whether or not to trigger the deprecation warning for the ContainerAwareHttpKernel
      */
     public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver, RequestStack $requestStack = null, $triggerDeprecation = true)
     {

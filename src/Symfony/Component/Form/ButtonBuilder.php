@@ -78,7 +78,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @param string|int|FormBuilderInterface $child
      * @param string|FormTypeInterface        $type
-     * @param array                           $options
      *
      * @throws BadMethodCallException
      */
@@ -94,7 +93,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @param string                   $name
      * @param string|FormTypeInterface $type
-     * @param array                    $options
      *
      * @throws BadMethodCallException
      */
@@ -196,8 +194,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param DataTransformerInterface $viewTransformer
-     * @param bool                     $forcePrepend
+     * @param bool $forcePrepend
      *
      * @throws BadMethodCallException
      */
@@ -223,8 +220,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param DataTransformerInterface $modelTransformer
-     * @param bool                     $forceAppend
+     * @param bool $forceAppend
      *
      * @throws BadMethodCallException
      */

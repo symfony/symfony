@@ -34,7 +34,6 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
     protected $validator;
 
     /**
-     * @param MetadataFactoryInterface $metadataFactory
      *
      * @return LegacyValidatorInterface
      */

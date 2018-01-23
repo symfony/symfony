@@ -135,8 +135,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      * @see https://bugs.php.net/bug.php?id=53710
      * @see https://bugs.php.net/bug.php?id=60926
      *
-     * @param string           $tagName
-     * @param ContainerBuilder $container
+     * @param string $tagName
      *
      * @return array
      */

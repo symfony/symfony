@@ -189,8 +189,7 @@ class ProgressHelper extends Helper
     /**
      * Starts the progress output.
      *
-     * @param OutputInterface $output An Output instance
-     * @param int|null        $max    Maximum steps
+     * @param int|null $max Maximum steps
      */
     public function start(OutputInterface $output, $max = null)
     {
@@ -439,8 +438,7 @@ class ProgressHelper extends Helper
     /**
      * Overwrites a previous message to the output.
      *
-     * @param OutputInterface $output  An Output instance
-     * @param string          $message The message
+     * @param string $message The message
      */
     private function overwrite(OutputInterface $output, $message)
     {

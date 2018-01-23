@@ -24,9 +24,8 @@ class MappingRule
     private $targetPath;
 
     /**
-     * @param FormInterface $origin
-     * @param string        $propertyPath
-     * @param string        $targetPath
+     * @param string $propertyPath
+     * @param string $targetPath
      */
     public function __construct(FormInterface $origin, $propertyPath, $targetPath)
     {

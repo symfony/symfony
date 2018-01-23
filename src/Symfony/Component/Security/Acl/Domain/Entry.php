@@ -32,14 +32,12 @@ class Entry implements AuditableEntryInterface
     private $granting;
 
     /**
-     * @param int                       $id
-     * @param AclInterface              $acl
-     * @param SecurityIdentityInterface $sid
-     * @param string                    $strategy
-     * @param int                       $mask
-     * @param bool                      $granting
-     * @param bool                      $auditFailure
-     * @param bool                      $auditSuccess
+     * @param int    $id
+     * @param string $strategy
+     * @param int    $mask
+     * @param bool   $granting
+     * @param bool   $auditFailure
+     * @param bool   $auditSuccess
      */
     public function __construct($id, AclInterface $acl, SecurityIdentityInterface $sid, $strategy, $mask, $granting, $auditFailure, $auditSuccess)
     {

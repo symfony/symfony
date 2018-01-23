@@ -131,16 +131,14 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * Creates a new execution context.
      *
-     * @param ValidatorInterface  $validator         The validator
-     * @param mixed               $root              The root value of the
-     *                                               validated object graph
-     * @param TranslatorInterface $translator        The translator
-     * @param string|null         $translationDomain The translation domain to
-     *                                               use for translating
-     *                                               violation messages
+     * @param mixed       $root              The root value of the
+     *                                       validated object graph
+     * @param string|null $translationDomain The translation domain to
+     *                                       use for translating
+     *                                       violation messages
      *
      * @internal Called by {@link ExecutionContextFactory}. Should not be used
-     *           in user code.
+     * in user code.
      */
     public function __construct(ValidatorInterface $validator, $root, TranslatorInterface $translator, $translationDomain = null)
     {

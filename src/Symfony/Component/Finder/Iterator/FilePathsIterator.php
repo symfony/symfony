@@ -59,7 +59,6 @@ class FilePathsIterator extends \ArrayIterator
 
     /**
      * @param string $name
-     * @param array  $arguments
      *
      * @return mixed
      */

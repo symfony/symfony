@@ -33,7 +33,6 @@ class CompiledRoute implements \Serializable
      * @param array       $tokens        An array of tokens to use to generate URL for this route
      * @param array       $pathVariables An array of path variables
      * @param string|null $hostRegex     Host regex
-     * @param array       $hostTokens    Host tokens
      * @param array       $hostVariables An array of host variables
      * @param array       $variables     An array of variables (variables defined in the path and in the host patterns)
      */

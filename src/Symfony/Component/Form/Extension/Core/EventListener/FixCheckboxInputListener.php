@@ -32,9 +32,6 @@ class FixCheckboxInputListener implements EventSubscriberInterface
 {
     private $choiceList;
 
-    /**
-     * @param ChoiceListInterface $choiceList
-     */
     public function __construct(ChoiceListInterface $choiceList)
     {
         $this->choiceList = $choiceList;

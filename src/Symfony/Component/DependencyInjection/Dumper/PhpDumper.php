@@ -274,8 +274,7 @@ class PhpDumper extends Dumper
     /**
      * Generates the inline definition of a service.
      *
-     * @param string     $id
-     * @param Definition $definition
+     * @param string $id
      *
      * @return string
      *
@@ -339,8 +338,7 @@ class PhpDumper extends Dumper
     /**
      * Adds the service return statement.
      *
-     * @param string     $id         Service id
-     * @param Definition $definition
+     * @param string $id Service id
      *
      * @return string
      */
@@ -356,8 +354,7 @@ class PhpDumper extends Dumper
     /**
      * Generates the service instance.
      *
-     * @param string     $id
-     * @param Definition $definition
+     * @param string $id
      *
      * @return string
      *
@@ -403,8 +400,7 @@ class PhpDumper extends Dumper
     /**
      * Checks if the definition is a simple instance.
      *
-     * @param string     $id
-     * @param Definition $definition
+     * @param string $id
      *
      * @return bool
      */
@@ -426,8 +422,7 @@ class PhpDumper extends Dumper
     /**
      * Adds method calls to a service definition.
      *
-     * @param Definition $definition
-     * @param string     $variableName
+     * @param string $variableName
      *
      * @return string
      */
@@ -459,8 +454,7 @@ class PhpDumper extends Dumper
     /**
      * Generates the inline definition setup.
      *
-     * @param string     $id
-     * @param Definition $definition
+     * @param string $id
      *
      * @return string
      *
@@ -504,8 +498,7 @@ class PhpDumper extends Dumper
     /**
      * Adds configurator definition.
      *
-     * @param Definition $definition
-     * @param string     $variableName
+     * @param string $variableName
      *
      * @return string
      */
@@ -536,8 +529,7 @@ class PhpDumper extends Dumper
     /**
      * Adds a service.
      *
-     * @param string     $id
-     * @param Definition $definition
+     * @param string $id
      *
      * @return string
      */
@@ -664,8 +656,7 @@ EOF;
     /**
      * Adds synchronizer methods.
      *
-     * @param string     $id         A service identifier
-     * @param Definition $definition A Definition instance
+     * @param string $id A service identifier
      *
      * @return string|null
      *
@@ -1066,7 +1057,6 @@ EOF;
     /**
      * Exports parameters.
      *
-     * @param array  $parameters
      * @param string $path
      * @param int    $indent
      *
@@ -1212,9 +1202,7 @@ EOF;
      * Checks if a service id has a reference.
      *
      * @param string $id
-     * @param array  $arguments
      * @param bool   $deep
-     * @param array  $visited
      *
      * @return bool
      */
@@ -1413,9 +1401,7 @@ EOF;
 
     /**
      * @deprecated since version 2.6.2, to be removed in 3.0.
-     *             Use \Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider instead.
-     *
-     * @param ExpressionFunctionProviderInterface $provider
+     * Use \Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider instead.
      */
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
     {
@@ -1427,8 +1413,7 @@ EOF;
     /**
      * Gets a service call.
      *
-     * @param string    $id
-     * @param Reference $reference
+     * @param string $id
      *
      * @return string
      */

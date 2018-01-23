@@ -34,7 +34,6 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 
     /**
      * @param EngineInterface|Environment $templating            An EngineInterface or a Twig instance
-     * @param UriSigner                   $signer                A UriSigner instance
      * @param string                      $globalDefaultTemplate The global default content (it can be a template name or the content)
      * @param string                      $charset
      */

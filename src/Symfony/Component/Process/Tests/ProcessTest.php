@@ -1234,7 +1234,6 @@ class ProcessTest extends TestCase
      * @param null|array  $env
      * @param null|string $input
      * @param int         $timeout
-     * @param array       $options
      *
      * @return Process
      */

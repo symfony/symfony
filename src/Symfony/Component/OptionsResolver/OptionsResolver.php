@@ -375,8 +375,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
      *
      * The resolved option value is set to the return value of the closure.
      *
-     * @param string   $option     The option name
-     * @param \Closure $normalizer The normalizer
+     * @param string $option The option name
      *
      * @return $this
      *

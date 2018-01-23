@@ -124,8 +124,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param Command $command
-     * @param string  $dir
+     * @param string $dir
      *
      * @return Command
      */
@@ -139,7 +138,6 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param Command  $command
      * @param string[] $names
      * @param bool     $not
      */
@@ -186,7 +184,6 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param Command  $command
      * @param string   $dir
      * @param string[] $paths
      * @param bool     $not
@@ -228,7 +225,6 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param Command            $command
      * @param NumberComparator[] $sizes
      */
     private function buildSizesFiltering(Command $command, array $sizes)
@@ -258,7 +254,6 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param Command          $command
      * @param DateComparator[] $dates
      */
     private function buildDatesFiltering(Command $command, array $dates)
@@ -296,8 +291,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param Command $command
-     * @param string  $sort
+     * @param string $sort
      *
      * @throws \InvalidArgumentException
      */
@@ -307,15 +301,12 @@ abstract class AbstractFindAdapter extends AbstractAdapter
     }
 
     /**
-     * @param Command $command
-     * @param string  $sort
+     * @param string $sort
      */
     abstract protected function buildFormatSorting(Command $command, $sort);
 
     /**
-     * @param Command $command
-     * @param array   $contains
-     * @param bool    $not
+     * @param bool $not
      */
     abstract protected function buildContentFiltering(Command $command, array $contains, $not = false);
 }

@@ -42,7 +42,6 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      * mapper implementations.
      *
      * @param ChoiceListFactoryInterface $factory      The factory for creating the loaded choice list
-     * @param ObjectManager              $manager      The object manager
      * @param string                     $class        The class name of the loaded objects
      * @param IdReader                   $idReader     The reader for the object IDs
      * @param null|EntityLoaderInterface $objectLoader The objects loader

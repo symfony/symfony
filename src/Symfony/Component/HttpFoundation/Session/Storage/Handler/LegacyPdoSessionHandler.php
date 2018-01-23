@@ -57,12 +57,11 @@ class LegacyPdoSessionHandler implements \SessionHandlerInterface
      * Constructor.
      *
      * List of available options:
-     *  * db_table: The name of the table [required]
-     *  * db_id_col: The column where to store the session id [default: sess_id]
-     *  * db_data_col: The column where to store the session data [default: sess_data]
-     *  * db_time_col: The column where to store the timestamp [default: sess_time]
+     * * db_table: The name of the table [required]
+     * * db_id_col: The column where to store the session id [default: sess_id]
+     * * db_data_col: The column where to store the session data [default: sess_data]
+     * * db_time_col: The column where to store the timestamp [default: sess_time]
      *
-     * @param \PDO  $pdo       A \PDO instance
      * @param array $dbOptions An associative array of DB options
      *
      * @throws \InvalidArgumentException When "db_table" option is not provided

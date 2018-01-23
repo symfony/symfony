@@ -332,7 +332,6 @@ class ResolvedFormTypeTest extends TestCase
 
     /**
      * @param string $name
-     * @param array  $options
      *
      * @return FormBuilder
      */

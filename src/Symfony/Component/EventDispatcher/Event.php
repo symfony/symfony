@@ -69,8 +69,6 @@ class Event
     /**
      * Stores the EventDispatcher that dispatches this Event.
      *
-     * @param EventDispatcherInterface $dispatcher
-     *
      * @deprecated since version 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)

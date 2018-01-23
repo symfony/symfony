@@ -35,11 +35,9 @@ class LegacyExecutionContextFactory implements ExecutionContextFactoryInterface
     /**
      * Creates a new context factory.
      *
-     * @param MetadataFactoryInterface $metadataFactory   The metadata factory
-     * @param TranslatorInterface      $translator        The translator
-     * @param string|null              $translationDomain The translation domain
-     *                                                    to use for translating
-     *                                                    violation messages
+     * @param string|null $translationDomain The translation domain
+     *                                       to use for translating
+     *                                       violation messages
      */
     public function __construct(MetadataFactoryInterface $metadataFactory, TranslatorInterface $translator, $translationDomain = null)
     {

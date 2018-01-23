@@ -51,7 +51,6 @@ class XPathExpr
     }
 
     /**
-     * @param $condition
      *
      * @return $this
      */
@@ -96,8 +95,7 @@ class XPathExpr
     /**
      * Joins another XPathExpr with a combiner.
      *
-     * @param string    $combiner
-     * @param XPathExpr $expr
+     * @param string $combiner
      *
      * @return $this
      */

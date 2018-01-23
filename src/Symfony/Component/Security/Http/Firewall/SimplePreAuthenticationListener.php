@@ -40,12 +40,9 @@ class SimplePreAuthenticationListener implements ListenerInterface
     private $dispatcher;
 
     /**
-     * @param TokenStorageInterface           $tokenStorage          A TokenStorageInterface instance
-     * @param AuthenticationManagerInterface  $authenticationManager An AuthenticationManagerInterface instance
-     * @param string                          $providerKey
-     * @param SimplePreAuthenticatorInterface $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
-     * @param LoggerInterface|null            $logger                A LoggerInterface instance
-     * @param EventDispatcherInterface|null   $dispatcher            An EventDispatcherInterface instance
+     * @param string                        $providerKey
+     * @param LoggerInterface|null          $logger      A LoggerInterface instance
+     * @param EventDispatcherInterface|null $dispatcher  An EventDispatcherInterface instance
      */
     public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {

@@ -128,8 +128,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
     /**
      * Retrieves the user from an implementation-specific location.
      *
-     * @param string                $username The username to retrieve
-     * @param UsernamePasswordToken $token    The Token
+     * @param string $username The username to retrieve
      *
      * @return UserInterface The user
      *

@@ -50,8 +50,6 @@ abstract class FileDumper implements DumperInterface
 
     /**
      * Sets backup flag.
-     *
-     * @param bool
      */
     public function setBackup($backup)
     {
@@ -89,8 +87,7 @@ abstract class FileDumper implements DumperInterface
     /**
      * Transforms a domain of a message catalogue to its string representation.
      *
-     * @param MessageCatalogue $messages
-     * @param string           $domain
+     * @param string $domain
      *
      * @return string representation
      */

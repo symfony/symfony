@@ -38,7 +38,6 @@ class ValidationListener implements EventSubscriberInterface
 
     /**
      * @param ValidatorInterface|LegacyValidatorInterface $validator
-     * @param ViolationMapperInterface                    $violationMapper
      */
     public function __construct($validator, ViolationMapperInterface $violationMapper)
     {

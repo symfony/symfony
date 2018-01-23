@@ -45,8 +45,6 @@ class LegacyChoiceListAdapter implements ChoiceListInterface
 
     /**
      * Adapts a legacy choice list to {@link ChoiceListInterface}.
-     *
-     * @param LegacyChoiceListInterface $adaptedList The adapted list
      */
     public function __construct(LegacyChoiceListInterface $adaptedList)
     {

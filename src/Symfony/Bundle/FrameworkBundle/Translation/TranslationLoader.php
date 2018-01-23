@@ -32,8 +32,7 @@ class TranslationLoader
     /**
      * Adds a loader to the translation extractor.
      *
-     * @param string          $format The format of the loader
-     * @param LoaderInterface $loader
+     * @param string $format The format of the loader
      */
     public function addLoader($format, LoaderInterface $loader)
     {
@@ -43,8 +42,7 @@ class TranslationLoader
     /**
      * Loads translation messages from a directory to the catalogue.
      *
-     * @param string           $directory The directory to look into
-     * @param MessageCatalogue $catalogue The catalogue
+     * @param string $directory The directory to look into
      */
     public function loadMessages($directory, MessageCatalogue $catalogue)
     {

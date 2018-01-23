@@ -25,9 +25,7 @@ class ServiceReferenceGraphEdge
     private $value;
 
     /**
-     * @param ServiceReferenceGraphNode $sourceNode
-     * @param ServiceReferenceGraphNode $destNode
-     * @param mixed                     $value
+     * @param mixed $value
      */
     public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, $value = null)
     {

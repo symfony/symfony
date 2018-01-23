@@ -1079,8 +1079,6 @@ EOT
     }
 
     /**
-     * @param $lineNumber
-     * @param $yaml
      * @dataProvider parserThrowsExceptionWithCorrectLineNumberProvider
      */
     public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)

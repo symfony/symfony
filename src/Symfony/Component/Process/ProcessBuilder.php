@@ -149,8 +149,6 @@ class ProcessBuilder
      * overridden by the new values passed to this method. Pass `null` to unset
      * a variable.
      *
-     * @param array $variables The variables
-     *
      * @return $this
      */
     public function addEnvironmentVariables(array $variables)

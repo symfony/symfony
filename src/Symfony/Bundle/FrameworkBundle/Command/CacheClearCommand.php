@@ -173,10 +173,9 @@ EOF
     }
 
     /**
-     * @param KernelInterface $parent
-     * @param string          $namespace
-     * @param string          $parentClass
-     * @param string          $warmupDir
+     * @param string $namespace
+     * @param string $parentClass
+     * @param string $warmupDir
      *
      * @return KernelInterface
      */

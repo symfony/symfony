@@ -92,7 +92,8 @@ class ChoiceType extends AbstractType
 
                     if (false === FormUtil::isEmpty($emptyData) && array() !== $emptyData) {
                         if (!is_callable($emptyData) || (
-                            is_scalar($emptyData) && array_key_exists($emptyData, $form->getConfig()->getOption('choices'))
+                            array_key_exists($emptyData, $form->getConfig()->getOption('choices')) ||
+                            false !== array_search($emptyData, $form->getConfig()->getOption('choices'))
                         )) {
                             $data = $emptyData;
                         } else {

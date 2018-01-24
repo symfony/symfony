@@ -558,7 +558,7 @@ EOF;
         return array(
             array('dev-server', 'devserver'),
             array('local', 'local'),
-            array('env_#8', 'env8')
+            array('env_#8', 'env8'),
         );
     }
 

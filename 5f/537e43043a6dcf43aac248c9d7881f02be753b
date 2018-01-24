@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-24T16:36:57Z
+
+~This looks wrong to me as there is no `RoleInterface` anymore since Symfony 4.0.~
+
+never mind, this was before the target branch was modified

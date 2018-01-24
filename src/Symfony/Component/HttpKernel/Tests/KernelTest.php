@@ -535,6 +535,7 @@ EOF;
             {
                 // TODO: Implement registerContainerConfiguration() method.
             }
+
             public function registerBundles()
             {
                 // TODO: Implement registerBundles() method.
@@ -554,11 +555,11 @@ EOF;
      */
     public function envDataProvider()
     {
-        return [
-            ['dev-server', 'devserver'],
-            ['local', 'local'],
-            ['env_#8', 'env8']
-        ];
+        return array(
+            array('dev-server', 'devserver'),
+            array('local', 'local'),
+            array('env_#8', 'env8')
+        );
     }
 
     public function testKernelReset()

@@ -12,22 +12,23 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\Matcher\Dumper\StaticUrlMatcherDumper;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher;
+use Symfony\Bundle\FrameworkBundle\Routing\RedirectableStaticUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * @group legacy
+ * @requires function \Symfony\Component\Routing\Matcher\StaticUrlMatcher::match
  */
-class RedirectableUrlMatcherTest extends TestCase
+class RedirectableStaticUrlMatcherTest extends TestCase
 {
     public function testRedirectWhenNoSlash()
     {
-        $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo/'));
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/foo/'));
 
-        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
@@ -44,10 +45,10 @@ class RedirectableUrlMatcherTest extends TestCase
 
     public function testSchemeRedirect()
     {
-        $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
+        $routes = new RouteCollection();
+        $routes->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
 
-        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $matcher = $this->getMatcher($routes, $context = new RequestContext());
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
@@ -60,5 +61,17 @@ class RedirectableUrlMatcherTest extends TestCase
             ),
             $matcher->match('/foo')
         );
+    }
+
+    private function getMatcher(RouteCollection $routes, RequestContext $context)
+    {
+        $dumper = new StaticUrlMatcherDumper($routes);
+        $path = sys_get_temp_dir().'/php_matcher.'.uniqid('StaticUrlMatcher').'.php';
+
+        file_put_contents($path, $dumper->dump());
+        $matcher = new RedirectableStaticUrlMatcher(require $path, $context);
+        unlink($path);
+
+        return $matcher;
     }
 }

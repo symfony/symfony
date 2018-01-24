@@ -63,8 +63,11 @@ use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
+use Symfony\Component\Routing\Matcher\StaticUrlMatcher;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
@@ -641,6 +644,12 @@ class FrameworkExtension extends Extension
         $argument['strict_requirements'] = $config['strict_requirements'];
         if (isset($config['type'])) {
             $argument['resource_type'] = $config['type'];
+        }
+        if (!class_exists(StaticUrlMatcher::class)) {
+            $argument['generator_class'] = $argument['generator_base_class'];
+            $argument['generator_dumper_class'] = PhpGeneratorDumper::class;
+            $argument['matcher_class'] = $argument['matcher_base_class'];
+            $argument['matcher_dumper_class'] = PhpMatcherDumper::class;
         }
         $router->replaceArgument(2, $argument);
 

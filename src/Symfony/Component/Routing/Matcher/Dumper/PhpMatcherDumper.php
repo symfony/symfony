@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1 and will be removed in 5.0. Use StaticUrlMatcherDumper instead.', PhpMatcherDumper::class), E_USER_DEPRECATED);
+
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -22,6 +24,8 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
+ *
+ * @deprecated since Symfony 4.1, to be removed in 5.0. Use StaticUrlMatcherDumper instead.
  */
 class PhpMatcherDumper extends MatcherDumper
 {

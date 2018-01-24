@@ -17,9 +17,11 @@ use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
+use Symfony\Component\Routing\Generator\StaticUrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
+use Symfony\Component\Routing\Matcher\StaticUrlMatcher;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -82,6 +84,8 @@ class Router implements RouterInterface, RequestMatcherInterface
      * @var ExpressionFunctionProviderInterface[]
      */
     private $expressionLanguageProviders = array();
+
+    private static $dumpCache = array();
 
     /**
      * @param LoaderInterface $loader   A LoaderInterface instance
@@ -273,8 +277,10 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->matcher;
         }
 
+        $useStatic = is_subclass_of($this->options['matcher_class'], StaticUrlMatcher::class);
+
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
-            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
+            $this->matcher = new $this->options[$useStatic ? 'matcher_base_class' : 'matcher_class']($this->getRouteCollection(), $this->context);
             if (method_exists($this->matcher, 'addExpressionLanguageProvider')) {
                 foreach ($this->expressionLanguageProviders as $provider) {
                     $this->matcher->addExpressionLanguageProvider($provider);
@@ -302,6 +308,14 @@ class Router implements RouterInterface, RequestMatcherInterface
             }
         );
 
+        if ($useStatic) {
+            if (!isset(self::$dumpCache[$path = $cache->getPath()])) {
+                self::$dumpCache[$path] = require $path;
+            }
+
+            return $this->matcher = new $this->options['matcher_class'](self::$dumpCache[$path], $this->context);
+        }
+
         require_once $cache->getPath();
 
         return $this->matcher = new $this->options['matcher_cache_class']($this->context);
@@ -318,8 +332,10 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->generator;
         }
 
+        $useStatic = is_a($this->options['generator_class'], StaticUrlGenerator::class, true);
+
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
-            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
+            $this->generator = new $this->options[$useStatic ? 'generator_base_class' : 'generator_class']($this->getRouteCollection(), $this->context, $this->logger);
         } else {
             $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['generator_cache_class'].'.php',
                 function (ConfigCacheInterface $cache) {
@@ -334,9 +350,17 @@ class Router implements RouterInterface, RequestMatcherInterface
                 }
             );
 
-            require_once $cache->getPath();
+            if ($useStatic) {
+                if (!isset(self::$dumpCache[$path = $cache->getPath()])) {
+                    self::$dumpCache[$path] = require $path;
+                }
 
-            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger);
+                $this->generator = new $this->options['generator_class'](self::$dumpCache[$path], $this->context, $this->logger);
+            } else {
+                require_once $cache->getPath();
+
+                $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger);
+            }
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {

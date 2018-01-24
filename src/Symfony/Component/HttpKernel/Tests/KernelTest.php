@@ -523,6 +523,44 @@ EOF;
         $this->assertSame('foo', $kernel->getContainer()->getParameter('kernel.project_dir'));
     }
 
+    /**
+     * @param $env
+     * @param $expected
+     * @dataProvider envDataProvider
+     */
+    public function testKernelNormalizedEnv($env, $expected)
+    {
+        $kernel = new class($env, true) extends Kernel {
+            public function registerContainerConfiguration(LoaderInterface $loader)
+            {
+                // TODO: Implement registerContainerConfiguration() method.
+            }
+            public function registerBundles()
+            {
+                // TODO: Implement registerBundles() method.
+            }
+        };
+
+        $reflection = new \ReflectionObject($kernel);
+        $normalizeEnvMethod = $reflection->getMethod('getNormalizedEnv');
+        $normalizeEnvMethod->setAccessible(true);
+        $normalizedEnv = $normalizeEnvMethod->invoke($kernel);
+
+        $this->assertSame($expected, $normalizedEnv);
+    }
+
+    /**
+     * @return array
+     */
+    public function envDataProvider()
+    {
+        return [
+            ['dev-server', 'devserver'],
+            ['local', 'local'],
+            ['env_#8', 'env8']
+        ];
+    }
+
     public function testKernelReset()
     {
         (new Filesystem())->remove(__DIR__.'/Fixtures/cache');

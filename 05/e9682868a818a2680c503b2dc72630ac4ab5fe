@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-08T14:20:33Z
+
+3.4?
+
+---------------------------------------------------------------------------
+
+by sstok at 2017-12-09T10:31:35Z
+
+Dude! could you please stop posting pictures! This is GitHub not Instagram 😂
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-09T11:28:30Z
+
+This is now Instagit cc @iltar
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-10T10:49:27Z
+
+I like the idea of giving issues something more than just lines of code as it's people doing things behind :)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T04:40:41Z
+
+fabbot error is about https://github.com/symfony/symfony/pull/25397#discussion_r157103866 so I'm not fixing it.
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-12-19T23:40:11Z
+
+fabbot is right, `@expectedException` is always from root namespace. use FQCN there as fabbot ask you
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-20T15:49:28Z
+
+PR rebased with current 3.4
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-21T16:13:19Z
+
+done @stof
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-05T12:05:21Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-19T13:12:24Z
+
+It feels strange that are broken this way, I don't see how I can fix them without adding the `@expectedException` because it really passes a Reference object to a `factory.service`
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-19T13:58:48Z
+
+`Reference` can be casted to string, this probably needs to deal with objects implementing `__toString()` in addition to strings.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-19T14:00:20Z
+
+So I need to cast it to string.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-19T14:07:18Z
+
+No, you need to check for `!is_scalar($cell) &&
+!(is_object($cell) && method_exists($cell, '__toString'))` (strings are strings, objects are not strings but can be casted too).
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-19T14:08:14Z
+
+This is what I've done instead of doing a cast that could lead to errors.

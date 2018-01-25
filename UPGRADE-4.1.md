@@ -48,7 +48,7 @@ Validator
 Form
 ----
 
- * Using callable strings as `empty_data` in `ChoiceType` has been deprecated in Symfony 4.1 use a `\Closure` instead.
+ * Using callable strings as `empty_data` in `ChoiceType` is deprecated and will be removed in Symfony 5.0, use a `\Closure` instead.
 
   Before:
   

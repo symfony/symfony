@@ -50,14 +50,14 @@ Form
   Before:
   
   ```php
-  'empty_data' => 'SomeValueObject::getDefaultValue',
+  'empty_data' => 'some_function',
   ```
 
   After:
   
   ```php
   'empty_data' => function (FormInterface $form, $data) {
-      return SomeValueObject::getDefaultValue();
+      return some_function($form, $data);
   },
   ```
 

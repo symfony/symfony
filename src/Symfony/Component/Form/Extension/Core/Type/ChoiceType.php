@@ -91,7 +91,14 @@ class ChoiceType extends AbstractType
                     $emptyData = $form->getConfig()->getEmptyData();
 
                     if (false === FormUtil::isEmpty($emptyData) && array() !== $emptyData) {
-                        $data = is_callable($emptyData) ? call_user_func($emptyData, $form, $data) : $emptyData;
+                        if ($emptyData instanceof \Closure) {
+                            $data = call_user_func($emptyData, $form, $data);
+                        } elseif (is_callable($emptyData)) {
+                            @trigger_error('Usage of callable empty_data not instance of Closure is deprecated since version 4.1 and will be removed in 5.0.', E_USER_DEPRECATED);
+                            $data = call_user_func($emptyData, $form, $data);
+                        } else {
+                            $data = $emptyData;
+                        }
                     }
                 }
 

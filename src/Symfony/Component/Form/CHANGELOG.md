@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Using callable strings as `empty_data` in `ChoiceType` has been deprecated in Symfony 4.1 use a `\Closure` instead.
+
 4.0.0
 -----
 

@@ -93,7 +93,7 @@ class ChoiceType extends AbstractType
                     if (false === FormUtil::isEmpty($emptyData) && array() !== $emptyData) {
                         if (is_callable($emptyData)) {
                             if (is_string($emptyData)) {
-                                @trigger_error('Passing callable strings is deprecated is deprecated since version 4.1 and will be removed in 5.0.', E_USER_DEPRECATED);
+                                @trigger_error('Passing callable strings is deprecated since version 4.1 and will be removed in 5.0. You should use a "\Closure" instead.', E_USER_DEPRECATED);
                             }
                             $data = call_user_func($emptyData, $form, $data);
                         } else {

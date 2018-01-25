@@ -1811,7 +1811,12 @@ EOF;
 
     private function doExport($value, $resolveEnv = false)
     {
-        if (is_string($value) && false !== strpos($value, "\n")) {
+        if (is_string($value) && \in_array(preg_match('/[^\s\P{Cc}]/u', $value), array(false, 1), true)) {
+            $toHex = function (&$values, $char) {
+                return $values.sprintf('\\x%02x', ord($char));
+            };
+            $export = '"'.array_reduce(str_split($value), $toHex, '').'"';
+        } elseif (is_string($value) && false !== strpos($value, "\n")) {
             $cleanParts = explode("\n", $value);
             $cleanParts = array_map(function ($part) { return var_export($part, true); }, $cleanParts);
             $export = implode('."\n".', $cleanParts);

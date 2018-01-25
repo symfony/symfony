@@ -18,6 +18,8 @@
       <parameter type="string">false</parameter>
       <parameter type="string">null</parameter>
     </parameter>
+    <parameter key="binary" type="binary">8PDw8A==</parameter>
+    <parameter key="binary-control-char" type="binary">VGhpcyBpcyBhIEJlbGwgY2hhciAH</parameter>
   </parameters>
   <services>
     <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>

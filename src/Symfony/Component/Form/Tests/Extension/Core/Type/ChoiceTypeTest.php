@@ -671,7 +671,7 @@ class ChoiceTypeTest extends BaseTypeTest
             'multiple' => false,
             'expanded' => true,
             'choices' => array('test'),
-            'empty_data' => function() {
+            'empty_data' => function () {
                 return 'test';
             },
         ));

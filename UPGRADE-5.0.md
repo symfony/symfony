@@ -11,11 +11,15 @@ EventDispatcher
 
  * The `TraceableEventDispatcherInterface` has been removed.
 
+FrameworkBundle
+---------------
+
+ * Using a `RouterInterface` that does not implement the `WarmableInterface` is not supported anymore.
+
 HttpFoundation
 --------------
 
  * The `$size` argument of the `UploadedFile` constructor has been removed.
-
  * The `getClientSize()` method of the `UploadedFile` class has been removed.
 
 Security

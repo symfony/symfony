@@ -27,6 +27,7 @@ final class Dotenv
     const VARNAME_REGEX = '(?i:[A-Z][A-Z0-9_]*+)';
     const STATE_VARNAME = 0;
     const STATE_VALUE = 1;
+    const STATE_KEY = 2;
 
     private $path;
     private $cursor;
@@ -114,6 +115,7 @@ final class Dotenv
         $this->state = self::STATE_VARNAME;
         $this->values = array();
         $name = '';
+        $key = null;
 
         $this->skipEmptyLines();
 
@@ -121,18 +123,31 @@ final class Dotenv
             switch ($this->state) {
                 case self::STATE_VARNAME:
                     $name = $this->lexVarname();
+
+                    if ('[' === $this->data[$this->cursor]) {
+                        $this->state = self::STATE_KEY;
+                    } else {
+                        $this->state = self::STATE_VALUE;
+                        ++$this->cursor;
+                    }
+
+                    break;
+
+                case self::STATE_KEY:
+                    $key = $this->lexKey();
                     $this->state = self::STATE_VALUE;
                     break;
 
                 case self::STATE_VALUE:
-                    $this->values[$name] = $this->lexValue();
+                    $value = $this->lexValue();
+                    $this->setValue($name, $key, $value);
                     $this->state = self::STATE_VARNAME;
                     break;
             }
         }
 
         if (self::STATE_VALUE === $this->state) {
-            $this->values[$name] = '';
+            $this->setValue($name, $key, '');
         }
 
         try {
@@ -164,12 +179,27 @@ final class Dotenv
             throw $this->createFormatException('Whitespace are not supported after the variable name');
         }
 
+        if ('=' !== $this->data[$this->cursor] && '[' !== $this->data[$this->cursor]) {
+            throw $this->createFormatException('Missing = in the environment variable declaration');
+        }
+
+        return $matches[2];
+    }
+
+    private function lexKey()
+    {
+        if (!preg_match('/\[(.*?)\]/', $this->data, $matches, 0, $this->cursor)) {
+            throw $this->createFormatException('Invalid character in variable name');
+            return;
+        }
+        $this->moveCursor($matches[0]);
+
         if ('=' !== $this->data[$this->cursor]) {
             throw $this->createFormatException('Missing = in the environment variable declaration');
         }
         ++$this->cursor;
 
-        return $matches[2];
+        return $matches[1];
     }
 
     private function lexValue()
@@ -398,5 +428,22 @@ final class Dotenv
     private function createFormatException($message)
     {
         return new FormatException($message, new FormatExceptionContext($this->data, $this->path, $this->lineno, $this->cursor));
+    }
+
+    private function setValue($name, $key, $value)
+    {
+        if (null === $key) {
+            $this->values[$name] = $value;
+        } else {
+            if (!isset($this->values[$name])) {
+                $this->values[$name] = array();
+            }
+
+            if ('' === $key) {
+                $this->values[$name][] = $value;
+            } else {
+                $this->values[$name][$key] = $value;
+            }
+        }
     }
 }

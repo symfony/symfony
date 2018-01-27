@@ -137,6 +137,12 @@ class DotenvTest extends TestCase
             array('BAR=$LOCAL', array('BAR' => 'local')),
             array('BAR=$REMOTE', array('BAR' => 'remote')),
             array('FOO=$NOTDEFINED', array('FOO' => '')),
+
+            // array
+            array('FOO[]=', array('FOO' => array(''))),
+            array('FOO[]=BAR', array('FOO' => array('BAR'))),
+            array("FOO[]=BAR\nFOO[]=BAZ", array('FOO' => array('BAR', 'BAZ'))),
+            array("FOO[bar]=BAR\nFOO[baz]=BAZ", array('FOO' => array('bar' => 'BAR', 'baz' => 'BAZ'))),
         );
 
         if ('\\' !== DIRECTORY_SEPARATOR) {

@@ -39,6 +39,11 @@ class PhpDocExtractorTest extends TestCase
         $this->assertSame($shortDescription, $this->extractor->getShortDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
         $this->assertSame($longDescription, $this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
+    
+    public function testParamTagTypeIsOmitted()
+    {
+        $this->assertNull($this->extractor->getTypes(OmittedParamTagTypeDocBlock::class, 'omittedType'));
+    }
 
     /**
      * @dataProvider typesWithCustomPrefixesProvider
@@ -175,4 +180,15 @@ class PhpDocExtractorTest extends TestCase
 class EmptyDocBlock
 {
     public $foo;
+}
+
+class OmittedParamTagTypeDocBlock
+{
+    /**
+     * @param $omittedTagType
+     */
+    public function setOmittedType(array $omittedTagType)
+    {
+    }
+    
 }

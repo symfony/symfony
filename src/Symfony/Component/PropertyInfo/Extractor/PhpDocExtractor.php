@@ -131,7 +131,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $types = array();
         /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
         foreach ($docBlock->getTagsByName($tag) as $tag) {
-            if ($tag && $tag->getType() !== null) {
+            if ($tag && null !== $tag->getType()) {
                 $types = array_merge($types, $this->phpDocTypeHelper->getTypes($tag->getType()));
             }
         }

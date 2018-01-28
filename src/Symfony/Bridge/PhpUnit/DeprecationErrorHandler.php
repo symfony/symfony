@@ -113,7 +113,7 @@ class DeprecationErrorHandler
                     // if the error has been triggered from vendor code.
                     $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode ||
                         (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = isset($parsedMsg['triggering_file']) && self::inVendors($parsedMsg['triggering_file'])) ||
-                        (DeprecationErrorHandler::MODE_WEAK_LAGGING_VENDORS === $mode); // not enough information to make the right call, so let's be lenient
+                        (DeprecationErrorHandler::MODE_WEAK_LAGGING_VENDORS === $mode) && $isLaggingVendor = isset($parsedMsg['trace']) && self::isLaggingVendor($parsedMsg['trace']);
                 } else {
                     $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
                     $method = $trace[$i]['function'];
@@ -343,7 +343,7 @@ class DeprecationErrorHandler
 
                 return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
-            $deprecations[] = array(error_reporting(), $msg, $file);
+            $deprecations[] = array(error_reporting(), $msg, $file, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         });
 
         register_shutdown_function(function () use ($outputFile, &$deprecations) {

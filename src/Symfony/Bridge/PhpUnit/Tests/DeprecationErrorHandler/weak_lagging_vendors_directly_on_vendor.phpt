@@ -37,6 +37,6 @@ $defraculator->deprecatedApi();
 --EXPECTF--
 Remaining deprecation notices (1)
 
-deprecatedApi is deprecated! You should stop relying on it!: 1x
+  1x: deprecatedApi is deprecated! You should stop relying on it!
     1x in SomeService::deprecatedApi from acme\lib
 

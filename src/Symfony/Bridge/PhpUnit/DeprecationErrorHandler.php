@@ -286,7 +286,10 @@ class DeprecationErrorHandler
             }
         }
 
-        throw new \RuntimeException('No vendors found');
+        throw new \RuntimeException(sprintf(
+            'No vendors found for path "%s"',
+            $path
+        ));
     }
 
     private static function getVendors(): array

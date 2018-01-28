@@ -252,7 +252,7 @@ class DeprecationErrorHandler
                 continue;
             }
             $file = $line['file'];
-            if ('-' === $file) {
+            if ('-' === $file || 'Standard input code' === $file || !realpath($file)) {
                 continue;
             }
             if (!self::inVendors($file)) {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Workflow;
 /**
  * A list of transition blockers.
  */
-class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAccess
+class TransitionBlockerList implements \IteratorAggregate, \Countable
 {
     /** @var TransitionBlocker[] */
     private $blockers = array();
@@ -45,16 +45,6 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
         return isset($this->blockers[$offset]);
     }
 
-    public function set(int $offset, TransitionBlocker $blocker): void
-    {
-        $this->blockers[$offset] = $blocker;
-    }
-
-    public function remove(int $offset): void
-    {
-        unset($this->blockers[$offset]);
-    }
-
     /**
      * {@inheritdoc}
      *
@@ -68,30 +58,6 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable, \ArrayAcc
     public function count(): int
     {
         return count($this->blockers);
-    }
-
-    public function offsetExists($offset): bool
-    {
-        return $this->has($offset);
-    }
-
-    public function offsetGet($offset): TransitionBlocker
-    {
-        return $this->get($offset);
-    }
-
-    public function offsetSet($offset, $blocker): void
-    {
-        if (null === $offset) {
-            $this->add($blocker);
-        } else {
-            $this->set($offset, $blocker);
-        }
-    }
-
-    public function offsetUnset($offset): void
-    {
-        $this->remove($offset);
     }
 
     public function findByCode(string $code): ?TransitionBlocker

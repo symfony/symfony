@@ -14,8 +14,7 @@ namespace Symfony\Component\Workflow\Exception;
 use Symfony\Component\Workflow\TransitionBlockerList;
 
 /**
- * Thrown by Workflow when a transition is applied on a subject that is
- * not possible to be made.
+ * Thrown by the workflow when a transition is not enabled.
  */
 class BlockedTransitionException extends LogicException
 {

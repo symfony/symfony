@@ -464,7 +464,7 @@ class WorkflowTest extends TestCase
         $this->assertCount(1, $transitionBlockerList);
         $this->assertEquals(
             TransitionBlocker::REASON_TRANSITION_NOT_DEFINED,
-            $transitionBlockerList[0]->getCode()
+            $transitionBlockerList->get(0)->getCode()
         );
     }
 
@@ -480,7 +480,7 @@ class WorkflowTest extends TestCase
         $this->assertCount(1, $transitionBlockerList);
         $this->assertEquals(
             TransitionBlocker::REASON_TRANSITION_NOT_APPLICABLE,
-            $transitionBlockerList[0]->getCode()
+            $transitionBlockerList->get(0)->getCode()
         );
     }
 

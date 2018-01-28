@@ -25,6 +25,9 @@ class DeprecationErrorHandler
 
     private static $isRegistered = false;
 
+    /** @var string[] absolute paths to vendor directories */
+    private static $vendors;
+
     /**
      * Registers and configures the deprecation handler.
      *
@@ -294,23 +297,20 @@ class DeprecationErrorHandler
 
     private static function getVendors(): array
     {
-        /** @var string[] absolute paths to vendor directories */
-        static $vendors;
-
-        if (null === $vendors) {
-            $vendors = array();
+        if (null === self::$vendors) {
+            self::$vendors = array();
             foreach (get_declared_classes() as $class) {
                 if ('C' === $class[0] && 0 === strpos($class, 'ComposerAutoloaderInit')) {
                     $r = new \ReflectionClass($class);
                     $v = dirname(dirname($r->getFileName()));
                     if (file_exists($v.'/composer/installed.json')) {
-                        $vendors[] = $v;
+                        self::$vendors[] = $v;
                     }
                 }
             }
         }
 
-        return $vendors;
+        return self::$vendors;
     }
 
     private static function inVendors(string $path): bool

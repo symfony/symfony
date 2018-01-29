@@ -22,6 +22,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 class PhpMatcherDumper extends MatcherDumper
 {
@@ -93,7 +94,21 @@ EOF;
      */
     private function generateMatchMethod($supportsRedirections)
     {
-        $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections), "\n");
+        // Group hosts by same-suffix, re-order when possible
+        $matchHost = false;
+        $routes = new StaticPrefixCollection();
+        foreach ($this->getRoutes()->all() as $name => $route) {
+            if ($host = $route->getHost()) {
+                $matchHost = true;
+                $host = '/'.str_replace('.', '/', rtrim(explode('}', strrev($host), 2)[0], '.'));
+            }
+
+            $routes->addRoute($host ?: '/', array($name, $route));
+        }
+        $routes = $matchHost ? $routes->populateCollection(new RouteCollection()) : $this->getRoutes();
+
+        $code = rtrim($this->compileRoutes($routes, $supportsRedirections, $matchHost), "\n");
+        $fetchHost = $matchHost ? "        \$host = strtolower(\$context->getHost());\n" : '';
 
         return <<<EOF
     public function match(\$rawPathinfo)
@@ -102,16 +117,15 @@ EOF;
         \$pathinfo = rawurldecode(\$rawPathinfo);
         \$trimmedPathinfo = rtrim(\$pathinfo, '/');
         \$context = \$this->context;
-        \$request = \$this->request ?: \$this->createRequest(\$pathinfo);
         \$requestMethod = \$canonicalMethod = \$context->getMethod();
-
+{$fetchHost}
         if ('HEAD' === \$requestMethod) {
             \$canonicalMethod = 'GET';
         }
 
 $code
 
-        throw 0 < count(\$allow) ? new MethodNotAllowedException(array_unique(\$allow)) : new ResourceNotFoundException();
+        throw \$allow ? new MethodNotAllowedException(array_keys(\$allow)) : new ResourceNotFoundException();
     }
 EOF;
     }
@@ -124,34 +138,12 @@ EOF;
      *
      * @return string PHP code
      */
-    private function compileRoutes(RouteCollection $routes, $supportsRedirections)
+    private function compileRoutes(RouteCollection $routes, $supportsRedirections, $matchHost)
     {
-        $fetchedHost = false;
-        $groups = $this->groupRoutesByHostRegex($routes);
-        $code = '';
+        list($staticRoutes, $dynamicRoutes) = $this->groupStaticRoutes($routes, $supportsRedirections);
 
-        foreach ($groups as $collection) {
-            if (null !== $regex = $collection->getAttribute('host_regex')) {
-                if (!$fetchedHost) {
-                    $code .= "        \$host = \$context->getHost();\n\n";
-                    $fetchedHost = true;
-                }
-
-                $code .= sprintf("        if (preg_match(%s, \$host, \$hostMatches)) {\n", var_export($regex, true));
-            }
-
-            $tree = $this->buildStaticPrefixCollection($collection);
-            $groupCode = $this->compileStaticPrefixRoutes($tree, $supportsRedirections);
-
-            if (null !== $regex) {
-                // apply extra indention at each line (except empty ones)
-                $groupCode = preg_replace('/^.{2,}$/m', '    $0', $groupCode);
-                $code .= $groupCode;
-                $code .= "        }\n\n";
-            } else {
-                $code .= $groupCode;
-            }
-        }
+        $code = $this->compileStaticRoutes($staticRoutes, $supportsRedirections, $matchHost);
+        $code .= $this->compileDynamicRoutes($dynamicRoutes, $supportsRedirections, $matchHost);
 
         if ('' === $code) {
             $code .= "        if ('/' === \$pathinfo) {\n";
@@ -162,55 +154,391 @@ EOF;
         return $code;
     }
 
-    private function buildStaticPrefixCollection(DumperCollection $collection)
-    {
-        $prefixCollection = new StaticPrefixCollection();
-
-        foreach ($collection as $dumperRoute) {
-            $prefix = $dumperRoute->getRoute()->compile()->getStaticPrefix();
-            $prefixCollection->addRoute($prefix, $dumperRoute);
-        }
-
-        $prefixCollection->optimizeGroups();
-
-        return $prefixCollection;
-    }
-
     /**
-     * Generates PHP code to match a tree of routes.
-     *
-     * @param StaticPrefixCollection $collection           A StaticPrefixCollection instance
-     * @param bool                   $supportsRedirections Whether redirections are supported by the base class
-     * @param string                 $ifOrElseIf           either "if" or "elseif" to influence chaining
-     *
-     * @return string PHP code
+     * Splits static routes from dynamic routes, so that they can be matched first, using a simple switch.
      */
-    private function compileStaticPrefixRoutes(StaticPrefixCollection $collection, $supportsRedirections, $ifOrElseIf = 'if')
+    private function groupStaticRoutes(RouteCollection $collection, bool $supportsRedirections): array
     {
-        $code = '';
-        $prefix = $collection->getPrefix();
+        $staticRoutes = $dynamicRegex = array();
+        $dynamicRoutes = new RouteCollection();
 
-        if (!empty($prefix) && '/' !== $prefix) {
-            $code .= sprintf("    %s (0 === strpos(\$pathinfo, %s)) {\n", $ifOrElseIf, var_export($prefix, true));
-        }
+        foreach ($collection->all() as $name => $route) {
+            $compiledRoute = $route->compile();
+            $hostRegex = $compiledRoute->getHostRegex();
+            $regex = $compiledRoute->getRegex();
+            if ($hasTrailingSlash = $supportsRedirections && $pos = strpos($regex, '/$')) {
+                $regex = substr_replace($regex, '/?$', $pos, 2);
+            }
+            if (!$compiledRoute->getPathVariables()) {
+                $host = !$compiledRoute->getHostVariables() ? $route->getHost() : '';
+                $url = $route->getPath();
+                if ($hasTrailingSlash) {
+                    $url = rtrim($url, '/');
+                }
+                foreach ($dynamicRegex as list($hostRx, $rx)) {
+                    if (preg_match($rx, $url) && (!$host || !$hostRx || preg_match($hostRx, $host))) {
+                        $dynamicRegex[] = array($hostRegex, $regex);
+                        $dynamicRoutes->add($name, $route);
+                        continue 2;
+                    }
+                }
 
-        $ifOrElseIf = 'if';
-
-        foreach ($collection->getItems() as $route) {
-            if ($route instanceof StaticPrefixCollection) {
-                $code .= $this->compileStaticPrefixRoutes($route, $supportsRedirections, $ifOrElseIf);
-                $ifOrElseIf = 'elseif';
+                $staticRoutes[$url][$name] = array($hasTrailingSlash, $route);
             } else {
-                $code .= $this->compileRoute($route[1]->getRoute(), $route[1]->getName(), $supportsRedirections, $prefix)."\n";
-                $ifOrElseIf = 'if';
+                $dynamicRegex[] = array($hostRegex, $regex);
+                $dynamicRoutes->add($name, $route);
             }
         }
 
-        if (!empty($prefix) && '/' !== $prefix) {
-            $code .= "    }\n\n";
-            // apply extra indention at each line (except empty ones)
-            $code = preg_replace('/^.{2,}$/m', '    $0', $code);
+        return array($staticRoutes, $dynamicRoutes);
+    }
+
+    /**
+     * Compiles static routes in a switch statement.
+     *
+     * Condition-less paths are put in a static array in the switch's default, with generic matching logic.
+     * Paths that can match two or more routes, or have user-specified conditions are put in separate switch's cases.
+     *
+     * @throws \LogicException
+     */
+    private function compileStaticRoutes(array $staticRoutes, bool $supportsRedirections, bool $matchHost): string
+    {
+        if (!$staticRoutes) {
+            return '';
         }
+        $code = $default = '';
+        $checkTrailingSlash = false;
+
+        foreach ($staticRoutes as $url => $routes) {
+            if (1 === count($routes)) {
+                foreach ($routes as $name => list($hasTrailingSlash, $route)) {
+                }
+
+                if (!$route->getCondition()) {
+                    if (!$supportsRedirections && $route->getSchemes()) {
+                        throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
+                    }
+                    $checkTrailingSlash = $checkTrailingSlash || $hasTrailingSlash;
+                    $default .= sprintf(
+                        "%s => array(%s, %s, %s, %s),\n",
+                        self::export($url),
+                        self::export(array('_route' => $name) + $route->getDefaults()),
+                        self::export(!$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex() ?: null),
+                        self::export(array_flip($route->getMethods()) ?: null),
+                        self::export(array_flip($route->getSchemes()) ?: null).($hasTrailingSlash ? ', true' : '')
+                    );
+                    continue;
+                }
+            }
+
+            $code .= sprintf("        case %s:\n", self::export($url));
+            foreach ($routes as $name => list($hasTrailingSlash, $route)) {
+                $code .= $this->compileRoute($route, $name, $supportsRedirections, $hasTrailingSlash);
+            }
+            $code .= "            break;\n";
+        }
+
+        $matchedPathinfo = $supportsRedirections ? '$trimmedPathinfo' : '$pathinfo';
+
+        if ($default) {
+            $code .= <<<EOF
+        default:
+            \$routes = array(
+{$this->indent($default, 4)}            );
+
+            if (!isset(\$routes[{$matchedPathinfo}])) {
+                break;
+            }
+            list(\$ret, \$requiredHost, \$requiredMethods, \$requiredSchemes) = \$routes[{$matchedPathinfo}];
+{$this->compileSwitchDefault(false, $matchedPathinfo, $matchHost, $supportsRedirections, $checkTrailingSlash)}
+EOF;
+        }
+
+        return sprintf("        switch (%s) {\n%s        }\n\n", $matchedPathinfo, $this->indent($code));
+    }
+
+    /**
+     * Compiles a regular expression followed by a switch statement to match dynamic routes.
+     *
+     * The regular expression matches both the host and the pathinfo at the same time. For stellar performance,
+     * it is built as a tree of patterns, with re-ordering logic to group same-prefix routes together when possible.
+     *
+     * Patterns are named so that we know which one matched (https://pcre.org/current/doc/html/pcre2syntax.html#SEC23).
+     * This name is used to "switch" to the additional logic required to match the final route.
+     *
+     * Condition-less paths are put in a static array in the switch's default, with generic matching logic.
+     * Paths that can match two or more routes, or have user-specified conditions are put in separate switch's cases.
+     *
+     * Last but not least:
+     *  - Because it is not possibe to mix unicode/non-unicode patterns in a single regexp, several of them can be generated.
+     *  - The same regexp can be used several times when the logic in the switch rejects the match. When this happens, the
+     *    matching-but-failing subpattern is blacklisted by replacing its name by "(*F)", which forces a failure-to-match.
+     *    To ease this backlisting operation, the name of subpatterns is also the string offset where the replacement should occur.
+     */
+    private function compileDynamicRoutes(RouteCollection $collection, bool $supportsRedirections, bool $matchHost): string
+    {
+        if (!$collection->all()) {
+            return '';
+        }
+        $code = '';
+        $state = (object) array(
+            'switch' => '',
+            'default' => '',
+            'mark' => 0,
+            'markTail' => 0,
+            'supportsRedirections' => $supportsRedirections,
+            'checkTrailingSlash' => false,
+            'hostVars' => array(),
+            'vars' => array(),
+        );
+        $state->getVars = static function ($m) use ($state) {
+            if ('_route' === $m[1]) {
+                return '?:';
+            }
+
+            $state->vars[] = $m[1];
+
+            return '';
+        };
+
+        $prev = null;
+        $perModifiers = array();
+        foreach ($collection->all() as $name => $route) {
+            preg_match('#[a-zA-Z]*$#', $route->compile()->getRegex(), $rx);
+            if ($prev !== $rx[0] && $route->compile()->getPathVariables()) {
+                $routes = new RouteCollection();
+                $perModifiers[] = array($rx[0], $routes);
+                $prev = $rx[0];
+            }
+            $routes->add($name, $route);
+        }
+
+        foreach ($perModifiers as list($modifiers, $routes)) {
+            $prev = false;
+            $perHost = array();
+            foreach ($routes->all() as $name => $route) {
+                $regex = $route->compile()->getHostRegex();
+                if ($prev !== $regex) {
+                    $routes = new RouteCollection();
+                    $perHost[] = array($regex, $routes);
+                    $prev = $regex;
+                }
+                $routes->add($name, $route);
+            }
+            $prev = false;
+            $code .= "\n            {$state->mark} => '{^(?'";
+            $state->mark += 4;
+
+            foreach ($perHost as list($hostRegex, $routes)) {
+                if ($matchHost) {
+                    if ($hostRegex) {
+                        preg_match('#^.\^(.*)\$.[a-zA-Z]*$#', $hostRegex, $rx);
+                        $state->vars = array();
+                        $hostRegex = '(?i:'.preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]).')';
+                        $state->hostVars = $state->vars;
+                    } else {
+                        $hostRegex = '[^/]*+';
+                        $state->hostVars = array();
+                    }
+                    $state->mark += 3 + $prev + strlen($hostRegex);
+                    $code .= "\n                .".self::export(($prev ? ')' : '')."|{$hostRegex}(?");
+                    $prev = true;
+                }
+
+                $tree = new StaticPrefixCollection();
+                foreach ($routes->all() as $name => $route) {
+                    preg_match('#^.\^(.*)\$.[a-zA-Z]*$#', $route->compile()->getRegex(), $rx);
+
+                    $state->vars = array();
+                    $regex = preg_replace_callback('#\?P<([^>]++)>#', $state->getVars, $rx[1]);
+                    $tree->addRoute($regex, array($name, $regex, $state->vars, $route));
+                }
+
+                $code .= $this->compileStaticPrefixCollection($tree, $state);
+            }
+            if ($matchHost) {
+                $code .= "\n                .')'";
+            }
+            $code .= "\n                .')$}{$modifiers}',";
+        }
+
+        if ($state->default) {
+            $state->switch .= <<<EOF
+        default:
+            \$routes = array(
+{$this->indent($state->default, 4)}            );
+
+            list(\$ret, \$vars, \$requiredMethods, \$requiredSchemes) = \$routes[\$m];
+{$this->compileSwitchDefault(true, '$m', $matchHost, $supportsRedirections, $state->checkTrailingSlash)}
+EOF;
+        }
+
+        $matchedPathinfo = $matchHost ? '$host.$pathinfo' : '$pathinfo';
+        unset($state->getVars);
+
+        return <<<EOF
+        \$matchedPathinfo = {$matchedPathinfo};
+        \$regexList = array({$code}
+        );
+
+        foreach (\$regexList as \$offset => \$regex) {
+            while (preg_match(\$regex, \$matchedPathinfo, \$matches)) {
+                switch (\$m = (int) \$matches['MARK']) {
+{$this->indent($state->switch, 3)}                }
+
+                if ({$state->mark} === \$m) {
+                    break;
+                }
+                \$regex = substr_replace(\$regex, 'F', \$m - \$offset, 1 + strlen(\$m));
+                \$offset += strlen(\$m);
+            }
+        }
+
+EOF;
+    }
+
+    /**
+     * Compiles a regexp tree of subpatterns that matches nested same-prefix routes.
+     *
+     * @param \stdClass $state A simple state object that keeps track of the progress of the compilation,
+     *                         and gathers the generated switch's "case" and "default" statements
+     */
+    private function compileStaticPrefixCollection(StaticPrefixCollection $tree, \stdClass $state, int $prefixLen = 0)
+    {
+        $code = '';
+        $prevRegex = null;
+        $routes = $tree->getRoutes();
+
+        foreach ($routes as $i => $route) {
+            if ($route instanceof StaticPrefixCollection) {
+                $prevRegex = null;
+                $prefix = substr($route->getPrefix(), $prefixLen);
+                $state->mark += 3 + strlen($prefix);
+                $code .= "\n                    .".self::export("|{$prefix}(?");
+                $code .= $this->indent($this->compileStaticPrefixCollection($route, $state, $prefixLen + strlen($prefix)));
+                $code .= "\n                    .')'";
+                $state->markTail += 1;
+                continue;
+            }
+
+            list($name, $regex, $vars, $route) = $route;
+            $compiledRoute = $route->compile();
+            $hasTrailingSlash = $state->supportsRedirections && '' !== $regex && '/' === $regex[-1];
+
+            if ($compiledRoute->getRegex() === $prevRegex) {
+                $state->switch = substr_replace($state->switch, $this->compileRoute($route, $name, $state->supportsRedirections, $hasTrailingSlash)."\n", -19, 0);
+                continue;
+            }
+
+            $methods = array_flip($route->getMethods());
+            $hasTrailingSlash = $hasTrailingSlash && (!$methods || isset($methods['GET']));
+            $state->mark += 3 + $state->markTail + $hasTrailingSlash + strlen($regex) - $prefixLen;
+            $state->markTail = 2 + strlen($state->mark);
+            $code .= "\n                    .";
+            $code .= self::export(sprintf('|%s(*:%s)', substr($regex, $prefixLen).($hasTrailingSlash ? '?' : ''), $state->mark));
+            $vars = array_merge($state->hostVars, $vars);
+
+            if (!$route->getCondition() && (!is_array($next = $routes[1 + $i] ?? null) || $regex !== $next[1])) {
+                $prevRegex = null;
+                $state->checkTrailingSlash = $state->checkTrailingSlash || $hasTrailingSlash;
+                $state->default .= sprintf(
+                    "%s => array(%s, %s, %s, %s),\n",
+                    $state->mark,
+                    self::export(array('_route' => $name) + $route->getDefaults()),
+                    self::export($vars),
+                    self::export($methods ?: null),
+                    self::export(array_flip($route->getSchemes()) ?: null).($hasTrailingSlash ? ', true' : '')
+                );
+            } else {
+                $prevRegex = $compiledRoute->getRegex();
+                $combine = '            $matches = array(';
+                foreach ($vars as $j => $m) {
+                    $combine .= sprintf('%s => $matches[%d] ?? null, ', self::export($m), 1 + $j);
+                }
+                $combine = $vars ? substr_replace($combine, ");\n\n", -2) : '';
+
+                $state->switch .= <<<EOF
+        case {$state->mark}:
+{$combine}{$this->compileRoute($route, $name, $state->supportsRedirections, $hasTrailingSlash)}
+            break;
+
+EOF;
+            }
+        }
+
+        return $code;
+    }
+
+    /**
+     * A simple helper to compiles the switch's "default" for both static and dynamic routes.
+     */
+    private function compileSwitchDefault(bool $hasVars, string $routesKey, bool $matchHost, bool $supportsRedirections, bool $checkTrailingSlash)
+    {
+        if ($hasVars) {
+            $code = <<<EOF
+
+            foreach (\$vars as \$i => \$v) {
+                if (isset(\$matches[1 + \$i])) {
+                    \$ret[\$v] = \$matches[1 + \$i];
+                }
+            }
+
+EOF;
+        } elseif ($matchHost) {
+            $code = <<<EOF
+
+            if (\$requiredHost) {
+                if ('#' !== \$requiredHost[0] ? \$requiredHost !== \$host : !preg_match(\$requiredHost, \$host, \$hostMatches)) {
+                    break;
+                }
+                if ('#' === \$requiredHost[0] && \$hostMatches) {
+                    \$hostMatches['_route'] = \$ret['_route'];
+                    \$ret = \$this->mergeDefaults(\$hostMatches, \$ret);
+                }
+            }
+
+EOF;
+        } else {
+            $code = '';
+        }
+        if ($supportsRedirections && $checkTrailingSlash) {
+            $code .= <<<EOF
+
+            if (empty(\$routes[{$routesKey}][4]) || '/' === \$pathinfo[-1]) {
+                // no-op
+            } elseif ('GET' !== \$canonicalMethod) {
+                \$allow['GET'] = 'GET';
+                break;
+            } else {
+                return array_replace(\$ret, \$this->redirect(\$rawPathinfo.'/', \$ret['_route']));
+            }
+
+EOF;
+        }
+        if ($supportsRedirections) {
+            $code .= <<<EOF
+
+            if (\$requiredSchemes && !isset(\$requiredSchemes[\$context->getScheme()])) {
+                if ('GET' !== \$canonicalMethod) {
+                    \$allow['GET'] = 'GET';
+                    break;
+                }
+
+                return array_replace(\$ret, \$this->redirect(\$rawPathinfo, \$ret['_route'], key(\$requiredSchemes)));
+            }
+
+EOF;
+        }
+        $code .= <<<EOF
+
+            if (\$requiredMethods && !isset(\$requiredMethods[\$canonicalMethod]) && !isset(\$requiredMethods[\$requestMethod])) {
+                \$allow += \$requiredMethods;
+                break;
+            }
+
+            return \$ret;
+
+EOF;
 
         return $code;
     }
@@ -218,64 +546,58 @@ EOF;
     /**
      * Compiles a single Route to PHP code used to match it against the path info.
      *
-     * @param Route       $route                A Route instance
-     * @param string      $name                 The name of the Route
-     * @param bool        $supportsRedirections Whether redirections are supported by the base class
-     * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code
+     * @param Route  $route                A Route instance
+     * @param string $name                 The name of the Route
+     * @param bool   $supportsRedirections Whether redirections are supported by the base class
+     * @param bool   $hasTrailingSlash     Whether the path has a trailing slash
      *
      * @return string PHP code
      *
      * @throws \LogicException
      */
-    private function compileRoute(Route $route, $name, $supportsRedirections, $parentPrefix = null)
+    private function compileRoute(Route $route, string $name, bool $supportsRedirections, bool $hasTrailingSlash): string
     {
         $code = '';
         $compiledRoute = $route->compile();
         $conditions = array();
-        $hasTrailingSlash = false;
-        $matches = false;
-        $hostMatches = false;
-        $methods = $route->getMethods();
+        $matches = (bool) $compiledRoute->getPathVariables();
+        $hostMatches = (bool) $compiledRoute->getHostVariables();
+        $methods = array_flip($route->getMethods());
+        $supportsTrailingSlash = $supportsRedirections && (!$methods || isset($methods['GET']));
 
-        $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('GET', $methods));
-        $regex = $compiledRoute->getRegex();
-
-        if (!count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#'.('u' === substr($regex, -1) ? 'u' : ''), $regex, $m)) {
-            if ($supportsTrailingSlash && '/' === substr($m['url'], -1)) {
-                $conditions[] = sprintf('%s === $trimmedPathinfo', var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
-                $hasTrailingSlash = true;
-            } else {
-                $conditions[] = sprintf('%s === $pathinfo', var_export(str_replace('\\', '', $m['url']), true));
-            }
-        } else {
-            if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() !== $parentPrefix) {
-                $conditions[] = sprintf('0 === strpos($pathinfo, %s)', var_export($compiledRoute->getStaticPrefix(), true));
-            }
-
-            if ($supportsTrailingSlash && $pos = strpos($regex, '/$')) {
-                $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
-                $hasTrailingSlash = true;
-            }
-            $conditions[] = sprintf('preg_match(%s, $pathinfo, $matches)', var_export($regex, true));
-
-            $matches = true;
-        }
-
-        if ($compiledRoute->getHostVariables()) {
-            $hostMatches = true;
+        if ($hasTrailingSlash && !$supportsTrailingSlash) {
+            $hasTrailingSlash = false;
+            $conditions[] = "'/' === \$pathinfo[-1]";
         }
 
         if ($route->getCondition()) {
-            $conditions[] = $this->getExpressionLanguage()->compile($route->getCondition(), array('context', 'request'));
+            $expression = $this->getExpressionLanguage()->compile($route->getCondition(), array('context', 'request'));
+
+            if (false !== strpos($expression, '$request')) {
+                $conditions[] = '($request = $request ?? $this->request ?: $this->createRequest($pathinfo))';
+            }
+            $conditions[] = $expression;
+        }
+
+        if (!$compiledRoute->getHostRegex()) {
+            // no-op
+        } elseif ($hostMatches) {
+            $conditions[] = sprintf('preg_match(%s, $host, $hostMatches)', self::export($compiledRoute->getHostRegex()));
+        } else {
+            $conditions[] = sprintf('%s === $host', self::export($route->getHost()));
         }
 
         $conditions = implode(' && ', $conditions);
 
-        $code .= <<<EOF
+        if ($conditions) {
+            $code .= <<<EOF
         // $name
         if ($conditions) {
 
 EOF;
+        } else {
+            $code .= "            // {$name}\n";
+        }
 
         $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
 
@@ -296,20 +618,20 @@ EOF;
             $code .= sprintf(
                 "            \$ret = \$this->mergeDefaults(array_replace(%s), %s);\n",
                 implode(', ', $vars),
-                str_replace("\n", '', var_export($route->getDefaults(), true))
+                self::export($route->getDefaults())
             );
         } elseif ($route->getDefaults()) {
-            $code .= sprintf("            \$ret = %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
+            $code .= sprintf("            \$ret = %s;\n", self::export(array_replace($route->getDefaults(), array('_route' => $name))));
         } else {
             $code .= sprintf("            \$ret = array('_route' => '%s');\n", $name);
         }
 
         if ($hasTrailingSlash) {
             $code .= <<<EOF
-            if ('/' === substr(\$pathinfo, -1)) {
+            if ('/' === \$pathinfo[-1]) {
                 // no-op
             } elseif ('GET' !== \$canonicalMethod) {
-                \$allow[] = 'GET';
+                \$allow['GET'] = 'GET';
                 goto $gotoname;
             } else {
                 return array_replace(\$ret, \$this->redirect(\$rawPathinfo.'/', '$name'));
@@ -323,12 +645,12 @@ EOF;
             if (!$supportsRedirections) {
                 throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
-            $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
+            $schemes = self::export(array_flip($schemes));
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$context->getScheme()])) {
                 if ('GET' !== \$canonicalMethod) {
-                    \$allow[] = 'GET';
+                    \$allow['GET'] = 'GET';
                     goto $gotoname;
                 }
 
@@ -340,56 +662,17 @@ EOF;
         }
 
         if ($methods) {
-            if (1 === count($methods)) {
-                if ('HEAD' === $methods[0]) {
-                    $code .= <<<EOF
-            if ('HEAD' !== \$requestMethod) {
-                \$allow[] = 'HEAD';
+            $methodVariable = isset($methods['GET']) ? '$canonicalMethod' : '$requestMethod';
+            $methods = self::export($methods);
+
+            $code .= <<<EOF
+            if (!isset((\$a = {$methods})[{$methodVariable}])) {
+                \$allow += \$a;
                 goto $gotoname;
             }
 
 
 EOF;
-                } else {
-                    $code .= <<<EOF
-            if ('$methods[0]' !== \$canonicalMethod) {
-                \$allow[] = '$methods[0]';
-                goto $gotoname;
-            }
-
-
-EOF;
-                }
-            } else {
-                $methodVariable = 'requestMethod';
-
-                if (in_array('GET', $methods)) {
-                    // Since we treat HEAD requests like GET requests we don't need to match it.
-                    $methodVariable = 'canonicalMethod';
-                    $methods = array_values(array_filter($methods, function ($method) { return 'HEAD' !== $method; }));
-                }
-
-                if (1 === count($methods)) {
-                    $code .= <<<EOF
-            if ('$methods[0]' !== \$$methodVariable) {
-                \$allow[] = '$methods[0]';
-                goto $gotoname;
-            }
-
-
-EOF;
-                } else {
-                    $methods = implode("', '", $methods);
-                    $code .= <<<EOF
-            if (!in_array(\$$methodVariable, array('$methods'))) {
-                \$allow = array_merge(\$allow, array('$methods'));
-                goto $gotoname;
-            }
-
-
-EOF;
-                }
-            }
         }
 
         if ($hasTrailingSlash || $schemes || $methods) {
@@ -397,42 +680,17 @@ EOF;
         } else {
             $code = substr_replace($code, 'return', $retOffset, 6);
         }
-        $code .= "        }\n";
+        if ($conditions) {
+            $code .= "        }\n";
+        } elseif ($hasTrailingSlash || $schemes || $methods) {
+            $code .= '    ';
+        }
 
         if ($hasTrailingSlash || $schemes || $methods) {
             $code .= "        $gotoname:\n";
         }
 
-        return $code;
-    }
-
-    /**
-     * Groups consecutive routes having the same host regex.
-     *
-     * The result is a collection of collections of routes having the same host regex.
-     *
-     * @param RouteCollection $routes A flat RouteCollection
-     *
-     * @return DumperCollection A collection with routes grouped by host regex in sub-collections
-     */
-    private function groupRoutesByHostRegex(RouteCollection $routes)
-    {
-        $groups = new DumperCollection();
-        $currentGroup = new DumperCollection();
-        $currentGroup->setAttribute('host_regex', null);
-        $groups->add($currentGroup);
-
-        foreach ($routes as $name => $route) {
-            $hostRegex = $route->compile()->getHostRegex();
-            if ($currentGroup->getAttribute('host_regex') !== $hostRegex) {
-                $currentGroup = new DumperCollection();
-                $currentGroup->setAttribute('host_regex', $hostRegex);
-                $groups->add($currentGroup);
-            }
-            $currentGroup->add(new DumperRoute($name, $route));
-        }
-
-        return $groups;
+        return $conditions ? $this->indent($code) : $code;
     }
 
     private function getExpressionLanguage()
@@ -445,5 +703,45 @@ EOF;
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function indent($code, $level = 1)
+    {
+        return preg_replace('/^./m', str_repeat('    ', $level).'$0', $code);
+    }
+
+    /**
+     * @internal
+     */
+    public static function export($value): string
+    {
+        if (null === $value) {
+            return 'null';
+        }
+        if (!\is_array($value)) {
+            return str_replace("\n", '\'."\n".\'', var_export($value, true));
+        }
+        if (!$value) {
+            return 'array()';
+        }
+
+        $i = 0;
+        $export = 'array(';
+
+        foreach ($value as $k => $v) {
+            if ($i === $k) {
+                ++$i;
+            } else {
+                $export .= self::export($k).' => ';
+
+                if (\is_int($k) && $i < $k) {
+                    $i = 1 + $k;
+                }
+            }
+
+            $export .= self::export($v).', ';
+        }
+
+        return substr_replace($export, ')', -2);
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
+use Symfony\Component\Routing\RouteCollection;
+
 /**
  * Prefix tree of routes preserving routes order.
  *
@@ -20,24 +22,24 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
  */
 class StaticPrefixCollection
 {
-    /**
-     * @var string
-     */
     private $prefix;
+    private $staticPrefix;
+    private $matchStart = 0;
 
     /**
-     * @var array[]|StaticPrefixCollection[]
+     * @var string[]
+     */
+    private $prefixes = array();
+
+    /**
+     * @var array[]|self[]
      */
     private $items = array();
 
-    /**
-     * @var int
-     */
-    private $matchStart = 0;
-
-    public function __construct(string $prefix = '')
+    public function __construct(string $prefix = '/', string $staticPrefix = '/')
     {
         $this->prefix = $prefix;
+        $this->staticPrefix = $staticPrefix;
     }
 
     public function getPrefix(): string
@@ -46,9 +48,9 @@ class StaticPrefixCollection
     }
 
     /**
-     * @return mixed[]|StaticPrefixCollection[]
+     * @return array[]|self[]
      */
-    public function getItems(): array
+    public function getRoutes(): array
     {
         return $this->items;
     }
@@ -56,28 +58,26 @@ class StaticPrefixCollection
     /**
      * Adds a route to a group.
      *
-     * @param string $prefix
-     * @param mixed  $route
+     * @param array|self $route
      */
     public function addRoute(string $prefix, $route)
     {
-        $prefix = '/' === $prefix ? $prefix : rtrim($prefix, '/');
         $this->guardAgainstAddingNotAcceptedRoutes($prefix);
+        list($prefix, $staticPrefix) = $this->detectCommonPrefix($prefix, $prefix) ?: array(rtrim($prefix, '/') ?: '/', '/');
 
-        if ($this->prefix === $prefix) {
+        if ($this->staticPrefix === $staticPrefix) {
             // When a prefix is exactly the same as the base we move up the match start position.
             // This is needed because otherwise routes that come afterwards have higher precedence
             // than a possible regular expression, which goes against the input order sorting.
-            $this->items[] = array($prefix, $route);
+            $this->prefixes[] = $prefix;
+            $this->items[] = $route;
             $this->matchStart = count($this->items);
 
             return;
         }
 
-        foreach ($this->items as $i => $item) {
-            if ($i < $this->matchStart) {
-                continue;
-            }
+        for ($i = $this->matchStart; $i < \count($this->items); ++$i) {
+            $item = $this->items[$i];
 
             if ($item instanceof self && $item->accepts($prefix)) {
                 $item->addRoute($prefix, $route);
@@ -85,9 +85,8 @@ class StaticPrefixCollection
                 return;
             }
 
-            $group = $this->groupWithItem($item, $prefix, $route);
-
-            if ($group instanceof self) {
+            if ($group = $this->groupWithItem($i, $prefix, $route)) {
+                $this->prefixes[$i] = $group->getPrefix();
                 $this->items[$i] = $group;
 
                 return;
@@ -96,33 +95,43 @@ class StaticPrefixCollection
 
         // No optimised case was found, in this case we simple add the route for possible
         // grouping when new routes are added.
-        $this->items[] = array($prefix, $route);
+        $this->prefixes[] = $prefix;
+        $this->items[] = $route;
+    }
+
+    /**
+     * Linearizes back a set of nested routes into a collection.
+     */
+    public function populateCollection(RouteCollection $routes): RouteCollection
+    {
+        foreach ($this->items as $route) {
+            if ($route instanceof self) {
+                $route->populateCollection($routes);
+            } else {
+                $routes->add(...$route);
+            }
+        }
+
+        return $routes;
     }
 
     /**
      * Tries to combine a route with another route or group.
-     *
-     * @param StaticPrefixCollection|array $item
-     * @param string                       $prefix
-     * @param mixed                        $route
-     *
-     * @return null|StaticPrefixCollection
      */
-    private function groupWithItem($item, string $prefix, $route)
+    private function groupWithItem(int $i, string $prefix, $route): ?self
     {
-        $itemPrefix = $item instanceof self ? $item->prefix : $item[0];
-        $commonPrefix = $this->detectCommonPrefix($prefix, $itemPrefix);
-
-        if (!$commonPrefix) {
-            return;
+        if (!$commonPrefix = $this->detectCommonPrefix($prefix, $this->prefixes[$i])) {
+            return null;
         }
 
-        $child = new self($commonPrefix);
+        $child = new self(...$commonPrefix);
+        $item = $this->items[$i];
 
         if ($item instanceof self) {
+            $child->prefixes = array($commonPrefix[0]);
             $child->items = array($item);
         } else {
-            $child->addRoute($item[0], $item[1]);
+            $child->addRoute($this->prefixes[$i], $item);
         }
 
         $child->addRoute($prefix, $route);
@@ -141,76 +150,48 @@ class StaticPrefixCollection
     /**
      * Detects whether there's a common prefix relative to the group prefix and returns it.
      *
-     * @return false|string A common prefix, longer than the base/group prefix, or false when none available
+     * @return null|array A common prefix, longer than the base/group prefix, or null when none available
      */
-    private function detectCommonPrefix(string $prefix, string $anotherPrefix)
+    private function detectCommonPrefix(string $prefix, string $anotherPrefix): ?array
     {
         $baseLength = strlen($this->prefix);
-        $commonLength = $baseLength;
         $end = min(strlen($prefix), strlen($anotherPrefix));
+        $staticLength = null;
 
-        for ($i = $baseLength; $i <= $end; ++$i) {
-            if (substr($prefix, 0, $i) !== substr($anotherPrefix, 0, $i)) {
+        for ($i = $baseLength; $i < $end && $prefix[$i] === $anotherPrefix[$i]; ++$i) {
+            if ('(' === $prefix[$i]) {
+                $staticLength = $staticLength ?? $i;
+                for ($j = 1 + $i, $n = 1; $j < $end && 0 < $n; ++$j) {
+                    if ($prefix[$j] !== $anotherPrefix[$j]) {
+                        break 2;
+                    }
+                    if ('(' === $prefix[$j]) {
+                        ++$n;
+                    } elseif (')' === $prefix[$j]) {
+                        --$n;
+                    } elseif ('\\' === $prefix[$j] && (++$j === $end || $prefix[$j] !== $anotherPrefix[$j])) {
+                        --$j;
+                        break;
+                    }
+                }
+                if (0 < $n) {
+                    break;
+                }
+                $i = $j;
+            } elseif ('\\' === $prefix[$i] && (++$i === $end || $prefix[$i] !== $anotherPrefix[$i])) {
+                --$i;
                 break;
             }
-
-            $commonLength = $i;
         }
 
-        $commonPrefix = rtrim(substr($prefix, 0, $commonLength), '/');
+        $staticLength = $staticLength ?? $i;
+        $commonPrefix = rtrim(substr($prefix, 0, $i), '/');
 
         if (strlen($commonPrefix) > $baseLength) {
-            return $commonPrefix;
+            return array($commonPrefix, rtrim(substr($prefix, 0, $staticLength), '/') ?: '/');
         }
 
-        return false;
-    }
-
-    /**
-     * Optimizes the tree by inlining items from groups with less than 3 items.
-     */
-    public function optimizeGroups(): void
-    {
-        $index = -1;
-
-        while (isset($this->items[++$index])) {
-            $item = $this->items[$index];
-
-            if ($item instanceof self) {
-                $item->optimizeGroups();
-
-                // When a group contains only two items there's no reason to optimize because at minimum
-                // the amount of prefix check is 2. In this case inline the group.
-                if ($item->shouldBeInlined()) {
-                    array_splice($this->items, $index, 1, $item->items);
-
-                    // Lower index to pass through the same index again after optimizing.
-                    // The first item of the replacements might be a group needing optimization.
-                    --$index;
-                }
-            }
-        }
-    }
-
-    private function shouldBeInlined(): bool
-    {
-        if (count($this->items) >= 3) {
-            return false;
-        }
-
-        foreach ($this->items as $item) {
-            if ($item instanceof self) {
-                return true;
-            }
-        }
-
-        foreach ($this->items as $item) {
-            if (is_array($item) && $item[0] === $this->prefix) {
-                return false;
-            }
-        }
-
-        return true;
+        return null;
     }
 
     /**
@@ -218,7 +199,7 @@ class StaticPrefixCollection
      *
      * @throws \LogicException when a prefix does not belong in a group
      */
-    private function guardAgainstAddingNotAcceptedRoutes(string $prefix)
+    private function guardAgainstAddingNotAcceptedRoutes(string $prefix): void
     {
         if (!$this->accepts($prefix)) {
             $message = sprintf('Could not add route with prefix %s to collection with prefix %s', $prefix, $this->prefix);

@@ -475,6 +475,31 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(array('_route' => 'buz'), $matcher->match('/prefix/buz'));
     }
 
+    public function testSiblingRoutes()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', (new Route('/a{a}'))->setMethods('POST'));
+        $coll->add('b', (new Route('/a{a}'))->setMethods('PUT'));
+        $coll->add('c', new Route('/a{a}'));
+        $coll->add('d', (new Route('/b{a}'))->setCondition('false'));
+        $coll->add('e', (new Route('/{b}{a}'))->setCondition('false'));
+        $coll->add('f', (new Route('/{b}{a}'))->setRequirements(array('b' => 'b')));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(array('_route' => 'c', 'a' => 'a'), $matcher->match('/aa'));
+        $this->assertEquals(array('_route' => 'f', 'b' => 'b', 'a' => 'a'), $matcher->match('/ba'));
+    }
+
+    public function testUnicodeRoute()
+    {
+        $coll = new RouteCollection();
+        $coll->add('a', new Route('/{a}', array(), array('a' => '.'), array('utf8' => false)));
+        $coll->add('b', new Route('/{a}', array(), array('a' => '.'), array('utf8' => true)));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(array('_route' => 'b', 'a' => 'é'), $matcher->match('/é'));
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?: new RequestContext());

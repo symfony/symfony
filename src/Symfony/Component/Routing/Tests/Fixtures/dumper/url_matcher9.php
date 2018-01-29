@@ -22,13 +22,27 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
+        $host = strtolower($context->getHost());
 
         if ('HEAD' === $requestMethod) {
             $canonicalMethod = 'GET';
         }
 
-        if ('/' === $pathinfo) {
-            throw new Symfony\Component\Routing\Exception\NoConfigurationException();
+        switch ($pathinfo) {
+            case '/':
+                // a
+                if (preg_match('#^(?P<d>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', $host, $hostMatches)) {
+                    return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'a')), array());
+                }
+                // c
+                if (preg_match('#^(?P<e>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', $host, $hostMatches)) {
+                    return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'c')), array());
+                }
+                // b
+                if ('d.c.b.a' === $host) {
+                    return array('_route' => 'b');
+                }
+                break;
         }
 
         throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();

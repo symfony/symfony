@@ -20,7 +20,7 @@ class DeprecationErrorHandler
 {
     const MODE_WEAK = 'weak';
     const MODE_WEAK_VENDORS = 'weak_vendors';
-    const MODE_WEAK_LAGGING_VENDORS = 'weak_lagging_vendors';
+    const MODE_ALLOW_OUTDATED_VENDORS = 'allow_outdated_vendors';
     const MODE_DISABLED = 'disabled';
 
     private static $isRegistered = false;
@@ -34,7 +34,7 @@ class DeprecationErrorHandler
      * The following reporting modes are supported:
      * - use "weak" to hide the deprecation report but keep a global count;
      * - use "weak_vendors" to act as "weak" but only for vendors;
-     * - use "weak_lagging_vendors" to act as "weak" but only for vendors that
+     * - use "allow_outdated_vendors" to act as "weak" but only for vendors that
      *   failed to keep up with their upstream dependencies deprecations;
      * - use "/some-regexp/" to stop the test suite whenever a deprecation
      *   message matches the given regular expression;
@@ -63,7 +63,7 @@ class DeprecationErrorHandler
             if (!in_array($mode, array(
                 DeprecationErrorHandler::MODE_WEAK,
                 DeprecationErrorHandler::MODE_WEAK_VENDORS,
-                DeprecationErrorHandler::MODE_WEAK_LAGGING_VENDORS,
+                DeprecationErrorHandler::MODE_ALLOW_OUTDATED_VENDORS,
             ), true) && (!isset($mode[0]) || '/' !== $mode[0])) {
                 $mode = preg_match('/^[1-9][0-9]*$/', $mode) ? (int) $mode : 0;
             }
@@ -76,13 +76,13 @@ class DeprecationErrorHandler
             'remainingCount' => 0,
             'legacyCount' => 0,
             'otherCount' => 0,
-            'lagging vendorCount' => 0,
+            'outdated vendorCount' => 0,
             'remaining vendorCount' => 0,
             'unsilenced' => array(),
             'remaining' => array(),
             'legacy' => array(),
             'other' => array(),
-            'lagging vendor' => array(),
+            'outdated vendor' => array(),
             'remaining vendor' => array(),
         );
         $deprecationHandler = function ($type, $msg, $file, $line, $context = array()) use (&$deprecations, $getMode, $UtilPrefix) {
@@ -98,7 +98,7 @@ class DeprecationErrorHandler
             $isVendor = false;
             $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode ||
                 (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = self::inVendors($file)) ||
-                (DeprecationErrorHandler::MODE_WEAK_LAGGING_VENDORS === $mode && $isLaggingVendor = self::isLaggingVendor($trace));
+                (DeprecationErrorHandler::MODE_ALLOW_OUTDATED_VENDORS === $mode && $isOutdatedVendor = self::isOutdatedVendor($trace));
             $i = count($trace);
             while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_') || 0 === strpos($trace[$i]['class'], 'PHPUnit\\')))) {
                 // No-op
@@ -116,7 +116,7 @@ class DeprecationErrorHandler
                     // if the error has been triggered from vendor code.
                     $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode ||
                         (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = isset($parsedMsg['triggering_file']) && self::inVendors($parsedMsg['triggering_file'])) ||
-                        (DeprecationErrorHandler::MODE_WEAK_LAGGING_VENDORS === $mode) && $isLaggingVendor = isset($parsedMsg['trace']) && self::isLaggingVendor($parsedMsg['trace']);
+                        (DeprecationErrorHandler::MODE_ALLOW_OUTDATED_VENDORS === $mode) && $isOutdatedVendor = isset($parsedMsg['trace']) && self::isOutdatedVendor($parsedMsg['trace']);
                 } else {
                     $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
                     $method = $trace[$i]['function'];
@@ -133,8 +133,8 @@ class DeprecationErrorHandler
                     || in_array('legacy', $Test::getGroups($class, $method), true)
                 ) {
                     $group = 'legacy';
-                } elseif (DeprecationErrorHandler::MODE_WEAK_LAGGING_VENDORS === $mode && $isLaggingVendor) {
-                    $group = 'lagging vendor';
+                } elseif (DeprecationErrorHandler::MODE_ALLOW_OUTDATED_VENDORS === $mode && $isOutdatedVendor) {
+                    $group = 'outdated vendor';
                 } elseif (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor) {
                     $group = 'remaining vendor';
                 } else {
@@ -209,8 +209,8 @@ class DeprecationErrorHandler
                 if (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode) {
                     $groups[] = 'remaining vendor';
                 }
-                if (DeprecationErrorHandler::MODE_WEAK_LAGGING_VENDORS === $mode) {
-                    $groups[] = 'lagging vendor';
+                if (DeprecationErrorHandler::MODE_ALLOW_OUTDATED_VENDORS === $mode) {
+                    $groups[] = 'outdated vendor';
                 }
                 array_push($groups, 'legacy', 'other');
 
@@ -218,7 +218,7 @@ class DeprecationErrorHandler
                     if ($deprecations[$group.'Count']) {
                         echo "\n", $colorize(
                             sprintf('%s deprecation notices (%d)', ucfirst($group), $deprecations[$group.'Count']),
-                            !in_array($group, array('legacy', 'remaining vendor', 'lagging vendor'), true)
+                            !in_array($group, array('legacy', 'remaining vendor', 'outdated vendor'), true)
                         ), "\n";
 
                         uasort($deprecations[$group], $cmp);
@@ -247,7 +247,7 @@ class DeprecationErrorHandler
         }
     }
 
-    private static function isLaggingVendor(array $trace): bool
+    private static function isOutdatedVendor(array $trace): bool
     {
         $erroringFile = $erroringPackage = null;
         foreach ($trace as $line) {

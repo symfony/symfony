@@ -1,9 +1,9 @@
 --TEST--
-Test DeprecationErrorHandler in weak vendors mode on vendor file
+Test DeprecationErrorHandler in weak vendors mode when calling deprecated api
 --FILE--
 <?php
 
-putenv('SYMFONY_DEPRECATIONS_HELPER=weak_lagging_vendors');
+putenv('SYMFONY_DEPRECATIONS_HELPER=allow_outdated_vendors');
 putenv('ANSICON');
 putenv('ConEmuANSI');
 putenv('TERM');
@@ -28,8 +28,15 @@ class Test
 EOPHP
 );
 require __DIR__.'/fake_vendor/autoload.php';
-require __DIR__.'/fake_vendor/acme/lagging-lib/lagging_file.php';
+require __DIR__.'/fake_vendor/acme/lib/SomeService.php';
+$defraculator = new \Acme\Lib\SomeService();
+$defraculator->deprecatedApi();
+
 
 ?>
 --EXPECTF--
-Lagging vendor deprecation notices (1)
+Remaining deprecation notices (1)
+
+  1x: deprecatedApi is deprecated! You should stop relying on it!
+    1x in SomeService::deprecatedApi from acme\lib
+

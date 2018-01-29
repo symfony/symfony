@@ -74,7 +74,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2010-06-02');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('2010-06-02', $form->getViewData());
     }
 
@@ -90,7 +90,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2010');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-01-01 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-01-01 UTC'), $form->getData());
         $this->assertEquals('2010', $form->getViewData());
     }
 
@@ -111,7 +111,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2.6.2010');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
@@ -204,7 +204,7 @@ class DateTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
         $this->assertEquals($text, $form->getViewData());
     }
 
@@ -227,7 +227,7 @@ class DateTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 UTC');
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
         $this->assertEquals($text, $form->getViewData());
     }
 
@@ -264,7 +264,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('06*2010*02');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
@@ -478,7 +478,7 @@ class DateTypeTest extends BaseTypeTest
 
         // 2010-06-02 00:00:00 UTC
         // 2010-06-01 20:00:00 UTC-4
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
         $this->assertEquals('01.06.2010', $form->getViewData());
     }
 

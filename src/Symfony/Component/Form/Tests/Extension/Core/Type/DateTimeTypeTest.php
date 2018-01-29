@@ -59,7 +59,7 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
     }
 
     public function testSubmitString()
@@ -143,7 +143,7 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $form->submit($input);
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:00:00 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 03:00:00 UTC'), $form->getData());
     }
 
     public function testSubmitWithSeconds()
@@ -175,7 +175,7 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $form->submit($input);
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $form->getData());
+        $this->assertEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $form->getData());
     }
 
     public function testSubmitDifferentTimezones()
@@ -225,7 +225,7 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertDateTimeEquals($outputTime, $form->getData());
+        $this->assertEquals($outputTime, $form->getData());
         $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
     }
 
@@ -276,7 +276,7 @@ class DateTimeTypeTest extends BaseTypeTest
             'time' => '03:04',
         ));
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
     }
 
     public function testInitializeWithDateTime()

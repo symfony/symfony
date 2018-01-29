@@ -52,8 +52,9 @@ abstract class HttpCache extends BaseHttpCache
     protected function forward(Request $request, $raw = false, Response $entry = null)
     {
         $this->getKernel()->boot();
-        $this->getKernel()->getContainer()->set('cache', $this);
-        $this->getKernel()->getContainer()->set($this->getSurrogate()->getName(), $this->getSurrogate());
+        $container = $this->getKernel()->getContainer();
+        $container->set('cache', $this);
+        $container->set($this->getSurrogate()->getName(), $this->getSurrogate());
 
         return parent::forward($request, $raw, $entry);
     }

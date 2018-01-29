@@ -459,7 +459,7 @@ class YamlFileLoader extends FileLoader
                 continue;
             }
 
-            if (!is_array($values)) {
+            if (!is_array($values) && null !== $values) {
                 $values = array();
             }
 

@@ -197,8 +197,9 @@ class ExecutionContext implements ExecutionContextInterface
     {
         $propertyPath = $this->getPropertyPath($subPath);
 
+        $visitor = $this->globalContext->getVisitor();
         foreach ($this->resolveGroups($groups) as $group) {
-            $this->globalContext->getVisitor()->validate($value, $group, $propertyPath, $traverse, $deep);
+            $visitor->validate($value, $group, $propertyPath, $traverse, $deep);
         }
     }
 

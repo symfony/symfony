@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 
-class DateTimeToStringTransformerTest extends DateTimeTestCase
+class DateTimeToStringTransformerTest extends TestCase
 {
     public function dataProvider()
     {
@@ -126,7 +127,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
         $output = new \DateTime($output);
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformEmpty()
@@ -144,7 +145,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
         $input = $output->format('Y-m-d H:i:s');
         $output->setTimezone(new \DateTimeZone('America/New_York'));
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformExpectsString()

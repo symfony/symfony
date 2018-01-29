@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-25T07:58:00Z
+
+Thanks for the PR. Why do we need to have a switch? Can't we just use the version with the `+` all the time? Any downside doing so ?
+
+---------------------------------------------------------------------------
+
+by tanasecosminromeo at 2018-01-25T08:06:43Z
+
+@nicolas-grekas According to #24456 the version with a + breaks Postgres. I haven't tested myself but it seems likely. Unfortunately the fix for #24456 breaks MySQL. I have noticed the issue myself in production using Percona and it was confirmed in #25665 - We could use an if or a short if, but I think this way it's more clear.
+
+Would be worthwhile to test sqlite driver as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-25T08:30:48Z
+
+OK thanks. I think an if/else would be better in fact :) also note that we use four-spaces indentation.
+Can you add a comment meanwhile to hint why mysql needs special care (but no link to github, we don't add these).
+Thanks
+
+---------------------------------------------------------------------------
+
+by tanasecosminromeo at 2018-01-25T21:17:21Z
+
+## Issue
+Because MySQL cast the result of this expression to unsigned types when doing **sess_lifetime < time() - sess_time** an out of range exception is thrown by MySQL when the PDOSessionHandler is closing a session and does garbage collection.
+
+**MySQL Exception Example from Production _(percona:5.6)_**
+
+> request.CRITICAL: Uncaught PHP Exception PDOException: "SQLSTATE[22003]: Numeric value out of range: 1690 BIGINT UNSIGNED value is out of range in '(1516801382 - ***.sessions.sess_time)'" at /code/vendor/symfony/symfony/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php line 382
+
+## How to replicate
+Using an MySQL Server _(replicated with mysql:latest, percona:latest and percona:5.6)_ create a custom PdoSessionHandler - force garbage collection when session is closed  and set time time to 1 day ago and simply make a request. This is a valid replication as in a production environment I had the above error without a custom Handler and these changes just force the circumstances creating the bug to appear, you just have to match the garbage collection with having a session that needs _collecting_
+
+_PdoSessionHandler.php:374_
+`if ($this->gcCalled || true) {`
+
+_PdoSessionHandler.php:381_
+`$stmt->bindValue(':time', strtotime('-1 day'), \PDO::PARAM_INT);`
+
+## Why was the initial fix working for Postgres:latest**
+If you used lifetime sessions you could end up with the issue below.
+> [SQL]INSERT INTO sessions VALUES ('test-id1', 'data', 2147483647, 1440);
+> DELETE FROM sessions WHERE sess_lifetime + sess_time < 1509428343;
+>
+> [Err] ERROR:  integer out of range
+
+## Conclusion
+I personally wouldn't add session time as MAXINT, but it does make sense if you want to have an unlimited session and the fix works fine in this case, but breaks normal functionality in MySQL/Percona.
+
+Thank you Nicolas, will use an if and change indentation. Sorry for this and for the long message 😄

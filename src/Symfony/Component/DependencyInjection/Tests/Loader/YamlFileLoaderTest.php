@@ -221,6 +221,17 @@ class YamlFileLoaderTest extends TestCase
         }
     }
 
+    public function testExtensionWithNullConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension(new \ProjectExtension());
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('null_config.yml');
+        $container->compile();
+
+        $this->assertSame(array(null), $container->getParameter('project.configs'));
+    }
+
     public function testSupports()
     {
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator());

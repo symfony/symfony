@@ -315,7 +315,7 @@ class TimeTypeTest extends BaseTypeTest
             'second' => (int) $outputTime->format('s'),
         );
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
         $this->assertEquals($displayedData, $form->getViewData());
     }
 

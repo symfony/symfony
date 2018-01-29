@@ -8,7 +8,14 @@ class ProjectExtension implements ExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $configuration)
     {
-        $config = call_user_func_array('array_merge', $configs);
+        $configuration->setParameter('project.configs', $configs);
+        $configs = array_filter($configs);
+
+        if ($configs) {
+            $config = call_user_func_array('array_merge', $configs);
+        } else {
+            $config = array();
+        }
 
         $configuration->register('project.service.bar', 'FooClass')->setPublic(true);
         $configuration->setParameter('project.parameter.bar', isset($config['foo']) ? $config['foo'] : 'foobar');

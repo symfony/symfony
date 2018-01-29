@@ -101,9 +101,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Sets the indentation pad string.
      *
-     * @param string $pad A string the will be prepended to dumped lines, repeated by nesting level
+     * @param string $pad A string that will be prepended to dumped lines, repeated by nesting level
      *
-     * @return string The indent pad
+     * @return string The previous indent pad
      */
     public function setIndentPad($pad)
     {

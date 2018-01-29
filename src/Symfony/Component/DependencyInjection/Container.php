@@ -149,8 +149,6 @@ class Container implements ResettableContainerInterface
             $initialize();
         }
 
-        $id = $this->normalizeId($id);
-
         if ('service_container' === $id) {
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }

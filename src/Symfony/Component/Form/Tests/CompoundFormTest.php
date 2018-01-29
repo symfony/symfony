@@ -1014,6 +1014,28 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertSame($button, $this->form->getClickedButton());
     }
 
+    public function testDisabledButtonIsNotSubmitted()
+    {
+        $button = new SubmitButtonBuilder('submit');
+        $submit = $button
+            ->setDisabled(true)
+            ->getForm();
+
+        $form = $this->createForm()
+            ->add($this->getBuilder('text')->getForm())
+            ->add($submit)
+        ;
+
+        $form->submit(array(
+            'text' => '',
+            'submit' => '',
+        ));
+
+        $this->assertTrue($submit->isDisabled());
+        $this->assertFalse($submit->isClicked());
+        $this->assertFalse($submit->isSubmitted());
+    }
+
     protected function createForm()
     {
         return $this->getBuilder()

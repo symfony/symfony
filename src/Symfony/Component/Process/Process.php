@@ -1062,7 +1062,7 @@ class Process implements \IteratorAggregate
     /**
      * Sets the environment variables.
      *
-     * An environment variable value should be a string.
+     * Each environment variable value should be a string.
      * If it is an array, the variable is ignored.
      * If it is false or null, it will be removed when
      * env vars are otherwise inherited.

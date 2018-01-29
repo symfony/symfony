@@ -1096,16 +1096,16 @@ EOF;
             }
         }
 
-        $code = "\n";
+        $code = '';
 
         foreach ($lineage as $file) {
             if (!isset($this->inlinedRequires[$file])) {
                 $this->inlinedRequires[$file] = true;
-                $code .= sprintf("        include_once %s;\n", $file);
+                $code .= sprintf("\n            include_once %s;", $file);
             }
         }
 
-        return "\n" === $code ? '' : $code;
+        return $code ? sprintf("\n        \$this->privates['service_container'] = function () {%s\n        };\n", $code) : '';
     }
 
     private function addDefaultParametersMethod(): string

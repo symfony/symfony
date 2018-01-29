@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 
-class DateTimeToTimestampTransformerTest extends DateTimeTestCase
+class DateTimeToTimestampTransformerTest extends TestCase
 {
     public function testTransform()
     {
@@ -83,7 +84,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
         $input = $output->format('U');
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformEmpty()
@@ -101,7 +102,7 @@ class DateTimeToTimestampTransformerTest extends DateTimeTestCase
         $input = $output->format('U');
         $output->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
 
-        $this->assertDateTimeEquals($output, $reverseTransformer->reverseTransform($input));
+        $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
     public function testReverseTransformExpectsValidTimestamp()

@@ -7,6 +7,35 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.34 (2018-01-29)
+
+ * bug #25922 [HttpFoundation] Use the correct syntax for session gc based on Pdo driver (tanasecosminromeo)
+ * bug #25933 Disable CSP header on exception pages only in debug (ostrolucky)
+ * bug #25926 [Form] Fixed Button::setParent() when already submitted (HeahDude)
+ * bug #25927 [Form] Fixed submitting disabled buttons (HeahDude)
+ * bug #25891 [DependencyInjection] allow null values for root nodes in YAML configs (xabbuh)
+ * bug #25848 [Validator] add missing parent isset and add test (Simperfit)
+ * bug #25861 do not conflict with egulias/email-validator 2.0+ (xabbuh)
+ * bug #25851 [Validator] Conflict with egulias/email-validator 2.0 (emodric)
+ * bug #25837 [SecurityBundle] Don't register in memory users as services (chalasr)
+ * bug #25835 [HttpKernel] DebugHandlersListener should always replace the existing exception handler (nicolas-grekas)
+ * bug #25829 [Debug] Always decorate existing exception handlers to deal with fatal errors (nicolas-grekas)
+ * bug #25824 Fixing a bug where the dump() function depended on bundle ordering (weaverryan)
+ * bug #25789  Enableable ArrayNodeDefinition is disabled for empty configuration (kejwmen)
+ * bug #25816 Problem in phar see mergerequest #25579 (betzholz)
+ * bug #25781 [Form] Disallow transform dates beyond the year 9999 (curry684)
+ * bug #25812 Copied NO language files to the new NB locale (derrabus)
+ * bug #25801 [Router] Skip anonymous classes when loading annotated routes (pierredup)
+ * bug #25657 [Security] Fix fatal error on non string username (chalasr)
+ * bug #25799 Fixed Request::__toString ignoring cookies (Toflar)
+ * bug #25755 [Debug] prevent infinite loop with faulty exception handlers (nicolas-grekas)
+ * bug #25771 [Validator] 19 digits VISA card numbers are valid (xabbuh)
+ * bug #25751 [FrameworkBundle] Add the missing `enabled` session attribute (sroze)
+ * bug #25750 [HttpKernel] Turn bad hosts into 400 instead of 500 (nicolas-grekas)
+ * bug #25490 [Serializer] Fixed throwing exception with option JSON_PARTIAL_OUTPUT_ON_ERROR (diversantvlz)
+ * bug #25709 Tweaked some styles in the profiler tables (javiereguiluz)
+ * feature #25669 [Security] Fail gracefully if the security token cannot be unserialized from the session (thewilkybarkid)
+
 * 2.8.33 (2018-01-05)
 
  * bug #25532 [HttpKernel] Disable CSP header on exception pages (ostrolucky)

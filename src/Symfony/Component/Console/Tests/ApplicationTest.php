@@ -459,6 +459,24 @@ class ApplicationTest extends TestCase
         $application->find($name);
     }
 
+    public function testDontRunAlternativeNamespaceName()
+    {
+        $application = new Application();
+        $application->add(new \Foo1Command());
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foos:bar1'), array('decorated' => false));
+        $this->assertSame("
+                                                          
+  There are no commands defined in the \"foos\" namespace.  
+                                                          
+  Did you mean this?                                      
+      foo                                                 
+                                                          
+
+", $tester->getDisplay(true));
+    }
+
     public function testCanRunAlternativeCommandName()
     {
         $application = new Application();

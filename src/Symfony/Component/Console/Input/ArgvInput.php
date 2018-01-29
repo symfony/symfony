@@ -285,16 +285,6 @@ class ArgvInput extends Input
                 if ($token === $value || 0 === strpos($token, $value.'=')) {
                     return true;
                 }
-
-                if (0 === strpos($token, '-') && 0 !== strpos($token, '--')) {
-                    $noValue = explode('=', $token);
-                    $token = $noValue[0];
-                    $searchableToken = str_replace('-', '', $token);
-                    $searchableValue = str_replace('-', '', $value);
-                    if ('' !== $searchableToken && '' !== $searchableValue && false !== strpos($searchableToken, $searchableValue)) {
-                        return true;
-                    }
-                }
             }
         }
 

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-01-26T00:51:55Z
+
+Well-done @derrabus!
+
+The question is: feature or bug-fix? It's a *safe* change: I mean, anyone with bad classes is currently getting an error... and this just makes it *not* an error. I vote bug fix - we'll see what other people think.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2018-01-26T05:37:34Z
+
+Agree on it being a bugfix. It doesn't introduce a new public-facing API, it just fixes incorrect behavior.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-01-26T13:21:22Z
+
+@nicolas-grekas, @stof: Do you agree with @weaverryan on turning this PR into a bugfix? I'd try to apply my patch against 3.4 then.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-26T13:21:50Z
+
+I do, go for 3.4 on my side
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-01-26T13:47:18Z
+
+I've added some context to the error message extracted from the exception. Please have a look @weaverryan.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-01-26T13:53:12Z
+
+I've set up a `symfony/symfony-standard` clone with a class that extends a missing class. With Symfony 3.4 from composer, invoking the console fails as expected.
+
+<img width="1436" alt="bildschirmfoto 2018-01-26 um 14 48 58" src="https://user-images.githubusercontent.com/1506493/35442610-2c1d4960-02a8-11e8-9b74-9012d6435325.png">
+
+When I link the project to the code of this PR, the console is executed without failure. Now, if I add a public alias to the service discovered from my broken class, the console fails again.
+
+<img width="1209" alt="bildschirmfoto 2018-01-26 um 14 45 32" src="https://user-images.githubusercontent.com/1506493/35442715-82870d36-02a8-11e8-9dbb-0a1a5317e1b0.png">
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-01-26T14:06:01Z
+
+The AppVeyor failure looks unrelated.

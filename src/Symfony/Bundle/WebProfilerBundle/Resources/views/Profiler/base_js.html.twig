@@ -32,7 +32,7 @@
                         setTimeout(function(){
                             options.maxTries--;
                             request(url, onSuccess, onError, payload, options);
-                        }, 500);
+                        }, 1000);
 
                         return null;
                     }

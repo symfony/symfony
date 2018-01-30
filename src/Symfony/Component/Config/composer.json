@@ -22,7 +22,8 @@
     "require-dev": {
         "symfony/finder": "~3.3|~4.0",
         "symfony/yaml": "~3.0|~4.0",
-        "symfony/dependency-injection": "~3.3|~4.0"
+        "symfony/dependency-injection": "~3.3|~4.0",
+        "symfony/event-dispatcher": "~3.3|~4.0"
     },
     "conflict": {
         "symfony/finder": "<3.3",

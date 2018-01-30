@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Config\Resource;
 
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -114,7 +117,9 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
 
     private function generateSignature(\ReflectionClass $class)
     {
-        yield $class->getDocComment().$class->getModifiers();
+        yield $class->getDocComment();
+        yield (int) $class->isFinal();
+        yield (int) $class->isAbstract();
 
         if ($class->isTrait()) {
             yield print_r(class_uses($class->name), true);
@@ -148,6 +153,16 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
                 }
                 yield print_r($defaults, true);
             }
+        }
+
+        if ($class->isSubclassOf(EventSubscriberInterface::class)) {
+            yield EventSubscriberInterface::class;
+            yield print_r(\call_user_func(array($class->name, 'getSubscribedEvents')), true);
+        }
+
+        if ($class->isSubclassOf(ServiceSubscriberInterface::class)) {
+            yield ServiceSubscriberInterface::class;
+            yield print_r(\call_user_func(array($class->name, 'getSubscribedServices')), true);
         }
     }
 }

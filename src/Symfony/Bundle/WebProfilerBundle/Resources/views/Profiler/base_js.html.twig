@@ -28,7 +28,6 @@
             var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
             options = options || {};
             options.maxTries = options.maxTries || 0;
-            options.retryDelay = options.retryDelay || 500;
             xhr.open(options.method || 'GET', url, true);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onreadystatechange = function(state) {
@@ -40,7 +39,7 @@
                     setTimeout(function(){
                         options.maxTries--;
                         request(url, onSuccess, onError, payload, options);
-                    }, options.retryDelay);
+                    }, 1000);
 
                     return null;
                 }

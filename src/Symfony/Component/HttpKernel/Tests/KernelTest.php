@@ -526,9 +526,9 @@ EOF;
     /**
      * @param $env
      * @param $expected
-     * @dataProvider envDataProvider
+     * @dataProvider envAndContainerClassDataProvider
      */
-    public function testKernelNormalizedEnv($env, $expected)
+    public function testContainerClassNormalization($env, $expected)
     {
         $kernel = new class($env, true) extends Kernel {
             public function registerContainerConfiguration(LoaderInterface $loader)
@@ -542,23 +542,22 @@ EOF;
             }
         };
 
-        $reflection = new \ReflectionObject($kernel);
-        $normalizeEnvMethod = $reflection->getMethod('getNormalizedEnv');
-        $normalizeEnvMethod->setAccessible(true);
-        $normalizedEnv = $normalizeEnvMethod->invoke($kernel);
+        $containerClassMethod = (new \ReflectionObject($kernel))->getMethod('getContainerClass');
+        $containerClassMethod->setAccessible(true);
+        $class = $containerClassMethod->invoke($kernel);
 
-        $this->assertSame($expected, $normalizedEnv);
+        $this->assertSame($expected, $class);
     }
 
     /**
      * @return array
      */
-    public function envDataProvider()
+    public function envAndContainerClassDataProvider()
     {
         return array(
-            array('dev-server', 'devserver'),
-            array('local', 'local'),
-            array('env_#8', 'env8'),
+            array('dev-server', 'TestsDevserverDebugProjectContainer'),
+            array('local', 'TestsLocalDebugProjectContainer'),
+            array('env_#8---*1', 'TestsEnv_81DebugProjectContainer'),
         );
     }
 

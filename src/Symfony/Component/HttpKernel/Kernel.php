@@ -425,15 +425,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
      */
     protected function getContainerClass()
     {
-        return $this->name.ucfirst($this->getNormalizedEnv()).($this->debug ? 'Debug' : '').'ProjectContainer';
-    }
-
-    /**
-     * @return null|string|string[]
-     */
-    protected function getNormalizedEnv()
-    {
-        return preg_replace('/[^\p{L}\p{Nd}]+/im', null, $this->environment);
+        return $this->name.ucfirst(preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $this->environment)).($this->debug ? 'Debug' : '').'ProjectContainer';
     }
 
     /**

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * deprecated support for callable strings as `empty_data` in `ChoiceType`
+
 4.0.0
 -----
 

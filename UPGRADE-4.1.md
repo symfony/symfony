@@ -50,6 +50,25 @@ Validator
  * Calling `EmailValidator::__construct()` method with a boolean parameter is deprecated and will be removed in 5.0, use `EmailValidator("strict")` instead.
  * Deprecated the `checkDNS` and `dnsMessage` options of the `Url` constraint. They will be removed in 5.0.
 
+Form
+----
+
+ * Using callable strings as `empty_data` in `ChoiceType` is deprecated and will be removed in Symfony 5.0, use a `\Closure` instead.
+
+  Before:
+  
+  ```php
+  'empty_data' => 'some_function',
+  ```
+
+  After:
+  
+  ```php
+  'empty_data' => function (FormInterface $form, $data) {
+      return some_function($form, $data);
+  },
+  ```
+
 Workflow
 --------
 

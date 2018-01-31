@@ -46,6 +46,25 @@ Validator
  * Calling `EmailValidator::__construct()` method with a boolean parameter has been removed, use `EmailValidator("strict")` instead.
  * Removed the `checkDNS` and `dnsMessage` options from the `Url` constraint.
 
+Form
+----
+
+ * Support for callable strings as `empty_data` in `ChoiceType` has been removed. Use a `\Closure` instead.
+
+  Before:
+  
+  ```php
+  'empty_data' => 'some_function',
+  ```
+
+  After:
+  
+  ```php
+  'empty_data' => function (FormInterface $form, $data) {
+      return some_function($form, $data);
+  },
+  ```
+
 Workflow
 --------
 

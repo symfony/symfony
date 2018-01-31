@@ -144,7 +144,7 @@ class Request
     public $headers;
 
     /**
-     * @var string|resource
+     * @var string|resource|false|null
      */
     protected $content;
 
@@ -242,13 +242,13 @@ class Request
     );
 
     /**
-     * @param array           $query      The GET parameters
-     * @param array           $request    The POST parameters
-     * @param array           $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-     * @param array           $cookies    The COOKIE parameters
-     * @param array           $files      The FILES parameters
-     * @param array           $server     The SERVER parameters
-     * @param string|resource $content    The raw body data
+     * @param array                $query      The GET parameters
+     * @param array                $request    The POST parameters
+     * @param array                $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array                $cookies    The COOKIE parameters
+     * @param array                $files      The FILES parameters
+     * @param array                $server     The SERVER parameters
+     * @param string|resource|null $content    The raw body data
      */
     public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
@@ -260,13 +260,13 @@ class Request
      *
      * This method also re-initializes all properties.
      *
-     * @param array           $query      The GET parameters
-     * @param array           $request    The POST parameters
-     * @param array           $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
-     * @param array           $cookies    The COOKIE parameters
-     * @param array           $files      The FILES parameters
-     * @param array           $server     The SERVER parameters
-     * @param string|resource $content    The raw body data
+     * @param array                $query      The GET parameters
+     * @param array                $request    The POST parameters
+     * @param array                $attributes The request attributes (parameters parsed from the PATH_INFO, ...)
+     * @param array                $cookies    The COOKIE parameters
+     * @param array                $files      The FILES parameters
+     * @param array                $server     The SERVER parameters
+     * @param string|resource|null $content    The raw body data
      */
     public function initialize(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
@@ -329,13 +329,13 @@ class Request
      * The information contained in the URI always take precedence
      * over the other information (server and parameters).
      *
-     * @param string          $uri        The URI
-     * @param string          $method     The HTTP method
-     * @param array           $parameters The query (GET) or request (POST) parameters
-     * @param array           $cookies    The request cookies ($_COOKIE)
-     * @param array           $files      The request files ($_FILES)
-     * @param array           $server     The server parameters ($_SERVER)
-     * @param string|resource $content    The raw body data
+     * @param string               $uri        The URI
+     * @param string               $method     The HTTP method
+     * @param array                $parameters The query (GET) or request (POST) parameters
+     * @param array                $cookies    The request cookies ($_COOKIE)
+     * @param array                $files      The request files ($_FILES)
+     * @param array                $server     The server parameters ($_SERVER)
+     * @param string|resource|null $content    The raw body data
      *
      * @return static
      */

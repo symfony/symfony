@@ -497,7 +497,8 @@ class CliDumper extends AbstractDumper
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             static::$defaultColors = @(
-                '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD
+                function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support($this->outputStream)
+                || '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM')

@@ -1044,15 +1044,15 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
-     * @param int $position
+     * @param int $position, mixed $default
      *
      * @return \DOMElement|null
      */
-    public function getNode($position)
-    {
+    public function getNode($position, $default = null) {
         if (isset($this->nodes[$position])) {
             return $this->nodes[$position];
         }
+        return $default;
     }
 
     /**

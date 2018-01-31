@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-24T11:59:13Z
+
+did you test it?
+AFAIK, adding the `cache.pool` tag requires a special order and list of arguments on the constructor, which is not the case here (esp $namespace first), isn't it?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-01-25T18:16:56Z
+
+Yes, tested in a real project! And you're right about the ArrayAdapter argument thing, but it was already taken into account:
+
+https://github.com/symfony/symfony/blob/332ad0ab9bd5a24b7f86435277346a0ad3ddd019/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/CachePoolPass.php#L83
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2018-01-30T20:11:50Z
+
+> There's no simple way to disable caching (e.g. in the dev) environment.
+
+Why not using ``NullAdapter`` instead? using ArrayAdapter will cache the values, even if it's only for a request, isn't it?

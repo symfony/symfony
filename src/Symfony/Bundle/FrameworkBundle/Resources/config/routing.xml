@@ -38,7 +38,7 @@
             <argument type="service" id="file_locator" />
         </service>
 
-        <service id="routing.loader.glob" class="Symfony\Component\Config\Loader\GlobFileLoader">
+        <service id="routing.loader.glob" class="Symfony\Component\Routing\Loader\GlobFileLoader">
             <tag name="routing.loader" />
             <argument type="service" id="file_locator" />
         </service>

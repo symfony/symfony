@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-01-30T15:47:04Z
+
+That works only with the next version of Twig, so we need to bump Twig's versions.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-01-30T15:56:33Z
+
+this should be done with a different case, checking both the environment major version and the minor version IMO, instead of forbidding older minor versions strictly.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-30T16:26:14Z
+
+I am not sure if it's worth it, but taken that into account doesn't add much complexity. So here we go.

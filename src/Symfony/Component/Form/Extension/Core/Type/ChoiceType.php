@@ -91,7 +91,11 @@ class ChoiceType extends AbstractType
                     $emptyData = $form->getConfig()->getEmptyData();
 
                     if (false === FormUtil::isEmpty($emptyData) && array() !== $emptyData) {
-                        $data = is_callable($emptyData) ? call_user_func($emptyData, $form, $data) : $emptyData;
+                        if (is_callable($emptyData) && !is_string($emptyData)) {
+                            $data = call_user_func($emptyData, $form, $data);
+                        } else {
+                            $data = $emptyData;
+                        }
                     }
                 }
 

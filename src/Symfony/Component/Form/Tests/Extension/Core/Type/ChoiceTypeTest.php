@@ -640,6 +640,22 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame(array('test'), $form->getData());
     }
 
+    public function testSubmitSingleChoiceWithClosureEmptyData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => array('test'),
+            'empty_data' => function () {
+                return 'test';
+            },
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame('test', $form->getData());
+    }
+
     public function testSubmitMultipleNonExpanded()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(

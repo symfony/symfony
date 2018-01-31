@@ -21,3 +21,5 @@ eval("@trigger_error('who knows where I come from?', E_USER_DEPRECATED);")
 --EXPECTF--
 
 Other deprecation notices (1)
+
+  1x: who knows where I come from?

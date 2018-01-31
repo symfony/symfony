@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * all deprecations but those from tests marked with `@group legacy` are always
+   displayed when not in `weak` mode.
+
 4.0.0
 -----
 

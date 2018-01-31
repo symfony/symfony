@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by lstrojny at 2018-01-30T22:37:07Z
+
+@nicolas-grekas not sure what to do about the resource tracking topic. Probably worth another PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-01-31T08:29:56Z
+
+@lstrojny we currently don't invalidate the cached container when the class changes, meaning the generated proxy class might not be regenerated properly when needed.
+Adding the method call suggested by @nicolas-grekas will register the appropriate resource tracking.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-31T09:09:21Z
+
+I fixed resource tracking in #25981

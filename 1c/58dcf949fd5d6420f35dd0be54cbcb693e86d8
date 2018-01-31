@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-01-30T16:15:26Z
+
+@symfony/deciders should we merge this in 2.7, or should we consider it a new feature ?
+
+For reference, the automatic detection of Mintty was backported  to 2.3 in the past (see #15915), so merging in 2.7 looks fine.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-30T16:34:56Z
+
+For 2.7: infrastructure-related changes are bug fixes (similarly to PR fixing issues with newer versions of PHP)
+
+---------------------------------------------------------------------------
+
+by jhdxr at 2018-01-30T16:42:54Z
+
+travis ci fails due to [an issue](https://travis-ci.org/symfony/symfony/builds/335161356) on the base branch, I'll rebase these changes when it has been fixed if necessary.

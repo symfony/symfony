@@ -4,7 +4,7 @@
   <argument type="service" id="definition2"/>
   <argument>%parameter%</argument>
   <argument>
-    <definition class="inline_service" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file="">
+    <definition class="inline_service" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file="">
       <argument>arg1</argument>
       <argument>arg2</argument>
     </definition>
@@ -13,7 +13,7 @@
     <argument>foo</argument>
     <argument type="service" id="definition2"/>
     <argument>
-      <definition class="inline_service" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file=""/>
+      <definition class="inline_service" public="false" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" file=""/>
     </argument>
   </argument>
   <argument type="iterator">

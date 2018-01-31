@@ -318,7 +318,7 @@ class XmlDescriptor extends Descriptor
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $service = $this->resolveServiceDefinition($builder, $serviceId);
 
-            if (($service instanceof Definition || $service instanceof Alias) && !($showPrivate || $service->isPublic())) {
+            if (($service instanceof Definition || $service instanceof Alias) && !($showPrivate || ($service->isPublic() && !$service->isPrivate()))) {
                 continue;
             }
 
@@ -364,7 +364,7 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
+        $serviceXML->setAttribute('public', $definition->isPublic() && !$definition->isPrivate() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
         $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
@@ -469,7 +469,7 @@ class XmlDescriptor extends Descriptor
         }
 
         $aliasXML->setAttribute('service', (string) $alias);
-        $aliasXML->setAttribute('public', $alias->isPublic() ? 'true' : 'false');
+        $aliasXML->setAttribute('public', $alias->isPublic() && !$alias->isPrivate() ? 'true' : 'false');
 
         return $dom;
     }

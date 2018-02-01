@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alcaeus at 2018-01-30T15:44:13Z
+
+@nicolas-grekas I applied your commit on 3.4.4 in my projects and it fixes the problems I've been having since moving to 3.4.4 :+1:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-01-31T13:00:04Z
+
+With your patch applied, the leak seems to be gone.

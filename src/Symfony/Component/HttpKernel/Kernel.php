@@ -842,7 +842,7 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         $dumper = new PhpDumper($container);
 
         if (class_exists('ProxyManager\Configuration') && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper')) {
-            $dumper->setProxyDumper(new ProxyDumper(substr(hash('sha256', $cache->getPath()), 0, 7)));
+            $dumper->setProxyDumper(new ProxyDumper());
         }
 
         $content = $dumper->dump(array(

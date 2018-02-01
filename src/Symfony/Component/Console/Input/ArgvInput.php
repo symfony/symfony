@@ -129,9 +129,9 @@ class ArgvInput extends Input
                 $this->addLongOption($option->getName(), $i === $len - 1 ? null : substr($name, $i + 1));
 
                 break;
-            } else {
-                $this->addLongOption($option->getName(), null);
             }
+
+            $this->addLongOption($option->getName(), null);
         }
     }
 
@@ -170,12 +170,12 @@ class ArgvInput extends Input
             $arg = $this->definition->getArgument($c);
             $this->arguments[$arg->getName()] = $arg->isArray() ? array($token) : $token;
 
-        // if last argument isArray(), append token to last argument
+            // if last argument isArray(), append token to last argument
         } elseif ($this->definition->hasArgument($c - 1) && $this->definition->getArgument($c - 1)->isArray()) {
             $arg = $this->definition->getArgument($c - 1);
             $this->arguments[$arg->getName()][] = $token;
 
-        // unexpected argument
+            // unexpected argument
         } else {
             $all = $this->definition->getArguments();
             if (count($all)) {

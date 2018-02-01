@@ -30,7 +30,9 @@ while ($read || $write) {
 
     if (false === $n) {
         die(ERR_SELECT_FAILED);
-    } elseif ($n < 1) {
+    }
+
+    if ($n < 1) {
         die(ERR_TIMEOUT);
     }
 

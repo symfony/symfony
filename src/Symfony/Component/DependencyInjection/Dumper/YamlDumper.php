@@ -247,15 +247,25 @@ class YamlDumper extends Dumper
             }
 
             return $code;
-        } elseif ($value instanceof Reference) {
+        }
+
+        if ($value instanceof Reference) {
             return $this->getServiceCall((string) $value, $value);
-        } elseif ($value instanceof Parameter) {
+        }
+
+        if ($value instanceof Parameter) {
             return $this->getParameterCall((string) $value);
-        } elseif ($value instanceof Expression) {
+        }
+
+        if ($value instanceof Expression) {
             return $this->getExpressionCall((string) $value);
-        } elseif ($value instanceof Definition) {
+        }
+
+        if ($value instanceof Definition) {
             return new TaggedValue('service', (new Parser())->parse("_:\n".$this->addService('_', $value), Yaml::PARSE_CUSTOM_TAGS)['_']['_']);
-        } elseif (is_object($value) || is_resource($value)) {
+        }
+
+        if (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         }
 

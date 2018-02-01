@@ -61,7 +61,9 @@ class ControllerResolver implements ControllerResolverInterface
         if (false === strpos($controller, ':')) {
             if (method_exists($controller, '__invoke')) {
                 return $this->instantiateController($controller);
-            } elseif (function_exists($controller)) {
+            }
+
+            if (function_exists($controller)) {
                 return $controller;
             }
         }

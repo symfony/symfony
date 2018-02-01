@@ -237,7 +237,9 @@ class Container implements ResettableContainerInterface
         try {
             if (isset($this->fileMap[$id])) {
                 return /* self::IGNORE_ON_UNINITIALIZED_REFERENCE */ 4 === $invalidBehavior ? null : $this->load($this->fileMap[$id]);
-            } elseif (isset($this->methodMap[$id])) {
+            }
+
+            if (isset($this->methodMap[$id])) {
                 return /* self::IGNORE_ON_UNINITIALIZED_REFERENCE */ 4 === $invalidBehavior ? null : $this->{$this->methodMap[$id]}();
             }
         } catch (\Exception $e) {

@@ -355,7 +355,9 @@ class AutowirePass extends AbstractRecursivePass
         $servicesAndAliases = $this->container->getServiceIds();
         if (!$this->container->has($type) && false !== $key = array_search(strtolower($type), array_map('strtolower', $servicesAndAliases))) {
             return sprintf(' Did you mean "%s"?', $servicesAndAliases[$key]);
-        } elseif (isset($this->ambiguousServiceTypes[$type])) {
+        }
+
+        if (isset($this->ambiguousServiceTypes[$type])) {
             $message = sprintf('one of these existing services: "%s"', implode('", "', $this->ambiguousServiceTypes[$type]));
         } elseif (isset($this->types[$type])) {
             $message = sprintf('the existing "%s" service', $this->types[$type]);

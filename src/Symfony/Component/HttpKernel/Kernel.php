@@ -790,7 +790,6 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         foreach ($this->bundles as $bundle) {
             if ($extension = $bundle->getContainerExtension()) {
                 $container->registerExtension($extension);
-                $extensions[] = $extension->getAlias();
             }
 
             if ($this->debug) {
@@ -803,6 +802,10 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
         }
 
         $this->build($container);
+
+        foreach ($container->getExtensions() as $extension) {
+            $extensions[] = $extension->getAlias();
+        }
 
         // ensure these extensions are implicitly loaded
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));

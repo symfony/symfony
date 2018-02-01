@@ -60,7 +60,7 @@ $foo->testLegacyFoo();
 $foo->testNonLegacyBar();
 
 register_shutdown_function(function () {
-    exit('I get precedence over any exit statements inside the deprecation error handler.');
+    @trigger_error('root deprecation during shutdown', E_USER_DEPRECATED);
 });
 
 ?>
@@ -84,4 +84,8 @@ Other deprecation notices (1)
 
   1x: root deprecation
 
-I get precedence over any exit statements inside the deprecation error handler.
+Shutdown-time deprecations:
+
+Other deprecation notices (1)
+
+  1x: root deprecation during shutdown

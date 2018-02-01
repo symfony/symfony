@@ -173,9 +173,13 @@ class IsbnValidator extends ConstraintValidator
     {
         if (null !== $constraint->message) {
             return $constraint->message;
-        } elseif ('isbn10' === $type) {
+        }
+
+        if ('isbn10' === $type) {
             return $constraint->isbn10Message;
-        } elseif ('isbn13' === $type) {
+        }
+
+        if ('isbn13' === $type) {
             return $constraint->isbn13Message;
         }
 

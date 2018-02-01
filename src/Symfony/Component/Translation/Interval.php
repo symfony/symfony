@@ -100,7 +100,9 @@ EOF;
     {
         if ('-Inf' === $number) {
             return log(0);
-        } elseif ('+Inf' === $number || 'Inf' === $number) {
+        }
+
+        if ('+Inf' === $number || 'Inf' === $number) {
             return -log(0);
         }
 

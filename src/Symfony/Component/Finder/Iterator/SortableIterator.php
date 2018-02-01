@@ -45,7 +45,9 @@ class SortableIterator implements \IteratorAggregate
             $this->sort = function ($a, $b) {
                 if ($a->isDir() && $b->isFile()) {
                     return -1;
-                } elseif ($a->isFile() && $b->isDir()) {
+                }
+
+                if ($a->isFile() && $b->isDir()) {
                     return 1;
                 }
 

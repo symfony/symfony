@@ -16,25 +16,25 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLan
 
 if (!class_exists(BaseExpressionLanguage::class)) {
     throw new \LogicException(sprintf('The "%s" class requires the "ExpressionLanguage" component. Try running "composer require symfony/expression-language".', ExpressionLanguage::class));
-} else {
-    /**
-     * Adds some function to the default ExpressionLanguage.
-     *
-     * @author Fabien Potencier <fabien@symfony.com>
-     *
-     * @see ExpressionLanguageProvider
-     */
-    class ExpressionLanguage extends BaseExpressionLanguage
-    {
-        /**
-         * {@inheritdoc}
-         */
-        public function __construct(CacheItemPoolInterface $cache = null, array $providers = array())
-        {
-            // prepend the default provider to let users override it easily
-            array_unshift($providers, new ExpressionLanguageProvider());
+}
 
-            parent::__construct($cache, $providers);
-        }
+/**
+ * Adds some function to the default ExpressionLanguage.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @see ExpressionLanguageProvider
+ */
+class ExpressionLanguage extends BaseExpressionLanguage
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(CacheItemPoolInterface $cache = null, array $providers = array())
+    {
+        // prepend the default provider to let users override it easily
+        array_unshift($providers, new ExpressionLanguageProvider());
+
+        parent::__construct($cache, $providers);
     }
 }

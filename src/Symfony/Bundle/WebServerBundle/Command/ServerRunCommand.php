@@ -104,11 +104,11 @@ EOF
                 $io->error('The environment must be either passed as second argument of the constructor or through the "--env" input option.');
 
                 return 1;
-            } else {
-                $io->error('The environment must be passed as second argument of the constructor.');
-
-                return 1;
             }
+
+            $io->error('The environment must be passed as second argument of the constructor.');
+
+            return 1;
         }
 
         if ('prod' === $env) {

@@ -810,7 +810,9 @@ class OptionsResolver implements Options
 
                     // Don't include closures in the exception message
                     continue;
-                } elseif ($value === $allowedValue) {
+                }
+
+                if ($value === $allowedValue) {
                     $success = true;
                     break;
                 }

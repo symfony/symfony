@@ -90,9 +90,13 @@ class ExceptionListener
         do {
             if ($exception instanceof AuthenticationException) {
                 return $this->handleAuthenticationException($event, $exception);
-            } elseif ($exception instanceof AccessDeniedException) {
+            }
+
+            if ($exception instanceof AccessDeniedException) {
                 return $this->handleAccessDeniedException($event, $exception);
-            } elseif ($exception instanceof LogoutException) {
+            }
+
+            if ($exception instanceof LogoutException) {
                 return $this->handleLogoutException($exception);
             }
         } while (null !== $exception = $exception->getPrevious());

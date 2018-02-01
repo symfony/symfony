@@ -357,7 +357,7 @@ class RouteCollectionBuilderTest extends TestCase
         $routeCollectionBuilder->import('/directory/recurse/*', '/other/', 'glob');
         $routes = $routeCollectionBuilder->build()->all();
 
-        $this->assertEquals(2, count($routes));
+        $this->assertCount(2, $routes);
         $this->assertEquals('/other/a', $routes['a']->getPath());
         $this->assertEquals('/other/b', $routes['b']->getPath());
     }

@@ -20,7 +20,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $allow = array();
         $pathinfo = rawurldecode($rawPathinfo);
         $context = $this->context;
-        $request = $this->request;
+        $request = $this->request ?: $this->createRequest($pathinfo);
 
         if (0 === strpos($pathinfo, '/rootprefix')) {
             // static

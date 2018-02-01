@@ -515,6 +515,9 @@ class SecurityExtension extends Extension
                             throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall[$key]['provider']));
                         }
                         $userProvider = $providerIds[$normalizedName];
+                    } elseif ('remember_me' === $key) {
+                        // RememberMeFactory will use the firewall secret when created
+                        $userProvider = null;
                     } else {
                         $userProvider = $defaultProvider ?: $this->getFirstProvider($id, $key, $providerIds);
                     }

@@ -110,7 +110,7 @@ EOF
         if (is_file($filename)) {
             return array($filename);
         }
-        
+
         if (is_dir($filename)) {
             return Finder::create()->files()->in($filename)->name('*.twig');
         }

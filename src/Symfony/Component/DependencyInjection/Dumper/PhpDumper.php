@@ -1557,8 +1557,8 @@ EOF;
             }
 
             $replaceParameters = function ($match) {
-                    return "'.".$this->dumpParameter($match[2]).".'";
-                };
+                return "'.".$this->dumpParameter($match[2]).".'";
+            };
 
             $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
 

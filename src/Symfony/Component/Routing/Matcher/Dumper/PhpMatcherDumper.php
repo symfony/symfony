@@ -101,7 +101,7 @@ EOF;
         \$allow = array();
         \$pathinfo = rawurldecode(\$rawPathinfo);
         \$context = \$this->context;
-        \$request = \$this->request;
+        \$request = \$this->request ?: \$this->createRequest(\$pathinfo);
 
 $code
 
@@ -283,7 +283,11 @@ EOF;
 
         if ($hasTrailingSlash) {
             $code .= <<<EOF
-            if (substr(\$pathinfo, -1) !== '/') {
+            if ('/' === substr(\$pathinfo, -1)) {
+                // no-op
+            } elseif (!in_array(\$this->context->getMethod(), array('HEAD', 'GET'))) {
+                goto $gotoname;
+            } else {
                 return \$this->redirect(\$rawPathinfo.'/', '$name');
             }
 
@@ -329,7 +333,7 @@ EOF;
         }
         $code .= "        }\n";
 
-        if ($methods) {
+        if ($methods || $hasTrailingSlash) {
             $code .= "        $gotoname:\n";
         }
 

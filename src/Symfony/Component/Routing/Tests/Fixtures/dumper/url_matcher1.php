@@ -20,7 +20,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $allow = array();
         $pathinfo = rawurldecode($rawPathinfo);
         $context = $this->context;
-        $request = $this->request;
+        $request = $this->request ?: $this->createRequest($pathinfo);
 
         // foo
         if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#s', $pathinfo, $matches)) {

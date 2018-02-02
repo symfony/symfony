@@ -35,7 +35,7 @@ class ErrorHandlerTest extends TestCase
 
             $newHandler = new ErrorHandler();
 
-            $this->assertSame($newHandler, ErrorHandler::register($newHandler, false));
+            $this->assertSame($handler, ErrorHandler::register($newHandler, false));
             $h = set_error_handler('var_dump');
             restore_error_handler();
             $this->assertSame(array($handler, 'handleError'), $h);

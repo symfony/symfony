@@ -20,7 +20,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $allow = array();
         $pathinfo = rawurldecode($rawPathinfo);
         $context = $this->context;
-        $request = $this->request;
+        $request = $this->request ?: $this->createRequest($pathinfo);
 
         // foo
         if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#s', $pathinfo, $matches)) {
@@ -66,23 +66,33 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
                 // baz3
                 if ('/test/baz3' === rtrim($pathinfo, '/')) {
-                    if (substr($pathinfo, -1) !== '/') {
+                    if ('/' === substr($pathinfo, -1)) {
+                        // no-op
+                    } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                        goto not_baz3;
+                    } else {
                         return $this->redirect($rawPathinfo.'/', 'baz3');
                     }
 
                     return array('_route' => 'baz3');
                 }
+                not_baz3:
 
             }
 
             // baz4
             if (preg_match('#^/test/(?P<foo>[^/]++)/?$#s', $pathinfo, $matches)) {
-                if (substr($pathinfo, -1) !== '/') {
+                if ('/' === substr($pathinfo, -1)) {
+                    // no-op
+                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                    goto not_baz4;
+                } else {
                     return $this->redirect($rawPathinfo.'/', 'baz4');
                 }
 
                 return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz4')), array ());
             }
+            not_baz4:
 
             // baz5
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
@@ -170,12 +180,17 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // hey
             if ('/multi/hey' === rtrim($pathinfo, '/')) {
-                if (substr($pathinfo, -1) !== '/') {
+                if ('/' === substr($pathinfo, -1)) {
+                    // no-op
+                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                    goto not_hey;
+                } else {
                     return $this->redirect($rawPathinfo.'/', 'hey');
                 }
 
                 return array('_route' => 'hey');
             }
+            not_hey:
 
         }
 

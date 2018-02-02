@@ -89,7 +89,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
             return true;
         } catch (LockConflictedException $e) {
             $this->dirty = false;
-            $this->logger->warning('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', array('resource' => $this->key));
+            $this->logger->notice('Failed to acquire the "{resource}" lock. Someone else already acquired the lock.', array('resource' => $this->key));
 
             if ($blocking) {
                 throw $e;
@@ -97,7 +97,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
 
             return false;
         } catch (\Exception $e) {
-            $this->logger->warning('Failed to acquire the "{resource}" lock.', array('resource' => $this->key, 'exception' => $e));
+            $this->logger->notice('Failed to acquire the "{resource}" lock.', array('resource' => $this->key, 'exception' => $e));
             throw new LockAcquiringException(sprintf('Failed to acquire the "%s" lock.', $this->key), 0, $e);
         }
     }
@@ -123,10 +123,10 @@ final class Lock implements LockInterface, LoggerAwareInterface
             $this->logger->info('Expiration defined for "{resource}" lock for "{ttl}" seconds.', array('resource' => $this->key, 'ttl' => $this->ttl));
         } catch (LockConflictedException $e) {
             $this->dirty = false;
-            $this->logger->warning('Failed to define an expiration for the "{resource}" lock, someone else acquired the lock.', array('resource' => $this->key));
+            $this->logger->notice('Failed to define an expiration for the "{resource}" lock, someone else acquired the lock.', array('resource' => $this->key));
             throw $e;
         } catch (\Exception $e) {
-            $this->logger->warning('Failed to define an expiration for the "{resource}" lock.', array('resource' => $this->key, 'exception' => $e));
+            $this->logger->notice('Failed to define an expiration for the "{resource}" lock.', array('resource' => $this->key, 'exception' => $e));
             throw new LockAcquiringException(sprintf('Failed to define an expiration for the "%s" lock.', $this->key), 0, $e);
         }
     }
@@ -148,7 +148,7 @@ final class Lock implements LockInterface, LoggerAwareInterface
         $this->dirty = false;
 
         if ($this->store->exists($this->key)) {
-            $this->logger->warning('Failed to release the "{resource}" lock.', array('resource' => $this->key));
+            $this->logger->notice('Failed to release the "{resource}" lock.', array('resource' => $this->key));
             throw new LockReleasingException(sprintf('Failed to release the "%s" lock.', $this->key));
         }
     }

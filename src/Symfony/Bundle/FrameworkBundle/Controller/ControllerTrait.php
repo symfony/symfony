@@ -95,7 +95,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function redirect(string $url, int $status = 302): RedirectResponse
+    protected function redirect(string $url, int $status = Response::HTTP_FOUND): RedirectResponse
     {
         return new RedirectResponse($url, $status);
     }
@@ -105,7 +105,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function redirectToRoute(string $route, array $parameters = array(), int $status = 302): RedirectResponse
+    protected function redirectToRoute(string $route, array $parameters = array(), int $status = Response::HTTP_FOUND): RedirectResponse
     {
         return $this->redirect($this->generateUrl($route, $parameters), $status);
     }

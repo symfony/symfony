@@ -524,23 +524,11 @@ EOF;
     }
 
     /**
-     * @param $env
-     * @param $expected
-     * @dataProvider envAndContainerClassDataProvider
+     * @dataProvider envAndContainerClassDataProviderForCustomProjectDirKernel
      */
     public function testContainerClassNormalization($env, $expected)
     {
-        $kernel = new class($env, true) extends Kernel {
-            public function registerContainerConfiguration(LoaderInterface $loader)
-            {
-                // TODO: Implement registerContainerConfiguration() method.
-            }
-
-            public function registerBundles()
-            {
-                // TODO: Implement registerBundles() method.
-            }
-        };
+        $kernel = new CustomProjectDirKernel(null, null, $env);
 
         $containerClassMethod = (new \ReflectionObject($kernel))->getMethod('getContainerClass');
         $containerClassMethod->setAccessible(true);
@@ -552,12 +540,12 @@ EOF;
     /**
      * @return array
      */
-    public function envAndContainerClassDataProvider()
+    public function envAndContainerClassDataProviderForCustomProjectDirKernel()
     {
         return array(
-            array('dev-server', 'TestsDevserverDebugProjectContainer'),
-            array('local', 'TestsLocalDebugProjectContainer'),
-            array('env_#8---*1', 'TestsEnv_81DebugProjectContainer'),
+            array('dev-server', 'FixturesDevserverDebugProjectContainer'),
+            array('local', 'FixturesLocalDebugProjectContainer'),
+            array('env_#8---*1', 'FixturesEnv_81DebugProjectContainer'),
         );
     }
 

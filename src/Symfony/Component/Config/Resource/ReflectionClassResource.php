@@ -37,11 +37,12 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
         }
 
         foreach ($this->files as $file => $v) {
-            if (!file_exists($file)) {
+            $filemtime = @filemtime($file);
+            if (!$filemtime) {
                 return false;
             }
 
-            if (@filemtime($file) > $timestamp) {
+            if ($filemtime > $timestamp) {
                 return $this->hash === $this->computeHash();
             }
         }

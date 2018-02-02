@@ -34,12 +34,13 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
 
     public function isFresh($timestamp)
     {
-        if (!file_exists($this->filePath)) {
+        $filemtime = @filemtime($this->filePath);
+        if (!$filemtime) {
             return false;
         }
 
         // has the file *not* been modified? Definitely fresh
-        if (@filemtime($this->filePath) <= $timestamp) {
+        if ($filemtime <= $timestamp) {
             return true;
         }
 

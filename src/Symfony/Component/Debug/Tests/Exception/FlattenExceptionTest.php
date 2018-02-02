@@ -12,6 +12,7 @@
 namespace Symfony\Component\Debug\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -123,6 +124,16 @@ class FlattenExceptionTest extends TestCase
         $this->assertInstanceOf($flattened->getClass(), $exception, 'The class is set to the class of the original exception');
     }
 
+    public function testThrowable()
+    {
+        $exception = new FatalThrowableError(new \DivisionByZeroError('Ouch', 42));
+        $flattened = FlattenException::create($exception);
+
+        $this->assertSame('Ouch', $flattened->getMessage(), 'The message is copied from the original error.');
+        $this->assertSame(42, $flattened->getCode(), 'The code is copied from the original error.');
+        $this->assertSame('DivisionByZeroError', $flattened->getClass(), 'The class is set to the class of the original error');
+    }
+
     /**
      * @dataProvider flattenDataProvider
      */
@@ -144,9 +155,9 @@ class FlattenExceptionTest extends TestCase
 
         $flattened = FlattenException::create($exception)->getPrevious();
 
-        $this->assertEquals($flattened->getMessage(), 'Parse error: Oh noes!', 'The message is copied from the original exception.');
+        $this->assertEquals($flattened->getMessage(), 'Oh noes!', 'The message is copied from the original exception.');
         $this->assertEquals($flattened->getCode(), 42, 'The code is copied from the original exception.');
-        $this->assertEquals($flattened->getClass(), 'Symfony\Component\Debug\Exception\FatalThrowableError', 'The class is set to the class of the original exception');
+        $this->assertEquals($flattened->getClass(), 'ParseError', 'The class is set to the class of the original exception');
     }
 
     /**

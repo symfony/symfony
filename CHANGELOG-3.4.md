@@ -7,6 +7,10 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.x (2018-xx-xx)
+
+ * bug #25999 [DependencyInjection] Huge performance degradation of ReflectionClassResource and FileResource on big projects inside Docker For Mac
+
 * 3.4.4 (2018-01-29)
 
  * bug #25932 Don't stop PSR-4 service discovery if a parent class is missing (derrabus)

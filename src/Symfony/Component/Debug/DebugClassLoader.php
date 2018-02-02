@@ -141,7 +141,7 @@ class DebugClassLoader
             if ($this->isFinder && !isset($this->loaded[$class])) {
                 $this->loaded[$class] = true;
                 if ($file = $this->classLoader[0]->findFile($class) ?: false) {
-                    $wasCached = \function_exists('opcache_is_script_cached') && opcache_is_script_cached($file);
+                    $wasCached = \function_exists('opcache_is_script_cached') && @opcache_is_script_cached($file);
 
                     require $file;
 

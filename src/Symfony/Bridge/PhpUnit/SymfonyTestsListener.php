@@ -11,15 +11,18 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
-use PHPUnit\Framework\BaseTestListener;
 use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestListener;
+use PHPUnit\Framework\TestListenerDefaultImplementation;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Framework\Warning;
 
-if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
-    class_alias('Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener', 'Symfony\Bridge\PhpUnit\SymfonyTestsListener');
 // Using an early return instead of a else does not work when using the PHPUnit phar due to some weird PHP behavior (the class
 // gets defined without executing the code before it and so the definition is not properly conditional)
+if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
+    class_alias('Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener', 'Symfony\Bridge\PhpUnit\SymfonyTestsListener');
+} elseif (version_compare(\PHPUnit\Runner\Version::id(), '7.0.0', '<')) {
+    class_alias('Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerPhpunit6', 'Symfony\Bridge\PhpUnit\SymfonyTestsListener');
 } else {
     /**
      * Collects and replays skipped tests.
@@ -28,8 +31,10 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
      *
      * @final
      */
-    class SymfonyTestsListener extends BaseTestListener
+    class SymfonyTestsListener implements TestListener
     {
+        use TestListenerDefaultImplementation;
+
         private $trait;
 
         public function __construct(array $mockedNamespaces = array())
@@ -42,29 +47,29 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
             $this->trait->globalListenerDisabled();
         }
 
-        public function startTestSuite(TestSuite $suite)
+        public function startTestSuite(TestSuite $suite): void
         {
-            return $this->trait->startTestSuite($suite);
+            $this->trait->startTestSuite($suite);
         }
 
-        public function addSkippedTest(Test $test, \Exception $e, $time)
+        public function addSkippedTest(Test $test, \Throwable $t, float $time): void
         {
-            return $this->trait->addSkippedTest($test, $e, $time);
+            $this->trait->addSkippedTest($test, $t, $time);
         }
 
-        public function startTest(Test $test)
+        public function startTest(Test $test): void
         {
-            return $this->trait->startTest($test);
+            $this->trait->startTest($test);
         }
 
-        public function addWarning(Test $test, Warning $e, $time)
+        public function addWarning(Test $test, Warning $e, float $time): void
         {
-            return $this->trait->addWarning($test, $e, $time);
+            $this->trait->addWarning($test, $e, $time);
         }
 
-        public function endTest(Test $test, $time)
+        public function endTest(Test $test, float $time): void
         {
-            return $this->trait->endTest($test, $time);
+            $this->trait->endTest($test, $time);
         }
     }
 }

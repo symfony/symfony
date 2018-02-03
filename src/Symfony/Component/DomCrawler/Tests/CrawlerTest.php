@@ -281,6 +281,16 @@ EOF
         $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
     }
 
+
+    public function testEachNullGetsNotAddedToResult()
+    {
+        $data = $this->createTestCrawler()->filterXPath('//a')->each(function ($node, $i) {
+            return false !== strpos($node->attr('href'),'foo') ? $node : null;
+        });
+
+        $this->assertCount(4, $data, '->each() does not add null to the results');
+    }
+
     public function testSlice()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');

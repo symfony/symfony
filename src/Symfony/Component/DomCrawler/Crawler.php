@@ -352,7 +352,9 @@ class Crawler extends \SplObjectStorage
     {
         $data = array();
         foreach ($this as $i => $node) {
-            $data[] = $closure($this->createSubCrawler($node), $i);
+            if (null !== $result = $closure($this->createSubCrawler($node), $i)) {
+                $data[] = $result;
+            }
         }
 
         return $data;

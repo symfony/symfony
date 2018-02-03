@@ -598,12 +598,54 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame('test', $form->getData());
     }
 
+    public function testSubmitSingleChoiceWithEmptyDataAndInitialData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, 'initial', array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => array('initial', 'test'),
+            'empty_data' => 'test',
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame('test', $form->getData());
+    }
+
     public function testSubmitMultipleChoiceWithEmptyData()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => array('test'),
+            'empty_data' => array('test'),
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame(array('test'), $form->getData());
+    }
+
+    public function testSubmitMultipleChoiceWithEmptyDataAndInitialEmptyArray()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => array('test'),
+            'empty_data' => array('test'),
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame(array('test'), $form->getData());
+    }
+
+    public function testSubmitMultipleChoiceWithEmptyDataAndInitialData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, array('initial'), array(
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => array('initial', 'test'),
             'empty_data' => array('test'),
         ));
 
@@ -626,6 +668,20 @@ class ChoiceTypeTest extends BaseTypeTest
         $this->assertSame('test', $form->getData());
     }
 
+    public function testSubmitSingleChoiceExpandedWithEmptyDataAndInitialData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, 'initial', array(
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => array('initial', 'test'),
+            'empty_data' => 'test',
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame('test', $form->getData());
+    }
+
     public function testSubmitMultipleChoiceExpandedWithEmptyData()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array(
@@ -638,6 +694,49 @@ class ChoiceTypeTest extends BaseTypeTest
         $form->submit(null);
 
         $this->assertSame(array('test'), $form->getData());
+    }
+
+    public function testSubmitMultipleChoiceExpandedWithEmptyDataAndInitialEmptyArray()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, array(), array(
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => array('test'),
+            'empty_data' => array('test'),
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame(array('test'), $form->getData());
+    }
+
+    public function testSubmitMultipleChoiceExpandedWithEmptyDataAndInitialData()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, array('init'), array(
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => array('init', 'test'),
+            'empty_data' => array('test'),
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame(array('test'), $form->getData());
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyNullChoices()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => null,
+        ));
+        $this->assertNull($form->getConfig()->getOption('choices'));
+        $this->assertFalse($form->getConfig()->getOption('multiple'));
+        $this->assertFalse($form->getConfig()->getOption('expanded'));
     }
 
     public function testSubmitMultipleNonExpanded()

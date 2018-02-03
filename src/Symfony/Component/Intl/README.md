@@ -5,7 +5,7 @@ A PHP replacement layer for the C intl extension that also provides access to
 the localization data of the ICU library.
 
 The replacement layer is limited to the locale "en". If you want to use other
-locales, you should [install the intl PHP extension] [0] instead.
+locales, you should [install the intl PHP extension][0] instead.
 
 Resources
 ---------

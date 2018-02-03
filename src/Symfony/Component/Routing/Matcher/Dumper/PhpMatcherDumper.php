@@ -236,7 +236,7 @@ EOF;
                 $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                 $hasTrailingSlash = true;
             }
-            $conditions[] = sprintf('preg_match(%s, $pathinfo, $matches)', var_export($regex, true));
+            $conditions[] = sprintf('preg_match(%s, $pathinfo, $matches)', var_export($regex.'D', true));
 
             $matches = true;
         }

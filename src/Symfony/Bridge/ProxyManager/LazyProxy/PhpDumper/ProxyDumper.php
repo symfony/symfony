@@ -102,7 +102,7 @@ EOF;
      */
     private function getProxyClassName(Definition $definition)
     {
-        return preg_replace('/^.*\\\\/', '', $definition->getClass()).'_'.substr(hash('sha256', spl_object_hash($definition).$this->salt), -7);
+        return preg_replace('/^.*\\\\/', '', $definition->getClass()).'_'.substr(hash('sha256', $definition->getClass().$this->salt), -7);
     }
 
     /**

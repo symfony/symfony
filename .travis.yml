@@ -96,7 +96,6 @@ before_install:
       echo apc.enable_cli = 1 >> $INI
       echo extension = redis.so >> $INI
       echo extension = memcached.so >> $INI
-      echo extension = mongodb.so >> $INI
 
       # Matrix lines for intermediate PHP versions are skipped for pull requests
       if [[ ! $deps && ! $PHP = $MIN_PHP && $TRAVIS_PULL_REQUEST != false ]]; then
@@ -115,8 +114,9 @@ before_install:
 
     - |
       # Install extra PHP extensions
-      if [[ ! $skip && $PHP = 7.* ]]; then
+      if [[ ! $skip ]]; then
           tfold ext.apcu5 'echo yes | pecl install -f apcu-5.1.6'
+          tfold ext.mongodb pecl install -f mongodb-1.4.0RC1
       fi
 
     - |

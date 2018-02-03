@@ -136,9 +136,20 @@ class ErrorHandler
         }
         if (!$replace && $prev) {
             restore_error_handler();
+            $handlerIsRegistered = is_array($prev) && $handler === $prev[0];
+        } else {
+            $handlerIsRegistered = true;
         }
-        if (is_array($prev = set_exception_handler(array($handler, 'handleException'))) && $prev[0] === $handler) {
+        if (is_array($prev = set_exception_handler(array($handler, 'handleException'))) && $prev[0] instanceof self) {
             restore_exception_handler();
+            if (!$handlerIsRegistered) {
+                $handler = $prev[0];
+            } elseif ($handler !== $prev[0] && $replace) {
+                set_exception_handler(array($handler, 'handleException'));
+                $p = $prev[0]->setExceptionHandler(null);
+                $handler->setExceptionHandler($p);
+                $prev[0]->setExceptionHandler($p);
+            }
         } else {
             $handler->setExceptionHandler($prev);
         }

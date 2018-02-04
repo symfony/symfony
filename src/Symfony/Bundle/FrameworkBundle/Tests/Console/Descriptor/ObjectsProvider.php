@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\CompiledRoute;
 use Symfony\Component\Routing\RouteCollection;
 
 class ObjectsProvider
@@ -35,7 +36,7 @@ class ObjectsProvider
     public static function getRoutes()
     {
         return array(
-            'route_1' => new Route(
+            'route_1' => new RouteStub(
                 '/hello/{name}',
                 array('name' => 'Joseph'),
                 array('name' => '[a-z]+'),
@@ -44,7 +45,7 @@ class ObjectsProvider
                 array('http', 'https'),
                 array('get', 'head')
             ),
-            'route_2' => new Route(
+            'route_2' => new RouteStub(
                 '/name/add',
                 array(),
                 array(),
@@ -205,5 +206,13 @@ class ExtendedCallableClass extends CallableClass
 {
     public static function staticMethod()
     {
+    }
+}
+
+class RouteStub extends Route
+{
+    public function compile()
+    {
+        return new CompiledRoute('', '#PATH_REGEX#', array(), array(), '#HOST_REGEX#');
     }
 }

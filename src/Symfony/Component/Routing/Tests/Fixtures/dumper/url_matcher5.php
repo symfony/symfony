@@ -23,7 +23,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $context = $this->context;
         $request = $this->request ?: $this->createRequest($pathinfo);
         $requestMethod = $canonicalMethod = $context->getMethod();
-        $scheme = $context->getScheme();
 
         if ('HEAD' === $requestMethod) {
             $canonicalMethod = 'GET';
@@ -58,7 +57,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 $ret = array('_route' => 'a_fourth');
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
-                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                } elseif ('GET' !== $canonicalMethod) {
                     goto not_a_fourth;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'a_fourth'));
@@ -73,7 +72,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 $ret = array('_route' => 'a_fifth');
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
-                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                } elseif ('GET' !== $canonicalMethod) {
                     goto not_a_fifth;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'a_fifth'));
@@ -88,7 +87,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 $ret = array('_route' => 'a_sixth');
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
-                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                } elseif ('GET' !== $canonicalMethod) {
                     goto not_a_sixth;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'a_sixth'));
@@ -111,7 +110,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 $ret = array('_route' => 'nested_a');
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
-                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                } elseif ('GET' !== $canonicalMethod) {
                     goto not_nested_a;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'nested_a'));
@@ -126,7 +125,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 $ret = array('_route' => 'nested_b');
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
-                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                } elseif ('GET' !== $canonicalMethod) {
                     goto not_nested_b;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'nested_b'));
@@ -141,7 +140,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 $ret = array('_route' => 'nested_c');
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
-                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                } elseif ('GET' !== $canonicalMethod) {
                     goto not_nested_c;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'nested_c'));
@@ -159,7 +158,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 $ret = array('_route' => 'slashed_a');
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
-                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                } elseif ('GET' !== $canonicalMethod) {
                     goto not_slashed_a;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'slashed_a'));
@@ -174,7 +173,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 $ret = array('_route' => 'slashed_b');
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
-                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                } elseif ('GET' !== $canonicalMethod) {
                     goto not_slashed_b;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'slashed_b'));
@@ -189,7 +188,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 $ret = array('_route' => 'slashed_c');
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
-                } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                } elseif ('GET' !== $canonicalMethod) {
                     goto not_slashed_c;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'slashed_c'));

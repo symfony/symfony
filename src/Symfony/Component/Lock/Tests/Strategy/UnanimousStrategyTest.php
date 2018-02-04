@@ -82,7 +82,7 @@ class UnanimousStrategyTest extends TestCase
     /**
      * @dataProvider provideIndeterminate
      */
-    public function canBeMet($success, $failure, $total, $isMet)
+    public function testCanBeMet($success, $failure, $total, $isMet)
     {
         $this->assertSame($isMet, $this->strategy->canBeMet($failure, $total));
     }

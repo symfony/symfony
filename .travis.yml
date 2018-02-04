@@ -32,6 +32,7 @@ cache:
     directories:
         - .phpunit
         - php-$MIN_PHP
+        - php-ext
 
 services:
     - memcached
@@ -97,6 +98,23 @@ before_install:
       echo extension = redis.so >> $INI
       echo extension = memcached.so >> $INI
 
+      # tpecl is a helper to compile and cache php extensions
+      tpecl () {
+          local ext_name=$1
+          local ext_so=$2
+          local ext_dir=$(php -r "echo ini_get('extension_dir');")
+          local ext_cache=~/php-ext/$(basename $ext_dir)/$ext_name
+
+          if [[ -e $ext_cache/$ext_so ]]; then
+              echo extension = $ext_cache/$ext_so >> $INI
+          else
+              mkdir -p $ext_cache
+              echo yes | pecl install -f $ext_name &&
+              cp $ext_dir/$ext_so $ext_cache
+          fi
+      }
+      export -f tpecl
+
       # Matrix lines for intermediate PHP versions are skipped for pull requests
       if [[ ! $deps && ! $PHP = $MIN_PHP && $TRAVIS_PULL_REQUEST != false ]]; then
           deps=skip
@@ -115,8 +133,8 @@ before_install:
     - |
       # Install extra PHP extensions
       if [[ ! $skip ]]; then
-          tfold ext.apcu5 'echo yes | pecl install -f apcu-5.1.6'
-          tfold ext.mongodb pecl install -f mongodb-1.4.0RC1
+          tfold ext.apcu tpecl apcu-5.1.6 apcu.so
+          tfold ext.mongodb tpecl mongodb-1.4.0RC1 mongodb.so
       fi
 
     - |

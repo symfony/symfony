@@ -104,7 +104,6 @@ EOF;
         \$context = \$this->context;
         \$request = \$this->request ?: \$this->createRequest(\$pathinfo);
         \$requestMethod = \$canonicalMethod = \$context->getMethod();
-        \$scheme = \$context->getScheme();
 
         if ('HEAD' === \$requestMethod) {
             \$canonicalMethod = 'GET';
@@ -362,7 +361,7 @@ EOF;
             $code .= <<<EOF
             if ('/' === substr(\$pathinfo, -1)) {
                 // no-op
-            } elseif (!in_array(\$this->context->getMethod(), array('HEAD', 'GET'))) {
+            } elseif ('GET' !== \$canonicalMethod) {
                 goto $gotoname;
             } else {
                 return array_replace(\$ret, \$this->redirect(\$rawPathinfo.'/', '$name'));
@@ -379,7 +378,7 @@ EOF;
             $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
-            if (!isset(\$requiredSchemes[\$scheme])) {
+            if (!isset(\$requiredSchemes[\$context->getScheme()])) {
                 return array_replace(\$ret, \$this->redirect(\$rawPathinfo, '$name', key(\$requiredSchemes)));
             }
 

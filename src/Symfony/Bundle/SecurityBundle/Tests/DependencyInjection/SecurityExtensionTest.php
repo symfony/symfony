@@ -198,7 +198,6 @@ class SecurityExtensionTest extends TestCase
             'firewalls' => array(
                 'default' => array(
                     'form_login' => array('provider' => 'second'),
-                    'logout_on_user_change' => true,
                     'remember_me' => array('secret' => 'baz'),
                 ),
             ),

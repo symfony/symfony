@@ -2,12 +2,12 @@ route_1
 -------
 
 - Path: /hello/{name}
-- Path Regex: #^/hello(?:/(?P<name>[a-z]+))?$#s
+- Path Regex: #PATH_REGEX#
 - Host: localhost
-- Host Regex: #^localhost$#si
+- Host Regex: #HOST_REGEX#
 - Scheme: http|https
 - Method: GET|HEAD
-- Class: Symfony\Component\Routing\Route
+- Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub
 - Defaults: 
     - `name`: Joseph
 - Requirements: 
@@ -22,12 +22,12 @@ route_2
 -------
 
 - Path: /name/add
-- Path Regex: #^/name/add$#s
+- Path Regex: #PATH_REGEX#
 - Host: localhost
-- Host Regex: #^localhost$#si
+- Host Regex: #HOST_REGEX#
 - Scheme: http|https
 - Method: PUT|POST
-- Class: Symfony\Component\Routing\Route
+- Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub
 - Defaults: NONE
 - Requirements: NO CUSTOM
 - Options: 

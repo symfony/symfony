@@ -412,7 +412,7 @@ class SecurityExtension extends Extension
                     } elseif ('remember_me' === $key) {
                         // RememberMeFactory will use the firewall secret when created
                         $userProvider = null;
-                    } elseif($defaultProvider) {
+                    } elseif ($defaultProvider) {
                         $userProvider = $defaultProvider;
                     } else {
                         throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $key, $id));

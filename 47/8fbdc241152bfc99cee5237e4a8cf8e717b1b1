@@ -1,0 +1,137 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2017-12-07T11:49:40Z
+
+@nicolas-grekas Do you have a good hint for me why the `AbstractDescriptorTest`-based tests either fail on low or high PHP versions?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-08T16:20:59Z
+
+The change impacts two components, but composer.json allows a non patched version of one of them to be used with the patched version of the other one. That's the reason.
+
+Is there any way to make this change in a different way that doesn't needs changing the regexps? Like in the base matcher?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-12-10T21:16:14Z
+
+@nicolas-grekas Thanks for the hint!
+
+I have no clever idea ATM how to achieve that... :-( Using for example `trim()` to get rid of the newline is not the same, as I do not want to modify the requested URL. I mean, after all, it *was* requested with the trailing `%0a`, so we should not simply ignore that.
+
+Asking the other way round: If a change in one component breaks tests in another one, maybe that's an opportunity to re-organize/re-structure the affected tests? This somehow smells, doesn't it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-10T21:21:47Z
+
+On other side, changing existing tests is a sign of a BC break...
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-12-10T22:46:15Z
+
+Not necessarily, if the tests are too implementation specific and do not only guard intended behaviour. But let's not argue here :beers:.
+
+Handling routes with a trailing, urlencoded newline is an edge case. I happened to discover this because someone requested such URLs on one of our apps and I found notices in the PHP log.
+
+IMO the "right" fix would be to make PHP not silently ignore the newline at the end of the string, which I think is quirky PHP behavior in the first place.
+
+The rest is up to you guys to decide, and as usual, you're gonna make a good decision :innocent:.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2017-12-12T08:44:02Z
+
+@nicolas-grekas If I get you right, the problem is that this PR needs to change the Routing component *and* tests/fixtures in FrameworkBundle?
+
+The Descriptor tests in FrameworkBundle are brittle, as they fail when the route regexp changes. IMO it's not the intention of these `Descriptor` tests to assert the exact route regexp.
+
+So, what if the Descriptor tests allowed placeholders/regexes in the fixtures to accept (some) changes in the output?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-01-27T13:13:44Z
+
+Ping @symfony/deciders
+
+I‘d like to know whether you’re going to pull/fix this.
+
+I am continuously getting the notices caused by this in my log monitoring. If you won’t fix it, I’ll have a look what my other options are.
+
+I haven’t heard any objections against the fix per se. The issue is that it breaks some tests across components. The tests affected IMO never intended to assert a particular routing behavior and do so only by accident.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-03T14:51:49Z
+
+Continued in #26035
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-02-03T16:10:44Z
+
+@nicolas-grekas  I probably don’t fully understand the implications of what I am suggesting here.
+
+ Do we agree that the tests for `FrameworkBundle` are not responsible for (and never intended to) guard the regex used?
+
+Even more, agree that the regex used is an implementation detail whereas tests should assert behavior?
+
+Is it even *impossible* to change `FrameworkBundle` tests in a way that ignores/tolerates different regexes, as we would have to change the tests for versions that have already been released? So, the regex will never ever be changed anymore?
+
+Could we address this by narrowing dependency version constraints on either component/bundle? Or isn’t that an option either because we cannot change them for already released versions (that is, preventing tests from “before” the change to run against a version containing the change)?
+
+Thanks for your help, I appreciate your feedback!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-03T16:38:38Z
+
+Yes about FrameworkBundle. Narrowing minimum version is possible, but maybe better not and make tests less strict instead.
+I'm more worried by the removal of the serialized routes. We added the test for a reason, and there are serialized routes into the wild that deserve some attention.
+By not changing the route data object at all, we take zero risk, thus my proposal.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-02-03T16:51:21Z
+
+Ok, I don’t get this serialized routes part... you mean people have tucked away serialized routes somewhere and you would like them to continue working as-is? Why would this PR break that?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-02-03T16:53:40Z
+
+I’d like to look into making FrameworkBundle tests less strict if you say that this might solve the problem.
+
+I guess that would still require bumping deps just to make sure the tests are liberal enough?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-03T17:49:31Z
+
+> bumping deps just to make sure the tests are liberal enough
+
+I don't think so. Let's try without.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-03T17:52:04Z
+
+> bumping deps just to make sure the tests are liberal enough
+
+I don't think so. Let's try without.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T10:49:33Z
+
+you need to fetch+rebase on lastest 2.7
+
+---------------------------------------------------------------------------
+
+by mpdude at 2018-02-04T11:06:15Z
+
+@nicolas-grekas Using a RouteStub in FrameworkBundle tests, kept the Route unserialization test, rebased & squashed. Let's :crossed_fingers:  and see if tests stay 🆗
+
+Update: fabbot.io complains about fixture for generated code violating CS; ignoring that.

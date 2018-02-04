@@ -20,6 +20,30 @@ use Symfony\Component\Form\FormError;
  */
 abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
 {
+    public function testRow()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $form->addError(new FormError('[trans]Error![/trans]'));
+        $view = $form->createView();
+        $html = $this->renderRow($view);
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [
+        ./label[@for="name"]
+        [
+            ./div[
+                ./ul
+                    [./li[.="[trans]Error![/trans]"]]
+                    [count(./li)=1]
+            ]
+        ]
+        /following-sibling::input[@id="name"]
+    ]
+'
+        );
+    }
+
     public function testLabelOnForm()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType');

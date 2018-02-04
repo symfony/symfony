@@ -162,6 +162,18 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(array('_route' => '$péß^a|'), $matcher->match('/bar'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testTrailingEncodedNewlineIsNotOverlooked()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+
+        $matcher = $this->getUrlMatcher($collection);
+        $matcher->match('/foo%0a');
+    }
+
     public function testMatchNonAlpha()
     {
         $collection = new RouteCollection();

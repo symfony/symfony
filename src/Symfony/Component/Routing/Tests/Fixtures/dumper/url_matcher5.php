@@ -47,7 +47,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         }
 
         // a_wildcard
-        if (preg_match('#^/(?P<param>[^/]++)$#s', $pathinfo, $matches)) {
+        if (preg_match('#^/(?P<param>[^/]++)$#sD', $pathinfo, $matches)) {
             return $this->mergeDefaults(array_replace($matches, array('_route' => 'a_wildcard')), array ());
         }
 
@@ -100,7 +100,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         }
 
         // nested_wildcard
-        if (0 === strpos($pathinfo, '/nested') && preg_match('#^/nested/(?P<param>[^/]++)$#s', $pathinfo, $matches)) {
+        if (0 === strpos($pathinfo, '/nested') && preg_match('#^/nested/(?P<param>[^/]++)$#sD', $pathinfo, $matches)) {
             return $this->mergeDefaults(array_replace($matches, array('_route' => 'nested_wildcard')), array ());
         }
 

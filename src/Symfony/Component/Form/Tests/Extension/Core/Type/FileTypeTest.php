@@ -188,7 +188,7 @@ class FileTypeTest extends BaseTypeTest
     private function createUploadedFileMock(RequestHandlerInterface $requestHandler, $path, $originalName)
     {
         if ($requestHandler instanceof HttpFoundationRequestHandler) {
-            return new UploadedFile($path, $originalName, null, null, null, true);
+            return new UploadedFile($path, $originalName, null, null, true);
         }
 
         return array(

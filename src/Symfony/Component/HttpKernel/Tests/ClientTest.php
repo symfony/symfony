@@ -97,6 +97,7 @@ class ClientTest extends TestCase
     public function testUploadedFile()
     {
         $source = tempnam(sys_get_temp_dir(), 'source');
+        file_put_contents($source, '1');
         $target = sys_get_temp_dir().'/sf.moved.file';
         @unlink($target);
 
@@ -104,8 +105,8 @@ class ClientTest extends TestCase
         $client = new Client($kernel);
 
         $files = array(
-            array('tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => 123, 'error' => UPLOAD_ERR_OK),
-            new UploadedFile($source, 'original', 'mime/original', 123, UPLOAD_ERR_OK, true),
+            array('tmp_name' => $source, 'name' => 'original', 'type' => 'mime/original', 'size' => 1, 'error' => UPLOAD_ERR_OK),
+            new UploadedFile($source, 'original', 'mime/original', 1, UPLOAD_ERR_OK, true),
         );
 
         $file = null;
@@ -120,7 +121,7 @@ class ClientTest extends TestCase
 
             $this->assertEquals('original', $file->getClientOriginalName());
             $this->assertEquals('mime/original', $file->getClientMimeType());
-            $this->assertEquals('123', $file->getClientSize());
+            $this->assertSame(1, $file->getClientSize());
             $this->assertTrue($file->isValid());
         }
 

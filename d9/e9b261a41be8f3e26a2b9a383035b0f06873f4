@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-21T16:14:29Z
+
+@nicolas-grekas should we update the test before merging this one ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-29T22:10:49Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-05T14:48:02Z
+
+PR rebased and comments done
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-05T14:48:11Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-07T10:14:53Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-23T21:31:55Z
+
+@Simperfit FYI, I have pushed some changes that IMO fix some issues in the tests and make the build green
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-26T13:11:35Z
+
+@nicolas-grekas done

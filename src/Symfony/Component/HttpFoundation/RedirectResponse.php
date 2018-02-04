@@ -18,25 +18,30 @@ namespace Symfony\Component\HttpFoundation;
  */
 class RedirectResponse extends Response
 {
+    protected $callable;
     protected $targetUrl;
 
     /**
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
      *
-     * @param string $url     The URL to redirect to. The URL should be a full URL, with schema etc.,
-     *                        but practically every browser redirects on paths only as well
-     * @param int    $status  The status code (302 by default)
-     * @param array  $headers The headers (Location is always set to the given URL)
+     * @param string|callable $url     The URL to redirect to. The URL should be a full URL, with schema etc.,
+     *                                 but practically every browser redirects on paths only as well
+     * @param int             $status  The status code (302 by default)
+     * @param array           $headers The headers (Location is always set to the given URL)
      *
      * @throws \InvalidArgumentException
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
      */
-    public function __construct(?string $url, int $status = 302, array $headers = array())
+    public function __construct($url, int $status = 302, array $headers = array())
     {
         parent::__construct('', $status, $headers);
 
-        $this->setTargetUrl($url);
+        if (!is_callable($url)) {
+            $this->setTargetUrl($url);
+        } else {
+            $this->callable = $url;
+        }
 
         if (!$this->isRedirect()) {
             throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $status));
@@ -103,6 +108,20 @@ class RedirectResponse extends Response
 </html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')));
 
         $this->headers->set('Location', $url);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sendHeaders()
+    {
+        if (!$this->targetUrl && $this->callable) {
+            $this->setTargetUrl(call_user_func($this->callable, $this));
+        }
+
+        parent::sendHeaders();
 
         return $this;
     }

@@ -53,7 +53,7 @@ class NullAdapterTest extends TestCase
             $itemKey = $item->getKey();
 
             $this->assertEquals($itemKey, $key, 'Keys must be preserved when fetching multiple items');
-            $this->assertTrue(in_array($key, $keys), 'Cache key can not change.');
+            $this->assertContains($key, $keys, 'Cache key can not change.');
             $this->assertFalse($item->isHit());
 
             // Remove $key for $keys

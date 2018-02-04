@@ -43,7 +43,7 @@ class ProxyAdapterTest extends AdapterTestCase
 
         $proxyItem = $pool->getItem('foo');
 
-        $this->assertFalse($proxyItem === $item);
+        $this->assertNotSame($item, $proxyItem);
         $pool->save($proxyItem->set('bar'));
     }
 }

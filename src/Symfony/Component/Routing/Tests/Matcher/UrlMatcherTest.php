@@ -435,7 +435,7 @@ class UrlMatcherTest extends TestCase
     {
         $coll = new RouteCollection();
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = $this->getUrlMatcher($coll);
         $matcher->match('/');
     }
 

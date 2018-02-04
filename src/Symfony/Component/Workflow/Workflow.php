@@ -162,6 +162,25 @@ class Workflow implements WorkflowInterface
     }
 
     /**
+     * Returns all available transitions (without taking care of guard handlers).
+     *
+     * @param object $subject A subject
+     *
+     * @return Transition[] All available transitions
+     */
+    public function getAvailableTransitions($subject)
+    {
+        $available = array();
+        $marking = $this->getMarking($subject);
+
+        foreach ($this->definition->getTransitions() as $transition) {
+            $available[] = $transition;
+        }
+
+        return $available;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getName()

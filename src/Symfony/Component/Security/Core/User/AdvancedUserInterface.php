@@ -32,6 +32,7 @@ use Symfony\Component\Security\Core\Exception\DisabledException;
  *
  * @see UserInterface
  * @see AccountStatusException
+ * @deprecated since version 4.1, will be removed in 5.0.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

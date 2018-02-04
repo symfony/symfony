@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\User;
 
-use Symfony\Component\Security\Core\Role\Role;
-
 /**
  * Represents the interface that all user classes must implement.
  *
@@ -27,7 +25,6 @@ use Symfony\Component\Security\Core\Role\Role;
  * loaded by different objects that implement UserProviderInterface
  *
  * @see UserProviderInterface
- * @see AdvancedUserInterface
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

@@ -1,0 +1,157 @@
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-11-01T11:00:17Z
+
+CI failures unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-01T11:08:20Z
+
+Should target 4.1, thus branch master.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-11-01T11:17:00Z
+
+@nicolas-grekas
+
+> Should target 4.1, thus branch master.
+
+I did that at first, but the PR template said it should target 3.4 so I've changed it. Will switch to master.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-11-01T11:34:33Z
+
+Please check which driver supports locking before supporting it. Without locking the session driver is useless in multi ajax application
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-11-01T11:40:08Z
+
+@mvrhov not sure what you're referring to here exactly, please elaborate.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-01T12:31:40Z
+
+@mvrhov neither the Memcached nor the MongoDb do locking. Yet I wouldn't call them useless :) I think it's fine to do no locking here. We could provide locking via a proxy that'd leverage the Lock component BTW. So definitely not in this PR.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-11-01T18:41:25Z
+
+@dkarlovi well if the driver doesn't lock the session, and your application is heavily based on ajax and you do a write inside ajax request, then you will probably loose some data.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-11-01T18:59:55Z
+
+@mvrhov session locking isn't in scope of this PR, I'd like Redis to be usable as a session storage on the same level as other available session handlers (which also means no locking). Session locking should be available across handlers, not just implemented in a single one.
+
+On the other hand, "heavily based on ajax" app (with heavy session write patterns to boot) sounds like a good candidate to do a stateless integration (for example, access tokens).
+
+---------------------------------------------------------------------------
+
+by smuggli at 2017-11-10T13:02:11Z
+
+Fyi, there is an open pr which would add locking functionality to phpredis.
+
+https://github.com/phpredis/phpredis/pull/1181
+
+---------------------------------------------------------------------------
+
+by michael-grunder at 2017-11-11T23:59:28Z
+
+This functionality has been pulled into the phpredis repo as a branch here:
+https://github.com/phpredis/phpredis/tree/session-locking
+
+This is still a work in progress but if people could help test that it's working well that would be great.
+
+I will probably extend locking to the redis cluster class and then hopefully bring it into our main develop branch soon.
+
+Cheers
+Mike
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-12-12T15:02:37Z
+
+I think this should be good to go, I've omitted `RedisCluster` tests because they seem tricky to setup. Also switched to functional tests instead of unit, seems too complex to mock IMO.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-12-12T15:04:36Z
+
+Also, if anyone can help me figure out why `deps=low` fails, that would be great. <3
+
+It seems Travis doesn't make the `redis` service available with `deps=low`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-12T17:04:46Z
+
+>  Yet it could be simplified since we never deal with multiple values, isn't it?
+
+actually, all the pipelining logic should be replaced by simple fetch - pipelining is only usefull when dealing with several values, which is not the case here.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-12-12T19:06:27Z
+
+@nicolas-grekas I agree, this was to get the tests working for all clients, now it's only the matter of getting the simplest code possible. :)
+
+TYVM for the review.
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-12-15T14:10:12Z
+
+@nicolas-grekas
+
+I've rebased and dropped the whole pipeline thing. Can squash to merge.
+
+`deps=low` still fails, don't know why. Help?
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-12-19T14:28:20Z
+
+@nicolas-grekas does this look good or do you need me to do anything else?
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-12-20T16:13:32Z
+
+Rebased again, can squash before you merge.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-21T16:25:34Z
+
+I think you can squash them now ;).
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2017-12-21T18:19:40Z
+
+@Simperfit there might be some more changes requested, will squash when the changeset is confirmed. :)
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-01-02T11:04:57Z
+
+Err, bump?
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2018-01-02T13:44:49Z
+
+@dkarlovi: It's holiday season! A lot of people are home till monday
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2018-01-29T08:36:24Z
+
+@nicolas-grekas can this get merged?

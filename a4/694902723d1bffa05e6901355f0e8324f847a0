@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-31T07:58:20Z
+
+Now tested, PR ready.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-01-31T08:05:47Z
+
+If this is something that should be documented for end users, please add some description about this feature, some simple code example, etc.  Otherwise, please ignore my comment. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-01T05:41:22Z
+
+It's not that weird, it's just a type check, that doesn't make it coupling.
+#25984 is non trivial because of the deduplication requirement, if we really want to make it correct and performant.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-02-01T11:48:51Z
+
+#25984 would happen on 4.1 anyways, isn't it?

@@ -113,7 +113,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
         $matcher = $this->getUrlMatcher($coll, new RequestContext());
-        $matcher->expects($this->once())->method('redirect')->with('/foo', 'foo', 'https')->willReturn(array('_route' => 'foo'));
+        $matcher->expects($this->once())->method('redirect')->with('/foo', 'foo', 'https')->willReturn(array());
         $this->assertSame(array('_route' => 'foo'), $matcher->match('/foo'));
     }
 

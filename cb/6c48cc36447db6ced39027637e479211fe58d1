@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-02-03T10:43:09Z
+
+Looks good 👍
+
+---------------------------------------------------------------------------
+
+by dmifedorenko at 2018-02-03T11:46:17Z
+
+@nicolas-grekas yes, merge it in 3.4 please and close pull request. Thank you.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-03T17:57:47Z
+
+While I agree it makes sense to do this with one call, there will be alot of people reporting the silenced errors again. See https://github.com/twigphp/Twig/pull/1866 and related tickets.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-03T18:03:37Z
+
+@Tobion I wondered the same - but this should happen only in dev, when the cache is rebuilt. Not sure it's a real issue. Would you consider this a no-go?
+
+---------------------------------------------------------------------------
+
+by dmifedorenko at 2018-02-03T22:45:14Z
+
+@Tobion https://github.com/twigphp/Twig/pull/1866 is very strange issue. We use "@" before filemtime to mute all error, and it work in default php's error handler. If custom error handlers dont check error level of error and rice error event even code called with "@" this is problem of error handler, not framework components code.
+
+I search for regexp @[^\s]+\( on framework's source code and found more then 500 calls with muted errors. So Symfony has tons of calls with @, shall we rewrite them all according to https://github.com/twigphp/Twig/pull/1866?
+
+![image](https://user-images.githubusercontent.com/1930019/35772316-620e9570-0987-11e8-9083-0875b2bbb4ce.png)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-03T23:10:29Z
+
+@dmifedorenko symfonys debug error handler logs all silenced errors. The other silenced operator usages usually never happen, they are just silenced as a safe guard against the PHP warnings generated. But this change here will likely trigger these silenced errors alot. This is what happened in the referenced twig tickket. And when it happens alot, people will complain. And they will not know, that this is intended and does not need a fix.
+
+@nicolas-grekas If we accept these silenced errors we probably need a way to tell people that this is an acceptable warning. Like explaining that in the web profiler in the silenced errors tab.
+
+---------------------------------------------------------------------------
+
+by dmifedorenko at 2018-02-03T23:30:37Z
+
+> symfonys debug error handler logs all silenced errors
+
+Why so?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T08:41:12Z
+
+I just tried: the notice is invisible in practice, so there is no issue at all. I suppose the reason why it is invisible is because it is thrown pre compile time, at a moment where things are not bootstrapped enough.
+
+So let's do that change on my side.

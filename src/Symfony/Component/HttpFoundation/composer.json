@@ -20,6 +20,7 @@
         "symfony/polyfill-mbstring": "~1.1"
     },
     "require-dev": {
+        "predis/predis": "~1.0",
         "symfony/expression-language": "~3.4|~4.0"
     },
     "autoload": {

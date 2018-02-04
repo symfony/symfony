@@ -1,0 +1,165 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-15T08:05:25Z
+
+Btw if we deprecate AdvancedUserInterace, i dont see the need to inline those methods into User (as a side effect); we could deprecate those in turn as well. Probably allows to cleanup further :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-07-15T16:42:37Z
+
+@ro0NL They are already _in_ the `User`, so it's merely making them a class only set of functions. I was thinking if we could remove those fields and limit it to a disabled/enabled, but this would influence the messages to the user based on the `getMessageKey`.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-07-15T16:43:13Z
+
+Side note, I was thinking of opening an RFC to rename the `User` to `InMemoryUser`, as it seems too generic right now. This would also allow cleanup of all those methods.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-15T16:46:24Z
+
+> I just need to find a way to not trigger a deprecation for that.
+
+> rename the User to InMemoryUser
+
+Deprecate `User`, add `InMemoryUser`... problem solved?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-07-15T16:50:18Z
+
+That could make the deprecations of User complete and simply use a smaller InMemory user anyway, Might solve more issues
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-15T17:41:09Z
+
+Please, don't deprecate `User` by `InMemoryUser`. It's a really bad name. Remember that Symfony should do the normal simple and the custom possible. The normal is to have a simple user in the database and represent it with a `User` entity. Thanks!
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-07-15T17:44:02Z
+
+@javiereguiluz the `User` is the `InMemoryUser` and should only be used for the in memory provider. Sadly, due to the generic name, this is often mistaken as "the" user class.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-15T17:51:22Z
+
+@iltar I'm sorry. I should have checked twice before commenting (I was on the phone). If this is the non-persisted user, then `InMemoryUser` is a perfect name because it's used in other frameworks/technologies too.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-08-14T08:57:37Z
+
+@chalasr tests should be green now
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-25T07:37:18Z
+
+Squashed and rebased against 3.4 to solve merge conflicts
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T14:49:43Z
+
+@iltar sorry another rebase is needed
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-09-27T06:18:38Z
+
+@nicolas-grekas fixed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-02T11:01:04Z
+
+ping @iltar
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-10-02T11:27:09Z
+
+Merge conflicts resolved and namespaces in the md files fixed as comment by xabbuh
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-24T12:10:54Z
+
+Moving to 4.1 as 3.4 is in beta, thus closed for new feats.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-11T07:57:31Z
+
+@iltar Can you rebase and update the changelog/update entries to account for 4.1?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-12-11T10:09:15Z
+
+@xabbuh should be fixed now
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-18T13:09:57Z
+
+@fabpot still sceptical about this change? It would be good to move forward
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-21T15:16:45Z
+
+(small rebase needed)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-24T19:30:45Z
+
+I'm sorry to come late in the game with this question, but what's the purpose of this change? What's the expected benefit? Every new deprecation has a clear downside: it is asking users to, someday, change their code. That's a cost for sure. What's the other side of the balance that justifies this?
+
+To be honest, I really don't know this part of Symfony, so I don't expect to understand your answer :)
+But I'd really like that people who understand what's going on here to still have this reasoning, and that we take the decision on this basis.
+
+Any hints?
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-24T20:30:43Z
+
+@nicolas-grekas long story short: this particular part in Symfony is domain logic, rather than infrastructure.
+
+```php
+// comes with
+public function isAccountNonExpired();
+public function isAccountNonLocked();
+public function isCredentialsNonExpired();
+public function isEnabled();
+```
+
+Those 4 "states" _can_ be reused by an application, but usually does not. In addition to that, the code that everyone uses _by default_, has all kind of exceptions programmed for the advanced user interface.
+ - The UserChecker doesn't do anything unless it's an advanced user
+ - The AbstractToken (which pretty much every token extends), contains special branches for the AdvancedUserInterface
+
+This kind of logic does (in my opinion), not belong in the core framework. If you don't use the AdvancedUserInterface, Security will still work, but will still contain the domain logic in all the core framework classes.
+
+Symfony by default comes with 1 user class: `Symfony\Component\Security\Core\User\User`. By default, this user implements the AdvancedUserInterface. However, this user object, is only used for the InMemoryUserProvider. This particular provider (in theory) doesn't need domain logic, because you manage it from the security.yaml config. In any other case, the documentation tells the developer to implement the UserInterface themselves.
+
+So to sum it up:
+ - The AdvancedUserInterface causes the core framework to contain code branches in 2 core classes that is used by pretty much everyone, but never hit
+ - It provides a some form of domain logic with the 4 methods listed above, that are pretty much never needed at all (or maybe subset thereof).
+ - The method names are very confusing due to being negations
+
+As far as I can tell, the AdvancedUserInterface is based on a subset of methods from the Spring user: https://docs.spring.io/spring-security/site/docs/2.0.7.RELEASE/apidocs/org/springframework/security/userdetails/UserDetails.html (much as other parts, like the SecurityContext were based on). I feel that Symfony does not need this by default.
+
+If this PR comes through:
+ - There will be less User related interfaces and branches for a new developer to get confused by
+ - It opens the door to make a NullUserChecker which would become the default, the current user checker doesn't do anything without the interface anyway
+ - It opens the door to add an InMemoryUserChecker, which could do the current checks, _if_ they are still needed (which seems obsolete imo, due to the config being in security.yaml)
+ - It opens the door to rename the current `User` to `InMemoryUser`, which is what it's used for
+
+If you have any questions, I'll be happy to answer 👍

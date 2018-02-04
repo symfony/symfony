@@ -65,6 +65,17 @@ class RedirectResponseTest extends TestCase
         $this->assertEquals('baz.beep', $response->getTargetUrl());
     }
 
+    public function testSetTargetUrlWithCallback()
+    {
+        $response = new RedirectResponse(function () {
+            return 'foo.bar';
+        });
+
+        $response->sendHeaders();
+
+        $this->assertEquals('foo.bar', $response->getTargetUrl());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -72,6 +83,18 @@ class RedirectResponseTest extends TestCase
     {
         $response = new RedirectResponse('foo.bar');
         $response->setTargetUrl(null);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetTargetUrlNullWithCallback()
+    {
+        $response = new RedirectResponse(function () {
+            return null;
+        });
+
+        $response->sendHeaders();
     }
 
     public function testCreate()

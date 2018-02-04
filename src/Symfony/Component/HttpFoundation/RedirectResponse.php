@@ -33,7 +33,7 @@ class RedirectResponse extends Response
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
      */
-    public function __construct(?string $url, int $status = 302, array $headers = array())
+    public function __construct($url, int $status = 302, array $headers = array())
     {
         parent::__construct('', $status, $headers);
 

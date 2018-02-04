@@ -259,6 +259,28 @@ class SecurityExtensionTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testPerListenerProviderWithRememberMe()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'first' => array('id' => 'foo'),
+                'second' => array('id' => 'bar'),
+            ),
+
+            'firewalls' => array(
+                'default' => array(
+                    'form_login' => array('provider' => 'second'),
+                    'logout_on_user_change' => true,
+                    'remember_me' => array('secret' => 'baz'),
+                ),
+            ),
+        ));
+
+        $container->compile();
+        $this->addToAssertionCount(1);
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

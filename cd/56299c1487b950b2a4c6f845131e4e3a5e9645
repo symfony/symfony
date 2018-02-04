@@ -1,0 +1,150 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-05T11:57:14Z
+
+Is it really something that we could only implement for Bootstrap 4? Wouldn't it make sense to make the change to the other themes? Also, for Bootstrap 4, it should be done on 3.4, not master.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-10-08T14:03:56Z
+
+Wouldn't changing this in older themes be BC break?
+Bootstrap 4 theme has been added in Symfony 3.4 so it's ok to do this there.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-08T14:51:23Z
+
+@ostrolucky I know that, but it's kind of weird to fix a real issue only for one theme.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:48:17Z
+
+@Nyholm rebase on 3.4 needed (I already retargeted on github)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-12T16:16:05Z
+
+@Nyholm I just rebased on 3.4. Can you please review other comments?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-10-12T21:03:03Z
+
+Thank you for reviews and comments. I'll take care of this tonight.
+
+//Tobias Nyholm
+
+Skickat på språng
+
+> On 12 Oct 2017, at 09:16, Nicolas Grekas <notifications@github.com> wrote:
+>
+> @Nyholm I just rebased on 3.4. Can you please review other comments?
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub, or mute the thread.
+>
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-10-13T04:04:23Z
+
+I've updated all the themes.
+Please note that the design (depending on CSS) might break with these fixes.
+
+If we are happy with the implementation I'll try to write a paragraph or two in the docs about this and how to remove the error from the label.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-13T06:50:32Z
+
+tests seem to need an update too
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-10-17T04:26:44Z
+
+I updated some tests. It passes locally. Travis is not all happy, did I do it correctly?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-12T16:23:43Z
+
+@Nyholm could you rebase + check tests please?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-11-26T08:57:10Z
+
+I've rebased and fixed one test.. I cannot figure out how to fix `AbstractTableLayoutTest::testNestedFormError`. Where is the documentation of DomCrawler?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-11-26T15:51:07Z
+
+@Nyholm Tests for the TwigBridge are green now. But it looks like you need to update some PHP templates too (see the failing FrameworkBundle tests).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-11-26T20:01:15Z
+
+Tests are green except for low/high. Also, Fabbot is a false negative
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-11-30T16:05:12Z
+
+Don't merge such a bc break in a minor version
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-16T19:22:00Z
+
+@Nyholm how could we move forward here?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-01-16T20:26:36Z
+
+I think this is still ok to go into bootstrap 4 theme, since that one needs to be changed in BC breaking way anyway to support newer bootstrap 4 release
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-22T08:14:05Z
+
+@Nyholm because we cannot break BC, except on bootstrap 4 because it was not even stable before, what about focusing this PR only on bootstrap 4? That'd be a nice step. Would you have some time to make it before next release? (ie this week would be great)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-01-22T08:19:59Z
+
+Hey. Sorry for the delay. I will make sure to only change the bootstrap theme this week.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-01-28T15:47:21Z
+
+There we go. The PR does only edit bootstrap 4 and added some tests to make sure it works.
+
+I've also rebased on branch 3.4. But I guess it should be changed to master, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-28T16:03:41Z
+
+This should really go to 3.4 as bug fix. Later would mean BC breaks. Doing now is also a BC break, but matches the fact that BS4 just when out of beta.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-01-28T16:14:28Z
+
+Great great great. Then Im done with this PR. Im ready for a review.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-01-29T08:15:17Z
+
+Thank you

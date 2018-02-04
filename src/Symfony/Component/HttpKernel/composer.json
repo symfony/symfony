@@ -28,7 +28,7 @@
         "symfony/config": "~2.8|~3.0|~4.0",
         "symfony/console": "~2.8|~3.0|~4.0",
         "symfony/css-selector": "~2.8|~3.0|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
+        "symfony/dependency-injection": "^3.4.5|^4.0.5",
         "symfony/dom-crawler": "~2.8|~3.0|~4.0",
         "symfony/expression-language": "~2.8|~3.0|~4.0",
         "symfony/finder": "~2.8|~3.0|~4.0",
@@ -45,7 +45,7 @@
     },
     "conflict": {
         "symfony/config": "<2.8",
-        "symfony/dependency-injection": "<3.4",
+        "symfony/dependency-injection": "<3.4.5|<4.0.5,>=4",
         "symfony/var-dumper": "<3.3",
         "twig/twig": "<1.34|<2.4,>=2"
     },

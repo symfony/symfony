@@ -13,6 +13,8 @@ namespace Symfony\Component\Config\Tests\Resource;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
+use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReflectionClassResourceTest extends TestCase
 {
@@ -136,8 +138,52 @@ EOPHP;
         yield array(0, 14, '/** priv docblock */');
         yield array(0, 15, '');
     }
+
+    public function testEventSubscriber()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
+        $this->assertTrue($res->isFresh(0));
+
+        TestEventSubscriber::$subscribedEvents = array(123);
+        $this->assertFalse($res->isFresh(0));
+
+        $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
+        $this->assertTrue($res->isFresh(0));
+    }
+
+    public function testServiceSubscriber()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
+        $this->assertTrue($res->isFresh(0));
+
+        TestServiceSubscriber::$subscribedServices = array(123);
+        $this->assertFalse($res->isFresh(0));
+
+        $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
+        $this->assertTrue($res->isFresh(0));
+    }
 }
 
 interface DummyInterface
 {
+}
+
+class TestEventSubscriber implements EventSubscriberInterface
+{
+    public static $subscribedEvents = array();
+
+    public static function getSubscribedEvents()
+    {
+        return self::$subscribedEvents;
+    }
+}
+
+class TestServiceSubscriber implements ServiceSubscriberInterface
+{
+    public static $subscribedServices = array();
+
+    public static function getSubscribedServices()
+    {
+        return self::$subscribedServices;
+    }
 }

@@ -62,9 +62,17 @@ class PhpExecutableFinder
             }
         }
 
-        $dirs = array(PHP_BINDIR);
+        $dirs = array();
         if ('\\' === DIRECTORY_SEPARATOR) {
             $dirs[] = 'C:\xampp\php\\';
+        }
+
+        $name = 'php';
+        foreach (array('', '.exe', '.bat', '.cmd', '.com') as $suffix) {
+            if (@is_file($file = PHP_BINDIR.DIRECTORY_SEPARATOR.$name.$suffix) &&
+                ('\\' === DIRECTORY_SEPARATOR || is_executable($file))) {
+                return $file;
+            }
         }
 
         return $this->executableFinder->find('php', false, $dirs);

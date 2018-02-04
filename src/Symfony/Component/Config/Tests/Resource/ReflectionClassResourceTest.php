@@ -100,7 +100,7 @@ EOPHP;
         $signature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
 
         if ($changeExpected) {
-            $this->assertTrue($expectedSignature !== $signature);
+            $this->assertNotSame($expectedSignature, $signature);
         } else {
             $this->assertSame($expectedSignature, $signature);
         }

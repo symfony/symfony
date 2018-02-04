@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-11T08:13:54Z
+
+Could happen, but right now we already call the parent constructor if the container is not compiled. Not doing this for compiled containers leads to inconsistencies and to issues as described in the linked issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-11T08:21:23Z
+
+On the other hand, uncompiled containers are not a thing, so their code path is mostly dead (we even removed it in 4.0.)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-11T08:25:29Z
+
+Hm indeed, you are right about that. Should we do some reflection then and try to find out if there is a constructor that could be called instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-11T08:34:32Z
+
+Looks great yes. We should ensure that there is a constructor, and that it has zero mandatory args.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-11T08:35:35Z
+
+On 3.4 only? I'd prefer not change any behavior on 2.*

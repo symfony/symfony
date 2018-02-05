@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationEvent;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Event\AuthenticationSensitiveEvent;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
@@ -32,6 +33,10 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
 {
     private $providers;
     private $eraseCredentials;
+
+    /**
+     * @var EventDispatcherInterface|null
+     */
     private $eventDispatcher;
 
     /**
@@ -62,6 +67,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
     {
         $lastException = null;
         $result = null;
+        $providerClassName = null;
 
         foreach ($this->providers as $provider) {
             if (!$provider instanceof AuthenticationProviderInterface) {
@@ -76,6 +82,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
                 $result = $provider->authenticate($token);
 
                 if (null !== $result) {
+                    $providerClassName = get_class($provider);
                     break;
                 }
             } catch (AccountStatusException $e) {
@@ -88,6 +95,10 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         }
 
         if (null !== $result) {
+            if (null !== $this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(AuthenticationEvents::AUTHENTICATION_SUCCESS_SENSITIVE, new AuthenticationSensitiveEvent($token, $result, $providerClassName));
+            }
+
             if (true === $this->eraseCredentials) {
                 $result->eraseCredentials();
             }

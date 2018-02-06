@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-13T02:25:23Z
+
+👍
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-16T21:41:50Z
+
+BC break? Should be in a recipe instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-16T21:43:19Z
+
+OH, it's already in a recipe, and the doc was accurate when starting with the standard edition, isn't it?
+Because of the BC break cannot happen as is IMHO.
+
+---------------------------------------------------------------------------
+
+by curry684 at 2018-01-16T22:39:28Z
+
+Standard Edition has always explicitly defined it, see 2.7 @ https://github.com/symfony/symfony-standard/blob/2.7/app/config/config.yml#L36. So given that all "supported" standard editions and the Flex recipe default it correctly we're only "BC breaking" people that explicitly removed it to fall back to a value that was documented to be identical to the default. Even if somebody actually did that (why?!?) they were expecting it to do this as documented (`%kernel.debug%`), so absolute worst possible BC break that could happen is that we're fixing their dev environment to be a bit stricter.
+
+Imho that's a very hard case to call a "BC break".
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-01-16T23:07:29Z
+
+Agree with @curry684, this BC break is very weird, however we can do something to solve it, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-17T05:31:02Z
+
+Yes we can: we just need to deprecate not setting the option.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-01-24T16:29:55Z
+
+> we just need to deprecate not setting the option.
+
+Well, first step completed!
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-01-24T17:43:55Z
+
+@fabpot done.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-01-25T15:55:06Z
+
+Modified deprecation message.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-02-05T14:07:30Z
+
+@yceruto Can you please also update the `UPGRADE-4.1.md` and `UPGRADE-5.0.md` files as well as the changelog file of TwigBundle?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-02-05T14:57:48Z
+
+Should be ready now.

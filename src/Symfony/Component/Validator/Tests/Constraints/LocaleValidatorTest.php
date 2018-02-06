@@ -94,7 +94,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getUncanonicalizedLocales
      */
-    public function testInvalidLocalesWithoutCanonicalization($locale)
+    public function testInvalidLocalesWithoutCanonicalization(string $locale)
     {
         $constraint = new Locale(array(
             'message' => 'myMessage',
@@ -111,7 +111,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getUncanonicalizedLocales
      */
-    public function testValidLocalesWithCanonicalization($locale)
+    public function testValidLocalesWithCanonicalization(string $locale)
     {
         $constraint = new Locale(array(
             'message' => 'myMessage',
@@ -123,7 +123,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function getUncanonicalizedLocales()
+    public function getUncanonicalizedLocales(): iterable
     {
         return array(
             array('en-US'),

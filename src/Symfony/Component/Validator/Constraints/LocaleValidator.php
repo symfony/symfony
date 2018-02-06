@@ -54,12 +54,4 @@ class LocaleValidator extends ConstraintValidator
                 ->addViolation();
         }
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultOption()
-    {
-        return 'canonicalize';
-    }
 }

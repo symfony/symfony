@@ -262,6 +262,7 @@ class DateTimeTypeTest extends BaseTypeTest
 
         $outputTime = $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
+        $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
         $this->assertEquals($outputTime, $form->getData());
         $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
     }

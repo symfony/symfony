@@ -47,6 +47,11 @@ Translation
  * The `FileDumper::setBackup()` method is deprecated and will be removed in 5.0.
  * The `TranslationWriter::disableBackup()` method is deprecated and will be removed in 5.0.
 
+TwigBundle
+----------
+
+ * Deprecated relying on the default value (`false`) of the `twig.strict_variables` configuration option. You should use `%kernel.debug%` explicitly instead, which will be the new default in 5.0.
+
 Validator
 --------
 

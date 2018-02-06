@@ -28,22 +28,22 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             $canonicalMethod = 'GET';
         }
 
-        if (0 === strpos($pathinfo, '/rootprefix')) {
-            // static
-            if ('/rootprefix/test' === $pathinfo) {
+        switch ($pathinfo) {
+            case '/rootprefix/test':
+                // static
                 return array('_route' => 'static');
-            }
-
-            // dynamic
-            if (preg_match('#^/rootprefix/(?P<var>[^/]++)$#sD', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'dynamic')), array ());
-            }
-
+                break;
+            case '/with-condition':
+                // with-condition
+                if (($context->getMethod() == "GET")) {
+                    return array('_route' => 'with-condition');
+                }
+                break;
         }
 
-        // with-condition
-        if ('/with-condition' === $pathinfo && ($context->getMethod() == "GET")) {
-            return array('_route' => 'with-condition');
+        // dynamic
+        if (0 === strpos($pathinfo, '/rootprefix') && preg_match('#^/rootprefix/(?P<var>[^/]++)$#sD', $pathinfo, $matches)) {
+            return $this->mergeDefaults(array_replace($matches, array('_route' => 'dynamic')), array());
         }
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();

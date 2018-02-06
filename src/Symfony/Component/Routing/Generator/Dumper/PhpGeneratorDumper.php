@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Generator\Dumper;
 
+use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
+
 /**
  * PhpGeneratorDumper creates a PHP class able to generate URLs for a given set of routes.
  *
@@ -88,7 +90,7 @@ EOF;
             $properties[] = $compiledRoute->getHostTokens();
             $properties[] = $route->getSchemes();
 
-            $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
+            $routes .= sprintf("        '%s' => %s,\n", $name, PhpMatcherDumper::export($properties));
         }
         $routes .= '    )';
 

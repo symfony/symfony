@@ -149,7 +149,15 @@ before_install:
           ([[ $deps ]] || tfold ext.symfony_debug 'cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo extension = $(pwd)/modules/symfony_debug.so >> '"$INI")
           tfold ext.apcu tpecl apcu-4.0.11 apcu.so
       elif [[ ! $skip && $PHP = 7.* ]]; then
+          # install libsodium
+          if [[ ! -e ~/php-ext/$(php -r "echo basename(ini_get('extension_dir'));")/libsodium/sodium.so ]]; then
+              sudo add-apt-repository ppa:ondrej/php -y
+              sudo apt-get update -q
+              sudo apt-get install libsodium-dev -y
+          fi
+
           tfold ext.apcu tpecl apcu-5.1.6 apcu.so
+          tfold ext.libsodium tpecl libsodium sodium.so
           tfold ext.mongodb tpecl mongodb-1.4.0RC1 mongodb.so
       fi
 

@@ -41,7 +41,13 @@ class TimezoneValidator extends ConstraintValidator
 
         $value = (string) $value;
         $zone = null !== $constraint->zone ? $constraint->zone : \DateTimeZone::ALL;
-        $timezoneIds = \DateTimeZone::listIdentifiers($zone, $constraint->countryCode);
+
+        // @see: https://bugs.php.net/bug.php?id=75928
+        if ($constraint->countryCode) {
+            $timezoneIds = \DateTimeZone::listIdentifiers($zone, $constraint->countryCode);
+        } else {
+            $timezoneIds = \DateTimeZone::listIdentifiers($zone);
+        }
 
         if ($timezoneIds && !in_array($value, $timezoneIds, true)) {
             if ($constraint->countryCode) {
@@ -52,10 +58,16 @@ class TimezoneValidator extends ConstraintValidator
                 $code = Timezone::NO_SUCH_TIMEZONE_ERROR;
             }
 
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ extra_info }}', $this->formatExtraInfo($constraint->zone, $constraint->countryCode))
+            $violation = $this->context->buildViolation($constraint->message);
+
+            foreach ($this->generateValidationMessage($constraint->zone, $constraint->countryCode) as $placeholder => $message) {
+                $violation->setParameter($placeholder, $message);
+            }
+
+            $violation
                 ->setCode($code)
-                ->addViolation();
+                ->addViolation()
+            ;
         }
     }
 
@@ -68,31 +80,35 @@ class TimezoneValidator extends ConstraintValidator
     }
 
     /**
-     * Format the extra info which is appended to validation message based on
-     * constraint options.
+     * Generates the replace parameters which are used in validation message.
      *
      * @param int|null    $zone
      * @param string|null $countryCode
      *
-     * @return string
+     * @return array
      */
-    private function formatExtraInfo($zone, $countryCode = null)
+    private function generateValidationMessage(int $zone = null, string $countryCode = null): array
     {
-        if (null === $zone) {
-            return '';
-        }
-        if ($countryCode) {
-            $value = ' for ISO 3166-1 country code "'.$countryCode.'"';
-        } else {
-            $r = new \ReflectionClass('\DateTimeZone');
-            $consts = $r->getConstants();
-            if ($value = array_search($zone, $consts, true)) {
-                $value = ' for "'.$value.'" zone';
-            } else {
-                $value = ' for zone with identifier '.$zone;
+        $values = array(
+            '{{ country_code_message }}' => '',
+            '{{ zone_message }}' => '',
+        );
+
+        if (null !== $zone) {
+            if (\DateTimeZone::PER_COUNTRY !== $zone) {
+                $r = new \ReflectionClass(\DateTimeZone::class);
+                $consts = $r->getConstants();
+                if ($zoneFound = array_search($zone, $consts, true)) {
+                    $values['{{ zone_message }}'] = ' at "'.$zoneFound.'" zone';
+                } else {
+                    $values['{{ zone_message }}'] = ' at zone with identifier '.$zone;
+                }
+            }
+            if ($countryCode) {
+                $values['{{ country_code_message }}'] = ' for ISO 3166-1 country code "'.$countryCode.'"';
             }
         }
 
-        return $value;
+        return $values;
     }
 }

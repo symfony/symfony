@@ -27,23 +27,21 @@ class Timezone extends Constraint
     const NO_SUCH_TIMEZONE_IN_COUNTRY_ERROR = 'c4a22222-dc92-4fc0-abb0-d95b268c7d0b';
 
     public $zone;
-
     public $countryCode;
-
-    public $message = 'This value is not a valid timezone{{ extra_info }}.';
+    public $message = 'This value is not a valid timezone{{ zone_message }}{{ country_code_message }}.';
 
     protected static $errorNames = array(
         self::NO_SUCH_TIMEZONE_ERROR => 'NO_SUCH_TIMEZONE_ERROR',
+        self::NO_SUCH_TIMEZONE_IN_ZONE_ERROR => 'NO_SUCH_TIMEZONE_IN_ZONE_ERROR',
+        self::NO_SUCH_TIMEZONE_IN_COUNTRY_ERROR => 'NO_SUCH_TIMEZONE_IN_COUNTRY_ERROR',
     );
 
     /**
      * {@inheritdoc}
      */
-    public function __construct($options = null)
+    public function __construct(array $options = null)
     {
-        if (isset($options['zone'])) {
-            $this->zone = $options['zone'];
-        }
+        $this->zone = $options['zone'] ?? null;
 
         if (isset($options['countryCode'])) {
             if (\DateTimeZone::PER_COUNTRY !== $this->zone) {

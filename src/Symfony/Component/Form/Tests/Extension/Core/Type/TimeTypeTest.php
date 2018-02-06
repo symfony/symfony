@@ -56,7 +56,7 @@ class TimeTypeTest extends BaseTypeTest
 
         $dateTime = new \DateTimeImmutable('1970-01-01 03:04:00 UTC');
 
-        $this->assertDateTimeImmutableEquals($dateTime, $form->getData());
+        $this->assertEquals($dateTime, $form->getData());
         $this->assertEquals($input, $form->getViewData());
     }
 

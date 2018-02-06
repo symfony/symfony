@@ -122,7 +122,7 @@ class DateTypeTest extends BaseTypeTest
 
         $form->submit('2.6.2010');
 
-        $this->assertDateTimeImmutableEquals(new \DateTimeImmutable('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals(new \DateTimeImmutable('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());
     }
 

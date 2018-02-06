@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 
-class DateTimeImmutableToDateTimeTransformerTest extends DateTimeTestCase
+class DateTimeImmutableToDateTimeTransformerTest extends TestCase
 {
     public function testTransform()
     {
@@ -22,7 +23,7 @@ class DateTimeImmutableToDateTimeTransformerTest extends DateTimeTestCase
         $input = new \DateTimeImmutable('2010-02-03 04:05:06 UTC');
         $output = new \DateTime('2010-02-03 04:05:06 UTC');
 
-        $this->assertDateTimeEquals($output, $transformer->transform($input));
+        $this->assertEquals($output, $transformer->transform($input));
     }
 
     public function testTransformEmpty()
@@ -49,7 +50,7 @@ class DateTimeImmutableToDateTimeTransformerTest extends DateTimeTestCase
         $input = new \DateTime('2010-02-03 04:05:06 UTC');
         $output = new \DateTimeImmutable('2010-02-03 04:05:06 UTC');
 
-        $this->assertDateTimeImmutableEquals($output, $transformer->reverseTransform($input));
+        $this->assertEquals($output, $transformer->reverseTransform($input));
     }
 
     public function testReverseTransformEmpty()

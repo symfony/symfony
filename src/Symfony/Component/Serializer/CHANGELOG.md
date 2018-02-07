@@ -8,6 +8,7 @@ CHANGELOG
   of objects that needs data insertion in constructor
 * added an optional `default_constructor_arguments` option of context to specify a default data in
   case the object is not initializable by its constructor because of data missing
+* added optional `bool $escapeFormulas = false` argument to `CsvEncoder::__construct`
 
 4.0.0
 -----

@@ -12,78 +12,34 @@
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class TwigEnvironmentPassTest extends TestCase
 {
     public function testTwigBridgeExtensionsAreRegisteredFirst()
     {
-        $twigDefinition = new Definition('twig');
-
-        $containerBuilderMock = $this->getMockBuilder(ContainerBuilder::class)
-            ->setMethods(array('hasDefinition', 'get', 'findTaggedServiceIds', 'getDefinition'))
-            ->getMock();
-        $containerBuilderMock
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with('twig')
-            ->will($this->returnValue(true));
-        $containerBuilderMock
-            ->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with('twig.extension')
-            ->will($this->returnValue(array(
-                'other_extension' => array(
-                    array(),
-                ),
-                'twig_bridge_extension' => array(
-                    array(),
-                ),
-            )));
-
-        $otherExtensionDefinitionMock = $this->getMockBuilder(Definition::class)
-            ->setMethods(array('getClass'))
-            ->getMock();
-        $otherExtensionDefinitionMock
-            ->expects($this->once())
-            ->method('getClass')
-            ->will($this->returnValue('Foo\\Bar'));
-
-        $twigExtensionDefinitionMock = $this->getMockBuilder(Definition::class)
-            ->setMethods(array('getClass'))
-            ->getMock();
-        $twigExtensionDefinitionMock
-            ->expects($this->once())
-            ->method('getClass')
-            ->will($this->returnValue('Symfony\\Bridge\\Twig\\Extension\\Foo'));
-
-        $containerBuilderMock
-            ->expects($this->exactly(3))
-            ->method('getDefinition')
-            ->withConsecutive(array('twig'), array('other_extension'), array('twig_bridge_extension'))
-            ->willReturnOnConsecutiveCalls(
-                $this->returnValue($twigDefinition),
-                $this->returnValue($otherExtensionDefinitionMock),
-                $this->returnValue($twigExtensionDefinitionMock)
-            );
+        $container = new ContainerBuilder();
+        $twigDefinition = $container->register('twig');
+        $container->register('other_extension', 'Foo\Bar')
+            ->addTag('twig.extension');
+        $container->register('twig_bridge_extension', FormExtension::class)
+            ->addTag('twig.extension');
 
         $twigEnvironmentPass = new TwigEnvironmentPass();
-        $twigEnvironmentPass->process($containerBuilderMock);
+        $twigEnvironmentPass->process($container);
 
         $methodCalls = $twigDefinition->getMethodCalls();
         $this->assertCount(2, $methodCalls);
 
         $twigBridgeExtensionReference = $methodCalls[0][1][0];
         $this->assertInstanceOf(Reference::class, $twigBridgeExtensionReference);
-        /* @var Reference $twigBridgeExtensionReference */
-        $this->assertEquals('twig_bridge_extension', $twigBridgeExtensionReference->__toString());
+        $this->assertSame('twig_bridge_extension', (string) $twigBridgeExtensionReference);
 
         $otherExtensionReference = $methodCalls[1][1][0];
         $this->assertInstanceOf(Reference::class, $otherExtensionReference);
-        /* @var Reference $otherExtensionReference */
-        $this->assertEquals('other_extension', $otherExtensionReference->__toString());
+        $this->assertSame('other_extension', (string) $otherExtensionReference);
     }
 }

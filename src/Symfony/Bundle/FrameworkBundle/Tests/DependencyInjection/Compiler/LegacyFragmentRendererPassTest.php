@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRendererPass;
@@ -29,29 +30,10 @@ class LegacyFragmentRendererPassTest extends TestCase
      */
     public function testContentRendererWithoutInterface()
     {
-        // one service, not implementing any interface
-        $services = array(
-            'my_content_renderer' => array(),
-        );
-
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $definition->expects($this->atLeastOnce())
-            ->method('getClass')
-            ->will($this->returnValue('stdClass'));
-
-        $builder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition'))->getMock();
-        $builder->expects($this->any())
-            ->method('hasDefinition')
-            ->will($this->returnValue(true));
-
-        // We don't test kernel.fragment_renderer here
-        $builder->expects($this->atLeastOnce())
-            ->method('findTaggedServiceIds')
-            ->will($this->returnValue($services));
-
-        $builder->expects($this->atLeastOnce())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
+        $builder = new ContainerBuilder();
+        $builder->register('fragment.handler');
+        $builder->register('my_content_renderer', 'stdClass')
+            ->addTag('kernel.fragment_renderer');
 
         $pass = new FragmentRendererPass();
         $pass->process($builder);
@@ -59,38 +41,15 @@ class LegacyFragmentRendererPassTest extends TestCase
 
     public function testValidContentRenderer()
     {
-        $services = array(
-            'my_content_renderer' => array(),
-        );
-
-        $renderer = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $renderer
-            ->expects($this->once())
-            ->method('addMethodCall')
-            ->with('addRenderer', array(new Reference('my_content_renderer')))
-        ;
-
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $definition->expects($this->atLeastOnce())
-            ->method('getClass')
-            ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\RendererService'));
-
-        $builder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition'))->getMock();
-        $builder->expects($this->any())
-            ->method('hasDefinition')
-            ->will($this->returnValue(true));
-
-        // We don't test kernel.fragment_renderer here
-        $builder->expects($this->atLeastOnce())
-            ->method('findTaggedServiceIds')
-            ->will($this->returnValue($services));
-
-        $builder->expects($this->atLeastOnce())
-            ->method('getDefinition')
-            ->will($this->onConsecutiveCalls($renderer, $definition));
+        $builder = new ContainerBuilder();
+        $fragmentHandlerDefinition = $builder->register('fragment.handler');
+        $builder->register('my_content_renderer', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\RendererService')
+            ->addTag('kernel.fragment_renderer');
 
         $pass = new FragmentRendererPass();
         $pass->process($builder);
+
+        $this->assertEquals(array(array('addRenderer', array(new Reference('my_content_renderer')))), $fragmentHandlerDefinition->getMethodCalls());
     }
 }
 

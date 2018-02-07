@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
@@ -133,7 +134,9 @@ class TimeType extends AbstractType
             $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
         }
 
-        if ('string' === $options['input']) {
+        if ('datetime_immutable' === $options['input']) {
+            $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
+        } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
                 new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'H:i:s')
             ));
@@ -252,6 +255,7 @@ class TimeType extends AbstractType
 
         $resolver->setAllowedValues('input', array(
             'datetime',
+            'datetime_immutable',
             'string',
             'timestamp',
             'array',

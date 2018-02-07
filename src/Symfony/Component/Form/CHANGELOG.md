@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added `input=datetime_immutable` to DateType, TimeType, DateTimeType
+
 4.0.0
 -----
 

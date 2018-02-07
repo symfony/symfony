@@ -90,4 +90,45 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             array('foobar'),
         );
     }
+
+    /**
+     * @dataProvider getUncanonicalizedLocales
+     */
+    public function testInvalidLocalesWithoutCanonicalization(string $locale)
+    {
+        $constraint = new Locale(array(
+            'message' => 'myMessage',
+        ));
+
+        $this->validator->validate($locale, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$locale.'"')
+            ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getUncanonicalizedLocales
+     */
+    public function testValidLocalesWithCanonicalization(string $locale)
+    {
+        $constraint = new Locale(array(
+            'message' => 'myMessage',
+            'canonicalize' => true,
+        ));
+
+        $this->validator->validate($locale, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function getUncanonicalizedLocales(): iterable
+    {
+        return array(
+            array('en-US'),
+            array('es-AR'),
+            array('fr_FR.utf8'),
+        );
+    }
 }

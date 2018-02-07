@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-01-10T20:42:22Z
+
+I really like the idea of having a "safe" instance of Twig just for the profiler.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-11T08:11:12Z
+
+I am not sure if having a safe Twig instance for the profiler is actually doable. We do not know what panels added by third-party libraries do require. The same is true for the exception controller. As soon as someone creates a custom exception page we cannot know anymore which Twig features they use there.
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2018-01-18T07:29:57Z
+
+I tried really hard to fallback on a safe exception page using a safe Twig instance when an exception is thrown in the initial exception page but was not able to make it work completely, mainly because of our BC policy.
+
+So I saw that we can now add Twig extensions by priority (https://github.com/symfony/symfony/pull/24777). What about using it to load the TwigBridge extensions first by default and just stops there for now. It will still be better than the current situation.

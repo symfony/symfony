@@ -51,6 +51,8 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Extension\Validator\Util\ServerParams')->setMethods(array('getNormalizedIniPostMaxSize', 'getContentLength'))->getMock();
 
         parent::setUp();
+
+        $this->constraint = new Form();
     }
 
     protected function getApiVersion()

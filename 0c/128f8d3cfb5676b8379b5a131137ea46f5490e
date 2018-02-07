@@ -1,0 +1,253 @@
+---------------------------------------------------------------------------
+
+by Plopix at 2017-10-27T04:36:50Z
+
+That is failing on Windows, but I don't really know why, probably a weird Windows specificity, or the END OF LINE?
+You might have an idea?
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by Plopix at 2017-10-28T21:59:38Z
+
+- I fixed the comment 9 (cc @stloyd)
+- _appveyor_ build is passing now
+- _travis-ci_ build fails because of VarDumper (that is not related to this PR cc @nicolas-grekas)
+
+@Nyholm or @lyrixx
+**Question/Note**: The current _workflow:dump_ does not generate the same way workflow and state machine. Is that a standard? I feel that it is so much more readable with transition names on the arrows. Is that something you want me to add on the PR? I am not a graph expert and it might be a convention or something.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-28T22:12:15Z
+
+DST time, transient failure will be fixed tomorrow hopefully :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-11-07T16:31:48Z
+
+> Question/Note: The current workflow:dump does not generate the same way workflow and state machine. Is that a standard?
+
+Oups Sorry I forgot to reply.
+
+Yes it's wanted. As a state machine can have many transition with the same name, the graph could be very ugly. that's why we did this.
+
+---------------------------------------------------------------------------
+
+by Plopix at 2017-11-08T05:43:57Z
+
+@lyrixx I have added an option to let the user decide which transition he wants.
+I hope that is fine for you! Because to me, the square as transition kind of complexify sometimes too. It is great to have the option.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-11-08T13:46:02Z
+
+Thanks. I will try your PR as soon as possible ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-08T19:43:55Z
+
+@lyrixx time to review? :)
+
+---------------------------------------------------------------------------
+
+by Plopix at 2017-12-12T01:16:26Z
+
+I have updated the PR and rebased. Not sure why the tests are failing I think it is not related to this code, `master` code is failing too.
+
+---------------------------------------------------------------------------
+
+by Plopix at 2017-12-12T07:53:59Z
+
+updated @Simperfit (we are almost there ;) )
+
+---------------------------------------------------------------------------
+
+by Plopix at 2017-12-28T09:13:21Z
+
+Thank you for your review @lyrixx, I have implemented the changes, please find my feedbacks to your other comments.
+
+> I let few comments on the Command Class. It seems you did not test it on real project :/
+
+I don't know what you mean here, but this code was tested and was working. You caught good fixes that is really nice of you. I did not test on a *real* *real* project but I have:
+- installed SF4 skeleton
+- required the workflow component
+- added a workflow configuration
+- added an entity class
+- tested the command (for real)
+
+> And I followed you doc and it does not work. the program open a dialog windows where I'm supposed to select a folder. I'm a bit lost.
+
+The doc in the PR mentions: "don't forget the -p to enable the "piping", but there was a typo in the doc in the command (`-p` was misplaced). Thanks for catching that!
+
+> Finally, I'm not sure if plantuml is really mainstream. By default the website is in French :/ http://plantuml.com/
+
+Well it is in English for me, are you sure it is not switched based on your browser?
+Not sure if the language is relevant though. Look here it seems that it is used by many and for a long time:
+https://en.wikipedia.org/wiki/PlantUML
+
+And it does not invalidate the fact that it generates **nicer** diagrams, **more readable** and most of all **easier to adapt** diagram.
+
+> So for now I'm not sure we want this support in the Core. What do others think?
+
+That is your decision, feel free to deny, I was happy to do it anyway ;-). This PR is based on the comments I got at a lightning talk at the Symfony Live SF 2017. People found it interesting at this time. cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-28T09:22:03Z
+
+I still like it and would like to have it in core :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-12-28T09:23:36Z
+
+> I don't know what you mean here, but this code was tested and was working.
+
+I said that because of the double use import. It made a fatal error. My comment was a bit harsh. I'm sorry about it.
+
+---
+
+About having it in the core, if @nicolas-grekas is OK, I'm also OK.
+I'll review it another time today to ensure everything is OK.
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by Plopix at 2017-12-28T09:29:43Z
+
+@lyrixx the duplicate was introduced when I rebased/merged. (because the new Label option that was not existing). The tests passed, I did not retest everything at this time.
+No problem, comments are true and make SF solid. I don't mind ;)
+
+cool to have it in the core, I am happy to contribute, and will be happy to do other changes if required!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-12-28T15:11:33Z
+
+I just tested and now it works. Good job ;)
+
+I will review the code, but could you remove the footer? (`Generated by Symfony .... `)
+
+For everyone, I'm posting the workflow images of this [my demo app](https://github.com/lyrixx/SFLive-Paris2016-Workflow) (It's now powered by SF4 & Flex ;))
+
+![workflow](https://user-images.githubusercontent.com/408368/34414424-9bc76f00-ebe9-11e7-9cd3-ce66d613eb2d.png)
+![workflow2](https://user-images.githubusercontent.com/408368/34414425-9bdf61b4-ebe9-11e7-93d1-f0345a400e5b.png)
+
+---------------------------------------------------------------------------
+
+by Plopix at 2017-12-28T18:59:27Z
+
+thanks @lyrixx, I have done most of the comments and asked questions about some of them.
+Let me know, I will finalize ASAP.
+
+> note: Windows crash is not on me ;)
+
+---------------------------------------------------------------------------
+
+by Plopix at 2018-01-05T10:05:33Z
+
+@lyrixx are we good here? thx!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-01-22T19:50:29Z
+
+:+1: (I will merge it this week if everyone is OK :tada: )
+
+---------------------------------------------------------------------------
+
+by stof at 2018-01-23T09:53:06Z
+
+The dump of the workflow in https://github.com/symfony/symfony/pull/24705#issuecomment-354303061 looks confusing to me. It looks like there are 2 independant `publish` transitions, allowing to go one path or the other, while it is actually a single transition with 2 inputs (meaning that it is a AND between both paths, not a OR). This is exactly the reason why the dot dumper uses boxes to represent transitions, not arrows (to allow having multiple inputs and multiple outputs for each of them).
+This is the main difference between a generic workflow and a state machine (the state machine has only one input and one output for each transition)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-01-23T11:07:55Z
+
+Oh @stof Is totally right. This PR could not be merged in this state.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-01-23T14:04:12Z
+
+The current dumper is fine for the case of state machines though
+
+---------------------------------------------------------------------------
+
+by Plopix at 2018-01-23T22:10:09Z
+
+@stof thank you I have updated the code.
+About the confusion, well as I said before, I am not an expert on workflow/state_machine, I was just trying to provide a better dump.
+
+From my point of view, I don't find it that confusing as I know that I can have only one `transition` with the same name, then it must be the same.
+
+You said:
+> This is the main difference between a generic workflow and a state machine (the state machine has only one input and one output for each transition)
+
+But here: https://symfony.com/doc/current/workflow/state-machines.html
+`update` gets multiple 'from'
+
+The PR is aiming to let the choice to the user to dump it with `arrow` or `square` transition.
+I have compared closely the dumps with Dot and PlantUML
+
+On the cases provided in the doc and on the `article` workflow of @lyrixx :
+(for each I dumped with Dot, PlantUML square and arrow transition)
+
+Pull Request: https://symfony.com/doc/current/workflow/state-machines.html
+<img width="1650" alt="screen shot 2018-01-23 at 1 46 31 pm" src="https://user-images.githubusercontent.com/313532/35303335-7400acea-0046-11e8-8e02-e51752ce6c96.png">
+
+Blog Publishing: https://symfony.com/doc/current/workflow/usage.html
+<img width="1655" alt="screen shot 2018-01-23 at 1 49 20 pm" src="https://user-images.githubusercontent.com/313532/35303338-7588c4f8-0046-11e8-8e9b-4924d42a4ae7.png">
+
+Article: https://github.com/lyrixx/SFLive-Paris2016-Workflow/blob/master/config/packages/workflow.yaml#L3
+<img width="1606" alt="screen shot 2018-01-23 at 1 51 03 pm" src="https://user-images.githubusercontent.com/313532/35303340-77a705d8-0046-11e8-91ae-0dd4f7d206d7.png">
+
+I think that is working, I am not sure what you are expecting, I see at least 3 options in which we could go:
+
+- 1/ we could force `square` for `workflow` and `arrow` for `state_machine`
+- 2/ we could put by default `square` for `workflow` and `arrow` for `state_machine`
+- 3/ don't do change anything as the user has the choice already
+
+Let me know
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-01-24T09:19:38Z
+
+>1/ we could force square for workflow and arrow for state_machine
+
+It's definitively the way to go ;)
+
+---------------------------------------------------------------------------
+
+by Plopix at 2018-01-25T08:13:48Z
+
+hey @lyrixx @stof I have done the option 1/
+
+For the sake of my understanding, I would love if you could you explain why "arrows" are not valid sometimes?
+<img width="1087" alt="screen shot 2018-01-25 at 12 07 02 am" src="https://user-images.githubusercontent.com/313532/35377512-534d79e6-0164-11e8-8043-3f67bb003072.png">
+
+In this example, for instance, it feels simpler to have arrows. But I would understand if the reason is to force a kind of consistency for each type.
+
+Let me know!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-01-26T09:43:01Z
+
+![2018-01-26 10 38 57](https://user-images.githubusercontent.com/408368/35433901-5d22f6ea-0285-11e8-8e91-889272802094.jpg)
+
+As you can see on the previous schema, If you don't draw the transition (square), you have **no way** to know how many transition there are. And of course the 2 workflows (line 1 and line 2) are totally different.
+
+---------------------------------------------------------------------------
+
+by Plopix at 2018-01-26T18:46:39Z
+
+ok makes sense ;-) all good to merge then maybe ;-)

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-09-15T09:29:13Z
+
+@phansys Can you address @Koc's comments and then also rebase on the `3.4` branch?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:02:55Z
+
+Moving to 4.1. Rebase on master might be needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by phansys at 2018-02-06T18:49:21Z
+
+@Koc, sorry for the delay. Your comments were already addressed.
+Ping @xabbuh, @nicolas-grekas.

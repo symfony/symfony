@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T10:13:00Z
+
+Do we support `image/*`? Worth doing in the same PR otherwise WDYT?

@@ -8,6 +8,8 @@ CHANGELOG
  * Deprecate the usage of `SupportStrategyInterface`, use `WorkflowSupportStrategyInterface` instead.
  * The `Workflow` class now implements `WorkflowInterface`.
  * Deprecated the class `ClassInstanceSupportStrategy` in favor of the class `InstanceOfSupportStrategy`.
+ * Added TransitionBlockers as a way to pass around reasons why exactly transitions 
+   can't be made.
 
 4.0.0
 -----

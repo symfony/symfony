@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by greg-1-anderson at 2018-01-22T23:24:41Z
+
+AppVeyor build has an error in code not modified by this PR:
+```
+1) Symfony\Bundle\FrameworkBundle\Tests\Functional\SessionTest::testTwoClients with data set #0 ('config.yml', true)
+RuntimeException: OUTPUT:  ERROR OUTPUT:
+```
+Must be a transient failure, since https://ci.appveyor.com/project/fabpot/symfony/build/1.0.32162 passed.
+
+---------------------------------------------------------------------------
+
+by greg-1-anderson at 2018-01-23T15:14:47Z
+
+Reverted the mistaken style patch.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-01-26T15:17:57Z
+
+:-1:
+
+I'd rather revert the problematic patch (#24987) and see if we can fix that problem properly, or live with the limitation.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-01-26T15:22:39Z
+
+I think I agree with @jakzal. I'm going to revert #24987
+
+---------------------------------------------------------------------------
+
+by greg-1-anderson at 2018-01-26T18:09:39Z
+
+@fabpot Thanks for backing out the previous commits. That will help considerably.
+
+Note that this PR also fixes a bug in getParameterOption that has existed for a long time. Would you like that re-submitted as a separate PR, or would you prefer to live with the limitation?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-01-29T09:12:07Z
+
+@greg-1-anderson Can you rebase on current 2.7?
+
+---------------------------------------------------------------------------
+
+by greg-1-anderson at 2018-01-29T18:05:55Z
+
+Rebased. The only remaining failure is the mistaken code style change suggested by fabbot, as mentioned above.

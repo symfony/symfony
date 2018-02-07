@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-12T10:53:10Z
+
+In 3.4, none of the core features seem to catch this interface. However, I'm not sure about the behavior of custom listeners if people had this check already, it might alter behavior and break code.
+
+Also, this seems to be a new feature :thinking:
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-12T11:39:03Z
+
+This seems to be a new feature for me too. Like @iltar said it could break people's code.
+
+---------------------------------------------------------------------------
+
+by paq85 at 2018-01-12T12:33:10Z
+
+I can imagine a code that would break after this change but this is very unlikely.
+I can imagine people having
+```php
+} catch (\Symfony\Component\Security\Core\Exception\ExceptionInterface $sex) {
+```
+expecting it to catch whatever Security component throws and it's not gonna happen because of this issue.
+I was expecting such a behaviour because I was quite sure that's how all Symfony components are build.
+
+IMHO BC break is not such a big case here because if anyone is catching a specific sub-exception like `\Symfony\Component\Security\Core\Exception\BadCredentialsException` it will still get caught.
+If anyone is catching the generic `\RuntimeException` it will still get caught as the `\Symfony\Component\Security\Core\Exception\RuntimeException` extends `\RuntimeException`
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-12T12:36:06Z
+
+> IMHO BC break is not such a big case
+
+A BC break is still a BC break though.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-01-15T09:36:45Z
+
+I agree this could be a BC for people **misusing** the exceptions. However, this is a bug to me as the exceptions are not implementing the intended interface.
+
+@paq85 @chalasr I've updated to PR, so all exceptions are updated.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-01-15T10:00:13Z
+
+> I agree this could be a BC for people **misusing** the exceptions. However, this is a bug to me as the exceptions are not implementing the intended interface.
+
+It doesn't have to be misusing, can be perfectly normal usage.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-20T21:50:25Z
+
+I can't say if not making these classes implement the interface was done on purpose or not, but I share @iltar concerns, this is a BC break, especially important because it is about security exceptions. Exception handling is often little tested, this could break final applications as well as librairies.
+I tend to be -1, letting things as they are. Not for 2.7 anyways. Let's see what others think
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-03T10:58:18Z
+
+AFAIK, we make such changes on master only.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-02-03T11:01:12Z
+
+That's probably a good tradeoff. It will not break some applications that are potentially misusing the exceptions but will correct the expected behaviour 👍
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-02-03T11:04:17Z
+
+Rebased on master and PR's base changed.

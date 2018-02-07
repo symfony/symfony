@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-27T10:07:45Z
+
+For master, that's not a bug but an improvement.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-27T16:02:29Z
+
+True, and i dont mind really. Just picked 3.3 so profiler templates stay in sync as much as possible. But im not sure that's a goal we should keep pursuing.
+
+And of course, curious what others think of the change / branch target.
+
+2nd commit is for 3.3; ill create a new PR if needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T15:45:19Z
+
+please rebase/retarget for master
+a screenshot would be nice also :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-05T09:07:01Z
+
+@nicolas-grekas screenshots added in main post.

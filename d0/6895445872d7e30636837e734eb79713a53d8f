@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2018-01-27T20:39:24Z
+
+I've worked with @userdude on this issue, so I won't change the status, but I too have experienced this bug and I can attest that this solution fixes it.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-01-27T22:05:11Z
+
+This fix needs to go into the 3.3 branch. 3.2 is EOL.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-29T15:21:05Z
+
+moving to the 3.4 milestone as the last bugfix release for 3.3 was published today
+
+---------------------------------------------------------------------------
+
+by userdude at 2018-02-02T15:40:51Z
+
+Rebased to 3.4, will try to add the 2.8 regression test as a separate PR but will be next week.

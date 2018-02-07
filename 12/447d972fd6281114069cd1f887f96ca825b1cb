@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-26T16:26:53Z
+
+The context is modified by the nested validator calls for the form children. I am actually not sure if this solution is the best or if we should rather clone the current context before validating the nested data.
+
+If someone is able to write a test case for this, that will be really appreciated. I failed miserably.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-26T18:09:02Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-03T10:51:09Z
+
+~Could you add a test case please?~

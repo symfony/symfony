@@ -10,6 +10,10 @@ CHANGELOG
  * The `getClientSize()` method of the `UploadedFile` class is deprecated. Use `getSize()` instead.
  * added `RedisSessionHandler` to use Redis as a session storage
 
+* The `get()` method of the `AcceptHeader` class now takes into account the
+  `*` and `*/*` default values (if they are present in the Accept HTTP header)
+  when looking for items.
+
 4.0.0
 -----
 
@@ -27,8 +31,8 @@ CHANGELOG
    method (by not passing `false` as its argument) is not supported anymore and
    throws a `\BadMethodCallException`
  * the `WriteCheckSessionHandler`, `NativeSessionHandler` and `NativeProxy` classes have been removed
- * setting session save handlers that do not implement `\SessionHandlerInterface` in 
-   `NativeSessionStorage::setSaveHandler()` is not supported anymore and throws a 
+ * setting session save handlers that do not implement `\SessionHandlerInterface` in
+   `NativeSessionStorage::setSaveHandler()` is not supported anymore and throws a
    `\TypeError`
 
 3.4.0

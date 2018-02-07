@@ -37,11 +37,11 @@ class TwigEnvironmentPassTest extends TestCase
             ->with('twig.extension')
             ->will($this->returnValue(array(
                 'other_extension' => array(
-                    array()
+                    array(),
                 ),
                 'twig_bridge_extension' => array(
-                    array()
-                )
+                    array(),
+                ),
             )));
 
         $otherExtensionDefinitionMock = $this->getMockBuilder(Definition::class)

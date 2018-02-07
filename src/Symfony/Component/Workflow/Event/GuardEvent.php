@@ -36,18 +36,18 @@ class GuardEvent extends Event
 
     public function isBlocked(): bool
     {
-        return 0 !== count($this->transitionBlockerList);
+        return !$this->transitionBlockerList->isEmpty();
     }
 
     public function setBlocked(bool $blocked): void
     {
         if (!$blocked) {
-            $this->transitionBlockerList = new TransitionBlockerList();
+            $this->transitionBlockerList->reset();
 
             return;
         }
 
-        $this->transitionBlockerList->add(TransitionBlocker::createUnknownReason($this->getTransition()->getName()));
+        $this->transitionBlockerList->add(TransitionBlocker::createUnknown());
     }
 
     public function getTransitionBlockerList(): TransitionBlockerList

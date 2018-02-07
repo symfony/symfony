@@ -13,7 +13,13 @@ namespace Symfony\Component\Workflow\Exception;
 
 /**
  * Thrown by Workflow when an undefined transition is applied on a subject.
+ *
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class UndefinedTransitionException extends LogicException
 {
+    public function __construct(string $transitionName, string $workflowName)
+    {
+        parent::__construct(sprintf('Transition "%s" is not defined for workflow "%s".', $transitionName, $workflowName));
+    }
 }

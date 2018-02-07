@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
-use Symfony\Component\Workflow\Exception\BlockedTransitionException;
+use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
@@ -164,20 +164,6 @@ class WorkflowTest extends TestCase
         $this->assertSame(array('workflow_name.guard.t3'), $dispatchedEvents);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage Unable to apply transition "t2" for workflow "unnamed".
-     */
-    public function testApplyWithImpossibleTransition()
-    {
-        $definition = $this->createComplexWorkflowDefinition();
-        $subject = new \stdClass();
-        $subject->marking = null;
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
-
-        $workflow->apply($subject, 't2');
-    }
-
     public function testCanWithSameNameTransition()
     {
         $definition = $this->createWorkflowWithSameNameTransition();
@@ -193,6 +179,99 @@ class WorkflowTest extends TestCase
         $this->assertFalse($workflow->can($subject, 'a_to_bc'));
         $this->assertTrue($workflow->can($subject, 'b_to_c'));
         $this->assertTrue($workflow->can($subject, 'to_a'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Workflow\Exception\UndefinedTransitionException
+     * @expectedExceptionMessage Transition "404 Not Found" is not defined for workflow "unnamed".
+     */
+    public function testBuildTransitionBlockerListReturnsUndefinedTransition()
+    {
+        $definition = $this->createSimpleWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition);
+
+        $workflow->buildTransitionBlockerList($subject, '404 Not Found');
+    }
+
+    public function testBuildTransitionBlockerListReturnsReasonsProvidedByMarking()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't2');
+        $this->assertCount(1, $transitionBlockerList);
+        $blockers = iterator_to_array($transitionBlockerList);
+        $this->assertSame('The marking does not enable the transition.', $blockers[0]->getMessage());
+        $this->assertSame('19beefc8-6b1e-4716-9d07-a39bd6d16e34', $blockers[0]->getCode());
+    }
+
+    public function testBuildTransitionBlockerListReturnsReasonsProvidedInGuards()
+    {
+        $definition = $this->createSimpleWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $dispatcher = new EventDispatcher();
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $dispatcher);
+
+        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+            $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 1', 'blocker_1'));
+            $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 2', 'blocker_2'));
+        });
+        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+            $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 3', 'blocker_3'));
+        });
+        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+            $event->setBlocked(true);
+        });
+
+        $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't1');
+        $this->assertCount(4, $transitionBlockerList);
+        $blockers = iterator_to_array($transitionBlockerList);
+        $this->assertSame('Transition blocker 1', $blockers[0]->getMessage());
+        $this->assertSame('blocker_1', $blockers[0]->getCode());
+        $this->assertSame('Transition blocker 2', $blockers[1]->getMessage());
+        $this->assertSame('blocker_2', $blockers[1]->getCode());
+        $this->assertSame('Transition blocker 3', $blockers[2]->getMessage());
+        $this->assertSame('blocker_3', $blockers[2]->getCode());
+        $this->assertSame('Unknown reason.', $blockers[3]->getMessage());
+        $this->assertSame('e8b5bbb9-5913-4b98-bfa6-65dbd228a82a', $blockers[3]->getCode());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Workflow\Exception\UndefinedTransitionException
+     * @expectedExceptionMessage Transition "404 Not Found" is not defined for workflow "unnamed".
+     */
+    public function testApplyWithNotExisingTransition()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $workflow->apply($subject, '404 Not Found');
+    }
+
+    public function testApplyWithNotEnabledTransition()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        try {
+            $workflow->apply($subject, 't2');
+
+            $this->fail('Should throw an exception');
+        } catch (NotEnabledTransitionException $e) {
+            $this->assertSame('Transition "t2" is not enabled for workflow "unnamed".', $e->getMessage());
+            $this->assertCount(1, $e->getTransitionBlockerList());
+            $list = iterator_to_array($e->getTransitionBlockerList());
+            $this->assertSame('The marking does not enable the transition.', $list[0]->getMessage());
+        }
     }
 
     public function testApply()
@@ -412,116 +491,6 @@ class WorkflowTest extends TestCase
         $this->assertSame('b_to_c', $transitions[0]->getName());
         $this->assertSame('to_a', $transitions[1]->getName());
         $this->assertSame('to_a', $transitions[2]->getName());
-    }
-
-    public function testWhyCannotReturnsReasonsProvidedInGuards()
-    {
-        $definition = $this->createSimpleWorkflowDefinition();
-        $subject = new \stdClass();
-        $subject->marking = null;
-        $dispatcher = new EventDispatcher();
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $dispatcher);
-
-        $guardsAddingTransitionBlockers = array(
-            function (GuardEvent $event) {
-                $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 1', 'blocker_1'));
-                $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 2', 'blocker_2'));
-            },
-            function (GuardEvent $event) {
-                $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 3', 'blocker_3'));
-            },
-        );
-
-        foreach ($guardsAddingTransitionBlockers as $guard) {
-            $dispatcher->addListener('workflow.guard', $guard);
-        }
-
-        $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't1');
-
-        $this->assertCount(3, $transitionBlockerList);
-
-        $assertTransitionBlockerPresentByCodeFn = function (string $code) use ($transitionBlockerList) {
-            $this->assertNotNull(
-                $transitionBlockerList->findByCode($code),
-                sprintf('Workflow did not produce transition blocker with code "%s"', $code)
-            );
-        };
-
-        $assertTransitionBlockerPresentByCodeFn('blocker_1');
-        $assertTransitionBlockerPresentByCodeFn('blocker_2');
-        $assertTransitionBlockerPresentByCodeFn('blocker_3');
-    }
-
-    public function testWhyCannotReturnsTransitionNotDefinedReason()
-    {
-        $definition = $this->createSimpleWorkflowDefinition();
-        $subject = new \stdClass();
-        $subject->marking = null;
-        $workflow = new Workflow($definition);
-
-        $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 'undefined_transition_name');
-
-        $this->assertCount(1, $transitionBlockerList);
-        $this->assertEquals(
-            TransitionBlocker::REASON_TRANSITION_NOT_DEFINED,
-            $transitionBlockerList->get(0)->getCode()
-        );
-    }
-
-    public function testWhyCannotReturnsTransitionNotApplicableReason()
-    {
-        $definition = $this->createSimpleWorkflowDefinition();
-        $subject = new \stdClass();
-        $subject->marking = null;
-        $workflow = new Workflow($definition);
-
-        $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 't2');
-
-        $this->assertCount(1, $transitionBlockerList);
-        $this->assertEquals(
-            TransitionBlocker::REASON_TRANSITION_NOT_APPLICABLE,
-            $transitionBlockerList->get(0)->getCode()
-        );
-    }
-
-    public function testApplyConveysTheTransitionBlockers()
-    {
-        $definition = $this->createSimpleWorkflowDefinition();
-        $subject = new \stdClass();
-        $subject->marking = null;
-        $dispatcher = new EventDispatcher();
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $dispatcher);
-
-        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
-            $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 3', 'blocker_1'));
-        });
-
-        try {
-            $workflow->apply($subject, 't1');
-        } catch (BlockedTransitionException $exception) {
-            $this->assertNotNull(
-                $exception->getTransitionBlockerList()->findByCode('blocker_1'),
-                'Workflow failed to convey it could not transition subject because of expected blocker'
-            );
-
-            return;
-        }
-
-        $this->fail('Workflow failed to prevent a transition from happening');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\UndefinedTransitionException
-     * @expectedExceptionMessage Transition "undefined_transition" is not defined in workflow "unnamed".
-     */
-    public function testApplyWithUndefinedTransition()
-    {
-        $definition = $this->createSimpleWorkflowDefinition();
-        $subject = new \stdClass();
-        $subject->marking = null;
-        $workflow = new Workflow($definition);
-
-        $workflow->apply($subject, 'undefined_transition');
     }
 }
 

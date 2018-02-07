@@ -13,14 +13,20 @@ namespace Symfony\Component\Workflow;
 
 /**
  * A list of transition blockers.
+ *
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class TransitionBlockerList implements \IteratorAggregate, \Countable
+final class TransitionBlockerList implements \IteratorAggregate, \Countable
 {
-    /** @var TransitionBlocker[] */
-    private $blockers = array();
+    private $blockers;
 
+    /**
+     * @param TransitionBlocker[] $blockers
+     */
     public function __construct(array $blockers = array())
     {
+        $this->blockers = array();
+
         foreach ($blockers as $blocker) {
             $this->add($blocker);
         }
@@ -31,18 +37,14 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable
         $this->blockers[] = $blocker;
     }
 
-    public function get(int $offset): TransitionBlocker
+    public function reset(): void
     {
-        if (!isset($this->blockers[$offset])) {
-            throw new \OutOfBoundsException(sprintf('The offset "%s" does not exist.', $offset));
-        }
-
-        return $this->blockers[$offset];
+        $this->blockers = array();
     }
 
-    public function has(int $offset): bool
+    public function isEmpty(): bool
     {
-        return isset($this->blockers[$offset]);
+        return !$this->blockers;
     }
 
     /**
@@ -57,17 +59,6 @@ class TransitionBlockerList implements \IteratorAggregate, \Countable
 
     public function count(): int
     {
-        return count($this->blockers);
-    }
-
-    public function findByCode(string $code): ?TransitionBlocker
-    {
-        foreach ($this as $transitionBlocker) {
-            if ($transitionBlocker->getCode() === $code) {
-                return $transitionBlocker;
-            }
-        }
-
-        return null;
+        return \count($this->blockers);
     }
 }

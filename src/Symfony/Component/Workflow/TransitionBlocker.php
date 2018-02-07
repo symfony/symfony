@@ -14,22 +14,22 @@ namespace Symfony\Component\Workflow;
 /**
  * A reason why a transition cannot be performed for a subject.
  */
-class TransitionBlocker
+final class TransitionBlocker
 {
-    const REASON_TRANSITION_NOT_DEFINED = '80f2a8e9-ee53-408a-9dd8-cce09e031db8';
-    const REASON_TRANSITION_NOT_APPLICABLE = '19beefc8-6b1e-4716-9d07-a39bd6d16e34';
-    const REASON_TRANSITION_UNKNOWN = 'e8b5bbb9-5913-4b98-bfa6-65dbd228a82a';
+    const BLOCKED_BY_MARKING = '19beefc8-6b1e-4716-9d07-a39bd6d16e34';
+    const BLOCKED_BY_EXPRESSION_GUARD_LISTENER = '326a1e9c-0c12-11e8-ba89-0ed5f89f718b';
+    const UNKNOWN = 'e8b5bbb9-5913-4b98-bfa6-65dbd228a82a';
 
     private $message;
     private $code;
-
-    /**
-     * @var array This is useful if you would like to pass around the condition values, that
-     *            blocked the transition. E.g. for a condition "distance must be larger than
-     *            5 miles", you might want to pass around the value of 5.
-     */
     private $parameters;
 
+    /**
+     * @param string $code       Code is a machine-readable string, usually an UUID
+     * @param array  $parameters This is useful if you would like to pass around the condition values, that
+     *                           blocked the transition. E.g. for a condition "distance must be larger than
+     *                           5 miles", you might want to pass around the value of 5.
+     */
     public function __construct(string $message, string $code, array $parameters = array())
     {
         $this->message = $message;
@@ -38,61 +38,40 @@ class TransitionBlocker
     }
 
     /**
-     * Create a blocker, that says the transition cannot be made because it is undefined
-     * in a workflow.
+     * Create a blocker that says the transition cannot be made because it is
+     * not enabled.
      *
-     * @param string $transitionName
-     * @param string $workflowName
-     *
-     * @return static
+     * It means the subject is in wrong place (i.e. status):
+     * * If the workflow is a state machine: the subject is not in the previous place of the transition.
+     * * If the workflow is a workflow: the subject is not in all previous places of the transition.
      */
-    public static function createNotDefined(string $transitionName, string $workflowName): self
+    public static function createBlockedByMarking(Marking $marking): self
     {
-        $message = sprintf('Transition "%s" is not defined in workflow "%s".', $transitionName, $workflowName);
-        $parameters = array(
-            'transitionName' => $transitionName,
-            'workflowName' => $workflowName,
-        );
-
-        return new static($message, self::REASON_TRANSITION_NOT_DEFINED, $parameters);
+        return new static('The marking does not enable the transition.', self::BLOCKED_BY_MARKING, array(
+            'marking' => $marking,
+        ));
     }
 
     /**
-     * Create a blocker, that says the transition cannot be made because the subject
-     * is in wrong place (i.e. status).
-     *
-     * @param string $transitionName
-     *
-     * @return static
+     * Creates a blocker that says the transition cannot be made because it has
+     * been blocked by the expression guard listener.
      */
-    public static function createNotApplicable(string $transitionName): self
+    public static function createBlockedByExpressionGuardListener(string $expression): self
     {
-        $message = sprintf('Transition "%s" cannot be made, because the subject is not in the required place.', $transitionName);
-        $parameters = array(
-            'transitionName' => $transitionName,
-        );
-
-        return new static($message, self::REASON_TRANSITION_NOT_APPLICABLE, $parameters);
+        return new static('The expression blocks the transition.', self::BLOCKED_BY_EXPRESSION_GUARD_LISTENER, array(
+            'expression' => $expression,
+        ));
     }
 
     /**
-     * Create a blocker, that says the transition cannot be made because of unknown
-     * reason.
+     * Creates a blocker that says the transition cannot be made because of an
+     * unknown reason.
      *
      * This blocker code is chiefly for preserving backwards compatibility.
-     *
-     * @param string $transitionName
-     *
-     * @return static
      */
-    public static function createUnknownReason(string $transitionName): self
+    public static function createUnknown(): self
     {
-        $message = sprintf('Transition "%s" cannot be made, because of unknown reason.', $transitionName);
-        $parameters = array(
-            'transitionName' => $transitionName,
-        );
-
-        return new static($message, self::REASON_TRANSITION_UNKNOWN, $parameters);
+        return new static('Unknown reason.', self::UNKNOWN);
     }
 
     public function getMessage(): string

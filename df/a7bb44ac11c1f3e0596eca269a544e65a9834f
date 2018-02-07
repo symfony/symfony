@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by sroze at 2017-10-10T13:22:26Z
+
+Great initiative 👍 I'd target 3.4.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2017-10-11T08:37:45Z
+
+Thanks @chalasr @kaznovac @xabbuh for your comments and review.
+I just push fixes. I'm agree to set `$escapeFormulas` at `false` by default, after all negative numbers doesn't have to be escaped. And it will avoid BC Break.
+
+Should I replace all `assertEquals` by `assertSame` in `CsvEncoderTest` class?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-11T08:40:09Z
+
+@welcoMattic Nope, that would create merge conflicts when merging lower branches up to master. Thanks.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-11T08:40:58Z
+
+Should we also allow to pass this option through the context so that you do not necessary have to configure this option globally?
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2017-10-11T08:47:58Z
+
+@xabbuh why not. We should also make the context `$escapeFormulas` value overrides the global `$escapeFormulas` value. It could be set to `true` globally, but for one particular encoding it could be set to `false`.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-11T08:49:17Z
+
+👍  to allow overriding this option in the context.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2017-10-11T13:49:24Z
+
+@chalasr @xabbuh Overriding is now possible
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-12T05:58:57Z
+
+Great!
+
+But as stated in the article, it's definitely not a security issue on our side. The current implementation respects the RFC (Excel and Google Sheets don't), and most software consuming CSV expect the current behavior.
+It should made be clear in the docs PR that this option should only be used when the generated CSV will be imported in spreadsheets or it can cause interoperability issues.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2017-10-12T15:58:17Z
+
+Thanks @dunglas!
+
+For documentation, should I create a new page under [Serializer section](https://github.com/welcoMattic/symfony-docs/tree/master/serializer)? Named CsvEncoder, and where I explain why this options exists?
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-10-16T01:08:55Z
+
+Alternative approach might be to just add a normalizer. That would help with deserialization of such sanitized csvs too and doesn't pollute __construct arguments.
+
+I don't like having this in core anyway though, as it's security issue in Excel and Google sheets only and this is destructive kind of escaping
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-01T14:50:59Z
+
+Not sure if we need to support that in core. /cc @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-12-10T13:39:03Z
+
+👍 to include that as it's security feature that people should be aware about.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-20T15:07:50Z
+
+👍 to support this feature too. But as it's definitely not a security fix (on our side), it's a new feature that should be merged in 4.1.
+
+> there is only a problem if this component is used to generate sheets with formula.
+
+There is also a problem when the value start with `'=', '-', '+', '@'` and the parser supports correctly the RFC: a `\t` will be added, but it should not (actually, when using this flag, it's not really a true CSV file anymore).
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2017-12-20T15:40:56Z
+
+Thanks @dbu @dunglas for your comments. I think that we can support this "fix" and explain it explicitly in PHPDoc.
+
+Should I update the PR now, or we need to wait other opinions?
+
+---------------------------------------------------------------------------
+
+by dbu at 2017-12-20T15:42:41Z
+
+i'd update the changelog and phpdoc as that will be relevant either way. i hope one of the maintainers can decide which version this should go. i can see the point of kevin, and its a good reason why its not on by default. but i feel it still is security relevant, even if its not a bug of symfony, but symfony helping around lax security of other tools - and as such should go into 3.3 or 3.4.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-01-11T10:29:52Z
+
+I think that you can update and rebase the PR @welcoMattic
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2018-02-04T18:16:53Z
+
+@nicolas-grekas Done, I also fix @ostrolucky's comment.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T18:19:23Z
+
+@welcoMattic thanks. Can you rebase to get rid of the merge commit? I invite you to squash while doing so.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2018-02-06T10:22:25Z
+
+Thanks for review @Tobion 👍

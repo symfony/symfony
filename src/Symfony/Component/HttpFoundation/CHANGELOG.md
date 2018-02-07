@@ -14,6 +14,10 @@ CHANGELOG
   `*` and `*/*` default values (if they are present in the Accept HTTP header)
   when looking for items.
 
+* The `get()` method of the `AcceptHeader` class now takes into account the
+  `*` and `*/*` default values (if they are present in the Accept HTTP header)
+  when looking for items.
+
 4.0.0
 -----
 

@@ -35,7 +35,7 @@ final class Security
     /**
      * @return UserInterface|null
      */
-    public function getUser()
+    public function getUser(string $userClass)
     {
         if (!$token = $this->getToken()) {
             return null;
@@ -46,7 +46,15 @@ final class Security
             return null;
         }
 
-        return $user;
+        if (!$userClass) {
+            return $user;
+        }
+
+        if ($user instanceof $userClass) {
+            return $user;
+        }
+
+        return null;
     }
 
     /**

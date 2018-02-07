@@ -34,7 +34,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * @internal
      */
-    public static $defaultAccessorPrefixes = array('is', 'can', 'get');
+    public static $defaultAccessorPrefixes = array('is', 'can', 'get', 'has');
 
     /**
      * @internal
@@ -178,7 +178,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return array($this->extractFromReflectionType($reflectionType));
         }
 
-        if (in_array($prefix, array('is', 'can'))) {
+        if (in_array($prefix, array('is', 'can', 'has'))) {
             return array(new Type(Type::BUILTIN_TYPE_BOOL));
         }
 

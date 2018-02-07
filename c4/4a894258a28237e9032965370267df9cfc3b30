@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-07-19T08:07:52Z
+
+All performance gains are more than welcome ... but please always use realistic benchmarks. Nobody is going to display 1 million rows in a console table 😱   Thanks!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-19T08:13:50Z
+
+Of course :) just wanted to check the impact it has. Basically switching to yield and avoid array merging and such; we gain memory.
+
+Point is with iterable support we allow for lazy loading rows, i.e. i can build the row when needed (which can be heavy action by itself).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:25:11Z
+
+Moving to 4.1. Rebase on master might be needed, where PHP 7.1 features can be used btw.

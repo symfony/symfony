@@ -299,6 +299,7 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                     ->arrayNode('transitions')
+                                        ->normalizeKeys(false)
                                         ->beforeNormalization()
                                             ->always()
                                             ->then(function ($transitions) {

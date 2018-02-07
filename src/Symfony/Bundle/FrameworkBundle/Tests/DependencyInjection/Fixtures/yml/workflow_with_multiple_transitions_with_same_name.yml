@@ -15,7 +15,7 @@ framework:
                 - approved_by_spellchecker
                 - published
             transitions:
-                request_review:
+                request-review:
                     from: [draft]
                     to: [wait_for_journalist, wait_for_spellchecker]
                 journalist_approval:

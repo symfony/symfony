@@ -19,7 +19,7 @@
             <framework:place>wait_for_spellchecker</framework:place>
             <framework:place>approved_by_spellchecker</framework:place>
             <framework:place>published</framework:place>
-            <framework:transition name="request_review">
+            <framework:transition name="request-review">
                 <framework:from>draft</framework:from>
                 <framework:to>wait_for_journalist</framework:to>
                 <framework:to>wait_for_spellchecker</framework:to>

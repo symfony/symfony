@@ -34,20 +34,6 @@ class ContainerControllerResolver extends ControllerResolver
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getController(Request $request)
-    {
-        $controller = parent::getController($request);
-
-        if (is_array($controller) && isset($controller[0]) && is_string($controller[0]) && $this->container->has($controller[0])) {
-            $controller[0] = $this->instantiateController($controller[0]);
-        }
-
-        return $controller;
-    }
-
-    /**
      * Returns a callable for the given controller.
      *
      * @param string $controller A Controller string

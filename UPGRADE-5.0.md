@@ -14,6 +14,38 @@ EventDispatcher
 FrameworkBundle
 ---------------
 
+ * Removed support for `bundle:controller:action` and `service:action` syntaxes to reference controllers. Use `serviceOrFqcn::method`
+   instead where `serviceOrFqcn` is either the service ID when using controllers as services or the FQCN of the controller.
+
+   Before:
+
+   ```yml
+   bundle_controller:
+       path: /
+       defaults:
+           _controller: FrameworkBundle:Redirect:redirect
+
+   service_controller:
+       path: /
+       defaults:
+           _controller: app.my_controller:myAction
+   ```
+
+   After:
+
+   ```yml
+   bundle_controller:
+       path: /
+       defaults:
+           _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
+
+   service_controller:
+       path: /
+       defaults:
+           _controller: app.my_controller::myAction
+  ```
+
+ * Removed `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`
  * Using a `RouterInterface` that does not implement the `WarmableInterface` is not supported anymore.
  * The `RequestDataCollector` class has been removed. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
 

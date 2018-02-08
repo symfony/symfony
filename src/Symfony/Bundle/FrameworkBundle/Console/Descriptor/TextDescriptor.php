@@ -95,9 +95,6 @@ class TextDescriptor extends Descriptor
             array('Defaults', $this->formatRouterConfig($route->getDefaults())),
             array('Options', $this->formatRouterConfig($route->getOptions())),
         );
-        if (isset($options['callable'])) {
-            $tableRows[] = array('Callable', $options['callable']);
-        }
 
         $table = new Table($this->getOutput());
         $table->setHeaders($tableHeaders)->setRows($tableRows);

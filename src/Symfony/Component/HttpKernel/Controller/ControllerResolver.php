@@ -16,8 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * This implementation uses the '_controller' request attribute to determine
- * the controller to execute and uses the request attributes to determine
- * the controller method arguments.
+ * the controller to execute.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -32,9 +31,6 @@ class ControllerResolver implements ControllerResolverInterface
 
     /**
      * {@inheritdoc}
-     *
-     * This method looks for a '_controller' request attribute that represents
-     * the controller name (a string like ClassName::MethodName).
      */
     public function getController(Request $request)
     {
@@ -66,12 +62,8 @@ class ControllerResolver implements ControllerResolverInterface
             throw new \InvalidArgumentException(sprintf('Controller "%s" for URI "%s" is not callable.', get_class($controller), $request->getPathInfo()));
         }
 
-        if (false === strpos($controller, ':')) {
-            if (method_exists($controller, '__invoke')) {
-                return $this->instantiateController($controller);
-            } elseif (function_exists($controller)) {
-                return $controller;
-            }
+        if (function_exists($controller)) {
+            return $controller;
         }
 
         $callable = $this->createController($controller);
@@ -95,14 +87,10 @@ class ControllerResolver implements ControllerResolverInterface
     protected function createController($controller)
     {
         if (false === strpos($controller, '::')) {
-            throw new \InvalidArgumentException(sprintf('Unable to find controller "%s".', $controller));
+            return $this->instantiateController($controller);
         }
 
         list($class, $method) = explode('::', $controller, 2);
-
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
-        }
 
         return array($this->instantiateController($class), $method);
     }
@@ -116,6 +104,10 @@ class ControllerResolver implements ControllerResolverInterface
      */
     protected function instantiateController($class)
     {
+        if (!class_exists($class)) {
+            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+        }
+
         return new $class();
     }
 
@@ -132,6 +124,12 @@ class ControllerResolver implements ControllerResolverInterface
 
             if (!function_exists($callable)) {
                 return sprintf('Function "%s" does not exist.', $callable);
+            }
+        }
+
+        if (is_object($callable)) {
+            if (!method_exists($callable, '__invoke')) {
+                return sprintf('Controller class "%s" cannot be called without a method name. Did you forget an "__invoke" method?', get_class($callable));
             }
         }
 

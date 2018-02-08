@@ -38,15 +38,14 @@ class ControllerResolver extends ContainerControllerResolver
         if (false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
             // controller in the a:b:c notation then
             $controller = $this->parser->parse($controller);
+
+            @trigger_error(sprintf(
+                'Referencing controllers with the bundle:controller:action notation is deprecated since version 4.1 and will be removed in 5.0. Use %s instead.',
+                $controller
+            ), E_USER_DEPRECATED);
         }
 
-        $resolvedController = parent::createController($controller);
-
-        if (1 === substr_count($controller, ':') && is_array($resolvedController)) {
-            $resolvedController[0] = $this->configureController($resolvedController[0]);
-        }
-
-        return $resolvedController;
+        return parent::createController($controller);
     }
 
     /**

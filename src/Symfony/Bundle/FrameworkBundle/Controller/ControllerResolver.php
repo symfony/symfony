@@ -37,10 +37,12 @@ class ControllerResolver extends ContainerControllerResolver
     {
         if (false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
             // controller in the a:b:c notation then
-            $controller = $this->parser->parse($controller);
+            $deprecatedNotation = $controller;
+            $controller = $this->parser->parse($deprecatedNotation);
 
             @trigger_error(sprintf(
-                'Referencing controllers with the bundle:controller:action notation is deprecated since version 4.1 and will be removed in 5.0. Use %s instead.',
+                'Referencing controllers with %s is deprecated since version 4.1 and will be removed in 5.0. Use %s instead.',
+                $deprecatedNotation,
                 $controller
             ), E_USER_DEPRECATED);
         }

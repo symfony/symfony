@@ -55,11 +55,11 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         if (is_object($controller)) {
-            if (method_exists($controller, '__invoke')) {
-                return $controller;
+            if (!is_callable($controller)) {
+                throw new \InvalidArgumentException(sprintf('The controller for URI "%s" is not callable. %s', $request->getPathInfo(), $this->getControllerError($controller)));
             }
 
-            throw new \InvalidArgumentException(sprintf('Controller "%s" for URI "%s" is not callable.', get_class($controller), $request->getPathInfo()));
+            return $controller;
         }
 
         if (function_exists($controller)) {
@@ -81,8 +81,6 @@ class ControllerResolver implements ControllerResolverInterface
      * @param string $controller A Controller string
      *
      * @return callable A PHP callable
-     *
-     * @throws \InvalidArgumentException
      */
     protected function createController($controller)
     {
@@ -104,10 +102,6 @@ class ControllerResolver implements ControllerResolverInterface
      */
     protected function instantiateController($class)
     {
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
-        }
-
         return new $class();
     }
 
@@ -115,14 +109,8 @@ class ControllerResolver implements ControllerResolverInterface
     {
         if (is_string($callable)) {
             if (false !== strpos($callable, '::')) {
-                $callable = explode('::', $callable);
-            }
-
-            if (class_exists($callable) && !method_exists($callable, '__invoke')) {
-                return sprintf('Class "%s" does not have a method "__invoke".', $callable);
-            }
-
-            if (!function_exists($callable)) {
+                $callable = explode('::', $callable, 2);
+            } else {
                 return sprintf('Function "%s" does not exist.', $callable);
             }
         }
@@ -134,11 +122,11 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         if (!is_array($callable)) {
-            return sprintf('Invalid type for controller given, expected string or array, got "%s".', gettype($callable));
+            return sprintf('Invalid type for controller given, expected string, array or object, got "%s".', gettype($callable));
         }
 
-        if (2 !== count($callable)) {
-            return 'Invalid format for controller, expected array(controller, method) or controller::method.';
+        if (!isset($callable[0]) | !isset($callable[1])) {
+            return 'Array callable has to contain indices 0 and 1 like array(controller, method).';
         }
 
         list($controller, $method) = $callable;

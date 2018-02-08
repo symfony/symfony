@@ -13,12 +13,12 @@
                 <framework:argument>a</framework:argument>
             </framework:marking-store>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
-            <framework:place>draft</framework:place>
-            <framework:place>wait_for_journalist</framework:place>
-            <framework:place>approved_by_journalist</framework:place>
-            <framework:place>wait_for_spellchecker</framework:place>
-            <framework:place>approved_by_spellchecker</framework:place>
-            <framework:place>published</framework:place>
+            <framework:place name="draft"></framework:place>
+            <framework:place name="wait_for_journalist"></framework:place>
+            <framework:place name="approved_by_journalist"></framework:place>
+            <framework:place name="wait_for_spellchecker"></framework:place>
+            <framework:place name="approved_by_spellchecker"></framework:place>
+            <framework:place name="published"></framework:place>
             <framework:transition name="request_review">
                 <framework:from>draft</framework:from>
                 <framework:to>wait_for_journalist</framework:to>
@@ -42,15 +42,22 @@
         <framework:workflow name="pull_request" initial-place="start">
             <framework:marking-store type="single_state"/>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
-            <framework:place>start</framework:place>
-            <framework:place>coding</framework:place>
-            <framework:place>travis</framework:place>
-            <framework:place>review</framework:place>
-            <framework:place>merged</framework:place>
-            <framework:place>closed</framework:place>
+            <framework:place name="start">
+                <framework:metadata>
+                    <framework:title>place start title</framework:title>
+                </framework:metadata>
+            </framework:place>
+            <framework:place name="coding"></framework:place>
+            <framework:place name="travis"></framework:place>
+            <framework:place name="review"></framework:place>
+            <framework:place name="merged"></framework:place>
+            <framework:place name="closed"></framework:place>
             <framework:transition name="submit">
                 <framework:from>start</framework:from>
                 <framework:to>travis</framework:to>
+                <framework:metadata>
+                    <framework:title>transition submit title</framework:title>
+                </framework:metadata>
             </framework:transition>
             <framework:transition name="update">
                 <framework:from>coding</framework:from>
@@ -78,11 +85,15 @@
                 <framework:from>closed</framework:from>
                 <framework:to>review</framework:to>
             </framework:transition>
+            <framework:metadata>
+                <framework:title>workflow title</framework:title>
+            </framework:metadata>
         </framework:workflow>
 
         <framework:workflow name="service_marking_store_workflow" type="workflow">
             <framework:marking-store service="workflow_service"/>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <!-- Simple format -->
             <framework:place>first</framework:place>
             <framework:place>last</framework:place>
             <framework:transition name="go">

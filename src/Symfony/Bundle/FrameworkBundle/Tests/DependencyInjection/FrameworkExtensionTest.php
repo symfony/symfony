@@ -43,7 +43,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
-use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -209,12 +209,12 @@ abstract class FrameworkExtensionTest extends TestCase
             'Places are passed to the workflow definition'
         );
         $this->assertSame(array('workflow.definition' => array(array('name' => 'article', 'type' => 'workflow', 'marking_store' => 'multiple_state'))), $workflowDefinition->getTags());
+        $this->assertCount(4, $workflowDefinition->getArgument(1));
+        $this->assertSame('draft', $workflowDefinition->getArgument(2));
 
         $this->assertTrue($container->hasDefinition('state_machine.pull_request'), 'State machine is registered as a service');
         $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
         $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition'), 'State machine definition is registered as a service');
-        $this->assertCount(4, $workflowDefinition->getArgument(1));
-        $this->assertSame('draft', $workflowDefinition->getArgument(2));
 
         $stateMachineDefinition = $container->getDefinition('state_machine.pull_request.definition');
 
@@ -233,6 +233,28 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('workflow.definition' => array(array('name' => 'pull_request', 'type' => 'state_machine', 'marking_store' => 'single_state'))), $stateMachineDefinition->getTags());
         $this->assertCount(9, $stateMachineDefinition->getArgument(1));
         $this->assertSame('start', $stateMachineDefinition->getArgument(2));
+
+        $metadataStoreDefinition = $stateMachineDefinition->getArgument(3);
+        $this->assertInstanceOf(Definition::class, $metadataStoreDefinition);
+        $this->assertSame(Workflow\Metadata\InMemoryMetadataStore::class, $metadataStoreDefinition->getClass());
+
+        $workflowMetadata = $metadataStoreDefinition->getArgument(0);
+        $this->assertSame(array('title' => 'workflow title'), $workflowMetadata);
+
+        $placesMetadata = $metadataStoreDefinition->getArgument(1);
+        $this->assertArrayHasKey('start', $placesMetadata);
+        $this->assertSame(array('title' => 'place start title'), $placesMetadata['start']);
+
+        $transitionsMetadata = $metadataStoreDefinition->getArgument(2);
+        $this->assertSame(\SplObjectStorage::class, $transitionsMetadata->getClass());
+        $transitionsMetadataCall = $transitionsMetadata->getMethodCalls()[0];
+        $this->assertSame('attach', $transitionsMetadataCall[0]);
+        $params = $transitionsMetadataCall[1];
+        $this->assertCount(2, $params);
+        $this->assertInstanceOf(Definition::class, $params[0]);
+        $this->assertSame(Workflow\Transition::class, $params[0]->getClass());
+        $this->assertSame(array('submit', 'start', 'travis'), $params[0]->getArguments());
+        $this->assertSame(array('title' => 'transition submit title'), $params[1]);
 
         $serviceMarkingStoreWorkflowDefinition = $container->getDefinition('workflow.service_marking_store_workflow');
         /** @var Reference $markingStoreRef */
@@ -308,7 +330,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('workflows_enabled');
 
-        $this->assertTrue($container->has(Registry::class));
+        $this->assertTrue($container->has(Workflow\Registry::class));
         $this->assertTrue($container->hasDefinition('console.command.workflow_dump'));
     }
 

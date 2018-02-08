@@ -104,3 +104,4 @@ Workflow
  * Deprecated the `add` method in favor of the `addWorkflow` method in `Workflow\Registry`.
  * Deprecated `SupportStrategyInterface` in favor of `WorkflowSupportStrategyInterface`.
  * Deprecated the class `ClassInstanceSupportStrategy` in favor of the class `InstanceOfSupportStrategy`.
+ * Deprecated passing the workflow name as 4th parameter of `Event` constructor in favor of the workflow itself.

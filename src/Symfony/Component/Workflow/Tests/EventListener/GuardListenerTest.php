@@ -14,6 +14,7 @@ use Symfony\Component\Workflow\EventListener\GuardListener;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Transition;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 class GuardListenerTest extends TestCase
 {
@@ -102,7 +103,9 @@ class GuardListenerTest extends TestCase
         $subject->marking = new Marking();
         $transition = new Transition('name', 'from', 'to');
 
-        return new GuardEvent($subject, $subject->marking, $transition);
+        $workflow = $this->getMockBuilder(WorkflowInterface::class)->getMock();
+
+        return new GuardEvent($subject, $subject->marking, $transition, $workflow);
     }
 
     private function configureAuthenticationChecker($isUsed, $granted = true)

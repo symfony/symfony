@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * add a `workflow_metadata` function
+
 3.4.0
 -----
 

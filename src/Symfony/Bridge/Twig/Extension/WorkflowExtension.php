@@ -37,6 +37,7 @@ class WorkflowExtension extends AbstractExtension
             new TwigFunction('workflow_transitions', array($this, 'getEnabledTransitions')),
             new TwigFunction('workflow_has_marked_place', array($this, 'hasMarkedPlace')),
             new TwigFunction('workflow_marked_places', array($this, 'getMarkedPlaces')),
+            new TwigFunction('workflow_metadata', array($this, 'getMetadata')),
         );
     }
 
@@ -99,6 +100,24 @@ class WorkflowExtension extends AbstractExtension
         }
 
         return $places;
+    }
+
+    /**
+     * Returns the metadata for a specific subject.
+     *
+     * @param object                 $subject         A subject
+     * @param null|string|Transition $metadataSubject Use null to get workflow metadata
+     *                                                Use a string (the place name) to get place metadata
+     *                                                Use a Transition instance to get transition metadata
+     */
+    public function getMetadata($subject, string $key, $metadataSubject = null, string $name = null): ?string
+    {
+        return $this
+            ->workflowRegistry
+            ->get($subject, $name)
+            ->getMetadataStore()
+            ->getMetadata($key, $metadataSubject)
+        ;
     }
 
     public function getName()

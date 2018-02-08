@@ -13,12 +13,12 @@
                 <framework:argument>a</framework:argument>
             </framework:marking-store>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
-            <framework:place>draft</framework:place>
-            <framework:place>wait_for_journalist</framework:place>
-            <framework:place>approved_by_journalist</framework:place>
-            <framework:place>wait_for_spellchecker</framework:place>
-            <framework:place>approved_by_spellchecker</framework:place>
-            <framework:place>published</framework:place>
+            <framework:place name="draft" />
+            <framework:place name="wait_for_journalist" />
+            <framework:place name="approved_by_journalist" />
+            <framework:place name="wait_for_spellchecker" />
+            <framework:place name="approved_by_spellchecker" />
+            <framework:place name="published" />
             <framework:transition name="request_review">
                 <framework:from>draft</framework:from>
                 <framework:to>wait_for_journalist</framework:to>

@@ -13,6 +13,7 @@ namespace Symfony\Component\Workflow;
 
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
+use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -82,4 +83,6 @@ interface WorkflowInterface
      * @return MarkingStoreInterface
      */
     public function getMarkingStore();
+
+    public function getMetadataStore(): MetadataStoreInterface;
 }

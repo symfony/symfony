@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2018-02-07T21:25:41Z
+
+Hey, I am the person who wrote this test yesterday.
+I unfortunately don't know much about testing so I did it by looking to this other test of the TwigBundle https://github.com/symfony/symfony/blob/39e88ed3128933d7540eadd847d5650c8b52f5ba/src/Symfony/Bundle/TwigBundle/Tests/DependencyInjection/Compiler/TwigLoaderPassTest.php
+For my personal knowledge, can someone explain me why this is better to not use mocking in this scenario please ? :-) Thank you.

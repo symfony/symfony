@@ -27,4 +27,8 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\CoverageListener"></listener>
+    </listeners>
 </phpunit>

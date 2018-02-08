@@ -34,7 +34,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception:showAction')->end()
+                ->scalarNode('exception_controller')->defaultValue('twig.controller.exception::showAction')->end()
             ->end()
         ;
 

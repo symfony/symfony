@@ -28,7 +28,6 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/expression-language": "~3.4|~4.0",
-        "symfony/phpunit-bridge": "~3.4|~4.0",
         "symfony/security-core": "~3.4|~4.0",
         "symfony/validator": "~3.4|~4.0"
     },
@@ -36,9 +35,6 @@
         "psr-4": { "Symfony\\Component\\Workflow\\": "" }
     },
     "minimum-stability": "dev",
-    "config": {
-        "sort-packages": true
-    },
     "extra": {
         "branch-alias": {
             "dev-master": "4.1-dev"

@@ -375,7 +375,7 @@ trait ControllerTrait
      *
      * @final since version 3.4
      */
-    protected function isCsrfTokenValid(string $id, string $token): bool
+    protected function isCsrfTokenValid(string $id, ?string $token): bool
     {
         if (!$this->container->has('security.csrf.token_manager')) {
             throw new \LogicException('CSRF protection is not enabled in your application. Enable it with the "csrf_protection" key in "config/packages/framework.yaml".');

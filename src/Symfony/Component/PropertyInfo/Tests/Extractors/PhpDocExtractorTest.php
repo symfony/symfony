@@ -74,4 +74,21 @@ class PhpDocExtractorTest extends TestCase
             array('staticSetter', null, null, null),
         );
     }
+
+    public function testParamTagTypeIsOmitted()
+    {
+        $this->assertNull($this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\PhpDocExtractors\OmittedParamTagTypeDocBlock', 'omittedType'));
+    }
+}
+
+class OmittedParamTagTypeDocBlock
+{
+    /**
+     * The type is omitted here to ensure that the extractor doesn't choke on missing types.
+     *
+     * @param $omittedTagType
+     */
+    public function setOmittedType(array $omittedTagType)
+    {
+    }
 }

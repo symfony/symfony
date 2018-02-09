@@ -542,7 +542,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior) {
             return parent::get($id, $invalidBehavior);
         }
-        if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+        if (null !== $service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {            
             return $service;
         }
 

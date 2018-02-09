@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-09T15:31:10Z
+
+Note that eg HttpKernel enables the `Symfony\Bridge\PhpUnit\SymfonyTestsListener` and nobody complained, so I'd suppose that nobody but core devs test components per components. They should know they have to use the bridge IMHO.

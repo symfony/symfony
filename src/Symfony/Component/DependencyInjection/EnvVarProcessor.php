@@ -110,11 +110,13 @@ class EnvVarProcessor implements EnvVarProcessorInterface
         }
 
         if ('const' === $prefix) {
+            $env = \str_replace("\\\\","\\", $env);
+            
             if (!defined($env)) {
                 throw new RuntimeException(sprintf('Env var "%s" maps to undefined constant "%s".', $name, $env));
             }
 
-            return constant($name);
+            return constant($env);
         }
 
         if ('base64' === $prefix) {

@@ -34,8 +34,8 @@ UnrujbYjjz0NnsObkTgnmolqJD4QgGUYTQiNe8eIjtx4b6Vv8nPGpncn3NJ8Geo9W9VW2wGACm_JzgIO
 qM53XHDUwhY0TAwPug3OG9NonRFhO8ynF3I4unuAMDHmSrXH57V1RGvl9jafuZF9ZhqjWOEh98y0tUYGsUxkBSllIyBdT2oM5Fn2-ut-fzsq_cQNuL6Uvwqr
 knh4RrvOKzxZfLV3s0rs_R_1SdYt3VxeQ1_y2_W2
 }';
-    private const INITIAL = 'initial';
-    private const MARKED = 'marked';
+    private const INITIAL = '<<initial>>';
+    private const MARKED = '<<marked>>';
 
     const STATEMACHINE_TRANSITION = 'arrow';
     const WORKFLOW_TRANSITION = 'square';
@@ -45,11 +45,11 @@ knh4RrvOKzxZfLV3s0rs_R_1SdYt3VxeQ1_y2_W2
             'titleBorderRoundCorner' => 15,
             'titleBorderThickness' => 2,
             'state' => array(
-                'BackgroundColor<<'.self::INITIAL.'>>' => '#87b741',
-                'BackgroundColor<<'.self::MARKED.'>>' => '#3887C6',
+                'BackgroundColor'.self::INITIAL => '#87b741',
+                'BackgroundColor'.self::MARKED => '#3887C6',
                 'BorderColor' => '#3887C6',
-                'BorderColor<<'.self::MARKED.'>>' => 'Black',
-                'FontColor<<'.self::MARKED.'>>' => 'White',
+                'BorderColor'.self::MARKED => 'Black',
+                'FontColor'.self::MARKED => 'White',
             ),
             'agent' => array(
                 'BackgroundColor' => '#ffffff',
@@ -63,7 +63,7 @@ knh4RrvOKzxZfLV3s0rs_R_1SdYt3VxeQ1_y2_W2
     public function __construct(string $transitionType = null)
     {
         if (!in_array($transitionType, self::TRANSITION_TYPES)) {
-            throw new InvalidArgumentException("Transition type '{$transitionType}' does not exist.");
+            throw new InvalidArgumentException("Transition type '$transitionType' does not exist.");
         }
         $this->transitionType = $transitionType;
     }
@@ -73,23 +73,28 @@ knh4RrvOKzxZfLV3s0rs_R_1SdYt3VxeQ1_y2_W2
         $options = array_replace_recursive(self::DEFAULT_OPTIONS, $options);
         $code = $this->initialize($options);
         foreach ($definition->getPlaces() as $place) {
+            $placeEscaped = $this->escape($place);
             $code[] =
-                "state {$place}".
-                ($definition->getInitialPlace() === $place ? ' <<'.self::INITIAL.'>>' : '').
-                ($marking && $marking->has($place) ? ' <<'.self::MARKED.'>>' : '');
+                "state $placeEscaped".
+                ($definition->getInitialPlace() === $place ? ' '.self::INITIAL : '').
+                ($marking && $marking->has($place) ? ' '.self::MARKED : '');
         }
         if ($this->isWorkflowTransitionType()) {
             foreach ($definition->getTransitions() as $transition) {
-                $code[] = "agent {$transition->getName()}";
+                $transitionEscaped = $this->escape($transition->getName());
+                $code[] = "agent $transitionEscaped";
             }
         }
         foreach ($definition->getTransitions() as $transition) {
+            $transitionEscaped = $this->escape($transition->getName());
             foreach ($transition->getFroms() as $from) {
+                $fromEscaped = $this->escape($from);
                 foreach ($transition->getTos() as $to) {
+                    $toEscaped = $this->escape($to);
                     if ($this->isWorkflowTransitionType()) {
                         $lines = array(
-                            "{$from} --> {$transition->getName()}",
-                            "{$transition->getName()} --> {$to}",
+                            "$fromEscaped --> $transitionEscaped",
+                            "$transitionEscaped --> $toEscaped",
                         );
                         foreach ($lines as $line) {
                             if (!in_array($line, $code)) {
@@ -97,7 +102,7 @@ knh4RrvOKzxZfLV3s0rs_R_1SdYt3VxeQ1_y2_W2
                             }
                         }
                     } else {
-                        $code[] = "{$from} --> {$to}: {$transition->getName()}";
+                        $code[] = "$fromEscaped --> $toEscaped: $transitionEscaped";
                     }
                 }
             }
@@ -114,10 +119,7 @@ knh4RrvOKzxZfLV3s0rs_R_1SdYt3VxeQ1_y2_W2
     private function startPuml(array $options): string
     {
         $start = '@startuml'.PHP_EOL;
-
-        if ($this->isWorkflowTransitionType()) {
-            $start .= 'allow_mixing'.PHP_EOL;
-        }
+        $start .= 'allow_mixing'.PHP_EOL;
 
         if ($options['nofooter'] ?? false) {
             return $start;
@@ -168,5 +170,11 @@ knh4RrvOKzxZfLV3s0rs_R_1SdYt3VxeQ1_y2_W2
         }
 
         return $code;
+    }
+
+    private function escape(string $string): string
+    {
+        // It's not possible to escape property double quote, so let's remove it
+        return '"'.str_replace('"', '', $string).'"';
     }
 }

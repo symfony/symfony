@@ -1,4 +1,5 @@
 @startuml
+allow_mixing
 title SimpleDiagram
 skinparam titleBorderRoundCorner 15
 skinparam titleBorderThickness 2
@@ -9,9 +10,9 @@ skinparam state {
     BorderColor<<marked>> Black
     FontColor<<marked>> White
 }
-state a <<initial>>
-state b <<marked>>
-state c
-a --> b: t1
-b --> c: t2
+state "a" <<initial>>
+state "b" <<marked>>
+state "c"
+"a" --> "b": "t1"
+"b" --> "c": "t2"
 @enduml

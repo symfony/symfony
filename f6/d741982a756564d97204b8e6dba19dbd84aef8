@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by Plopix at 2018-02-07T18:59:48Z
+
+@lyrixx I have just checked and I think your .puml result is not syntactically valid.
+
+```puml
+state "a" <<initial>>
+state "b"
+"a" --> "b": "t1"
+```
+=> That is not valid, you have a `Syntax Error`
+Instead PlantUML as this concept of *aliases*
+
+```puml
+state "a" as a<<initial>>
+state "b" as b
+a --> b: "t1"
+```
+
+Let me push the valid test fixtures for you to update the dumper accordingly :)
+
+---------------------------------------------------------------------------
+
+by Plopix at 2018-02-07T19:12:03Z
+
+Finally, there is a simpler way, just add `allow_mixing` in the header everywhere. Look at the fixtures inside the "square" folder.
+Plus remove the if here: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Workflow/Dumper/PlantUmlDumper.php#L118
+
+cc @lyrixx thx!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-08T09:49:15Z
+
+Thanks @Plopix for the review.
+
+I have testes in real life with really strange char and my code works.
+My test was base on this workflow:
+```
+        weird:
+            type: workflow
+            supports: stdClass # Just a hack
+            places:
+                - "a'"
+                - 'é!'
+                - 'b\"(\"'
+            transitions:
+                -
+                    name: '{}'
+                    from: "a'"
+                    to: 'é!'
+```
+
+And as it's already a workflow, the `allow_mixing` was already present.
+If I remove the `"` in the pum dump, then it's broken.
+
+Here is the dump
+```
+@startuml
+allow_mixing
+title weird
+skinparam titleBorderRoundCorner 15
+skinparam titleBorderThickness 2
+skinparam state {
+    BackgroundColor<<initial>> #87b741
+    BackgroundColor<<marked>> #3887C6
+    BorderColor #3887C6
+    BorderColor<<marked>> Black
+    FontColor<<marked>> White
+}
+skinparam agent {
+    BackgroundColor #ffffff
+    BorderColor #3887C6
+}
+state "a'" <<initial>>
+state "é!"
+state "b\(\"
+agent "{}"
+"a'" --> "{}"
+"{}" --> "é!"
+@enduml
+
+**But** You are right about the "state_machine dumper". We should always add `allow_mixing`.
+I have updated the PR.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-08T09:51:26Z
+
+Not really related question: Do you really use the `nofooter` option  of the dumper? (right now, there are not way to use it without writing / editing some code) I no-one use it, I would like to remove it (less code === less bug)
+
+---------------------------------------------------------------------------
+
+by Plopix at 2018-02-08T17:06:43Z
+
+Yes indeed the `allow_mixing` is enough and was present in the workflow dump. I just picked one file randomly in your PR that is how I saw that syntax error and testing a workflow I saw it was working then I figured the `allow_mixing`.
+
+Ok to remove _nofooter_  I agree with the less code less bug. (having the footer was prob too fancy)
+
+> We should always add `allow_mixing`. I have updated the PR.
+
+I don't see the changes but I could have a look when done!
+thx!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-08T17:13:46Z
+
+> I don't see the changes but I could have a look when done!
+
+Indeed, I forgot to push ;) It's not pushed

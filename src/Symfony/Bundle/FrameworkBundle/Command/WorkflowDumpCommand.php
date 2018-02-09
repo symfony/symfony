@@ -39,7 +39,7 @@ class WorkflowDumpCommand extends Command
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::REQUIRED, 'A workflow name'),
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
-                new InputOption('label', 'l', InputArgument::OPTIONAL, 'Labels a graph'),
+                new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Labels a graph'),
                 new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format [dot|puml]', 'dot'),
             ))
             ->setDescription('Dump a workflow')
@@ -47,7 +47,7 @@ class WorkflowDumpCommand extends Command
 The <info>%command.name%</info> command dumps the graphical representation of a
 workflow in different formats
 
-<info>DOT</info>:  %command.full_name% <workflow name> | dot -Tpng > workflow.png 
+<info>DOT</info>:  %command.full_name% <workflow name> | dot -Tpng > workflow.png
 <info>PUML</info>: %command.full_name% <workflow name> --dump-format=puml | java -jar plantuml.jar -p > workflow.png
 
 EOF
@@ -74,9 +74,8 @@ EOF
         }
 
         if ('puml' === $input->getOption('dump-format')) {
-            $dumper = new PlantUmlDumper(
-                'workflow' === $type ? PlantUmlDumper::WORKFLOW_TRANSITION : PlantUmlDumper::STATEMACHINE_TRANSITION
-            );
+            $transitionType = 'workflow' === $type ? PlantUmlDumper::WORKFLOW_TRANSITION : PlantUmlDumper::STATEMACHINE_TRANSITION;
+            $dumper = new PlantUmlDumper($transitionType);
         } elseif ('workflow' === $type) {
             $dumper = new GraphvizDumper();
         } else {
@@ -89,12 +88,13 @@ EOF
             $marking->mark($place);
         }
 
-        $options = array();
-        $label = $input->getOption('label');
-        if (null !== $label && '' !== trim($label)) {
-            $options = array('graph' => array('label' => $label));
-        }
-        $options = array_replace($options, array('name' => $serviceId, 'nofooter' => true));
+        $options = array(
+            'name' => $serviceId,
+            'nofooter' => true,
+            'graph' => array(
+                'label' => $input->getOption('label'),
+            ),
+        );
         $output->writeln($dumper->dump($workflow->getDefinition(), $marking, $options));
     }
 }

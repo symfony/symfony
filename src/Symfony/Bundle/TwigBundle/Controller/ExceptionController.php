@@ -60,7 +60,7 @@ class ExceptionController
         $code = $exception->getStatusCode();
 
         return new Response($this->twig->render(
-            (string) $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
+            (string) $this->findTemplate($request, $request->getRequestedResponseFormat(), $code, $showException),
             array(
                 'status_code' => $code,
                 'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
@@ -68,7 +68,7 @@ class ExceptionController
                 'logger' => $logger,
                 'currentContent' => $currentContent,
             )
-        ), 200, array('Content-Type' => $request->getMimeType($request->getRequestFormat()) ?: 'text/html'));
+        ), 200, array('Content-Type' => $request->getMimeType($request->getRequestedResponseFormat()) ?: 'text/html'));
     }
 
     /**
@@ -117,7 +117,7 @@ class ExceptionController
         }
 
         // default to a generic HTML exception
-        $request->setRequestFormat('html');
+        $request->setRequestedResponseFormat('html');
 
         return sprintf('@Twig/Exception/%s.html.twig', $showException ? 'exception_full' : $name);
     }

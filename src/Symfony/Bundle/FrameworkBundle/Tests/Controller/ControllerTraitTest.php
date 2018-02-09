@@ -35,14 +35,14 @@ abstract class ControllerTraitTest extends TestCase
     {
         $request = Request::create('/');
         $request->setLocale('fr');
-        $request->setRequestFormat('xml');
+        $request->setRequestedResponseFormat('xml');
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
-            return new Response($request->getRequestFormat().'--'.$request->getLocale());
+            return new Response($request->getRequestedResponseFormat().'--'.$request->getLocale());
         }));
 
         $container = new Container();

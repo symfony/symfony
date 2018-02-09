@@ -58,7 +58,7 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
         // to rendering a route if the route pattern does not contain the special
         // _format and _locale placeholders.
         if (!isset($reference->attributes['_format'])) {
-            $reference->attributes['_format'] = $request->getRequestFormat();
+            $reference->attributes['_format'] = $request->getRequestedResponseFormat();
         }
         if (!isset($reference->attributes['_locale'])) {
             $reference->attributes['_locale'] = $request->getLocale();

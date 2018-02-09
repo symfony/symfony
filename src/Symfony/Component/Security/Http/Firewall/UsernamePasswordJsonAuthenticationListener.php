@@ -73,7 +73,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (false === strpos($request->getRequestFormat(), 'json')
+        if (false === strpos($request->getRequestedResponseFormat(), 'json')
             && false === strpos($request->getContentType(), 'json')
         ) {
             return;
@@ -121,7 +121,7 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         } catch (AuthenticationException $e) {
             $response = $this->onFailure($request, $e);
         } catch (BadRequestHttpException $e) {
-            $request->setRequestFormat('json');
+            $request->setRequestedResponseFormat('json');
 
             throw $e;
         }

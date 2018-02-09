@@ -12,7 +12,10 @@ skinparam state {
 }
 state "a" <<initial>>
 state "b"
-state "c"
+state "c" <<marked>>
+state "d"
 "a" --> "b": "t1"
+"d" --> "b": "t1"
 "b" --> "c": "t2"
+"b" --> "d": "t3"
 @enduml

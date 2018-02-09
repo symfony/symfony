@@ -371,7 +371,7 @@ trait ControllerTrait
      * Checks the validity of a CSRF token.
      *
      * @param string $id    The id used when generating the token
-     * @param string $token The actual token sent with the request that should be validated
+     * @param string|null $token The actual token sent with the request that should be validated
      *
      * @final since version 3.4
      */

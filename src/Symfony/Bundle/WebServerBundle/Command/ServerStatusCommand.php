@@ -38,6 +38,7 @@ class ServerStatusCommand extends Command
             ->setDefinition(array(
                 new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
                 new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'The value to display (one of port, host, or address)'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt or json)', 'txt'),
             ))
             ->setDescription('Outputs the status of the local web server for the given address')
             ->setHelp(<<<'EOF'
@@ -64,15 +65,18 @@ EOF
     {
         $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
         $server = new WebServer();
+        $isStarted = $server->isRunning($input->getOption('pidfile'));
+        $isJsonFormatted = 'json' === $input->getOption('format');
+        list($host, $port) = explode(':', $address = $server->getAddress($input->getOption('pidfile')));
+
         if ($filter = $input->getOption('filter')) {
-            if ($server->isRunning($input->getOption('pidfile'))) {
-                list($host, $port) = explode(':', $address = $server->getAddress($input->getOption('pidfile')));
+            if ($isStarted) {
                 if ('address' === $filter) {
-                    $output->write($address);
+                    $output->write($isJsonFormatted ? json_encode(array('address' => $address)) : $address);
                 } elseif ('host' === $filter) {
-                    $output->write($host);
+                    $output->write($isJsonFormatted ? json_encode(array('host' => $host)) : $host);
                 } elseif ('port' === $filter) {
-                    $output->write($port);
+                    $output->write($isJsonFormatted ? json_encode(array('host' => $port)) : $port);
                 } else {
                     throw new \InvalidArgumentException(sprintf('"%s" is not a valid filter.', $filter));
                 }
@@ -80,8 +84,10 @@ EOF
                 return 1;
             }
         } else {
-            if ($server->isRunning($input->getOption('pidfile'))) {
-                $io->success(sprintf('Web server still listening on http://%s', $server->getAddress($input->getOption('pidfile'))));
+            if ($isStarted && $isJsonFormatted) {
+                $output->write(json_encode(array('host' => $host, 'port' => $port)));
+            } elseif ($isStarted) {
+                $io->success(sprintf('Web server still listening on http://%s', $address));
             } else {
                 $io->warning('No web server is listening.');
 

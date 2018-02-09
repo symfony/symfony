@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-02-09T11:07:02Z
+
+@ro0NL any hint on the remaining failures https://travis-ci.org/symfony/symfony/jobs/339399751#L4108?
+
+---------------------------------------------------------------------------
+
+by lcobucci at 2018-02-09T11:24:11Z
+
+> Sorry :) not sure how i missed that
+
+No worries, 💩 happens. I just wanted to fix it because it's breaking our tests - in `doctrine/orm` - for dev dependencies (which is ran on travis cron).
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-09T11:33:48Z
+
+Does our own testsuite catches it ? If yes, how could it have been merged ? If no, we need more tests
+
+---------------------------------------------------------------------------
+
+by lcobucci at 2018-02-09T11:47:03Z
+
+> Does our own testsuite catches it ? If yes, how could it have been merged ? If no, we need more tests
+
+@stof yeap, the test suite was is broken in `master`. With this fix is less broken (still broken though).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-09T11:51:56Z
+
+ref is https://github.com/symfony/symfony/pull/23582
+
+The sudden merge / switch from 3.4 to 4.1 was unexpected for me (i'd happily rebase / test once more before merge). Then again.. it was passing; so im curious about the sudden breakage and the obvious  bug we missed here (fixed by this PR) :thinking:
+
+@lcobucci i can have a look at remaining tests... unless you already figured things out ;)
+
+---------------------------------------------------------------------------
+
+by lcobucci at 2018-02-09T11:59:59Z
+
+> @lcobucci i can have a look at remaining tests... unless you already figured things out ;)
+
+@ro0NL please do, I've started to check them but couldn't finish. It's essentially related on how the table is drew...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-09T12:06:58Z
+
+Ok.. I restored my original branch: still passing, rebased on 3.4 it starts failing.
+
+Im not sure about this fix btw. The initial order was OK.. it's related to changes meanwhile (added type hints im guessing, but im not sure yet). So perhaps revert #23582 instead of merging this.
+
+Im on it either way.. hopefully it's something small :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-09T12:10:45Z
+
+Yep: https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Console/Helper/Table.php#L587
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-09T12:14:10Z
+
+@lcobucci could you try
+
+```diff
+diff --git a/src/Symfony/Component/Console/Helper/Table.php b/src/Symfony/Component/Console/Helper/Table.php
+index 70ef04c..d54f636 100644
+--- a/src/Symfony/Component/Console/Helper/Table.php
++++ b/src/Symfony/Component/Console/Helper/Table.php
+@@ -565,7 +565,7 @@ class Table
+     /**
+      * Calculates columns widths.
+      */
+-    private function calculateColumnsWidth(array $rows)
++    private function calculateColumnsWidth(iterable $rows)
+     {
+         for ($column = 0; $column < $this->numberOfColumns; ++$column) {
+             $lengths = array();
+```
+
+seems to fix everything :)
+
+---------------------------------------------------------------------------
+
+by lcobucci at 2018-02-09T12:38:41Z
+
+@ro0NL applied, thanks!

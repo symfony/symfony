@@ -1,6 +1,6 @@
 security:
     encoders:
-        JMS\FooBundle\Entity\User6:
+        JMS\FooBundle\Entity\User7:
             algorithm: argon2i
 
     providers:

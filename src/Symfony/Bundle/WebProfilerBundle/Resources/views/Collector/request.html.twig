@@ -272,9 +272,7 @@
             <div class="tab-content">
                 {% for child in profile.children %}
                     <h3>
-                        <a href="{{ path('_profiler', { token: child.token }) }}">
-                            {{ helper.set_handler(child.getcollector('request').controller) }}
-                        </a>
+                        {{ helper.set_handler(child.getcollector('request').controller) }}
                         <small>(token = <a href="{{ path('_profiler', { token: child.token }) }}">{{ child.token }}</a>)</small>
                     </h3>
 

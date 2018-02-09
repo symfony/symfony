@@ -16,6 +16,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Watcher\FileChangeEvent;
 
 /**
  * Validates XLIFF files syntax and outputs encountered errors.
@@ -50,6 +52,7 @@ class XliffLintCommand extends Command
             ->setDescription('Lints a XLIFF file and outputs encountered errors')
             ->addArgument('filename', null, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
+            ->addOption('watch', null, InputOption::VALUE_NONE, 'Watch the files or directories for changes')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a XLIFF file and outputs to STDOUT
 the first encountered syntax error.
@@ -96,7 +99,24 @@ EOF
             $filesInfo[] = $this->validate(file_get_contents($file), $file);
         }
 
-        return $this->display($io, $filesInfo);
+        $display = $this->display($io, $filesInfo);
+
+        if (!$input->getOption('watch')) {
+            return $display;
+        }
+
+        if (!class_exists(Filesystem::class)) {
+            throw new \RuntimeException('The symfony/filesystem package is required in order to watch files for changes.');
+        }
+
+        $io->note('Watching files for changes...');
+
+        $fs = new Filesystem();
+        $fs->watch($filename, function (string $file, int $event) use ($io) {
+            if (FileChangeEvent::FILE_DELETED !== $event) {
+                $this->display($io, array($this->validate(file_get_contents($file), $file)));
+            }
+        });
     }
 
     private function validate($content, $file = null)

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+  * added `watch()` method to watch filesystem for changes
+
 4.0.0
 -----
 

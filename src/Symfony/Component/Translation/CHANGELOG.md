@@ -6,6 +6,7 @@ CHANGELOG
 
  * The `FileDumper::setBackup()` method is deprecated and will be removed in 5.0.
  * The `TranslationWriter::disableBackup()` method is deprecated and will be removed in 5.0.
+ * Added `--watch` option to the `lint:xliff` command to watch the filesystem for changes and re-lint any changed files
 
 4.0.0
 -----

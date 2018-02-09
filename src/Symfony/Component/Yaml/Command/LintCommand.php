@@ -16,6 +16,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Watcher\FileChangeEvent;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
@@ -54,6 +56,7 @@ class LintCommand extends Command
             ->addArgument('filename', null, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->addOption('parse-tags', null, InputOption::VALUE_NONE, 'Parse custom tags')
+            ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Watch the files or directories for changes')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a YAML file and outputs to STDOUT
 the first encountered syntax error.
@@ -101,7 +104,24 @@ EOF
             $filesInfo[] = $this->validate(file_get_contents($file), $flags, $file);
         }
 
-        return $this->display($io, $filesInfo);
+        $display = $this->display($io, $filesInfo);
+
+        if (!$input->getOption('watch')) {
+            return $display;
+        }
+
+        if (!class_exists(Filesystem::class)) {
+            throw new \RuntimeException('The symfony/filesystem package is required in order to watch files for changes.');
+        }
+
+        $io->note('Watching files for changes...');
+
+        $fs = new Filesystem();
+        $fs->watch($filename, function (string $file, int $event) use ($flags, $io) {
+            if (FileChangeEvent::FILE_DELETED !== $event) {
+                $this->display($io, array($this->validate(file_get_contents($file), $flags, $file)));
+            }
+        });
     }
 
     private function validate($content, $flags, $file = null)

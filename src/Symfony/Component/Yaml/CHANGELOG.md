@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+  * added `--watch` option to the `lint:yaml` command to watch the filesystem for changes and re-lint any changed files
+
 4.0.0
 -----
 

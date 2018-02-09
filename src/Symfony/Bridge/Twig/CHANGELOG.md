@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+  * added `--watch` option to the `lint:twig` command to watch the filesystem for changes and re-lint any changed files
+
 3.4.0
 -----
 

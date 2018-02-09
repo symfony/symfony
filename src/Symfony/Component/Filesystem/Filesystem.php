@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Filesystem;
 
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+use Symfony\Component\Filesystem\Watcher\FileChangeWatcher;
+use Symfony\Component\Filesystem\Watcher\INotifyWatcher;
 
 /**
  * Provides basic utility to manipulate the file system.
@@ -722,6 +724,27 @@ class Filesystem
         if (false === @file_put_contents($filename, $content, FILE_APPEND)) {
             throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
         }
+    }
+
+    /**
+     * Watches a file or directory for any changes, and calls $callback when any changes is detected.
+     *
+     * @param mixed    $path     The path to watch for changes. Can be a path to a file or directory, iterator or array with paths
+     * @param callable $callback The callback to execute when a change is detected
+     * @param int      $timeout  The number of watch iterations to run before the watch is halted. -1 to continue watching for infinity
+     * @param int      $wait     The number of seconds delay between detecting changes
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function watch($path, callable $callback, int $timeout = -1, int $wait = 1)
+    {
+        if (extension_loaded('inotify')) {
+            $watcher = new INotifyWatcher();
+        } else {
+            $watcher = new FileChangeWatcher(null, $timeout, $wait);
+        }
+
+        $watcher->watch($path, $callback);
     }
 
     private function toIterable($files): iterable

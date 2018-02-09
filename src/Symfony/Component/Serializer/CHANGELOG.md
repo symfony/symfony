@@ -9,6 +9,8 @@ CHANGELOG
 * added an optional `default_constructor_arguments` option of context to specify a default data in
   case the object is not initializable by its constructor because of data missing
 * added optional `bool $escapeFormulas = false` argument to `CsvEncoder::__construct`
+* added `AbstractObjectNormalizer::setMaxDepthHandler` to set a handler to call when the configured
+  maximum depth is reached
 
 4.0.0
 -----

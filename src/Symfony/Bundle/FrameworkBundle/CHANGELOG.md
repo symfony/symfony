@@ -17,6 +17,7 @@ CHANGELOG
    is either the service ID or the FQCN of the controller.
  * Deprecated `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`
  * The `container.service_locator` tag of `ServiceLocator`s is now autoconfigured.
+ * Add the ability to search a route in `debug:router`.
 
 4.0.0
 -----

@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * A console command for retrieving information about routes.
@@ -76,7 +77,13 @@ EOF
         $routes = $this->router->getRouteCollection();
 
         if ($name) {
-            if (!$route = $routes->get($name)) {
+            if (!($route = $routes->get($name)) && $matchingRoutes = $this->findRouteNameContaining($name, $routes)) {
+                $default = 1 === count($matchingRoutes) ? $matchingRoutes[0] : null;
+                $name = $io->choice('Select one of the matching routes', $matchingRoutes, $default);
+                $route = $routes->get($name);
+            }
+
+            if (!$route) {
                 throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
 
@@ -94,5 +101,17 @@ EOF
                 'output' => $io,
             ));
         }
+    }
+
+    private function findRouteNameContaining(string $name, RouteCollection $routes): array
+    {
+        $foundRoutesNames = array();
+        foreach ($routes as $routeName => $route) {
+            if (false !== stripos($routeName, $name)) {
+                $foundRoutesNames[] = $routeName;
+            }
+        }
+
+        return $foundRoutesNames;
     }
 }

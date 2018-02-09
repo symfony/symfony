@@ -43,8 +43,23 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         if (is_array($controller)) {
-            if (isset($controller[0]) && is_string($controller[0])) {
-                $controller[0] = $this->instantiateController($controller[0]);
+            if (isset($controller[0]) && is_string($controller[0]) && isset($controller[1])) {
+                try {
+                    $controller[0] = $this->instantiateController($controller[0]);
+                } catch (\Error | \LogicException $e) {
+                    try {
+                        // We cannot just check is_callable but have to use reflection because a non-static method
+                        // can still be called statically in PHP but we don't want that. This is deprecated in PHP 7, so we
+                        // could simplify this with PHP 8.
+                        if ((new \ReflectionMethod($controller[0], $controller[1]))->isStatic()) {
+                            return $controller;
+                        }
+                    } catch (\ReflectionException $reflectionException) {
+                        throw $e;
+                    }
+
+                    throw $e;
+                }
             }
 
             if (!is_callable($controller)) {
@@ -90,7 +105,19 @@ class ControllerResolver implements ControllerResolverInterface
 
         list($class, $method) = explode('::', $controller, 2);
 
-        return array($this->instantiateController($class), $method);
+        try {
+            return array($this->instantiateController($class), $method);
+        } catch (\Error | \LogicException $e) {
+            try {
+                if ((new \ReflectionMethod($class, $method))->isStatic()) {
+                    return $class.'::'.$method;
+                }
+            } catch (\ReflectionException $reflectionException) {
+                throw $e;
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -125,8 +152,8 @@ class ControllerResolver implements ControllerResolverInterface
             return sprintf('Invalid type for controller given, expected string, array or object, got "%s".', gettype($callable));
         }
 
-        if (!isset($callable[0]) | !isset($callable[1])) {
-            return 'Array callable has to contain indices 0 and 1 like array(controller, method).';
+        if (!isset($callable[0]) || !isset($callable[1]) || 2 !== count($callable)) {
+            return 'Invalid array callable, expected array(controller, method).';
         }
 
         list($controller, $method) = $callable;

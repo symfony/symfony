@@ -85,7 +85,6 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
     {
         $request = Request::create('/login_check', 'POST', array('_username' => array()));
         $request->setSession($this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock());
-
         $listener = new UsernamePasswordFormAuthenticationListener(
             new TokenStorage(),
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock(),
@@ -96,9 +95,7 @@ class UsernamePasswordFormAuthenticationListenerTest extends TestCase
             new DefaultAuthenticationFailureHandler($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $httpUtils),
             array('require_previous_session' => false, 'post_only' => $postOnly)
         );
-
         $event = new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
-
         $listener->handle($event);
     }
 

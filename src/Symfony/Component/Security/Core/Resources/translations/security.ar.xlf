@@ -3,63 +3,63 @@
     <file source-language="en" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="1">
-                <source>Isang pambihirang pagpaptunay ang nangyari</source>
+                <source>An authentication exception occurred.</source>
                 <target>حدث خطأ اثناء الدخول.</target>
             </trans-unit>
             <trans-unit id="2">
-                <source>Hindi mahanap ang mga kinakailangan na dokumento para sa pagpapatunay.</source>
+                <source>Authentication credentials could not be found.</source>
                 <target>لم استطع العثور على معلومات الدخول.</target>
             </trans-unit>
             <trans-unit id="3">
-                <source>Hindi maproseso ang iyong hiling dahil may problema sa sistema.</source>
+                <source>Authentication request could not be processed due to a system problem.</source>
                 <target>لم يكتمل طلب الدخول نتيجه عطل فى النظام.</target>
             </trans-unit>
             <trans-unit id="4">
-                <source>Hindi balidong mga dokumento.</source>
+                <source>Invalid credentials.</source>
                 <target>معلومات الدخول خاطئة.</target>
             </trans-unit>
             <trans-unit id="5">
-                <source>Ang Cookie ay ginamit na ng ibang tao.</source>
+                <source>Cookie has already been used by someone else.</source>
                 <target>ملفات تعريف الارتباط(cookies) تم استخدامها من قبل شخص اخر.</target>
             </trans-unit>
             <trans-unit id="6">
-                <source>Walang pribilehiyo upang humingi ng mga bagong mapagkukunan.</source>
+                <source>Not privileged to request the resource.</source>
                 <target>ليست لديك الصلاحيات الكافية لهذا الطلب.</target>
             </trans-unit>
             <trans-unit id="7">
-                <source>Hindi balidong mga token ng CSRF.</source>
+                <source>Invalid CSRF token.</source>
                 <target>رمز الموقع غير صحيح.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>Walang nakitang nagbibibagay ng suporta sa token ng pagpapatunay.</source>
+                <source>No authentication provider found to support the authentication token.</source>
                 <target>لا يوجد معرف للدخول يدعم الرمز المستخدم للدخول.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>Walang sesyon ng magagamit, ito ay nawalan ng oras o hindi pinagana.</source>
+                <source>No session available, it either timed out or cookies are not enabled.</source>
                 <target>لا يوجد صلة بينك و بين الموقع اما انها انتهت او ان متصفحك لا يدعم خاصية ملفات تعريف الارتباط (cookies).</target>
             </trans-unit>
             <trans-unit id="11">
-                <source>Walang token na nahanap.</source>
+                <source>No token could be found.</source>
                 <target>لم استطع العثور على الرمز.</target>
             </trans-unit>
             <trans-unit id="12">
-                <source>Walang username na makita.</source>
+                <source>Username could not be found.</source>
                 <target>لم استطع العثور على اسم الدخول.</target>
             </trans-unit>
             <trans-unit id="13">
-                <source>Ang akawnt ay nag-expire na.</source>
+                <source>Account has expired.</source>
                 <target>انتهت صلاحية الحساب.</target>
             </trans-unit>
             <trans-unit id="14">
-                <source>Ang mga kinakailangang dokumento ay nag expire na.</source>
+                <source>Credentials have expired.</source>
                 <target>انتهت صلاحية معلومات الدخول.</target>
             </trans-unit>
             <trans-unit id="15">
-                <source>Ang akawnt ay hindi pinagana.</source>
+                <source>Account is disabled.</source>
                 <target>الحساب موقوف.</target>
             </trans-unit>
             <trans-unit id="16">
-                <source>Ang akawnt ay nakalock.</source>
+                <source>Account is locked.</source>
                 <target>الحساب مغلق.</target>
             </trans-unit>
         </body>

@@ -1635,9 +1635,8 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)
     {
-        $version = new Parameter('container.build_id');
-        $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
-        $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
+        $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $config['version']);
+        $container->getDefinition('cache.adapter.system')->replaceArgument(2, $config['version']);
         $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
 
         if (isset($config['prefix_seed'])) {
@@ -1673,7 +1672,7 @@ class FrameworkExtension extends Extension
 
             if (!$container->getParameter('kernel.debug')) {
                 $propertyAccessDefinition->setFactory(array(PropertyAccessor::class, 'createCache'));
-                $propertyAccessDefinition->setArguments(array(null, null, $version, new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
+                $propertyAccessDefinition->setArguments(array(null, null, $config['version'], new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
                 $propertyAccessDefinition->addTag('cache.pool', array('clearer' => 'cache.system_clearer'));
                 $propertyAccessDefinition->addTag('monolog.logger', array('channel' => 'cache'));
             } else {

@@ -118,6 +118,8 @@ class DigestAuthenticationListener implements ListenerInterface
             $this->logger->info('Digest authentication successful.', array('username' => $digestAuth->getUsername(), 'received' => $digestAuth->getResponse()));
         }
 
+        $this->migrateSession($request);
+
         $this->tokenStorage->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
@@ -133,6 +135,18 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         $event->setResponse($this->authenticationEntryPoint->start($request, $authException));
+    }
+
+    private function migrateSession(Request $request)
+    {
+        if (!$request->hasSession() || !$request->hasPreviousSession()) {
+            return;
+        }
+
+        // Destroying the old session is broken in php 5.4.0 - 5.4.10
+        // See https://bugs.php.net/63379
+        $destroy = \PHP_VERSION_ID < 50400 || \PHP_VERSION_ID >= 50411;
+        $request->getSession()->migrate($destroy);
     }
 }
 

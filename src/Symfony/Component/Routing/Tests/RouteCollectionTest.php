@@ -86,20 +86,23 @@ class RouteCollectionTest extends TestCase
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
+        $collection->add('prio', new Route('/prio'));
 
         $collection1 = new RouteCollection();
         $collection1->add('bar', $bar = new Route('/bar'));
         $collection1->add('foo', $foo = new Route('/foo-new'));
+        $collection1->addWithPriority('prio', $prio = new Route('/prio-new'), 100);
 
         $collection2 = new RouteCollection();
         $collection2->add('grandchild', $grandchild = new Route('/grandchild'));
+        $collection2->addWithPriority('first', $first = new Route('/grandchild'), 200);
 
         $collection1->addCollection($collection2);
         $collection->addCollection($collection1);
         $collection->add('last', $last = new Route('/last'));
 
-        $this->assertSame(array('bar' => $bar, 'foo' => $foo, 'grandchild' => $grandchild, 'last' => $last), $collection->all(),
-            '->addCollection() imports routes of another collection, overrides if necessary and adds them at the end');
+        $this->assertSame(array('first' => $first, 'prio' => $prio, 'bar' => $bar, 'foo' => $foo, 'grandchild' => $grandchild, 'last' => $last), $collection->all(),
+            '->addCollection() imports routes of another collection, overrides if necessary and adds them at the end of their priority');
     }
 
     public function testAddCollectionWithResources()
@@ -316,5 +319,27 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals($apiFoo, $collection->get('api_api_foo'));
         $this->assertNull($collection->get('foo'));
         $this->assertNull($collection->get('bar'));
+    }
+
+    public function testAddWithNumericName()
+    {
+        $collection = new RouteCollection();
+        $collection->add(100, new Route('/foo'));
+
+        $this->assertSame([100], array_keys($collection->all()));
+    }
+
+    public function testAddWithPriority()
+    {
+        $collection = new RouteCollection();
+        $collection->addWithPriority('foo', $foo = new Route('/foo'), 0);
+        $collection->addWithPriority('bar', $bar = new Route('/bar'), 1);
+
+        $expected = [
+            'bar' => $bar,
+            'foo' => $foo,
+        ];
+
+        $this->assertSame($expected, $collection->all());
     }
 }

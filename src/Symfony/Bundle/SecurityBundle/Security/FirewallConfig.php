@@ -28,8 +28,9 @@ final class FirewallConfig
     private $accessDeniedUrl;
     private $listeners;
     private $switchUser;
+    private $options;
 
-    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $listeners = array(), $switchUser = null)
+    public function __construct(string $name, string $userChecker, string $requestMatcher = null, bool $securityEnabled = true, bool $stateless = false, string $provider = null, string $context = null, string $entryPoint = null, string $accessDeniedHandler = null, string $accessDeniedUrl = null, array $listeners = array(), $switchUser = null, array $options = [])
     {
         $this->name = $name;
         $this->userChecker = $userChecker;
@@ -43,6 +44,7 @@ final class FirewallConfig
         $this->accessDeniedUrl = $accessDeniedUrl;
         $this->listeners = $listeners;
         $this->switchUser = $switchUser;
+        $this->options = $options;
     }
 
     public function getName(): string
@@ -115,5 +117,10 @@ final class FirewallConfig
     public function getSwitchUser(): ?array
     {
         return $this->switchUser;
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

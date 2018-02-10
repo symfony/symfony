@@ -154,6 +154,7 @@
             <argument />                   <!-- access_denied_url -->
             <argument type="collection" /> <!-- listeners -->
             <argument />                   <!-- switch_user -->
+            <argument type="collection" /> <!-- options -->
         </service>
 
         <service id="security.logout_url_generator" class="Symfony\Component\Security\Http\Logout\LogoutUrlGenerator">

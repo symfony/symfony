@@ -14,7 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Validator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Blank as BlankConstraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 class ConstraintValidatorFactoryTest extends TestCase
 {
@@ -42,26 +44,13 @@ class ConstraintValidatorFactoryTest extends TestCase
 
     public function testGetInstanceReturnsService()
     {
-        $service = 'validator_constraint_service';
-        $alias = 'validator_constraint_alias';
-        $validator = $this->getMockForAbstractClass('Symfony\\Component\\Validator\\ConstraintValidator');
+        $validator = new DummyConstraintValidator();
 
-        // mock ContainerBuilder b/c it implements TaggedContainerInterface
-        $container = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\ContainerBuilder')->setMethods(array('get'))->getMock();
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with($service)
-            ->will($this->returnValue($validator));
-
-        $constraint = $this->getMockBuilder('Symfony\\Component\\Validator\\Constraint')->getMock();
-        $constraint
-            ->expects($this->once())
-            ->method('validatedBy')
-            ->will($this->returnValue($alias));
+        $container = new Container();
+        $container->set('validator_constraint_service', $validator);
 
         $factory = new ConstraintValidatorFactory($container, array('validator_constraint_alias' => 'validator_constraint_service'));
-        $this->assertSame($validator, $factory->getInstance($constraint));
+        $this->assertSame($validator, $factory->getInstance(new ConstraintStub()));
     }
 
     /**
@@ -77,5 +66,20 @@ class ConstraintValidatorFactoryTest extends TestCase
 
         $factory = new ConstraintValidatorFactory(new Container());
         $factory->getInstance($constraint);
+    }
+}
+
+class ConstraintStub extends Constraint
+{
+    public function validatedBy()
+    {
+        return 'validator_constraint_alias';
+    }
+}
+
+class DummyConstraintValidator extends ConstraintValidator
+{
+    public function validate($value, Constraint $constraint)
+    {
     }
 }

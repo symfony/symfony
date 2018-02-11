@@ -117,4 +117,24 @@ class PhpFileLoaderTest extends TestCase
 
         $this->assertEquals($expectedCollection, $routeCollection);
     }
+
+    public function testRoutingI18nConfigurator()
+    {
+        $locator = new FileLocator(array(__DIR__.'/../Fixtures'));
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl_i18n.php');
+
+        $expectedCollection = new RouteCollection();
+
+        $expectedCollection->add('foo.en', (new Route('/glish/foo'))->setDefaults(array('_locale' => 'en')));
+        $expectedCollection->add('bar.en', (new Route('/glish/bar'))->setDefaults(array('_locale' => 'en')));
+        $expectedCollection->add('baz.en', (new Route('/baz'))->setDefaults(array('_locale' => 'en')));
+        $expectedCollection->add('c_foo.fr', (new Route('/ench/pub/foo'))->setDefaults(array('_locale' => 'fr')));
+        $expectedCollection->add('c_bar.fr', (new Route('/ench/pub/bar'))->setDefaults(array('_locale' => 'fr')));
+
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub_i18n.php')));
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_i18n.php')));
+
+        $this->assertEquals($expectedCollection, $routeCollection);
+    }
 }

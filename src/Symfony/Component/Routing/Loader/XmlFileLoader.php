@@ -107,17 +107,34 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
-        if ('' === ($id = $node->getAttribute('id')) || !$node->hasAttribute('path')) {
-            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "path" attribute.', $path));
+        if ('' === $id = $node->getAttribute('id')) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" attribute.', $path));
         }
 
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY);
         $methods = preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY);
 
-        list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
+        list($defaults, $requirements, $options, $condition, $paths) = $this->parseConfigs($node, $path);
 
-        $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
-        $collection->add($id, $route);
+        if (!$paths && '' === $node->getAttribute('path')) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have a "path" attribute or <path> child nodes.', $path));
+        }
+
+        if ($paths && '' !== $node->getAttribute('path')) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must not have both a "path" attribute and <path> child nodes.', $path));
+        }
+
+        if (!$paths) {
+            $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
+            $collection->add($id, $route);
+        } else {
+            foreach ($paths as $locale => $p) {
+                $defaults['_locale'] = $locale;
+                $routeName = $id.'.'.$locale;
+                $route = new Route($p, $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
+                $collection->add($routeName, $route);
+            }
+        }
     }
 
     /**
@@ -142,13 +159,41 @@ class XmlFileLoader extends FileLoader
         $schemes = $node->hasAttribute('schemes') ? preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY) : null;
         $methods = $node->hasAttribute('methods') ? preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY) : null;
 
-        list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
+        list($defaults, $requirements, $options, $condition, /* $paths */, $prefixes) = $this->parseConfigs($node, $path);
+
+        if ('' !== $prefix && $prefixes) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must not have both a "prefix" attribute and <prefix> child nodes.', $path));
+        }
 
         $this->setCurrentDir(dirname($path));
 
-        $subCollection = $this->import($resource, ('' !== $type ? $type : null), false, $file);
         /* @var $subCollection RouteCollection */
-        $subCollection->addPrefix($prefix);
+        $subCollection = $this->import($resource, ('' !== $type ? $type : null), false, $file);
+
+        if ('' !== $prefix || !$prefixes) {
+            $subCollection->addPrefix($prefix);
+        } else {
+            foreach ($prefixes as $locale => $localePrefix) {
+                $prefixes[$locale] = trim(trim($localePrefix), '/');
+            }
+            foreach ($subCollection->all() as $name => $route) {
+                if (null === $locale = $route->getDefault('_locale')) {
+                    $subCollection->remove($name);
+                    foreach ($prefixes as $locale => $localePrefix) {
+                        $localizedRoute = clone $route;
+                        $localizedRoute->setPath($localePrefix.$route->getPath());
+                        $localizedRoute->setDefault('_locale', $locale);
+                        $subCollection->add($name.'.'.$locale, $localizedRoute);
+                    }
+                } elseif (!isset($prefixes[$locale])) {
+                    throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding prefix when imported in "%s".', $name, $locale, $path));
+                } else {
+                    $route->setPath($prefixes[$locale].$route->getPath());
+                    $subCollection->add($name, $route);
+                }
+            }
+        }
+
         if (null !== $host) {
             $subCollection->setHost($host);
         }
@@ -204,6 +249,8 @@ class XmlFileLoader extends FileLoader
         $requirements = array();
         $options = array();
         $condition = null;
+        $prefixes = array();
+        $paths = array();
 
         foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
             if ($node !== $n->parentNode) {
@@ -211,6 +258,12 @@ class XmlFileLoader extends FileLoader
             }
 
             switch ($n->localName) {
+                case 'path':
+                    $paths[$n->getAttribute('locale')] = trim($n->textContent);
+                    break;
+                case 'prefix':
+                    $prefixes[$n->getAttribute('locale')] = trim($n->textContent);
+                    break;
                 case 'default':
                     if ($this->isElementValueNull($n)) {
                         $defaults[$n->getAttribute('key')] = null;
@@ -243,7 +296,7 @@ class XmlFileLoader extends FileLoader
             $defaults['_controller'] = $controller;
         }
 
-        return array($defaults, $requirements, $options, $condition);
+        return array($defaults, $requirements, $options, $condition, $paths, $prefixes);
     }
 
     /**

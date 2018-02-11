@@ -1,0 +1,4 @@
+---
+imported:
+    controller: ImportedController::someAction
+    path: /imported

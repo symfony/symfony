@@ -54,11 +54,13 @@ use Psr\Log\LoggerInterface;
 class {$options['class']} extends {$options['base_class']}
 {
     private static \$declaredRoutes;
+    private \$defaultLocale;
 
-    public function __construct(RequestContext \$context, LoggerInterface \$logger = null)
+    public function __construct(RequestContext \$context, LoggerInterface \$logger = null, string \$defaultLocale = null)
     {
         \$this->context = \$context;
         \$this->logger = \$logger;
+        \$this->defaultLocale = \$defaultLocale;
         if (null === self::\$declaredRoutes) {
             self::\$declaredRoutes = {$this->generateDeclaredRoutes()};
         }
@@ -107,7 +109,14 @@ EOF;
         return <<<'EOF'
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
-        if (!isset(self::$declaredRoutes[$name])) {
+        $locale = $parameters['_locale']
+            ?? $this->context->getParameter('_locale')
+            ?: $this->defaultLocale;
+
+        if (null !== $locale && isset(self::$declaredRoutes[$name.'.'.$locale])) {
+            unset($parameters['_locale']);
+            $name = $name.'.'.$locale;
+        } elseif (!isset(self::$declaredRoutes[$name])) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
         }
 

@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-02-01T23:07:56Z
+
+@alcaeus please review
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-02-03T12:29:44Z
+
+Best reviewed when [ignoring whitespace](https://github.com/symfony/symfony/pull/26012/files?w=1)
+
+@nicolas-grekas the second commit feels more like a feature than a bugfix to me. Would you be ok with moving it to a separate PR?
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2018-02-04T11:31:23Z
+
+> the second commit feels more like a feature than a bugfix to me
+
+TBH, I'd still consider it a bugfix: the original bug was that any existing deprecations cause other shutdown handlers to be ignored. This is fixed in your first commit. Fixing that bug exposes another bug, namely that any deprecations happening in other shutdown handlers don't reported. This is fixed in your second commit.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-02-04T15:03:39Z
+
+Correct, but let me try to test it on 5.4 to be 100% sure.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-02-04T15:24:09Z
+
+Don't merge, I get this, which seems to be a bug since I used the same version as in Travis:
+
+> Fatal error: Class 'PHPUnit_Util_ErrorHandler' not found in /tmp/sf/src/Symfony/Bridge/PhpUnit/DeprecationErrorHandler.php on line 54
+
+Then, with a ` var_dump($msg)` on the offending line, this:
+
+`"Use of undefined constant ARRAY_FILTER_USE_KEY - assumed 'ARRAY_FILTER_USE_KEY'"`
+
+This can't work for php < 5.6
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-02-04T15:37:39Z
+
+I fixed it however I could, it should be good to merge now (although Travis is still red)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-02-04T15:39:20Z
+
+Why exactly do we have those `Count` indices, BTW? I suppose the answer is performance, somehow?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2018-02-04T16:25:35Z
+
+Tested with `docker run -it -v $PWD:/tmp/sf squallcx/docker-php54-apache /bin/sh`

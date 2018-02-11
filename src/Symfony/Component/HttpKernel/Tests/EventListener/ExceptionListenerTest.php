@@ -151,6 +151,23 @@ class ExceptionListenerTest extends TestCase
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
         $this->assertFalse($dispatcher->hasListeners(KernelEvents::RESPONSE), 'CSP removal listener has been removed');
     }
+
+    public function testNullController()
+    {
+        $listener = new ExceptionListener(null);
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+            $controller = $request->attributes->get('_controller');
+
+            return $controller();
+        }));
+        $request = Request::create('/');
+        $event = new GetResponseForExceptionEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, new \Exception('foo'));
+
+        $listener->onKernelException($event);
+
+        $this->assertContains('Whoops, looks like something went wrong.', $event->getResponse()->getContent());
+    }
 }
 
 class TestLogger extends Logger implements DebugLoggerInterface

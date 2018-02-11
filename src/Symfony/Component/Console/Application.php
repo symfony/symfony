@@ -41,6 +41,7 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -241,9 +242,10 @@ class Application
             }
 
             $alternative = $alternatives[0];
-            $question = new ConfirmationQuestion(sprintf("<error>Command \"%s\" is not defined.</error>\n\nDo you want to run \"%s\" instead? [y/n] ", $name, $alternative), false);
 
-            if (!(new QuestionHelper())->ask($input, $output, $question)) {
+            $style = new SymfonyStyle($input, $output);
+            $style->block(sprintf("\nCommand \"%s\" is not defined.\n", $name), null, 'error');
+            if (!$style->confirm(sprintf("Do you want to run \"%s\" instead? ", $alternative), false)) {
                 if (null !== $this->dispatcher) {
                     $event = new ConsoleErrorEvent($input, $output, $e);
                     $this->dispatcher->dispatch(ConsoleEvents::ERROR, $event);

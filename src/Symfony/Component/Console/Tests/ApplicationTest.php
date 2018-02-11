@@ -485,7 +485,18 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->setInputs(array('y'));
         $tester->run(array('command' => 'foos'), array('decorated' => false));
-        $this->assertSame("Command \"foos\" is not defined.\n\nDo you want to run \"foo\" instead? [y/n] called\n", $tester->getDisplay(true));
+        $this->assertSame(<<<OUTPUT
+
+                                                                                                                        
+ Command "foos" is not defined.                                                                                         
+                                                                                                                        
+
+ Do you want to run "foo" instead?  (yes/no) [no]:
+ > 
+called
+
+OUTPUT
+, $tester->getDisplay(true));
     }
 
     public function testDontRunAlternativeCommandName()
@@ -497,7 +508,17 @@ class ApplicationTest extends TestCase
         $tester->setInputs(array('n'));
         $exitCode = $tester->run(array('command' => 'foos'), array('decorated' => false));
         $this->assertSame(1, $exitCode);
-        $this->assertSame("Command \"foos\" is not defined.\n\nDo you want to run \"foo\" instead? [y/n] ", $tester->getDisplay(true));
+        $this->assertSame(<<<OUTPUT
+
+                                                                                                                        
+ Command "foos" is not defined.                                                                                         
+                                                                                                                        
+
+ Do you want to run "foo" instead?  (yes/no) [no]:
+ > 
+
+OUTPUT
+            , $tester->getDisplay(true));
     }
 
     public function provideInvalidCommandNamesSingle()

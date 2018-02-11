@@ -6,6 +6,7 @@ CHANGELOG
 
  * added orphaned events support to `EventDataCollector`
  * `ExceptionListener` now logs and collects exceptions at priority `2048` (previously logged at `-128` and collected at `0`)
+ * Deprecated `service:action` syntax with a single colon to reference controllers. Use `service::method` instead.
 
 4.0.0
 -----

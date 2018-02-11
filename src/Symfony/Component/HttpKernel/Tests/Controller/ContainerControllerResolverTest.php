@@ -185,20 +185,20 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $tests = parent::getUndefinedControllers();
         $tests[0] = array('foo', \InvalidArgumentException::class, 'Controller "foo" does neither exist as service nor as class');
         $tests[1] = array('oof::bar', \InvalidArgumentException::class, 'Controller "oof" does neither exist as service nor as class');
-        $tests[2] = array(['oof', 'bar'], \InvalidArgumentException::class, 'Controller "oof" does neither exist as service nor as class');
+        $tests[2] = array(array('oof', 'bar'), \InvalidArgumentException::class, 'Controller "oof" does neither exist as service nor as class');
         $tests[] = array(
-            [ControllerTestService::class, 'action'],
+            array(ControllerTestService::class, 'action'),
             \InvalidArgumentException::class,
-            'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?'
+            'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?',
         );
         $tests[] = array(
             ControllerTestService::class.'::action',
-            \InvalidArgumentException::class, 'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?'
+            \InvalidArgumentException::class, 'Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?',
         );
         $tests[] = array(
             InvokableControllerService::class,
             \InvalidArgumentException::class,
-            'Controller "Symfony\Component\HttpKernel\Tests\Controller\InvokableControllerService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?'
+            'Controller "Symfony\Component\HttpKernel\Tests\Controller\InvokableControllerService" has required constructor arguments and does not exist in the container. Did you forget to define such a service?',
         );
 
         return $tests;

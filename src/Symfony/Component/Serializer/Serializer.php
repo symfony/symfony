@@ -98,11 +98,11 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     final public function serialize($data, $format, array $context = array())
     {
-        if (!$this->supportsEncoding($format)) {
+        if (!$this->supportsEncoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Serialization for the format %s is not supported', $format));
         }
 
-        if ($this->encoder->needsNormalization($format)) {
+        if ($this->encoder->needsNormalization($format, $context)) {
             $data = $this->normalize($data, $format, $context);
         }
 
@@ -114,7 +114,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     final public function deserialize($data, $type, $format, array $context = array())
     {
-        if (!$this->supportsDecoding($format)) {
+        if (!$this->supportsDecoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Deserialization for the format %s is not supported', $format));
         }
 

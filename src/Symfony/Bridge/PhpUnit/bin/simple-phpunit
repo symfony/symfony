@@ -17,7 +17,7 @@ error_reporting(-1);
 
 if (PHP_VERSION_ID >= 70200) {
     // PHPUnit 6 is required for PHP 7.2+
-    $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '6.3';
+    $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '6.5';
 } elseif (PHP_VERSION_ID >= 50600) {
     // PHPUnit 4 does not support PHP 7
     $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '5.7';

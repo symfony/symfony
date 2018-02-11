@@ -214,41 +214,62 @@ class DeprecationErrorHandler
                     return $b['count'] - $a['count'];
                 };
 
-                $groups = array('unsilenced', 'remaining');
-                if (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode) {
-                    $groups[] = 'remaining vendor';
-                }
-                array_push($groups, 'legacy', 'other');
+                $displayDeprecations = function ($deprecations) use ($colorize, $cmp) {
+                    $groups = array('unsilenced', 'remaining');
+                    if (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode) {
+                        $groups[] = 'remaining vendor';
+                    }
+                    array_push($groups, 'legacy', 'other');
 
-                foreach ($groups as $group) {
-                    if ($deprecations[$group.'Count']) {
-                        echo "\n", $colorize(
-                            sprintf('%s deprecation notices (%d)', ucfirst($group), $deprecations[$group.'Count']),
-                            'legacy' !== $group && 'remaining vendor' !== $group
-                        ), "\n";
+                    foreach ($groups as $group) {
+                        if ($deprecations[$group.'Count']) {
+                            echo "\n", $colorize(
+                                sprintf('%s deprecation notices (%d)', ucfirst($group), $deprecations[$group.'Count']),
+                                'legacy' !== $group && 'remaining vendor' !== $group
+                            ), "\n";
 
-                        uasort($deprecations[$group], $cmp);
+                            uasort($deprecations[$group], $cmp);
 
-                        foreach ($deprecations[$group] as $msg => $notices) {
-                            echo "\n  ", $notices['count'], 'x: ', $msg, "\n";
+                            foreach ($deprecations[$group] as $msg => $notices) {
+                                echo "\n  ", $notices['count'], 'x: ', $msg, "\n";
 
-                            arsort($notices);
+                                arsort($notices);
 
-                            foreach ($notices as $method => $count) {
-                                if ('count' !== $method) {
-                                    echo '    ', $count, 'x in ', preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method), "\n";
+                                foreach ($notices as $method => $count) {
+                                    if ('count' !== $method) {
+                                        echo '    ', $count, 'x in ', preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method), "\n";
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                if (!empty($notices)) {
-                    echo "\n";
+                    if (!empty($notices)) {
+                        echo "\n";
+                    }
+                };
+
+                $displayDeprecations($deprecations);
+
+                // store failing status
+                $isFailing = DeprecationErrorHandler::MODE_WEAK !== $mode && $mode < $deprecations['unsilencedCount'] + $deprecations['remainingCount'] + $deprecations['otherCount'];
+
+                // reset deprecations array
+                foreach ($deprecations as $group => $arrayOrInt) {
+                    $deprecations[$group] = is_int($arrayOrInt) ? 0 : array();
                 }
 
-                if (DeprecationErrorHandler::MODE_WEAK !== $mode && $mode < $deprecations['unsilencedCount'] + $deprecations['remainingCount'] + $deprecations['otherCount']) {
-                    exit(1);
-                }
+                register_shutdown_function(function () use (&$deprecations, $isFailing, $displayDeprecations, $mode) {
+                    foreach ($deprecations as $group => $arrayOrInt) {
+                        if (0 < (is_int($arrayOrInt) ? $arrayOrInt : count($arrayOrInt))) {
+                            echo "Shutdown-time deprecations:\n";
+                            break;
+                        }
+                    }
+                    $displayDeprecations($deprecations);
+                    if ($isFailing || DeprecationErrorHandler::MODE_WEAK !== $mode && $mode < $deprecations['unsilencedCount'] + $deprecations['remainingCount'] + $deprecations['otherCount']) {
+                        exit(1);
+                    }
+                });
             });
         }
     }

@@ -62,7 +62,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         not_get_and_head:
 
         // post_and_head
-        if ('/post_and_get' === $pathinfo) {
+        if ('/post_and_head' === $pathinfo) {
             if (!in_array($requestMethod, array('POST', 'HEAD'))) {
                 $allow = array_merge($allow, array('POST', 'HEAD'));
                 goto not_post_and_head;

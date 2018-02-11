@@ -120,6 +120,7 @@ class PhpDumper extends Dumper
             'debug' => true,
             'hot_path_tag' => 'container.hot_path',
             'inline_class_loader_parameter' => 'container.dumper.inline_class_loader',
+            'build_time' => time(),
         ), $options);
 
         $this->namespace = $options['namespace'];
@@ -223,7 +224,7 @@ EOF;
             array_pop($code);
             $code["Container{$hash}/{$options['class']}.php"] = substr_replace($files[$options['class'].'.php'], "<?php\n\nnamespace Container{$hash};\n", 0, 6);
             $namespaceLine = $this->namespace ? "\nnamespace {$this->namespace};\n" : '';
-            $time = time();
+            $time = $options['build_time'];
             $id = hash('crc32', $hash.$time);
 
             $code[$options['class'].'.php'] = <<<EOF

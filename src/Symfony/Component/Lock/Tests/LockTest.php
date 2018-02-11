@@ -12,6 +12,7 @@
 namespace Symfony\Component\Lock\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Lock;
@@ -177,6 +178,35 @@ class LockTest extends TestCase
         $key = new Key(uniqid(__METHOD__, true));
         $store = $this->getMockBuilder(StoreInterface::class)->getMock();
         $lock = new Lock($key, $store, 10);
+
+        $store
+            ->expects($this->once())
+            ->method('delete')
+            ->with($key);
+
+        $store
+            ->expects($this->once())
+            ->method('exists')
+            ->with($key)
+            ->willReturn(true);
+
+        $lock->release();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Lock\Exception\LockReleasingException
+     */
+    public function testReleaseThrowsAndLog()
+    {
+        $key = new Key(uniqid(__METHOD__, true));
+        $store = $this->getMockBuilder(StoreInterface::class)->getMock();
+        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $lock = new Lock($key, $store, 10, true);
+        $lock->setLogger($logger);
+
+        $logger->expects($this->atLeastOnce())
+            ->method('notice')
+            ->with('Failed to release the "{resource}" lock.', array('resource' => $key));
 
         $store
             ->expects($this->once())

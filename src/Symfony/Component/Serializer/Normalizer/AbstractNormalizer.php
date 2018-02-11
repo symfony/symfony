@@ -351,10 +351,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         }
                     } catch (\ReflectionException $e) {
                         throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
-                    } catch(MissingConstructorArgumentsException $e) {
-                        if(!$constructorParameter->getType()->allowsNull())
+                    } catch (MissingConstructorArgumentsException $e) {
+                        if(!$constructorParameter->getType()->allowsNull()) {
                             throw $e;
-
+                        }
                         $parameterData = null;
                     }
 

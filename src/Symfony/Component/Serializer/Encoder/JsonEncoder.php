@@ -96,7 +96,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      */
     public static function getLastErrorMessage()
     {
-        if (function_exists('json_last_error_msg')) {
+        if (\function_exists('json_last_error_msg')) {
             return json_last_error_msg();
         }
 

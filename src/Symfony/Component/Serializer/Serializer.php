@@ -132,7 +132,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             return $data;
         }
 
-        if (is_array($data) || $data instanceof \Traversable) {
+        if (\is_array($data) || $data instanceof \Traversable) {
             $normalized = array();
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);
@@ -141,12 +141,12 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
             return $normalized;
         }
 
-        if (is_object($data)) {
+        if (\is_object($data)) {
             if (!$this->normalizers) {
                 throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
             }
 
-            throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', get_class($data)));
+            throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', \get_class($data)));
         }
 
         throw new UnexpectedValueException(sprintf('An unexpected value could not be normalized: %s', var_export($data, true)));

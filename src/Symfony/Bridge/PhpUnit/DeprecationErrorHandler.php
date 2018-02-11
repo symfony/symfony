@@ -214,13 +214,13 @@ class DeprecationErrorHandler
                     return $b['count'] - $a['count'];
                 };
 
-                $displayDeprecations = function ($deprecations) use ($colorize, $cmp) {
-                    $groups = array('unsilenced', 'remaining');
-                    if (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode) {
+                $groups = array('unsilenced', 'remaining');
+                if (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode) {
                         $groups[] = 'remaining vendor';
-                    }
-                    array_push($groups, 'legacy', 'other');
+                }
+                array_push($groups, 'legacy', 'other');
 
+                $displayDeprecations = function ($deprecations) use ($colorize, $cmp, $groups) {
                     foreach ($groups as $group) {
                         if ($deprecations[$group.'Count']) {
                             echo "\n", $colorize(

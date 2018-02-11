@@ -186,7 +186,7 @@ class ObjectNormalizerTest extends TestCase
     {
         $data = array(
             'id' => 10,
-            'inner' => null
+            'inner' => null,
         );
 
         $normalizer = new ObjectNormalizer();

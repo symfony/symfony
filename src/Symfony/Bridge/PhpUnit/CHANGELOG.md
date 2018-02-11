@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added a `CoverageListener` to enhance the code coverage report
+ * all deprecations but those from tests marked with `@group legacy` are always
+   displayed when not in `weak` mode
 
 3.3.0
 -----

@@ -20,13 +20,11 @@ use PHPUnit\Framework\Warning;
 /**
  * Collects and replays skipped tests.
  *
- * (Version of SymfonyTestsListener for PHPUnit 7+, and PHP 7.1+.)
- *
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final
+ * @internal
  */
-class SymfonyTestsListenerWithReturnTypes implements TestListener
+class SymfonyTestsListenerForV7 implements TestListener
 {
     use TestListenerDefaultImplementation;
 
@@ -34,7 +32,7 @@ class SymfonyTestsListenerWithReturnTypes implements TestListener
 
     public function __construct(array $mockedNamespaces = array())
     {
-        $this->trait = new Legacy\SymfonyTestsListenerTrait($mockedNamespaces);
+        $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
     }
 
     public function globalListenerDisabled()

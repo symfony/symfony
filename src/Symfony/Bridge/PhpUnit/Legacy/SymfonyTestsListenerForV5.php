@@ -18,7 +18,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
  *
  * @internal
  */
-class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
+class SymfonyTestsListenerForV5 extends \PHPUnit_Framework_BaseTestListener
 {
     private $trait;
 
@@ -34,26 +34,26 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 
     public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
     {
-        return $this->trait->startTestSuite($suite);
+        $this->trait->startTestSuite($suite);
     }
 
     public function addSkippedTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
     {
-        return $this->trait->addSkippedTest($test, $e, $time);
+        $this->trait->addSkippedTest($test, $e, $time);
     }
 
     public function startTest(\PHPUnit_Framework_Test $test)
     {
-        return $this->trait->startTest($test);
+        $this->trait->startTest($test);
     }
 
     public function addWarning(\PHPUnit_Framework_Test $test, \PHPUnit_Framework_Warning $e, $time)
     {
-        return $this->trait->addWarning($test, $e, $time);
+        $this->trait->addWarning($test, $e, $time);
     }
 
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
-        return $this->trait->endTest($test, $time);
+        $this->trait->endTest($test, $time);
     }
 }

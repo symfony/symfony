@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by shieldo at 2018-02-02T15:48:41Z
+
+There's also the question of whether having return types in a file that's being parsed by <PHP 7 will cause an error even if that class isn't to be executed in that runtime. Can anyone comment on that? It might be that this is only appropriate to submit to 4.0+ branches.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-02T16:29:11Z
+
+AFAIK, phpunit 7 supports *not* using void, isn't it? If yes, then we should just do the strict minimum to make the bridge work with phpunit 7 *without* using features incompatible with our lower supported PHP version, if possible.
+
+---------------------------------------------------------------------------
+
+by shieldo at 2018-02-02T16:45:19Z
+
+My understanding is that because this class is implementing an interface defined within phpunit/phpunit and that interface defines return types, the return types cannot then be omitted in implementing classes.
+
+I suppose conditionally requiring another file where the class is defined might work better, but that also seems quite kludgy.
+
+---------------------------------------------------------------------------
+
+by shieldo at 2018-02-02T16:47:36Z
+
+Another option might be to use `class_alias` for this rather than just for both of the legacy ones.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-02T17:20:18Z
+
+Note that on v4, the bridge supports PHP 5.5. That's the special exception (same on 3, where PHP 5.3 is the min for the bridge only, this allows running the latest bridge on most supported versions.)
+
+---------------------------------------------------------------------------
+
+by shieldo at 2018-02-02T17:23:16Z
+
+Note taken. I'll probably rework using `class_alias` to progressively enhance, but any other advice/ suggestions welcome.
+
+---------------------------------------------------------------------------
+
+by shieldo at 2018-02-04T16:25:43Z
+
+@Jean85 Was going to rework this PR just now to progressively enhance - i.e. to use `class_alias` for the new class with PHP 5.4+ (if we include traits) syntax in order not to introduce parse errors. Is it OK to rework this PR now you've approved it? It'll be the same classes more or less but in a different order.
+
+---------------------------------------------------------------------------
+
+by shieldo at 2018-02-04T17:37:30Z
+
+@Jean85 I've added another commit to convert this to using `class_alias` in the case of PHPUnit 7/ PHP 7.1, in order to leave the original SymfonyTestsListener class parseable by PHP 5.3 and up. If you'd like me to squash the two commits in this PR, let me know - I didn't want to rewrite the history of what you'd already approved.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2018-02-05T08:24:55Z
+
+@shieldo as you can see, my approval tick is not green, I do not have powers here :smile:
+BTW, contributions are normally squashed automatically afterwards, so you don't have to bother about it.
+
+---------------------------------------------------------------------------
+
+by vivekagarwal1984 at 2018-02-09T06:02:29Z
+
+When is this getting merged?

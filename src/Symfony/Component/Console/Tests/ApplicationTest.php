@@ -550,10 +550,10 @@ OUTPUT
         // Namespace + plural
         try {
             $application->find('foo2:bar');
-            $this->fail('->find() throws a NamespaceNotFoundException if command does not exist, with alternatives');
+            $this->fail('->find() throws a CommandNotFoundException if command does not exist, with alternatives');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Console\Exception\NamespaceNotFoundException', $e, '->find() throws a NamespaceNotFoundException if command does not exist, with alternatives');
-            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws a NamespaceNotFoundException if command does not exist, with alternatives');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
+            $this->assertRegExp('/Did you mean one of these/', $e->getMessage(), '->find() throws a CommandNotFoundException if command does not exist, with alternatives');
             $this->assertRegExp('/foo1/', $e->getMessage());
         }
 
@@ -627,26 +627,27 @@ OUTPUT
 
         try {
             $application->find('Unknown-namespace:Unknown-command');
-            $this->fail('->find() throws a NamespaceNotFoundException if namespace does not exist');
+            $this->fail('->find() throws a CommandNotFoundException if namespace does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Console\Exception\NamespaceNotFoundException', $e, '->find() throws a NamespaceNotFoundException if namespace does not exist');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if namespace does not exist');
             $this->assertSame(array(), $e->getAlternatives());
-            $this->assertEquals('There are no commands defined in the "Unknown-namespace" namespace.', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, without alternatives');
+            $this->assertEquals('There are no commands defined in the "Unknown-namespace" namespace.', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, without alternatives');
         }
 
         try {
             $application->find('foo2:command');
-            $this->fail('->find() throws a NamespaceNotFoundException if namespace does not exist');
+            $this->fail('->find() throws a CommandNotFoundException if namespace does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('Symfony\Component\Console\Exception\NamespaceNotFoundException', $e, '->find() throws a NamespaceNotFoundException if namespace does not exist');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, 'NamespaceNotFoundException extends from CommandNotFoundException');
             $this->assertCount(3, $e->getAlternatives());
             $this->assertContains('foo', $e->getAlternatives());
             $this->assertContains('foo1', $e->getAlternatives());
             $this->assertContains('foo3', $e->getAlternatives());
-            $this->assertRegExp('/There are no commands defined in the "foo2" namespace./', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, with alternative');
-            $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, with alternative : "foo"');
-            $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, with alternative : "foo1"');
-            $this->assertRegExp('/foo3/', $e->getMessage(), '->find() throws a NamespaceNotFoundException if namespace does not exist, with alternative : "foo3"');
+            $this->assertRegExp('/There are no commands defined in the "foo2" namespace./', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative');
+            $this->assertRegExp('/foo/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo"');
+            $this->assertRegExp('/foo1/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo1"');
+            $this->assertRegExp('/foo3/', $e->getMessage(), '->find() throws a CommandNotFoundException if namespace does not exist, with alternative : "foo3"');
         }
     }
 

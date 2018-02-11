@@ -100,7 +100,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     public function setCircularReferenceHandler($circularReferenceHandler)
     {
-        if (!is_callable($circularReferenceHandler)) {
+        if (!\is_callable($circularReferenceHandler)) {
             throw new InvalidArgumentException('The given circular reference handler is not callable.');
         }
 
@@ -121,7 +121,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     public function setCallbacks(array $callbacks)
     {
         foreach ($callbacks as $attribute => $callback) {
-            if (!is_callable($callback)) {
+            if (!\is_callable($callback)) {
                 throw new InvalidArgumentException(sprintf(
                     'The given callback for attribute "%s" is not callable.',
                     $attribute
@@ -220,7 +220,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected function handleCircularReference($object)
     {
         if ($this->circularReferenceHandler) {
-            return call_user_func($this->circularReferenceHandler, $object);
+            return \call_user_func($this->circularReferenceHandler, $object);
         }
 
         throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', get_class($object), $this->circularReferenceLimit));
@@ -259,7 +259,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
         $allowedAttributes = array();
         foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata() as $attributeMetadata) {
-            if (count(array_intersect($attributeMetadata->getGroups(), $context[static::GROUPS]))) {
+            if (array_intersect($attributeMetadata->getGroups(), $context[static::GROUPS])) {
                 $allowedAttributes[] = $attributesAsString ? $attributeMetadata->getName() : $attributeMetadata;
             }
         }
@@ -302,7 +302,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     {
         if (
             isset($context[static::OBJECT_TO_POPULATE]) &&
-            is_object($context[static::OBJECT_TO_POPULATE]) &&
+            \is_object($context[static::OBJECT_TO_POPULATE]) &&
             $context[static::OBJECT_TO_POPULATE] instanceof $class
         ) {
             $object = $context[static::OBJECT_TO_POPULATE];
@@ -320,11 +320,11 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 $paramName = $constructorParameter->name;
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
 
-                $allowed = false === $allowedAttributes || in_array($paramName, $allowedAttributes);
-                $ignored = in_array($paramName, $this->ignoredAttributes);
+                $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes, true);
+                $ignored = \in_array($paramName, $this->ignoredAttributes, true);
                 if (method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                        if (!is_array($data[$paramName])) {
+                        if (!\is_array($data[$paramName])) {
                             throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
                         }
 

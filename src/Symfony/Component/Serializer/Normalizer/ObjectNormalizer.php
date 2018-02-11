@@ -98,14 +98,14 @@ class ObjectNormalizer extends AbstractNormalizer
         }
 
         foreach ($attributes as $attribute) {
-            if (in_array($attribute, $this->ignoredAttributes)) {
+            if (\in_array($attribute, $this->ignoredAttributes, true)) {
                 continue;
             }
 
             $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
             if (isset($this->callbacks[$attribute])) {
-                $attributeValue = call_user_func($this->callbacks[$attribute], $attributeValue);
+                $attributeValue = \call_user_func($this->callbacks[$attribute], $attributeValue);
             }
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
@@ -151,7 +151,7 @@ class ObjectNormalizer extends AbstractNormalizer
             }
 
             $allowed = false === $allowedAttributes || in_array($attribute, $allowedAttributes);
-            $ignored = in_array($attribute, $this->ignoredAttributes);
+            $ignored = \in_array($attribute, $this->ignoredAttributes, true);
 
             if ($allowed && !$ignored) {
                 try {

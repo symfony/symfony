@@ -96,10 +96,10 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     private function getClass($value)
     {
-        if (!is_object($value) && !is_string($value)) {
+        if (!($isObject = \is_object($value)) && !\is_string($value)) {
             return false;
         }
 
-        return ltrim(is_object($value) ? get_class($value) : $value, '\\');
+        return ltrim($isObject ? \get_class($value) : $value, '\\');
     }
 }

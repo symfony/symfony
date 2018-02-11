@@ -58,7 +58,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
         foreach ($reflectionMethods as $method) {
             if ($this->isGetMethod($method)) {
                 $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
-                if (in_array($attributeName, $this->ignoredAttributes)) {
+                if (\in_array($attributeName, $this->ignoredAttributes, true)) {
                     continue;
                 }
 
@@ -68,7 +68,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
 
                 $attributeValue = $method->invoke($object);
                 if (isset($this->callbacks[$attributeName])) {
-                    $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
+                    $attributeValue = \call_user_func($this->callbacks[$attributeName], $attributeValue);
                 }
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
                     if (!$this->serializer instanceof NormalizerInterface) {
@@ -108,13 +108,13 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                 $attribute = $this->nameConverter->denormalize($attribute);
             }
 
-            $allowed = false === $allowedAttributes || in_array($attribute, $allowedAttributes);
-            $ignored = in_array($attribute, $this->ignoredAttributes);
+            $allowed = false === $allowedAttributes || \in_array($attribute, $allowedAttributes, true);
+            $ignored = \in_array($attribute, $this->ignoredAttributes, true);
 
             if ($allowed && !$ignored) {
                 $setter = 'set'.ucfirst($attribute);
 
-                if (in_array($setter, $classMethods) && !$reflectionClass->getMethod($setter)->isStatic()) {
+                if (\in_array($setter, $classMethods, true) && !$reflectionClass->getMethod($setter)->isStatic()) {
                     $object->$setter($value);
                 }
             }

@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Creates the service-locators required by ServiceValueResolver.
@@ -145,6 +146,10 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
 
                         continue;
                     } elseif (!$type || !$autowire) {
+                        continue;
+                    }
+
+                    if (Request::class === $type) {
                         continue;
                     }
 

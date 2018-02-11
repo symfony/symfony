@@ -466,15 +466,15 @@ class ApplicationTest extends TestCase
         $application->setAutoExit(false);
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foos:bar1'), array('decorated' => false));
-        $this->assertSame("
+        $this->assertSame('
                                                           
-  There are no commands defined in the \"foos\" namespace.  
+  There are no commands defined in the "foos" namespace.  
                                                           
   Did you mean this?                                      
       foo                                                 
                                                           
 
-", $tester->getDisplay(true));
+', $tester->getDisplay(true));
     }
 
     public function testCanRunAlternativeCommandName()

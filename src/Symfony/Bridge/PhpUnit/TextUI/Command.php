@@ -15,22 +15,20 @@ use PHPUnit\TextUI\Command as BaseCommand;
 
 if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
     class_alias('Symfony\Bridge\PhpUnit\Legacy\Command', 'Symfony\Bridge\PhpUnit\TextUI\Command');
-
-    return;
-}
-
-/**
- * {@inheritdoc}
- *
- * @internal
- */
-class Command extends BaseCommand
-{
+} else {
     /**
      * {@inheritdoc}
+     *
+     * @internal
      */
-    protected function createRunner()
+    class Command extends BaseCommand
     {
-        return new TestRunner($this->arguments['loader']);
+        /**
+         * {@inheritdoc}
+         */
+        protected function createRunner()
+        {
+            return new TestRunner($this->arguments['loader']);
+        }
     }
 }

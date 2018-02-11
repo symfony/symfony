@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-10T09:53:03Z
+
+> I might invalidate it too early or too late, but that's my choice as a user.
+> On PSR-6: can you elaborate where the PSR-6 breakage comes from?
+
+The breakage comes from the first sentence, which is breaking basic expectations from the consumer pov (the instantiation is not the responsibility of the consumer, so it doesn't know that this pool is behaving specially - and doesn't *expect* it more importantly.)
+
+As noted before, I'd suggest to use a time-less value for non-expirable items.
+Reproducible builds just need this.
+Generating expirable items at build time should never be part of a "reproducible build" anyway (just split them out if you want to warm-up such items - but they cannot be considered part of the build artifact.)
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2018-02-10T11:00:48Z
+
+@nicolas-grekas I don't think I agree that this would be so bad but I like your suggestion more, simply because it is way less code and we can live without adding any extra parameter to the classes.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2018-02-10T11:10:41Z
+
+~~It seems really odd to change public methods by adding parameters whose sole purpose are to make testing easier but provide little (or no?) benefit to consumers (developers) themselves.~~ Looks like you settled on a different implementation.

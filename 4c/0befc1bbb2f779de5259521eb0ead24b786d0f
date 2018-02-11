@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-02T13:09:05Z
+
+Travis failure are not related and seems to be already adressed in another PR.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-02-03T13:41:11Z
+
+What's about injecting a logger with a dedicated channel instead of adding another argument to the Lock constructor?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T10:14:46Z
+
+@jderusse but log channel != log level, isn't it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T10:19:01Z
+
+Hum, actually, shouldn't we just change these "warning" to "notice"? A lock failure is normal situation for a lock system. "notice" better fits the description of the log level IMHO.
+On the other ide, making the log level configurable doesn't make really sense to me, at the semantical level.
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-02-04T10:53:00Z
+
+Yep, it's not the same thing. But I wonder if the purpose of this PR wasn't just to reduce noise. That's why I suggested to use channel and move logs to another stream (this could be configured by the user without modifications on SF).
+
+I'm also fine with reducing log level (I don't remember why I chose warning at first), Is it considered as BC break?
+
+Anyway  I agreed that configuring log level is not the right way to do.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T10:55:23Z
+
+ping @omnilight can you describe your use case? IMHO we should just turn that "warning" into "notice" in 3.4, as bug fix.
+
+---------------------------------------------------------------------------
+
+by omnilight at 2018-02-04T13:18:03Z
+
+Our usecase: we use lock component for preventing console command run when
+other instance is running. This is not a warning at all
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T14:56:09Z
+
+ok, so @Simperfit let's turn "warning" into "notice" on 3.4 and done IMHO
+
+---------------------------------------------------------------------------
+
+by omnilight at 2018-02-05T06:58:41Z
+
+For us it will be ok
+
+4 февр. 2018 г. 17:56 пользователь "Nicolas Grekas" <
+notifications@github.com> написал:
+
+> ok, so @Simperfit <https://github.com/simperfit> let's turn "warning"
+> into "notice" on 3.4 and done IMHO
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/26020#issuecomment-362912459>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADJ0KdpLYmPfNLx3jFLatOQNsobsgxXXks5tRcUegaJpZM4R3IGw>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-05T09:31:50Z
+
+done @nicolas-grekas

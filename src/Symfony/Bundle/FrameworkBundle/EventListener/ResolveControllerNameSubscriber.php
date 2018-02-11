@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Guarantees that the _controller key is parsed into its final format.
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
+ *
+ * @deprecated since version 4.1, will be removed in 5.0.
  */
 class ResolveControllerNameSubscriber implements EventSubscriberInterface
 {

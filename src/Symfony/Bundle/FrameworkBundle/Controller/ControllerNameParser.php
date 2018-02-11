@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * (Bundle\BlogBundle\Controller\PostController::indexAction).
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 4.1, will be removed in 5.0.
  */
 class ControllerNameParser
 {
@@ -41,6 +43,8 @@ class ControllerNameParser
      */
     public function parse($controller)
     {
+        @trigger_error(sprintf('The %s class is deprecated since version 4.1 and will be removed in 5.0.', __CLASS__), E_USER_DEPRECATED);
+
         $parts = explode(':', $controller);
         if (3 !== count($parts) || in_array('', $parts, true)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
@@ -86,6 +90,8 @@ class ControllerNameParser
      */
     public function build($controller)
     {
+        @trigger_error(sprintf('The %s class is deprecated since version 4.1 and will be removed in 5.0.', __CLASS__), E_USER_DEPRECATED);
+
         if (0 === preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)::(.+)Action$#', $controller, $match)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "class::method" string.', $controller));
         }

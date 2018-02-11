@@ -13,6 +13,7 @@ CHANGELOG
  * The `RedirectController` class allows for 307/308 HTTP status codes
  * Deprecated `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead where `serviceOrFqcn`
    is either the service ID or the FQCN of the controller.
+ * Deprecated `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`
 
 4.0.0
 -----

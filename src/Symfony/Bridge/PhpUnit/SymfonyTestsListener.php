@@ -16,10 +16,12 @@ use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Framework\Warning;
 
-if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
-    class_alias('Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener', 'Symfony\Bridge\PhpUnit\SymfonyTestsListener');
 // Using an early return instead of a else does not work when using the PHPUnit phar due to some weird PHP behavior (the class
 // gets defined without executing the code before it and so the definition is not properly conditional)
+if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '6.0.0', '<')) {
+    class_alias('Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener', 'Symfony\Bridge\PhpUnit\SymfonyTestsListener');
+} elseif (version_compare(\PHPUnit\Runner\Version::id(), '7.0.0', '>=')) {
+    class_alias('Symfony\Bridge\PhpUnit\SymfonyTestsListenerWithReturnTypes', 'Symfony\Bridge\PhpUnit\SymfonyTestsListener');
 } else {
     /**
      * Collects and replays skipped tests.

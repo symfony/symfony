@@ -29,7 +29,7 @@ class SymfonyTestsListenerForV6 extends BaseTestListener
 
     public function __construct(array $mockedNamespaces = array())
     {
-        $this->trait = new Legacy\SymfonyTestsListenerTrait($mockedNamespaces);
+        $this->trait = new SymfonyTestsListenerTrait($mockedNamespaces);
     }
 
     public function globalListenerDisabled()

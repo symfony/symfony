@@ -153,5 +153,9 @@
         <service id="twig.runtime_loader" class="Twig\RuntimeLoader\ContainerRuntimeLoader">
             <argument /> <!-- runtime locator -->
         </service>
+
+        <service id="debug.autowiring.twig_autowiring_info_provider" class="Symfony\Bundle\TwigBundle\DependencyInjection\TwigAutowiringInfoProvider">
+            <tag name="debug.autowiring_info_provider" />
+        </service>
     </services>
 </container>

@@ -23,5 +23,13 @@
             <argument type="service" id="debug.argument_resolver.inner" />
             <argument type="service" id="debug.stopwatch" />
         </service>
+
+        <service id="debug.autowiring_info_manager" class="Symfony\Component\DependencyInjection\Debug\AutowiringInfoManager">
+            <argument /> <!-- argument info providers -->
+        </service>
+
+        <service id="debug.autowiring.framework_autowiring_info_provider" class="Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkAutowiringInfoProvider">
+            <tag name="debug.autowiring_info_provider" />
+        </service>
     </services>
 </container>

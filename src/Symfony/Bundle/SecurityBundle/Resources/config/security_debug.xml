@@ -19,5 +19,9 @@
         </service>
 
         <service id="security.firewall" alias="debug.security.firewall" />
+
+        <service id="debug.autowiring.security_autowiring_info_provider" class="Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityAutowiringInfoProvider">
+            <tag name="debug.autowiring_info_provider" />
+        </service>
     </services>
 </container>

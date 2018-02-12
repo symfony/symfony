@@ -1,0 +1,448 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-06T07:59:03Z
+
+In the benchmark code, all the route URLs have the same prefix. I wonder if that influences in any way the results (maybe it unlocks some internal optimizations somehow):
+
+```php
+$routes->add('r'.$i, new Route('/abc'.$i));
+$routes->add('f'.$i, new Route('/abc{foo}/'.$i));
+```
+
+Maybe for the benchmark we could try the worst case possible (a different prefix for each route) and see if the results vary:
+
+```diff
+for ($i = 0; $i < 400; ++$i) {
+-    $routes->add('r'.$i, new Route('/abc'.$i));
+-    $routes->add('f'.$i, new Route('/abc{foo}/'.$i));
++    $prefix = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz'), -3);
++    $routes->add('r'.$i, new Route('/'.$prefix.$i));
++    $routes->add('f'.$i, new Route('/'.$prefix.'{foo}/'.$i));
+}
+
+// ...
+
+while (--$i) {
+-    $router->match('/abcdef/399');
++    $router->match('/'.$prefix.'def/399');
+}
+
+// ...
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-06T08:12:24Z
+
+@javiereguiluz oh yes, please report your findings!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-06T10:23:22Z
+
+PR ready :)
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-02-06T11:26:53Z
+
+@nicolas-grekas it seems this is now too optimized for a common prefix?
+
+Out of interest I benchmarked it on my biggest Symfony 3.4 monolith app with around 540 routes.
+
+```php
+<?php
+
+require_once 'vendor/autoload.php';
+
+$kernel = new AppKernel('prod', false);
+$kernel->boot();
+
+$router = $kernel->getContainer()->get('router');
+$routes = $router->getRouteCollection();
+$router->getContext()->setHost('...');
+$router->getContext()->setMethod('GET');
+
+foreach (range(0, 10000) as $i) {
+    /** @var \Symfony\Component\Routing\Route $route */
+    foreach ($routes as $route) {
+        if (!$route->getCondition() && (!$route->getMethods() || in_array('GET', $route->getMethods()))) {
+            try {
+                $router->match(preg_replace('/\{[^{]+\}/', 'foo', $route->getPath()));
+            } catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException $e) {
+            }
+        }
+    }
+}
+```
+
+This naive script matches 177 out of 541 routes.
+
+Benchmarks done with cleared & warmed up cache.
+
+With Symfony 3.4.4.:
+
+```
+$ time php route_bench.php
+
+real	0m11.288s
+user	0m11.256s
+sys	0m0.024s
+```
+
+Applied your changes for `PhpMatcherDumper` and `PhpGeneratorDumper`:
+
+```
+$ time php route_bench.php
+
+real	0m37.907s
+user	0m37.856s
+sys	0m0.028s
+```
+
+So for me this takes roughly 3.5 times as long now. Do you see something wrong with my benchmark?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-06T13:00:47Z
+
+@dmaicher can you share the dumped router matcher? (PM on Slack if you want)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-06T13:52:43Z
+
+Quickly running a Blackfire bench on both your cases made me notice that the issue is the call to `createRequest()` - which is totally unrelated to the PR itself and would remove 95% of the perf delta you have. This made me realize we should move this call next to expressions, since that's the only place where the request is used. Being done with this, my own bench above now makes our router 3x faster than FastRoute, yay!
+
+Still, after this change, I measure 27ms vs 33ms in your case, so still slower. Now working on fixing that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-06T16:57:40Z
+
+@dmaicher perf should be back on par. Which means in your case, this is not faster for now, so you have a pretty pathological case, thank you ;-) Basically, it has interweaved routes with and without host constraints, and also has a host-bound route that matches any pathinfo. The mix of both makes the hard case.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-06T17:52:21Z
+
+Perhaps now would be a good time to have some technical documentation around this. For instance we have a general rule we preserve input order (which prevents certain optimisations, but for good reasons). It may be the most trivial of documents, but it does prevent the maintainers to correct PR's which might want to optimise for this as well as give people a more general idea of why things are done the way they are done (which might be a broader topic that could benefit the framework).
+
+Overall, this work looks great! While I was pretty proud at the optimisations my contributions brought to the framework, I'm happy to see something even more performant will replace them 🤘
+
+---------------------------------------------------------------------------
+
+by jderusse at 2018-02-06T18:01:32Z
+
+Static route are loaded before dynamic, wouldn't it be a BC break?
+
+Thinking about such case:
+#1: "/foo/{trap}"
+#2: "/foo/bar"
+
+When calling "/foo/bar", before the PR, route 1 will match, but your PR will return 2.
+
+see: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Routing/Tests/Fixtures/dumper/url_matcher1.php#L33-L40
+
+IMO this PR new implementation make more sens, but I'm wondering about such code:
+
+```
+$myOverridePattern = '^foo|baz$'; // or whatever logic to extract PATH from a back office
+
+$collection->add('overrided_route', new Route('/{trap}', ['trap' => $myOverridePattern]));
+$collection->add('default_foo', new Route('/foo'));
+$collection->add('default_bar', new Route('/bar'));
+$collection->add('default_baz', new Route('/baz'));
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-06T19:57:07Z
+
+@jderusse the lines you linked can and thus are reordered. Basically, this is already handled.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-06T19:59:07Z
+
+@nicolas-grekas do you mean the default behaviour is not by order of definition?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-06T20:01:04Z
+
+I mean that static routes are put before dynamic ones *only* if they are exclusive to each other.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-06T20:02:24Z
+
+But that's not the current behaviour. I've dealt with this too in the previous implementation. The input order needed to be respected then, so I can only assume that's still the case.
+
+(btw, I'll be running some tests with the large app setup I used for my optimisations)
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-06T20:50:00Z
+
+@nicolas-grekas I've spotted an issue:
+
+Given this set of routes:
+
+```
+company_service_for_consumers_get_add_product.en                                       GET        ANY          ANY    /en/service/reservation/{funnel}/products/
+company_service_for_consumers_get_add_product.nl                                       GET        ANY          ANY    /nl/swimming/reserveren/{funnel}/producten/
+company_service_for_consumers_post_add_product.en                                      POST       ANY          ANY    /en/service/reservation/{funnel}/products/
+company_service_for_consumers_post_add_product.nl                                      POST       ANY          ANY    /nl/swimming/reserveren/{funnel}/producten/
+```
+
+Your current implementation generates the following matcher: https://gist.github.com/frankdejonge/1bae274fd09eefbfb5c49c6143ab96ca
+
+When a POST request is sent to /en/service/reservation/a-value/products/ a `MethodNotAllowedException` exception is thrown, which is not correct.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-07T00:01:08Z
+
+@dmaicher good news, grouping per hosts in the regexp fills the gap, this is now faster. This also encourages to group per-common prefix in the regexp btw, so I'll add this to the list.
+
+@frankdejonge this means I may reuse your static prefix grouping logic to generate the big regexp Cool!
+
+> The input order needed to be respected then, so I can only assume that's still the case.
+
+not sure to see what is not covered, I'd be happy to add a test case if you have one.
+
+> Your current implementation generates the following matcher
+
+that's strange, the generated matcher doesn't have 'POST' anywhere, how is that possible? i'll check tomorrow.
+
+Thank you all for your help today, we're going to achieve something nice together :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-07T09:01:25Z
+
+@frankdejonge I cannot reproduce your issue with the following:
+```php
+$routes = new RouteCollection();
+$routes->add('company_service_for_consumers_get_add_product.en', (new Route('/en/service/reservation/{funnel}/products/'))->setMethods('GET'));
+$routes->add('company_service_for_consumers_get_add_product.nl', (new Route('/nl/swimming/reserveren/{funnel}/producten/'))->setMethods('GET'));
+$routes->add('company_service_for_consumers_post_add_product.en', (new Route('/en/service/reservation/{funnel}/products/'))->setMethods('POST'));
+$routes->add('company_service_for_consumers_post_add_product.nl', (new Route('/nl/swimming/reserveren/{funnel}/producten/'))->setMethods('POST'));
+$dumper = new Matcher\Dumper\PhpMatcherDumper($routes);
+$dump = $dumper->dump();
+```
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-07T11:15:04Z
+
+@nicolas-grekas I did another hard checkout of your branch (using git reset --hard nicolas router-one-rx) after a fetch and now I get everything working. I corrected some errors in my fixtures and ran all the benchmarks, it looks really really good. I've put my test set and the scripts to build and run the benchmarks here: https://gist.github.com/frankdejonge/e96f95a8fe1fb99ea79a3fc5cb5d7d05#file-index-md
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-07T21:26:09Z
+
+Progress report for today: I recovered @frankdejonge's static-prefix grouping logic to compute an optimized regexp (see fixtures). The host is now considered to move more static routes in the static switch. Static single-route "case" are moved to "default" by adding requirements to $routes.
+See main description for remaining todo.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-08T07:55:15Z
+
+@nicolas-grekas I think that made it even faster. My results now show this:
+
+```
+$ php benchmark/run.php original
+Checks 212424 Avg 0.042978421134769 min 0.034546852111816 max 0.061064004898071
+
+$ php benchmark/run.php original
+Checks 212424 Avg 0.045320738036678 min 0.034888982772827 max 0.10526013374329
+
+$ php benchmark/run.php original
+Checks 212424 Avg 0.044620820373859 min 0.034824132919312 max 0.063091039657593
+
+$ php benchmark/run.php original
+Checks 212424 Avg 0.042424658559403 min 0.033901214599609 max 0.069259166717529
+
+$ php benchmark/run.php optimized
+Checks 212424 Avg 0.0031020135249732 min 0.0020041465759277 max 0.0075650215148926
+
+$ php benchmark/run.php optimized
+Checks 212424 Avg 0.0031365695989357 min 0.0019848346710205 max 0.0075139999389648
+
+$ php benchmark/run.php optimized
+Checks 212424 Avg 0.0030974065357784 min 0.0020120143890381 max 0.0078351497650146
+
+$ php benchmark/run.php optimized
+Checks 212424 Avg 0.0029748020307073 min 0.0019619464874268 max 0.0057780742645264
+
+$ php benchmark/run.php optimized
+Checks 212424 Avg 0.0032461088783336 min 0.0020008087158203 max 0.005558967590332
+
+$ php benchmark/run.php optimized
+Checks 212424 Avg 0.0029748020307073 min 0.0019619464874268 max 0.0057780742645264
+```
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-02-08T08:05:21Z
+
+@nicolas-grekas same with my simple bench from above 😄
+
+Now at `5.5s` with your optimizations vs `11.5s` with default 3.4.4 🎉
+
+Only one small PHP Notice when dumping the matcher:
+
+```
+PHP Notice:  Uninitialized string offset: -1 in /var/www/x/symfony/vendor/symfony/symfony/src/Symfony/Component/Routing/Matcher/Dumper/PhpMatcherDumper.php on line 502
+```
+
+I'm available on Slack if you need me to debug it somehow
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-09T16:41:20Z
+
+I've renamed this to "Match 77.7x faster" instead of "Match 5x faster" because this is what the last optimization I just pushed provides on my canonical test case. This makes our router 15x faster than FastRoute on the same case.
+
+That's insane :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-09T16:43:58Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-09T16:50:48Z
+
+@nicolas-grekas here are the new test runs from me based on your latest implementation.
+
+```
+php benchmark/run.php optimized
+Checks 212424 Avg 0.0027442417054806 min 0.0020239353179932 max 0.005687952041626
+
+$ php benchmark/run.php optimized
+Checks 212424 Avg 0.002912091196708 min 0.0020279884338379 max 0.0093469619750977
+
+$ php benchmark/run.php optimized
+Checks 212424 Avg 0.0028626221530842 min 0.0020110607147217 max 0.0058000087738037
+
+$ php benchmark/run.php optimized
+Checks 212424 Avg 0.0027576623097906 min 0.0019600391387939 max 0.0063772201538086
+
+$ php benchmark/run.php original
+Checks 212424 Avg 0.043092505549485 min 0.035098791122437 max 0.082517862319946
+
+$ php benchmark/run.php original
+Checks 212424 Avg 0.043235119783653 min 0.03510308265686 max 0.066028833389282
+
+$ php benchmark/run.php original
+Checks 212424 Avg 0.04283702542197 min 0.034250974655151 max 0.068773984909058
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-10T04:10:46Z
+
+@nicolas-grekas This looks genius. Well done. What I've seen is clever and I haven't spotted any flaws. But the code could use more comments and explanations because it's really hard to understand, esp. the new compile dynamic routes part.
+
+---------------------------------------------------------------------------
+
+by sebastianblum at 2018-02-10T14:16:51Z
+
+Hello @nicolas-grekas
+
+We have in general a problem with the current symfony version that the order of static and dynamic routes is important.
+example:
+- /prefix/add-to-card
+- /prefix/{param1}-{param2}-{param3}
+
+The first static route must be defined before the second dynamic route. But in our case, the 2 routes come from different controller and the first route has a controller that start with a greater letter.
+
+At the moment we use the workaround and load some controller individual before others in the routing.yaml.
+
+I know the backward compatibility promise but I would say that the feature to execute static routes first will have great advantage for many users.
+
+Your changes look very good, thank for this pr
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-10T14:23:26Z
+
+@sebastianblum I've experienced your case before too. The downside of matching absolutes first (and static prefix first even) is that you loose the cause and effect relation more easily. It's also so ingrained with Symfony's BC legacy it could be a community upgrade splitter unlike anything else. Pretty much anything that shares URL definitions through bundles could potentially be affected. It would warrant a new major version. On the other side, as you said there are multiple ways to mitigate this inconvenience. If it were up to me I'd know what side of this equation I'd put myself on.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-10T14:30:53Z
+
+@sebastianblum this won't be changed by this PR, which keeps the in-order matching logic (what you read about this in this PR applies only when there is no such ambiguity.) This is off-topic, but here might be your solution: #26132
+
+---------------------------------------------------------------------------
+
+by sebastianblum at 2018-02-10T14:45:19Z
+
+thank you and really great work nicolas.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-10T23:36:51Z
+
+Last optim: hosts now are also grouped+reordered together, based on their static suffix.
+
+---------------------------------------------------------------------------
+
+by jean-pasqualini at 2018-02-11T05:30:33Z
+
+@nicolas-grekas what about an application with 200 dynamic routes ?  I will probably test your pr on our application to make my own opinion.
+
+@nicolas-grekas In the article he talks about the fact that having everything on a regex is effective on a small number of routes but that on a large number of routes it is better to group the regex in packs of 10. Is this an approach that you have tried ? I do not find that in the implementation that's why I ask
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-11T09:21:32Z
+
+@jean-pasqualini My canonical test as 400 dynamic routes (see main description), and I have another one with 540 static + non-static routes from a real app. Which means 200 dynamic routes will be fine :) About chunking, this uses PCRE named patterns, which are faster and don't need it.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2018-02-12T10:22:14Z
+
+@nicolas-grekas awesome job 🎉
+
+For my huge monolith app I extended my simple test script a bit so it matches routes for all available hosts: https://gist.github.com/dmaicher/61f2e388ac0e65cc945dbb6e678e2ef7
+
+Here the new numbers:
+
+Stock symfony 3.4.4: `0m22.874s`
+Your optimizations: `0m14.812s`
+
+The total number of matched routes is identical 👍
+
+Edit: but I guess you used my route collection already for some benchmarks yourself 😄
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-12T18:56:02Z
+
+PR ready for a last round of review, all green on my side.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-12T21:39:55Z
+
+@nicolas-grekas I think the trailing slash logic is way to complicated now and makes it really hard to maintain. I think it would be much easier to do something similar as the RedirectableUrlMatcher.
+So it first matches with the original uri path. And only if it does not find anything then trigger a new internal match with the changed path using the same generated match method. Then we don't need to keep track of all the supportsRedirections and hashTrailingSlash logic and changing the regex based on this. And since it happens only when it does not match the original path, it has no real-world performance inpact as well. But I think it makes the code much more readable.
+
+This would also allow to do the redirect the other way round very easily which has been asked for several times: GET /foo/ to redirect to GET /foo when /foo/ does not exist.
+This is currently really hard to implement due to all the string manipulation magic and implementation details.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-12T22:07:18Z
+
+@Tobion why not. For another PR if you don't mind?

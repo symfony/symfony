@@ -44,18 +44,22 @@
                             </dl>
                         {%- endif %}
 
-                        {% if request_collector and request_collector.forward|default(false) and request_collector.forward.controller.class is defined -%}
-                            {%- set forward = request_collector.forward -%}
-                            {%- set controller = forward.controller -%}
+                        {% if request_collector and request_collector.forwardtoken -%}
+                            {% set forward_profile = profile.childByToken(request_collector.forwardtoken) %}
+                            {% set controller = forward_profile ? forward_profile.collector('request').controller : 'n/a' %}
                             <dl class="metadata">
                                 <dt>Forwarded to</dt>
                                 <dd>
-                                    {% set link = controller.file|file_link(controller.line) -%}
+                                    {% set link = controller.file is defined ? controller.file|file_link(controller.line) : null -%}
                                     {%- if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif -%}
-                                        {{- controller.class|abbr_class|striptags -}}
-                                        {{- controller.method ? ' :: ' ~ controller.method }}
+                                        {% if controller.class is defined %}
+                                            {{- controller.class|abbr_class|striptags -}}
+                                            {{- controller.method ? ' :: ' ~ controller.method -}}
+                                        {% else %}
+                                            {{- controller -}}
+                                        {% endif %}
                                     {%- if link %}</a>{% endif %}
-                                    (<a href="{{ path('_profiler', { token: forward.token }) }}">{{ forward.token }}</a>)
+                                    (<a href="{{ path('_profiler', { token: request_collector.forwardtoken }) }}">{{ request_collector.forwardtoken }}</a>)
                                 </dd>
                             </dl>
                         {%- endif %}

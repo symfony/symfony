@@ -24,7 +24,6 @@ class SubRequestServiceResolutionController implements ContainerAwareInterface
     public function indexAction()
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
-        $path['_forwarded'] = $request->attributes;
         $path['_controller'] = 'TestBundle:SubRequestServiceResolution:fragment';
         $subRequest = $request->duplicate(array(), null, $path);
 

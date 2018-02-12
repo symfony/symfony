@@ -62,7 +62,7 @@ class PhpExecutableFinder
             }
         }
 
-        if (is_executable($php = PHP_BINDIR.'/php'.('\\' === DIRECTORY_SEPARATOR ? '.exe' : ''))) {
+        if (is_executable($php = PHP_BINDIR.('\\' === DIRECTORY_SEPARATOR ? '\\php.exe' : '/php'))) {
             return $php;
         }
 

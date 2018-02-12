@@ -44,23 +44,25 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         elseif (0 === strpos($pathinfo, '/bar')) {
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#sD', $pathinfo, $matches)) {
+                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'bar')), array ());
                 if ('GET' !== $canonicalMethod) {
                     $allow[] = 'GET';
                     goto not_bar;
                 }
 
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar')), array ());
+                return $ret;
             }
             not_bar:
 
             // barhead
             if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]++)$#sD', $pathinfo, $matches)) {
+                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'barhead')), array ());
                 if ('GET' !== $canonicalMethod) {
                     $allow[] = 'GET';
                     goto not_barhead;
                 }
 
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'barhead')), array ());
+                return $ret;
             }
             not_barhead:
 
@@ -92,23 +94,25 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
             // baz5
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#sD', $pathinfo, $matches)) {
+                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz5')), array ());
                 if ('POST' !== $canonicalMethod) {
                     $allow[] = 'POST';
                     goto not_baz5;
                 }
 
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz5')), array ());
+                return $ret;
             }
             not_baz5:
 
             // baz.baz6
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#sD', $pathinfo, $matches)) {
+                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz.baz6')), array ());
                 if ('PUT' !== $canonicalMethod) {
                     $allow[] = 'PUT';
                     goto not_bazbaz6;
                 }
 
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz.baz6')), array ());
+                return $ret;
             }
             not_bazbaz6:
 

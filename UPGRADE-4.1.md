@@ -16,6 +16,7 @@ FrameworkBundle
 ---------------
 
  * A `RouterInterface` that does not implement the `WarmableInterface` is deprecated and will not be supported in Symfony 5.0.
+ * The `RequestDataCollector` class has been deprecated and will be removed in Symfony 5.0. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
 
 HttpFoundation
 --------------

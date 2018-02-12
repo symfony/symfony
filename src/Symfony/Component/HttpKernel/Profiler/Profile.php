@@ -216,6 +216,17 @@ class Profile
         $child->setParent($this);
     }
 
+    public function getChildByToken(string $token): ?self
+    {
+        foreach ($this->children as $child) {
+            if ($token === $child->getToken()) {
+                return $child;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Gets a Collector by name.
      *

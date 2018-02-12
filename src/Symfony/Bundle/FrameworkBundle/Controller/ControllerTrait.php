@@ -83,7 +83,6 @@ trait ControllerTrait
     protected function forward(string $controller, array $path = array(), array $query = array()): Response
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
-        $path['_forwarded'] = $request->attributes;
         $path['_controller'] = $controller;
         $subRequest = $request->duplicate($query, null, $path);
 

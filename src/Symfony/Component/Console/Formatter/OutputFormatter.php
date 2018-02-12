@@ -141,7 +141,7 @@ class OutputFormatter implements OutputFormatterInterface
             $pos = $match[1];
             $text = $match[0];
 
-            if (0 != $pos && '\\' == mb_substr($message, $pos - 1, 1, 'ASCII')) {
+            if (0 != $pos && '\\' == $message[$pos - 1]) {
                 continue;
             }
 
@@ -150,7 +150,7 @@ class OutputFormatter implements OutputFormatterInterface
             $offset = $pos + strlen($text);
 
             // opening tag?
-            if ($open = '/' != mb_substr($text, 1, 1, 'ASCII')) {
+            if ($open = '/' != $text[1]) {
                 $tag = $matches[1][$i][0];
             } else {
                 $tag = isset($matches[3][$i][0]) ? $matches[3][$i][0] : '';
@@ -170,7 +170,7 @@ class OutputFormatter implements OutputFormatterInterface
 
         $output .= $this->applyCurrentStyle(mb_substr($message, $offset, null, 'ASCII'));
 
-        if (false !== mb_strpos($output, "\0", 0, 'ASCII')) {
+        if (false !== strpos($output, "\0")) {
             return strtr($output, array("\0" => '\\', '\\<' => '<'));
         }
 

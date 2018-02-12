@@ -19,6 +19,14 @@ use Symfony\Component\Routing\RequestContext;
 
 class DumpedRedirectableUrlMatcherTest extends RedirectableUrlMatcherTest
 {
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\MethodNotAllowedException
+     */
+    public function testRedirectWhenNoSlashForNonSafeMethod()
+    {
+        parent::testRedirectWhenNoSlashForNonSafeMethod();
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         static $i = 0;

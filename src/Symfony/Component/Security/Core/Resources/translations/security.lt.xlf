@@ -8,7 +8,7 @@
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
-                <target>Nepavyko rasti autentifikacijos duomneų.</target>
+                <target>Nepavyko rasti autentifikacijos duomenų.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>

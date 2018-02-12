@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by sroze at 2018-02-09T09:25:21Z
+
+👍 but... that's a BC break.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-09T09:41:47Z
+
+A 301/302 in response of a POST to add a trailing slash doesn't work already. It's just silent now, but still badly broken.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-09T17:21:31Z
+
+This now fixes the same issue with scheme-based redirections.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-11T01:17:25Z
+
+For this there is 307 HTTP status code
+
+> This status code is similar to 302 (Found), except that it
+      does not allow changing the request method from POST to GET.
+https://tools.ietf.org/html/rfc7231#section-6.4.7
+
+I'm ok to change it to 405 as bug fix but in master it should be changed to 307 IMO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-12T16:46:30Z
+
+@Tobion comments addressed.

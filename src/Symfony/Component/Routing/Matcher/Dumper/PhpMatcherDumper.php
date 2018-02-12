@@ -327,7 +327,7 @@ EOF;
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$context->getScheme()])) {
-                if (!in_array(\$this->context->getMethod(), array('HEAD', 'GET'))) {
+                if ('GET' !== \$canonicalMethod) {
                     \$allow[] = 'GET';
                     goto $gotoname;
                 }

@@ -347,7 +347,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $ret = array('_route' => 'secure');
             $requiredSchemes = array (  'https' => 0,);
             if (!isset($requiredSchemes[$context->getScheme()])) {
-                if (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                if ('GET' !== $canonicalMethod) {
                     $allow[] = 'GET';
                     goto not_secure;
                 }
@@ -364,7 +364,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $ret = array('_route' => 'nonsecure');
             $requiredSchemes = array (  'http' => 0,);
             if (!isset($requiredSchemes[$context->getScheme()])) {
-                if (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                if ('GET' !== $canonicalMethod) {
                     $allow[] = 'GET';
                     goto not_nonsecure;
                 }

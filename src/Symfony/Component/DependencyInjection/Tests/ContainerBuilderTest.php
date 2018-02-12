@@ -159,7 +159,7 @@ class ContainerBuilderTest extends TestCase
         $builder = new ContainerBuilder();
         $builder->register('bar', 'stdClass');
 
-        $this->assertTrue($builder->get('bar') === $builder->get('bar'), '->get() always returns the same instance if the service is shared');
+        $this->assertSame($builder->get('bar'), $builder->get('bar'), '->get() always returns the same instance if the service is shared');
     }
 
     public function testGetCreatesServiceBasedOnDefinition()
@@ -335,7 +335,7 @@ class ContainerBuilderTest extends TestCase
         $passes = $builder->getCompiler()->getPassConfig()->getPasses();
         $this->assertCount(count($passes) - 2, $defaultPasses);
         // Pass 1 is executed later
-        $this->assertTrue(array_search($pass1, $passes, true) > array_search($pass2, $passes, true));
+        $this->assertGreaterThan(array_search($pass2, $passes, true), array_search($pass1, $passes, true));
     }
 
     public function testCreateService()
@@ -358,7 +358,7 @@ class ContainerBuilderTest extends TestCase
         $foo1 = $builder->get('foo1');
 
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
-        $this->assertSame('Bar\FooClass', get_class($foo1));
+        $this->assertInstanceOf('Bar\FooClass', $foo1);
     }
 
     public function testCreateServiceClass()

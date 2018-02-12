@@ -165,7 +165,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertArrayHasKey('another_alias_for_foo', $aliases);
         $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
         $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
-        $this->assertTrue(isset($aliases['another_third_alias_for_foo']));
+        $this->assertArrayHasKey('another_third_alias_for_foo', $aliases);
         $this->assertEquals('foo', (string) $aliases['another_third_alias_for_foo']);
         $this->assertTrue($aliases['another_third_alias_for_foo']->isPublic());
 
@@ -394,8 +394,8 @@ class YamlFileLoaderTest extends TestCase
         $resources = $container->getResources();
 
         $fixturesDir = dirname(__DIR__).DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR;
-        $this->assertTrue(false !== array_search(new FileResource($fixturesDir.'yaml'.DIRECTORY_SEPARATOR.'services_prototype.yml'), $resources));
-        $this->assertTrue(false !== array_search(new GlobResource($fixturesDir.'Prototype', '', true), $resources));
+        $this->assertNotFalse(array_search(new FileResource($fixturesDir.'yaml'.DIRECTORY_SEPARATOR.'services_prototype.yml'), $resources));
+        $this->assertNotFalse(array_search(new GlobResource($fixturesDir.'Prototype', '', true), $resources));
         $resources = array_map('strval', $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo', $resources);
         $this->assertContains('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar', $resources);

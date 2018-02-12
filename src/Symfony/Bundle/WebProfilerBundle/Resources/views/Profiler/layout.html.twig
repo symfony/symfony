@@ -44,7 +44,7 @@
                             </dl>
                         {%- endif %}
 
-                        {% if request_collector and request_collector.forwardtoken|default(null) -%}
+                        {% if request_collector and request_collector.forwardtoken -%}
                             {% set forward_profile = profile.childByToken(request_collector.forwardtoken) %}
                             {% set controller = forward_profile ? forward_profile.collector('request').controller : 'n/a' %}
                             <dl class="metadata">

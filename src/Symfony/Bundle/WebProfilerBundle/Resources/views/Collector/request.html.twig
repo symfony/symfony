@@ -12,7 +12,7 @@
         {% endset %}
     {% endif %}
 
-    {% if collector.forwardtoken|default(null) %}
+    {% if collector.forwardtoken %}
         {% set forward_profile = profile.childByToken(collector.forwardtoken) %}
         {% set forward_handler %}
             {{ helper.set_handler(forward_profile ? forward_profile.collector('request').controller : 'n/a') }}
@@ -25,7 +25,7 @@
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
         {% if collector.route %}
             {% if collector.redirect %}{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
-            {% if collector.forwardtoken|default(null) %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
+            {% if collector.forwardtoken %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
             <span class="sf-toolbar-label">{{ 'GET' != collector.method ? collector.method }} @</span>
             <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
         {% endif %}

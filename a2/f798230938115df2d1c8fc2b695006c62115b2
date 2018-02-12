@@ -1,0 +1,235 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2017-04-15T16:31:15Z
+
+@ro0NL the `forward` icon doesn't appear anymore, can you check why?
+![selection_084](https://cloud.githubusercontent.com/assets/1753742/25065130/1da8cd38-2201-11e7-83ad-afbff44472c0.png)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-15T16:47:34Z
+
+Not sure.. what code are you referring to? Assuming symfony-demo.. i installed the latest version but i dont get a forward; or im missing it somewhere else in the app.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2017-04-15T17:27:21Z
+
+I see now what's happen and but I'm not sure if it's expected or not.
+Before, the `forward` icon is displayed if at least one request is forwarded and it doesn't matter if main request is forwarded or not But Now it appear only if the main request is forwarded.
+Try with this:
+```php
+public function indexAction()
+{
+    $bar1 = $this->forward(__CLASS__.'::barAction');
+    $bar2 = $this->forward(__CLASS__.'::bar2Action');
+    return $this->render('index.html.twig');
+}
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-04-15T17:34:08Z
+
+Imo. the arrow / "Forwarded to" implies the request was as-is forwarded to a sub-request, this is why i think the current behavior is misleading. In your example `indexAction` returns it's own response, it's not forwarded.
+
+Note the sub-requests are still available in the request panel, nothing changed with that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-07-12T12:13:18Z
+
+rebase needed
+ping @javiereguiluz also since this is "profiler panel" related
+
+---------------------------------------------------------------------------
+
+by stof at 2017-07-12T12:17:57Z
+
+this should be done against 3.4, not master, when rebasing (no need to reopen a different PR, as Github allows changing the branch)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-07-31T14:30:00Z
+
+I don't get the use case, isn't "forward" meant to return "the" response?
+
+This looks really weird to handle this. The forward feature should not be confused with making standard sub requests IMO (with were already profiled before https://github.com/symfony/symfony/pull/17589 btw).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-06T13:25:24Z
+
+Well.. imo. whats weird is the profiler assumes a forward request to the last sub request, whereas we may forward to the first sub request.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-08-06T13:55:22Z
+
+>the profiler assumes a forward request to the last sub request
+
+This is not exact. The last forwarded request is considered since "forwarded" actions could be chained.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-06T15:42:29Z
+
+Yet we imply a forward to bar2Action whereas you agree it should be bar1Action right?
+
+>  The last forwarded request is considered since "forwarded" actions could be chained.
+
+You mean if `A > B > C` the profiler currently shows C for A? Indeed this PR would show B for A (and C for B).
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-08-06T17:17:50Z
+
+Sorry for the short answer above, let me try to explain myself better.
+
+Your case:
+```php
+public function indexAction(Request $request)
+{
+    $bar1 = $this->forward(__CLASS__.'::barAction');
+    $bar2 = $this->forward(__CLASS__.'::bar2Action');
+
+    return $bar1;
+}
+```
+is not a valid use case for forwarding IMHO, and such cannot be profiled correctly.
+
+What I assumed when working on #17589 is:
+```php
+class FooController
+{
+    public function indexAction(Request $request)
+    {
+        return $this->forward('BarController::barAction');
+    }
+}
+
+class BarController
+{
+    public function barAction(Request $request)
+    {
+        return $this->forward('BazController::bazAction');
+    }
+}
+```
+Would show the `bazAction` profile in the toolbar as forwarded from `barAction` (with a link to its profile) and this las one as forwarded from `indexAction`.
+
+So `A > B > C`, would show the C profile in the toolbar with a link to B that links A.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-08-06T17:41:59Z
+
+> is not a valid use case for forwarding IMHO, and such cannot be profiled correctly.
+
+Agree it's a bit edgy, but this PR does fix it...
+
+> So A > B > C, would show the C profile in the toolbar with a link to B that links A.
+
+Tested it and currently A shows B, and B shows C. So no change there.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-02T07:42:23Z
+
+@HeahDude good catch, ive removed the `_forwarded` attribute.
+
+@javiereguiluz could you have a look? Is the change clear for you?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-12T15:14:34Z
+
+@ro0NL the example you showed in the description is very very edgy to me. If this PR solves it, that's great ... but I wouldn't mind if that remains unsolved.
+
+My concern is this comment from @HeahDude:
+
+> Doesn't this make any sub request a forwarded one?
+
+If that's true ... isn't it wrong? We've never considered sub-request as forwarded requests, right?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-12T15:37:22Z
+
+> but I wouldn't mind if that remains unsolved.
+
+Same, but experienced this issue (once now :)) when _additionally_ doing a sub request (just to trigger some logging, ignoring it's response). Yet the forwarded response was requested before that, the one we return. Might be solved by changing it's order on our side, sure :) (well.. not sure really, but i could try).
+
+However, the case, made me think of different approach, this PR.
+
+> If that's true ... isn't it wrong?
+
+Not really, every sub request simply gets a `X-Debug-Token`. Nothing new here.
+
+Thus when we return a sub request we basically return a response _which already has_ a `X-Debug-Token` (otherwise this wont happen, as the profiler assigns it).
+
+Now the profiler is updated to check if it has X-Debug-Token beforehand, if so, that becomes X-Debug-Previous-Token and again assigns a new X-Debug-Token. So only in this case we have 2 debug tokens.
+
+Consequently if we have a `X-Debug-Previous-Token` we know we returned a forwarded response.
+
+That's robust to me.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-12T18:01:37Z
+
+@javiereguiluz other fix is it also works if you dont use forward(), ie dont extend from base controller. Thats nice actually.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-26T13:07:28Z
+
+@ro0NL rebase needed again sorry
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-08T16:03:12Z
+
+Moving to 4.1. Rebase on master might be needed, where PHP 7.1 features can be used btw.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-07T06:49:12Z
+
+LGTM. Needs to be reworked to take into account that this will be merged into 4.1 (mostly deprecation messages).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-09T13:54:49Z
+
+@fabpot good to go. However something else is bugging me:
+
+![image](https://user-images.githubusercontent.com/1047696/36030648-6215a890-0da8-11e8-8500-6803026c3de1.png)
+
+(on master in case of a forward request)
+
+The token differs, the link goes to the actual subrequest made (which is the right one here actually :D)
+
+![image](https://user-images.githubusercontent.com/1047696/36030715-94c2d344-0da8-11e8-8b11-f4d6e6de5b96.png)
+
+`f561d2` should be `5a8b10` here (which is what this PR solves)
+
+So i dont understand why `x-debug-token-link` resolves different currently :thinking: moreover shouldnt it just be the current token instead?
+
+Also not sure if you want me to apply fabbot.io patch..
+
+edit: `X-Debug-Token-Link` is only set wrong in the profiler. THe actual HTTP header value is indeed linking to the current token.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-12T13:34:33Z
+
+@ro0NL The WebProfiler uses new methods on the data collector class, so it looks like some Composer constraints need to be adjusted so that the web profiler does not allow using an older version of the HTTP Kernel component.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-12T13:54:28Z
+
+Correct, i confused deps with framework bundle. Means safety checks in templates (`collector.forwardtoken|default(null)`) are actually not needed :tada:
+
+Now updated. Ill have a look at wrong `X-Debug-Token-Link` in profiler soonish, that's unrelated.

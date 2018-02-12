@@ -27,35 +27,16 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             $canonicalMethod = 'GET';
         }
 
-        switch ($pathinfo) {
-            case '/with-condition':
-                // with-condition
-                if (($context->getMethod() == "GET")) {
-                    return array('_route' => 'with-condition');
-                }
-                break;
-            default:
-                $routes = array(
-                    '/rootprefix/test' => array(array('_route' => 'static'), null, null, null),
-                );
-
-                if (!isset($routes[$pathinfo])) {
-                    break;
-                }
-                list($ret, $requiredHost, $requiredMethods, $requiredSchemes) = $routes[$pathinfo];
-
-                if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
-                    $allow += $requiredMethods;
-                    break;
-                }
-
-                return $ret;
-        }
-
         $matchedPathinfo = $pathinfo;
         $regexList = array(
             0 => '{^(?'
-                    .'|/rootprefix/([^/]++)(*:27)'
+                    .'|/(a)(*:11)'
+                .')$}sD',
+            11 => '{^(?'
+                    .'|/(.)(*:26)'
+                .')$}sDu',
+            26 => '{^(?'
+                    .'|/(.)(*:41)'
                 .')$}sD',
         );
 
@@ -64,7 +45,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 switch ($m = (int) $matches['MARK']) {
                     default:
                         $routes = array(
-                            27 => array(array('_route' => 'dynamic'), array('var'), null, null),
+                            11 => array(array('_route' => 'a'), array('a'), null, null),
+                            26 => array(array('_route' => 'b'), array('a'), null, null),
+                            41 => array(array('_route' => 'c'), array('a'), null, null),
                         );
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
@@ -83,7 +66,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         return $ret;
                 }
 
-                if (27 === $m) {
+                if (41 === $m) {
                     break;
                 }
                 $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));

@@ -181,7 +181,7 @@ class PhpMatcherDumperTest extends TestCase
         // prefixes
         $collection1 = new RouteCollection();
         $collection1->add('overridden', new Route('/overridden1'));
-        $collection1->add('foo1', new Route('/{foo}'));
+        $collection1->add('foo1', (new Route('/{foo}'))->setMethods('PUT'));
         $collection1->add('bar1', new Route('/{bar}'));
         $collection1->addPrefix('/b\'b');
         $collection2 = new RouteCollection();
@@ -399,6 +399,7 @@ class PhpMatcherDumperTest extends TestCase
         $groupOptimisedCollection->add('slashed_b', new Route('/slashed/group/b/'));
         $groupOptimisedCollection->add('slashed_c', new Route('/slashed/group/c/'));
 
+        /* test case 6 & 7 */
         $trailingSlashCollection = new RouteCollection();
         $trailingSlashCollection->add('simple_trailing_slash_no_methods', new Route('/trailing/simple/no-methods/', array(), array(), array(), '', array(), array()));
         $trailingSlashCollection->add('simple_trailing_slash_GET_method', new Route('/trailing/simple/get-method/', array(), array(), array(), '', array(), array('GET')));
@@ -418,6 +419,18 @@ class PhpMatcherDumperTest extends TestCase
         $trailingSlashCollection->add('regex_not_trailing_slash_HEAD_method', new Route('/not-trailing/regex/head-method/{param}', array(), array(), array(), '', array(), array('HEAD')));
         $trailingSlashCollection->add('regex_not_trailing_slash_POST_method', new Route('/not-trailing/regex/post-method/{param}', array(), array(), array(), '', array(), array('POST')));
 
+        /* test case 8 */
+        $unicodeCollection = new RouteCollection();
+        $unicodeCollection->add('a', new Route('/{a}', array(), array('a' => 'a'), array('utf8' => false)));
+        $unicodeCollection->add('b', new Route('/{a}', array(), array('a' => '.'), array('utf8' => true)));
+        $unicodeCollection->add('c', new Route('/{a}', array(), array('a' => '.'), array('utf8' => false)));
+
+        /* test case 9 */
+        $hostTreeCollection = new RouteCollection();
+        $hostTreeCollection->add('a', (new Route('/'))->setHost('{d}.e.c.b.a'));
+        $hostTreeCollection->add('b', (new Route('/'))->setHost('d.c.b.a'));
+        $hostTreeCollection->add('c', (new Route('/'))->setHost('{e}.e.c.b.a'));
+
         return array(
            array(new RouteCollection(), 'url_matcher0.php', array()),
            array($collection, 'url_matcher1.php', array()),
@@ -427,6 +440,8 @@ class PhpMatcherDumperTest extends TestCase
            array($groupOptimisedCollection, 'url_matcher5.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
            array($trailingSlashCollection, 'url_matcher6.php', array()),
            array($trailingSlashCollection, 'url_matcher7.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
+           array($unicodeCollection, 'url_matcher8.php', array()),
+           array($hostTreeCollection, 'url_matcher9.php', array()),
         );
     }
 

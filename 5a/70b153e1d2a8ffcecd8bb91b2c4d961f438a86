@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-10T11:00:37Z
+
+Why failed?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-10T11:03:01Z
+
+@ergiegonzaga there is a minor problem in one of the XML files. This is how you can solve it:
+
+1) Open the `src/Symfony/Component/Validator/Resources/translations/validators.tl.xlf` file.
+2) Remove the `+` contained at the beginning of each line.
+3) Save the changes, commit the changes (`git commit src/Symfony/Component/Validator/Resources/translations/validators.tl.xlf`) and push the changes.
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-10T11:04:22Z
+
+Ahh okay sir , thanks
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-10T11:18:14Z
+
+Sir? why does it failed again this time? what's the problem?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-10T11:22:22Z
+
+@ergiegonzaga there are some problems which are unrelated to your changes ... but there's still a super minor problem with your pull request. The last line of the `validators.tl.xlf` file contains an extra `+` at the beginning of the line.
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-10T11:23:39Z
+
+okay sir i'll look at it now.
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-10T11:36:32Z
+
+Sir, why does it failed again? I already removed the last (+) sign.
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-10T12:11:02Z
+
+Hi! can someone help me on why does my pull request fails ?
+ Thank you.
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-10T12:15:49Z
+
+Hi! can someone help me on why does my pull request fails ?
+Thank you.
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-10T17:37:03Z
+
+Someone help me please with the error on my pull request..
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-11T10:54:37Z
+
+@ergiegonzaga good news, I rebased and squashed your PR on latest master (using the `git rebase -i` command) and this is now green.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-11T16:37:49Z
+
+@nicolas-grekas Translations should always be merged in the lowest maintained branch (2.7 right now) even if some translations don't exist in 2.7.
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-12T00:52:19Z
+
+Hi sir,I already updated the security.tl.xlf and added trans #8 .
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-12T03:40:02Z
+
+sir? why does the (continuous-integration/appveyor/pr ) failed ?
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-12T12:13:23Z
+
+Please someone, help me with the error..
+
+---------------------------------------------------------------------------
+
+by eXtreme at 2018-02-12T12:15:44Z
+
+@ergiegonzaga looking at other pending PRs, this failure seems not to be related to your changes so you shouldn't be worried.
+
+---------------------------------------------------------------------------
+
+by ergiegonzaga at 2018-02-12T12:30:15Z
+
+aww okay sir, ill just wait for the project owner to review my pull request..

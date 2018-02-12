@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
  * the controller to execute.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
 class ControllerResolver implements ControllerResolverInterface
 {
@@ -143,9 +144,10 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         if (is_object($callable)) {
-            if (!method_exists($callable, '__invoke')) {
-                return sprintf('Controller class "%s" cannot be called without a method name. Did you forget an "__invoke" method?', get_class($callable));
-            }
+            $availableMethods = $this->getClassMethodsWithoutMagicMethods($callable);
+            $alternativeMsg = $availableMethods ? sprintf(' or use one of the available methods: "%s"', implode('", "', $availableMethods)) : '';
+
+            return sprintf('Controller class "%s" cannot be called without a method name. You need to implement "__invoke"%s.', get_class($callable), $alternativeMsg);
         }
 
         if (!is_array($callable)) {
@@ -168,7 +170,7 @@ class ControllerResolver implements ControllerResolverInterface
             return sprintf('Method "%s" on class "%s" should be public and non-abstract.', $method, $className);
         }
 
-        $collection = get_class_methods($controller);
+        $collection = $this->getClassMethodsWithoutMagicMethods($controller);
 
         $alternatives = array();
 
@@ -191,5 +193,14 @@ class ControllerResolver implements ControllerResolverInterface
         }
 
         return $message;
+    }
+
+    private function getClassMethodsWithoutMagicMethods($classOrObject)
+    {
+        $methods = get_class_methods($classOrObject);
+
+        return array_filter($methods, function(string $method) {
+            return 0 !== strncmp($method, '__', 2);
+        });
     }
 }

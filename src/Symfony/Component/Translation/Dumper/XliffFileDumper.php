@@ -146,6 +146,7 @@ class XliffFileDumper extends FileDumper
         foreach ($messages->all($domain) as $source => $target) {
             $translation = $dom->createElement('unit');
             $translation->setAttribute('id', strtr(substr(base64_encode(hash('sha256', $source, true)), 0, 7), '/+', '._'));
+            $translation->setAttribute('name', $source);
             $metadata = $messages->getMetadata($source, $domain);
 
             // Add notes section

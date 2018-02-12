@@ -6,6 +6,7 @@ CHANGELOG
 
  * The `FileDumper::setBackup()` method is deprecated and will be removed in 5.0.
  * The `TranslationWriter::disableBackup()` method is deprecated and will be removed in 5.0.
+ * The `XliffFileDumper` will write "name" on the "unit" node. 
 
 4.0.0
 -----

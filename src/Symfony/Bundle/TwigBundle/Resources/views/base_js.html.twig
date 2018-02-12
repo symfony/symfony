@@ -37,7 +37,7 @@
             addEventListener: addEventListener,
 
             createTabs: function() {
-                var tabGroups = document.querySelectorAll('.sf-tabs');
+                var tabGroups = document.querySelectorAll('.sf-tabs:not([data-processed=true])');
 
                 /* create the tab navigation for each group of tabs */
                 for (var i = 0; i < tabGroups.length; i++) {
@@ -99,11 +99,13 @@
                             document.getElementById(activeTabId).className = 'block';
                         });
                     }
+
+                    tabGroups[i].setAttribute('data-processed', 'true');
                 }
             },
 
             createToggles: function() {
-                var toggles = document.querySelectorAll('.sf-toggle');
+                var toggles = document.querySelectorAll('.sf-toggle:not([data-processed=true])');
 
                 for (var i = 0; i < toggles.length; i++) {
                     var elementSelector = toggles[i].getAttribute('data-toggle-selector');
@@ -156,14 +158,16 @@
                         var altContent = toggle.getAttribute('data-toggle-alt-content');
                         toggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
                     });
-                }
 
-                /* Prevents from disallowing clicks on links inside toggles */
-                var toggleLinks = document.querySelectorAll('.sf-toggle a');
-                for (var i = 0; i < toggleLinks.length; i++) {
-                    addEventListener(toggleLinks[i], 'click', function(e) {
-                        e.stopPropagation();
-                    });
+                    /* Prevents from disallowing clicks on links inside toggles */
+                    var toggleLinks = toggles[i].querySelectorAll('a');
+                    for (var j = 0; j < toggleLinks.length; j++) {
+                        addEventListener(toggleLinks[j], 'click', function(e) {
+                            e.stopPropagation();
+                        });
+                    }
+
+                    toggles[i].setAttribute('data-processed', 'true');
                 }
             }
         };

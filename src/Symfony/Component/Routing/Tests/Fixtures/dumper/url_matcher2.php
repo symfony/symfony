@@ -44,23 +44,25 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         elseif (0 === strpos($pathinfo, '/bar')) {
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#sD', $pathinfo, $matches)) {
+                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'bar')), array ());
                 if ('GET' !== $canonicalMethod) {
                     $allow[] = 'GET';
                     goto not_bar;
                 }
 
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'bar')), array ());
+                return $ret;
             }
             not_bar:
 
             // barhead
             if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]++)$#sD', $pathinfo, $matches)) {
+                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'barhead')), array ());
                 if ('GET' !== $canonicalMethod) {
                     $allow[] = 'GET';
                     goto not_barhead;
                 }
 
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'barhead')), array ());
+                return $ret;
             }
             not_barhead:
 
@@ -84,6 +86,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     if ('/' === substr($pathinfo, -1)) {
                         // no-op
                     } elseif ('GET' !== $canonicalMethod) {
+                        $allow[] = 'GET';
                         goto not_baz3;
                     } else {
                         return array_replace($ret, $this->redirect($rawPathinfo.'/', 'baz3'));
@@ -101,6 +104,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
+                    $allow[] = 'GET';
                     goto not_baz4;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'baz4'));
@@ -112,23 +116,25 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz5
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#sD', $pathinfo, $matches)) {
+                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz5')), array ());
                 if ('POST' !== $canonicalMethod) {
                     $allow[] = 'POST';
                     goto not_baz5;
                 }
 
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz5')), array ());
+                return $ret;
             }
             not_baz5:
 
             // baz.baz6
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#sD', $pathinfo, $matches)) {
+                $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz.baz6')), array ());
                 if ('PUT' !== $canonicalMethod) {
                     $allow[] = 'PUT';
                     goto not_bazbaz6;
                 }
 
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'baz.baz6')), array ());
+                return $ret;
             }
             not_bazbaz6:
 
@@ -190,6 +196,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
+                    $allow[] = 'GET';
                     goto not_hey;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'hey'));
@@ -340,22 +347,34 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $ret = array('_route' => 'secure');
             $requiredSchemes = array (  'https' => 0,);
             if (!isset($requiredSchemes[$context->getScheme()])) {
+                if (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                    $allow[] = 'GET';
+                    goto not_secure;
+                }
+
                 return array_replace($ret, $this->redirect($rawPathinfo, 'secure', key($requiredSchemes)));
             }
 
             return $ret;
         }
+        not_secure:
 
         // nonsecure
         if ('/nonsecure' === $pathinfo) {
             $ret = array('_route' => 'nonsecure');
             $requiredSchemes = array (  'http' => 0,);
             if (!isset($requiredSchemes[$context->getScheme()])) {
+                if (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+                    $allow[] = 'GET';
+                    goto not_nonsecure;
+                }
+
                 return array_replace($ret, $this->redirect($rawPathinfo, 'nonsecure', key($requiredSchemes)));
             }
 
             return $ret;
         }
+        not_nonsecure:
 
         throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
     }

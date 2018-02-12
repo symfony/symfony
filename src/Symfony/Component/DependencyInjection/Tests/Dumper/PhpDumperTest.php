@@ -210,6 +210,10 @@ class PhpDumperTest extends TestCase
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
         $container->getDefinition('bar')->addTag('hot');
+        $container->register('non_shared_foo', \Bar\FooClass::class)
+            ->setFile(realpath(self::$fixturesPath.'/includes/foo.php'))
+            ->setShared(false)
+            ->setPublic(true);
         $container->compile();
         $dumper = new PhpDumper($container);
         $dump = print_r($dumper->dump(array('as_files' => true, 'file' => __DIR__, 'hot_path_tag' => 'hot')), true);

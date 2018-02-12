@@ -738,15 +738,6 @@ EOTXT
 EOF;
         }
 
-        if ($this->getProxyDumper()->isProxyCandidate($definition)) {
-            $factoryCode = $asFile ? "\$this->load(__DIR__.'/%s.php', false)" : '$this->%s(false)';
-            $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName));
-        }
-
-        if ($definition->isDeprecated()) {
-            $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
-        }
-
         $inlinedDefinitions = $this->getDefinitionsFromArguments(array($definition));
         $constructorDefinitions = $this->getDefinitionsFromArguments(array($definition->getArguments(), $definition->getFactory()));
         $otherDefinitions = new \SplObjectStorage();
@@ -761,8 +752,18 @@ EOF;
 
         $isSimpleInstance = !$definition->getProperties() && !$definition->getMethodCalls() && !$definition->getConfigurator();
 
+        $code .= $this->addServiceInclude($id, $definition, $inlinedDefinitions);
+
+        if ($this->getProxyDumper()->isProxyCandidate($definition)) {
+            $factoryCode = $asFile ? "\$this->load(__DIR__.'/%s.php', false)" : '$this->%s(false)';
+            $code .= $this->getProxyDumper()->getProxyFactoryCode($definition, $id, sprintf($factoryCode, $methodName));
+        }
+
+        if ($definition->isDeprecated()) {
+            $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
+        }
+
         $code .=
-            $this->addServiceInclude($id, $definition, $inlinedDefinitions).
             $this->addServiceLocalTempVariables($id, $definition, $constructorDefinitions, $inlinedDefinitions).
             $this->addServiceInlinedDefinitions($id, $definition, $constructorDefinitions, $isSimpleInstance).
             $this->addServiceInstance($id, $definition, $isSimpleInstance).
@@ -815,9 +816,16 @@ EOF;
                 $code = $this->addService($id, $definition, $file);
 
                 if (!$definition->isShared()) {
-                    $code = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $code)));
+                    $i = strpos($code, "\n\ninclude_once ");
+                    if (false !== $i && false !== $i = strpos($code, "\n\n", 2 + $i)) {
+                        $code = array(substr($code, 0, 2 + $i), substr($code, 2 + $i));
+                    } else {
+                        $code = array("\n", $code);
+                    }
+                    $code[1] = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $code[1])));
                     $factory = sprintf('$this->factories%s[\'%s\']', $definition->isPublic() ? '' : "['service_container']", $id);
-                    $code = sprintf("\n%s = function () {\n%s};\n\nreturn %1\$s();\n", $factory, $code);
+                    $code[1] = sprintf("%s = function () {\n%s};\n\nreturn %1\$s();\n", $factory, $code[1]);
+                    $code = $code[0].$code[1];
                 }
 
                 yield $file => $code;

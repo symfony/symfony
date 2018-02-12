@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-12T15:46:45Z
+
+>Bug fix? | yes
+
+What does it fix? And if it's a bug fix shouldn't it go into older branches?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-12T16:06:19Z
+
+It's performance bug fix for a feature that is in master only, follow up of #25867

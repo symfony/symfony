@@ -11,7 +11,6 @@
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Workflow\Dumper\DumperInterface;
 use Symfony\Component\Workflow\Dumper\PlantUmlDumper;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
@@ -21,73 +20,46 @@ class PlantUmlDumperTest extends TestCase
     use WorkflowBuilderTrait;
 
     /**
-     * @var DumperInterface[]
-     */
-    private $dumpers;
-
-    protected function setUp()
-    {
-        $this->dumpers =
-            array(
-                PlantUmlDumper::STATEMACHINE_TRANSITION => new PlantUmlDumper(PlantUmlDumper::STATEMACHINE_TRANSITION),
-                PlantUmlDumper::WORKFLOW_TRANSITION => new PlantUmlDumper(PlantUmlDumper::WORKFLOW_TRANSITION),
-            );
-    }
-
-    /**
      * @dataProvider provideWorkflowDefinitionWithoutMarking
      */
-    public function testDumpWithoutMarking($definition, $expectedFileName, $title, $nofooter)
+    public function testDumpWorkflowWithoutMarking($definition, $marking, $expectedFileName, $title)
     {
-        foreach ($this->dumpers as $transitionType => $dumper) {
-            $dump = $dumper->dump($definition, null, array('title' => $title, 'nofooter' => $nofooter));
-            // handle windows, and avoid to create more fixtures
-            $dump = str_replace(PHP_EOL, "\n", $dump.PHP_EOL);
-            $this->assertStringEqualsFile($this->getFixturePath($expectedFileName, $transitionType), $dump);
-        }
-    }
-
-    /**
-     * @dataProvider provideWorkflowDefinitionWithMarking
-     */
-    public function testDumpWithMarking($definition, $marking, $expectedFileName, $title, $footer)
-    {
-        foreach ($this->dumpers as $transitionType => $dumper) {
-            $dump = $dumper->dump($definition, $marking, array('title' => $title, 'nofooter' => $footer));
-            // handle windows, and avoid to create more fixtures
-            $dump = str_replace(PHP_EOL, "\n", $dump.PHP_EOL);
-            $this->assertStringEqualsFile($this->getFixturePath($expectedFileName, $transitionType), $dump);
-        }
+        $dumper = new PlantUmlDumper(PlantUmlDumper::WORKFLOW_TRANSITION);
+        $dump = $dumper->dump($definition, $marking, array('title' => $title));
+        // handle windows, and avoid to create more fixtures
+        $dump = str_replace(PHP_EOL, "\n", $dump.PHP_EOL);
+        $file = $this->getFixturePath($expectedFileName, PlantUmlDumper::WORKFLOW_TRANSITION);
+        $this->assertStringEqualsFile($file, $dump);
     }
 
     public function provideWorkflowDefinitionWithoutMarking()
     {
-        $title = 'SimpleDiagram';
-        yield array($this->createSimpleWorkflowDefinition(), 'simple-workflow-nomarking-nofooter', $title, true);
-        yield array($this->createSimpleWorkflowDefinition(), 'simple-workflow-nomarking', $title, false);
-        $title = 'ComplexDiagram';
-        yield array($this->createComplexWorkflowDefinition(), 'complex-workflow-nomarking-nofooter', $title, true);
-        yield array($this->createComplexWorkflowDefinition(), 'complex-workflow-nomarking', $title, false);
+        yield array($this->createSimpleWorkflowDefinition(), null, 'simple-workflow-nomarking', 'SimpleDiagram');
+        yield array($this->createComplexWorkflowDefinition(), null, 'complex-workflow-nomarking', 'ComplexDiagram');
+        $marking = new Marking(array('b' => 1));
+        yield array($this->createSimpleWorkflowDefinition(), $marking, 'simple-workflow-marking', 'SimpleDiagram');
+        $marking = new Marking(array('c' => 1, 'e' => 1));
+        yield array($this->createComplexWorkflowDefinition(), $marking, 'complex-workflow-marking', 'ComplexDiagram');
     }
 
-    public function provideWorkflowDefinitionWithMarking()
+    /**
+     * @dataProvider provideStateMachineDefinitionWithoutMarking
+     */
+    public function testDumpStateMachineWithoutMarking($definition, $marking, $expectedFileName, $title)
     {
-        $title = 'SimpleDiagram';
-        $marking = new Marking(array('b' => 1));
-        yield array(
-            $this->createSimpleWorkflowDefinition(), $marking, 'simple-workflow-marking-nofooter', $title, true,
-        );
-        yield array(
-            $this->createSimpleWorkflowDefinition(), $marking, 'simple-workflow-marking', $title, false,
-        );
-        $title = 'ComplexDiagram';
+        $dumper = new PlantUmlDumper(PlantUmlDumper::STATEMACHINE_TRANSITION);
+        $dump = $dumper->dump($definition, $marking, array('title' => $title));
+        // handle windows, and avoid to create more fixtures
+        $dump = str_replace(PHP_EOL, "\n", $dump.PHP_EOL);
+        $file = $this->getFixturePath($expectedFileName, PlantUmlDumper::STATEMACHINE_TRANSITION);
+        $this->assertStringEqualsFile($file, $dump);
+    }
+
+    public function provideStateMachineDefinitionWithoutMarking()
+    {
+        yield array($this->createComplexStateMachineDefinition(), null, 'complex-state-machine-nomarking', 'SimpleDiagram');
         $marking = new Marking(array('c' => 1, 'e' => 1));
-        yield array(
-            $this->createComplexWorkflowDefinition(), $marking, 'complex-workflow-marking-nofooter', $title, true,
-        );
-        yield array(
-            $this->createComplexWorkflowDefinition(), $marking, 'complex-workflow-marking', $title, false,
-        );
+        yield array($this->createComplexStateMachineDefinition(), $marking, 'complex-state-machine-marking', 'SimpleDiagram');
     }
 
     private function getFixturePath($name, $transitionType)

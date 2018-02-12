@@ -71,7 +71,7 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', array('input' => 'datetime_immutable'), Guess::HIGH_CONFIDENCE);
             case Type::TIME:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', array(), Guess::HIGH_CONFIDENCE);
-            case 'time_immutable'
+            case 'time_immutable':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', array('input' => 'datetime_immutable'), Guess::HIGH_CONFIDENCE);
             case Type::DECIMAL:
             case Type::FLOAT:

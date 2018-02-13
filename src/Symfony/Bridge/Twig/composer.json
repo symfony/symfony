@@ -23,7 +23,7 @@
         "symfony/asset": "~2.8|~3.0|~4.0",
         "symfony/dependency-injection": "~2.8|~3.0|~4.0",
         "symfony/finder": "~2.8|~3.0|~4.0",
-        "symfony/form": "~3.4|~4.0",
+        "symfony/form": "^3.4.5|^4.0.5",
         "symfony/http-foundation": "^3.3.11|~4.0",
         "symfony/http-kernel": "~3.2|~4.0",
         "symfony/polyfill-intl-icu": "~1.0",
@@ -41,7 +41,7 @@
         "symfony/workflow": "~3.3|~4.0"
     },
     "conflict": {
-        "symfony/form": "<3.4",
+        "symfony/form": "<3.4.5",
         "symfony/console": "<3.4"
     },
     "suggest": {

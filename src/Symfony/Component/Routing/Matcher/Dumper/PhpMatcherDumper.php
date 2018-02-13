@@ -27,6 +27,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 class PhpMatcherDumper extends MatcherDumper
 {
     private $expressionLanguage;
+    private $signalingException;
 
     /**
      * @var ExpressionFunctionProviderInterface[]
@@ -87,12 +88,8 @@ EOF;
 
     /**
      * Generates the code for the match method implementing UrlMatcherInterface.
-     *
-     * @param bool $supportsRedirections Whether redirections are supported by the base class
-     *
-     * @return string Match method as PHP code
      */
-    private function generateMatchMethod($supportsRedirections)
+    private function generateMatchMethod(bool $supportsRedirections): string
     {
         // Group hosts by same-suffix, re-order when possible
         $matchHost = false;
@@ -132,18 +129,27 @@ EOF;
 
     /**
      * Generates PHP code to match a RouteCollection with all its routes.
-     *
-     * @param RouteCollection $routes               A RouteCollection instance
-     * @param bool            $supportsRedirections Whether redirections are supported by the base class
-     *
-     * @return string PHP code
      */
-    private function compileRoutes(RouteCollection $routes, $supportsRedirections, $matchHost)
+    private function compileRoutes(RouteCollection $routes, bool $supportsRedirections, bool $matchHost): string
     {
         list($staticRoutes, $dynamicRoutes) = $this->groupStaticRoutes($routes, $supportsRedirections);
 
         $code = $this->compileStaticRoutes($staticRoutes, $supportsRedirections, $matchHost);
-        $code .= $this->compileDynamicRoutes($dynamicRoutes, $supportsRedirections, $matchHost);
+        $chunkLimit = count($dynamicRoutes);
+
+        while (true) {
+            try {
+                $this->signalingException = new \RuntimeException('PCRE compilation failed: regular expression is too large');
+                $code .= $this->compileDynamicRoutes($dynamicRoutes, $supportsRedirections, $matchHost, $chunkLimit);
+                break;
+            } catch (\Exception $e) {
+                if (1 < $chunkLimit && $this->signalingException === $e) {
+                    $chunkLimit = 1 + ($chunkLimit >> 1);
+                    continue;
+                }
+                throw $e;
+            }
+        }
 
         if ('' === $code) {
             $code .= "        if ('/' === \$pathinfo) {\n";
@@ -275,13 +281,14 @@ EOF;
      *    matching-but-failing subpattern is blacklisted by replacing its name by "(*F)", which forces a failure-to-match.
      *    To ease this backlisting operation, the name of subpatterns is also the string offset where the replacement should occur.
      */
-    private function compileDynamicRoutes(RouteCollection $collection, bool $supportsRedirections, bool $matchHost): string
+    private function compileDynamicRoutes(RouteCollection $collection, bool $supportsRedirections, bool $matchHost, int $chunkLimit): string
     {
         if (!$collection->all()) {
             return '';
         }
         $code = '';
         $state = (object) array(
+            'regex' => '',
             'switch' => '',
             'default' => '',
             'mark' => 0,
@@ -301,11 +308,13 @@ EOF;
             return '';
         };
 
+        $chunkSize = 0;
         $prev = null;
         $perModifiers = array();
         foreach ($collection->all() as $name => $route) {
             preg_match('#[a-zA-Z]*$#', $route->compile()->getRegex(), $rx);
-            if ($prev !== $rx[0] && $route->compile()->getPathVariables()) {
+            if ($chunkLimit < ++$chunkSize || $prev !== $rx[0] && $route->compile()->getPathVariables()) {
+                $chunkSize = 1;
                 $routes = new RouteCollection();
                 $perModifiers[] = array($rx[0], $routes);
                 $prev = $rx[0];
@@ -326,8 +335,10 @@ EOF;
                 $routes->add($name, $route);
             }
             $prev = false;
-            $code .= "\n            {$state->mark} => '{^(?'";
-            $state->mark += 4;
+            $rx = '{^(?';
+            $code .= "\n            {$state->mark} => ".self::export($rx);
+            $state->mark += strlen($rx);
+            $state->regex = $rx;
 
             foreach ($perHost as list($hostRegex, $routes)) {
                 if ($matchHost) {
@@ -340,8 +351,9 @@ EOF;
                         $hostRegex = '[^/]*+';
                         $state->hostVars = array();
                     }
-                    $state->mark += 3 + $prev + strlen($hostRegex);
-                    $code .= "\n                .".self::export(($prev ? ')' : '')."|{$hostRegex}(?");
+                    $state->mark += strlen($rx = ($prev ? ')' : '')."|{$hostRegex}(?");
+                    $code .= "\n                .".self::export($rx);
+                    $state->regex .= $rx;
                     $prev = true;
                 }
 
@@ -358,8 +370,19 @@ EOF;
             }
             if ($matchHost) {
                 $code .= "\n                .')'";
+                $state->regex .= ')';
             }
-            $code .= "\n                .')$}{$modifiers}',";
+            $rx = ")$}{$modifiers}";
+            $code .= "\n                .'{$rx}',";
+            $state->regex .= $rx;
+
+            // if the regex is too large, throw a signaling exception to recompute with smaller chunk size
+            set_error_handler(function ($type, $message) { throw $this->signalingException; });
+            try {
+                preg_match($state->regex, '');
+            } finally {
+                restore_error_handler();
+            }
         }
 
         if ($state->default) {
@@ -403,7 +426,7 @@ EOF;
      * @param \stdClass $state A simple state object that keeps track of the progress of the compilation,
      *                         and gathers the generated switch's "case" and "default" statements
      */
-    private function compileStaticPrefixCollection(StaticPrefixCollection $tree, \stdClass $state, int $prefixLen = 0)
+    private function compileStaticPrefixCollection(StaticPrefixCollection $tree, \stdClass $state, int $prefixLen = 0): string
     {
         $code = '';
         $prevRegex = null;
@@ -413,10 +436,12 @@ EOF;
             if ($route instanceof StaticPrefixCollection) {
                 $prevRegex = null;
                 $prefix = substr($route->getPrefix(), $prefixLen);
-                $state->mark += 3 + strlen($prefix);
-                $code .= "\n                    .".self::export("|{$prefix}(?");
+                $state->mark += strlen($rx = "|{$prefix}(?");
+                $code .= "\n                    .".self::export($rx);
+                $state->regex .= $rx;
                 $code .= $this->indent($this->compileStaticPrefixCollection($route, $state, $prefixLen + strlen($prefix)));
                 $code .= "\n                    .')'";
+                $state->regex .= ')';
                 $state->markTail += 1;
                 continue;
             }
@@ -434,8 +459,9 @@ EOF;
             $hasTrailingSlash = $hasTrailingSlash && (!$methods || isset($methods['GET']));
             $state->mark += 3 + $state->markTail + $hasTrailingSlash + strlen($regex) - $prefixLen;
             $state->markTail = 2 + strlen($state->mark);
-            $code .= "\n                    .";
-            $code .= self::export(sprintf('|%s(*:%s)', substr($regex, $prefixLen).($hasTrailingSlash ? '?' : ''), $state->mark));
+            $rx = sprintf('|%s(*:%s)', substr($regex, $prefixLen).($hasTrailingSlash ? '?' : ''), $state->mark);
+            $code .= "\n                    .".self::export($rx);
+            $state->regex .= $rx;
             $vars = array_merge($state->hostVars, $vars);
 
             if (!$route->getCondition() && (!is_array($next = $routes[1 + $i] ?? null) || $regex !== $next[1])) {
@@ -472,7 +498,7 @@ EOF;
     /**
      * A simple helper to compiles the switch's "default" for both static and dynamic routes.
      */
-    private function compileSwitchDefault(bool $hasVars, string $routesKey, bool $matchHost, bool $supportsRedirections, bool $checkTrailingSlash)
+    private function compileSwitchDefault(bool $hasVars, string $routesKey, bool $matchHost, bool $supportsRedirections, bool $checkTrailingSlash): string
     {
         if ($hasVars) {
             $code = <<<EOF

@@ -217,21 +217,18 @@ class Container implements ResettableContainerInterface
      */
     public function get($id, $invalidBehavior = /* self::EXCEPTION_ON_INVALID_REFERENCE */ 1)
     {
-        if (isset($this->aliases[$id])) {
-            $id = $this->aliases[$id];
-        }
+        return $this->services[$id]
+            ?? $this->services[$id = $this->aliases[$id] ?? $id]
+            ?? ('service_container' === $id ? $this : ($this->factories[$id] ?? array($this, 'make'))($id, $invalidBehavior));
+    }
 
-        // Re-use shared service instance if it exists.
-        if (isset($this->services[$id])) {
-            return $this->services[$id];
-        }
-        if ('service_container' === $id) {
-            return $this;
-        }
-        if (isset($this->factories[$id])) {
-            return $this->factories[$id]();
-        }
-
+    /**
+     * Creates a service.
+     *
+     * As a separate method to allow "get()" to use the really fast `??` operator.
+     */
+    private function make(string $id, int $invalidBehavior)
+    {
         if (isset($this->loading[$id])) {
             throw new ServiceCircularReferenceException($id, array_keys($this->loading));
         }

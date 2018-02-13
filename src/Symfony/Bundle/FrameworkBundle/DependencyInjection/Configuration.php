@@ -18,6 +18,7 @@ use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
@@ -829,6 +830,10 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->fixXmlConfig('pool')
                     ->children()
+                        ->scalarNode('version')
+                            ->info('Used to ensure that each container build has it’s own cache version')
+                            ->defaultValue(new Parameter('container.build_id'))
+                        ->end()
                         ->scalarNode('prefix_seed')
                             ->info('Used to namespace cache keys when using several apps with the same shared backend')
                             ->example('my-application-name')

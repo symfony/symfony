@@ -107,7 +107,7 @@ class GraphvizDumper implements DumperInterface
         $code = '';
 
         foreach ($places as $id => $place) {
-            $code .= sprintf("  place_%s [label=\"%s\", shape=circle%s];\n", $this->dotize($id), $id, $this->addAttributes($place['attributes']));
+            $code .= sprintf("  place_%s [label=\"%s\", shape=circle%s];\n", $this->dotize($id), $this->escape($id), $this->addAttributes($place['attributes']));
         }
 
         return $code;
@@ -121,7 +121,7 @@ class GraphvizDumper implements DumperInterface
         $code = '';
 
         foreach ($transitions as $place) {
-            $code .= sprintf("  transition_%s [label=\"%s\", shape=box%s];\n", $this->dotize($place['name']), $place['name'], $this->addAttributes($place['attributes']));
+            $code .= sprintf("  transition_%s [label=\"%s\", shape=box%s];\n", $this->dotize($place['name']), $this->escape($place['name']), $this->addAttributes($place['attributes']));
         }
 
         return $code;
@@ -198,21 +198,29 @@ class GraphvizDumper implements DumperInterface
      */
     protected function dotize($id)
     {
-        return strtolower(preg_replace('/[^\w]/i', '_', $id));
+        return hash('sha1', $id);
     }
 
-    private function addAttributes(array $attributes)
+    /**
+     * @internal
+     */
+    protected function escape(string $string): string
+    {
+        return addslashes($string);
+    }
+
+    private function addAttributes(array $attributes): string
     {
         $code = array();
 
         foreach ($attributes as $k => $v) {
-            $code[] = sprintf('%s="%s"', $k, $v);
+            $code[] = sprintf('%s="%s"', $k, $this->escape($v));
         }
 
         return $code ? ', '.implode(', ', $code) : '';
     }
 
-    private function addOptions(array $options)
+    private function addOptions(array $options): string
     {
         $code = array();
 

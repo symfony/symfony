@@ -36,7 +36,7 @@ class FlockStore implements StoreInterface
      *
      * @throws LockStorageException If the lock directory could not be created or is not writable
      */
-    public function __construct($lockPath = null)
+    public function __construct(string $lockPath = null)
     {
         if (null === $lockPath) {
             $lockPath = sys_get_temp_dir();

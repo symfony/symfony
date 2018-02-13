@@ -51,7 +51,7 @@ class SwitchUserListener implements ListenerInterface
     private $dispatcher;
     private $stateless;
 
-    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, $usernameParameter = '_switch_user', $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, $stateless = false)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, UserCheckerInterface $userChecker, string $providerKey, AccessDecisionManagerInterface $accessDecisionManager, LoggerInterface $logger = null, string $usernameParameter = '_switch_user', string $role = 'ROLE_ALLOWED_TO_SWITCH', EventDispatcherInterface $dispatcher = null, bool $stateless = false)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -126,7 +126,9 @@ class SwitchUserListener implements ListenerInterface
             throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
         }
 
-        if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
+        $user = $this->provider->loadUserByUsername($username);
+
+        if (false === $this->accessDecisionManager->decide($token, array($this->role), $user)) {
             $exception = new AccessDeniedException();
             $exception->setAttributes($this->role);
 
@@ -137,7 +139,6 @@ class SwitchUserListener implements ListenerInterface
             $this->logger->info('Attempting to switch to user.', array('username' => $username));
         }
 
-        $user = $this->provider->loadUserByUsername($username);
         $this->userChecker->checkPostAuth($user);
 
         $roles = $user->getRoles();

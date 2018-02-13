@@ -16,10 +16,10 @@
         }
     ],
     "require": {
-        "php": "^5.5.9|>=7.0.8"
+        "php": "^7.1.3"
     },
     "require-dev": {
-        "symfony/process": "~3.2|~4.0"
+        "symfony/process": "~3.4|~4.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Dotenv\\": "" },
@@ -30,7 +30,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.4-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

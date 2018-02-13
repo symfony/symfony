@@ -55,7 +55,13 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                 if (isset($key[0]) && '$' === $key[0]) {
                     foreach ($parameters as $j => $p) {
                         if ($key === '$'.$p->name) {
-                            $resolvedArguments[$j] = $argument;
+                            if ($p->isVariadic() && \is_array($argument)) {
+                                foreach ($argument as $variadicArgument) {
+                                    $resolvedArguments[$j++] = $variadicArgument;
+                                }
+                            } else {
+                                $resolvedArguments[$j] = $argument;
+                            }
 
                             continue 2;
                         }

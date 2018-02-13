@@ -26,7 +26,7 @@ class ProcessTimedOutException extends RuntimeException
     private $process;
     private $timeoutType;
 
-    public function __construct(Process $process, $timeoutType)
+    public function __construct(Process $process, int $timeoutType)
     {
         $this->process = $process;
         $this->timeoutType = $timeoutType;

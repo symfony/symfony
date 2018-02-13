@@ -77,9 +77,13 @@ class HttpUtils
     public function createRequest(Request $request, $path)
     {
         $newRequest = Request::create($this->generateUri($request, $path), 'get', array(), $request->cookies->all(), array(), $request->server->all());
-        if ($request->hasSession()) {
-            $newRequest->setSession($request->getSession());
+
+        static $setSession;
+
+        if (null === $setSession) {
+            $setSession = \Closure::bind(function ($newRequest, $request) { $newRequest->session = $request->session; }, null, Request::class);
         }
+        $setSession($newRequest, $request);
 
         if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
             $newRequest->attributes->set(Security::AUTHENTICATION_ERROR, $request->attributes->get(Security::AUTHENTICATION_ERROR));

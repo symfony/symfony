@@ -22,7 +22,7 @@ class ConstantNode extends Node
 {
     private $isIdentifier;
 
-    public function __construct($value, $isIdentifier = false)
+    public function __construct($value, bool $isIdentifier = false)
     {
         $this->isIdentifier = $isIdentifier;
         parent::__construct(

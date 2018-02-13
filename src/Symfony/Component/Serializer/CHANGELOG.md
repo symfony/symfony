@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+* added `MissingConstructorArgumentsException` new exception for deserialization failure
+  of objects that needs data insertion in constructor
+* added an optional `default_constructor_arguments` option of context to specify a default data in
+  case the object is not initializable by its constructor because of data missing
+* added optional `bool $escapeFormulas = false` argument to `CsvEncoder::__construct`
+
+4.0.0
+-----
+
+ * removed the `SerializerAwareEncoder` and `SerializerAwareNormalizer` classes,
+   use the `SerializerAwareTrait` instead
+ * removed the `Serializer::$normalizerCache` and `Serializer::$denormalizerCache`
+   properties
+ * added an optional `string $format = null` argument to `AbstractNormalizer::instantiateObject`
+ * added an optional `array $context = array()` to `Serializer::supportsNormalization`, `Serializer::supportsDenormalization`,
+   `Serializer::supportsEncoding` and `Serializer::supportsDecoding`
+
 3.4.0
 -----
 

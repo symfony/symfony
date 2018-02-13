@@ -168,7 +168,6 @@ EOF;
                         '',
                         $value->getClientOriginalName(),
                         $value->getClientMimeType(),
-                        0,
                         UPLOAD_ERR_INI_SIZE,
                         true
                     );
@@ -177,7 +176,6 @@ EOF;
                         $value->getPathname(),
                         $value->getClientOriginalName(),
                         $value->getClientMimeType(),
-                        $value->getClientSize(),
                         $value->getError(),
                         true
                     );

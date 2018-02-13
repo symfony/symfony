@@ -153,6 +153,31 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertCount(2, $dispatcher->getCalledListeners());
     }
 
+    public function testItReturnsNoOrphanedEventsWhenCreated()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertEmpty($events);
+    }
+
+    public function testItReturnsOrphanedEventsAfterDispatch()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->dispatch('foo');
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertCount(1, $events);
+        $this->assertEquals(array('foo'), $events);
+    }
+
+    public function testItDoesNotReturnHandledEvents()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', function () {});
+        $tdispatcher->dispatch('foo');
+        $events = $tdispatcher->getOrphanedEvents();
+        $this->assertEmpty($events);
+    }
+
     public function testLogger()
     {
         $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();

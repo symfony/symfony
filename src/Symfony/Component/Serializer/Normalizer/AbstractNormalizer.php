@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -19,21 +20,24 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
  * Normalizer implementation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
+abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     use ObjectToPopulateTrait;
+    use SerializerAwareTrait;
 
     const CIRCULAR_REFERENCE_LIMIT = 'circular_reference_limit';
     const OBJECT_TO_POPULATE = 'object_to_populate';
     const GROUPS = 'groups';
     const ATTRIBUTES = 'attributes';
     const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
+    const DEFAULT_CONSTRUCTOR_ARGUMENTS = 'default_constructor_arguments';
 
     /**
      * @var int
@@ -306,22 +310,10 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * @return object
      *
      * @throws RuntimeException
+     * @throws MissingConstructorArgumentsException
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes/*, string $format = null*/)
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
-        if (func_num_args() >= 6) {
-            $format = func_get_arg(5);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s::%s() will have a 6th `string $format = null` argument in version 4.0. Not defining it is deprecated since Symfony 3.2.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-
-            $format = null;
-        }
-
         if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
             unset($context[static::OBJECT_TO_POPULATE]);
 
@@ -339,7 +331,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
                 $allowed = false === $allowedAttributes || in_array($paramName, $allowedAttributes);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
-                if (method_exists($constructorParameter, 'isVariadic') && $constructorParameter->isVariadic()) {
+                if ($constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                         if (!is_array($data[$paramName])) {
                             throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
@@ -364,10 +356,12 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                     // Don't run set for a parameter passed to the constructor
                     $params[] = $parameterData;
                     unset($data[$key]);
+                } elseif (isset($context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key])) {
+                    $params[] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
-                    throw new RuntimeException(
+                    throw new MissingConstructorArgumentsException(
                         sprintf(
                             'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
                             $class,

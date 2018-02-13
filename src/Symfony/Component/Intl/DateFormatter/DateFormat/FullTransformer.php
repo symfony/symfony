@@ -40,7 +40,7 @@ class FullTransformer
      * @param string $pattern  The pattern to be used to format and/or parse values
      * @param string $timezone The timezone to perform the date/time calculations
      */
-    public function __construct($pattern, $timezone)
+    public function __construct(string $pattern, string $timezone)
     {
         $this->pattern = $pattern;
         $this->timezone = $timezone;

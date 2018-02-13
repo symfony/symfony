@@ -1,3 +1,3 @@
 someroute:
   resource: path/to/some.yml
-  name_prefix: test_
+  not_valid_key: test_

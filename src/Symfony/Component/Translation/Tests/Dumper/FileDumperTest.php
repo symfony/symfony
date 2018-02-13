@@ -32,29 +32,6 @@ class FileDumperTest extends TestCase
         @unlink($tempDir.'/messages.en.concrete');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDumpBackupsFileIfExisting()
-    {
-        $tempDir = sys_get_temp_dir();
-        $file = $tempDir.'/messages.en.concrete';
-        $backupFile = $file.'~';
-
-        @touch($file);
-
-        $catalogue = new MessageCatalogue('en');
-        $catalogue->add(array('foo' => 'bar'));
-
-        $dumper = new ConcreteFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir));
-
-        $this->assertFileExists($backupFile);
-
-        @unlink($file);
-        @unlink($backupFile);
-    }
-
     public function testDumpCreatesNestedDirectoriesAndFile()
     {
         $tempDir = sys_get_temp_dir();

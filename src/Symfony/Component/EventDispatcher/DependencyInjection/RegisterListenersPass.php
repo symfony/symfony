@@ -31,12 +31,7 @@ class RegisterListenersPass implements CompilerPassInterface
     private $hotPathEvents = array();
     private $hotPathTagName;
 
-    /**
-     * @param string $dispatcherService Service name of the event dispatcher in processed container
-     * @param string $listenerTag       Tag name used for listener
-     * @param string $subscriberTag     Tag name used for subscribers
-     */
-    public function __construct($dispatcherService = 'event_dispatcher', $listenerTag = 'kernel.event_listener', $subscriberTag = 'kernel.event_subscriber')
+    public function __construct(string $dispatcherService = 'event_dispatcher', string $listenerTag = 'kernel.event_listener', string $subscriberTag = 'kernel.event_subscriber')
     {
         $this->dispatcherService = $dispatcherService;
         $this->listenerTag = $listenerTag;
@@ -73,6 +68,10 @@ class RegisterListenersPass implements CompilerPassInterface
                         '/[^a-z0-9]/i',
                     ), function ($matches) { return strtoupper($matches[0]); }, $event['event']);
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
+
+                    if (null !== ($class = $container->getDefinition($id)->getClass()) && ($r = $container->getReflectionClass($class, false)) && !$r->hasMethod($event['method']) && $r->hasMethod('__invoke')) {
+                        $event['method'] = '__invoke';
+                    }
                 }
 
                 $definition->addMethodCall('addListener', array($event['event'], array(new ServiceClosureArgument(new Reference($id)), $event['method']), $priority));

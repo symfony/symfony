@@ -16,12 +16,12 @@
         }
     ],
     "require": {
-        "php": "^5.5.9|>=7.0.8",
-        "symfony/polyfill-mbstring": "~1.1",
-        "symfony/polyfill-php70": "~1.6"
+        "php": "^7.1.3",
+        "symfony/polyfill-mbstring": "~1.1"
     },
     "require-dev": {
-        "symfony/expression-language": "~2.8|~3.0|~4.0"
+        "predis/predis": "~1.0",
+        "symfony/expression-language": "~3.4|~4.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },
@@ -32,7 +32,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.4-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

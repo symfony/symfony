@@ -133,6 +133,11 @@
       </argument>
       <argument type="iterator"/>
     </service>
+    <service id="BAR" class="stdClass" public="true">
+      <property name="bar" type="service" id="bar"/>
+    </service>
+    <service id="bar2" class="stdClass" public="true"/>
+    <service id="BAR2" class="stdClass" public="true"/>
     <service id="tagged_iterator_foo" class="Bar" public="false">
       <tag name="foo"/>
     </service>

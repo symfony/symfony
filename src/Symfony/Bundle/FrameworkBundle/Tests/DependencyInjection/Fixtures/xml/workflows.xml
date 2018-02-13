@@ -39,7 +39,7 @@
             </framework:transition>
         </framework:workflow>
 
-        <framework:workflow name="pull_request" type="state_machine" initial-place="start">
+        <framework:workflow name="pull_request" initial-place="start">
             <framework:marking-store type="single_state"/>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
             <framework:place>start</framework:place>

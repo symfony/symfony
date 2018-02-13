@@ -21,88 +21,54 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $pathinfo = rawurldecode($rawPathinfo);
         $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
-        $request = $this->request ?: $this->createRequest($pathinfo);
         $requestMethod = $canonicalMethod = $context->getMethod();
 
         if ('HEAD' === $requestMethod) {
             $canonicalMethod = 'GET';
         }
 
-        // just_head
-        if ('/just_head' === $pathinfo) {
-            $ret = array('_route' => 'just_head');
-            if ('HEAD' !== $requestMethod) {
-                $allow[] = 'HEAD';
-                goto not_just_head;
-            }
-
-            return $ret;
-        }
-        not_just_head:
-
-        // head_and_get
-        if ('/head_and_get' === $pathinfo) {
-            $ret = array('_route' => 'head_and_get');
-            if ('GET' !== $canonicalMethod) {
-                $allow[] = 'GET';
-                goto not_head_and_get;
-            }
-
-            return $ret;
-        }
-        not_head_and_get:
-
-        // get_and_head
-        if ('/get_and_head' === $pathinfo) {
-            $ret = array('_route' => 'get_and_head');
-            if ('GET' !== $canonicalMethod) {
-                $allow[] = 'GET';
-                goto not_get_and_head;
-            }
-
-            return $ret;
-        }
-        not_get_and_head:
-
-        // post_and_head
-        if ('/post_and_head' === $pathinfo) {
-            $ret = array('_route' => 'post_and_head');
-            if (!in_array($requestMethod, array('POST', 'HEAD'))) {
-                $allow = array_merge($allow, array('POST', 'HEAD'));
-                goto not_post_and_head;
-            }
-
-            return $ret;
-        }
-        not_post_and_head:
-
-        if (0 === strpos($pathinfo, '/put_and_post')) {
-            // put_and_post
-            if ('/put_and_post' === $pathinfo) {
+        switch ($pathinfo) {
+            case '/put_and_post':
+                // put_and_post
                 $ret = array('_route' => 'put_and_post');
-                if (!in_array($requestMethod, array('PUT', 'POST'))) {
-                    $allow = array_merge($allow, array('PUT', 'POST'));
+                if (!isset(($a = array('PUT' => 0, 'POST' => 1))[$requestMethod])) {
+                    $allow += $a;
                     goto not_put_and_post;
                 }
 
                 return $ret;
-            }
-            not_put_and_post:
-
-            // put_and_get_and_head
-            if ('/put_and_post' === $pathinfo) {
+                not_put_and_post:
+                // put_and_get_and_head
                 $ret = array('_route' => 'put_and_get_and_head');
-                if (!in_array($canonicalMethod, array('PUT', 'GET'))) {
-                    $allow = array_merge($allow, array('PUT', 'GET'));
+                if (!isset(($a = array('PUT' => 0, 'GET' => 1, 'HEAD' => 2))[$canonicalMethod])) {
+                    $allow += $a;
                     goto not_put_and_get_and_head;
                 }
 
                 return $ret;
-            }
-            not_put_and_get_and_head:
+                not_put_and_get_and_head:
+                break;
+            default:
+                $routes = array(
+                    '/just_head' => array(array('_route' => 'just_head'), null, array('HEAD' => 0), null),
+                    '/head_and_get' => array(array('_route' => 'head_and_get'), null, array('HEAD' => 0, 'GET' => 1), null),
+                    '/get_and_head' => array(array('_route' => 'get_and_head'), null, array('GET' => 0, 'HEAD' => 1), null),
+                    '/post_and_head' => array(array('_route' => 'post_and_head'), null, array('POST' => 0, 'HEAD' => 1), null),
+                );
 
+                if (!isset($routes[$pathinfo])) {
+                    break;
+                }
+                list($ret, $requiredHost, $requiredMethods, $requiredSchemes) = $routes[$pathinfo];
+
+                if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
+                    $allow += $requiredMethods;
+                    break;
+                }
+
+                return $ret;
         }
 
-        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
+        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
     }
 }

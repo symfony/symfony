@@ -31,7 +31,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
      * @param string      $name     Session name
      * @param MetadataBag $metaBag  MetadataBag instance
      */
-    public function __construct($savePath = null, $name = 'MOCKSESSID', MetadataBag $metaBag = null)
+    public function __construct(string $savePath = null, string $name = 'MOCKSESSID', MetadataBag $metaBag = null)
     {
         if (null === $savePath) {
             $savePath = sys_get_temp_dir();

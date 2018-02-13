@@ -188,7 +188,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws InvalidArgumentException if the data class is not a valid class or if
      *                                  the name contains invalid characters
      */
-    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
+    public function __construct($name, ?string $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
         self::validateName($name);
 

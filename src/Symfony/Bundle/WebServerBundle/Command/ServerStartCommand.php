@@ -13,6 +13,7 @@ namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Bundle\WebServerBundle\WebServerConfig;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,14 +27,14 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  */
-class ServerStartCommand extends ServerCommand
+class ServerStartCommand extends Command
 {
     private $documentRoot;
     private $environment;
 
     protected static $defaultName = 'server:start';
 
-    public function __construct($documentRoot = null, $environment = null)
+    public function __construct(string $documentRoot = null, string $environment = null)
     {
         $this->documentRoot = $documentRoot;
         $this->environment = $environment;
@@ -100,12 +101,6 @@ EOF
             }
 
             return 1;
-        }
-
-        // deprecated, logic to be removed in 4.0
-        // this allows the commands to work out of the box with web/ and public/
-        if ($this->documentRoot && !is_dir($this->documentRoot) && is_dir(dirname($this->documentRoot).'/web')) {
-            $this->documentRoot = dirname($this->documentRoot).'/web';
         }
 
         if (null === $documentRoot = $input->getOption('docroot')) {

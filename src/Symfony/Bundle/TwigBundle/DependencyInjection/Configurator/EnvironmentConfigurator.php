@@ -31,7 +31,7 @@ class EnvironmentConfigurator
     private $decimalPoint;
     private $thousandsSeparator;
 
-    public function __construct($dateFormat, $intervalFormat, $timezone, $decimals, $decimalPoint, $thousandsSeparator)
+    public function __construct(string $dateFormat, string $intervalFormat, ?string $timezone, int $decimals, string $decimalPoint, string $thousandsSeparator)
     {
         $this->dateFormat = $dateFormat;
         $this->intervalFormat = $intervalFormat;

@@ -32,7 +32,7 @@ abstract class HttpCache extends BaseHttpCache
      * @param HttpKernelInterface $kernel   An HttpKernelInterface instance
      * @param string              $cacheDir The cache directory (default used if null)
      */
-    public function __construct(HttpKernelInterface $kernel, $cacheDir = null)
+    public function __construct(HttpKernelInterface $kernel, string $cacheDir = null)
     {
         $this->kernel = $kernel;
         $this->cacheDir = $cacheDir;

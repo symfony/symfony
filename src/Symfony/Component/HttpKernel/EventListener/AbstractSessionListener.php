@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -22,9 +23,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Sets the session in the request.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Tobias Schultze <http://tobion.de>
  */
 abstract class AbstractSessionListener implements EventSubscriberInterface
 {
+    protected $container;
+
+    public function __construct(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
@@ -32,12 +41,13 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        $session = $this->getSession();
-        if (null === $session || $request->hasSession()) {
-            return;
+        if ($request->hasSession()) {
+            // no-op
+        } elseif (method_exists($request, 'setSessionFactory')) {
+            $request->setSessionFactory(function () { return $this->getSession(); });
+        } elseif ($session = $this->getSession()) {
+            $request->setSession($session);
         }
-
-        $request->setSession($session);
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
@@ -46,7 +56,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
             return;
         }
 
-        if (!$session = $event->getRequest()->getSession()) {
+        if (!$session = $this->container && $this->container->has('initialized_session') ? $this->container->get('initialized_session') : $event->getRequest()->getSession()) {
             return;
         }
 
@@ -56,13 +66,42 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
                 ->setMaxAge(0)
                 ->headers->addCacheControlDirective('must-revalidate');
         }
+
+        if ($session->isStarted()) {
+            /*
+             * Saves the session, in case it is still open, before sending the response/headers.
+             *
+             * This ensures several things in case the developer did not save the session explicitly:
+             *
+             *  * If a session save handler without locking is used, it ensures the data is available
+             *    on the next request, e.g. after a redirect. PHPs auto-save at script end via
+             *    session_register_shutdown is executed after fastcgi_finish_request. So in this case
+             *    the data could be missing the next request because it might not be saved the moment
+             *    the new request is processed.
+             *  * A locking save handler (e.g. the native 'files') circumvents concurrency problems like
+             *    the one above. But by saving the session before long-running things in the terminate event,
+             *    we ensure the session is not blocked longer than needed.
+             *  * When regenerating the session ID no locking is involved in PHPs session design. See
+             *    https://bugs.php.net/bug.php?id=61470 for a discussion. So in this case, the session must
+             *    be saved anyway before sending the headers with the new session ID. Otherwise session
+             *    data could get lost again for concurrent requests with the new ID. One result could be
+             *    that you get logged out after just logging in.
+             *
+             * This listener should be executed as one of the last listeners, so that previous listeners
+             * can still operate on the open session. This prevents the overhead of restarting it.
+             * Listeners after closing the session can still work with the session as usual because
+             * Symfonys session implementation starts the session on demand. So writing to it after
+             * it is saved will just restart it.
+             */
+            $session->save();
+        }
     }
 
     public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::REQUEST => array('onKernelRequest', 128),
-            // low priority to come after regular response listeners, same as SaveSessionListener
+            // low priority to come after regular response listeners, but higher than StreamedResponseListener
             KernelEvents::RESPONSE => array('onKernelResponse', -1000),
         );
     }

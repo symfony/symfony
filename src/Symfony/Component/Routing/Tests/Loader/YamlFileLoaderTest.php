@@ -182,4 +182,15 @@ class YamlFileLoaderTest extends TestCase
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
         $loader->load('import_override_defaults.yml');
     }
+
+    public function testImportRouteWithNamePrefix()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_name_prefix')));
+        $routeCollection = $loader->load('routing.yml');
+
+        $this->assertNotNull($routeCollection->get('app_blog'));
+        $this->assertEquals('/blog', $routeCollection->get('app_blog')->getPath());
+        $this->assertNotNull($routeCollection->get('api_app_blog'));
+        $this->assertEquals('/api/blog', $routeCollection->get('api_app_blog')->getPath());
+    }
 }

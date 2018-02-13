@@ -59,6 +59,9 @@ class File extends Constraint
 
     protected $maxSize;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($options = null)
     {
         parent::__construct($options);

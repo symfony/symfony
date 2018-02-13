@@ -27,7 +27,7 @@ class AnonymousToken extends AbstractToken
      * @param string|object $user   The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string
      * @param Role[]        $roles  An array of roles
      */
-    public function __construct($secret, $user, array $roles = array())
+    public function __construct(string $secret, $user, array $roles = array())
     {
         parent::__construct($roles);
 

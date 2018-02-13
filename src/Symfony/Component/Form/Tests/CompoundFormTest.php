@@ -597,7 +597,7 @@ class CompoundFormTest extends AbstractFormTest
     {
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
-
+        file_put_contents($path, 'zaza');
         $values = array(
             'author' => array(
                 'name' => 'Bernhard',
@@ -609,7 +609,7 @@ class CompoundFormTest extends AbstractFormTest
             'author' => array(
                 'error' => array('image' => UPLOAD_ERR_OK),
                 'name' => array('image' => 'upload.png'),
-                'size' => array('image' => 123),
+                'size' => array('image' => null),
                 'tmp_name' => array('image' => $path),
                 'type' => array('image' => 'image/png'),
             ),
@@ -630,7 +630,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->handleRequest($request);
 
-        $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', UPLOAD_ERR_OK);
 
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals($file, $form['image']->getData());
@@ -645,6 +645,7 @@ class CompoundFormTest extends AbstractFormTest
     {
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
+        file_put_contents($path, 'zaza');
 
         $values = array(
             'name' => 'Bernhard',
@@ -655,7 +656,7 @@ class CompoundFormTest extends AbstractFormTest
             'image' => array(
                 'error' => UPLOAD_ERR_OK,
                 'name' => 'upload.png',
-                'size' => 123,
+                'size' => null,
                 'tmp_name' => $path,
                 'type' => 'image/png',
             ),
@@ -676,7 +677,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->handleRequest($request);
 
-        $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', UPLOAD_ERR_OK);
 
         $this->assertEquals('Bernhard', $form['name']->getData());
         $this->assertEquals($file, $form['image']->getData());
@@ -692,12 +693,13 @@ class CompoundFormTest extends AbstractFormTest
     {
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
+        file_put_contents($path, 'zaza');
 
         $files = array(
             'image' => array(
                 'error' => UPLOAD_ERR_OK,
                 'name' => 'upload.png',
-                'size' => 123,
+                'size' => null,
                 'tmp_name' => $path,
                 'type' => 'image/png',
             ),
@@ -714,7 +716,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $form->handleRequest($request);
 
-        $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
+        $file = new UploadedFile($path, 'upload.png', 'image/png', UPLOAD_ERR_OK);
 
         $this->assertEquals($file, $form->getData());
 
@@ -728,6 +730,7 @@ class CompoundFormTest extends AbstractFormTest
     {
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
+        file_put_contents($path, 'zaza');
 
         $values = array(
             'name' => 'Bernhard',

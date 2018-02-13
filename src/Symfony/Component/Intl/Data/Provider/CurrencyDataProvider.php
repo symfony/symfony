@@ -39,7 +39,7 @@ class CurrencyDataProvider
      * @param string                     $path   The path to the resource bundle
      * @param BundleEntryReaderInterface $reader The reader for reading the resource bundle
      */
-    public function __construct($path, BundleEntryReaderInterface $reader)
+    public function __construct(string $path, BundleEntryReaderInterface $reader)
     {
         $this->path = $path;
         $this->reader = $reader;

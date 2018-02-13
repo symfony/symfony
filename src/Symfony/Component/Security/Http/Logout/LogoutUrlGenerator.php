@@ -48,21 +48,8 @@ class LogoutUrlGenerator
      * @param CsrfTokenManagerInterface|null $csrfTokenManager A CsrfTokenManagerInterface instance
      * @param string|null                    $context          The listener context
      */
-    public function registerListener($key, $logoutPath, $csrfTokenId, $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null/*, string $context = null*/)
+    public function registerListener($key, $logoutPath, $csrfTokenId, $csrfParameter, CsrfTokenManagerInterface $csrfTokenManager = null, string $context = null)
     {
-        if (func_num_args() >= 6) {
-            $context = func_get_arg(5);
-        } else {
-            if (__CLASS__ !== get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a sixth `string $context = null` argument in version 4.0. Not defining it is deprecated since Symfony 3.3.', __METHOD__), E_USER_DEPRECATED);
-                }
-            }
-
-            $context = null;
-        }
-
         $this->listeners[$key] = array($logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager, $context);
     }
 

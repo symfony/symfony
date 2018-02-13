@@ -105,6 +105,28 @@ class DateTypeTest extends BaseTypeTest
         $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
+    public function testSubmitFromSingleTextDateTimeImmutable()
+    {
+        // we test against "de_DE", so we need the full implementation
+        IntlTestHelper::requireFullIntl($this, false);
+
+        \Locale::setDefault('de_DE');
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'datetime_immutable',
+        ));
+
+        $form->submit('2.6.2010');
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $form->getData());
+        $this->assertEquals(new \DateTimeImmutable('2010-06-02 UTC'), $form->getData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
+    }
+
     public function testSubmitFromSingleTextString()
     {
         // we test against "de_DE", so we need the full implementation

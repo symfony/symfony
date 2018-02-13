@@ -56,7 +56,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
             } catch (InvalidArgumentException $e) {
                 throw new InvalidArgumentException(sprintf('Unable to replace alias "%s" with actual definition "%s".', $definitionId, $targetId), null, $e);
             }
-            if ($definition->isPublic() || $definition->isPrivate()) {
+            if ($definition->isPublic()) {
                 continue;
             }
             // Remove private definition and schedule for replacement

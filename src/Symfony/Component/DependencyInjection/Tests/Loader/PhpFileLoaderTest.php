@@ -61,7 +61,7 @@ class PhpFileLoaderTest extends TestCase
         $container->compile();
 
         $dumper = new YamlDumper($container);
-        $this->assertStringEqualsFile($fixtures.'/config/'.$file.'.expected.yml', $dumper->dump());
+        $this->assertStringMatchesFormatFile($fixtures.'/config/'.$file.'.expected.yml', $dumper->dump());
     }
 
     public function provideConfig()
@@ -71,10 +71,8 @@ class PhpFileLoaderTest extends TestCase
         yield array('instanceof');
         yield array('prototype');
         yield array('child');
-
-        if (\PHP_VERSION_ID >= 70000) {
-            yield array('php7');
-        }
+        yield array('php7');
+        yield array('anonymous');
     }
 
     /**

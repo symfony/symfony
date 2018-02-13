@@ -39,7 +39,7 @@ class JsonResponse extends Response
      * @param array $headers An array of response headers
      * @param bool  $json    If the data is already a JSON string
      */
-    public function __construct($data = null, $status = 200, $headers = array(), $json = false)
+    public function __construct($data = null, int $status = 200, array $headers = array(), bool $json = false)
     {
         parent::__construct('', $status, $headers);
 
@@ -139,29 +139,13 @@ class JsonResponse extends Response
      */
     public function setData($data = array())
     {
-        if (defined('HHVM_VERSION')) {
-            // HHVM does not trigger any warnings and let exceptions
-            // thrown from a JsonSerializable object pass through.
-            // If only PHP did the same...
+        try {
             $data = json_encode($data, $this->encodingOptions);
-        } else {
-            if (!interface_exists('JsonSerializable', false)) {
-                set_error_handler(function () { return false; });
-                try {
-                    $data = @json_encode($data, $this->encodingOptions);
-                } finally {
-                    restore_error_handler();
-                }
-            } else {
-                try {
-                    $data = json_encode($data, $this->encodingOptions);
-                } catch (\Exception $e) {
-                    if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
-                        throw $e->getPrevious() ?: $e;
-                    }
-                    throw $e;
-                }
+        } catch (\Exception $e) {
+            if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                throw $e->getPrevious() ?: $e;
             }
+            throw $e;
         }
 
         if (JSON_ERROR_NONE !== json_last_error()) {

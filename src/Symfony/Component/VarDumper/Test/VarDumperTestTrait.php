@@ -19,26 +19,14 @@ use Symfony\Component\VarDumper\Dumper\CliDumper;
  */
 trait VarDumperTestTrait
 {
-    public function assertDumpEquals($dump, $data, $filter = 0, $message = '')
+    public function assertDumpEquals($expected, $data, $filter = 0, $message = '')
     {
-        if (is_string($filter)) {
-            @trigger_error(sprintf('The $message argument of the "%s()" method at 3rd position is deprecated since Symfony 3.4 and will be moved at 4th position in 4.0.', __METHOD__), E_USER_DEPRECATED);
-            $message = $filter;
-            $filter = 0;
-        }
-
-        $this->assertSame(rtrim($dump), $this->getDump($data, null, $filter), $message);
+        $this->assertSame($this->prepareExpectation($expected, $filter), $this->getDump($data, null, $filter), $message);
     }
 
-    public function assertDumpMatchesFormat($dump, $data, $filter = 0, $message = '')
+    public function assertDumpMatchesFormat($expected, $data, $filter = 0, $message = '')
     {
-        if (is_string($filter)) {
-            @trigger_error(sprintf('The $message argument of the "%s()" method at 3rd position is deprecated since Symfony 3.4 and will be moved at 4th position in 4.0.', __METHOD__), E_USER_DEPRECATED);
-            $message = $filter;
-            $filter = 0;
-        }
-
-        $this->assertStringMatchesFormat(rtrim($dump), $this->getDump($data, null, $filter), $message);
+        $this->assertStringMatchesFormat($this->prepareExpectation($expected, $filter), $this->getDump($data, null, $filter), $message);
     }
 
     protected function getDump($data, $key = null, $filter = 0)
@@ -56,5 +44,14 @@ trait VarDumperTestTrait
         }
 
         return rtrim($dumper->dump($data, true));
+    }
+
+    private function prepareExpectation($expected, $filter)
+    {
+        if (!is_string($expected)) {
+            $expected = $this->getDump($expected, null, $filter);
+        }
+
+        return rtrim($expected);
     }
 }

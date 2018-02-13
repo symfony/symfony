@@ -59,12 +59,12 @@ class ChoiceValidator extends ConstraintValidator
         }
 
         if (true !== $constraint->strict) {
-            @trigger_error('Not setting the strict option of the Choice constraint to true is deprecated since Symfony 3.4 and will throw an exception in 4.0.', E_USER_DEPRECATED);
+            throw new \RuntimeException('The "strict" option of the Choice constraint should not be used.');
         }
 
         if ($constraint->multiple) {
             foreach ($value as $_value) {
-                if (!in_array($_value, $choices, $constraint->strict)) {
+                if (!in_array($_value, $choices, true)) {
                     $this->context->buildViolation($constraint->multipleMessage)
                         ->setParameter('{{ value }}', $this->formatValue($_value))
                         ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
@@ -96,7 +96,7 @@ class ChoiceValidator extends ConstraintValidator
 
                 return;
             }
-        } elseif (!in_array($value, $choices, $constraint->strict)) {
+        } elseif (!in_array($value, $choices, true)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Choice::NO_SUCH_CHOICE_ERROR)

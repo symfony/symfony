@@ -21,7 +21,7 @@
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="profiler" />
             <argument type="service" id="request_stack" />
-            <argument type="service" id="profiler.request_matcher" on-invalid="null" />
+            <argument>null</argument>
             <argument>%profiler_listener.only_exceptions%</argument>
             <argument>%profiler_listener.only_master_requests%</argument>
         </service>

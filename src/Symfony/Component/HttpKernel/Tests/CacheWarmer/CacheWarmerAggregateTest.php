@@ -38,34 +38,6 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(self::$cacheDir);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testInjectWarmersUsingAdd()
-    {
-        $warmer = $this->getCacheWarmerMock();
-        $warmer
-            ->expects($this->once())
-            ->method('warmUp');
-        $aggregate = new CacheWarmerAggregate();
-        $aggregate->add($warmer);
-        $aggregate->warmUp(self::$cacheDir);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testInjectWarmersUsingSetWarmers()
-    {
-        $warmer = $this->getCacheWarmerMock();
-        $warmer
-            ->expects($this->once())
-            ->method('warmUp');
-        $aggregate = new CacheWarmerAggregate();
-        $aggregate->setWarmers(array($warmer));
-        $aggregate->warmUp(self::$cacheDir);
-    }
-
     public function testWarmupDoesCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsEnabled()
     {
         $warmer = $this->getCacheWarmerMock();

@@ -8,6 +8,7 @@ use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
+use Symfony\Component\Workflow\SupportStrategy\WorkflowSupportStrategyInterface;
 use Symfony\Component\Workflow\Workflow;
 
 class RegistryTest extends TestCase
@@ -18,14 +19,29 @@ class RegistryTest extends TestCase
     {
         $this->registry = new Registry();
 
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->createSupportStrategy(Subject1::class));
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), $this->createSupportStrategy(Subject2::class));
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->createSupportStrategy(Subject2::class));
+        $this->registry->addWorkflow(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->createWorkflowSupportStrategy(Subject1::class));
+        $this->registry->addWorkflow(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), $this->createWorkflowSupportStrategy(Subject2::class));
+        $this->registry->addWorkflow(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->createWorkflowSupportStrategy(Subject2::class));
     }
 
     protected function tearDown()
     {
         $this->registry = null;
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Symfony\Component\Workflow\Registry::add is deprecated since Symfony 4.1. Use addWorkflow() instead.
+     */
+    public function testAddIsDeprecated()
+    {
+        $registry = new Registry();
+
+        $registry->add($w = new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->createSupportStrategy(Subject1::class));
+
+        $workflow = $registry->get(new Subject1());
+        $this->assertInstanceOf(Workflow::class, $workflow);
+        $this->assertSame('workflow1', $workflow->getName());
     }
 
     public function testGetWithSuccess()
@@ -68,29 +84,23 @@ class RegistryTest extends TestCase
     /**
      * @group legacy
      */
-    public function testGetWithSuccessLegacyStrategy()
-    {
-        $registry = new Registry();
-
-        $registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), Subject1::class);
-        $registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), Subject2::class);
-
-        $workflow = $registry->get(new Subject1());
-        $this->assertInstanceOf(Workflow::class, $workflow);
-        $this->assertSame('workflow1', $workflow->getName());
-
-        $workflow = $registry->get(new Subject1(), 'workflow1');
-        $this->assertInstanceOf(Workflow::class, $workflow);
-        $this->assertSame('workflow1', $workflow->getName());
-
-        $workflow = $registry->get(new Subject2(), 'workflow2');
-        $this->assertInstanceOf(Workflow::class, $workflow);
-        $this->assertSame('workflow2', $workflow->getName());
-    }
-
     private function createSupportStrategy($supportedClassName)
     {
         $strategy = $this->getMockBuilder(SupportStrategyInterface::class)->getMock();
+        $strategy->expects($this->any())->method('supports')
+            ->will($this->returnCallback(function ($workflow, $subject) use ($supportedClassName) {
+                return $subject instanceof $supportedClassName;
+            }));
+
+        return $strategy;
+    }
+
+    /**
+     * @group legacy
+     */
+    private function createWorkflowSupportStrategy($supportedClassName)
+    {
+        $strategy = $this->getMockBuilder(WorkflowSupportStrategyInterface::class)->getMock();
         $strategy->expects($this->any())->method('supports')
             ->will($this->returnCallback(function ($workflow, $subject) use ($supportedClassName) {
                 return $subject instanceof $supportedClassName;

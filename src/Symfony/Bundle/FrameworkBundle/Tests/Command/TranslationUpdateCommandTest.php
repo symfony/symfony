@@ -187,53 +187,6 @@ class TranslationUpdateCommandTest extends TestCase
         return new CommandTester($application->find('translation:update'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand::__construct() expects an instance of "Symfony\Component\Translation\Writer\TranslationWriterInterface" as first argument since Symfony 3.4. Not passing it is deprecated and will throw a TypeError in 4.0.
-     */
-    public function testLegacyUpdateCommand()
-    {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $extractor = $this->getMockBuilder('Symfony\Component\Translation\Extractor\ExtractorInterface')->getMock();
-        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader')->getMock();
-        $writer = $this->getMockBuilder('Symfony\Component\Translation\Writer\TranslationWriter')->getMock();
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
-        $kernel
-            ->expects($this->any())
-            ->method('getBundles')
-            ->will($this->returnValue(array()));
-
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-        $container
-            ->expects($this->any())
-            ->method('get')
-            ->will($this->returnValueMap(array(
-                array('translation.extractor', 1, $extractor),
-                array('translation.reader', 1, $loader),
-                array('translation.writer', 1, $writer),
-                array('translator', 1, $translator),
-                array('kernel', 1, $kernel),
-            )));
-
-        $kernel
-            ->expects($this->any())
-            ->method('getContainer')
-            ->will($this->returnValue($container));
-
-        $command = new TranslationUpdateCommand();
-        $command->setContainer($container);
-
-        $application = new Application($kernel);
-        $application->add($command);
-
-        $tester = new CommandTester($application->find('translation:update'));
-        $tester->execute(array('locale' => 'en'));
-
-        $this->assertContains('You must choose one of --force or --dump-messages', $tester->getDisplay());
-    }
-
     private function getBundle($path)
     {
         $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();

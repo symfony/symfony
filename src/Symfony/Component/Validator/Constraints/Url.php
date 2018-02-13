@@ -21,18 +21,69 @@ use Symfony\Component\Validator\Constraint;
  */
 class Url extends Constraint
 {
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_ANY = 'ANY';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_NONE = false;
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_A = 'A';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_A6 = 'A6';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_AAAA = 'AAAA';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_CNAME = 'CNAME';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_MX = 'MX';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_NAPTR = 'NAPTR';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_NS = 'NS';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_PTR = 'PTR';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_SOA = 'SOA';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_SRV = 'SRV';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     const CHECK_DNS_TYPE_TXT = 'TXT';
 
     const INVALID_URL_ERROR = '57c2f299-1154-4870-89bb-ef3b1f5ad229';
@@ -42,7 +93,29 @@ class Url extends Constraint
     );
 
     public $message = 'This value is not a valid URL.';
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     public $dnsMessage = 'The host could not be resolved.';
     public $protocols = array('http', 'https');
+
+    /**
+     * @deprecated since Symfony 4.1, to be removed in 5.0
+     */
     public $checkDNS = self::CHECK_DNS_TYPE_NONE;
+
+    public function __construct($options = null)
+    {
+        if (is_array($options)) {
+            if (array_key_exists('checkDNS', $options)) {
+                @trigger_error(sprintf('The "checkDNS" option in "%s" is deprecated since Symfony 4.1 and will be removed in 5.0. Its false-positive rate is too high to be relied upon.', self::class), E_USER_DEPRECATED);
+            }
+            if (array_key_exists('dnsMessage', $options)) {
+                @trigger_error(sprintf('The "dnsMessage" option in "%s" is deprecated since Symfony 4.1 and will be removed in 5.0.', self::class), E_USER_DEPRECATED);
+            }
+        }
+
+        parent::__construct($options);
+    }
 }

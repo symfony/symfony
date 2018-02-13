@@ -23,58 +23,23 @@ class TemplateControllerTest extends TestCase
     public function testTwig()
     {
         $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->willReturn('bar');
+        $twig->expects($this->exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController($twig);
 
         $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
+        $this->assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
     public function testTemplating()
     {
         $templating = $this->getMockBuilder(EngineInterface::class)->getMock();
-        $templating->expects($this->once())->method('render')->willReturn('bar');
+        $templating->expects($this->exactly(2))->method('render')->willReturn('bar');
 
         $controller = new TemplateController(null, $templating);
 
         $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyTwig()
-    {
-        $twig = $this->getMockBuilder('Twig\Environment')->disableOriginalConstructor()->getMock();
-        $twig->expects($this->once())->method('render')->willReturn('bar');
-
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-        $container->expects($this->at(0))->method('has')->will($this->returnValue(false));
-        $container->expects($this->at(1))->method('has')->will($this->returnValue(true));
-        $container->expects($this->at(2))->method('get')->will($this->returnValue($twig));
-
-        $controller = new TemplateController();
-        $controller->setContainer($container);
-
-        $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyTemplating()
-    {
-        $templating = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
-        $templating->expects($this->once())->method('render')->willReturn('bar');
-
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
-        $container->expects($this->at(0))->method('has')->willReturn(true);
-        $container->expects($this->at(1))->method('get')->will($this->returnValue($templating));
-
-        $controller = new TemplateController();
-        $controller->setContainer($container);
-
-        $this->assertEquals('bar', $controller->templateAction('mytemplate')->getContent());
+        $this->assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
     /**
@@ -86,5 +51,6 @@ class TemplateControllerTest extends TestCase
         $controller = new TemplateController();
 
         $controller->templateAction('mytemplate')->getContent();
+        $controller('mytemplate')->getContent();
     }
 }

@@ -12,7 +12,6 @@ $container->loadFromExtension('security', array(
         'main' => array(
             'provider' => 'undefined',
             'form_login' => true,
-            'logout_on_user_change' => true,
         ),
     ),
 ));

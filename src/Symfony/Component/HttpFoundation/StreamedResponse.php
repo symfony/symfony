@@ -35,7 +35,7 @@ class StreamedResponse extends Response
      * @param int           $status   The response status code
      * @param array         $headers  An array of response headers
      */
-    public function __construct(callable $callback = null, $status = 200, $headers = array())
+    public function __construct(callable $callback = null, int $status = 200, array $headers = array())
     {
         parent::__construct(null, $status, $headers);
 

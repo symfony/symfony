@@ -257,7 +257,7 @@ class NumberFormatter
      * @throws MethodArgumentValueNotImplementedException When the $style is not supported
      * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
-    public function __construct($locale = 'en', $style = null, $pattern = null)
+    public function __construct(?string $locale = 'en', int $style = null, $pattern = null)
     {
         if ('en' !== $locale && null !== $locale) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');

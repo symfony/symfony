@@ -5,14 +5,6 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="router.options.generator_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
-        <parameter key="router.options.generator_base_class">Symfony\Component\Routing\Generator\UrlGenerator</parameter>
-        <parameter key="router.options.generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper</parameter>
-        <parameter key="router.options.matcher_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</parameter>
-        <parameter key="router.options.matcher_base_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</parameter>
-        <parameter key="router.options.matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper</parameter>
-        <parameter key="router.options.matcher.cache_class">%router.cache_class_prefix%UrlMatcher</parameter>
-        <parameter key="router.options.generator.cache_class">%router.cache_class_prefix%UrlGenerator</parameter>
         <parameter key="router.request_context.host">localhost</parameter>
         <parameter key="router.request_context.scheme">http</parameter>
         <parameter key="router.request_context.base_url"></parameter>
@@ -59,21 +51,25 @@
         </service>
 
         <service id="router.default" class="Symfony\Bundle\FrameworkBundle\Routing\Router">
-            <argument type="service" id="service_container" />
+            <tag name="monolog.logger" channel="router" />
+            <tag name="container.service_subscriber" id="routing.loader" />
+            <argument type="service" id="Psr\Container\ContainerInterface" />
             <argument>%router.resource%</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
-                <argument key="generator_class">%router.options.generator_class%</argument>
-                <argument key="generator_base_class">%router.options.generator_base_class%</argument>
-                <argument key="generator_dumper_class">%router.options.generator_dumper_class%</argument>
-                <argument key="generator_cache_class">%router.options.generator.cache_class%</argument>
-                <argument key="matcher_class">%router.options.matcher_class%</argument>
-                <argument key="matcher_base_class">%router.options.matcher_base_class%</argument>
-                <argument key="matcher_dumper_class">%router.options.matcher_dumper_class%</argument>
-                <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
+                <argument key="generator_class">Symfony\Component\Routing\Generator\UrlGenerator</argument>
+                <argument key="generator_base_class">Symfony\Component\Routing\Generator\UrlGenerator</argument>
+                <argument key="generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper</argument>
+                <argument key="generator_cache_class">%router.cache_class_prefix%UrlGenerator</argument>
+                <argument key="matcher_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</argument>
+                <argument key="matcher_base_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</argument>
+                <argument key="matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper</argument>
+                <argument key="matcher_cache_class">%router.cache_class_prefix%UrlMatcher</argument>
             </argument>
             <argument type="service" id="router.request_context" on-invalid="ignore" />
+            <argument type="service" id="parameter_bag" on-invalid="ignore" />
+            <argument type="service" id="logger" on-invalid="ignore" />
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
             </call>

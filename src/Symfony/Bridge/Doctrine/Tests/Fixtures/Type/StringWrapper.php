@@ -15,10 +15,7 @@ class StringWrapper
 {
     private $string;
 
-    /**
-     * @param string $string
-     */
-    public function __construct($string = null)
+    public function __construct(string $string = null)
     {
         $this->string = $string;
     }

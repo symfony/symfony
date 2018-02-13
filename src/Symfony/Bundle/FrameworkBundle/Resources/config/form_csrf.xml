@@ -16,10 +16,5 @@
             <argument>%validator.translation_domain%</argument>
             <argument type="service" id="form.server_params" />
         </service>
-
-        <service id="deprecated.form.registry.csrf" class="stdClass">
-            <property name="registry" type="collection" />
-            <deprecated>The service "%service_id%" is internal and deprecated since Symfony 3.3 and will be removed in Symfony 4.0</deprecated>
-        </service>
     </services>
 </container>

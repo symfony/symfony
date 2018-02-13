@@ -184,9 +184,8 @@ class RouteCompilerTest extends TestCase
     }
 
     /**
-     * @group legacy
      * @dataProvider provideCompileImplicitUtf8Data
-     * @expectedDeprecation Using UTF-8 route %s without setting the "utf8" option is deprecated %s.
+     * @expectedException \LogicException
      */
     public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens, $deprecationType)
     {

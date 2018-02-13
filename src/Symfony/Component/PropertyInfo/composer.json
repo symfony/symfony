@@ -23,20 +23,20 @@
         }
     ],
     "require": {
-        "php": "^5.5.9|>=7.0.8",
-        "symfony/inflector": "~3.1|~4.0"
+        "php": "^7.1.3",
+        "symfony/inflector": "~3.4|~4.0"
     },
     "require-dev": {
-        "symfony/serializer": "~2.8|~3.0|~4.0",
-        "symfony/cache": "~3.1|~4.0",
-        "symfony/dependency-injection": "~3.3|~4.0",
+        "symfony/serializer": "~3.4|~4.0",
+        "symfony/cache": "~3.4|~4.0",
+        "symfony/dependency-injection": "~3.4|~4.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0",
         "doctrine/annotations": "~1.0"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
         "phpdocumentor/type-resolver": "<0.2.1",
-        "symfony/dependency-injection": "<3.3"
+        "symfony/dependency-injection": "<3.4"
     },
     "suggest": {
         "psr/cache-implementation": "To cache results",
@@ -53,7 +53,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.4-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

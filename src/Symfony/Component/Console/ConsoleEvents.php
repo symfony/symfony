@@ -36,19 +36,6 @@ final class ConsoleEvents
     const TERMINATE = 'console.terminate';
 
     /**
-     * The EXCEPTION event occurs when an uncaught exception appears
-     * while executing Command#run().
-     *
-     * This event allows you to deal with the exception or
-     * to modify the thrown exception.
-     *
-     * @Event("Symfony\Component\Console\Event\ConsoleExceptionEvent")
-     *
-     * @deprecated The console.exception event is deprecated since version 3.3 and will be removed in 4.0. Use the console.error event instead.
-     */
-    const EXCEPTION = 'console.exception';
-
-    /**
      * The ERROR event occurs when an uncaught exception or error appears.
      *
      * This event allows you to deal with the exception/error or

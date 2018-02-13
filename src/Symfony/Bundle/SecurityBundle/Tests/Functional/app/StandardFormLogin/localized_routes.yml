@@ -13,7 +13,6 @@ security:
 
     firewalls:
         default:
-            logout_on_user_change: true
             form_login:
                 login_path: localized_login_path
                 check_path: localized_check_path

@@ -18,7 +18,6 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
-use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
@@ -63,7 +62,7 @@ class FirewallMapTest extends TestCase
 
         $firewallContext = $this->getMockBuilder(FirewallContext::class)->disableOriginalConstructor()->getMock();
 
-        $firewallConfig = new FirewallConfig('main', $this->getMockBuilder(UserCheckerInterface::class)->getMock());
+        $firewallConfig = new FirewallConfig('main', 'user_checker');
         $firewallContext->expects($this->once())->method('getConfig')->willReturn($firewallConfig);
 
         $listener = $this->getMockBuilder(ListenerInterface::class)->getMock();

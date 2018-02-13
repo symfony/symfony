@@ -12,6 +12,7 @@
 namespace Symfony\Component\Debug\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -123,6 +124,16 @@ class FlattenExceptionTest extends TestCase
         $this->assertInstanceOf($flattened->getClass(), $exception, 'The class is set to the class of the original exception');
     }
 
+    public function testThrowable()
+    {
+        $exception = new FatalThrowableError(new \DivisionByZeroError('Ouch', 42));
+        $flattened = FlattenException::create($exception);
+
+        $this->assertSame('Ouch', $flattened->getMessage(), 'The message is copied from the original error.');
+        $this->assertSame(42, $flattened->getCode(), 'The code is copied from the original error.');
+        $this->assertSame('DivisionByZeroError', $flattened->getClass(), 'The class is set to the class of the original error');
+    }
+
     /**
      * @dataProvider flattenDataProvider
      */
@@ -138,18 +149,15 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(array($flattened2), $flattened->getAllPrevious());
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testPreviousError()
     {
         $exception = new \Exception('test', 123, new \ParseError('Oh noes!', 42));
 
         $flattened = FlattenException::create($exception)->getPrevious();
 
-        $this->assertEquals($flattened->getMessage(), 'Parse error: Oh noes!', 'The message is copied from the original exception.');
+        $this->assertEquals($flattened->getMessage(), 'Oh noes!', 'The message is copied from the original exception.');
         $this->assertEquals($flattened->getCode(), 42, 'The code is copied from the original exception.');
-        $this->assertEquals($flattened->getClass(), 'Symfony\Component\Debug\Exception\FatalThrowableError', 'The class is set to the class of the original exception');
+        $this->assertEquals($flattened->getClass(), 'ParseError', 'The class is set to the class of the original exception');
     }
 
     /**
@@ -236,7 +244,7 @@ class FlattenExceptionTest extends TestCase
         $this->assertSame(array('object', 'stdClass'), $array[$i++]);
         $this->assertSame(array('object', 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'), $array[$i++]);
         $this->assertSame(array('incomplete-object', 'BogusTestClass'), $array[$i++]);
-        $this->assertSame(array('resource', defined('HHVM_VERSION') ? 'Directory' : 'stream'), $array[$i++]);
+        $this->assertSame(array('resource', 'stream'), $array[$i++]);
         $this->assertSame(array('resource', 'stream'), $array[$i++]);
 
         $args = $array[$i++];

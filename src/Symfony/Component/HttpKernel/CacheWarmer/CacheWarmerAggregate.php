@@ -20,16 +20,12 @@ namespace Symfony\Component\HttpKernel\CacheWarmer;
  */
 class CacheWarmerAggregate implements CacheWarmerInterface
 {
-    protected $warmers = array();
-    protected $optionalsEnabled = false;
-    private $triggerDeprecation = false;
+    private $warmers;
+    private $optionalsEnabled = false;
 
-    public function __construct($warmers = array())
+    public function __construct(iterable $warmers = array())
     {
-        foreach ($warmers as $warmer) {
-            $this->add($warmer);
-        }
-        $this->triggerDeprecation = true;
+        $this->warmers = $warmers;
     }
 
     public function enableOptionalWarmers()
@@ -61,30 +57,5 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     public function isOptional()
     {
         return false;
-    }
-
-    /**
-     * @deprecated since version 3.4, to be removed in 4.0, inject the list of clearers as a constructor argument instead.
-     */
-    public function setWarmers(array $warmers)
-    {
-        @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0, inject the list of clearers as a constructor argument instead.', __METHOD__), E_USER_DEPRECATED);
-
-        $this->warmers = array();
-        foreach ($warmers as $warmer) {
-            $this->add($warmer);
-        }
-    }
-
-    /**
-     * @deprecated since version 3.4, to be removed in 4.0, inject the list of clearers as a constructor argument instead.
-     */
-    public function add(CacheWarmerInterface $warmer)
-    {
-        if ($this->triggerDeprecation) {
-            @trigger_error(sprintf('The "%s()" method is deprecated since Symfony 3.4 and will be removed in 4.0, inject the list of clearers as a constructor argument instead.', __METHOD__), E_USER_DEPRECATED);
-        }
-
-        $this->warmers[] = $warmer;
     }
 }

@@ -21,11 +21,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class DateTimeValidator extends DateValidator
 {
     /**
-     * @deprecated since version 3.1, to be removed in 4.0.
-     */
-    const PATTERN = '/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/';
-
-    /**
      * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)

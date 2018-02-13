@@ -38,7 +38,7 @@ class MemcachedStore implements StoreInterface
      * @param \Memcached $memcached
      * @param int        $initialTtl the expiration delay of locks in seconds
      */
-    public function __construct(\Memcached $memcached, $initialTtl = 300)
+    public function __construct(\Memcached $memcached, int $initialTtl = 300)
     {
         if (!static::isSupported()) {
             throw new InvalidArgumentException('Memcached extension is required');
@@ -149,12 +149,8 @@ class MemcachedStore implements StoreInterface
 
     /**
      * Retrieve an unique token for the given key.
-     *
-     * @param Key $key
-     *
-     * @return string
      */
-    private function getToken(Key $key)
+    private function getToken(Key $key): string
     {
         if (!$key->hasState(__CLASS__)) {
             $token = base64_encode(random_bytes(32));

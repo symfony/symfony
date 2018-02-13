@@ -32,7 +32,7 @@ class Event extends BaseEvent
      * @param Transition $transition
      * @param string     $workflowName
      */
-    public function __construct($subject, Marking $marking, Transition $transition, $workflowName = 'unnamed')
+    public function __construct($subject, Marking $marking, Transition $transition, string $workflowName = 'unnamed')
     {
         $this->subject = $subject;
         $this->marking = $marking;

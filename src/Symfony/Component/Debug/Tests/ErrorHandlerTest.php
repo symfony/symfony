@@ -299,9 +299,6 @@ class ErrorHandlerTest extends TestCase
         @$handler->handleError(E_USER_DEPRECATED, 'Foo deprecation', __FILE__, __LINE__, array());
     }
 
-    /**
-     * @group no-hhvm
-     */
     public function testHandleException()
     {
         try {
@@ -337,38 +334,6 @@ class ErrorHandlerTest extends TestCase
             });
 
             $handler->handleException($exception);
-        } finally {
-            restore_error_handler();
-            restore_exception_handler();
-        }
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testErrorStacking()
-    {
-        try {
-            $handler = ErrorHandler::register();
-            $handler->screamAt(E_USER_WARNING);
-
-            $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
-
-            $logger
-                ->expects($this->exactly(2))
-                ->method('log')
-                ->withConsecutive(
-                    array($this->equalTo(LogLevel::WARNING), $this->equalTo('Dummy log')),
-                    array($this->equalTo(LogLevel::DEBUG), $this->equalTo('User Warning: Silenced warning'))
-                )
-            ;
-
-            $handler->setDefaultLogger($logger, array(E_USER_WARNING => LogLevel::WARNING));
-
-            ErrorHandler::stackErrors();
-            @trigger_error('Silenced warning', E_USER_WARNING);
-            $logger->log(LogLevel::WARNING, 'Dummy log');
-            ErrorHandler::unstackErrors();
         } finally {
             restore_error_handler();
             restore_exception_handler();
@@ -426,9 +391,6 @@ class ErrorHandlerTest extends TestCase
         $handler->setLoggers(array(E_DEPRECATED => array($mockLogger, LogLevel::WARNING)));
     }
 
-    /**
-     * @group no-hhvm
-     */
     public function testSettingLoggerWhenExceptionIsBuffered()
     {
         $bootLogger = new BufferingLogger();
@@ -448,9 +410,6 @@ class ErrorHandlerTest extends TestCase
         $handler->handleException($exception);
     }
 
-    /**
-     * @group no-hhvm
-     */
     public function testHandleFatalError()
     {
         try {
@@ -491,9 +450,6 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
-    /**
-     * @requires PHP 7
-     */
     public function testHandleErrorException()
     {
         $exception = new \Error("Class 'Foo' not found");
@@ -507,42 +463,5 @@ class ErrorHandlerTest extends TestCase
 
         $this->assertInstanceOf('Symfony\Component\Debug\Exception\ClassNotFoundException', $args[0]);
         $this->assertStringStartsWith("Attempted to load class \"Foo\" from the global namespace.\nDid you forget a \"use\" statement", $args[0]->getMessage());
-    }
-
-    /**
-     * @group no-hhvm
-     */
-    public function testHandleFatalErrorOnHHVM()
-    {
-        try {
-            $handler = ErrorHandler::register();
-
-            $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
-            $logger
-                ->expects($this->once())
-                ->method('log')
-                ->with(
-                    $this->equalTo(LogLevel::CRITICAL),
-                    $this->equalTo('Fatal Error: foo')
-                )
-            ;
-
-            $handler->setDefaultLogger($logger, E_ERROR);
-
-            $error = array(
-                'type' => E_ERROR + 0x1000000, // This error level is used by HHVM for fatal errors
-                'message' => 'foo',
-                'file' => 'bar',
-                'line' => 123,
-                'context' => array(123),
-                'backtrace' => array(456),
-            );
-
-            call_user_func_array(array($handler, 'handleError'), $error);
-            $handler->handleFatalError($error);
-        } finally {
-            restore_error_handler();
-            restore_exception_handler();
-        }
     }
 }

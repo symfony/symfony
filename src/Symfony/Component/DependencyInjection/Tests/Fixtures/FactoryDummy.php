@@ -21,7 +21,6 @@ class FactoryDummy extends FactoryParent
     {
     }
 
-    // Not supported by hhvm
     public function createBuiltin(): int
     {
     }

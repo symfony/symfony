@@ -33,7 +33,7 @@ class NativeSessionTokenStorage implements TokenStorageInterface
      *
      * @param string $namespace The namespace under which the token is stored in the session
      */
-    public function __construct($namespace = self::SESSION_NAMESPACE)
+    public function __construct(string $namespace = self::SESSION_NAMESPACE)
     {
         $this->namespace = $namespace;
     }

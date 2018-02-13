@@ -17,11 +17,16 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Http\Controller\UserValueResolver;
+
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1 and will be removed in 5.0, use "%s" instead.', SecurityUserValueResolver::class, UserValueResolver::class), E_USER_DEPRECATED);
 
 /**
  * Supports the argument type of {@see UserInterface}.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
+ *
+ * @deprecated since Symfony 4.1, to be removed in 5.0. Use {@link UserValueResolver} instead
  */
 final class SecurityUserValueResolver implements ArgumentValueResolverInterface
 {

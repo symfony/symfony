@@ -38,7 +38,7 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
     {
         foreach ($container->getDefinitions() as $id => $definition) {
             // synthetic service is public
-            if ($definition->isSynthetic() && !($definition->isPublic() || $definition->isPrivate())) {
+            if ($definition->isSynthetic() && !$definition->isPublic()) {
                 throw new RuntimeException(sprintf('A synthetic service ("%s") must be public.', $id));
             }
 

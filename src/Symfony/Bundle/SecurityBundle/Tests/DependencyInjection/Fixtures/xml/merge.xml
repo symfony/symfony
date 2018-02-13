@@ -12,7 +12,7 @@
     <sec:config>
         <sec:provider name="default" id="foo" />
 
-        <sec:firewall name="main" form-login="false" logout-on-user-change="true">
+        <sec:firewall name="main" form-login="false">
             <sec:http-basic />
         </sec:firewall>
 

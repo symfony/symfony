@@ -1,5 +1,5 @@
 imports:
-    - { resource: ./../config/framework.yml }
+    - { resource: ./../config/default.yml }
 
 security:
     encoders:
@@ -13,7 +13,6 @@ security:
 
     firewalls:
         main:
-            logout_on_user_change: true
             pattern: ^/
             anonymous: true
             json_login:

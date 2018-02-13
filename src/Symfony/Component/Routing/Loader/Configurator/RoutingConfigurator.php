@@ -25,7 +25,7 @@ class RoutingConfigurator
     private $path;
     private $file;
 
-    public function __construct(RouteCollection $collection, PhpFileLoader $loader, $path, $file)
+    public function __construct(RouteCollection $collection, PhpFileLoader $loader, string $path, string $file)
     {
         $this->collection = $collection;
         $this->loader = $loader;

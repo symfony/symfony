@@ -24,7 +24,7 @@ interface LockInterface
 {
     /**
      * Acquires the lock. If the lock is acquired by someone else, the parameter `blocking` determines whether or not
-     * the the call should block until the release of the lock.
+     * the call should block until the release of the lock.
      *
      * @param bool $blocking Whether or not the Lock should wait for the release of someone else
      *
@@ -56,4 +56,16 @@ interface LockInterface
      * @throws LockReleasingException If the lock can not be released
      */
     public function release();
+
+    /**
+     * @return bool
+     */
+    public function isExpired();
+
+    /**
+     * Returns the remaining lifetime.
+     *
+     * @return float|null Remaining lifetime in seconds. Null when the lock won't expire.
+     */
+    public function getRemainingLifetime();
 }

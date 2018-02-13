@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Deprecate the usage of `add(Workflow $workflow, $supportStrategy)` in `Workflow/Registry`, use `addWorkflow(WorkflowInterface, $supportStrategy)` instead.  
+ * Deprecate the usage of `SupportStrategyInterface`, use `WorkflowSupportStrategyInterface` instead.
+ * The `Workflow` class now implements `WorkflowInterface`.
+ * Deprecated the class `ClassInstanceSupportStrategy` in favor of the class `InstanceOfSupportStrategy`.
+
+4.0.0
+-----
+
+ * Removed class name support in `WorkflowRegistry::add()` as second parameter.
+
 3.4.0
 -----
 

@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * The `ContextListener::setLogoutOnUserChange()` method is deprecated and will be removed in 5.0.
+ * added `UserValueResolver`.
+ * Using the AdvancedUserInterface is now deprecated. To use the existing
+   functionality, create a custom user-checker based on the
+   `Symfony\Component\Security\Core\User\UserChecker`. This functionality will
+   be removed in Symfony 5.0.
+
+4.0.0
+-----
+
+ * The `AbstractFormLoginAuthenticator::onAuthenticationSuccess()` was removed.
+   You should implement this method yourself in your concrete authenticator.
+ * removed the `AccessDecisionManager::setVoters()` method
+ * removed the `RoleInterface`
+ * removed support for voters that don't implement the `VoterInterface`
+ * added a sixth `string $context` argument to `LogoutUrlGenerator::registerListener()`
+ * removed HTTP digest authentication
+ * removed `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
+ * removed `AbstractGuardAuthenticator::supports()`
+ * added target user to `SwitchUserListener`
+
 3.4.0
 -----
 

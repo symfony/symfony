@@ -116,9 +116,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testReflectionParameterScalar()
     {
         $f = eval('return function (int $a) {};');
@@ -136,9 +133,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testReturnType()
     {
         $f = eval('return function ():int {};');
@@ -158,9 +152,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testGenerator()
     {
         if (extension_loaded('xdebug')) {

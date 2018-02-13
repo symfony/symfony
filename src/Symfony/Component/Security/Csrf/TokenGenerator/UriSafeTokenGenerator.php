@@ -25,7 +25,7 @@ class UriSafeTokenGenerator implements TokenGeneratorInterface
      *
      * @param int $entropy The amount of entropy collected for each token (in bits)
      */
-    public function __construct($entropy = 256)
+    public function __construct(int $entropy = 256)
     {
         $this->entropy = $entropy;
     }

@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added the `Process::isTtySupported()` method that allows to check for TTY support
+ * made `PhpExecutableFinder` look for the `PHP_BINARY` env var when searching the php binary
+ * added the `ProcessSignaledException` class to properly catch signaled process errors
+
+4.0.0
+-----
+
+ * environment variables will always be inherited
+ * added a second `array $env = array()` argument to the `start()`, `run()`,
+   `mustRun()`, and `restart()` methods of the `Process` class
+ * added a second `array $env = array()` argument to the `start()` method of the
+   `PhpProcess` class
+ * the `ProcessUtils::escapeArgument()` method has been removed
+ * the `areEnvironmentVariablesInherited()`, `getOptions()`, and `setOptions()`
+   methods of the `Process` class have been removed
+ * support for passing `proc_open()` options has been removed
+ * removed the `ProcessBuilder` class, use the `Process` class instead
+ * removed the `getEnhanceWindowsCompatibility()` and `setEnhanceWindowsCompatibility()` methods of the `Process` class
+ * passing a not existing working directory to the constructor of the `Symfony\Component\Process\Process` class is not
+   supported anymore
+
 3.4.0
 -----
 

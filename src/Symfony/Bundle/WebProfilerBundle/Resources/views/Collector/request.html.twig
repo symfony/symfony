@@ -12,9 +12,10 @@
         {% endset %}
     {% endif %}
 
-    {% if collector.forward|default(false) %}
+    {% if collector.forwardtoken %}
+        {% set forward_profile = profile.childByToken(collector.forwardtoken) %}
         {% set forward_handler %}
-            {{ helper.set_handler(collector.forward.controller) }}
+            {{ helper.set_handler(forward_profile ? forward_profile.collector('request').controller : 'n/a') }}
         {% endset %}
     {% endif %}
 
@@ -24,7 +25,7 @@
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
         {% if collector.route %}
             {% if collector.redirect %}{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
-            {% if collector.forward|default(false) %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
+            {% if collector.forwardtoken %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
             <span class="sf-toolbar-label">{{ 'GET' != collector.method ? collector.method }} @</span>
             <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
         {% endif %}
@@ -48,13 +49,6 @@
                 <b>Controller</b>
                 <span>{{ request_handler }}</span>
             </div>
-
-            {% if collector.controller.class is defined -%}
-                <div class="sf-toolbar-info-piece">
-                    <b>Controller class</b>
-                    <span>{{ collector.controller.class }}</span>
-                </div>
-            {%- endif %}
 
             <div class="sf-toolbar-info-piece">
                 <b>Route name</b>
@@ -88,7 +82,7 @@
                     <b>Forwarded to</b>
                     <span>
                         {{ forward_handler }}
-                        (<a href="{{ path('_profiler', { token: collector.forward.token }) }}">{{ collector.forward.token }}</a>)
+                        (<a href="{{ path('_profiler', { token: collector.forwardtoken }) }}">{{ collector.forwardtoken }}</a>)
                     </span>
                 </div>
             </div>
@@ -167,7 +161,15 @@
                 {% endif %}
 
                 <h3>Server Parameters</h3>
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestserver }, with_context = false) }}
+                <h4>Defined in .env</h4>
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.dotenvvars }, with_context = false) }}
+
+                <h4>Defined as regular env variables</h4>
+                {% set requestserver = [] %}
+                {% for key, value in collector.requestserver if key not in collector.dotenvvars.keys %}
+                    {% set requestserver = requestserver|merge({(key): value}) %}
+                {% endfor %}
+                {{ include('@WebProfiler/Profiler/table.html.twig', { data: requestserver }, with_context = false) }}
             </div>
         </div>
 
@@ -287,7 +289,7 @@
     {% if controller.class is defined -%}
         {%- if method|default(false) %}<span class="sf-toolbar-status sf-toolbar-redirection-method">{{ method }}</span>{% endif -%}
         {%- set link = controller.file|file_link(controller.line) %}
-        {%- if link %}<a href="{{ link }}" title="{{ controller.file }}">{% else %}<span>{% endif %}
+        {%- if link %}<a href="{{ link }}" title="{{ controller.class }}">{% else %}<span title="{{ controller.class }}">{% endif %}
 
             {%- if route|default(false) -%}
                 @{{ route }}

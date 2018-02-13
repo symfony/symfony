@@ -271,10 +271,6 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
     protected function getVariableGetter($name)
     {
-        if (\PHP_VERSION_ID >= 70000) {
-            return sprintf('($context["%s"] ?? null)', $name);
-        }
-
-        return sprintf('(isset($context["%s"]) ? $context["%1$s"] : null)', $name);
+        return sprintf('($context["%s"] ?? null)', $name);
     }
 }

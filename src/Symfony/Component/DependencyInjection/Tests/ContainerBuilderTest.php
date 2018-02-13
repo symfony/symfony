@@ -854,32 +854,6 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testAddClassResource()
-    {
-        $container = new ContainerBuilder();
-
-        $container->setResourceTracking(false);
-        $container->addClassResource(new \ReflectionClass('BarClass'));
-
-        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
-
-        $container->setResourceTracking(true);
-        $container->addClassResource(new \ReflectionClass('BarClass'));
-
-        $resources = $container->getResources();
-
-        $this->assertCount(2, $resources, '2 resources were registered');
-
-        /* @var $resource \Symfony\Component\Config\Resource\FileResource */
-        $resource = end($resources);
-
-        $this->assertInstanceOf('Symfony\Component\Config\Resource\FileResource', $resource);
-        $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
-    }
-
     public function testGetReflectionClass()
     {
         $container = new ContainerBuilder();
@@ -1325,41 +1299,31 @@ class ContainerBuilderTest extends TestCase
         $this->assertSame($childDefA, $container->registerForAutoconfiguration('AInterface'));
     }
 
-    /**
-     * This test checks the trigger of a deprecation note and should not be removed in major releases.
-     *
-     * @group legacy
-     * @expectedDeprecation The "foo" service is deprecated. You should stop using it, as it will soon be removed.
-     */
-    public function testPrivateServiceTriggersDeprecation()
+    public function testCaseSensitivity()
     {
         $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass')
-            ->setPublic(false)
-            ->setDeprecated(true);
-        $container->register('bar', 'stdClass')
-            ->setPublic(true)
-            ->setProperty('foo', new Reference('foo'));
+        $container->register('foo', 'stdClass')->setPublic(true);
+        $container->register('Foo', 'stdClass')->setProperty('foo', new Reference('foo'))->setPublic(false);
+        $container->register('fOO', 'stdClass')->setProperty('Foo', new Reference('Foo'))->setPublic(true);
+
+        $this->assertSame(array('service_container', 'foo', 'Foo', 'fOO', 'Psr\Container\ContainerInterface', 'Symfony\Component\DependencyInjection\ContainerInterface'), $container->getServiceIds());
 
         $container->compile();
 
-        $container->get('bar');
+        $this->assertNotSame($container->get('foo'), $container->get('fOO'), '->get() returns the service for the given id, case sensitively');
+        $this->assertSame($container->get('fOO')->Foo->foo, $container->get('foo'), '->get() returns the service for the given id, case sensitively');
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Parameter names will be made case sensitive in Symfony 4.0. Using "FOO" instead of "foo" is deprecated since Symfony 3.4.
-     */
     public function testParameterWithMixedCase()
     {
-        $container = new ContainerBuilder(new ParameterBag(array('foo' => 'bar')));
+        $container = new ContainerBuilder(new ParameterBag(array('foo' => 'bar', 'FOO' => 'BAR')));
         $container->register('foo', 'stdClass')
             ->setPublic(true)
             ->setProperty('foo', '%FOO%');
 
         $container->compile();
 
-        $this->assertSame('bar', $container->get('foo')->foo);
+        $this->assertSame('BAR', $container->get('foo')->foo);
     }
 
     public function testArgumentsHaveHigherPriorityThanBindings()
@@ -1384,6 +1348,24 @@ class ContainerBuilderTest extends TestCase
 
         $this->assertSame('via-argument', $container->get('foo')->class1->identifier);
         $this->assertSame('via-bindings', $container->get('foo')->class2->identifier);
+    }
+
+    public function testIdCanBeAnObjectAsLongAsItCanBeCastToString()
+    {
+        $id = new Reference('another_service');
+        $aliasId = new Reference('alias_id');
+
+        $container = new ContainerBuilder();
+        $container->set($id, new \stdClass());
+        $container->setAlias($aliasId, 'another_service');
+
+        $this->assertTrue($container->has('another_service'));
+        $this->assertTrue($container->has($id));
+        $this->assertTrue($container->hasAlias('alias_id'));
+        $this->assertTrue($container->hasAlias($aliasId));
+
+        $container->removeAlias($aliasId);
+        $container->removeDefinition($id);
     }
 }
 

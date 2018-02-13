@@ -29,7 +29,7 @@ class ChainUserProvider implements UserProviderInterface
     /**
      * @param iterable|UserProviderInterface[] $providers
      */
-    public function __construct($providers)
+    public function __construct(iterable $providers)
     {
         $this->providers = $providers;
     }

@@ -28,7 +28,6 @@ security:
             security: false
 
         default:
-            logout_on_user_change: true
             form_login:
                 check_path: /login_check
                 default_target_path: /profile

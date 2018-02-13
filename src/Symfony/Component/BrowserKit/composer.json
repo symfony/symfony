@@ -16,12 +16,12 @@
         }
     ],
     "require": {
-        "php": "^5.5.9|>=7.0.8",
-        "symfony/dom-crawler": "~2.8|~3.0|~4.0"
+        "php": "^7.1.3",
+        "symfony/dom-crawler": "~3.4|~4.0"
     },
     "require-dev": {
-        "symfony/process": "~2.8|~3.0|~4.0",
-        "symfony/css-selector": "~2.8|~3.0|~4.0"
+        "symfony/process": "~3.4|~4.0",
+        "symfony/css-selector": "~3.4|~4.0"
     },
     "suggest": {
         "symfony/process": ""
@@ -35,7 +35,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.4-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

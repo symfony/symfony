@@ -51,9 +51,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $this->argumentResolver = $argumentResolver;
 
         if (null === $this->argumentResolver) {
-            @trigger_error(sprintf('As of 3.1 an %s is used to resolve arguments. In 4.0 the $argumentResolver becomes the %s if no other is provided instead of using the $resolver argument.', ArgumentResolverInterface::class, ArgumentResolver::class), E_USER_DEPRECATED);
-            // fallback in case of deprecations
-            $this->argumentResolver = $resolver;
+            $this->argumentResolver = new ArgumentResolver();
         }
     }
 
@@ -118,7 +116,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * @throws \LogicException       If one of the listener does not behave as expected
      * @throws NotFoundHttpException When controller cannot be found
      */
-    private function handleRaw(Request $request, $type = self::MASTER_REQUEST)
+    private function handleRaw(Request $request, int $type = self::MASTER_REQUEST)
     {
         $this->requestStack->push($request);
 
@@ -157,9 +155,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
             if ($event->hasResponse()) {
                 $response = $event->getResponse();
-            }
-
-            if (!$response instanceof Response) {
+            } else {
                 $msg = sprintf('The controller must return a response (%s given).', $this->varToString($response));
 
                 // the user may have forgotten to return something
@@ -184,7 +180,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @throws \RuntimeException if the passed object is not a Response instance
      */
-    private function filterResponse(Response $response, Request $request, $type)
+    private function filterResponse(Response $response, Request $request, int $type)
     {
         $event = new FilterResponseEvent($this, $request, $type, $response);
 
@@ -201,11 +197,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      * Note that the order of the operations is important here, otherwise
      * operations such as {@link RequestStack::getParentRequest()} can lead to
      * weird results.
-     *
-     * @param Request $request
-     * @param int     $type
      */
-    private function finishRequest(Request $request, $type)
+    private function finishRequest(Request $request, int $type)
     {
         $this->dispatcher->dispatch(KernelEvents::FINISH_REQUEST, new FinishRequestEvent($this, $request, $type));
         $this->requestStack->pop();
@@ -216,13 +209,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @param \Exception $e       An \Exception instance
      * @param Request    $request A Request instance
-     * @param int        $type    The type of the request
-     *
-     * @return Response A Response instance
+     * @param int        $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @throws \Exception
      */
-    private function handleException(\Exception $e, $request, $type)
+    private function handleException(\Exception $e, Request $request, int $type): Response
     {
         $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
         $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
@@ -239,13 +230,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $response = $event->getResponse();
 
         // the developer asked for a specific status code
-        if ($response->headers->has('X-Status-Code')) {
-            @trigger_error(sprintf('Using the X-Status-Code header is deprecated since Symfony 3.3 and will be removed in 4.0. Use %s::allowCustomResponseCode() instead.', GetResponseForExceptionEvent::class), E_USER_DEPRECATED);
-
-            $response->setStatusCode($response->headers->get('X-Status-Code'));
-
-            $response->headers->remove('X-Status-Code');
-        } elseif (!$event->isAllowingCustomResponseCode() && !$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
+        if (!$event->isAllowingCustomResponseCode() && !$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
             // ensure that we actually have an error response
             if ($e instanceof HttpExceptionInterface) {
                 // keep the HTTP status code and headers
@@ -263,7 +248,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         }
     }
 
-    private function varToString($var)
+    private function varToString($var): string
     {
         if (is_object($var)) {
             return sprintf('Object(%s)', get_class($var));

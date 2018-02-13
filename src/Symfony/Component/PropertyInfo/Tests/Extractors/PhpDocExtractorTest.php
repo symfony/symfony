@@ -40,31 +40,6 @@ class PhpDocExtractorTest extends TestCase
         $this->assertSame($longDescription, $this->extractor->getLongDescription('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
-    public function testParamTagTypeIsOmitted()
-    {
-        $this->assertNull($this->extractor->getTypes(OmittedParamTagTypeDocBlock::class, 'omittedType'));
-    }
-
-    /**
-     * @dataProvider typesWithCustomPrefixesProvider
-     */
-    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
-    {
-        $customExtractor = new PhpDocExtractor(null, array('add', 'remove'), array('is', 'can'));
-
-        $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
-    }
-
-    /**
-     * @dataProvider typesWithNoPrefixesProvider
-     */
-    public function testExtractTypesWithNoPrefixes($property, array $type = null)
-    {
-        $noPrefixExtractor = new PhpDocExtractor(null, array(), array(), array());
-
-        $this->assertEquals($type, $noPrefixExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
-    }
-
     public function typesProvider()
     {
         return array(
@@ -93,12 +68,28 @@ class PhpDocExtractorTest extends TestCase
             array('d', array(new Type(Type::BUILTIN_TYPE_BOOL)), null, null),
             array('e', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))), null, null),
             array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))), null, null),
-            array('g', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)), 'Nullable array.', null),
+            array('g', array(new Type(Type::BUILTIN_TYPE_BOOL, true)), null, null),
+            array('array', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)), 'Nullable array.', null),
             array('donotexist', null, null, null),
             array('staticGetter', null, null, null),
             array('staticSetter', null, null, null),
             array('emptyVar', null, null, null),
         );
+    }
+
+    public function testParamTagTypeIsOmitted()
+    {
+        $this->assertNull($this->extractor->getTypes(OmittedParamTagTypeDocBlock::class, 'omittedType'));
+    }
+
+    /**
+     * @dataProvider typesWithCustomPrefixesProvider
+     */
+    public function testExtractTypesWithCustomPrefixes($property, array $type = null)
+    {
+        $customExtractor = new PhpDocExtractor(null, array('add', 'remove'), array('is', 'can'));
+
+        $this->assertEquals($type, $customExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
     public function typesWithCustomPrefixesProvider()
@@ -129,11 +120,21 @@ class PhpDocExtractorTest extends TestCase
             array('d', array(new Type(Type::BUILTIN_TYPE_BOOL)), null, null),
             array('e', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_RESOURCE))), null, null),
             array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime'))), null, null),
-            array('g', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)), 'Nullable array.', null),
+            array('g', null),
             array('donotexist', null, null, null),
             array('staticGetter', null, null, null),
             array('staticSetter', null, null, null),
         );
+    }
+
+    /**
+     * @dataProvider typesWithNoPrefixesProvider
+     */
+    public function testExtractTypesWithNoPrefixes($property, array $type = null)
+    {
+        $noPrefixExtractor = new PhpDocExtractor(null, array(), array(), array());
+
+        $this->assertEquals($type, $noPrefixExtractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', $property));
     }
 
     public function typesWithNoPrefixesProvider()
@@ -164,7 +165,7 @@ class PhpDocExtractorTest extends TestCase
             array('d', null, null, null),
             array('e', null, null, null),
             array('f', null, null, null),
-            array('g', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true)), 'Nullable array.', null),
+            array('g', null),
             array('donotexist', null, null, null),
             array('staticGetter', null, null, null),
             array('staticSetter', null, null, null),

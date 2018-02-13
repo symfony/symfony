@@ -7,17 +7,6 @@
     <services>
         <defaults public="false" />
 
-        <service id="security.command.init_acl" class="Symfony\Bundle\SecurityBundle\Command\InitAclCommand">
-            <argument type="service" id="security.acl.dbal.connection" />
-            <argument type="service" id="security.acl.dbal.schema" />
-            <tag name="console.command" command="init:acl" />
-        </service>
-
-        <service id="security.command.set_acl" class="Symfony\Bundle\SecurityBundle\Command\SetAclCommand">
-            <argument type="service" id="security.acl.provider" />
-            <tag name="console.command" command="acl:set" />
-        </service>
-
         <service id="security.command.user_password_encoder" class="Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand">
             <argument type="service" id="security.encoder_factory"/>
             <argument type="collection" /> <!-- encoders' user classes -->

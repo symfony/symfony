@@ -10,7 +10,7 @@
 
         <provider name="default" id="foo" />
 
-        <firewall name="main" logout-on-user-change="true">
+        <firewall name="main">
             <form-login login-path="/login" />
         </firewall>
     </config>

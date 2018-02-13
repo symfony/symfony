@@ -23,7 +23,29 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {
-        return new EmailValidator(false);
+        return new EmailValidator(Email::VALIDATION_MODE_LOOSE);
+    }
+
+    /**
+     * @expectedDeprecation Calling `new Symfony\Component\Validator\Constraints\EmailValidator(true)` is deprecated since Symfony 4.1 and will be removed in 5.0, use `new Symfony\Component\Validator\Constraints\EmailValidator("strict")` instead.
+     * @group legacy
+     */
+    public function testLegacyValidatorConstructorStrict()
+    {
+        $this->validator = new EmailValidator(true);
+        $this->validator->initialize($this->context);
+        $this->validator->validate('example@localhost', new Email());
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "defaultMode" parameter value is not valid.
+     */
+    public function testUnknownDefaultModeTriggerException()
+    {
+        new EmailValidator('Unknown Mode');
     }
 
     public function testNullIsValid()
@@ -64,6 +86,31 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             array('fabien@symfony.com'),
             array('example@example.co.uk'),
             array('fabien_potencier@example.fr'),
+            array('example@example.co..uk'),
+            array('{}~!@!@£$%%^&*().!@£$%^&*()'),
+            array('example@example.co..uk'),
+            array('example@-example.com'),
+            array(sprintf('example@%s.com', str_repeat('a', 64))),
+        );
+    }
+
+    /**
+     * @dataProvider getValidEmailsHtml5
+     */
+    public function testValidEmailsHtml5($email)
+    {
+        $this->validator->validate($email, new Email(array('mode' => Email::VALIDATION_MODE_HTML5)));
+
+        $this->assertNoViolation();
+    }
+
+    public function getValidEmailsHtml5()
+    {
+        return array(
+            array('fabien@symfony.com'),
+            array('example@example.co.uk'),
+            array('fabien_potencier@example.fr'),
+            array('{}~!@example.com'),
         );
     }
 
@@ -94,6 +141,95 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
+    /**
+     * @dataProvider getInvalidHtml5Emails
+     */
+    public function testInvalidHtml5Emails($email)
+    {
+        $constraint = new Email(
+            array(
+                'message' => 'myMessage',
+                'mode' => Email::VALIDATION_MODE_HTML5,
+            )
+        );
+
+        $this->validator->validate($email, $constraint);
+
+        $this->buildViolation('myMessage')
+             ->setParameter('{{ value }}', '"'.$email.'"')
+             ->setCode(Email::INVALID_FORMAT_ERROR)
+             ->assertRaised();
+    }
+
+    public function getInvalidHtml5Emails()
+    {
+        return array(
+            array('example'),
+            array('example@'),
+            array('example@localhost'),
+            array('example@example.co..uk'),
+            array('foo@example.com bar'),
+            array('example@example.'),
+            array('example@.fr'),
+            array('@example.com'),
+            array('example@example.com;example@example.com'),
+            array('example@.'),
+            array(' example@example.com'),
+            array('example@ '),
+            array(' example@example.com '),
+            array(' example @example .com '),
+            array('example@-example.com'),
+            array(sprintf('example@%s.com', str_repeat('a', 64))),
+        );
+    }
+
+    public function testModeStrict()
+    {
+        $constraint = new Email(array('mode' => Email::VALIDATION_MODE_STRICT));
+
+        $this->validator->validate('example@localhost', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testModeHtml5()
+    {
+        $constraint = new Email(array('mode' => Email::VALIDATION_MODE_HTML5));
+
+        $this->validator->validate('example@example..com', $constraint);
+
+        $this->buildViolation('This value is not a valid email address.')
+             ->setParameter('{{ value }}', '"example@example..com"')
+             ->setCode(Email::INVALID_FORMAT_ERROR)
+             ->assertRaised();
+    }
+
+    public function testModeLoose()
+    {
+        $constraint = new Email(array('mode' => Email::VALIDATION_MODE_LOOSE));
+
+        $this->validator->validate('example@example..com', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The Symfony\Component\Validator\Constraints\Email::$mode parameter value is not valid.
+     */
+    public function testUnknownModesOnValidateTriggerException()
+    {
+        $constraint = new Email();
+        $constraint->mode = 'Unknown Mode';
+
+        $this->validator->validate('example@example..com', $constraint);
+    }
+
+    /**
+     * @expectedDeprecation The "strict" property is deprecated since Symfony 4.1 and will be removed in 5.0. Use "mode"=>"strict" instead.
+     * @expectedDeprecation The Symfony\Component\Validator\Constraints\Email::$strict property is deprecated since Symfony 4.1 and will be removed in 5.0. Use Symfony\Component\Validator\Constraints\Email::mode="strict" instead.
+     * @group legacy
+     */
     public function testStrict()
     {
         $constraint = new Email(array('strict' => true));
@@ -110,7 +246,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Email(array(
             'message' => 'myMessage',
-            'strict' => true,
+            'mode' => Email::VALIDATION_MODE_STRICT,
         ));
 
         $this->validator->validate($email, $constraint);

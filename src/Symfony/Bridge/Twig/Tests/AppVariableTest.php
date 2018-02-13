@@ -50,9 +50,8 @@ class AppVariableTest extends TestCase
      */
     public function testGetSession()
     {
-        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
-        $request->method('getSession')->willReturn($session);
+        $request->method('getSession')->willReturn($session = new Session());
 
         $this->setRequestStack($request);
 

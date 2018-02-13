@@ -25,7 +25,7 @@ class YamlFileDumper extends FileDumper
 {
     private $extension;
 
-    public function __construct(/**string */$extension = 'yml')
+    public function __construct(string $extension = 'yml')
     {
         $this->extension = $extension;
     }

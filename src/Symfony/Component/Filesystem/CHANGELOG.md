@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+
+ * removed `LockHandler`
+ * Support for passing relative paths to `Filesystem::makePathRelative()` has been removed.
+
 3.4.0
 -----
 

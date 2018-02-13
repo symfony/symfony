@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -112,7 +113,7 @@ EOF
         $io->writeln(Yaml::dump($config, 10));
     }
 
-    private function compileContainer()
+    private function compileContainer(): ContainerBuilder
     {
         $kernel = clone $this->getApplication()->getKernel();
         $kernel->boot();
@@ -128,13 +129,11 @@ EOF
     /**
      * Iterate over configuration until the last step of the given path.
      *
-     * @param array $config A bundle configuration
-     *
      * @throws LogicException If the configuration does not exist
      *
      * @return mixed
      */
-    private function getConfigForPath(array $config, $path, $alias)
+    private function getConfigForPath(array $config, string $path, string $alias)
     {
         $steps = explode('.', $path);
 

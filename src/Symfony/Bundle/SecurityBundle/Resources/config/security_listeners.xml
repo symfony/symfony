@@ -26,8 +26,6 @@
 
         <service id="security.authentication.basic_entry_point" class="Symfony\Component\Security\Http\EntryPoint\BasicAuthenticationEntryPoint" />
 
-        <service id="security.authentication.digest_entry_point" class="Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint" />
-
         <service id="security.channel_listener" class="Symfony\Component\Security\Http\Firewall\ChannelListener">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.access_map" />
@@ -175,15 +173,6 @@
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authentication.manager" />
-            <argument /> <!-- Provider-shared Key -->
-            <argument /> <!-- Entry Point -->
-            <argument type="service" id="logger" on-invalid="null" />
-        </service>
-
-        <service id="security.authentication.listener.digest" class="Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener" abstract="true">
-            <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.token_storage" />
-            <argument /> <!-- User Provider -->
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- Entry Point -->
             <argument type="service" id="logger" on-invalid="null" />

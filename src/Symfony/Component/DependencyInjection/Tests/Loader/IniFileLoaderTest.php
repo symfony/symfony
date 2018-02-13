@@ -45,15 +45,10 @@ class IniFileLoaderTest extends TestCase
 
     /**
      * @dataProvider getTypeConversions
-     * @requires PHP 5.6.1
      * This test illustrates where our conversions differs from INI_SCANNER_TYPED introduced in PHP 5.6.1
      */
     public function testTypeConversionsWithNativePhp($key, $value, $supported)
     {
-        if (defined('HHVM_VERSION_ID')) {
-            $this->markTestSkipped();
-        }
-
         if (!$supported) {
             $this->markTestSkipped(sprintf('Converting the value "%s" to "%s" is not supported by the IniFileLoader.', $key, $value));
         }

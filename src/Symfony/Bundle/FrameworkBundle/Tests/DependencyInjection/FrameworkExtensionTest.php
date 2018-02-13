@@ -189,8 +189,9 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('workflows');
 
-        $this->assertTrue($container->hasDefinition('workflow.article', 'Workflow is registered as a service'));
-        $this->assertTrue($container->hasDefinition('workflow.article.definition', 'Workflow definition is registered as a service'));
+        $this->assertTrue($container->hasDefinition('workflow.article'), 'Workflow is registered as a service');
+        $this->assertSame('workflow.abstract', $container->getDefinition('workflow.article')->getParent());
+        $this->assertTrue($container->hasDefinition('workflow.article.definition'), 'Workflow definition is registered as a service');
 
         $workflowDefinition = $container->getDefinition('workflow.article.definition');
 
@@ -208,8 +209,9 @@ abstract class FrameworkExtensionTest extends TestCase
         );
         $this->assertSame(array('workflow.definition' => array(array('name' => 'article', 'type' => 'workflow', 'marking_store' => 'multiple_state'))), $workflowDefinition->getTags());
 
-        $this->assertTrue($container->hasDefinition('state_machine.pull_request', 'State machine is registered as a service'));
-        $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition', 'State machine definition is registered as a service'));
+        $this->assertTrue($container->hasDefinition('state_machine.pull_request'), 'State machine is registered as a service');
+        $this->assertSame('state_machine.abstract', $container->getDefinition('state_machine.pull_request')->getParent());
+        $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition'), 'State machine definition is registered as a service');
         $this->assertCount(4, $workflowDefinition->getArgument(1));
         $this->assertSame('draft', $workflowDefinition->getArgument(2));
 
@@ -240,15 +242,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('workflow.registry', 'Workflow registry is registered as a service'));
         $registryDefinition = $container->getDefinition('workflow.registry');
         $this->assertGreaterThan(0, count($registryDefinition->getMethodCalls()));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The "type" option of the "framework.workflows.missing_type" configuration entry must be defined since Symfony 3.3. The default value will be "state_machine" in Symfony 4.0.
-     */
-    public function testDeprecatedWorkflowMissingType()
-    {
-        $container = $this->createContainerFromFile('workflows_without_type');
     }
 
     /**
@@ -628,7 +621,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $container = $this->createContainerFromFile('validation_annotations', array(
             'kernel.bundles' => array('TestBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\TestBundle'),
-            'kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'parent' => null, 'path' => __DIR__.'/Fixtures/TestBundle')),
+            'kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle')),
         ));
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
@@ -664,7 +657,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $container = $this->createContainerFromFile('validation_annotations', array(
             'kernel.bundles' => array('CustomPathBundle' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\CustomPathBundle'),
-            'kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'parent' => null, 'path' => __DIR__.'/Fixtures/CustomPathBundle')),
+            'kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/CustomPathBundle')),
         ));
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
@@ -704,18 +697,51 @@ abstract class FrameworkExtensionTest extends TestCase
         // no cache, no annotations, no static methods
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "strict_email" and "email_validation_mode" cannot be used together.
+     */
+    public function testCannotConfigureStrictEmailAndEmailValidationModeAtTheSameTime()
+    {
+        $this->createContainerFromFile('validation_strict_email_and_validation_mode');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
+     */
+    public function testEnabledStrictEmailOptionIsMappedToStrictEmailValidationMode()
+    {
+        $container = $this->createContainerFromFile('validation_strict_email_enabled');
+
+        $this->assertSame('strict', $container->getDefinition('validator.email')->getArgument(0));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "framework.validation.strict_email" configuration key has been deprecated in Symfony 4.1. Use the "framework.validation.email_validation_mode" configuration key instead.
+     */
+    public function testDisabledStrictEmailOptionIsMappedToLooseEmailValidationMode()
+    {
+        $container = $this->createContainerFromFile('validation_strict_email_disabled');
+
+        $this->assertSame('loose', $container->getDefinition('validator.email')->getArgument(0));
+    }
+
+    public function testEmailValidationModeIsPassedToEmailValidator()
+    {
+        $container = $this->createContainerFromFile('validation_email_validation_mode');
+
+        $this->assertSame('html5', $container->getDefinition('validator.email')->getArgument(0));
+    }
+
     public function testValidationTranslationDomain()
     {
         $container = $this->createContainerFromFile('validation_translation_domain');
 
         $this->assertSame('messages', $container->getParameter('validator.translation_domain'));
-    }
-
-    public function testValidationStrictEmail()
-    {
-        $container = $this->createContainerFromFile('validation_strict_email');
-
-        $this->assertTrue($container->getDefinition('validator.email')->getArgument(0));
     }
 
     public function testValidationMapping()
@@ -867,24 +893,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The "framework.serializer.cache" option is deprecated %s.
-     */
-    public function testDeprecatedSerializerCacheOption()
-    {
-        $container = $this->createContainerFromFile('serializer_legacy_cache', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
-
-        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-        $this->assertTrue($container->hasDefinition('serializer.mapping.class_metadata_factory'));
-
-        $cache = $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1);
-        $this->assertEquals(new Reference('foo'), $cache);
-    }
-
     public function testSerializerMapping()
     {
-        $container = $this->createContainerFromFile('serializer_mapping', array('kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle', 'parent' => null))));
+        $container = $this->createContainerFromFile('serializer_mapping', array('kernel.bundles_metadata' => array('TestBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle\\Tests', 'path' => __DIR__.'/Fixtures/TestBundle'))));
         $projectDir = $container->getParameter('kernel.project_dir');
         $configDir = __DIR__.'/Fixtures/TestBundle/Resources/config';
         $expectedLoaders = array(
@@ -1037,7 +1048,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(
             'kernel.bundles' => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
-            'kernel.bundles_metadata' => array('FrameworkBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..', 'parent' => null)),
+            'kernel.bundles_metadata' => array('FrameworkBundle' => array('namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..')),
             'kernel.cache_dir' => __DIR__,
             'kernel.project_dir' => __DIR__,
             'kernel.debug' => false,

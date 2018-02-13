@@ -3,7 +3,7 @@
     <services>
         <defaults autowire="true" />
 
-        <service id="parent_service" class="stdClass" />
+        <service id="parent_service" class="stdClass" public="true"/>
         <service id="child_service" parent="parent_service" />
     </services>
 </container>

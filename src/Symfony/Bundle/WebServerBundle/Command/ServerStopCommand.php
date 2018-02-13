@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -23,7 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  */
-class ServerStopCommand extends ServerCommand
+class ServerStopCommand extends Command
 {
     protected static $defaultName = 'server:stop';
 

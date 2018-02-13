@@ -47,9 +47,9 @@ class Section
      * @param float|null $origin        Set the origin of the events in this section, use null to set their origin to their start time
      * @param bool       $morePrecision If true, time is stored as float to keep the original microsecond precision
      */
-    public function __construct($origin = null, $morePrecision = false)
+    public function __construct(float $origin = null, bool $morePrecision = false)
     {
-        $this->origin = is_numeric($origin) ? $origin : null;
+        $this->origin = $origin;
         $this->morePrecision = $morePrecision;
     }
 

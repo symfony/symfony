@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Mapping\Loader;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
@@ -65,6 +66,18 @@ class XmlFileLoader extends FileLoader
                 if (isset($attribute['max-depth'])) {
                     $attributeMetadata->setMaxDepth((int) $attribute['max-depth']);
                 }
+            }
+
+            if (isset($xml->{'discriminator-map'})) {
+                $mapping = array();
+                foreach ($xml->{'discriminator-map'}->mapping as $element) {
+                    $mapping[(string) $element->attributes()->type] = (string) $element->attributes()->class;
+                }
+
+                $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
+                    (string) $xml->{'discriminator-map'}->attributes()->{'type-property'},
+                    $mapping
+                ));
             }
 
             return true;

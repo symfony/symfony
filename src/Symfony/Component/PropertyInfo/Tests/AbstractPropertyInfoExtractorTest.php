@@ -14,6 +14,7 @@ namespace Symfony\Component\PropertyInfo\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyExtractor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummySecondExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NullExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -29,7 +30,7 @@ class AbstractPropertyInfoExtractorTest extends TestCase
 
     protected function setUp()
     {
-        $extractors = array(new NullExtractor(), new DummyExtractor());
+        $extractors = array(new NullExtractor(), new DummyExtractor(), new DummySecondExtractor());
         $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors);
     }
 

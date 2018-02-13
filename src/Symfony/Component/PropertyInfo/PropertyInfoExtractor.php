@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo;
 
+use Symfony\Component\PropertyInfo\PropertyList\PriorityExtractor;
+
 /**
  * Default {@see PropertyInfoExtractorInterface} implementation.
  *
@@ -20,20 +22,23 @@ namespace Symfony\Component\PropertyInfo;
  */
 class PropertyInfoExtractor implements PropertyInfoExtractorInterface
 {
-    private $listExtractors;
+    /**
+     * @var PropertyListExtractorInterface
+     */
+    private $listExtractor;
     private $typeExtractors;
     private $descriptionExtractors;
     private $accessExtractors;
 
     /**
-     * @param iterable|PropertyListExtractorInterface[]        $listExtractors
-     * @param iterable|PropertyTypeExtractorInterface[]        $typeExtractors
-     * @param iterable|PropertyDescriptionExtractorInterface[] $descriptionExtractors
-     * @param iterable|PropertyAccessExtractorInterface[]      $accessExtractors
+     * @param iterable|PropertyListExtractorInterface[]|PropertyListExtractorInterface $listExtractors
+     * @param iterable|PropertyTypeExtractorInterface[]                                $typeExtractors
+     * @param iterable|PropertyDescriptionExtractorInterface[]                         $descriptionExtractors
+     * @param iterable|PropertyAccessExtractorInterface[]                              $accessExtractors
      */
-    public function __construct(iterable $listExtractors = array(), iterable $typeExtractors = array(), iterable $descriptionExtractors = array(), iterable $accessExtractors = array())
+    public function __construct($listExtractors = array(), iterable $typeExtractors = array(), iterable $descriptionExtractors = array(), iterable $accessExtractors = array())
     {
-        $this->listExtractors = $listExtractors;
+        $this->listExtractor = !$listExtractors instanceof PropertyListExtractorInterface ? new PriorityExtractor($listExtractors) : $listExtractors;
         $this->typeExtractors = $typeExtractors;
         $this->descriptionExtractors = $descriptionExtractors;
         $this->accessExtractors = $accessExtractors;
@@ -44,7 +49,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      */
     public function getProperties($class, array $context = array())
     {
-        return $this->extract($this->listExtractors, 'getProperties', array($class, $context));
+        return $this->listExtractor->getProperties($class, $context);
     }
 
     /**

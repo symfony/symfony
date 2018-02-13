@@ -223,7 +223,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             return \call_user_func($this->circularReferenceHandler, $object);
         }
 
-        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', get_class($object), $this->circularReferenceLimit));
+        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', \get_class($object), $this->circularReferenceLimit));
     }
 
     /**
@@ -253,7 +253,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
-        if (!$this->classMetadataFactory || !isset($context[static::GROUPS]) || !is_array($context[static::GROUPS])) {
+        if (!$this->classMetadataFactory || !isset($context[static::GROUPS]) || !\is_array($context[static::GROUPS])) {
             return false;
         }
 

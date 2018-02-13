@@ -326,7 +326,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $node->nodeValue;
         }
 
-        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, array(XML_TEXT_NODE, XML_CDATA_SECTION_NODE), true)) {
+        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, array(XML_TEXT_NODE, XML_CDATA_SECTION_NODE))) {
             return $node->firstChild->nodeValue;
         }
 
@@ -488,9 +488,9 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $this->selectNodeType($node, $this->serializer->normalize($val, $this->format, $this->context));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
-        } elseif (($isString = \is_string($val)) && $this->needsCdataWrapping($val)) {
+        } elseif (\is_string($val) && $this->needsCdataWrapping($val)) {
             return $this->appendCData($node, $val);
-        } elseif ($isString) {
+        } elseif (\is_string($val)) {
             return $this->appendText($node, $val);
         } elseif (\is_bool($val)) {
             return $this->appendText($node, (int) $val);

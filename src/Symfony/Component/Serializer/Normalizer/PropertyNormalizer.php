@@ -50,11 +50,11 @@ class PropertyNormalizer extends AbstractNormalizer
         $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         foreach ($reflectionObject->getProperties() as $property) {
-            if (\in_array($property->name, $this->ignoredAttributes, true) || $property->isStatic()) {
+            if (\in_array($property->name, $this->ignoredAttributes) || $property->isStatic()) {
                 continue;
             }
 
-            if (false !== $allowedAttributes && !\in_array($property->name, $allowedAttributes, true)) {
+            if (false !== $allowedAttributes && !\in_array($property->name, $allowedAttributes)) {
                 continue;
             }
 
@@ -105,8 +105,8 @@ class PropertyNormalizer extends AbstractNormalizer
                 $propertyName = $this->nameConverter->denormalize($propertyName);
             }
 
-            $allowed = false === $allowedAttributes || \in_array($propertyName, $allowedAttributes, true);
-            $ignored = \in_array($propertyName, $this->ignoredAttributes, true);
+            $allowed = false === $allowedAttributes || \in_array($propertyName, $allowedAttributes);
+            $ignored = \in_array($propertyName, $this->ignoredAttributes);
             if ($allowed && !$ignored && $reflectionClass->hasProperty($propertyName)) {
                 $property = $reflectionClass->getProperty($propertyName);
 

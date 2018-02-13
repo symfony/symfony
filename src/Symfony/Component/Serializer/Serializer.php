@@ -146,7 +146,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
                 throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
             }
 
-            throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', get_class($data)));
+            throw new UnexpectedValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', \get_class($data)));
         }
 
         throw new UnexpectedValueException(sprintf('An unexpected value could not be normalized: %s', var_export($data, true)));

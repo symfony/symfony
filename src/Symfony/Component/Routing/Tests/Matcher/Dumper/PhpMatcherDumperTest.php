@@ -431,6 +431,13 @@ class PhpMatcherDumperTest extends TestCase
         $hostTreeCollection->add('b', (new Route('/'))->setHost('d.c.b.a'));
         $hostTreeCollection->add('c', (new Route('/'))->setHost('{e}.e.c.b.a'));
 
+        /* test case 10 */
+        $chunkedCollection = new RouteCollection();
+        for ($i = 0; $i < 1000; ++$i) {
+            $h = substr(md5($i), 0, 6);
+            $chunkedCollection->add('_'.$i, new Route('/'.$h.'/{a}/{b}/{c}/'.$h));
+        }
+
         return array(
            array(new RouteCollection(), 'url_matcher0.php', array()),
            array($collection, 'url_matcher1.php', array()),
@@ -442,6 +449,7 @@ class PhpMatcherDumperTest extends TestCase
            array($trailingSlashCollection, 'url_matcher7.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
            array($unicodeCollection, 'url_matcher8.php', array()),
            array($hostTreeCollection, 'url_matcher9.php', array()),
+           array($chunkedCollection, 'url_matcher10.php', array()),
         );
     }
 

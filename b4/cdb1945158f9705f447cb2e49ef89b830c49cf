@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-13T17:59:53Z
+
+I updated the PR to mimic existing code.
+But I still need to use the `require_once`.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-14T09:38:41Z
+
+> But I still need to use the require_once.
+
+Ok, now the listener does not need anymore the `require_once`.
+
+The PR is now ready

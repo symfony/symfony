@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="28">
+                <source>This form should not contain extra fields.</source>
+                <target>Ang pormang itong ay hindi dapat magkarron ng dagdag na mga patlang.</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file.</source>
+                <target>Ang ini-upload na file ay masyadong malaki. Pakiulit muling mag-upload ng mas maliit na file.</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>Hindi balido ang CSRF token. Maagpasa muli ng isang pang porma.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

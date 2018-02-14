@@ -99,9 +99,13 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
             }
         }
 
-        $requestBag = $this->options['post_only'] ? $request->request : $request;
-        $username = ParameterBagUtils::getParameterBagValue($requestBag, $this->options['username_parameter']);
-        $password = ParameterBagUtils::getParameterBagValue($requestBag, $this->options['password_parameter']);
+        if ($this->options['post_only']) {
+            $username = ParameterBagUtils::getParameterBagValue($request->request, $this->options['username_parameter']);
+            $password = ParameterBagUtils::getParameterBagValue($request->request, $this->options['password_parameter']);
+        } else {
+            $username = ParameterBagUtils::getRequestParameterValue($request, $this->options['username_parameter']);
+            $password = ParameterBagUtils::getRequestParameterValue($request, $this->options['password_parameter']);
+        }
 
         if (!\is_string($username) || (\is_object($username) && !\method_exists($username, '__toString'))) {
             throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', $this->options['username_parameter'], \gettype($username)));

@@ -80,7 +80,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
      */
     private function isGetMethod(\ReflectionMethod $method)
     {
-        $methodLength = strlen($method->name);
+        $methodLength = \strlen($method->name);
 
         return
             !$method->isStatic() &&
@@ -125,17 +125,17 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         $ucfirsted = ucfirst($attribute);
 
         $getter = 'get'.$ucfirsted;
-        if (is_callable(array($object, $getter))) {
+        if (\is_callable(array($object, $getter))) {
             return $object->$getter();
         }
 
         $isser = 'is'.$ucfirsted;
-        if (is_callable(array($object, $isser))) {
+        if (\is_callable(array($object, $isser))) {
             return $object->$isser();
         }
 
         $haser = 'has'.$ucfirsted;
-        if (is_callable(array($object, $haser))) {
+        if (\is_callable(array($object, $haser))) {
             return $object->$haser();
         }
     }
@@ -146,10 +146,10 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
     {
         $setter = 'set'.ucfirst($attribute);
-        $key = get_class($object).':'.$setter;
+        $key = \get_class($object).':'.$setter;
 
         if (!isset(self::$setterAccessibleCache[$key])) {
-            self::$setterAccessibleCache[$key] = is_callable(array($object, $setter)) && !(new \ReflectionMethod($object, $setter))->isStatic();
+            self::$setterAccessibleCache[$key] = \is_callable(array($object, $setter)) && !(new \ReflectionMethod($object, $setter))->isStatic();
         }
 
         if (self::$setterAccessibleCache[$key]) {

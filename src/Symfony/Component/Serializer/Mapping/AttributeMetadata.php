@@ -64,7 +64,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function addGroup($group)
     {
-        if (!in_array($group, $this->groups)) {
+        if (!\in_array($group, $this->groups)) {
             $this->groups[] = $group;
         }
     }

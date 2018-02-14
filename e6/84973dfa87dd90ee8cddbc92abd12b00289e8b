@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-24T13:38:08Z
+
+I'm not sure we can do this change as is: protocol-relative URLs have only a relative meaning.
+What if I want to validate that an URL is not-relative, as this validation rule used to provide?
+In a Web form, many won't want to accept protocol-relative URLs, isn't it?
+
+---------------------------------------------------------------------------
+
+by MyDigitalLife at 2017-09-24T13:56:54Z
+
+@nicolas-grekas Good point. I see 2 possible ways to fix this:
+
+1. Create a RelativeUrlValidator class
+2. Add a option to the current validator that can enable or disable the check for relative URL's
+
+I think option 2 is the better one. And to not break BC it should probably by default not allow relative URL's.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-24T14:03:42Z
+
+Let's go for option 2, with a default that doesn't change the behavior for sure.
+Should be submitted as a new feature, so against 3.4.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-09-24T20:26:08Z
+
+Can you rebase this PR to get rid of the merge commit? Thanks.
+
+---------------------------------------------------------------------------
+
+by MyDigitalLife at 2017-09-26T07:21:50Z
+
+@fabpot The PR has been rebased.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-24T12:14:19Z
+
+Moving to 4.1 as 3.4 is in beta, thus closed for new feats.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-01T05:46:36Z
+
+Could you please rebase against master ?

@@ -50,11 +50,11 @@ class PropertyNormalizer extends AbstractNormalizer
         $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         foreach ($reflectionObject->getProperties() as $property) {
-            if (in_array($property->name, $this->ignoredAttributes) || $property->isStatic()) {
+            if (\in_array($property->name, $this->ignoredAttributes) || $property->isStatic()) {
                 continue;
             }
 
-            if (false !== $allowedAttributes && !in_array($property->name, $allowedAttributes)) {
+            if (false !== $allowedAttributes && !\in_array($property->name, $allowedAttributes)) {
                 continue;
             }
 
@@ -66,7 +66,7 @@ class PropertyNormalizer extends AbstractNormalizer
             $attributeValue = $property->getValue($object);
 
             if (isset($this->callbacks[$property->name])) {
-                $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
+                $attributeValue = \call_user_func($this->callbacks[$property->name], $attributeValue);
             }
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
                 if (!$this->serializer instanceof NormalizerInterface) {
@@ -105,8 +105,8 @@ class PropertyNormalizer extends AbstractNormalizer
                 $propertyName = $this->nameConverter->denormalize($propertyName);
             }
 
-            $allowed = false === $allowedAttributes || in_array($propertyName, $allowedAttributes);
-            $ignored = in_array($propertyName, $this->ignoredAttributes);
+            $allowed = false === $allowedAttributes || \in_array($propertyName, $allowedAttributes);
+            $ignored = \in_array($propertyName, $this->ignoredAttributes);
             if ($allowed && !$ignored && $reflectionClass->hasProperty($propertyName)) {
                 $property = $reflectionClass->getProperty($propertyName);
 
@@ -131,7 +131,7 @@ class PropertyNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && !$data instanceof \Traversable && $this->supports(get_class($data));
+        return \is_object($data) && !$data instanceof \Traversable && $this->supports(\get_class($data));
     }
 
     /**

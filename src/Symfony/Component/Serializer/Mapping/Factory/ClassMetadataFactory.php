@@ -40,7 +40,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     {
         $class = $this->getClass($value);
         if (!$class) {
-            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: "%s"', gettype($value)));
+            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: "%s"', \gettype($value)));
         }
 
         if (isset($this->loadedClasses[$class])) {
@@ -96,10 +96,10 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     private function getClass($value)
     {
-        if (!is_object($value) && !is_string($value)) {
+        if (!\is_object($value) && !\is_string($value)) {
             return false;
         }
 
-        return ltrim(is_object($value) ? get_class($value) : $value, '\\');
+        return ltrim(\is_object($value) ? \get_class($value) : $value, '\\');
     }
 }

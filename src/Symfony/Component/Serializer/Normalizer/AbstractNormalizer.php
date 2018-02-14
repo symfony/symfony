@@ -121,7 +121,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public function setCallbacks(array $callbacks)
     {
         foreach ($callbacks as $attribute => $callback) {
-            if (!is_callable($callback)) {
+            if (!\is_callable($callback)) {
                 throw new InvalidArgumentException(sprintf(
                     'The given callback for attribute "%s" is not callable.',
                     $attribute
@@ -189,10 +189,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected function handleCircularReference($object)
     {
         if ($this->circularReferenceHandler) {
-            return call_user_func($this->circularReferenceHandler, $object);
+            return \call_user_func($this->circularReferenceHandler, $object);
         }
 
-        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', get_class($object), $this->circularReferenceLimit));
+        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', \get_class($object), $this->circularReferenceLimit));
     }
 
     /**
@@ -211,7 +211,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         $groups = false;
-        if (isset($context[static::GROUPS]) && is_array($context[static::GROUPS])) {
+        if (isset($context[static::GROUPS]) && \is_array($context[static::GROUPS])) {
             $groups = $context[static::GROUPS];
         } elseif (!isset($context[static::ALLOW_EXTRA_ATTRIBUTES]) || $context[static::ALLOW_EXTRA_ATTRIBUTES]) {
             return false;
@@ -222,7 +222,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             $name = $attributeMetadata->getName();
 
             if (
-                (false === $groups || count(array_intersect($attributeMetadata->getGroups(), $groups))) &&
+                (false === $groups || array_intersect($attributeMetadata->getGroups(), $groups)) &&
                 $this->isAllowedAttribute($classOrObject, $name, null, $context)
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
@@ -326,11 +326,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                 $paramName = $constructorParameter->name;
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
 
-                $allowed = false === $allowedAttributes || in_array($paramName, $allowedAttributes);
+                $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
                 if ($constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                        if (!is_array($data[$paramName])) {
+                        if (!\is_array($data[$paramName])) {
                             throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
                         }
 

@@ -61,6 +61,14 @@ class ProxyDumperTest extends TestCase
         );
     }
 
+    public function testDeterministicProxyCode()
+    {
+        $definition = new Definition(__CLASS__);
+        $definition->setLazy(true);
+
+        $this->assertSame($this->dumper->getProxyCode($definition), $this->dumper->getProxyCode($definition));
+    }
+
     public function testGetProxyFactoryCode()
     {
         $definition = new Definition(__CLASS__);

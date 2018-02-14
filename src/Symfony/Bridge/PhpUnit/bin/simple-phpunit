@@ -77,7 +77,9 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     $zip->extractTo(getcwd());
     $zip->close();
     chdir("phpunit-$PHPUNIT_VERSION");
-    passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
+    if ($SYMFONY_PHPUNIT_REMOVE) {
+        passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
+    }
     if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
         passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }

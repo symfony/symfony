@@ -44,27 +44,17 @@ class CachePoolPrunerPassTest extends TestCase
 
     public function testCompilePassIsIgnoredIfCommandDoesNotExist()
     {
-        $container = $this
-            ->getMockBuilder(ContainerBuilder::class)
-            ->setMethods(array('hasDefinition', 'getDefinition', 'findTaggedServiceIds'))
-            ->getMock();
+        $container = new ContainerBuilder();
 
-        $container
-            ->expects($this->atLeastOnce())
-            ->method('hasDefinition')
-            ->with(CachePoolPruneCommand::class)
-            ->will($this->returnValue(false));
-
-        $container
-            ->expects($this->never())
-            ->method('getDefinition');
-
-        $container
-            ->expects($this->never())
-            ->method('findTaggedServiceIds');
+        $definitionsBefore = count($container->getDefinitions());
+        $aliasesBefore = count($container->getAliases());
 
         $pass = new CachePoolPrunerPass();
         $pass->process($container);
+
+        // the container is untouched (i.e. no new definitions or aliases)
+        $this->assertCount($definitionsBefore, $container->getDefinitions());
+        $this->assertCount($aliasesBefore, $container->getAliases());
     }
 
     /**

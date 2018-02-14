@@ -104,6 +104,7 @@ class Url extends Constraint
      * @deprecated since Symfony 4.1, to be removed in 5.0
      */
     public $checkDNS = self::CHECK_DNS_TYPE_NONE;
+    public $relativeProtocol = false;
 
     public function __construct($options = null)
     {

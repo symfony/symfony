@@ -27,29 +27,10 @@ class RegisterListenersPassTest extends TestCase
      */
     public function testEventSubscriberWithoutInterface()
     {
-        // one service, not implementing any interface
-        $services = array(
-            'my_event_subscriber' => array(0 => array()),
-        );
-
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $definition->expects($this->atLeastOnce())
-            ->method('getClass')
-            ->will($this->returnValue('stdClass'));
-
-        $builder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition'))->getMock();
-        $builder->expects($this->any())
-            ->method('hasDefinition')
-            ->will($this->returnValue(true));
-
-        // We don't test kernel.event_listener here
-        $builder->expects($this->atLeastOnce())
-            ->method('findTaggedServiceIds')
-            ->will($this->onConsecutiveCalls(array(), $services));
-
-        $builder->expects($this->atLeastOnce())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
+        $builder = new ContainerBuilder();
+        $builder->register('event_dispatcher');
+        $builder->register('my_event_subscriber', 'stdClass')
+            ->addTag('kernel.event_subscriber');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($builder);
@@ -61,31 +42,25 @@ class RegisterListenersPassTest extends TestCase
             'my_event_subscriber' => array(0 => array()),
         );
 
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
-        $definition->expects($this->atLeastOnce())
-            ->method('getClass')
-            ->will($this->returnValue('Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService'));
-
-        $builder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition', 'findDefinition'))->getMock();
-        $builder->expects($this->any())
-            ->method('hasDefinition')
-            ->will($this->returnValue(true));
-
-        // We don't test kernel.event_listener here
-        $builder->expects($this->atLeastOnce())
-            ->method('findTaggedServiceIds')
-            ->will($this->onConsecutiveCalls(array(), $services));
-
-        $builder->expects($this->atLeastOnce())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
-
-        $builder->expects($this->atLeastOnce())
-            ->method('findDefinition')
-            ->will($this->returnValue($definition));
+        $builder = new ContainerBuilder();
+        $eventDispatcherDefinition = $builder->register('event_dispatcher');
+        $builder->register('my_event_subscriber', 'Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService')
+            ->addTag('kernel.event_subscriber');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($builder);
+
+        $expectedCalls = array(
+            array(
+                'addListener',
+                array(
+                    'event',
+                    array(new ServiceClosureArgument(new Reference('my_event_subscriber')), 'onEvent'),
+                    0,
+                ),
+            ),
+        );
+        $this->assertEquals($expectedCalls, $eventDispatcherDefinition->getMethodCalls());
     }
 
     /**

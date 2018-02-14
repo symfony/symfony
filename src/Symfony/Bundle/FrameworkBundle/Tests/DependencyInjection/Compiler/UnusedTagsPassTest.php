@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class UnusedTagsPassTest extends TestCase
 {
@@ -20,24 +21,14 @@ class UnusedTagsPassTest extends TestCase
     {
         $pass = new UnusedTagsPass();
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds', 'findUnusedTags', 'findTags', 'log'))->getMock();
-        $container->expects($this->once())
-            ->method('log')
-            ->with($pass, 'Tag "kenrel.event_subscriber" was defined on service(s) "foo", "bar", but was never used. Did you mean "kernel.event_subscriber"?');
-        $container->expects($this->once())
-            ->method('findTags')
-            ->will($this->returnValue(array('kenrel.event_subscriber')));
-        $container->expects($this->once())
-            ->method('findUnusedTags')
-            ->will($this->returnValue(array('kenrel.event_subscriber', 'form.type')));
-        $container->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with('kenrel.event_subscriber')
-            ->will($this->returnValue(array(
-                'foo' => array(),
-                'bar' => array(),
-            )));
+        $container = new ContainerBuilder();
+        $container->register('foo')
+            ->addTag('kenrel.event_subscriber');
+        $container->register('bar')
+            ->addTag('kenrel.event_subscriber');
 
         $pass->process($container);
+
+        $this->assertSame(array(sprintf('%s: Tag "kenrel.event_subscriber" was defined on service(s) "foo", "bar", but was never used. Did you mean "kernel.event_subscriber"?', UnusedTagsPass::class)), $container->getCompiler()->getLog());
     }
 }

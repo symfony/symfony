@@ -146,4 +146,13 @@ class RedirectController
 
         return new RedirectResponse($url, $statusCode);
     }
+
+    public function __invoke(Request $request): Response
+    {
+        if (null !== $route = $request->attributes->get('route')) {
+            return $this->redirectAction($request, $route, $request->attributes->getBoolean('permanent', false), $request->attributes->get('ignoreAttributes', false));
+        }
+
+        return $this->urlRedirectAction($request, $request->attributes->get('path'), $request->attributes->getBoolean('permanent', false), $request->attributes->get('scheme'), $request->attributes->get('httpPort'), $request->attributes->get('httpsPort'));
+    }
 }

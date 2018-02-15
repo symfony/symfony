@@ -566,7 +566,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // Argon2i encoder
         if ('argon2i' === $config['algorithm']) {
             if (!Argon2iPasswordEncoder::isSupported()) {
-                throw new InvalidConfigurationException('Argon2i algorithm is not supported. Please install the libsodium extension or upgrade to PHP 7.2+.');
+                if (\extension_loaded('sodium') && !\defined('SODIUM_CRYPTO_PWHASH_SALTBYTES')) {
+                    throw new InvalidConfigurationException('The installed libsodium version does not have support for Argon2i. Use Bcrypt instead.');
+                }
+
+                throw new InvalidConfigurationException('Argon2i algorithm is not supported. Install the libsodium extension or use BCrypt instead.');
             }
 
             return array(

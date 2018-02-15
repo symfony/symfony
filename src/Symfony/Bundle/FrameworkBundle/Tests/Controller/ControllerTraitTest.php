@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -516,6 +518,22 @@ abstract class ControllerTraitTest extends TestCase
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
     }
 
+    public function testCreateNamedFormBuilder()
+    {
+        $formBuilder = $this->getMockBuilder(FormBuilderInterface::class)->getMock();
+
+        $formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMock();
+        $formFactory->expects($this->once())->method('createNamedBuilder')->willReturn($formBuilder);
+
+        $container = new Container();
+        $container->set('form.factory', $formFactory);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->assertEquals($formBuilder, $controller->createNamedFormBuilder('foo'));
+    }
+
     public function testGetDoctrine()
     {
         $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
@@ -551,6 +569,7 @@ trait TestControllerTrait
         createAccessDeniedException as public;
         createForm as public;
         createFormBuilder as public;
+        createNamedFormBuilder as public;
         getDoctrine as public;
     }
 }

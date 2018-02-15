@@ -322,6 +322,16 @@ trait ControllerTrait
     }
 
     /**
+     * Creates and returns a named form builder instance.
+     *
+     * @final
+     */
+    protected function createNamedFormBuilder(string $name, $data = null, array $options = array()): FormBuilderInterface
+    {
+        return $this->container->get('form.factory')->createNamedBuilder($name, FormType::class, $data, $options);
+    }
+
+    /**
      * Shortcut to return the Doctrine Registry service.
      *
      * @throws \LogicException If DoctrineBundle is not available

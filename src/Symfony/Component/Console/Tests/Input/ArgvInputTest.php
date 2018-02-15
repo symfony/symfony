@@ -349,7 +349,7 @@ class ArgvInputTest extends TestCase
         // Control.
         $this->assertEquals('dev', $input->getParameterOption(array('-e', '')));
         // No warning is thrown if https://github.com/symfony/symfony/pull/26156 is fixed
-        $this->assertEquals('', $input->getParameterOption(array('-m', '')));
+        $this->assertFalse($input->getParameterOption(array('-m', '')));
     }
 
     public function testToString()

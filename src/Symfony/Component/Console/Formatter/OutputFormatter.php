@@ -134,6 +134,8 @@ class OutputFormatter implements OutputFormatterInterface
         $offset = 0;
         $output = '';
         $tagRegex = '[a-z][a-z0-9,_=;-]*+';
+        // Note: Offset capture is in bytes. For compatibility, explicitly use
+        // mbstring with ASCII encoding for string manipulations.
         preg_match_all("#<(($tagRegex) | /($tagRegex)?)>#ix", $message, $matches, PREG_OFFSET_CAPTURE);
         foreach ($matches[0] as $i => $match) {
             $pos = $match[1];
@@ -144,7 +146,7 @@ class OutputFormatter implements OutputFormatterInterface
             }
 
             // add the text up to the next tag
-            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset));
+            $output .= $this->applyCurrentStyle(mb_substr($message, $offset, $pos - $offset, 'ASCII'));
             $offset = $pos + strlen($text);
 
             // opening tag?
@@ -166,7 +168,7 @@ class OutputFormatter implements OutputFormatterInterface
             }
         }
 
-        $output .= $this->applyCurrentStyle(substr($message, $offset));
+        $output .= $this->applyCurrentStyle(mb_substr($message, $offset, null, 'ASCII'));
 
         if (false !== strpos($output, "\0")) {
             return strtr($output, array("\0" => '\\', '\\<' => '<'));

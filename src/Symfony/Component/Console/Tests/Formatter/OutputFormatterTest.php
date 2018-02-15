@@ -322,6 +322,18 @@ more text
 EOF
         ));
     }
+
+    public function testMultibyteStringSupport()
+    {
+        $formatter = new OutputFormatter(true);
+
+        // Formats a Unicode ballot x mark U+2717. This should work with
+        // mbstring function overloading on and off.
+        $this->assertEquals(
+            "\033[32m\xE2\x9C\x97\033[39m",
+            $formatter->format("<info>\xE2\x9C\x97</info>")
+        );
+    }
 }
 
 class TableCell

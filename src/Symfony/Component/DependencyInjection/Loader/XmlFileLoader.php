@@ -324,7 +324,9 @@ class XmlFileLoader extends FileLoader
                 $domElement->parentNode->replaceChild($tmpDomElement, $domElement);
                 $tmpDomElement->setAttribute('id', $id);
             } else {
-                $domElement->parentNode->removeChild($domElement);
+                if (null !== $domElement->parentNode) {
+                    $domElement->parentNode->removeChild($domElement);
+                }
             }
         }
     }

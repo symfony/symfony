@@ -616,14 +616,15 @@ class Request
     /**
      * Normalizes a query string.
      *
-     * It builds a normalized query string, where keys/value pairs are alphabetized,
+     * It builds a normalized query string, where keys/value pairs are alphabetized (by default),
      * have consistent escaping and unneeded delimiters are removed.
      *
-     * @param string $qs Query string
+     * @param string $qs            Query string
+     * @param bool   $preserveOrder Flag to preserve the querystring from being alphabetically ordered
      *
      * @return string A normalized query string for the Request
      */
-    public static function normalizeQueryString($qs)
+    public static function normalizeQueryString($qs, bool $preserveOrder = false)
     {
         if ('' == $qs) {
             return '';
@@ -651,7 +652,9 @@ class Request
             $order[] = urldecode($keyValuePair[0]);
         }
 
-        array_multisort($order, SORT_ASC, $parts);
+        if (true !== $preserveOrder) {
+            array_multisort($order, SORT_ASC, $parts);
+        }
 
         return implode('&', $parts);
     }
@@ -1103,13 +1106,15 @@ class Request
      * Generates the normalized query string for the Request.
      *
      * It builds a normalized query string, where keys/value pairs are alphabetized
-     * and have consistent escaping.
+     * (by default) and have consistent escaping.
+     *
+     * @param bool $preserveOrder Flag to preserve the querystring from being alphabetically ordered
      *
      * @return string|null A normalized query string for the Request
      */
-    public function getQueryString()
+    public function getQueryString(bool $preserveOrder = false)
     {
-        $qs = static::normalizeQueryString($this->server->get('QUERY_STRING'));
+        $qs = static::normalizeQueryString($this->server->get('QUERY_STRING'), $preserveOrder);
 
         return '' === $qs ? null : $qs;
     }

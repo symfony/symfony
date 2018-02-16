@@ -672,17 +672,43 @@ class RequestTest extends TestCase
         $this->assertSame($expectedQuery, $request->getQueryString(), $msg);
     }
 
+    public function testGetQueryStringSortAlphabeticalyByDefaut()
+    {
+        $request = new Request();
+
+        $request->server->set('QUERY_STRING', 'foo=bar&bar=');
+        $this->assertSame('bar=&foo=bar', $request->getQueryString(), 'sorts keys alphabetically');
+    }
+
+    /**
+     * @dataProvider getQueryStringNormalizationData
+     */
+    public function testGetQueryStringWithoutOrderingDoesNotAffectAnythingElseThanOrder($query, $expectedQuery, $msg)
+    {
+        $request = new Request();
+
+        $request->server->set('QUERY_STRING', $query);
+        $this->assertSame($expectedQuery, $request->getQueryString(true), $msg);
+    }
+
+    public function testGetQueryStringPreservesOrder()
+    {
+        $request = new Request();
+
+        $request->server->set('QUERY_STRING', 'foo=bar&bar=');
+        $this->assertSame('foo=bar&bar=', $request->getQueryString(true), 'preserves keys order');
+    }
+
     public function getQueryStringNormalizationData()
     {
         return array(
             array('foo', 'foo', 'works with valueless parameters'),
             array('foo=', 'foo=', 'includes a dangling equal sign'),
             array('bar=&foo=bar', 'bar=&foo=bar', '->works with empty parameters'),
-            array('foo=bar&bar=', 'bar=&foo=bar', 'sorts keys alphabetically'),
 
             // GET parameters, that are submitted from a HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
             // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str.
-            array('him=John%20Doe&her=Jane+Doe', 'her=Jane%20Doe&him=John%20Doe', 'normalizes spaces in both encodings "%20" and "+"'),
+            array('her=Jane+Doe&him=John%20Doe', 'her=Jane%20Doe&him=John%20Doe', 'normalizes spaces in both encodings "%20" and "+"'),
 
             array('foo[]=1&foo[]=2', 'foo%5B%5D=1&foo%5B%5D=2', 'allows array notation'),
             array('foo=1&foo=2', 'foo=1&foo=2', 'allows repeated parameters'),

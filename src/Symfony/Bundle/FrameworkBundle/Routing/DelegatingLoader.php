@@ -85,13 +85,9 @@ class DelegatingLoader extends BaseDelegatingLoader
                 $deprecatedNotation = $controller;
 
                 try {
-                    $controller = $this->parser->parse($controller);
+                    $controller = $this->parser->parse($controller, false);
 
-                    @trigger_error(sprintf(
-                        'Referencing controllers with %s is deprecated since version 4.1 and will be removed in 5.0. Use %s instead.',
-                        $deprecatedNotation,
-                        $controller
-                    ), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Referencing controllers with %s is deprecated since Symfony 4.1. Use %s instead.', $deprecatedNotation, $controller), E_USER_DEPRECATED);
                 } catch (\InvalidArgumentException $e) {
                     // unable to optimize unknown notation
                 }
@@ -99,10 +95,7 @@ class DelegatingLoader extends BaseDelegatingLoader
 
             if (1 === substr_count($controller, ':')) {
                 $controller = str_replace(':', '::', $controller);
-                @trigger_error(sprintf(
-                    'Referencing controllers with a single colon is deprecated since version 4.1 and will be removed in 5.0. Use %s instead.',
-                    $controller
-                ), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Referencing controllers with a single colon is deprecated since Symfony 4.1. Use %s instead.', $controller), E_USER_DEPRECATED);
             }
 
             $route->setDefault('_controller', $controller);

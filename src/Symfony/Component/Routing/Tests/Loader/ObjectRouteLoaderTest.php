@@ -20,7 +20,7 @@ class ObjectRouteLoaderTest extends TestCase
 {
     /**
      * @group legacy
-     * @expectedDeprecation Referencing service route loaders with a single colon is deprecated since version 4.1 and will be removed in 5.0. Use my_route_provider_service::loadRoutes instead.
+     * @expectedDeprecation Referencing service route loaders with a single colon is deprecated since Symfony 4.1. Use my_route_provider_service::loadRoutes instead.
      */
     public function testLoadCallsServiceAndReturnsCollectionWithLegacyNotation()
     {

@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  *
- * @deprecated since version 4.1, will be removed in 5.0.
+ * @deprecated since Symfony 4.1
  */
 class ResolveControllerNameSubscriber implements EventSubscriberInterface
 {
@@ -37,7 +37,7 @@ class ResolveControllerNameSubscriber implements EventSubscriberInterface
         $controller = $event->getRequest()->attributes->get('_controller');
         if (is_string($controller) && false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
             // controller in the a:b:c notation then
-            $event->getRequest()->attributes->set('_controller', $this->parser->parse($controller));
+            $event->getRequest()->attributes->set('_controller', $this->parser->parse($controller, false));
         }
     }
 

@@ -38,13 +38,9 @@ class ControllerResolver extends ContainerControllerResolver
         if (false === strpos($controller, '::') && 2 === substr_count($controller, ':')) {
             // controller in the a:b:c notation then
             $deprecatedNotation = $controller;
-            $controller = $this->parser->parse($deprecatedNotation);
+            $controller = $this->parser->parse($deprecatedNotation, false);
 
-            @trigger_error(sprintf(
-                'Referencing controllers with %s is deprecated since version 4.1 and will be removed in 5.0. Use %s instead.',
-                $deprecatedNotation,
-                $controller
-            ), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Referencing controllers with %s is deprecated since Symfony 4.1. Use %s instead.', $deprecatedNotation, $controller), E_USER_DEPRECATED);
         }
 
         return parent::createController($controller);

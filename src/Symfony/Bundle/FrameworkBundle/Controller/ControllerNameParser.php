@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since version 4.1, will be removed in 5.0.
+ * @deprecated since Symfony 4.1
  */
 class ControllerNameParser
 {
@@ -43,7 +43,9 @@ class ControllerNameParser
      */
     public function parse($controller)
     {
-        @trigger_error(sprintf('The %s class is deprecated since version 4.1 and will be removed in 5.0.', __CLASS__), E_USER_DEPRECATED);
+        if (2 > func_num_args() || func_get_arg(1)) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
+        }
 
         $parts = explode(':', $controller);
         if (3 !== count($parts) || in_array('', $parts, true)) {
@@ -90,7 +92,7 @@ class ControllerNameParser
      */
     public function build($controller)
     {
-        @trigger_error(sprintf('The %s class is deprecated since version 4.1 and will be removed in 5.0.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s class is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
 
         if (0 === preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)::(.+)Action$#', $controller, $match)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "class::method" string.', $controller));

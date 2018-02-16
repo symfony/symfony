@@ -52,7 +52,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
     /**
      * @group legacy
-     * @expectedDeprecation Referencing controllers with FooBundle:Default:test is deprecated since version 4.1 and will be removed in 5.0. Use Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction instead.
+     * @expectedDeprecation Referencing controllers with FooBundle:Default:test is deprecated since Symfony 4.1. Use Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction instead.
      */
     public function testGetControllerWithBundleNotation()
     {

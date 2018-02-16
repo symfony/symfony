@@ -22,7 +22,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
 {
     /**
      * @group legacy
-     * @expectedDeprecation Referencing controllers with a single colon is deprecated since version 4.1 and will be removed in 5.0. Use foo::action instead.
+     * @expectedDeprecation Referencing controllers with a single colon is deprecated since Symfony 4.1. Use foo::action instead.
      */
     public function testGetControllerServiceWithSingleColon()
     {

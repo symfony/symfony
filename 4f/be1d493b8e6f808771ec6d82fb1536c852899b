@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-01-30T21:59:10Z
+
+Let's improve this :)
+Do we actually need the README as a visible title? What about just this? (in order to put the all caps word upper in the field box - because scrolling-to-read will almost never happen :)
+
+```
+<!--
+Write a short README entry for your feature here (replace this comment block.)
+This will help people understand your PR and can be used as a start of the Doc PR.
+Additionally:
+ - Bug fixes must be submitted against the lowest branch where they apply
+   (lowest branches are regularly merged to upper ones so they get the fixes too).
+ - Features and deprecations must be submitted against the master branch.
+-->
+```
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-01-30T23:46:53Z
+
+I like what you have Nicolas.
+
+We hope this will be win all around, without being an added burden. The best PR’s already do this naturally :).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-06T10:52:21Z
+
+Maybe it's just me.. but what about (better) policy? Today we already ask to change base branch / re-target / handle legacy / add screenshots etc. Why not ask for a doc PR as well? Which was intended by the template anyway AFAIK.
+
+> and can be used as a start of the Doc PR
+
+This will be done for me? :) IMHO if we ask for a brief readme we could also ask for an initial doc PR... no? Thus `code > approve/feedback > doc PR > merge`. No doc PR, no merge :) (order of importance).
+
+> The best PR’s already do this naturally :)
+
+That's the goal right ;-)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-02-07T19:56:21Z
+
+The problem is that creating a doc pr is actually not so easy: it’s often not obvious where a feature should be doc’ed or what side effects it has. And also, your feature may get rejected :). That’s why we thought a “readme” was a good thing to require... and a docs PR is extra credit
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-07T19:58:27Z
+
+We just need a brief description of what the PR does and a simple example of how it's used. Then the Symfony Docs team can make the needed PR. But PRs with vague or empty descriptions should be rejected because it complicates our work a lot. Thanks!
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2018-02-08T02:03:51Z
+
+I couldn't even begin to enumerate the number of PRs that simply have _no information whatsoever_ attached to them. A good start would be to include _any_ descriptive text.
+
+While such information is obviously beneficial for the documentation team, it is also critical for those who keep track of the progress of this project by reading PRs or those who happen on a bug or behavioural change and reference the PR for information. It's frustrating when no description of the change exists, and this occurs all too regularly.
+
+That said, I think the template offered by @nicolas-grekas makes a ton of sense.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-08T08:41:25Z
+
+Indeed, I think we need to find a middle ground. For the record, we decided a while ago to not merge pull requests without a PR for the docs. It didn't work as most developers are not comfortable with writing some docs for their work (English, skills, time, ...). So, we gave up. But we should at least probably enforce a good description in the pull request so that we can take over the work of documenting a new feature.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-11T11:32:07Z
+
+> But we should at least probably enforce a good description in the pull request so that we can take over the work of documenting a new feature.
+
+👍 for that
+
+@wouterj OK for updating the PR with my proposal?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2018-02-15T22:03:24Z
+
+Updated with @nicolas-grekas proposal, I like it. Sorry for the delay!

@@ -337,6 +337,21 @@ class ArgvInputTest extends TestCase
         $this->assertFalse($input->hasParameterOption('-fh'), '->hasParameterOption() returns true if the given short option is in the raw input');
     }
 
+    public function testNoWarningOnInvalidParameterOption()
+    {
+        $input = new ArgvInput(array('cli.php', '-edev'));
+
+        // Control.
+        $this->assertTrue($input->hasParameterOption(array('-e', '')));
+        // No warning is thrown if https://github.com/symfony/symfony/pull/26156 is fixed
+        $this->assertFalse($input->hasParameterOption(array('-m', '')));
+
+        // Control.
+        $this->assertEquals('dev', $input->getParameterOption(array('-e', '')));
+        // No warning is thrown if https://github.com/symfony/symfony/pull/26156 is fixed
+        $this->assertFalse($input->getParameterOption(array('-m', '')));
+    }
+
     public function testToString()
     {
         $input = new ArgvInput(array('cli.php', '-f', 'foo'));

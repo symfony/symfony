@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by alexpott at 2018-01-20T21:57:29Z
+
+I've just added a new test `\Symfony\Component\Yaml\Tests\ParserTest::testMultiLineStringLastResortParsing()` which shows that the `Inline::parse()` in the loop is a bad idea anyway.
+
+The following yaml fails in 3.3 / 3.4 at the moment:
+
+```yaml
+test:
+  You can have things that don't look like strings here
+  true
+  yes you can
+```
+
+At the moment this produces an exception because the `Inline::parse()` parses the `true` to a boolean.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-29T15:24:34Z
+
+moving to the 3.4 milestone as the last bugfix release for 3.3 was published today

@@ -1,6 +1,9 @@
 Usage:
   list [options] [--] [<namespace>]
 
+ClassName:
+  Symfony\Component\Console\Command\ListCommand
+
 Arguments:
   namespace            The namespace name
 

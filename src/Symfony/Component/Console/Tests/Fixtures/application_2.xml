@@ -5,6 +5,7 @@
       <usages>
         <usage>help [--format FORMAT] [--raw] [--] [&lt;command_name&gt;]</usage>
       </usages>
+      <classname>Symfony\Component\Console\Command\HelpCommand</classname>
       <description>Displays help for a command</description>
       <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
@@ -60,6 +61,7 @@
       <usages>
         <usage>list [--raw] [--format FORMAT] [--] [&lt;namespace&gt;]</usage>
       </usages>
+      <classname>Symfony\Component\Console\Command\ListCommand</classname>
       <description>Lists commands</description>
       <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
  
@@ -100,6 +102,7 @@
         <usage>alias1</usage>
         <usage>alias2</usage>
       </usages>
+      <classname>Symfony\Component\Console\Tests\Fixtures\DescriptorCommand1</classname>
       <description>command 1 description</description>
       <help>command 1 help</help>
       <arguments/>
@@ -133,6 +136,7 @@
         <usage>descriptor:command2 -o|--option_name &lt;argument_name&gt;</usage>
         <usage>descriptor:command2 &lt;argument_name&gt;</usage>
       </usages>
+      <classname>Symfony\Component\Console\Tests\Fixtures\DescriptorCommand2</classname>
       <description>command 2 description</description>
       <help>command 2 help</help>
       <arguments>
@@ -172,6 +176,7 @@
       <usages>
         <usage>descriptor:command3</usage>
       </usages>
+      <classname>Symfony\Component\Console\Tests\Fixtures\DescriptorCommand3</classname>
       <description>command 3 description</description>
       <help>command 3 help</help>
       <arguments/>
@@ -205,6 +210,7 @@
         <usage>descriptor:alias_command4</usage>
         <usage>command4:descriptor</usage>
       </usages>
+      <classname>Symfony\Component\Console\Tests\Fixtures\DescriptorCommand4</classname>
       <description></description>
       <help></help>
       <arguments/>

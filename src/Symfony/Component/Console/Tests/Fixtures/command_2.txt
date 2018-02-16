@@ -3,6 +3,9 @@
   descriptor:command2 -o|--option_name \<argument_name>
   descriptor:command2 \<argument_name>
 
+<comment>ClassName:</comment>
+  Symfony\Component\Console\Tests\Fixtures\DescriptorCommand2
+
 <comment>Arguments:</comment>
   <info>argument_name</info>      
 

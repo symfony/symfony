@@ -11,6 +11,10 @@ command 2 description
 
 command 2 help
 
+### ClassName
+
+Symfony\Component\Console\Tests\Fixtures\DescriptorCommand2
+
 ### Arguments
 
 #### `argument_name`

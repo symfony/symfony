@@ -10,3 +10,7 @@ command 1 description
 * `alias2`
 
 command 1 help
+
+### ClassName
+
+Symfony\Component\Console\Tests\Fixtures\DescriptorCommand1

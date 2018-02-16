@@ -6,6 +6,7 @@
         "alias1",
         "alias2"
     ],
+    "classname": "Symfony\\Component\\Console\\Tests\\Fixtures\\DescriptorCommand1",
     "description": "command 1 description",
     "help": "command 1 help",
     "definition": {

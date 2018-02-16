@@ -5,6 +5,7 @@
     <usage>alias1</usage>
     <usage>alias2</usage>
   </usages>
+  <classname>Symfony\Component\Console\Tests\Fixtures\DescriptorCommand1</classname>
   <description>command 1 description</description>
   <help>command 1 help</help>
   <arguments/>

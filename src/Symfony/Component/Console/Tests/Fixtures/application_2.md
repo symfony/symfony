@@ -36,6 +36,10 @@ You can also output the help in other formats by using the --format option:
 
 To display the list of available commands, please use the list command.
 
+### ClassName
+
+Symfony\Component\Console\Command\HelpCommand
+
 ### Arguments
 
 #### `command_name`
@@ -154,6 +158,10 @@ It's also possible to get raw list of commands (useful for embedding command run
 
   php app/console list --raw
 
+### ClassName
+
+Symfony\Component\Console\Command\ListCommand
+
 ### Arguments
 
 #### `namespace`
@@ -196,6 +204,10 @@ command 1 description
 * `alias2`
 
 command 1 help
+
+### ClassName
+
+Symfony\Component\Console\Tests\Fixtures\DescriptorCommand1
 
 ### Options
 
@@ -274,6 +286,10 @@ command 2 description
 * `descriptor:command2 <argument_name>`
 
 command 2 help
+
+### ClassName
+
+Symfony\Component\Console\Tests\Fixtures\DescriptorCommand2
 
 ### Arguments
 
@@ -364,6 +380,10 @@ Do not ask any interactive question
 * `descriptor:alias_command4`
 * `command4:descriptor`
 
+
+### ClassName
+
+Symfony\Component\Console\Tests\Fixtures\DescriptorCommand4
 
 ### Options
 

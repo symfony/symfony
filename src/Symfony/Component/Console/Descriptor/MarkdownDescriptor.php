@@ -132,6 +132,10 @@ class MarkdownDescriptor extends Descriptor
             $this->write($help);
         }
 
+        $this->write("\n\n");
+        $this->write('### ClassName'."\n\n"
+            .\get_class($command));
+
         if ($command->getNativeDefinition()) {
             $this->write("\n\n");
             $this->describeInputDefinition($command->getNativeDefinition());

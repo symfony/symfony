@@ -318,6 +318,10 @@
                 <source>Error</source>
                 <target>Error</target>
             </trans-unit>
+            <trans-unit id="83">
+                <source>This value should be between {{ min }} and {{ max }} with a step of {{ step }}.</source>
+                <target>This value should be between {{ min }} and {{ max }} with a step of {{ step }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

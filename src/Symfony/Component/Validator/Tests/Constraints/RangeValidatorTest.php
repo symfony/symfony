@@ -44,6 +44,17 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
+    public function getTenToTwentyNonFloat()
+    {
+        return array(
+            array(10),
+            array(11),
+            array(12),
+            array(20),
+            array('13'),
+        );
+    }
+
     public function getLessThanTen()
     {
         return array(
@@ -92,6 +103,70 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     public function testValidValuesMinMax($value)
     {
         $constraint = new Range(array('min' => 10, 'max' => 20));
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getInvalidValuesSteps
+     */
+    public function testInvalidValuesMinMaxWithStepOne($value)
+    {
+        $constraint = new Range(array(
+            'min' => 1,
+            'max' => 21,
+            'step' => 1,
+            'stepMessage' => 'myMessage', ));
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $value)
+            ->setParameter('{{ min }}', 1)
+            ->setParameter('{{ max }}', 21)
+            ->setParameter('{{ step }}', 1)
+            ->setCode(Range::INVALID_STEP_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getInvalidValuesStepsWithFormattedValues
+     */
+    public function testInvalidValuesMinMaxWithStepString($value, $formattedValue)
+    {
+        $constraint = new Range(array(
+            'min' => '1',
+            'max' => '21',
+            'step' => '1',
+            'stepMessage' => 'myMessage', ));
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ min }}', '"1"')
+            ->setParameter('{{ max }}', '"21"')
+            ->setParameter('{{ step }}', '"1"')
+            ->setCode(Range::INVALID_STEP_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getTenToTwentyNonFloat
+     */
+    public function testValidValuesMinMaxWithStepOne($value)
+    {
+        $constraint = new Range(array('min' => 1, 'max' => 21, 'step' => 1));
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenToTwentyNonFloat
+     */
+    public function testValidValuesMinMaxWithStepOneStrings($value)
+    {
+        $constraint = new Range(array('min' => '1', 'max' => '21', 'step' => '1'));
         $this->validator->validate($value, $constraint);
 
         $this->assertNoViolation();
@@ -373,6 +448,22 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             array('9.999999'),
             array('20.000001'),
             array(new \stdClass()),
+        );
+    }
+
+    public function getInvalidValuesSteps()
+    {
+        return array(
+            array(9.999999),
+            array(20.000001),
+        );
+    }
+
+    public function getInvalidValuesStepsWithFormattedValues()
+    {
+        return array(
+            array('9.999999', '"9.999999"'),
+            array('20.000001', '"20.000001"'),
         );
     }
 

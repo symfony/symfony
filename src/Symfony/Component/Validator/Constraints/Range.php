@@ -25,18 +25,22 @@ class Range extends Constraint
     const INVALID_CHARACTERS_ERROR = 'ad9a9798-7a99-4df7-8ce9-46e416a1e60b';
     const TOO_HIGH_ERROR = '2d28afcb-e32e-45fb-a815-01c431a86a69';
     const TOO_LOW_ERROR = '76454e69-502c-46c5-9643-f447d837c4d5';
+    public const INVALID_STEP_ERROR = 'de5ca5b7-8fcf-49cf-97f7-1319b4fe8e5e';
 
     protected static $errorNames = array(
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
         self::TOO_HIGH_ERROR => 'TOO_HIGH_ERROR',
         self::TOO_LOW_ERROR => 'TOO_LOW_ERROR',
+        self::INVALID_STEP_ERROR => 'INVALID_STEP_ERROR',
     );
 
     public $minMessage = 'This value should be {{ limit }} or more.';
     public $maxMessage = 'This value should be {{ limit }} or less.';
+    public $stepMessage = 'This value should be between {{ min }} and {{ max }} with a step of {{ step }}.';
     public $invalidMessage = 'This value should be a valid number.';
     public $min;
     public $max;
+    public $step;
 
     public function __construct($options = null)
     {

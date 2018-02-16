@@ -341,14 +341,12 @@ class ArgvInputTest extends TestCase
     {
         $input = new ArgvInput(array('cli.php', '-edev'));
 
-        // Control.
         $this->assertTrue($input->hasParameterOption(array('-e', '')));
-        // No warning is thrown if https://github.com/symfony/symfony/pull/26156 is fixed
+        // No warning thrown
         $this->assertFalse($input->hasParameterOption(array('-m', '')));
 
-        // Control.
         $this->assertEquals('dev', $input->getParameterOption(array('-e', '')));
-        // No warning is thrown if https://github.com/symfony/symfony/pull/26156 is fixed
+        // No warning thrown
         $this->assertFalse($input->getParameterOption(array('-m', '')));
     }
 

@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by greg-1-anderson at 2018-02-13T15:20:53Z
+
+Adjusted as requested.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-14T12:20:19Z
+
+LGTM. Could you add a test case please?
+
+---------------------------------------------------------------------------
+
+by greg-1-anderson at 2018-02-14T15:06:14Z
+
+@nicolas-grekas Would you like a unit test that confirms that no warning is thrown (e.g. via set_error_handler), or would you prefer a clean test without set_error_handler that confirms that the right value is returned for invalid input?
+
+n.b. without this PR, the right value is returned, but there is a php warning, so the second option wouldn't really test the domain of this PR. Not sure how you feel about set_error_handler in your unit tests, though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-14T15:15:45Z
+
+A unit that fails when this patch is not applied yes :)
+
+---------------------------------------------------------------------------
+
+by greg-1-anderson at 2018-02-14T18:28:43Z
+
+ae3bad1 passes with this PR, and fails without.
+
+The test is not super clean. I tried setting the error handler in setUp, and restoring it in tearDown, but that does not appear to work any more. Note that if a test fails, then the error handler is not restored, and phpunit complains that the error handler changed. Feel free to offer suggestions if you'd like this test to look different in any way.
+
+---------------------------------------------------------------------------
+
+by greg-1-anderson at 2018-02-14T19:26:45Z
+
+Reworked the test without using a custom error handler.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-15T11:07:25Z
+
+btw, what is the goal of passing an empty string inside the values here ? This makes little sense to me (but `bin/console` does it by default when looking for `--no-debug`)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-15T11:10:09Z
+
+Ok, the usage of `array('--no-debug', '')` comes from the initial import in the Symfony Standard repo...
+
+---------------------------------------------------------------------------
+
+by greg-1-anderson at 2018-02-15T16:56:37Z
+
+`array('--no-debug', '')` is a bug as far as I can tell, but old versions of Symfony do not throw a warning when someone uses this pattern, whereas the current dev version does. This PR only avoids the warning on invalid input.

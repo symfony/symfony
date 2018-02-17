@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by lstrojny at 2018-02-15T10:57:38Z
+
+Ready to be merged from my POV
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-16T05:49:12Z
+
+Tests do not pass and it looks related to the changes made here.
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2018-02-16T18:35:51Z
+
+@fabpot good point, made the version check somewhat more complicated.
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2018-02-17T20:48:36Z
+
+Tests look good now

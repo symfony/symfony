@@ -86,7 +86,7 @@ EOF
                     array('/group/aa/', 'aa'),
                     array('/group/bb/', 'bb'),
                     array('/group/cc/', 'cc'),
-                    array('/', 'root'),
+                    array('/(.*)', 'root'),
                     array('/group/dd/', 'dd'),
                     array('/group/ee/', 'ee'),
                     array('/group/ff/', 'ff'),

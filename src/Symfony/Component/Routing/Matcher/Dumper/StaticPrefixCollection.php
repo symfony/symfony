@@ -17,14 +17,18 @@ use Symfony\Component\Routing\RouteCollection;
  * Prefix tree of routes preserving routes order.
  *
  * @author Frank de Jonge <info@frankdejonge.nl>
+ * @author Nicolas Grekas <p@tchwork.com>
  *
  * @internal
  */
 class StaticPrefixCollection
 {
     private $prefix;
-    private $staticPrefix;
-    private $matchStart = 0;
+
+    /**
+     * @var string[]
+     */
+    private $staticPrefixes = array();
 
     /**
      * @var string[]
@@ -36,10 +40,9 @@ class StaticPrefixCollection
      */
     private $items = array();
 
-    public function __construct(string $prefix = '/', string $staticPrefix = '/')
+    public function __construct(string $prefix = '/')
     {
         $this->prefix = $prefix;
-        $this->staticPrefix = $staticPrefix;
     }
 
     public function getPrefix(): string
@@ -60,41 +63,38 @@ class StaticPrefixCollection
      *
      * @param array|self $route
      */
-    public function addRoute(string $prefix, $route)
+    public function addRoute(string $prefix, $route, string $staticPrefix = null)
     {
         $this->guardAgainstAddingNotAcceptedRoutes($prefix);
-        list($prefix, $staticPrefix) = $this->detectCommonPrefix($prefix, $prefix) ?: array(rtrim($prefix, '/') ?: '/', '/');
-
-        if ($this->staticPrefix === $staticPrefix) {
-            // When a prefix is exactly the same as the base we move up the match start position.
-            // This is needed because otherwise routes that come afterwards have higher precedence
-            // than a possible regular expression, which goes against the input order sorting.
-            $this->prefixes[] = $prefix;
-            $this->items[] = $route;
-            $this->matchStart = count($this->items);
-
-            return;
+        if (null === $staticPrefix) {
+            list($prefix, $staticPrefix) = $this->getCommonPrefix($prefix, $prefix);
         }
 
-        for ($i = $this->matchStart; $i < \count($this->items); ++$i) {
+        for ($i = \count($this->items) - 1; 0 <= $i; --$i) {
             $item = $this->items[$i];
 
             if ($item instanceof self && $item->accepts($prefix)) {
-                $item->addRoute($prefix, $route);
+                $item->addRoute($prefix, $route, $staticPrefix);
 
                 return;
             }
 
-            if ($group = $this->groupWithItem($i, $prefix, $route)) {
-                $this->prefixes[$i] = $group->getPrefix();
-                $this->items[$i] = $group;
-
+            if ($this->groupWithItem($i, $prefix, $staticPrefix, $route)) {
                 return;
+            }
+
+            if ($this->staticPrefixes[$i] !== $this->prefixes[$i] && 0 === strpos($staticPrefix, $this->staticPrefixes[$i])) {
+                break;
+            }
+
+            if ($staticPrefix !== $prefix && 0 === strpos($this->staticPrefixes[$i], $staticPrefix)) {
+                break;
             }
         }
 
         // No optimised case was found, in this case we simple add the route for possible
         // grouping when new routes are added.
+        $this->staticPrefixes[] = $staticPrefix;
         $this->prefixes[] = $prefix;
         $this->items[] = $route;
     }
@@ -118,25 +118,25 @@ class StaticPrefixCollection
     /**
      * Tries to combine a route with another route or group.
      */
-    private function groupWithItem(int $i, string $prefix, $route): ?self
+    private function groupWithItem(int $i, string $prefix, string $staticPrefix, $route): bool
     {
-        if (!$commonPrefix = $this->detectCommonPrefix($prefix, $this->prefixes[$i])) {
-            return null;
+        list($commonPrefix, $commonStaticPrefix) = $this->getCommonPrefix($prefix, $this->prefixes[$i]);
+
+        if (\strlen($this->prefix) >= \strlen($commonPrefix)) {
+            return false;
         }
 
-        $child = new self(...$commonPrefix);
-        $item = $this->items[$i];
+        $child = new self($commonPrefix);
 
-        if ($item instanceof self) {
-            $child->prefixes = array($commonPrefix[0]);
-            $child->items = array($item);
-        } else {
-            $child->addRoute($this->prefixes[$i], $item);
-        }
+        $child->staticPrefixes = array($this->staticPrefixes[$i], $staticPrefix);
+        $child->prefixes = array($this->prefixes[$i], $prefix);
+        $child->items = array($this->items[$i], $route);
 
-        $child->addRoute($prefix, $route);
+        $this->staticPrefixes[$i] = $commonStaticPrefix;
+        $this->prefixes[$i] = $commonPrefix;
+        $this->items[$i] = $child;
 
-        return $child;
+        return true;
     }
 
     /**
@@ -144,18 +144,18 @@ class StaticPrefixCollection
      */
     private function accepts(string $prefix): bool
     {
-        return '' === $this->prefix || 0 === strpos($prefix, $this->prefix);
+        return 0 === strpos($prefix, $this->prefix) && '?' !== ($prefix[\strlen($this->prefix)] ?? '');
     }
 
     /**
-     * Detects whether there's a common prefix relative to the group prefix and returns it.
+     * Gets the full and static common prefixes between two route patterns.
      *
-     * @return null|array A common prefix, longer than the base/group prefix, or null when none available
+     * The static prefix stops at last at the first opening bracket.
      */
-    private function detectCommonPrefix(string $prefix, string $anotherPrefix): ?array
+    private function getCommonPrefix(string $prefix, string $anotherPrefix): array
     {
-        $baseLength = strlen($this->prefix);
-        $end = min(strlen($prefix), strlen($anotherPrefix));
+        $baseLength = \strlen($this->prefix);
+        $end = min(\strlen($prefix), \strlen($anotherPrefix));
         $staticLength = null;
 
         for ($i = $baseLength; $i < $end && $prefix[$i] === $anotherPrefix[$i]; ++$i) {
@@ -177,21 +177,23 @@ class StaticPrefixCollection
                 if (0 < $n) {
                     break;
                 }
-                $i = $j;
+                if (('?' === ($prefix[$j] ?? '') || '?' === ($anotherPrefix[$j] ?? '')) && ($prefix[$j] ?? '') !== ($anotherPrefix[$j] ?? '')) {
+                    break;
+                }
+                $i = $j - 1;
             } elseif ('\\' === $prefix[$i] && (++$i === $end || $prefix[$i] !== $anotherPrefix[$i])) {
                 --$i;
                 break;
             }
         }
-
-        $staticLength = $staticLength ?? $i;
-        $commonPrefix = rtrim(substr($prefix, 0, $i), '/');
-
-        if (strlen($commonPrefix) > $baseLength) {
-            return array($commonPrefix, rtrim(substr($prefix, 0, $staticLength), '/') ?: '/');
+        if (1 < $i && '/' === $prefix[$i - 1]) {
+            --$i;
+        }
+        if (null !== $staticLength && 1 < $staticLength && '/' === $prefix[$staticLength - 1]) {
+            --$staticLength;
         }
 
-        return null;
+        return array(substr($prefix, 0, $i), substr($prefix, 0, $staticLength ?? $i));
     }
 
     /**

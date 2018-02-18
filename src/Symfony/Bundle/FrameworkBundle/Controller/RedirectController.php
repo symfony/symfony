@@ -72,7 +72,6 @@ class RedirectController
         if ($keepRequestMethod) {
             $statusCode = $permanent ? Response::HTTP_PERMANENTLY_REDIRECT : Response::HTTP_TEMPORARY_REDIRECT;
         } else {
-            @trigger_error('Since next major release redirect action will be made with 307/308 HTTP status codes', \E_USER_DEPRECATED);
             $statusCode = $permanent ? Response::HTTP_MOVED_PERMANENTLY : Response::HTTP_FOUND;
         }
 
@@ -107,7 +106,6 @@ class RedirectController
         if ($keepRequestMethod) {
             $statusCode = $permanent ? Response::HTTP_PERMANENTLY_REDIRECT : Response::HTTP_TEMPORARY_REDIRECT;
         } else {
-            @trigger_error('Since next major release redirect action will be made with 307/308 HTTP status codes', \E_USER_DEPRECATED);
             $statusCode = $permanent ? Response::HTTP_MOVED_PERMANENTLY : Response::HTTP_FOUND;
         }
 

@@ -660,6 +660,7 @@ class Request
 
         $parts = array();
         $order = array();
+        $index = 0;
 
         foreach (explode('&', $qs) as $param) {
             if ('' === $param || '=' === $param[0]) {
@@ -670,14 +671,13 @@ class Request
             }
 
             $keyValuePair = explode('=', $param, 2);
+            $key = urldecode($keyValuePair[0]);
 
             // GET parameters, that are submitted from a HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
             // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str. This is why we use urldecode and then normalize to
             // RFC 3986 with rawurlencode.
-            $parts[] = isset($keyValuePair[1]) ?
-                rawurlencode(urldecode($keyValuePair[0])).'='.rawurlencode(urldecode($keyValuePair[1])) :
-                rawurlencode(urldecode($keyValuePair[0]));
-            $order[] = urldecode($keyValuePair[0]);
+            $parts[] = rawurlencode($key).(isset($keyValuePair[1]) ? '='.rawurlencode(urldecode($keyValuePair[1])) : '');
+            $order[] = false !== ($i = strpos($key, '[')) ? substr_replace($key, pack('N', ++$index), 1 + $i) : $key;
         }
 
         array_multisort($order, SORT_ASC, $parts);

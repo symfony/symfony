@@ -33,14 +33,14 @@ class RedirectControllerTest extends TestCase
             $controller->redirectAction($request, '', true);
             $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
         } catch (HttpException $e) {
-            $this->assertSame(Response::HTTP_GONE, $e->getStatusCode());
+            $this->assertSame(410, $e->getStatusCode());
         }
 
         try {
             $controller->redirectAction($request, '', false);
             $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
         } catch (HttpException $e) {
-            $this->assertSame(Response::HTTP_NOT_FOUND, $e->getStatusCode());
+            $this->assertSame(404, $e->getStatusCode());
         }
     }
 
@@ -86,14 +86,14 @@ class RedirectControllerTest extends TestCase
     public function provider()
     {
         return array(
-            array(true, false, false, Response::HTTP_MOVED_PERMANENTLY, array('additional-parameter' => 'value')),
-            array(false, false, false, Response::HTTP_FOUND, array('additional-parameter' => 'value')),
-            array(false, false, true, Response::HTTP_FOUND, array()),
-            array(false, false, array('additional-parameter'), Response::HTTP_FOUND, array()),
-            array(true, true, false, Response::HTTP_PERMANENTLY_REDIRECT, array('additional-parameter' => 'value')),
-            array(false, true, false, Response::HTTP_TEMPORARY_REDIRECT, array('additional-parameter' => 'value')),
-            array(false, true, true, Response::HTTP_TEMPORARY_REDIRECT, array()),
-            array(false, true, array('additional-parameter'), Response::HTTP_TEMPORARY_REDIRECT, array()),
+            array(true, false, false, 301, array('additional-parameter' => 'value')),
+            array(false, false, false, 302, array('additional-parameter' => 'value')),
+            array(false, false, true, 302, array()),
+            array(false, false, array('additional-parameter'), 302, array()),
+            array(true, true, false, 308, array('additional-parameter' => 'value')),
+            array(false, true, false, 307, array('additional-parameter' => 'value')),
+            array(false, true, true, 307, array()),
+            array(false, true, array('additional-parameter'), 307, array()),
         );
     }
 
@@ -106,14 +106,14 @@ class RedirectControllerTest extends TestCase
             $controller->urlRedirectAction($request, '', true);
             $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
         } catch (HttpException $e) {
-            $this->assertSame(Response::HTTP_GONE, $e->getStatusCode());
+            $this->assertSame(410, $e->getStatusCode());
         }
 
         try {
             $controller->urlRedirectAction($request, '', false);
             $this->fail('Expected Symfony\Component\HttpKernel\Exception\HttpException to be thrown');
         } catch (HttpException $e) {
-            $this->assertSame(Response::HTTP_NOT_FOUND, $e->getStatusCode());
+            $this->assertSame(404, $e->getStatusCode());
         }
     }
 
@@ -124,7 +124,7 @@ class RedirectControllerTest extends TestCase
         $returnResponse = $controller->urlRedirectAction($request, 'http://foo.bar/');
 
         $this->assertRedirectUrl($returnResponse, 'http://foo.bar/');
-        $this->assertEquals(Response::HTTP_FOUND, $returnResponse->getStatusCode());
+        $this->assertEquals(302, $returnResponse->getStatusCode());
     }
 
     public function testFullURLWithMethodKeep()
@@ -134,7 +134,7 @@ class RedirectControllerTest extends TestCase
         $returnResponse = $controller->urlRedirectAction($request, 'http://foo.bar/', false, null, null, null, true);
 
         $this->assertRedirectUrl($returnResponse, 'http://foo.bar/');
-        $this->assertEquals(Response::HTTP_TEMPORARY_REDIRECT, $returnResponse->getStatusCode());
+        $this->assertEquals(307, $returnResponse->getStatusCode());
     }
 
     public function testUrlRedirectDefaultPorts()

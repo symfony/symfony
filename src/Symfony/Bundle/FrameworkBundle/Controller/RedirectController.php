@@ -57,7 +57,7 @@ class RedirectController
     public function redirectAction(Request $request, string $route, bool $permanent = false, $ignoreAttributes = false, bool $keepRequestMethod = false): Response
     {
         if ('' == $route) {
-            throw new HttpException($permanent ? Response::HTTP_GONE : Response::HTTP_NOT_FOUND);
+            throw new HttpException($permanent ? 410 : 404);
         }
 
         $attributes = array();
@@ -70,9 +70,9 @@ class RedirectController
         }
 
         if ($keepRequestMethod) {
-            $statusCode = $permanent ? Response::HTTP_PERMANENTLY_REDIRECT : Response::HTTP_TEMPORARY_REDIRECT;
+            $statusCode = $permanent ? 308 : 307;
         } else {
-            $statusCode = $permanent ? Response::HTTP_MOVED_PERMANENTLY : Response::HTTP_FOUND;
+            $statusCode = $permanent ? 301 : 302;
         }
 
         return new RedirectResponse($this->router->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $statusCode);
@@ -100,13 +100,13 @@ class RedirectController
     public function urlRedirectAction(Request $request, string $path, bool $permanent = false, string $scheme = null, int $httpPort = null, int $httpsPort = null, bool $keepRequestMethod = false): Response
     {
         if ('' == $path) {
-            throw new HttpException($permanent ? Response::HTTP_GONE : Response::HTTP_NOT_FOUND);
+            throw new HttpException($permanent ? 410 : 404);
         }
 
         if ($keepRequestMethod) {
-            $statusCode = $permanent ? Response::HTTP_PERMANENTLY_REDIRECT : Response::HTTP_TEMPORARY_REDIRECT;
+            $statusCode = $permanent ? 308 : 307;
         } else {
-            $statusCode = $permanent ? Response::HTTP_MOVED_PERMANENTLY : Response::HTTP_FOUND;
+            $statusCode = $permanent ? 301 : 302;
         }
 
         // redirect if the path is a full URL

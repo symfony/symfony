@@ -313,8 +313,7 @@ SELECTCLAUSE;
      * Constructs the SQL for retrieving child object identities for the given
      * object identities.
      *
-     * @param ObjectIdentityInterface $oid
-     * @param bool                    $directChildrenOnly
+     * @param bool $directChildrenOnly
      *
      * @return string
      */

@@ -43,7 +43,6 @@ namespace Symfony\Component\ClassLoader;
  *         'Swift_' => __DIR__.'/Swift',
  *     ));
  *
- *
  *     // to enable searching the include path (e.g. for PEAR packages)
  *     $loader->useIncludePath(true);
  *

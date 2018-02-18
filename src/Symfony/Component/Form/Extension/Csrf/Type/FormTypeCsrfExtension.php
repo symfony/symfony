@@ -46,9 +46,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      * @param CsrfTokenManagerInterface|CsrfProviderInterface $defaultTokenManager
      * @param bool                                            $defaultEnabled
      * @param string                                          $defaultFieldName
-     * @param TranslatorInterface                             $translator
      * @param null|string                                     $translationDomain
-     * @param ServerParams                                    $serverParams
      */
     public function __construct($defaultTokenManager, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null, ServerParams $serverParams = null)
     {
@@ -68,9 +66,6 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
     /**
      * Adds a CSRF field to the form when the CSRF protection is enabled.
-     *
-     * @param FormBuilderInterface $builder The form builder
-     * @param array                $options The options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -93,10 +88,6 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
     /**
      * Adds a CSRF field to the root form view.
-     *
-     * @param FormView      $view    The form view
-     * @param FormInterface $form    The form
-     * @param array         $options The options
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {

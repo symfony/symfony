@@ -150,8 +150,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      *
      * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.
      *
-     * @param array $camelizedAttributes
-     *
      * @return self
      *
      * @throws LogicException
@@ -246,7 +244,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * Gets attributes to normalize using groups.
      *
      * @param string|object $classOrObject
-     * @param array         $context
      * @param bool          $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
      * @return string[]|AttributeMetadataInterface[]|bool
@@ -288,11 +285,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * is removed from the context before being returned to avoid side effects
      * when recursively normalizing an object graph.
      *
-     * @param array            $data
-     * @param string           $class
-     * @param array            $context
-     * @param \ReflectionClass $reflectionClass
-     * @param array|bool       $allowedAttributes
+     * @param string     $class
+     * @param array|bool $allowedAttributes
      *
      * @return object
      *

@@ -44,8 +44,7 @@ class ProgressBar
     private static $formats;
 
     /**
-     * @param OutputInterface $output An OutputInterface instance
-     * @param int             $max    Maximum steps (0 if unknown)
+     * @param int $max Maximum steps (0 if unknown)
      */
     public function __construct(OutputInterface $output, $max = 0)
     {

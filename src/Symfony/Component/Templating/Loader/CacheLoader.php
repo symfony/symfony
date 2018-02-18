@@ -30,8 +30,7 @@ class CacheLoader extends Loader
     protected $dir;
 
     /**
-     * @param LoaderInterface $loader A Loader instance
-     * @param string          $dir    The directory where to store the cache files
+     * @param string $dir The directory where to store the cache files
      */
     public function __construct(LoaderInterface $loader, $dir)
     {
@@ -87,8 +86,7 @@ class CacheLoader extends Loader
     /**
      * Returns true if the template is still fresh.
      *
-     * @param TemplateReferenceInterface $template A template
-     * @param int                        $time     The last modification time of the cached template (timestamp)
+     * @param int $time The last modification time of the cached template (timestamp)
      *
      * @return bool
      */

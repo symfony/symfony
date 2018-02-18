@@ -256,7 +256,6 @@ class ChoiceList implements ChoiceListInterface
      * @param array              $bucketForRemaining The bucket where to store the non-preferred view objects
      * @param array|\Traversable $choices            The list of choices
      * @param array              $labels             The labels corresponding to the choices
-     * @param array              $preferredChoices   The preferred choices
      *
      * @throws InvalidArgumentException      if the structures of the choices and labels array do not match
      * @throws InvalidConfigurationException if no valid value or index could be created for a choice
@@ -301,7 +300,6 @@ class ChoiceList implements ChoiceListInterface
      * @param array  $bucketForRemaining The bucket where to store the non-preferred view objects
      * @param array  $choices            The list of choices in the group
      * @param array  $labels             The labels corresponding to the choices in the group
-     * @param array  $preferredChoices   The preferred choices
      *
      * @throws InvalidConfigurationException if no valid value or index could be created for a choice
      */
@@ -336,7 +334,6 @@ class ChoiceList implements ChoiceListInterface
      * @param array  $bucketForRemaining The bucket where to store the non-preferred view objects
      * @param mixed  $choice             The choice to add
      * @param string $label              The label for the choice
-     * @param array  $preferredChoices   The preferred choices
      *
      * @throws InvalidConfigurationException if no valid value or index could be created
      */
@@ -495,8 +492,6 @@ class ChoiceList implements ChoiceListInterface
 
     /**
      * Fixes the data type of the given choices to avoid comparison problems.
-     *
-     * @param array $choices The choices
      *
      * @return array The fixed choices
      *

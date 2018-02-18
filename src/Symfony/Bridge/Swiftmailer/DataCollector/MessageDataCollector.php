@@ -34,8 +34,7 @@ class MessageDataCollector extends DataCollector
      * We don't inject the message logger and mailer here
      * to avoid the creation of these objects when no emails are sent.
      *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param bool               $isSpool
+     * @param bool $isSpool
      */
     public function __construct(ContainerInterface $container, $isSpool)
     {

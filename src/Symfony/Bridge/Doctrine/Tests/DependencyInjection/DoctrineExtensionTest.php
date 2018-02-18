@@ -187,7 +187,6 @@ class DoctrineExtensionTest extends TestCase
 
     /**
      * @param string $class
-     * @param array  $config
      *
      * @dataProvider providerBasicDrivers
      */

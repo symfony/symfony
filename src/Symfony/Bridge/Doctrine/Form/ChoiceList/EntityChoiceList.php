@@ -303,8 +303,6 @@ class EntityChoiceList extends ObjectChoiceList
     /**
      * Returns the indices corresponding to the given entities.
      *
-     * @param array $entities
-     *
      * @return array
      *
      * @see ChoiceListInterface
@@ -345,8 +343,6 @@ class EntityChoiceList extends ObjectChoiceList
 
     /**
      * Returns the entities corresponding to the given values.
-     *
-     * @param array $values
      *
      * @return array
      *

@@ -178,9 +178,7 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * @param string        $combiner
-     * @param NodeInterface $xpath
-     * @param NodeInterface $combinedXpath
+     * @param string $combiner
      *
      * @return XPathExpr
      *
@@ -210,8 +208,7 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param string    $pseudoClass
+     * @param string $pseudoClass
      *
      * @return XPathExpr
      *
@@ -227,10 +224,9 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * @param XPathExpr $xpath
-     * @param string    $operator
-     * @param string    $attribute
-     * @param string    $value
+     * @param string $operator
+     * @param string $attribute
+     * @param string $value
      *
      * @return XPathExpr
      *

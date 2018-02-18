@@ -47,8 +47,6 @@ class DumperCollection implements \IteratorAggregate
 
     /**
      * Adds a route or collection.
-     *
-     * @param DumperRoute|DumperCollection The route or collection
      */
     public function add($child)
     {
@@ -60,8 +58,6 @@ class DumperCollection implements \IteratorAggregate
 
     /**
      * Sets children.
-     *
-     * @param array $children The children
      */
     public function setAll(array $children)
     {

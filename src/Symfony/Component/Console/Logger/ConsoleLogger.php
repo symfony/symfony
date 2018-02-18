@@ -85,7 +85,6 @@ class ConsoleLogger extends AbstractLogger
      * @author PHP Framework Interoperability Group
      *
      * @param string $message
-     * @param array  $context
      *
      * @return string
      */

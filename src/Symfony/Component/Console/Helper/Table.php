@@ -70,8 +70,7 @@ class Table
     /**
      * Sets a style definition.
      *
-     * @param string     $name  The style name
-     * @param TableStyle $style A TableStyle instance
+     * @param string $name The style name
      */
     public static function setStyleDefinition($name, TableStyle $style)
     {
@@ -255,7 +254,6 @@ class Table
      *
      * Example: <code>| 9971-5-0210-0 | A Tale of Two Cities  | Charles Dickens  |</code>
      *
-     * @param array  $row
      * @param string $cellFormat
      */
     private function renderRow(array $row, $cellFormat)
@@ -275,7 +273,6 @@ class Table
     /**
      * Renders table cell with padding.
      *
-     * @param array  $row
      * @param int    $column
      * @param string $cellFormat
      */
@@ -365,8 +362,7 @@ class Table
     /**
      * fill rows that contains rowspan > 1.
      *
-     * @param array $rows
-     * @param int   $line
+     * @param int $line
      *
      * @return array
      */
@@ -440,8 +436,7 @@ class Table
     }
 
     /**
-     * @param array $rows
-     * @param int   $line
+     * @param int $line
      *
      * @return array
      */
@@ -543,8 +538,7 @@ class Table
     /**
      * Gets cell width.
      *
-     * @param array $row
-     * @param int   $column
+     * @param int $column
      *
      * @return int
      */

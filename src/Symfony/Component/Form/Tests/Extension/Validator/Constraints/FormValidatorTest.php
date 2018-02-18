@@ -634,7 +634,6 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @param string $name
      * @param string $dataClass
-     * @param array  $options
      *
      * @return FormBuilder
      */

@@ -655,7 +655,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * Dumps the service container to PHP code in the cache.
      *
-     * @param ConfigCache      $cache     The config cache
      * @param ContainerBuilder $container The service container
      * @param string           $class     The name of the class to generate
      * @param string           $baseClass The name of the container's base class

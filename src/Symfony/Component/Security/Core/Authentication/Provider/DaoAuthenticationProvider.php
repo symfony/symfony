@@ -32,11 +32,8 @@ class DaoAuthenticationProvider extends UserAuthenticationProvider
     private $userProvider;
 
     /**
-     * @param UserProviderInterface   $userProvider               An UserProviderInterface instance
-     * @param UserCheckerInterface    $userChecker                An UserCheckerInterface instance
-     * @param string                  $providerKey                The provider key
-     * @param EncoderFactoryInterface $encoderFactory             An EncoderFactoryInterface instance
-     * @param bool                    $hideUserNotFoundExceptions Whether to hide user not found exception or not
+     * @param string $providerKey                The provider key
+     * @param bool   $hideUserNotFoundExceptions Whether to hide user not found exception or not
      */
     public function __construct(UserProviderInterface $userProvider, UserCheckerInterface $userChecker, $providerKey, EncoderFactoryInterface $encoderFactory, $hideUserNotFoundExceptions = true)
     {

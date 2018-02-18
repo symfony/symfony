@@ -80,7 +80,6 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param Application $application
      * @param string|null $namespace
      *
      * @return \DOMDocument

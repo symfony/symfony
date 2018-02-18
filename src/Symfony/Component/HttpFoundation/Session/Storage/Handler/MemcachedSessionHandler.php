@@ -37,11 +37,10 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
      * Constructor.
      *
      * List of available options:
-     *  * prefix: The prefix to use for the memcached keys in order to avoid collision
-     *  * expiretime: The time to live in seconds
+     * * prefix: The prefix to use for the memcached keys in order to avoid collision
+     * * expiretime: The time to live in seconds
      *
-     * @param \Memcached $memcached A \Memcached instance
-     * @param array      $options   An associative array of Memcached options
+     * @param array $options An associative array of Memcached options
      *
      * @throws \InvalidArgumentException When unsupported options are passed
      */

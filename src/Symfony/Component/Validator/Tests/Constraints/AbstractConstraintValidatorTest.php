@@ -135,7 +135,6 @@ abstract class AbstractConstraintValidatorTest extends TestCase
 
     /**
      * @param mixed  $message
-     * @param array  $parameters
      * @param string $propertyPath
      * @param string $invalidValue
      * @param null   $plural
@@ -245,14 +244,13 @@ abstract class AbstractConstraintValidatorTest extends TestCase
 
     /**
      * @param mixed  $message
-     * @param array  $parameters
      * @param string $propertyPath
      * @param string $invalidValue
      * @param null   $plural
      * @param null   $code
      *
      * @deprecated To be removed in Symfony 3.0. Use
-     *             {@link buildViolation()} instead.
+     * {@link buildViolation()} instead.
      */
     protected function assertViolation($message, array $parameters = array(), $propertyPath = 'property.path', $invalidValue = 'InvalidValue', $plural = null, $code = null)
     {
@@ -268,10 +266,9 @@ abstract class AbstractConstraintValidatorTest extends TestCase
     }
 
     /**
-     * @param array $expected
      *
      * @deprecated To be removed in Symfony 3.0. Use
-     *             {@link buildViolation()} instead.
+     * {@link buildViolation()} instead.
      */
     protected function assertViolations(array $expected)
     {
@@ -289,7 +286,6 @@ abstract class AbstractConstraintValidatorTest extends TestCase
     }
 
     /**
-     * @param $message
      *
      * @return ConstraintViolationAssertion
      */

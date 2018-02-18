@@ -82,7 +82,6 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses all imports.
      *
-     * @param array  $content
      * @param string $file
      */
     private function parseImports(array $content, $file)
@@ -109,7 +108,6 @@ class YamlFileLoader extends FileLoader
     /**
      * Parses definitions.
      *
-     * @param array  $content
      * @param string $file
      */
     private function parseDefinitions(array $content, $file)

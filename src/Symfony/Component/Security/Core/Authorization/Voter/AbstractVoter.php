@@ -50,9 +50,8 @@ abstract class AbstractVoter implements VoterInterface
      * If at least one attribute is supported, but access not granted, then ACCESS_DENIED is returned
      * Otherwise it will return ACCESS_ABSTAIN
      *
-     * @param TokenInterface $token      A TokenInterface instance
-     * @param object         $object     The object to secure
-     * @param array          $attributes An array of attributes associated with the method being invoked
+     * @param object $object     The object to secure
+     * @param array  $attributes An array of attributes associated with the method being invoked
      *
      * @return int either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
      */

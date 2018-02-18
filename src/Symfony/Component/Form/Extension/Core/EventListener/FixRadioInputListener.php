@@ -34,8 +34,7 @@ class FixRadioInputListener implements EventSubscriberInterface
     private $placeholderPresent;
 
     /**
-     * @param ChoiceListInterface $choiceList
-     * @param bool                $placeholderPresent
+     * @param bool $placeholderPresent
      */
     public function __construct(ChoiceListInterface $choiceList, $placeholderPresent)
     {

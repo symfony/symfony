@@ -34,10 +34,9 @@ class Client extends BaseClient
     protected $kernel;
 
     /**
-     * @param HttpKernelInterface $kernel    An HttpKernel instance
-     * @param array               $server    The server parameters (equivalent of $_SERVER)
-     * @param History             $history   A History instance to store the browser history
-     * @param CookieJar           $cookieJar A CookieJar instance to store the cookies
+     * @param array     $server    The server parameters (equivalent of $_SERVER)
+     * @param History   $history   A History instance to store the browser history
+     * @param CookieJar $cookieJar A CookieJar instance to store the cookies
      */
     public function __construct(HttpKernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {

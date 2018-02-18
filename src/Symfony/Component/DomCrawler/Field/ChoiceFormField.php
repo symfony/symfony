@@ -155,8 +155,6 @@ class ChoiceFormField extends FormField
     /**
      * Adds a choice to the current ones.
      *
-     * @param \DOMElement $node
-     *
      * @throws \LogicException When choice provided is not multiple nor radio
      *
      * @internal
@@ -254,8 +252,6 @@ class ChoiceFormField extends FormField
 
     /**
      * Returns option value with associated disabled flag.
-     *
-     * @param \DOMElement $node
      *
      * @return array
      */

@@ -104,8 +104,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Writes content to output.
      *
-     * @param Table $table
-     * @param bool  $decorated
+     * @param bool $decorated
      */
     protected function renderTable(Table $table, $decorated = false)
     {
@@ -146,7 +145,6 @@ abstract class Descriptor implements DescriptorInterface
      * * name: name of described service
      *
      * @param Definition|Alias|object $service
-     * @param array                   $options
      */
     abstract protected function describeContainerService($service, array $options = array());
 
@@ -185,7 +183,6 @@ abstract class Descriptor implements DescriptorInterface
      * Describes a callable.
      *
      * @param callable $callable
-     * @param array    $options
      */
     abstract protected function describeCallable($callable, array $options = array());
 
@@ -232,8 +229,7 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param ContainerBuilder $builder
-     * @param string           $serviceId
+     * @param string $serviceId
      *
      * @return mixed
      */
@@ -257,8 +253,7 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
-     * @param ContainerBuilder $builder
-     * @param bool             $showPrivate
+     * @param bool $showPrivate
      *
      * @return array
      */

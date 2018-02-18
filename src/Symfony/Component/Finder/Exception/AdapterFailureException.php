@@ -23,9 +23,8 @@ class AdapterFailureException extends \RuntimeException implements ExceptionInte
     private $adapter;
 
     /**
-     * @param AdapterInterface $adapter
-     * @param string|null      $message
-     * @param \Exception|null  $previous
+     * @param string|null     $message
+     * @param \Exception|null $previous
      */
     public function __construct(AdapterInterface $adapter, $message = null, \Exception $previous = null)
     {

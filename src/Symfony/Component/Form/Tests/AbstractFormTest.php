@@ -55,10 +55,8 @@ abstract class AbstractFormTest extends TestCase
     abstract protected function createForm();
 
     /**
-     * @param string                   $name
-     * @param EventDispatcherInterface $dispatcher
-     * @param string                   $dataClass
-     * @param array                    $options
+     * @param string $name
+     * @param string $dataClass
      *
      * @return FormBuilder
      */

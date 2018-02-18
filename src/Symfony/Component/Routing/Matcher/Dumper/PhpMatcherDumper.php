@@ -113,8 +113,7 @@ EOF;
     /**
      * Generates PHP code to match a RouteCollection with all its routes.
      *
-     * @param RouteCollection $routes               A RouteCollection instance
-     * @param bool            $supportsRedirections Whether redirections are supported by the base class
+     * @param bool $supportsRedirections Whether redirections are supported by the base class
      *
      * @return string PHP code
      */
@@ -154,9 +153,8 @@ EOF;
     /**
      * Generates PHP code recursively to match a tree of routes.
      *
-     * @param DumperPrefixCollection $collection           A DumperPrefixCollection instance
-     * @param bool                   $supportsRedirections Whether redirections are supported by the base class
-     * @param string                 $parentPrefix         Prefix of the parent collection
+     * @param bool   $supportsRedirections Whether redirections are supported by the base class
+     * @param string $parentPrefix         Prefix of the parent collection
      *
      * @return string PHP code
      */
@@ -193,7 +191,6 @@ EOF;
     /**
      * Compiles a single Route to PHP code used to match it against the path info.
      *
-     * @param Route       $route                A Route instance
      * @param string      $name                 The name of the Route
      * @param bool        $supportsRedirections Whether redirections are supported by the base class
      * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code

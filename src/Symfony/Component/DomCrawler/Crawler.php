@@ -253,8 +253,6 @@ class Crawler extends \SplObjectStorage
 
     /**
      * Adds a \DOMDocument to the list of nodes.
-     *
-     * @param \DOMDocument $dom A \DOMDocument instance
      */
     public function addDocument(\DOMDocument $dom)
     {
@@ -265,8 +263,6 @@ class Crawler extends \SplObjectStorage
 
     /**
      * Adds a \DOMNodeList to the list of nodes.
-     *
-     * @param \DOMNodeList $nodes A \DOMNodeList instance
      */
     public function addNodeList(\DOMNodeList $nodes)
     {
@@ -291,8 +287,6 @@ class Crawler extends \SplObjectStorage
 
     /**
      * Adds a \DOMNode instance to the list of nodes.
-     *
-     * @param \DOMNode $node A \DOMNode instance
      */
     public function addNode(\DOMNode $node)
     {
@@ -973,8 +967,6 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * @param \DOMDocument $document
-     * @param array        $prefixes
      *
      * @return \DOMXPath
      *
@@ -995,8 +987,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * @param \DOMXPath $domxpath
-     * @param string    $prefix
+     * @param string $prefix
      *
      * @return string
      *

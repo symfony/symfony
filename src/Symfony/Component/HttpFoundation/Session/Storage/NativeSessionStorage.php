@@ -59,10 +59,10 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @see http://php.net/session.configuration for options
      * but we omit 'session.' from the beginning of the keys for convenience.
-     *
+     * 
      * ("auto_start", is not supported as it tells PHP to start a session before
      * PHP starts to execute user-land code. Setting during runtime has no effect).
-     *
+     * 
      * cache_limiter, "" (use "0" to prevent headers from being sent entirely).
      * cookie_domain, ""
      * cookie_httponly, ""
@@ -98,7 +98,6 @@ class NativeSessionStorage implements SessionStorageInterface
      *
      * @param array                                                            $options Session configuration options
      * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
-     * @param MetadataBag                                                      $metaBag MetadataBag
      */
     public function __construct(array $options = array(), $handler = null, MetadataBag $metaBag = null)
     {

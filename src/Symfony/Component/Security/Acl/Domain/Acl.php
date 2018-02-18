@@ -48,11 +48,8 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     private $listeners = array();
 
     /**
-     * @param int                                 $id
-     * @param ObjectIdentityInterface             $objectIdentity
-     * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
-     * @param array                               $loadedSids
-     * @param bool                                $entriesInheriting
+     * @param int  $id
+     * @param bool $entriesInheriting
      */
     public function __construct($id, ObjectIdentityInterface $objectIdentity, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $loadedSids, $entriesInheriting)
     {
@@ -436,12 +433,11 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Inserts an ACE.
      *
-     * @param string                    $property
-     * @param int                       $index
-     * @param int                       $mask
-     * @param SecurityIdentityInterface $sid
-     * @param bool                      $granting
-     * @param string                    $strategy
+     * @param string $property
+     * @param int    $index
+     * @param int    $mask
+     * @param bool   $granting
+     * @param string $strategy
      *
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
@@ -485,13 +481,12 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Inserts a field-based ACE.
      *
-     * @param string                    $property
-     * @param int                       $index
-     * @param string                    $field
-     * @param int                       $mask
-     * @param SecurityIdentityInterface $sid
-     * @param bool                      $granting
-     * @param string                    $strategy
+     * @param string $property
+     * @param int    $index
+     * @param string $field
+     * @param int    $mask
+     * @param bool   $granting
+     * @param string $strategy
      *
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
@@ -571,10 +566,9 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Updates auditing for an ACE.
      *
-     * @param array &$aces
-     * @param int   $index
-     * @param bool  $auditSuccess
-     * @param bool  $auditFailure
+     * @param int  $index
+     * @param bool $auditSuccess
+     * @param bool $auditFailure
      *
      * @throws \OutOfBoundsException
      */
@@ -646,10 +640,9 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Called when a property of an ACE associated with this ACL changes.
      *
-     * @param EntryInterface $entry
-     * @param string         $name
-     * @param mixed          $oldValue
-     * @param mixed          $newValue
+     * @param string $name
+     * @param mixed  $oldValue
+     * @param mixed  $newValue
      */
     private function onEntryPropertyChanged(EntryInterface $entry, $name, $oldValue, $newValue)
     {

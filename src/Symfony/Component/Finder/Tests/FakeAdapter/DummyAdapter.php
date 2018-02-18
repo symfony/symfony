@@ -23,9 +23,6 @@ class DummyAdapter extends AbstractAdapter
      */
     private $iterator;
 
-    /**
-     * @param \Iterator $iterator
-     */
     public function __construct(\Iterator $iterator)
     {
         $this->iterator = $iterator;

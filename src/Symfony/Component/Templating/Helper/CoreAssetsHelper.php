@@ -35,8 +35,7 @@ class CoreAssetsHelper extends Helper implements PackageInterface
     protected $namedPackages = array();
 
     /**
-     * @param PackageInterface $defaultPackage The default package
-     * @param array            $namedPackages  Additional packages indexed by name
+     * @param array $namedPackages Additional packages indexed by name
      */
     public function __construct(PackageInterface $defaultPackage, array $namedPackages = array())
     {
@@ -55,8 +54,7 @@ class CoreAssetsHelper extends Helper implements PackageInterface
     /**
      * Adds an asset package to the helper.
      *
-     * @param string           $name    The package name
-     * @param PackageInterface $package The package
+     * @param string $name The package name
      */
     public function addPackage($name, PackageInterface $package)
     {

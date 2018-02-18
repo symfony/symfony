@@ -43,7 +43,6 @@ class FormHelper extends Helper
      *
      * The theme format is "<Bundle>:<Controller>".
      *
-     * @param FormView     $view   A FormView instance
      * @param string|array $themes A theme or an array of theme
      */
     public function setTheme(FormView $view, $themes)

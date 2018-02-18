@@ -366,8 +366,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /**
      * Updates a user security identity when the user's username changes.
      *
-     * @param UserSecurityIdentity $usid
-     * @param string               $oldUsername
+     * @param string $oldUsername
      */
     public function updateUserSecurityIdentity(UserSecurityIdentity $usid, $oldUsername)
     {
@@ -661,8 +660,7 @@ QUERY;
     /**
      * Constructs the SQL for updating an object identity.
      *
-     * @param int   $pk
-     * @param array $changes
+     * @param int $pk
      *
      * @return string
      *
@@ -685,8 +683,7 @@ QUERY;
     /**
      * Constructs the SQL for updating a user security identity.
      *
-     * @param UserSecurityIdentity $usid
-     * @param string               $oldUsername
+     * @param string $oldUsername
      *
      * @return string
      */
@@ -711,8 +708,7 @@ QUERY;
     /**
      * Constructs the SQL for updating an ACE.
      *
-     * @param int   $pk
-     * @param array $sets
+     * @param int $pk
      *
      * @return string
      *
@@ -832,7 +828,6 @@ QUERY;
      * This processes new entries changes on an ACE related property (classFieldAces, or objectFieldAces).
      *
      * @param string $name
-     * @param array  $changes
      */
     private function updateNewFieldAceProperty($name, array $changes)
     {
@@ -874,7 +869,6 @@ QUERY;
      * This processes old entries changes on an ACE related property (classFieldAces, or objectFieldAces).
      *
      * @param string $name
-     * @param array  $changes
      */
     private function updateOldFieldAceProperty($name, array $changes)
     {
@@ -905,7 +899,6 @@ QUERY;
      * This processes new entries changes on an ACE related property (classAces, or objectAces).
      *
      * @param string $name
-     * @param array  $changes
      */
     private function updateNewAceProperty($name, array $changes)
     {
@@ -947,7 +940,6 @@ QUERY;
      * This processes old entries changes on an ACE related property (classAces, or objectAces).
      *
      * @param string $name
-     * @param array  $changes
      */
     private function updateOldAceProperty($name, array $changes)
     {

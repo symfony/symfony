@@ -113,9 +113,8 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      *
-     * @param ChoiceLoaderInterface             $loader The choice loader
-     * @param null|callable|string|PropertyPath $value  The callable or path for
-     *                                                  generating the choice values
+     * @param null|callable|string|PropertyPath $value The callable or path for
+     *                                                 generating the choice values
      *
      * @return ChoiceListInterface The choice list
      */
@@ -144,7 +143,6 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      *
-     * @param ChoiceListInterface                     $list             The choice list
      * @param null|array|callable|string|PropertyPath $preferredChoices The preferred choices
      * @param null|callable|string|PropertyPath       $label            The callable or path generating the choice labels
      * @param null|callable|string|PropertyPath       $index            The callable or path generating the view indices

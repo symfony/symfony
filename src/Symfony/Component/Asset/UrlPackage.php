@@ -39,9 +39,8 @@ class UrlPackage extends Package
     private $sslPackage;
 
     /**
-     * @param string|string[]          $baseUrls        Base asset URLs
-     * @param VersionStrategyInterface $versionStrategy The version strategy
-     * @param ContextInterface|null    $context         Context
+     * @param string|string[]       $baseUrls Base asset URLs
+     * @param ContextInterface|null $context  Context
      */
     public function __construct($baseUrls, VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {

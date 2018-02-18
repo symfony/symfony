@@ -68,8 +68,6 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Parses parameters.
-     *
-     * @param \DOMDocument $xml
      */
     private function parseParameters(\DOMDocument $xml)
     {
@@ -81,8 +79,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses imports.
      *
-     * @param \DOMDocument $xml
-     * @param string       $file
+     * @param string $file
      */
     private function parseImports(\DOMDocument $xml, $file)
     {
@@ -103,8 +100,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses multiple definitions.
      *
-     * @param \DOMDocument $xml
-     * @param string       $file
+     * @param string $file
      */
     private function parseDefinitions(\DOMDocument $xml, $file)
     {
@@ -125,8 +121,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses an individual Definition.
      *
-     * @param \DOMElement $service
-     * @param string      $file
+     * @param string $file
      *
      * @return Definition|null
      */
@@ -271,8 +266,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Processes anonymous services.
      *
-     * @param \DOMDocument $xml
-     * @param string       $file
+     * @param string $file
      */
     private function processAnonymousServices(\DOMDocument $xml, $file)
     {
@@ -334,9 +328,8 @@ class XmlFileLoader extends FileLoader
     /**
      * Returns arguments as valid php types.
      *
-     * @param \DOMElement $node
-     * @param string      $name
-     * @param bool        $lowercase
+     * @param string $name
+     * @param bool   $lowercase
      *
      * @return mixed
      */
@@ -407,8 +400,7 @@ class XmlFileLoader extends FileLoader
     /**
      * Get child elements by name.
      *
-     * @param \DOMNode $node
-     * @param mixed    $name
+     * @param mixed $name
      *
      * @return array
      */
@@ -426,8 +418,6 @@ class XmlFileLoader extends FileLoader
 
     /**
      * Validates a documents XML schema.
-     *
-     * @param \DOMDocument $dom
      *
      * @return bool
      *
@@ -505,8 +495,7 @@ EOF
     /**
      * Validates an extension.
      *
-     * @param \DOMDocument $dom
-     * @param string       $file
+     * @param string $file
      *
      * @throws InvalidArgumentException When no extension is found corresponding to a tag
      */
@@ -533,8 +522,6 @@ EOF
 
     /**
      * Loads from an extension.
-     *
-     * @param \DOMDocument $xml
      */
     private function loadFromExtensions(\DOMDocument $xml)
     {
@@ -557,17 +544,15 @@ EOF
      *
      * The following rules applies during the conversion:
      *
-     *  * Each tag is converted to a key value or an array
-     *    if there is more than one "value"
+     * * Each tag is converted to a key value or an array
+     *   if there is more than one "value"
      *
-     *  * The content of a tag is set under a "value" key (<foo>bar</foo>)
-     *    if the tag also has some nested tags
+     * * The content of a tag is set under a "value" key (<foo>bar</foo>)
+     *   if the tag also has some nested tags
      *
-     *  * The attributes are converted to keys (<foo foo="bar"/>)
+     * * The attributes are converted to keys (<foo foo="bar"/>)
      *
-     *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
-     *
-     * @param \DOMElement $element A \DOMElement instance
+     * * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
      * @return array A PHP array
      */

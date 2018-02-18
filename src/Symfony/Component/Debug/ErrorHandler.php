@@ -743,8 +743,7 @@ class ErrorHandler
     /**
      * Sets a logger for the given channel.
      *
-     * @param LoggerInterface $logger  A logger interface
-     * @param string          $channel The channel associated with the logger (deprecation, emergency or scream)
+     * @param string $channel The channel associated with the logger (deprecation, emergency or scream)
      *
      * @deprecated since version 2.6, to be removed in 3.0. Use setLoggers() or setDefaultLogger() instead.
      */

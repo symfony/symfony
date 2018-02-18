@@ -119,7 +119,6 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * permission/identity combinations are left. Finally, we will either throw
      * an NoAceFoundException, or deny access.
      *
-     * @param AclInterface                $acl
      * @param EntryInterface[]            $aces               An array of ACE to check against
      * @param array                       $masks              An array of permission masks
      * @param SecurityIdentityInterface[] $sids               An array of SecurityIdentityInterface implementations
@@ -183,8 +182,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * Strategy EQUAL:
      * The ACE will be considered applicable when the bitmasks are equal.
      *
-     * @param int            $requiredMask
-     * @param EntryInterface $ace
+     * @param int $requiredMask
      *
      * @return bool
      *

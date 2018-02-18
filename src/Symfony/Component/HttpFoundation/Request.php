@@ -787,8 +787,6 @@ class Request
 
     /**
      * Sets the Session.
-     *
-     * @param SessionInterface $session The Session
      */
     public function setSession(SessionInterface $session)
     {
@@ -1478,8 +1476,6 @@ class Request
      * Checks whether the method is safe or not.
      *
      * @see https://tools.ietf.org/html/rfc7231#section-4.2.1
-     *
-     * @param bool $andCacheable Adds the additional condition that the method should be cacheable. True by default.
      *
      * @return bool
      */

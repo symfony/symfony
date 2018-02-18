@@ -87,7 +87,6 @@ class SimpleChoiceList extends ChoiceList
      * @param array              $bucketForRemaining The bucket where to store the non-preferred view objects
      * @param array|\Traversable $choices            The list of choices
      * @param array              $labels             Ignored
-     * @param array              $preferredChoices   The preferred choices
      */
     protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
     {

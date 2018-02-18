@@ -34,11 +34,7 @@ class ProfilerController
     private $toolbarPosition;
 
     /**
-     * @param UrlGeneratorInterface $generator       The URL Generator
-     * @param Profiler              $profiler        The profiler
-     * @param Environment           $twig            The twig environment
-     * @param array                 $templates       The templates
-     * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
+     * @param string $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
      */
     public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, $toolbarPosition = 'normal')
     {

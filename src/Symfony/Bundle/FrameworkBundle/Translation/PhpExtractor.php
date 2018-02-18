@@ -186,8 +186,7 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * Extracts trans message from PHP tokens.
      *
-     * @param array            $tokens
-     * @param MessageCatalogue $catalog
+     * @param array $tokens
      */
     protected function parseTokens($tokens, MessageCatalogue $catalog)
     {

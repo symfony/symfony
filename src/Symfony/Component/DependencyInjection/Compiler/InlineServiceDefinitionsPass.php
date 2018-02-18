@@ -71,8 +71,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     /**
      * Processes inline arguments.
      *
-     * @param ContainerBuilder $container The ContainerBuilder
-     * @param array            $arguments An array of arguments
+     * @param array $arguments An array of arguments
      *
      * @return array
      */
@@ -108,9 +107,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     /**
      * Checks if the definition is inlineable.
      *
-     * @param ContainerBuilder $container
-     * @param string           $id
-     * @param Definition       $definition
+     * @param string $id
      *
      * @return bool If the definition is inlineable
      */

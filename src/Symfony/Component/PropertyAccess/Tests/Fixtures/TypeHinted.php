@@ -41,9 +41,6 @@ class TypeHinted
         return $this->countable;
     }
 
-    /**
-     * @param \Countable $countable
-     */
     public function setCountable(\Countable $countable)
     {
         $this->countable = $countable;

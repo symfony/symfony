@@ -40,11 +40,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * Creates a new form builder.
      *
-     * @param string                   $name
-     * @param string                   $dataClass
-     * @param EventDispatcherInterface $dispatcher
-     * @param FormFactoryInterface     $factory
-     * @param array                    $options
+     * @param string $name
+     * @param string $dataClass
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, FormFactoryInterface $factory, array $options = array())
     {

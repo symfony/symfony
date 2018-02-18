@@ -92,8 +92,7 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Registers a finder engine implementation.
      *
-     * @param AdapterInterface $adapter  An adapter instance
-     * @param int              $priority Highest is selected first
+     * @param int $priority Highest is selected first
      *
      * @return $this
      */
@@ -726,7 +725,6 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param $dir
      *
      * @return \Iterator
      *

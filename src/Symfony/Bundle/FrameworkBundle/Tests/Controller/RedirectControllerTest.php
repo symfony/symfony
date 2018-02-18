@@ -62,7 +62,7 @@ class RedirectControllerTest extends TestCase
                 'permanent' => $permanent,
                 'additional-parameter' => 'value',
                 'ignoreAttributes' => $ignoreAttributes,
-                'keepRequestMethod' => $keepRequestMethod
+                'keepRequestMethod' => $keepRequestMethod,
             ),
         );
 
@@ -85,16 +85,16 @@ class RedirectControllerTest extends TestCase
 
     public function provider()
     {
-        return [
-            [true, false, false, Response::HTTP_MOVED_PERMANENTLY, ['additional-parameter' => 'value']],
-            [false, false, false, Response::HTTP_FOUND, ['additional-parameter' => 'value']],
-            [false, false, true, Response::HTTP_FOUND, []],
-            [false, false, ['additional-parameter'], Response::HTTP_FOUND, []],
-            [true, true, false, Response::HTTP_PERMANENTLY_REDIRECT, ['additional-parameter' => 'value']],
-            [false, true, false, Response::HTTP_TEMPORARY_REDIRECT, ['additional-parameter' => 'value']],
-            [false, true, true, Response::HTTP_TEMPORARY_REDIRECT, []],
-            [false, true, ['additional-parameter'], Response::HTTP_TEMPORARY_REDIRECT, []],
-        ];
+        return array(
+            array(true, false, false, Response::HTTP_MOVED_PERMANENTLY, array('additional-parameter' => 'value')),
+            array(false, false, false, Response::HTTP_FOUND, array('additional-parameter' => 'value')),
+            array(false, false, true, Response::HTTP_FOUND, array()),
+            array(false, false, array('additional-parameter'), Response::HTTP_FOUND, array()),
+            array(true, true, false, Response::HTTP_PERMANENTLY_REDIRECT, array('additional-parameter' => 'value')),
+            array(false, true, false, Response::HTTP_TEMPORARY_REDIRECT, array('additional-parameter' => 'value')),
+            array(false, true, true, Response::HTTP_TEMPORARY_REDIRECT, array()),
+            array(false, true, array('additional-parameter'), Response::HTTP_TEMPORARY_REDIRECT, array()),
+        );
     }
 
     public function testEmptyPath()

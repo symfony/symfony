@@ -41,7 +41,7 @@
         </framework:translator>
         <framework:validation enabled="true" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
-        <framework:serializer enabled="true" enable-annotations="true" name-converter="serializer.name_converter.camel_case_to_snake_case" />
+        <framework:serializer enabled="true" enable-annotations="true" name-converter="serializer.name_converter.camel_case_to_snake_case" circular-reference-handler="my.circular.reference.handler" />
         <framework:property-info />
     </framework:config>
 </container>

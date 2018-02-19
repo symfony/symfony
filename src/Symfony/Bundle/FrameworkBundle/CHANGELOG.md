@@ -8,8 +8,8 @@ CHANGELOG
  * Added a new `parameter_bag` service with related autowiring aliases to access parameters as-a-service
  * Allowed the `Router` to work with any PSR-11 container
  * Added option in workflow dump command to label graph with a custom label
- * Using a `RouterInterface` that does not implement the `WarmableInterface` is deprecated and will not be supported in Symfony 5.0.
- * The `RequestDataCollector` class has been deprecated and will be removed in Symfony 5.0. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
+ * Using a `RouterInterface` that does not implement the `WarmableInterface` is deprecated.
+ * The `RequestDataCollector` class has been deprecated. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
  * The `RedirectController` class allows for 307/308 HTTP status codes
 
 4.0.0

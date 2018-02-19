@@ -265,7 +265,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      * @dataProvider getCheckDns
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      * @group legacy
-     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1 and will be removed in 5.0. Its false-positive rate is too high to be relied upon.
+     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.
      */
     public function testCheckDns($violation)
     {
@@ -297,7 +297,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      * @dataProvider getCheckDnsTypes
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      * @group legacy
-     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1 and will be removed in 5.0. Its false-positive rate is too high to be relied upon.
+     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.
      */
     public function testCheckDnsByType($type)
     {
@@ -335,8 +335,8 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
      * @expectedException \Symfony\Component\Validator\Exception\InvalidOptionsException
      * @requires function Symfony\Bridge\PhpUnit\DnsMock::withMockedHosts
      * @group legacy
-     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1 and will be removed in 5.0. Its false-positive rate is too high to be relied upon.
-     * @expectedDeprecation The "dnsMessage" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1 and will be removed in 5.0.
+     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.
+     * @expectedDeprecation The "dnsMessage" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1.
      */
     public function testCheckDnsWithInvalidType()
     {
@@ -352,7 +352,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1 and will be removed in 5.0. Its false-positive rate is too high to be relied upon.
+     * @expectedDeprecation The "checkDNS" option in "Symfony\Component\Validator\Constraints\Url" is deprecated since Symfony 4.1. Its false-positive rate is too high to be relied upon.
      */
     public function testCheckDnsOptionIsDeprecated()
     {

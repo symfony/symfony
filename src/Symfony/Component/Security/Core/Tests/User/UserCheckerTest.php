@@ -32,7 +32,7 @@ class UserCheckerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPostAuth with an AdvancedUserInterface is deprecated as of 4.1 and will be removed in 5.0. Create a custom user checker if you wish to keep this functionality.
+     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPostAuth with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
      */
     public function testCheckPostAuthPassAdvancedUser()
     {
@@ -55,7 +55,7 @@ class UserCheckerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPostAuth with an AdvancedUserInterface is deprecated as of 4.1 and will be removed in 5.0. Create a custom user checker if you wish to keep this functionality.
+     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPostAuth with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
      * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
      */
     public function testCheckPostAuthCredentialsExpiredAdvancedUser()
@@ -70,7 +70,7 @@ class UserCheckerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPreAuth with an AdvancedUserInterface is deprecated as of 4.1 and will be removed in 5.0. Create a custom user checker if you wish to keep this functionality.
+     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPreAuth with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
      */
     public function testCheckPreAuthPassAdvancedUser()
     {
@@ -95,7 +95,7 @@ class UserCheckerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPreAuth with an AdvancedUserInterface is deprecated as of 4.1 and will be removed in 5.0. Create a custom user checker if you wish to keep this functionality.
+     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPreAuth with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
      * @expectedException \Symfony\Component\Security\Core\Exception\LockedException
      */
     public function testCheckPreAuthAccountLockedAdvancedUser()
@@ -119,7 +119,7 @@ class UserCheckerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPreAuth with an AdvancedUserInterface is deprecated as of 4.1 and will be removed in 5.0. Create a custom user checker if you wish to keep this functionality.
+     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPreAuth with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
      * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
      */
     public function testCheckPreAuthDisabledAdvancedUser()
@@ -144,7 +144,7 @@ class UserCheckerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPreAuth with an AdvancedUserInterface is deprecated as of 4.1 and will be removed in 5.0. Create a custom user checker if you wish to keep this functionality.
+     * @expectedDeprecation Calling Symfony\Component\Security\Core\User\UserChecker::checkPreAuth with an AdvancedUserInterface is deprecated since Symfony 4.1. Create a custom user checker if you wish to keep this functionality.
      * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
      */
     public function testCheckPreAuthAccountExpiredAdvancedUser()

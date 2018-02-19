@@ -4,7 +4,7 @@ CHANGELOG
 4.1.0
 -----
 
- * The `logout_on_user_change` firewall option is deprecated and will be removed in 5.0.
+ * The `logout_on_user_change` firewall option is deprecated.
  * deprecated `SecurityUserValueResolver`, use
    `Symfony\Component\Security\Http\Controller\UserValueResolver` instead.
 

@@ -195,7 +195,7 @@ class UploadedFileTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
+     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1.
      */
     public function testConstructDeprecatedSize()
     {
@@ -213,7 +213,7 @@ class UploadedFileTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1 and will be unsupported in 5.0.
+     * @expectedDeprecation Passing a size as 4th argument to the constructor of "Symfony\Component\HttpFoundation\File\UploadedFile" is deprecated since Symfony 4.1.
      */
     public function testConstructDeprecatedSizeWhenPassingOnlyThe4Needed()
     {

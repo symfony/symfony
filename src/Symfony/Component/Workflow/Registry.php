@@ -27,7 +27,7 @@ class Registry
      * @param Workflow                 $workflow
      * @param SupportStrategyInterface $supportStrategy
      *
-     * @deprecated since Symfony 4.1, to be removed in 5.0. Use addWorkflow() instead.
+     * @deprecated since Symfony 4.1, use addWorkflow() instead
      */
     public function add(Workflow $workflow, $supportStrategy)
     {

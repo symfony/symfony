@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1 and will be removed in 5.0. Use AbstractSessionListener instead.', SaveSessionListener::class), E_USER_DEPRECATED);
+@trigger_error(sprintf('The "%s" class is deprecated since Symfony 4.1, use AbstractSessionListener instead.', SaveSessionListener::class), E_USER_DEPRECATED);
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * @author Tobias Schultze <http://tobion.de>
  *
- * @deprecated since Symfony 4.1, to be removed in 5.0. Use AbstractSessionListener instead.
+ * @deprecated since Symfony 4.1, use AbstractSessionListener instead
  */
 class SaveSessionListener implements EventSubscriberInterface
 {

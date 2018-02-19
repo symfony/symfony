@@ -438,7 +438,7 @@ class Filesystem
      *
      * @param string       $originDir The origin directory
      * @param string       $targetDir The target directory
-     * @param \Traversable $iterator  By default all files and directories are copied, you can provide an iterator to filter which one to copy
+     * @param \Traversable $iterator  Iterator that filters which files and directories to copy
      * @param array        $options   An array of boolean options
      *                                Valid options are:
      *                                - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)

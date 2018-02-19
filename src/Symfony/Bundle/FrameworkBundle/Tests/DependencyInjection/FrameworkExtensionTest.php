@@ -25,6 +25,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -582,10 +583,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testAnnotations()
     {
-        $container = $this->createContainerFromFile('full');
+        $container = $this->createContainerFromFile('full', array(), true, false);
+        $container->addCompilerPass(new TestAnnotationsPass());
+        $container->compile();
 
         $this->assertEquals($container->getParameter('kernel.cache_dir').'/annotations', $container->getDefinition('annotations.filesystem_cache')->getArgument(0));
-        $this->assertSame('annotations.filesystem_cache', (string) $container->getDefinition('annotations.cached_reader')->getArgument(1));
+        $this->assertSame('annotations.filesystem_cache', (string) $container->getDefinition('annotation_reader')->getArgument(1));
     }
 
     public function testFileLinkFormat()
@@ -1029,10 +1032,10 @@ abstract class FrameworkExtensionTest extends TestCase
         ), $data)));
     }
 
-    protected function createContainerFromFile($file, $data = array(), $resetCompilerPasses = true)
+    protected function createContainerFromFile($file, $data = array(), $resetCompilerPasses = true, $compile = true)
     {
         $cacheKey = md5(get_class($this).$file.serialize($data));
-        if (isset(self::$containerCache[$cacheKey])) {
+        if ($compile && isset(self::$containerCache[$cacheKey])) {
             return self::$containerCache[$cacheKey];
         }
         $container = $this->createContainer($data);
@@ -1043,7 +1046,12 @@ abstract class FrameworkExtensionTest extends TestCase
             $container->getCompilerPassConfig()->setOptimizationPasses(array());
             $container->getCompilerPassConfig()->setRemovingPasses(array());
         }
-        $container->getCompilerPassConfig()->setBeforeRemovingPasses(array(new AddAnnotationsCachedReaderPass(), new AddConstraintValidatorsPass(), new TranslatorPass('translator.default', 'translation.reader')));
+        $container->getCompilerPassConfig()->setBeforeRemovingPasses(array(new AddConstraintValidatorsPass(), new TranslatorPass('translator.default', 'translation.reader')));
+        $container->getCompilerPassConfig()->setAfterRemovingPasses(array(new AddAnnotationsCachedReaderPass()));
+
+        if (!$compile) {
+            return $container;
+        }
         $container->compile();
 
         return self::$containerCache[$cacheKey] = $container;
@@ -1134,5 +1142,17 @@ abstract class FrameworkExtensionTest extends TestCase
             default:
                 $this->fail('Unresolved adapter: '.$adapter);
         }
+    }
+}
+
+/**
+ * Simulates ReplaceAliasByActualDefinitionPass.
+ */
+class TestAnnotationsPass implements CompilerPassInterface
+{
+    public function process(ContainerBuilder $container)
+    {
+        $container->setDefinition('annotation_reader', $container->getDefinition('annotations.cached_reader'));
+        $container->removeDefinition('annotations.cached_reader');
     }
 }

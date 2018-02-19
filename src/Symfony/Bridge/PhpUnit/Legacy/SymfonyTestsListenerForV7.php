@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bridge\PhpUnit;
+namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestListener;

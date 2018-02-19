@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-10-31T14:24:39Z
+
+done @dunglas
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-10-31T15:19:48Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-11-01T17:50:22Z
+
+Someone proposed to fail when a var was used, but not provided when calling. Is that something that would be possible?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-01T18:59:24Z
+
+I need to figure out, but I don't see anything that would make it not possible.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-07T07:44:03Z
+
+Comments addressed and new throw added.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T04:53:10Z
+
+This PR has been rebased
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-05T14:05:35Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-16T09:00:30Z
+
+@dunglas @nicolas-grekas This PR is ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-19T08:26:48Z
+
+@Simperfit FYI I just pushed some changes here. I added two brackets around placeholders, to make it more twig-like. I also removed the condition that every env has to have a corresponding param (but kept the reciprocal: param must have an env param). I also restricted this feature to commandine strings, which are the only one that should have any parsing, like the shell does already.
+
+Could you please update the main description of this PR as a short README of the feature, so that the doc team and other people can know what this is about? Doc PR welcome also of course.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-19T13:39:15Z
+
+Thanks @nicolas-grekas I'm going to write the doc PR following this one.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-19T14:02:01Z
+
+Doc PR has been added.

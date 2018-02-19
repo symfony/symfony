@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {

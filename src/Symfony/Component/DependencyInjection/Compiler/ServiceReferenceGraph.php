@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @final since version 3.4
+ * @final
  */
 class ServiceReferenceGraph
 {

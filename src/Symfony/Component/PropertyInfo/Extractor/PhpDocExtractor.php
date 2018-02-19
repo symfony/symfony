@@ -25,7 +25,7 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
 class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface
 {

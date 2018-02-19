@@ -33,7 +33,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @author Florian Voutzinos <florian@voutzinos.com>
  *
- * @final since version 3.4
+ * @final
  */
 class TranslationDebugCommand extends Command
 {

@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Alexander M. Turek <me@derrabus.de>
  *
- * @final since version 3.3.
+ * @final
  */
 class ArrayDenormalizer implements ContextAwareDenormalizerInterface, SerializerAwareInterface
 {

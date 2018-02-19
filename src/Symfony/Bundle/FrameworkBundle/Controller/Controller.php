@@ -31,7 +31,7 @@ abstract class Controller implements ContainerAwareInterface
      *
      * @return mixed
      *
-     * @final since version 3.4
+     * @final
      */
     protected function getParameter(string $name)
     {

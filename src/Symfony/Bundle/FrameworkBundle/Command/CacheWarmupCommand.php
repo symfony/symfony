@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class CacheWarmupCommand extends Command
 {

@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
 class ProxyDumper implements DumperInterface
 {

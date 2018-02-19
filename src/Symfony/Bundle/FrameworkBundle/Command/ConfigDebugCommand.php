@@ -25,7 +25,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @final since version 3.4
+ * @final
  */
 class ConfigDebugCommand extends AbstractConfigCommand
 {

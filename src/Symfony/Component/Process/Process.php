@@ -192,7 +192,7 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException When process stopped after receiving signal
      * @throws LogicException   In case a callback is provided and output has been disabled
      *
-     * @final since version 3.3
+     * @final
      */
     public function run(callable $callback = null, array $env = array()): int
     {
@@ -214,7 +214,7 @@ class Process implements \IteratorAggregate
      *
      * @throws ProcessFailedException if the process didn't terminate successfully
      *
-     * @final since version 3.3
+     * @final
      */
     public function mustRun(callable $callback = null, array $env = array())
     {
@@ -335,7 +335,7 @@ class Process implements \IteratorAggregate
      *
      * @see start()
      *
-     * @final since version 3.3
+     * @final
      */
     public function restart(callable $callback = null, array $env = array())
     {

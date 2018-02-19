@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  *
- * @final since version 3.3.
+ * @final
  */
 class ChainDecoder implements ContextAwareDecoderInterface
 {

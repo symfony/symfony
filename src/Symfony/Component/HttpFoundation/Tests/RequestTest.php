@@ -658,6 +658,10 @@ class RequestTest extends TestCase
             // Ignore pairs with empty key, even if there was a value, e.g. "=value", as such nameless values cannot be retrieved anyway.
             // PHP also does not include them when building _GET.
             array('foo=bar&=a=b&=x=y', 'foo=bar', 'removes params with empty key'),
+
+            // Don't reorder nested query string keys
+            array('foo[]=Z&foo[]=A', 'foo%5B%5D=Z&foo%5B%5D=A', 'keeps values order'),
+            array('foo[Z]=B&foo[A]=B', 'foo%5BZ%5D=B&foo%5BA%5D=B', 'keeps keys order'),
         );
     }
 

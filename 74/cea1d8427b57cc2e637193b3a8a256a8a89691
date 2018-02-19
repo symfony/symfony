@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-27T10:42:35Z
+
+@jvasseur please comment when adding a :-1: , we're all curious about all opinions to enlighten decisions.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-12-27T14:07:46Z
+
+Sorry. I'm mostly against this change since having a constructor argument with the same name as a property doesn't necessarily mean it will be saved inside that property. This feels less reliable that using the types from getter/setters and I don't fell fine having this guess inside the same extractor. Maybe putting it inside a separate extractor that could be assigned a to a lower priority.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-12-27T14:50:11Z
+
+@jvasseur I agree with you, and it already have a lower priority. So there are no issue ;)
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-12-27T15:17:53Z
+
+@lyrixx it has a lower priority inside the reflection extractor, but it still is the same extractor meaning you can't run another extractor between the accessor and the constructor guess.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-12-27T15:23:30Z
+
+You are right, indeed ;)
+
+But I'm not sure it worth a dedicated extractor. Do you **really** think it worth this complexity?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2017-12-27T16:03:27Z
+
+Not necessary I am just thinking this is something that could append but I don't have a real case were it would append.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-12-28T15:03:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-29T14:09:11Z
+
+Shouldn't you also update the `getProperties()` method to add properties accessible trough the constructor to the list (write only).
+
+Also, if we start supporting this, it would be nice to also support constructors in the PhpDocExtractor (it is more powerful and precise than the `ReflectionExtractor`).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-29T14:09:44Z
+
+Regarding @jvasseur's comment, maybe can we add a flag in the constructor to disable this feature?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-29T14:26:29Z
+
+@dunglas please, let's not complicate things with a constructor flag. I'd like to understand better the problem explained by @jvasseur. Imagine that this is your code:
+
+```php
+private /* bool */ $stock;
+
+public function __construct(int $stock)
+{
+    $this->stock = $stock > 10;
+}
+```
+
+The `$stock` property is private and it doesn't have any getter/setter. The type of the property would be guessed as `int` instead of `bool`. Questions: 1) Is this code realistic or an academic example that nobody would use in practice? 2) Which parts of Symfony would stop working because of this wrong guess? Thanks!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-29T14:31:56Z
+
+I can reply to 2): The Symfony Serializer (at least in the full stack framework).
+
+To me in your example, `$stock` is not private, it is "write only".
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-01-12T16:53:48Z
+
+> apparently this needs to be opt-in, isn't it?
+
+What do you mean ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-02-09T18:57:31Z
+
+Both would be great (we already do that in the serializer component), the constructor flag allowing to set the default value, and the context option taking priority.
+If we must choose, I tend to prefer the constructor flag.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-16T15:05:08Z
+
+This PR is now ready

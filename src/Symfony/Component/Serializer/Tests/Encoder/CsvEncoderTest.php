@@ -311,6 +311,22 @@ CSV
         , 'csv'));
     }
 
+    public function testDecodeOnlyOneAsCollection()
+    {
+        $this->encoder = new CsvEncoder(',', '"', '\\', '.');
+
+        $expected = array(
+            array('foo' => 'a'),
+        );
+
+        $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'
+foo
+a
+
+CSV
+            , 'csv', array('as_collection' => true)));
+    }
+
     public function testDecodeToManyRelation()
     {
         $expected = array(

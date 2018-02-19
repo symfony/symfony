@@ -157,6 +157,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
         fclose($handle);
 
+        if ($context['as_collection'] ?? false) {
+            return $result;
+        }
+
         if (empty($result) || isset($result[1])) {
             return $result;
         }

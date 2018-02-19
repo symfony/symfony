@@ -47,7 +47,7 @@ class RedirectControllerTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testRoute($permanent, $ignoreAttributes, $expectedCode, $expectedAttributes)
+    public function testRoute($permanent, $keepRequestMethod, $ignoreAttributes, $expectedCode, $expectedAttributes)
     {
         $request = new Request();
 
@@ -62,6 +62,7 @@ class RedirectControllerTest extends TestCase
                 'permanent' => $permanent,
                 'additional-parameter' => 'value',
                 'ignoreAttributes' => $ignoreAttributes,
+                'keepRequestMethod' => $keepRequestMethod,
             ),
         );
 
@@ -76,7 +77,7 @@ class RedirectControllerTest extends TestCase
 
         $controller = new RedirectController($router);
 
-        $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes);
+        $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes, $keepRequestMethod);
 
         $this->assertRedirectUrl($returnResponse, $url);
         $this->assertEquals($expectedCode, $returnResponse->getStatusCode());
@@ -85,10 +86,14 @@ class RedirectControllerTest extends TestCase
     public function provider()
     {
         return array(
-            array(true, false, 301, array('additional-parameter' => 'value')),
-            array(false, false, 302, array('additional-parameter' => 'value')),
-            array(false, true, 302, array()),
-            array(false, array('additional-parameter'), 302, array()),
+            array(true, false, false, 301, array('additional-parameter' => 'value')),
+            array(false, false, false, 302, array('additional-parameter' => 'value')),
+            array(false, false, true, 302, array()),
+            array(false, false, array('additional-parameter'), 302, array()),
+            array(true, true, false, 308, array('additional-parameter' => 'value')),
+            array(false, true, false, 307, array('additional-parameter' => 'value')),
+            array(false, true, true, 307, array()),
+            array(false, true, array('additional-parameter'), 307, array()),
         );
     }
 
@@ -120,6 +125,16 @@ class RedirectControllerTest extends TestCase
 
         $this->assertRedirectUrl($returnResponse, 'http://foo.bar/');
         $this->assertEquals(302, $returnResponse->getStatusCode());
+    }
+
+    public function testFullURLWithMethodKeep()
+    {
+        $request = new Request();
+        $controller = new RedirectController();
+        $returnResponse = $controller->urlRedirectAction($request, 'http://foo.bar/', false, null, null, null, true);
+
+        $this->assertRedirectUrl($returnResponse, 'http://foo.bar/');
+        $this->assertEquals(307, $returnResponse->getStatusCode());
     }
 
     public function testUrlRedirectDefaultPorts()

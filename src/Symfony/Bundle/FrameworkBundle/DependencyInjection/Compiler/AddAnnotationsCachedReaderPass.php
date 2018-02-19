@@ -26,16 +26,16 @@ class AddAnnotationsCachedReaderPass implements CompilerPassInterface
     {
         // "annotations.cached_reader" is wired late so that any passes using
         // "annotation_reader" at build time don't get any cache
-        if ($container->hasDefinition('annotations.cached_reader')) {
-            $reader = $container->getDefinition('annotations.cached_reader');
+        foreach ($container->findTaggedServiceIds('annotations.cached_reader') as $id => $tags) {
+            $reader = $container->getDefinition($id);
             $properties = $reader->getProperties();
 
             if (isset($properties['cacheProviderBackup'])) {
                 $provider = $properties['cacheProviderBackup']->getValues()[0];
                 unset($properties['cacheProviderBackup']);
                 $reader->setProperties($properties);
-                $container->set('annotations.cached_reader', null);
-                $container->setDefinition('annotations.cached_reader', $reader->replaceArgument(1, $provider));
+                $container->set($id, null);
+                $container->setDefinition($id, $reader->replaceArgument(1, $provider));
             }
         }
     }

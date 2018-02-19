@@ -41,8 +41,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param string   $rootNodeName
-     * @param int|null $loadOptions  A bit field of LIBXML_* constants
+     * @param int|null $loadOptions A bit field of LIBXML_* constants
      */
     public function __construct(string $rootNodeName = 'response', int $loadOptions = null)
     {
@@ -346,7 +345,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Parse the data and convert it to DOMElements.
      *
-     * @param \DOMNode     $parentNode
      * @param array|object $data
      *
      * @throws NotEncodableValueException
@@ -412,7 +410,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Selects the type of node to create and appends it to the parent.
      *
-     * @param \DOMNode     $parentNode
      * @param array|object $data
      */
     private function appendNode(\DOMNode $parentNode, $data, string $nodeName, string $key = null): bool
@@ -441,8 +438,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Tests the value being passed and decide what sort of element to create.
      *
-     * @param \DOMNode $node
-     * @param mixed    $val
+     * @param mixed $val
      *
      * @throws NotEncodableValueException
      */

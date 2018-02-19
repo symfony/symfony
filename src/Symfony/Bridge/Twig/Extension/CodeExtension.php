@@ -259,6 +259,6 @@ class CodeExtension extends AbstractExtension
             $line .= '</span>';
         }
 
-        return $line;
+        return trim($line);
     }
 }

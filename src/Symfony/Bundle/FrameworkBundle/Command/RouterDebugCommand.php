@@ -29,7 +29,7 @@ use Symfony\Component\Routing\Route;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  *
- * @final since version 3.4
+ * @final
  */
 class RouterDebugCommand extends Command
 {

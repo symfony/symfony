@@ -29,7 +29,7 @@ use Symfony\Component\Finder\Finder;
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class CacheClearCommand extends Command
 {

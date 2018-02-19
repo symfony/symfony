@@ -19,7 +19,7 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class Parser
 {

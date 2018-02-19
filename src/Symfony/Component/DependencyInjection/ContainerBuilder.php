@@ -1397,7 +1397,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return array An array of Service conditionals
      *
-     * @internal since version 3.4
+     * @internal
      */
     public static function getServiceConditionals($value)
     {

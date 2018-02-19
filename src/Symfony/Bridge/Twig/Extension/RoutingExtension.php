@@ -91,7 +91,7 @@ class RoutingExtension extends AbstractExtension
      *
      * @return array An array with the contexts the URL is safe
      *
-     * @final since version 3.4
+     * @final
      */
     public function isUrlGenerationSafe(Node $argsNode)
     {

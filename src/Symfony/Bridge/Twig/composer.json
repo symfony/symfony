@@ -41,7 +41,7 @@
         "symfony/workflow": "~3.3|~4.0"
     },
     "conflict": {
-        "symfony/form": "<3.4.5",
+        "symfony/form": "<3.4.5|<4.0.5,>=4.0",
         "symfony/console": "<3.4"
     },
     "suggest": {

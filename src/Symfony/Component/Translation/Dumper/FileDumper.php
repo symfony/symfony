@@ -47,11 +47,11 @@ abstract class FileDumper implements DumperInterface
      *
      * @param bool
      *
-     * @deprecated since Symfony 4.1, to be removed in 5.0
+     * @deprecated since Symfony 4.1
      */
     public function setBackup($backup)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.1 and will be removed in 5.0.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
 
         if (false !== $backup) {
             throw new \LogicException('The backup feature is no longer supported.');

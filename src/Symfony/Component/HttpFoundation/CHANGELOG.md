@@ -4,15 +4,12 @@ CHANGELOG
 4.1.0
 -----
 
- * Passing the file size to the constructor of the `UploadedFile` class is deprecated and won't be
-   supported anymore in 5.0.
-
+ * Passing the file size to the constructor of the `UploadedFile` class is deprecated.
  * The `getClientSize()` method of the `UploadedFile` class is deprecated. Use `getSize()` instead.
  * added `RedisSessionHandler` to use Redis as a session storage
-
-* The `get()` method of the `AcceptHeader` class now takes into account the
-  `*` and `*/*` default values (if they are present in the Accept HTTP header)
-  when looking for items.
+ * The `get()` method of the `AcceptHeader` class now takes into account the
+   `*` and `*/*` default values (if they are present in the Accept HTTP header)
+   when looking for items.
 
 4.0.0
 -----

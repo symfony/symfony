@@ -59,7 +59,7 @@ class UploadedFile extends File
         $this->mimeType = $mimeType ?: 'application/octet-stream';
 
         if (4 < func_num_args() ? !is_bool($test) : null !== $error && @filesize($path) === $error) {
-            @trigger_error(sprintf('Passing a size as 4th argument to the constructor of "%s" is deprecated since Symfony 4.1 and will be unsupported in 5.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a size as 4th argument to the constructor of "%s" is deprecated since Symfony 4.1.', __CLASS__), E_USER_DEPRECATED);
             $error = $test;
             $test = 5 < func_num_args() ? func_get_arg(5) : false;
         }
@@ -145,13 +145,13 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @deprecated since 4.1 will be removed in 5.0 use getSize() instead.
+     * @deprecated since 4.1, use getSize() instead.
      *
      * @return int|null The file sizes
      */
     public function getClientSize()
     {
-        @trigger_error(sprintf('"%s" is deprecated since Symfony 4.1 and will be removed in 5.0. Use getSize() instead.', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('"%s" is deprecated since Symfony 4.1. Use getSize() instead.', __METHOD__), E_USER_DEPRECATED);
 
         return $this->getSize();
     }

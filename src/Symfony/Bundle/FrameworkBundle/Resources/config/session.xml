@@ -70,7 +70,7 @@
         </service>
 
         <service id="session.save_listener" class="Symfony\Component\HttpKernel\EventListener\SaveSessionListener">
-            <deprecated>The "%service_id%" service is deprecated since Symfony 4.1 and will be removed in 5.0. Use the "session_listener" service instead.</deprecated>
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.1. Use the "session_listener" service instead.</deprecated>
         </service>
 
         <!-- for BC -->

@@ -5,6 +5,7 @@
     <usage>descriptor:command2 -o|--option_name &lt;argument_name&gt;</usage>
     <usage>descriptor:command2 &lt;argument_name&gt;</usage>
   </usages>
+  <classname>Symfony\Component\Console\Tests\Fixtures\DescriptorCommand2</classname>
   <description>command 2 description</description>
   <help>command 2 help</help>
   <arguments>

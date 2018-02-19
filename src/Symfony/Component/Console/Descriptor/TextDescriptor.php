@@ -147,6 +147,12 @@ class TextDescriptor extends Descriptor
         }
         $this->writeText("\n");
 
+        $this->writeText("\n");
+        $this->writeText('<comment>ClassName:</comment>', $options);
+        $this->writeText("\n");
+        $this->writeText('  '.\get_class($command), $options);
+        $this->writeText("\n");
+
         $definition = $command->getNativeDefinition();
         if ($definition->getOptions() || $definition->getArguments()) {
             $this->writeText("\n");

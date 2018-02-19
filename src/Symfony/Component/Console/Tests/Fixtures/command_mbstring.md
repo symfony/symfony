@@ -11,6 +11,10 @@ command åèä description
 
 command åèä help
 
+### ClassName
+
+Symfony\Component\Console\Tests\Fixtures\DescriptorCommandMbString
+
 ### Arguments
 
 #### `argument_åèä`

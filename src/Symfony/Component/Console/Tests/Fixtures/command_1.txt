@@ -3,5 +3,8 @@
   alias1
   alias2
 
+<comment>ClassName:</comment>
+  Symfony\Component\Console\Tests\Fixtures\DescriptorCommand1
+
 <comment>Help:</comment>
   command 1 help

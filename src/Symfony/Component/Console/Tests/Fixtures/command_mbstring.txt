@@ -3,6 +3,9 @@
   descriptor:åèä -o|--option_name \<argument_name>
   descriptor:åèä \<argument_name>
 
+<comment>ClassName:</comment>
+  Symfony\Component\Console\Tests\Fixtures\DescriptorCommandMbString
+
 <comment>Arguments:</comment>
   <info>argument_åèä</info>   
 

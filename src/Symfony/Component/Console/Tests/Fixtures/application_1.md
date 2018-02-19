@@ -23,6 +23,10 @@ You can also output the help in other formats by using the --format option:
 
 To display the list of available commands, please use the list command.
 
+### ClassName
+
+Symfony\Component\Console\Command\HelpCommand
+
 ### Arguments
 
 #### `command_name`
@@ -140,6 +144,10 @@ You can also output the information in other formats by using the --format optio
 It's also possible to get raw list of commands (useful for embedding command runner):
 
   php app/console list --raw
+
+### ClassName
+
+Symfony\Component\Console\Command\ListCommand
 
 ### Arguments
 

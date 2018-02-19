@@ -46,6 +46,7 @@ FrameworkBundle
            _controller: app.my_controller::myAction
   ```
 
+ * Deprecated `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`
  * A `RouterInterface` that does not implement the `WarmableInterface` is deprecated.
  * The `RequestDataCollector` class has been deprecated. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
 

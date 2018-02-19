@@ -105,22 +105,25 @@ final class Lock implements LockInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function refresh()
+    public function refresh($ttl = null)
     {
-        if (!$this->ttl) {
+        if (null === $ttl) {
+            $ttl = $this->ttl;
+        }
+        if (!$ttl) {
             throw new InvalidArgumentException('You have to define an expiration duration.');
         }
 
         try {
             $this->key->resetLifetime();
-            $this->store->putOffExpiration($this->key, $this->ttl);
+            $this->store->putOffExpiration($this->key, $ttl);
             $this->dirty = true;
 
             if ($this->key->isExpired()) {
                 throw new LockExpiredException(sprintf('Failed to put off the expiration of the "%s" lock within the specified time.', $this->key));
             }
 
-            $this->logger->info('Expiration defined for "{resource}" lock for "{ttl}" seconds.', array('resource' => $this->key, 'ttl' => $this->ttl));
+            $this->logger->info('Expiration defined for "{resource}" lock for "{ttl}" seconds.', array('resource' => $this->key, 'ttl' => $ttl));
         } catch (LockConflictedException $e) {
             $this->dirty = false;
             $this->logger->notice('Failed to define an expiration for the "{resource}" lock, someone else acquired the lock.', array('resource' => $this->key));

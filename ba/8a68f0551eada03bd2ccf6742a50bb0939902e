@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-19T14:35:52Z
+
+does the anchor still work as expected ? ie anchoring to line 100 should create a top screen margin so that L100 is not hidden on the top of the screen, but has some offset before
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-19T14:51:51Z
+
+you're right. Not sure what the quirk is but it needs to be a block element indeed.
+
+Using `inline-block` fixes both the overlap as preserving top offset:
+
+![image](https://user-images.githubusercontent.com/1047696/36383366-37344442-158c-11e8-9835-94b4b9c6c5fc.png)
+
+For `/_profiler/open?file=src/Controller/MainController.php&line=9#line9`.
+
+But now there's this random space in both chrome and firefox:
+
+![image](https://user-images.githubusercontent.com/1047696/36383441-6fa90560-158c-11e8-8d8f-13549de9d6bd.png)
+
+Guess it's comes from a line break in source:
+
+![image](https://user-images.githubusercontent.com/1047696/36383486-900ee252-158c-11e8-84a4-703005048b27.png)
+
+Can have a look at that.. but maybe some real CSS expert knows a better fix.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-19T14:54:54Z
+
+Now all good :)

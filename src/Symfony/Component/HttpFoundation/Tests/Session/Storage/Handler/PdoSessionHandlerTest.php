@@ -324,6 +324,41 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertInstanceOf('\PDO', $method->invoke($storage));
     }
 
+    /**
+     * @dataProvider provideUrlDsnPairs
+     */
+    public function testUrlDsn($url, $expectedDsn, $expectedUser = null, $expectedPassword = null)
+    {
+        $storage = new PdoSessionHandler($url);
+
+        $this->assertAttributeEquals($expectedDsn, 'dsn', $storage);
+
+        if (null !== $expectedUser) {
+            $this->assertAttributeEquals($expectedUser, 'username', $storage);
+        }
+
+        if (null !== $expectedPassword) {
+            $this->assertAttributeEquals($expectedPassword, 'password', $storage);
+        }
+    }
+
+    public function provideUrlDsnPairs()
+    {
+        yield array('mysql://localhost/test', 'mysql:host=localhost;dbname=test;');
+        yield array('mysql://localhost:56/test', 'mysql:host=localhost;port=56;dbname=test;');
+        yield array('mysql2://root:pwd@localhost/test', 'mysql:host=localhost;dbname=test;', 'root', 'pwd');
+        yield array('postgres://localhost/test', 'pgsql:host=localhost;dbname=test;');
+        yield array('postgresql://localhost:5634/test', 'pgsql:host=localhost;port=5634;dbname=test;');
+        yield array('postgres://root:pwd@localhost/test', 'pgsql:host=localhost;dbname=test;', 'root', 'pwd');
+        yield 'sqlite relative path' => array('sqlite://localhost/tmp/test', 'sqlite:tmp/test');
+        yield 'sqlite absolute path' => array('sqlite://localhost//tmp/test', 'sqlite:/tmp/test');
+        yield 'sqlite relative path without host' => array('sqlite:///tmp/test', 'sqlite:tmp/test');
+        yield 'sqlite absolute path without host' => array('sqlite3:////tmp/test', 'sqlite:/tmp/test');
+        yield array('sqlite://localhost/:memory:', 'sqlite::memory:');
+        yield array('mssql://localhost/test', 'sqlsrv:server=localhost;Database=test');
+        yield array('mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test');
+    }
+
     private function createStream($content)
     {
         $stream = tmpfile();

@@ -22,7 +22,8 @@
     },
     "require-dev": {
         "ext-iconv": "*",
-        "twig/twig": "~1.34|~2.4"
+        "twig/twig": "~1.34|~2.4",
+        "darsyn/ip": "~3.3"
     },
     "conflict": {
         "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0"

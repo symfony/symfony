@@ -438,6 +438,26 @@ class PhpMatcherDumperTest extends TestCase
             $chunkedCollection->add('_'.$i, new Route('/'.$h.'/{a}/{b}/{c}/'.$h));
         }
 
+        /* test case 11 */
+        $demoCollection = new RouteCollection();
+        $demoCollection->add('a', new Route('/admin/post/'));
+        $demoCollection->add('b', new Route('/admin/post/new'));
+        $demoCollection->add('c', (new Route('/admin/post/{id}'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('d', (new Route('/admin/post/{id}/edit'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('e', (new Route('/admin/post/{id}/delete'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('f', new Route('/blog/'));
+        $demoCollection->add('g', new Route('/blog/rss.xml'));
+        $demoCollection->add('h', (new Route('/blog/page/{page}'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('i', (new Route('/blog/posts/{page}'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('j', (new Route('/blog/comments/{id}/new'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('k', new Route('/blog/search'));
+        $demoCollection->add('l', new Route('/login'));
+        $demoCollection->add('m', new Route('/logout'));
+        $demoCollection->addPrefix('/{_locale}');
+        $demoCollection->add('n', new Route('/{_locale}'));
+        $demoCollection->addRequirements(array('_locale' => 'en|fr'));
+        $demoCollection->addDefaults(array('_locale' => 'en'));
+
         return array(
            array(new RouteCollection(), 'url_matcher0.php', array()),
            array($collection, 'url_matcher1.php', array()),
@@ -450,6 +470,7 @@ class PhpMatcherDumperTest extends TestCase
            array($unicodeCollection, 'url_matcher8.php', array()),
            array($hostTreeCollection, 'url_matcher9.php', array()),
            array($chunkedCollection, 'url_matcher10.php', array()),
+           array($demoCollection, 'url_matcher11.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
         );
     }
 

@@ -118,23 +118,25 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         .')'
                     .')'
                     .'|/multi/hello(?:/([^/]++))?(*:239)'
-                    .'|/([^/]++)/b/([^/]++)(*:267)'
-                    .'|/([^/]++)/b/([^/]++)(*:295)'
-                    .'|/aba/([^/]++)(*:316)'
+                    .'|/([^/]++)/b/([^/]++)(?'
+                        .'|(*:270)'
+                        .'|(*:278)'
+                    .')'
+                    .'|/aba/([^/]++)(*:300)'
                 .')|(?i:([^\\.]++)\\.example\\.com)(?'
                     .'|/route1(?'
-                        .'|3/([^/]++)(*:376)'
-                        .'|4/([^/]++)(*:394)'
+                        .'|3/([^/]++)(*:360)'
+                        .'|4/([^/]++)(*:378)'
                     .')'
                 .')|(?i:c\\.example\\.com)(?'
-                    .'|/route15/([^/]++)(*:444)'
+                    .'|/route15/([^/]++)(*:428)'
                 .')|[^/]*+(?'
-                    .'|/route16/([^/]++)(*:479)'
+                    .'|/route16/([^/]++)(*:463)'
                     .'|/a(?'
-                        .'|/a\\.\\.\\.(*:500)'
+                        .'|/a\\.\\.\\.(*:484)'
                         .'|/b(?'
-                            .'|/([^/]++)(*:522)'
-                            .'|/c/([^/]++)(*:541)'
+                            .'|/([^/]++)(*:506)'
+                            .'|/c/([^/]++)(*:525)'
                         .')'
                     .')'
                 .')'
@@ -207,7 +209,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo2')), array());
 
                         break;
-                    case 267:
+                    case 270:
                         $matches = array('_locale' => $matches[1] ?? null, 'foo' => $matches[2] ?? null);
 
                         // foo3
@@ -224,15 +226,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                             171 => array(array('_route' => 'overridden'), array('var'), null, null),
                             203 => array(array('_route' => 'bar2'), array('bar1'), null, null),
                             239 => array(array('_route' => 'helloWorld', 'who' => 'World!'), array('who'), null, null),
-                            295 => array(array('_route' => 'bar3'), array('_locale', 'bar'), null, null),
-                            316 => array(array('_route' => 'foo4'), array('foo'), null, null),
-                            376 => array(array('_route' => 'route13'), array('var1', 'name'), null, null),
-                            394 => array(array('_route' => 'route14', 'var1' => 'val'), array('var1', 'name'), null, null),
-                            444 => array(array('_route' => 'route15'), array('name'), null, null),
-                            479 => array(array('_route' => 'route16', 'var1' => 'val'), array('name'), null, null),
-                            500 => array(array('_route' => 'a'), array(), null, null),
-                            522 => array(array('_route' => 'b'), array('var'), null, null),
-                            541 => array(array('_route' => 'c'), array('var'), null, null),
+                            278 => array(array('_route' => 'bar3'), array('_locale', 'bar'), null, null),
+                            300 => array(array('_route' => 'foo4'), array('foo'), null, null),
+                            360 => array(array('_route' => 'route13'), array('var1', 'name'), null, null),
+                            378 => array(array('_route' => 'route14', 'var1' => 'val'), array('var1', 'name'), null, null),
+                            428 => array(array('_route' => 'route15'), array('name'), null, null),
+                            463 => array(array('_route' => 'route16', 'var1' => 'val'), array('name'), null, null),
+                            484 => array(array('_route' => 'a'), array(), null, null),
+                            506 => array(array('_route' => 'b'), array('var'), null, null),
+                            525 => array(array('_route' => 'c'), array('var'), null, null),
                         );
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
@@ -260,7 +262,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         return $ret;
                 }
 
-                if (541 === $m) {
+                if (525 === $m) {
                     break;
                 }
                 $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));

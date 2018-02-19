@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-05T16:35:08Z
+
+fabbot failure seems unrelated
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-05T18:09:45Z
+
+This one is ready for review.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-09T16:06:52Z
+
+Named changed and test added.
+
+fabbot error is wrong.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T04:54:27Z
+
+AppVeyor failure is unrelated and fabbot error is a false positive.
+
+@fabpot WDYT of this new implem ?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-16T09:20:01Z
+
+PR rebased with master

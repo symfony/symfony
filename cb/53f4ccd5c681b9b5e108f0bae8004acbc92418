@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-20T05:31:02Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-20T09:43:18Z
+
+I don't like adding a new config option for this not-so-important feature. What if we set a non-configurable and common sense limit (e.g. `100` requests) and when you get MAX + 1 requests, the first one is dropped and so on.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-12-20T09:50:01Z
+
+I like idea about cutting off oldest requests, rather than stopping flow of new ones
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-20T10:02:43Z
+
+@javiereguiluz I guess it makes more sens.
+
+@ostrolucky Yes, why not I didn't think of that in the first place but it could be nice too.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-26T14:23:30Z
+
+@javiereguiluz so even if it's not the requested feature, is it really worth it to add this non-configurable limit ? I guess we could let it configurable, it make sense to me too WDYT ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-01-26T14:26:29Z
+
+Please, don't make it configurable. It does not make sense.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-26T14:30:15Z
+
+So we agree for a limit like 100 requests, after that we drop the olds one to have the new one ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-01-26T14:32:48Z
+
+LGTM
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-29T10:42:48Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-16T08:44:10Z
+
+@fabpot @javiereguiluz @ostrolucky could you please review this one ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-16T09:03:15Z
+
+It looks good to me. The current patch looks like a bug fix now. So, I would merge it into 2.7 instead of master. WDYT?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-16T10:16:52Z
+
+I agree, let's look on what other are thinking and ill rebase it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-19T07:31:33Z
+
+I think you can go ahead and rebase on 2.7.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-19T14:39:44Z
+
+rebased.

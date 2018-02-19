@@ -283,7 +283,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     private function validateAndDenormalize(string $currentClass, string $attribute, $data, ?string $format, array $context)
     {
-        if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute)) {
+        if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($currentClass, $attribute, array('serializer_context' => $context))) {
             return $data;
         }
 

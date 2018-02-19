@@ -1274,6 +1274,12 @@ class FrameworkExtension extends Extension
 
         if (isset($config['circular_reference_handler']) && $config['circular_reference_handler']) {
             $container->getDefinition('serializer.normalizer.object')->addMethodCall('setCircularReferenceHandler', array(new Reference($config['circular_reference_handler'])));
+            $container->getDefinition('serializer.normalizer.object.generated')->addMethodCall('setCircularReferenceHandler', array(new Reference($config['circular_reference_handler'])));
+        }
+
+        if (!$config['enable_normalizer_generation']) {
+            $container->removeDefinition('serializer.normalizer.object.generated');
+            $container->removeDefinition('serializer.normalizer.object.dumper');
         }
 
         if ($config['max_depth_handler'] ?? false) {

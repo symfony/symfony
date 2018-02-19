@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -29,6 +28,7 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
  */
 abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
+    use CircularReferenceTrait;
     use ObjectToPopulateTrait;
     use SerializerAwareTrait;
 
@@ -38,16 +38,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     const ATTRIBUTES = 'attributes';
     const ALLOW_EXTRA_ATTRIBUTES = 'allow_extra_attributes';
     const DEFAULT_CONSTRUCTOR_ARGUMENTS = 'default_constructor_arguments';
-
-    /**
-     * @var int
-     */
-    protected $circularReferenceLimit = 1;
-
-    /**
-     * @var callable
-     */
-    protected $circularReferenceHandler;
 
     /**
      * @var ClassMetadataFactoryInterface|null
@@ -84,34 +74,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     }
 
     /**
-     * Set circular reference limit.
-     *
-     * @param int $circularReferenceLimit Limit of iterations for the same object
-     *
-     * @return self
-     */
-    public function setCircularReferenceLimit($circularReferenceLimit)
-    {
-        $this->circularReferenceLimit = $circularReferenceLimit;
-
-        return $this;
-    }
-
-    /**
-     * Set circular reference handler.
-     *
-     * @param callable $circularReferenceHandler
-     *
-     * @return self
-     */
-    public function setCircularReferenceHandler(callable $circularReferenceHandler)
-    {
-        $this->circularReferenceHandler = $circularReferenceHandler;
-
-        return $this;
-    }
-
-    /**
      * Set normalization callbacks.
      *
      * @param callable[] $callbacks Help normalize the result
@@ -145,56 +107,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         $this->ignoredAttributes = $ignoredAttributes;
 
         return $this;
-    }
-
-    /**
-     * Detects if the configured circular reference limit is reached.
-     *
-     * @param object $object
-     * @param array  $context
-     *
-     * @return bool
-     *
-     * @throws CircularReferenceException
-     */
-    protected function isCircularReference($object, &$context)
-    {
-        $objectHash = spl_object_hash($object);
-
-        if (isset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash])) {
-            if ($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] >= $this->circularReferenceLimit) {
-                unset($context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash]);
-
-                return true;
-            }
-
-            ++$context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash];
-        } else {
-            $context[static::CIRCULAR_REFERENCE_LIMIT][$objectHash] = 1;
-        }
-
-        return false;
-    }
-
-    /**
-     * Handles a circular reference.
-     *
-     * If a circular reference handler is set, it will be called. Otherwise, a
-     * {@class CircularReferenceException} will be thrown.
-     *
-     * @param object $object
-     *
-     * @return mixed
-     *
-     * @throws CircularReferenceException
-     */
-    protected function handleCircularReference($object)
-    {
-        if ($this->circularReferenceHandler) {
-            return \call_user_func($this->circularReferenceHandler, $object);
-        }
-
-        throw new CircularReferenceException(sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d)', \get_class($object), $this->circularReferenceLimit));
     }
 
     /**
@@ -403,5 +315,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         return $parentContext;
+    }
+
+    private function getCircularReferenceLimitField()
+    {
+        return static::CIRCULAR_REFERENCE_LIMIT;
     }
 }

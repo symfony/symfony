@@ -174,6 +174,7 @@ class ConfigurationTest extends TestCase
             ),
             'serializer' => array(
                 'enabled' => !class_exists(FullStack::class),
+                'enable_normalizer_generation' => false,
                 'enable_annotations' => !class_exists(FullStack::class),
                 'mapping' => array('paths' => array()),
             ),

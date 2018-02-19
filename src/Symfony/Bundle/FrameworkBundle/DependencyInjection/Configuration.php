@@ -728,6 +728,7 @@ class Configuration implements ConfigurationInterface
                     ->info('serializer configuration')
                     ->{!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
+                        ->booleanNode('enable_normalizer_generation')->defaultFalse()->end()
                         ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->scalarNode('name_converter')->end()
                         ->scalarNode('circular_reference_handler')->end()

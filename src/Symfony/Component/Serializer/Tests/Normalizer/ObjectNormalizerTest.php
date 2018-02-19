@@ -510,13 +510,19 @@ class ObjectNormalizerTest extends TestCase
      */
     public function testUnableToNormalizeCircularReference()
     {
-        $serializer = new Serializer(array($this->normalizer));
-        $this->normalizer->setSerializer($serializer);
-        $this->normalizer->setCircularReferenceLimit(2);
+        $normalizer = $this->getNormalizerFor(CircularReferenceDummy::class);
+
+        $serializer = new Serializer(array($normalizer));
+        if ($normalizer instanceof ObjectNormalizer) {
+            $normalizer->setSerializer($serializer);
+        } else {
+            $normalizer->setNormalizer($serializer);
+        }
+        $normalizer->setCircularReferenceLimit(2);
 
         $obj = new CircularReferenceDummy();
 
-        $this->normalizer->normalize($obj);
+        $normalizer->normalize($obj);
     }
 
     public function testSiblingReference()
@@ -538,16 +544,22 @@ class ObjectNormalizerTest extends TestCase
 
     public function testCircularReferenceHandler()
     {
-        $serializer = new Serializer(array($this->normalizer));
-        $this->normalizer->setSerializer($serializer);
-        $this->normalizer->setCircularReferenceHandler(function ($obj) {
+        $normalizer = $this->getNormalizerFor(CircularReferenceDummy::class);
+        $serializer = new Serializer(array($normalizer));
+
+        if ($normalizer instanceof ObjectNormalizer) {
+            $normalizer->setSerializer($serializer);
+        } else {
+            $normalizer->setNormalizer($serializer);
+        }
+        $normalizer->setCircularReferenceHandler(function ($obj) {
             return get_class($obj);
         });
 
         $obj = new CircularReferenceDummy();
 
         $expected = array('me' => 'Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy');
-        $this->assertEquals($expected, $this->normalizer->normalize($obj));
+        $this->assertEquals($expected, $normalizer->normalize($obj));
     }
 
     public function testDenormalizeNonExistingAttribute()
@@ -637,6 +649,10 @@ class ObjectNormalizerTest extends TestCase
             ),
         );
 
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory);
+        $serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($serializer);
         $this->normalizer->setMaxDepthHandler(function ($obj) {
             return 'handler';
         });

@@ -1,0 +1,7 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    serializer:
+        enable_normalizer_generation: true
+        enable_annotations: true # required to detect properties

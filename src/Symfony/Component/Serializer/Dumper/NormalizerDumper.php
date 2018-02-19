@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 /**
  * @author Guilhem Niot <guilhem.niot@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ *
  * @experimental
  */
 final class NormalizerDumper
@@ -42,6 +43,7 @@ final class NormalizerDumper
 <?php
 $namespaceLine
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Normalizer\CircularReferenceTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -53,7 +55,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  */
 class {$context['class']} implements NormalizerInterface, NormalizerAwareInterface
 {
-    use NormalizerAwareTrait;
+    use CircularReferenceTrait, NormalizerAwareTrait;
 
 {$this->generateNormalizeMethod($reflectionClass)}
 
@@ -79,11 +81,8 @@ EOL;
     {
         $code = <<<EOL
 
-        \$objectHash = spl_object_hash(\$object);
-        if (isset(\$context[ObjectNormalizer::CIRCULAR_REFERENCE_LIMIT][\$objectHash])) {
-            return null;
-        } else {
-            \$context[ObjectNormalizer::CIRCULAR_REFERENCE_LIMIT][\$objectHash] = 1;
+        if (\$this->isCircularReference(\$object, \$context)) {
+            return \$this->handleCircularReference(\$object);
         }
 
         \$groups = isset(\$context[ObjectNormalizer::GROUPS]) && is_array(\$context[ObjectNormalizer::GROUPS]) ? \$context[ObjectNormalizer::GROUPS] : null;

@@ -89,7 +89,7 @@ class SwitchUserListener implements ListenerInterface
         }
 
         $request->query->remove($this->usernameParameter);
-        $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+        $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
 
         $response = new RedirectResponse($request->getUri(), 302);
 

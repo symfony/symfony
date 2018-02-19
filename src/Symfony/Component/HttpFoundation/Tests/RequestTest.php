@@ -2114,7 +2114,7 @@ class RequestContentProxy extends Request
 {
     public function getContent($asResource = false)
     {
-        return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
+        return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'), '', '&');
     }
 }
 

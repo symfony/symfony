@@ -285,7 +285,7 @@ class ArgvInput extends Input
                 //   For long options, test for '--option=' at beginning
                 //   For short options, test for '-o' at beginning
                 $leading = 0 === strpos($value, '--') ? $value.'=' : $value;
-                if ($token === $value || 0 === strpos($token, $leading)) {
+                if ($token === $value || '' !== $leading && 0 === strpos($token, $leading)) {
                     return true;
                 }
             }
@@ -313,7 +313,7 @@ class ArgvInput extends Input
                 //   For long options, test for '--option=' at beginning
                 //   For short options, test for '-o' at beginning
                 $leading = 0 === strpos($value, '--') ? $value.'=' : $value;
-                if (0 === strpos($token, $leading)) {
+                if ('' !== $leading && 0 === strpos($token, $leading)) {
                     return substr($token, strlen($leading));
                 }
             }

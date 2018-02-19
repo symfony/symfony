@@ -11,8 +11,10 @@
 | Doc PR        | symfony/symfony-docs#... <!--highly recommended for new features-->
 
 <!--
-- Bug fixes must be submitted against the lowest branch where they apply
-  (lowest branches are regularly merged to upper ones so they get the fixes too).
-- Features and deprecations must be submitted against the master branch.
-- Replace this comment by a description of what your PR is solving.
+Write a short README entry for your feature here (replace this comment block.)
+This will help people understand your PR and can be used as a start of the Doc PR.
+Additionally:
+ - Bug fixes must be submitted against the lowest branch where they apply
+   (lowest branches are regularly merged to upper ones so they get the fixes too).
+ - Features and deprecations must be submitted against the master branch.
 -->

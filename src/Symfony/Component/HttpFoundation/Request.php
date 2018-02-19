@@ -531,7 +531,7 @@ class Request
      */
     public function overrideGlobals()
     {
-        $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), null, '&')));
+        $this->server->set('QUERY_STRING', static::normalizeQueryString(http_build_query($this->query->all(), '', '&')));
 
         $_GET = $this->query->all();
         $_POST = $this->request->all();

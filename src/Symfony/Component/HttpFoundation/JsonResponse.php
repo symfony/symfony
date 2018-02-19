@@ -92,6 +92,7 @@ class JsonResponse extends Response
      * @return JsonResponse
      *
      * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function setData($data = array())
     {

@@ -148,6 +148,7 @@ class JsonResponse extends Response
                 if (\PHP_VERSION_ID < 50500 || !interface_exists('JsonSerializable', false)) {
                     restore_error_handler();
                 }
+                throw $e;
             } catch (\Exception $e) {
                 if (\PHP_VERSION_ID < 50500 || !interface_exists('JsonSerializable', false)) {
                     restore_error_handler();

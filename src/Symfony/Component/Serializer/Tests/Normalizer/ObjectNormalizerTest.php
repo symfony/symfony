@@ -182,6 +182,23 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('rab', $obj->getInner()->bar);
     }
 
+    public function testConstructorWithUnconstructableNullableObjectTypeHintDenormalize()
+    {
+        $data = array(
+            'id' => 10,
+            'inner' => null,
+        );
+
+        $normalizer = new ObjectNormalizer();
+        $serializer = new Serializer(array($normalizer));
+        $normalizer->setSerializer($serializer);
+
+        $obj = $normalizer->denormalize($data, DummyWithNullableConstructorObject::class);
+        $this->assertInstanceOf(DummyWithNullableConstructorObject::class, $obj);
+        $this->assertEquals(10, $obj->getId());
+        $this->assertNull($obj->getInner());
+    }
+
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
      * @expectedExceptionMessage Could not determine the class of the parameter "unknown".
@@ -1107,5 +1124,27 @@ class ObjectWithUpperCaseAttributeNames
     public function getFoo()
     {
         return $this->Foo;
+    }
+}
+
+class DummyWithNullableConstructorObject
+{
+    private $id;
+    private $inner;
+
+    public function __construct($id, ?ObjectConstructorDummy $inner)
+    {
+        $this->id = $id;
+        $this->inner = $inner;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getInner()
+    {
+        return $this->inner;
     }
 }

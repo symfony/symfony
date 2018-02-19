@@ -150,7 +150,7 @@ class StopwatchEvent
     /**
      * Gets the relative time of the start of the first period.
      *
-     * @return int The time (in milliseconds)
+     * @return int|float The time (in milliseconds)
      */
     public function getStartTime()
     {
@@ -160,7 +160,7 @@ class StopwatchEvent
     /**
      * Gets the relative time of the end of the last period.
      *
-     * @return int The time (in milliseconds)
+     * @return int|float The time (in milliseconds)
      */
     public function getEndTime()
     {
@@ -172,7 +172,7 @@ class StopwatchEvent
     /**
      * Gets the duration of the events (including all periods).
      *
-     * @return int The duration (in milliseconds)
+     * @return int|float The duration (in milliseconds)
      */
     public function getDuration()
     {

@@ -76,7 +76,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $properties[$propertyName] = $propertyName;
         }
 
-        return array_values($properties);
+        return $properties ? array_values($properties) : null;
     }
 
     /**

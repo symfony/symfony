@@ -1,0 +1,209 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-11-30T07:53:42Z
+
+Should be merged in 4.1 as it's a new feature.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-30T09:06:10Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-30T19:23:22Z
+
+Cant we just always return a collection? is there any real reason for mixed return values?
+
+Just curious :) otherwise `collection` might not be the best name, as collection=false still returns a collection, but only if it's >1.
+
+edit: yeah sorry reading ticket now :(
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-30T19:36:30Z
+
+If we want to return only collection we need to do it in 5.0 since it’s a
+BC.
+
+maybe we should name it always_collection ? @dunglas
+Le jeu. 30 nov. 2017 à 20:23, Roland Franssen <notifications@github.com> a
+écrit :
+
+> Cant we just always return a collection? is there any real reason for
+> mixed return values?
+>
+> Just curious :) otherwise collection might not be the best name, as
+> collection=false still returns a collection, but only if it's >1.
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25218#issuecomment-348293272>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8j8RxM7BsfygOCOuXJGwjRxiuWJZks5s7wC-gaJpZM4QwFUy>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-11-30T19:38:40Z
+
+It really makes sense for being _CSV_ no? I dont understand why this logic must be here for "API" purpose. CSV is a collection of row(s) no?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-01T16:14:46Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Aerendir at 2017-12-06T12:29:12Z
+
+ping
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-06T13:28:09Z
+
+@Aerendir Before doing it I'm waiting for @dunglas POV about that.
+
+---------------------------------------------------------------------------
+
+by Aerendir at 2017-12-12T14:18:50Z
+
+Hi at all of you folks ([let's be inclusive](https://symfony.com/blog/let-s-grow-the-symfony-community) :) ), any news about this?
+
+I need the collections be deserialized correctly ASAP.
+
+I'd like to send a PR for the `XMLEncoder`, but which path should have I to follow? Will we have an interface? Or I simply adapt the modifications of this PR adapting them for the `XMLEncoder`?
+
+ping @Simperfit, @dunglas
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-12T16:10:42Z
+
+I have a patch in progress for the xml encoder
+Le mar. 12 déc. 2017 à 15:19, Adamo Crespi <notifications@github.com> a
+écrit :
+
+> Hi at all of you folks (let's be inclusive
+> <https://symfony.com/blog/let-s-grow-the-symfony-community> :) ), any
+> news about this?
+>
+> I need the collections be deserialized correctly ASAP.
+>
+> I'd like to send a PR for the XMLEncoder, but which path should have I to
+> follow? Will we have an interface? Or I simply adapt the modifications of
+> this PR adapting them for the XMLEncoder?
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25218#issuecomment-351064198>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8turuUQbsfJkNjFKYusXWU3KkmjBks5s_otggaJpZM4QwFUy>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by Aerendir at 2017-12-12T23:57:39Z
+
+@Simperfit , any idea about when it will be ready? 👼
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-13T19:09:49Z
+
+@Aerendir it’s in review. We should wait for it to be reviewed and merged. it’s linked to the issue you postes
+
+---------------------------------------------------------------------------
+
+by Aerendir at 2017-12-15T19:28:31Z
+
+Ok, thank you!
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-16T04:34:15Z
+
+This is ready to review IMO.
+
+---------------------------------------------------------------------------
+
+by Aerendir at 2017-12-21T17:33:52Z
+
+@Simperfit , I've update my issue adding the result of a simple test I did.
+
+Practically, commenting the code that transforms nodes with only element, all the generated array is filled with keys `0` as they are not removed anymore.
+
+This breaks the current implementations and also is not a desirable thing.
+
+Did you checked this behavior on this PR?
+
+Unfortunately I have no data to test this PR, so I cannot tell you an opinion about, but I think you should give my comment a look and check the behavior is not the same with your behavior.
+
+Read here the comment: https://github.com/symfony/symfony/issues/25227#issuecomment-353409889
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-12-21T17:54:06Z
+
+I can check the behaviour. ill do that tomorrow!
+Le jeu. 21 déc. 2017 à 18:34, Adamo Crespi <notifications@github.com> a
+écrit :
+
+> @Simperfit <https://github.com/simperfit> , I've update my issue adding
+> the result of a simple test I did.
+>
+> Practically, commenting the code that transforms nodes with only element,
+> all the generated array is filled with keys 0 as they are not removed
+> anymore.
+>
+> This breaks the current implementations and also is not a desirable thing.
+>
+> Did you checked this behavior on this PR?
+>
+> Unfortunately I have no data to test this PR, so I cannot tell you an
+> opinion about, but I think you should give my comment a look and check the
+> behavior is not the same with your behavior.
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/25218#issuecomment-353410665>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8sxEXHSRg-sjdMpj6U8i8UkTOmBFks5tCpaRgaJpZM4QwFUy>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-01-10T10:51:45Z
+
+This is fixing a misbehaviour, should we really add a new normalizer to fix this ?
+cc @dunglas
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-02T13:20:49Z
+
+PR Changed to remove the param in the constructor and add it as a context key.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-16T08:43:31Z
+
+ping @dunglas @nicolas-grekas  this is ready.
+
+Travis failure is not related to this PR.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-16T09:58:01Z
+
+Status: Needs Review

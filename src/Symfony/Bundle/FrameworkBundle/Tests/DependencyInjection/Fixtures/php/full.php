@@ -68,6 +68,7 @@ $container->loadFromExtension('framework', array(
         'enabled' => true,
         'enable_annotations' => true,
         'name_converter' => 'serializer.name_converter.camel_case_to_snake_case',
+        'max_depth_handler' => 'my.max.depth.handler',
     ),
     'property_info' => true,
     'ide' => 'file%%link%%format',

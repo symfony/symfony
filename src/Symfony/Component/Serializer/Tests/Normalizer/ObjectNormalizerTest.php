@@ -613,6 +613,27 @@ class ObjectNormalizerTest extends TestCase
         );
 
         $this->assertEquals($expected, $result);
+
+        $expected = array(
+            'bar' => null,
+            'foo' => 'level1',
+            'child' => array(
+                'bar' => null,
+                'foo' => 'level2',
+                'child' => array(
+                    'bar' => null,
+                    'child' => null,
+                    'foo' => 'handler',
+                ),
+            ),
+        );
+
+        $this->normalizer->setMaxDepthHandler(function ($obj) {
+            return 'handler';
+        });
+
+        $result = $serializer->normalize($level1, null, array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
+        $this->assertEquals($expected, $result);
     }
 
     /**

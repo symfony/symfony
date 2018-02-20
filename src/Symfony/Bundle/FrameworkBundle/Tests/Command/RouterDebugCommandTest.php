@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -52,8 +53,9 @@ class RouterDebugCommandTest extends TestCase
      */
     private function createCommandTester()
     {
-        $application = new Application($this->getKernel());
-        $application->add(new RouterDebugCommand($this->getRouter()));
+        $kernel = $this->getKernel();
+        $application = new Application($kernel);
+        $application->add(new RouterDebugCommand($this->getRouter(), new ControllerNameParser($kernel)));
 
         return new CommandTester($application->find('debug:router'));
     }

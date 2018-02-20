@@ -35,12 +35,14 @@ class RouterDebugCommand extends Command
 {
     protected static $defaultName = 'debug:router';
     private $router;
+    private $parser;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, ControllerNameParser $parser)
     {
         parent::__construct();
 
         $this->router = $router;
+        $this->parser = $parser;
     }
 
     /**
@@ -109,9 +111,8 @@ EOF
     private function convertController(Route $route)
     {
         if ($route->hasDefault('_controller')) {
-            $nameParser = new ControllerNameParser($this->getApplication()->getKernel());
             try {
-                $route->setDefault('_controller', $nameParser->build($route->getDefault('_controller')));
+                $route->setDefault('_controller', $this->parser->build($route->getDefault('_controller')));
             } catch (\InvalidArgumentException $e) {
             }
         }
@@ -133,9 +134,8 @@ EOF
             }
         }
 
-        $nameParser = new ControllerNameParser($this->getApplication()->getKernel());
         try {
-            $shortNotation = $nameParser->build($controller);
+            $shortNotation = $this->parser->build($controller);
             $route->setDefault('_controller', $shortNotation);
 
             return $controller;

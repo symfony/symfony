@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by CoalaJoe at 2018-02-14T17:13:20Z
+
+@nicolas-grekas Ready for next review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-14T17:23:54Z
+
+SecurityBundle also needs an update, so that you can configure these settings using yaml.
+See src/Symfony/Bundle/SecurityBundle/DependencyInjection/MainConfiguration.php
+and src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-14T18:03:37Z
+
+is it possible to support this config when using ext-sodium on older versions too ?
+
+---------------------------------------------------------------------------
+
+by CoalaJoe at 2018-02-15T08:26:28Z
+
+@stof There are `$opslimit` and `$memlimit` in `crypto_pwhash_str()`. But there seems to be no way of using multiple threads.
+
+I can't say how these 2 parameters are related to `time_cost` and `memory_cost` because they have not been documented on php.net yet. (https://secure.php.net/manual/en/function.sodium-crypto-pwhash-str.php)
+
+---------------------------------------------------------------------------
+
+by CoalaJoe at 2018-02-15T08:38:32Z
+
+- [ ] Add this note to the documentation later?
+
+> As Argon2 doesn't have any “bad” values, however consuming more resources is considered better than consuming less. Users are encouraged to adjust the cost factors for the platform they're developing for.
+[From the RFC](https://wiki.php.net/rfc/argon2_password_hash#resolved_cost_factors)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-19T13:33:05Z
+
+almost there, tests should be updated (see failures)
+
+---------------------------------------------------------------------------
+
+by CoalaJoe at 2018-02-20T08:56:57Z
+
+@nicolas-grekas The tests should now run successfully. But the runners fail on installing the libsodium extension. Do you know why?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-20T09:15:41Z
+
+I suppose you'll need to split the new functional tests in dedicated test methods, and add them the `@requires extension libsodium` annotation.

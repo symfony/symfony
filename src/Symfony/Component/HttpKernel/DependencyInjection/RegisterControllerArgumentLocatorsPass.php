@@ -168,7 +168,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                 }
                 // register the maps as a per-method service-locators
                 if ($args) {
-                    $controllers[$id.':'.$r->name] = ServiceLocatorTagPass::register($container, $args);
+                    $controllers[$id.'::'.$r->name] = ServiceLocatorTagPass::register($container, $args);
                 }
             }
         }

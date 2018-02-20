@@ -12,16 +12,13 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Routing\Route;
 
 /**
  * A console command for retrieving information about routes.
@@ -83,63 +80,19 @@ EOF
                 throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
             }
 
-            $callable = $this->extractCallable($route);
-
             $helper->describe($io, $route, array(
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'name' => $name,
                 'output' => $io,
-                'callable' => $callable,
             ));
         } else {
-            foreach ($routes as $route) {
-                $this->convertController($route);
-            }
-
             $helper->describe($io, $routes, array(
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
                 'output' => $io,
             ));
-        }
-    }
-
-    private function convertController(Route $route)
-    {
-        if ($route->hasDefault('_controller')) {
-            $nameParser = new ControllerNameParser($this->getApplication()->getKernel());
-            try {
-                $route->setDefault('_controller', $nameParser->build($route->getDefault('_controller')));
-            } catch (\InvalidArgumentException $e) {
-            }
-        }
-    }
-
-    private function extractCallable(Route $route)
-    {
-        if (!$route->hasDefault('_controller')) {
-            return;
-        }
-
-        $controller = $route->getDefault('_controller');
-
-        if (1 === substr_count($controller, ':')) {
-            list($service, $method) = explode(':', $controller);
-            try {
-                return sprintf('%s::%s', get_class($this->getApplication()->getKernel()->getContainer()->get($service)), $method);
-            } catch (ServiceNotFoundException $e) {
-            }
-        }
-
-        $nameParser = new ControllerNameParser($this->getApplication()->getKernel());
-        try {
-            $shortNotation = $nameParser->build($controller);
-            $route->setDefault('_controller', $shortNotation);
-
-            return $controller;
-        } catch (\InvalidArgumentException $e) {
         }
     }
 }

@@ -23,11 +23,11 @@
         "symfony/config": "~3.4|~4.0",
         "symfony/event-dispatcher": "~3.4|~4.0",
         "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/http-kernel": "~3.4|~4.0",
+        "symfony/http-kernel": "^4.1",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~3.4|~4.0",
         "symfony/finder": "~3.4|~4.0",
-        "symfony/routing": "^3.4.5|^4.0.5"
+        "symfony/routing": "^4.1"
     },
     "require-dev": {
         "doctrine/cache": "~1.0",

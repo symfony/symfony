@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by phansys at 2018-02-11T12:12:32Z
+
+Comments addressed.
+
+---------------------------------------------------------------------------
+
+by phansys at 2018-02-12T15:48:00Z
+
+@fabpot, @nicolas-grekas; should we consider valid a locale including variants? "it_IT_NEDIS_ROJAZ_1901" by instance: http://php.net/manual/en/locale.getallvariants.php
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-12T16:28:35Z
+
+> should we consider valid a locale including variants?
+
+Only if a real world app needs it. Let's not spend time on theoretical improvements.
+
+---------------------------------------------------------------------------
+
+by phansys at 2018-02-12T19:51:08Z
+
+I can't imagine a practical use case using variants right now, but I think we should left a note about the situation in docs, explaining that locales including variants will not be considered valid. WDYT?
+
+---------------------------------------------------------------------------
+
+by phansys at 2018-02-16T02:45:06Z
+
+Do you know how we could avoid having different results per platform? AppVeyor is reading "en-us.utf8@VARIANT" as a valid locale, while in Travis it is invalid. Shouldn't both environments be using the same bundled ICU data?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-19T10:46:26Z
+
+> Shouldn't both environments be using the same bundled ICU data?
+
+let's make the test case independent from the data version instead, we're not testing the data set here.

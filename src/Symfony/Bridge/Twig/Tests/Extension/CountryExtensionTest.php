@@ -25,27 +25,26 @@ class CountryExtensionTest extends TestCase
 
     public static function dataProvider()
     {
-        return [
-            ['US', 'United States'],
-            ['ES', 'Spain'],
-            ['PT', 'Portugal'],
-            ['BR', 'Brazil'],
-        ];
+        return array(
+            array('US', 'United States'),
+            array('ES', 'Spain'),
+            array('PT', 'Portugal'),
+            array('BR', 'Brazil'),
+        );
     }
 
     public function testEmptyCountryIso()
     {
-        $output = $this->getTemplate("{{ ''|country }}")->render([]);
+        $output = $this->getTemplate("{{ ''|country }}")->render(array());
         $this->assertEmpty($output);
     }
-
 
     /**
      * @dataProvider dataProvider
      */
     public function testGetCountryName($countryIso, $expected)
     {
-        $output = $this->getTemplate("{{ '$countryIso'|country }}")->render([]);
+        $output = $this->getTemplate("{{ '$countryIso'|country }}")->render(array());
         $this->assertEquals($expected, $output);
     }
 }

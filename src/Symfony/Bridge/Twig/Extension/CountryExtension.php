@@ -1,12 +1,22 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Twig\Extension;
 
+use Symfony\Component\Intl\Intl;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
- * Provides translate country in ISO 3166-1 alpha 2 to country name.
+ * Translate country code in the ISO 3166-1 alpha 2 pattern to country name.
  *
  * @author Rafael Mello <merorafael@gmail.com>
  */
@@ -32,7 +42,7 @@ class CountryExtension extends AbstractExtension
      */
     public function getCountryName($isoCode, $locale = null)
     {
-        if ($isoCode === null) {
+        if (null === $isoCode) {
             return;
         }
         if ($locale) {

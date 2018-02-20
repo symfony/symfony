@@ -40,7 +40,8 @@ class LocaleValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        $value = (string) $value;
+        $inputValue = (string) $value;
+        $value = $inputValue;
         if ($constraint->canonicalize) {
             $value = \Locale::canonicalize($value);
         }
@@ -49,7 +50,7 @@ class LocaleValidator extends ConstraintValidator
 
         if (!isset($locales[$value]) && !in_array($value, $localeBundle->getAliases(), true)) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setParameter('{{ value }}', $this->formatValue($inputValue))
                 ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
                 ->addViolation();
         }

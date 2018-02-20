@@ -235,7 +235,7 @@ class XliffFileLoaderTest extends TestCase
         $resource = __DIR__.'/../fixtures/resources-2.0-multi-segment-unit.xlf';
         $catalog = $loader->load($resource, 'en', 'domain1');
 
-        $this->assertEquals('en', $catalog->getLocale());
+        $this->assertSame('en', $catalog->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalog->getResources());
         $this->assertSame(array(), libxml_get_errors());
 
@@ -245,8 +245,8 @@ class XliffFileLoaderTest extends TestCase
         $this->assertNotEmpty($metadata);
         $this->assertCount(1, $metadata['notes']);
 
-        $this->assertEquals('processed', $metadata['notes'][0]['category']);
-        $this->assertEquals('true', $metadata['notes'][0]['content']);
+        $this->assertSame('processed', $metadata['notes'][0]['category']);
+        $this->assertSame('true', $metadata['notes'][0]['content']);
 
         // test for "bar" metadata
         $this->assertTrue($catalog->defines('bar', 'domain1'));
@@ -254,7 +254,7 @@ class XliffFileLoaderTest extends TestCase
         $this->assertNotEmpty($metadata);
         $this->assertCount(1, $metadata['notes']);
 
-        $this->assertEquals('processed', $metadata['notes'][0]['category']);
-        $this->assertEquals('true', $metadata['notes'][0]['content']);
+        $this->assertSame('processed', $metadata['notes'][0]['category']);
+        $this->assertSame('true', $metadata['notes'][0]['content']);
     }
 }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Taluu at 2018-02-20T14:44:58Z
+
+Shouldn't the template be split into two (one for bug fixes, one for new features), as described [here](https://github.com/blog/2495-multiple-issue-and-pull-request-templates) ?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-20T15:00:30Z
+
+@Taluu most of the template is common. And when creating a PR using the github buttons, you always get the default PR template. Additional PR templates are used only when the URL contains a special query string (requiring to provide special links). I don't think we would benefit from the multiple templates here

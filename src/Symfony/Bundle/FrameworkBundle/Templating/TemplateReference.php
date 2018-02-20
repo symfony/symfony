@@ -43,8 +43,15 @@ class TemplateReference extends BaseTemplateReference
         $controller = str_replace('\\', '/', $this->get('controller'));
 
         $path = (empty($controller) ? '' : $controller.'/').$this->get('name').'.'.$this->get('format').'.'.$this->get('engine');
+        if (empty($this->parameters['bundle'])) {
+            if (file_exists('views/')) {
+                return  'views/'.$path;
+            }
 
-        return empty($this->parameters['bundle']) ? 'views/'.$path : '@'.$this->get('bundle').'/Resources/views/'.$path;
+            return  '../templates/'.$path;
+        }
+
+        return '@'.$this->get('bundle').'/Resources/views/'.$path;
     }
 
     /**

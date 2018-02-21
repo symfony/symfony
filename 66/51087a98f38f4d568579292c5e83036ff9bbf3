@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-11T00:34:55Z
+
+Tests should pass once merged.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-02-13T14:25:18Z
+
+The `controller_name_converter` and `resolve_controller_name_subscriber` services should be deprecated.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-13T14:58:33Z
+
+I can't deprecate them because we still need to use them internally.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-19T22:16:01Z
+
+@fabpot fixed your requests
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-20T21:51:12Z
+
+Can we merge this? I'd prefer to not having to rebase this again.

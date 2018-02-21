@@ -65,7 +65,6 @@ class StaticPrefixCollection
      */
     public function addRoute(string $prefix, $route, string $staticPrefix = null)
     {
-        $this->guardAgainstAddingNotAcceptedRoutes($prefix);
         if (null === $staticPrefix) {
             list($prefix, $staticPrefix) = $this->getCommonPrefix($prefix, $prefix);
         }
@@ -73,23 +72,50 @@ class StaticPrefixCollection
         for ($i = \count($this->items) - 1; 0 <= $i; --$i) {
             $item = $this->items[$i];
 
-            if ($item instanceof self && $item->accepts($prefix)) {
+            list($commonPrefix, $commonStaticPrefix) = $this->getCommonPrefix($prefix, $this->prefixes[$i]);
+
+            if ($this->prefix === $commonPrefix) {
+                // the new route and a previous one have no common prefix, let's see if they are exclusive to each others
+
+                if ($this->prefix !== $staticPrefix && $this->prefix !== $this->staticPrefixes[$i]) {
+                    // the new route and the previous one have exclusive static prefixes
+                    continue;
+                }
+
+                if ($this->prefix === $staticPrefix && $this->prefix === $this->staticPrefixes[$i]) {
+                    // the new route and the previous one have no static prefix
+                    break;
+                }
+
+                if ($this->prefixes[$i] !== $this->staticPrefixes[$i] && $this->prefix === $this->staticPrefixes[$i]) {
+                    // the previous route is non-static and has no static prefix
+                    break;
+                }
+
+                if ($prefix !== $staticPrefix && $this->prefix === $staticPrefix) {
+                    // the new route is non-static and has no static prefix
+                    break;
+                }
+
+                continue;
+            }
+
+            if ($item instanceof self && $this->prefixes[$i] === $commonPrefix) {
+                // the new route is a child of a previous one, let's nest it
                 $item->addRoute($prefix, $route, $staticPrefix);
+            } else {
+                // the new route and a previous one have a common prefix, let's merge them
+                $child = new self($commonPrefix);
+                list($child->prefixes[0], $child->staticPrefixes[0]) = $child->getCommonPrefix($this->prefixes[$i], $this->prefixes[$i]);
+                list($child->prefixes[1], $child->staticPrefixes[1]) = $child->getCommonPrefix($prefix, $prefix);
+                $child->items = array($this->items[$i], $route);
 
-                return;
+                $this->staticPrefixes[$i] = $commonStaticPrefix;
+                $this->prefixes[$i] = $commonPrefix;
+                $this->items[$i] = $child;
             }
 
-            if ($this->groupWithItem($i, $prefix, $staticPrefix, $route)) {
-                return;
-            }
-
-            if ($this->staticPrefixes[$i] !== $this->prefixes[$i] && 0 === strpos($staticPrefix, $this->staticPrefixes[$i])) {
-                break;
-            }
-
-            if ($staticPrefix !== $prefix && 0 === strpos($this->staticPrefixes[$i], $staticPrefix)) {
-                break;
-            }
+            return;
         }
 
         // No optimised case was found, in this case we simple add the route for possible
@@ -113,38 +139,6 @@ class StaticPrefixCollection
         }
 
         return $routes;
-    }
-
-    /**
-     * Tries to combine a route with another route or group.
-     */
-    private function groupWithItem(int $i, string $prefix, string $staticPrefix, $route): bool
-    {
-        list($commonPrefix, $commonStaticPrefix) = $this->getCommonPrefix($prefix, $this->prefixes[$i]);
-
-        if (\strlen($this->prefix) >= \strlen($commonPrefix)) {
-            return false;
-        }
-
-        $child = new self($commonPrefix);
-
-        $child->staticPrefixes = array($this->staticPrefixes[$i], $staticPrefix);
-        $child->prefixes = array($this->prefixes[$i], $prefix);
-        $child->items = array($this->items[$i], $route);
-
-        $this->staticPrefixes[$i] = $commonStaticPrefix;
-        $this->prefixes[$i] = $commonPrefix;
-        $this->items[$i] = $child;
-
-        return true;
-    }
-
-    /**
-     * Checks whether a prefix can be contained within the group.
-     */
-    private function accepts(string $prefix): bool
-    {
-        return 0 === strpos($prefix, $this->prefix) && '?' !== ($prefix[\strlen($this->prefix)] ?? '');
     }
 
     /**
@@ -194,19 +188,5 @@ class StaticPrefixCollection
         }
 
         return array(substr($prefix, 0, $i), substr($prefix, 0, $staticLength ?? $i));
-    }
-
-    /**
-     * Guards against adding incompatible prefixes in a group.
-     *
-     * @throws \LogicException when a prefix does not belong in a group
-     */
-    private function guardAgainstAddingNotAcceptedRoutes(string $prefix): void
-    {
-        if (!$this->accepts($prefix)) {
-            $message = sprintf('Could not add route with prefix %s to collection with prefix %s', $prefix, $this->prefix);
-
-            throw new \LogicException($message);
-        }
     }
 }

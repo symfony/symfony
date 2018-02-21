@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-21T10:38:16Z
+
+ping @mpiot @Nyholm for review :)
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-02-21T11:01:29Z
+
+It's ok for me :)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-21T11:02:53Z
+
+Excellent Marek. Thank you.
+
+Could you make a small update PR to the from here: https://github.com/Nyholm/symfony-bootstrap-form/blob/master/src/Form/SuperFormType.php
+
+I want to see the difference of the output.
+
+---------------------------------------------------------------------------
+
+by mssimi at 2018-02-21T12:08:46Z
+
+@Nyholm that form is shared with several css frameworks, this feature is specific for bootstrap 4, should I rly submit PR?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-21T12:10:14Z
+
+Yes please. Im not really sure what a custom radio is to be honest.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-02-21T12:24:46Z
+
+It's just a different CSS applied on a checkbox or a radio in the bootstrap
+4 framework. It does a nice box/radio.

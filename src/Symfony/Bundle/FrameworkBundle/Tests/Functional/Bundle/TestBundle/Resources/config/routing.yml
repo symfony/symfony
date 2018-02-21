@@ -1,49 +1,49 @@
 session_welcome:
     path:     /session
-    defaults: { _controller: TestBundle:Session:welcome }
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::welcomeAction }
 
 session_welcome_name:
     path:     /session/{name}
-    defaults: { _controller: TestBundle:Session:welcome }
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::welcomeAction }
 
 session_logout:
     path:     /session_logout
-    defaults: { _controller: TestBundle:Session:logout}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::logoutAction }
 
 session_setflash:
     path:     /session_setflash/{message}
-    defaults: { _controller: TestBundle:Session:setFlash}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::setFlashAction }
 
 session_showflash:
     path:     /session_showflash
-    defaults: { _controller: TestBundle:Session:showFlash}
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController::showFlashAction }
 
 profiler:
     path:     /profiler
-    defaults: { _controller: TestBundle:Profiler:index }
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\ProfilerController::indexAction }
 
 subrequest_index:
     path:     /subrequest/{_locale}.{_format}
-    defaults: { _controller: TestBundle:SubRequest:index, _format: "html" }
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SubRequestController::indexAction, _format: html }
     schemes:  [https]
 
 subrequest_fragment_error:
     path:     /subrequest/fragment/error/{_locale}.{_format}
-    defaults: { _controller: TestBundle:SubRequest:fragmentError, _format: "html" }
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SubRequestController::fragmentErrorAction, _format: html }
     schemes:  [http]
 
 subrequest_fragment:
     path:     /subrequest/fragment/{_locale}.{_format}
-    defaults: { _controller: TestBundle:SubRequest:fragment, _format: "html" }
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SubRequestController::fragmentAction, _format: html }
     schemes:  [http]
 
 fragment_home:
     path:     /fragment_home
-    defaults: { _controller: TestBundle:Fragment:index, _format: txt }
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController::indexAction, _format: txt }
 
 fragment_inlined:
     path:     /fragment_inlined
-    defaults: { _controller: TestBundle:Fragment:inlined }
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\FragmentController::inlinedAction }
 
 array_controller:
     path:     /array_controller

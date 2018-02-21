@@ -237,7 +237,7 @@ class XliffFileLoaderTest extends TestCase
 
         $this->assertSame('en', $catalog->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalog->getResources());
-        $this->assertSame(array(), libxml_get_errors());
+        $this->assertFalse(libxml_get_last_error());
 
         // test for "foo" metadata
         $this->assertTrue($catalog->defines('foo', 'domain1'));

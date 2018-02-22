@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-12T14:32:06Z
+
+> No it's not strictly needed, but I needed a way to distinguish between not finding a namespace and not finding a command to prevent incorrect suggestions when typing an incorrect namespace
+
+How that? AFAIU it behaves the same for both exceptions currently
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-01-23T06:22:12Z
+
+@pierredup Can you rebase to get rid of the merge commit? We never merge a PR with a merge commit. Thanks.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-02-17T00:13:52Z
+
+@pierredup Can you look at the failing tests? looks like a spacing issue.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2018-02-22T06:15:25Z
+
+New failures on travis seems unrelated

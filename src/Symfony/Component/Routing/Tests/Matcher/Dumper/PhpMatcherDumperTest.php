@@ -467,6 +467,11 @@ class PhpMatcherDumperTest extends TestCase
         $suffixCollection->add('r100', new Route('abc{foo}/100'));
         $suffixCollection->add('r200', new Route('abc{foo}/200'));
 
+        /* test case 13 */
+        $hostCollection = new RouteCollection();
+        $hostCollection->add('r1', (new Route('abc{foo}'))->setHost('{foo}.exampple.com'));
+        $hostCollection->add('r2', (new Route('abc{foo}'))->setHost('{foo}.exampple.com'));
+
         return array(
            array(new RouteCollection(), 'url_matcher0.php', array()),
            array($collection, 'url_matcher1.php', array()),
@@ -481,6 +486,7 @@ class PhpMatcherDumperTest extends TestCase
            array($chunkedCollection, 'url_matcher10.php', array()),
            array($demoCollection, 'url_matcher11.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
            array($suffixCollection, 'url_matcher12.php', array()),
+           array($hostCollection, 'url_matcher13.php', array()),
         );
     }
 

@@ -626,10 +626,10 @@ EOF;
         // optimize parameters array
         if ($matches || $hostMatches) {
             $vars = array();
-            if ($hostMatches) {
+            if ($hostMatches && $checkHost) {
                 $vars[] = '$hostMatches';
             }
-            if ($matches) {
+            if ($matches || ($hostMatches && !$checkHost)) {
                 $vars[] = '$matches';
             }
             $vars[] = "array('_route' => '$name')";

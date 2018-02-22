@@ -149,9 +149,9 @@ HttpFoundation
      - `isInvalid`/`isSuccessful`/`isRedirection`/`isClientError`/`isServerError`
      - `isOk`/`isForbidden`/`isNotFound`/`isRedirect`/`isEmpty`
 
-  * Checking only for cacheable HTTP methods with `Request::isMethodSafe()` is deprecated 
-    since version 3.2 and will throw an exception in 4.0. Disable checking only for 
-    cacheable methods by calling the method with `false` as first argument or use 
+  * Checking only for cacheable HTTP methods with `Request::isMethodSafe()` is deprecated
+    since version 3.2 and will throw an exception in 4.0. Disable checking only for
+    cacheable methods by calling the method with `false` as first argument or use
     `Request::isMethodCacheable()` instead.
 
 HttpKernel

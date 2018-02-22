@@ -413,8 +413,8 @@ UPGRADE FROM 2.x to 3.0
    $form = $this->createForm(MyType::class);
    ```
 
- * Passing custom data to forms now needs to be done 
-   through the options resolver. 
+ * Passing custom data to forms now needs to be done
+   through the options resolver.
 
     In the controller:
 
@@ -425,7 +425,7 @@ UPGRADE FROM 2.x to 3.0
         'method' => 'PUT',
     ));
     ```
-    After: 
+    After:
     ```php
     $form = $this->createForm(MyType::class, $entity, array(
         'action' => $this->generateUrl('action_route'),
@@ -434,13 +434,13 @@ UPGRADE FROM 2.x to 3.0
     ));
     ```
     In the form type:
-    
+
     Before:
     ```php
     class MyType extends AbstractType
     {
         private $value;
-    
+
         public function __construct($variableValue)
         {
             $this->value = $value;
@@ -448,7 +448,7 @@ UPGRADE FROM 2.x to 3.0
         // ...
     }
     ```
-    
+
     After:
     ```php
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -456,7 +456,7 @@ UPGRADE FROM 2.x to 3.0
         $value = $options['custom_value'];
         // ...
     }
-    
+
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
@@ -464,7 +464,7 @@ UPGRADE FROM 2.x to 3.0
         ));
     }
     ```
- 
+
  * The alias option of the `form.type_extension` tag was removed in favor of
    the `extended_type`/`extended-type` option.
 

@@ -322,7 +322,7 @@ Security
  * Deprecated the HTTP digest authentication: `NonceExpiredException`,
    `DigestAuthenticationListener` and `DigestAuthenticationEntryPoint` will be
    removed in 4.0. Use another authentication system like `http_basic` instead.
-   
+
  * The `GuardAuthenticatorInterface` has been deprecated and will be removed in 4.0.
    Use `AuthenticatorInterface` instead.
 

@@ -11,10 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Psr\Container\ContainerInterface as Psr11ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -169,13 +167,19 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($controllerContainer, $controller->getContainer());
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null, ControllerNameParser $parser = null): ControllerResolverInterface
+    protected function createControllerResolver(LoggerInterface $logger = null): ControllerResolverInterface
     {
-        if (!$parser) {
+        $parser = $container = null;
+
+        if (isset(\func_get_args()[2])) {
+            $parser = \func_get_args()[2];
+        } else {
             $parser = $this->createMockParser();
         }
 
-        if (!$container) {
+        if (isset(\func_get_args()[1])) {
+            $container = \func_get_args()[1];
+        } else {
             $container = $this->createMockContainer();
         }
 

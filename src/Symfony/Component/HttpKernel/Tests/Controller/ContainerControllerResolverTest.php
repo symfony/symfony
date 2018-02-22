@@ -204,9 +204,12 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         return $tests;
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, ContainerInterface $container = null): ControllerResolverInterface
+    protected function createControllerResolver(LoggerInterface $logger = null): ControllerResolverInterface
     {
-        if (!$container) {
+        $container = null;
+        if (isset(\func_get_args()[1])) {
+            $container = \func_get_args()[1];
+        } else {
             $container = $this->createMockContainer();
         }
 

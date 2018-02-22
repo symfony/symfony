@@ -227,7 +227,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param string|int $key The key to seek to
      *
-     * @return self|null A clone of $this of null if the key is not set
+     * @return self|null A clone of $this or null if the key is not set
      */
     public function seek($key)
     {

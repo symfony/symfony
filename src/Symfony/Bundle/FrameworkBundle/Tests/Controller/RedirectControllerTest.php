@@ -235,6 +235,40 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
+    public function testRedirectWithQuery()
+    {
+        $scheme = 'http';
+        $host = 'www.example.com';
+        $baseUrl = '/base';
+        $port = 80;
+
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'base=zaza');
+        $request->query = new ParameterBag(array('base' => 'zaza'));
+        $request->attributes = new ParameterBag(array('_route_params' => array('base2' => 'zaza')));
+        $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        $urlGenerator->expects($this->once())->method('generate')->will($this->returnValue('/test?base=zaza&base2=zaza'))->with('/test', array('base' => 'zaza', 'base2' => 'zaza'), UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $controller = new RedirectController($urlGenerator);
+        $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?base=zaza&base2=zaza');
+    }
+
+    public function testRedirectWithQueryWithRouteParamsOveriding()
+    {
+        $scheme = 'http';
+        $host = 'www.example.com';
+        $baseUrl = '/base';
+        $port = 80;
+
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'base=zaza');
+        $request->query = new ParameterBag(array('base' => 'zaza'));
+        $request->attributes = new ParameterBag(array('_route_params' => array('base' => 'zouzou')));
+        $urlGenerator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        $urlGenerator->expects($this->once())->method('generate')->will($this->returnValue('/test?base=zouzou'))->with('/test', array('base' => 'zouzou'), UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $controller = new RedirectController($urlGenerator);
+        $this->assertRedirectUrl($controller->redirectAction($request, '/test', false, false, false, true), '/test?base=zouzou');
+    }
+
     private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
     {
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();

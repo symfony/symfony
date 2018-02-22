@@ -317,7 +317,14 @@
                         </td>
                         <td>
                             {% if decision.attributes|length == 1 %}
-                                {{ decision.attributes|first }}
+                                {% set attribute = decision.attributes|first %}
+                                {% if attribute.expression is defined %}
+                                    Expression: <pre><code>{{ attribute.expression }}</code></pre>
+                                {% elseif attribute.type == 'string' %}
+                                    {{ attribute }}
+                                {% else %}
+                                     {{ profiler_dump(attribute) }}
+                                {% endif %}
                             {% else %}
                                 {{ profiler_dump(decision.attributes) }}
                             {% endif %}

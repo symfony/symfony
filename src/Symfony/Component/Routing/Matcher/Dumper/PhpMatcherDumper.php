@@ -239,7 +239,7 @@ EOF;
 
             $code .= sprintf("        case %s:\n", self::export($url));
             foreach ($routes as $name => list($hasTrailingSlash, $route)) {
-                $code .= $this->compileRoute($route, $name, $supportsRedirections, $hasTrailingSlash);
+                $code .= $this->compileRoute($route, $name, $supportsRedirections, $hasTrailingSlash, true);
             }
             $code .= "            break;\n";
         }
@@ -451,7 +451,7 @@ EOF;
             $hasTrailingSlash = $state->supportsRedirections && '' !== $regex && '/' === $regex[-1];
 
             if ($compiledRoute->getRegex() === $prevRegex) {
-                $state->switch = substr_replace($state->switch, $this->compileRoute($route, $name, $state->supportsRedirections, $hasTrailingSlash)."\n", -19, 0);
+                $state->switch = substr_replace($state->switch, $this->compileRoute($route, $name, $state->supportsRedirections, $hasTrailingSlash, false)."\n", -19, 0);
                 continue;
             }
 
@@ -485,7 +485,7 @@ EOF;
 
                 $state->switch .= <<<EOF
         case {$state->mark}:
-{$combine}{$this->compileRoute($route, $name, $state->supportsRedirections, $hasTrailingSlash)}
+{$combine}{$this->compileRoute($route, $name, $state->supportsRedirections, $hasTrailingSlash, false)}
             break;
 
 EOF;
@@ -572,16 +572,9 @@ EOF;
     /**
      * Compiles a single Route to PHP code used to match it against the path info.
      *
-     * @param Route  $route                A Route instance
-     * @param string $name                 The name of the Route
-     * @param bool   $supportsRedirections Whether redirections are supported by the base class
-     * @param bool   $hasTrailingSlash     Whether the path has a trailing slash
-     *
-     * @return string PHP code
-     *
      * @throws \LogicException
      */
-    private function compileRoute(Route $route, string $name, bool $supportsRedirections, bool $hasTrailingSlash): string
+    private function compileRoute(Route $route, string $name, bool $supportsRedirections, bool $hasTrailingSlash, bool $checkHost): string
     {
         $code = '';
         $compiledRoute = $route->compile();
@@ -605,7 +598,7 @@ EOF;
             $conditions[] = $expression;
         }
 
-        if (!$compiledRoute->getHostRegex()) {
+        if (!$checkHost || !$compiledRoute->getHostRegex()) {
             // no-op
         } elseif ($hostMatches) {
             $conditions[] = sprintf('preg_match(%s, $host, $hostMatches)', self::export($compiledRoute->getHostRegex()));

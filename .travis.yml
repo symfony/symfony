@@ -36,7 +36,7 @@ cache:
     directories:
         - .phpunit
         - php-$MIN_PHP
-        - php-ext
+        - ~/php-ext
 
 services:
     - memcached
@@ -117,7 +117,7 @@ before_install:
           local ext_so=$2
           local INI=$3
           local ext_dir=$(php -r "echo ini_get('extension_dir');")
-          local ext_cache=php-ext/$(basename $ext_dir)/$ext_name
+          local ext_cache=~/php-ext/$(basename $ext_dir)/$ext_name
 
           if [[ -e $ext_cache/$ext_so ]]; then
               echo extension = $ext_cache/$ext_so >> $INI

@@ -43,7 +43,7 @@ final class CachePoolDeleteCommand extends Command
     {
         $this
             ->setDefinition(array(
-                new InputArgument('pool', InputArgument::REQUIRED, 'The cache pool to delete an item from'),
+                new InputArgument('pool', InputArgument::REQUIRED, 'The cache pool from which to delete an item'),
                 new InputArgument('key', InputArgument::REQUIRED, 'The cache key to delete from the pool'),
             ))
             ->setDescription('Deletes an item from a cache pool')

@@ -519,13 +519,18 @@ class Filesystem
     /**
      * Mirrors a directory to another.
      *
+     * Copies files and directories from the origin directory into the target directory. By default:
+     *
+     *  - existing files in the target directory will be overwritten, except if they are newer (see the `override` option)
+     *  - files in the target directory that do not exist in the source directory will not be deleted (see the `delete` option)
+     *
      * @param string       $originDir The origin directory
      * @param string       $targetDir The target directory
-     * @param \Traversable $iterator  A Traversable instance
+     * @param \Traversable $iterator  Iterator that filters which files and directories to copy
      * @param array        $options   An array of boolean options
      *                                Valid options are:
-     *                                - $options['override'] Whether to override an existing file on copy or not (see copy())
-     *                                - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
+     *                                - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)
+     *                                - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink(), defaults to false)
      *                                - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @throws IOException When file type is unknown

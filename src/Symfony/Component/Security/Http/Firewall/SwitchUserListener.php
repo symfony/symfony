@@ -95,7 +95,7 @@ class SwitchUserListener implements ListenerInterface
 
         if (!$this->stateless) {
             $request->query->remove($this->usernameParameter);
-            $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
+            $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
             $response = new RedirectResponse($request->getUri(), 302);
 
             $event->setResponse($response);

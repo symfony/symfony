@@ -59,6 +59,8 @@ class ReflectionExtractorTest extends TestCase
             ),
             $this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
+
+        $this->assertNull($this->extractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\NoProperties'));
     }
 
     public function testGetPropertiesWithCustomPrefixes()

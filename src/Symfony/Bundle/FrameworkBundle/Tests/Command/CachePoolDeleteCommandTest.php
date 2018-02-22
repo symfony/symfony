@@ -61,7 +61,7 @@ class CachePoolDeleteCommandTest extends TestCase
         $tester = $this->getCommandTester($this->getKernel());
         $tester->execute(array('pool' => 'foo', 'key' => 'bar'));
 
-        $this->assertContains('[WARNING] Cache item "bar" does not exist in cache pool "foo".', $tester->getDisplay());
+        $this->assertContains('[NOTE] Cache item "bar" does not exist in cache pool "foo".', $tester->getDisplay());
     }
 
     public function testCommandDeleteFailed()

@@ -67,7 +67,7 @@ EOF
         $cachePool = $this->poolClearer->getPool($pool);
 
         if (!$cachePool->hasItem($key)) {
-            $io->warning(sprintf('Cache item "%s" does not exist in cache pool "%s".', $key, $pool));
+            $io->note(sprintf('Cache item "%s" does not exist in cache pool "%s".', $key, $pool));
 
             return;
         }

@@ -487,9 +487,9 @@ class ApplicationTest extends TestCase
         $tester->run(array('command' => 'foos'), array('decorated' => false));
         $this->assertSame(<<<OUTPUT
 
-                                                                                                                        
- Command "foos" is not defined.                                                                                         
-                                                                                                                        
+                                                                                
+ Command "foos" is not defined.                                                 
+                                                                                
 
  Do you want to run "foo" instead?  (yes/no) [no]:
  > 
@@ -510,9 +510,9 @@ OUTPUT
         $this->assertSame(1, $exitCode);
         $this->assertSame(<<<OUTPUT
 
-                                                                                                                        
- Command "foos" is not defined.                                                                                         
-                                                                                                                        
+                                                                                
+ Command "foos" is not defined.                                                 
+                                                                                
 
  Do you want to run "foo" instead?  (yes/no) [no]:
  > 

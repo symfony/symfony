@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by hkdobrev at 2018-02-22T09:31:12Z
+
+@xabbuh 👍 I guess this is indeed not a BC break, but this doesn't solve the side effect I've described in https://github.com/symfony/symfony/issues/26259#issuecomment-367465746
+
+When you have the phpDocumentor installed locally, because of another dependency like PHPUnit, this would not throw an exception locally or in testing, but it would throw an exception on production without #26260.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-02-22T09:38:32Z
+
+That's true, but I don't think we can cover that in Symfony itself.
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2018-02-22T09:42:11Z
+
+@xabbuh OK. What's your understanding of how that should be handled in the projects using the component? You should require a library noted in the docs even though you're not using its code directly, but it's used from your dependency?
+
+Shouldn't the `PhpDocExtractor` be extracted into a separate package and then that package would have the phpDocumentor in its `require` block? Then if you use the `PhpDocExtractor` class you need to install its package and it would work without knowing what are its dependencies. Easier to document as well.
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2018-02-22T10:00:34Z
+
+This looks as a good improvement to me, but keen on hearing your thoughts on the above suggestion/question! Thanks!

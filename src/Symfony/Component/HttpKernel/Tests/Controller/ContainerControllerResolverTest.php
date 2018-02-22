@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
-use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 
 class ContainerControllerResolverTest extends ControllerResolverTest
 {
@@ -204,7 +203,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         return $tests;
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, ContainerInterface $container = null): ControllerResolverInterface
+    protected function createControllerResolver(LoggerInterface $logger = null, ContainerInterface $container = null)
     {
         if (!$container) {
             $container = $this->createMockContainer();

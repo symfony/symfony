@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Tests\Controller\ContainerControllerResolverTest;
 
 class ControllerResolverTest extends ContainerControllerResolverTest
@@ -169,7 +168,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertSame($controllerContainer, $controller->getContainer());
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null, ControllerNameParser $parser = null): ControllerResolverInterface
+    protected function createControllerResolver(LoggerInterface $logger = null, Psr11ContainerInterface $container = null, ControllerNameParser $parser = null)
     {
         if (!$parser) {
             $parser = $this->createMockParser();

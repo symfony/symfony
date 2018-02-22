@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 
 class ControllerResolverTest extends TestCase
 {
@@ -194,7 +193,7 @@ class ControllerResolverTest extends TestCase
         );
     }
 
-    protected function createControllerResolver(LoggerInterface $logger = null): ControllerResolverInterface
+    protected function createControllerResolver(LoggerInterface $logger = null)
     {
         return new ControllerResolver($logger);
     }

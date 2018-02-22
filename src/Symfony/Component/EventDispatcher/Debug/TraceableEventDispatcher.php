@@ -209,12 +209,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         return $notCalled;
     }
 
-    /**
-     * Gets the orphaned events.
-     *
-     * @return array An array of orphaned events
-     */
-    public function getOrphanedEvents()
+    public function getOrphanedEvents(): array
     {
         return $this->orphanedEvents;
     }

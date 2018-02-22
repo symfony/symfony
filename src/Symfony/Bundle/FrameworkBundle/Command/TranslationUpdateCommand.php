@@ -31,7 +31,7 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
  *
  * @author Michel Salib <michelsalib@hotmail.com>
  *
- * @final since version 3.4
+ * @final
  */
 class TranslationUpdateCommand extends Command
 {

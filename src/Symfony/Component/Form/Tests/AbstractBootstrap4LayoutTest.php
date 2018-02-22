@@ -547,7 +547,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
             ]
         /following-sibling::div
             [@class="form-check"]
-            [  
+            [
                 ./input[@type="radio"][@name="name"][@id="name_0"][@checked]
                 /following-sibling::label
                     [.="Choice&A"]
@@ -959,8 +959,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
                     ./span
                     [@class="input-group-text"]
                     [contains(.., "%")]
-                ]               
-                     
+                ]
     ]
 '
         );

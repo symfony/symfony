@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
  *
  * @author Sarah Khalil <mkhalil.sarah@gmail.com>
  *
- * @final since version 3.4
+ * @final
  */
 class UserPasswordEncoderCommand extends Command
 {

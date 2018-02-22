@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class RouterMatchCommand extends Command
 {

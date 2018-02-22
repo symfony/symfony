@@ -5,7 +5,7 @@ namespace Symfony\Component\Debug\Tests\Fixtures;
 class AnnotatedClass
 {
     /**
-     * @deprecated since version 3.4.
+     * @deprecated
      */
     public function deprecatedMethod()
     {

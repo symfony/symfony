@@ -22,7 +22,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
 class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
@@ -94,7 +94,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $properties[$propertyName] = $propertyName;
         }
 
-        return array_values($properties);
+        return $properties ? array_values($properties) : null;
     }
 
     /**

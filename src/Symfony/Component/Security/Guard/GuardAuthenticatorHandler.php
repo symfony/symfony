@@ -30,7 +30,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
  *
  * @author Ryan Weaver <ryan@knpuniversity.com>
  *
- * @final since version 3.4
+ * @final
  */
 class GuardAuthenticatorHandler
 {

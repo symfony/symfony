@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class RedirectController
 {

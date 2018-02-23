@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by tony-tran at 2018-02-23T13:50:55Z
+
+I don't know if necessary to create a new PR, but there is the same issue with symfony 4.0 but this time it is the `Role` class
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-02-23T13:55:48Z
+
+This can probably be merged up until 3.4. For 4.0+, a second PR has to be created to change it into `Role` I believe :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-02-23T13:57:51Z
+
+by the way, we merged a similar PR before for the `PreAuthenticatedToken` class
+
+---------------------------------------------------------------------------
+
+by tony-tran at 2018-02-23T14:41:22Z
+
+I don't understand why CI was failed ? Anyone can explain to me please ?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-23T15:12:41Z
+
+Don't worry the CI failures seems not related to the current changes. It will be fixed.

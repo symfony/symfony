@@ -43,7 +43,7 @@ FrameworkBundle
        path: /
        defaults:
            _controller: app.my_controller::myAction
-  ```
+   ```
 
  * Removed `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`
  * Using a `RouterInterface` that does not implement the `WarmableInterface` is not supported anymore.

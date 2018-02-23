@@ -15,11 +15,26 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $this->context = $context;
     }
 
-    public function match($rawPathinfo)
+    public function match($pathinfo)
+    {
+        $allow = array();
+        if ($ret = $this->doMatch($pathinfo, $allow)) {
+            return $ret;
+        }
+        if ('/' !== $pathinfo && in_array($this->context->getMethod(), array('HEAD', 'GET'), true)) {
+            $pathinfo = '/' !== $pathinfo[-1] ? $pathinfo.'/' : substr($pathinfo, 0, -1);
+            if ($ret = $this->doMatch($pathinfo)) {
+                return $this->redirect($pathinfo, $ret['_route']) + $ret;
+            }
+        }
+
+        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
+    }
+
+    private function doMatch(string $rawPathinfo, array &$allow = array()): ?array
     {
         $allow = array();
         $pathinfo = rawurldecode($rawPathinfo);
-        $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
         $host = strtolower($context->getHost());
@@ -28,16 +43,16 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $canonicalMethod = 'GET';
         }
 
-        switch ($trimmedPathinfo) {
+        switch ($pathinfo) {
             default:
                 $routes = array(
                     '/test/baz' => array(array('_route' => 'baz'), null, null, null),
                     '/test/baz.html' => array(array('_route' => 'baz2'), null, null, null),
-                    '/test/baz3' => array(array('_route' => 'baz3'), null, null, null, true),
+                    '/test/baz3/' => array(array('_route' => 'baz3'), null, null, null),
                     '/foofoo' => array(array('_route' => 'foofoo', 'def' => 'test'), null, null, null),
                     '/spa ce' => array(array('_route' => 'space'), null, null, null),
                     '/multi/new' => array(array('_route' => 'overridden2'), null, null, null),
-                    '/multi/hey' => array(array('_route' => 'hey'), null, null, null, true),
+                    '/multi/hey/' => array(array('_route' => 'hey'), null, null, null),
                     '/ababa' => array(array('_route' => 'ababa'), null, null, null),
                     '/route1' => array(array('_route' => 'route1'), 'a.example.com', null, null),
                     '/c2/route2' => array(array('_route' => 'route2'), 'a.example.com', null, null),
@@ -52,10 +67,10 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     '/nonsecure' => array(array('_route' => 'nonsecure'), null, null, array('http' => 0)),
                 );
 
-                if (!isset($routes[$trimmedPathinfo])) {
+                if (!isset($routes[$pathinfo])) {
                     break;
                 }
-                list($ret, $requiredHost, $requiredMethods, $requiredSchemes) = $routes[$trimmedPathinfo];
+                list($ret, $requiredHost, $requiredMethods, $requiredSchemes) = $routes[$pathinfo];
 
                 if ($requiredHost) {
                     if ('#' !== $requiredHost[0] ? $requiredHost !== $host : !preg_match($requiredHost, $host, $hostMatches)) {
@@ -67,22 +82,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     }
                 }
 
-                if (empty($routes[$trimmedPathinfo][4]) || '/' === $pathinfo[-1]) {
-                    // no-op
-                } elseif ('GET' !== $canonicalMethod) {
-                    $allow['GET'] = 'GET';
-                    break;
-                } else {
-                    return array_replace($ret, $this->redirect($rawPathinfo.'/', $ret['_route']));
-                }
-
                 if ($requiredSchemes && !isset($requiredSchemes[$context->getScheme()])) {
                     if ('GET' !== $canonicalMethod) {
                         $allow['GET'] = 'GET';
                         break;
                     }
 
-                    return array_replace($ret, $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)));
+                    return $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)) + $ret;
                 }
 
                 if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
@@ -102,41 +108,41 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         .'|/([^/]++)(*:57)'
                         .'|head/([^/]++)(*:77)'
                     .')'
-                    .'|/test/([^/]++)(?'
-                        .'|/?(*:104)'
+                    .'|/test/([^/]++)/(?'
+                        .'|(*:103)'
                     .')'
-                    .'|/([\']+)(*:120)'
-                    .'|/a(?'
-                        .'|/b\'b/([^/]++)(?'
-                            .'|(*:149)'
-                            .'|(*:157)'
+                    .'|/([\']+)(*:119)'
+                    .'|/a/(?'
+                        .'|b\'b/([^/]++)(?'
+                            .'|(*:148)'
+                            .'|(*:156)'
                         .')'
-                        .'|/(.*)(*:171)'
-                        .'|/b\'b/([^/]++)(?'
-                            .'|(*:195)'
-                            .'|(*:203)'
+                        .'|(.*)(*:169)'
+                        .'|b\'b/([^/]++)(?'
+                            .'|(*:192)'
+                            .'|(*:200)'
                         .')'
                     .')'
-                    .'|/multi/hello(?:/([^/]++))?(*:239)'
+                    .'|/multi/hello(?:/([^/]++))?(*:236)'
                     .'|/([^/]++)/b/([^/]++)(?'
-                        .'|(*:270)'
-                        .'|(*:278)'
+                        .'|(*:267)'
+                        .'|(*:275)'
                     .')'
-                    .'|/aba/([^/]++)(*:300)'
+                    .'|/aba/([^/]++)(*:297)'
                 .')|(?i:([^\\.]++)\\.example\\.com)(?'
                     .'|/route1(?'
-                        .'|3/([^/]++)(*:360)'
-                        .'|4/([^/]++)(*:378)'
+                        .'|3/([^/]++)(*:357)'
+                        .'|4/([^/]++)(*:375)'
                     .')'
                 .')|(?i:c\\.example\\.com)(?'
-                    .'|/route15/([^/]++)(*:428)'
+                    .'|/route15/([^/]++)(*:425)'
                 .')|[^/]*+(?'
-                    .'|/route16/([^/]++)(*:463)'
-                    .'|/a(?'
-                        .'|/a\\.\\.\\.(*:484)'
-                        .'|/b(?'
-                            .'|/([^/]++)(*:506)'
-                            .'|/c/([^/]++)(*:525)'
+                    .'|/route16/([^/]++)(*:460)'
+                    .'|/a/(?'
+                        .'|a\\.\\.\\.(*:481)'
+                        .'|b/(?'
+                            .'|([^/]++)(*:502)'
+                            .'|c/([^/]++)(*:520)'
                         .')'
                     .')'
                 .')'
@@ -146,53 +152,38 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         foreach ($regexList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
                 switch ($m = (int) $matches['MARK']) {
-                    case 104:
+                    case 103:
                         $matches = array('foo' => $matches[1] ?? null);
 
                         // baz4
-                        $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz4')), array());
-                        if ('/' === $pathinfo[-1]) {
-                            // no-op
-                        } elseif ('GET' !== $canonicalMethod) {
-                            $allow['GET'] = 'GET';
-                            goto not_baz4;
-                        } else {
-                            return array_replace($ret, $this->redirect($rawPathinfo.'/', 'baz4'));
+                        return $this->mergeDefaults(array('_route' => 'baz4') + $matches, array());
+
+                        // baz5
+                        $ret = $this->mergeDefaults(array('_route' => 'baz5') + $matches, array());
+                        if (!isset(($a = array('POST' => 0))[$requestMethod])) {
+                            $allow += $a;
+                            goto not_baz5;
                         }
 
                         return $ret;
-                        not_baz4:
-
-                        // baz5
-                        if ('/' === $pathinfo[-1]) {
-                            $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz5')), array());
-                            if (!isset(($a = array('POST' => 0))[$requestMethod])) {
-                                $allow += $a;
-                                goto not_baz5;
-                            }
-
-                            return $ret;
-                        }
                         not_baz5:
 
                         // baz.baz6
-                        if ('/' === $pathinfo[-1]) {
-                            $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz.baz6')), array());
-                            if (!isset(($a = array('PUT' => 0))[$requestMethod])) {
-                                $allow += $a;
-                                goto not_bazbaz6;
-                            }
-
-                            return $ret;
+                        $ret = $this->mergeDefaults(array('_route' => 'baz.baz6') + $matches, array());
+                        if (!isset(($a = array('PUT' => 0))[$requestMethod])) {
+                            $allow += $a;
+                            goto not_bazbaz6;
                         }
+
+                        return $ret;
                         not_bazbaz6:
 
                         break;
-                    case 149:
+                    case 148:
                         $matches = array('foo' => $matches[1] ?? null);
 
                         // foo1
-                        $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'foo1')), array());
+                        $ret = $this->mergeDefaults(array('_route' => 'foo1') + $matches, array());
                         if (!isset(($a = array('PUT' => 0))[$requestMethod])) {
                             $allow += $a;
                             goto not_foo1;
@@ -202,18 +193,18 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         not_foo1:
 
                         break;
-                    case 195:
+                    case 192:
                         $matches = array('foo1' => $matches[1] ?? null);
 
                         // foo2
-                        return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo2')), array());
+                        return $this->mergeDefaults(array('_route' => 'foo2') + $matches, array());
 
                         break;
-                    case 270:
+                    case 267:
                         $matches = array('_locale' => $matches[1] ?? null, 'foo' => $matches[2] ?? null);
 
                         // foo3
-                        return $this->mergeDefaults(array_replace($matches, array('_route' => 'foo3')), array());
+                        return $this->mergeDefaults(array('_route' => 'foo3') + $matches, array());
 
                         break;
                     default:
@@ -221,20 +212,20 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                             34 => array(array('_route' => 'foo', 'def' => 'test'), array('bar'), null, null),
                             57 => array(array('_route' => 'bar'), array('foo'), array('GET' => 0, 'HEAD' => 1), null),
                             77 => array(array('_route' => 'barhead'), array('foo'), array('GET' => 0), null),
-                            120 => array(array('_route' => 'quoter'), array('quoter'), null, null),
-                            157 => array(array('_route' => 'bar1'), array('bar'), null, null),
-                            171 => array(array('_route' => 'overridden'), array('var'), null, null),
-                            203 => array(array('_route' => 'bar2'), array('bar1'), null, null),
-                            239 => array(array('_route' => 'helloWorld', 'who' => 'World!'), array('who'), null, null),
-                            278 => array(array('_route' => 'bar3'), array('_locale', 'bar'), null, null),
-                            300 => array(array('_route' => 'foo4'), array('foo'), null, null),
-                            360 => array(array('_route' => 'route13'), array('var1', 'name'), null, null),
-                            378 => array(array('_route' => 'route14', 'var1' => 'val'), array('var1', 'name'), null, null),
-                            428 => array(array('_route' => 'route15'), array('name'), null, null),
-                            463 => array(array('_route' => 'route16', 'var1' => 'val'), array('name'), null, null),
-                            484 => array(array('_route' => 'a'), array(), null, null),
-                            506 => array(array('_route' => 'b'), array('var'), null, null),
-                            525 => array(array('_route' => 'c'), array('var'), null, null),
+                            119 => array(array('_route' => 'quoter'), array('quoter'), null, null),
+                            156 => array(array('_route' => 'bar1'), array('bar'), null, null),
+                            169 => array(array('_route' => 'overridden'), array('var'), null, null),
+                            200 => array(array('_route' => 'bar2'), array('bar1'), null, null),
+                            236 => array(array('_route' => 'helloWorld', 'who' => 'World!'), array('who'), null, null),
+                            275 => array(array('_route' => 'bar3'), array('_locale', 'bar'), null, null),
+                            297 => array(array('_route' => 'foo4'), array('foo'), null, null),
+                            357 => array(array('_route' => 'route13'), array('var1', 'name'), null, null),
+                            375 => array(array('_route' => 'route14', 'var1' => 'val'), array('var1', 'name'), null, null),
+                            425 => array(array('_route' => 'route15'), array('name'), null, null),
+                            460 => array(array('_route' => 'route16', 'var1' => 'val'), array('name'), null, null),
+                            481 => array(array('_route' => 'a'), array(), null, null),
+                            502 => array(array('_route' => 'b'), array('var'), null, null),
+                            520 => array(array('_route' => 'c'), array('var'), null, null),
                         );
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
@@ -251,7 +242,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                                 break;
                             }
 
-                            return array_replace($ret, $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)));
+                            return $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)) + $ret;
                         }
 
                         if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
@@ -262,7 +253,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         return $ret;
                 }
 
-                if (525 === $m) {
+                if (520 === $m) {
                     break;
                 }
                 $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));
@@ -270,6 +261,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             }
         }
 
-        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
+        return null;
     }
 }

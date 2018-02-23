@@ -19,7 +19,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     {
         $allow = array();
         $pathinfo = rawurldecode($rawPathinfo);
-        $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
 
@@ -30,19 +29,19 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $matchedPathinfo = $pathinfo;
         $regexList = array(
             0 => '{^(?'
-                    .'|/abc([^/]++)(?'
-                        .'|/1(?'
+                    .'|/abc([^/]++)/(?'
+                        .'|1(?'
                             .'|(*:27)'
                             .'|0(?'
                                 .'|(*:38)'
                                 .'|0(*:46)'
                             .')'
                         .')'
-                        .'|/2(?'
-                            .'|(*:60)'
+                        .'|2(?'
+                            .'|(*:59)'
                             .'|0(?'
-                                .'|(*:71)'
-                                .'|0(*:79)'
+                                .'|(*:70)'
+                                .'|0(*:78)'
                             .')'
                         .')'
                     .')'
@@ -57,9 +56,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                             27 => array(array('_route' => 'r1'), array('foo'), null, null),
                             38 => array(array('_route' => 'r10'), array('foo'), null, null),
                             46 => array(array('_route' => 'r100'), array('foo'), null, null),
-                            60 => array(array('_route' => 'r2'), array('foo'), null, null),
-                            71 => array(array('_route' => 'r20'), array('foo'), null, null),
-                            79 => array(array('_route' => 'r200'), array('foo'), null, null),
+                            59 => array(array('_route' => 'r2'), array('foo'), null, null),
+                            70 => array(array('_route' => 'r20'), array('foo'), null, null),
+                            78 => array(array('_route' => 'r200'), array('foo'), null, null),
                         );
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
@@ -78,7 +77,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         return $ret;
                 }
 
-                if (79 === $m) {
+                if (78 === $m) {
                     break;
                 }
                 $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));

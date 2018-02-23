@@ -15,11 +15,26 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $this->context = $context;
     }
 
-    public function match($rawPathinfo)
+    public function match($pathinfo)
+    {
+        $allow = array();
+        if ($ret = $this->doMatch($pathinfo, $allow)) {
+            return $ret;
+        }
+        if ('/' !== $pathinfo && in_array($this->context->getMethod(), array('HEAD', 'GET'), true)) {
+            $pathinfo = '/' !== $pathinfo[-1] ? $pathinfo.'/' : substr($pathinfo, 0, -1);
+            if ($ret = $this->doMatch($pathinfo)) {
+                return $this->redirect($pathinfo, $ret['_route']) + $ret;
+            }
+        }
+
+        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
+    }
+
+    private function doMatch(string $rawPathinfo, array &$allow = array()): ?array
     {
         $allow = array();
         $pathinfo = rawurldecode($rawPathinfo);
-        $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
 
@@ -30,32 +45,34 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
         $matchedPathinfo = $pathinfo;
         $regexList = array(
             0 => '{^(?'
-                    .'|/(en|fr)(?'
-                        .'|/admin/post(?'
-                            .'|/?(*:34)'
-                            .'|/new(*:45)'
-                            .'|/(\\d+)(?'
-                                .'|(*:61)'
-                                .'|/edit(*:73)'
-                                .'|/delete(*:87)'
+                    .'|/(en|fr)/(?'
+                        .'|admin/post/(?'
+                            .'|(*:33)'
+                            .'|new(*:43)'
+                            .'|(\\d+)(?'
+                                .'|(*:58)'
+                                .'|/(?'
+                                    .'|edit(*:73)'
+                                    .'|delete(*:86)'
+                                .')'
                             .')'
                         .')'
-                        .'|/blog(?'
-                            .'|/?(*:106)'
-                            .'|/rss\\.xml(*:123)'
-                            .'|/p(?'
-                                .'|age/([^/]++)(*:148)'
-                                .'|osts/([^/]++)(*:169)'
+                        .'|blog/(?'
+                            .'|(*:104)'
+                            .'|rss\\.xml(*:120)'
+                            .'|p(?'
+                                .'|age/([^/]++)(*:144)'
+                                .'|osts/([^/]++)(*:165)'
                             .')'
-                            .'|/comments/(\\d+)/new(*:197)'
-                            .'|/search(*:212)'
+                            .'|comments/(\\d+)/new(*:192)'
+                            .'|search(*:206)'
                         .')'
-                        .'|/log(?'
-                            .'|in(*:230)'
-                            .'|out(*:241)'
+                        .'|log(?'
+                            .'|in(*:223)'
+                            .'|out(*:234)'
                         .')'
                     .')'
-                    .'|/(en|fr)?(*:260)'
+                    .'|/(en|fr)?(*:253)'
                 .')$}sD',
         );
 
@@ -64,20 +81,20 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 switch ($m = (int) $matches['MARK']) {
                     default:
                         $routes = array(
-                            34 => array(array('_route' => 'a', '_locale' => 'en'), array('_locale'), null, null, true),
-                            45 => array(array('_route' => 'b', '_locale' => 'en'), array('_locale'), null, null),
-                            61 => array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null),
+                            33 => array(array('_route' => 'a', '_locale' => 'en'), array('_locale'), null, null),
+                            43 => array(array('_route' => 'b', '_locale' => 'en'), array('_locale'), null, null),
+                            58 => array(array('_route' => 'c', '_locale' => 'en'), array('_locale', 'id'), null, null),
                             73 => array(array('_route' => 'd', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            87 => array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            106 => array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null, true),
-                            123 => array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null),
-                            148 => array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null),
-                            169 => array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null),
-                            197 => array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null),
-                            212 => array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null),
-                            230 => array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null),
-                            241 => array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null),
-                            260 => array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null),
+                            86 => array(array('_route' => 'e', '_locale' => 'en'), array('_locale', 'id'), null, null),
+                            104 => array(array('_route' => 'f', '_locale' => 'en'), array('_locale'), null, null),
+                            120 => array(array('_route' => 'g', '_locale' => 'en'), array('_locale'), null, null),
+                            144 => array(array('_route' => 'h', '_locale' => 'en'), array('_locale', 'page'), null, null),
+                            165 => array(array('_route' => 'i', '_locale' => 'en'), array('_locale', 'page'), null, null),
+                            192 => array(array('_route' => 'j', '_locale' => 'en'), array('_locale', 'id'), null, null),
+                            206 => array(array('_route' => 'k', '_locale' => 'en'), array('_locale'), null, null),
+                            223 => array(array('_route' => 'l', '_locale' => 'en'), array('_locale'), null, null),
+                            234 => array(array('_route' => 'm', '_locale' => 'en'), array('_locale'), null, null),
+                            253 => array(array('_route' => 'n', '_locale' => 'en'), array('_locale'), null, null),
                         );
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
@@ -88,22 +105,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                             }
                         }
 
-                        if (empty($routes[$m][4]) || '/' === $pathinfo[-1]) {
-                            // no-op
-                        } elseif ('GET' !== $canonicalMethod) {
-                            $allow['GET'] = 'GET';
-                            break;
-                        } else {
-                            return array_replace($ret, $this->redirect($rawPathinfo.'/', $ret['_route']));
-                        }
-
                         if ($requiredSchemes && !isset($requiredSchemes[$context->getScheme()])) {
                             if ('GET' !== $canonicalMethod) {
                                 $allow['GET'] = 'GET';
                                 break;
                             }
 
-                            return array_replace($ret, $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)));
+                            return $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)) + $ret;
                         }
 
                         if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
@@ -114,7 +122,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                         return $ret;
                 }
 
-                if (260 === $m) {
+                if (253 === $m) {
                     break;
                 }
                 $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));
@@ -122,6 +130,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             }
         }
 
-        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
+        return null;
     }
 }

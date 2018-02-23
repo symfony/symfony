@@ -180,12 +180,6 @@ class StaticPrefixCollection
                 break;
             }
         }
-        if (1 < $i && '/' === $prefix[$i - 1]) {
-            --$i;
-        }
-        if (null !== $staticLength && 1 < $staticLength && '/' === $prefix[$staticLength - 1]) {
-            --$staticLength;
-        }
 
         return array(substr($prefix, 0, $i), substr($prefix, 0, $staticLength ?? $i));
     }

@@ -236,6 +236,17 @@ DependencyInjection
 
  * The `ExtensionCompilerPass` has been moved to before-optimization passes with priority -1000.
 
+ * In 3.4, parameter `container.dumper.inline_class_loader` was introduced. Unless
+   you're using a custom autoloader, you should enable this parameter. This can
+   drastically improve DX by reducing the time to load classes when the `DebugClassLoader`
+   is enabled. If you're using `FrameworkBundle`, this performance improvement will
+   also impact the "dev" environment:
+
+   ```yml
+   parameters:
+       container.dumper.inline_class_loader: true
+   ```
+
 DoctrineBridge
 --------------
 

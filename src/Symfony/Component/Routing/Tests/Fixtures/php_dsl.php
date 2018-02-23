@@ -16,7 +16,11 @@ return function (RoutingConfigurator $routes) {
         ->requirements(array('id' => '\d+'));
 
     $routes->import('php_dsl_sub.php')
-        ->prefix('/zub', 'z_');
+        ->namePrefix('z_')
+        ->prefix('/zub');
+
+    $routes->import('php_dsl_sub_root.php')
+        ->prefix('/bus', false);
 
     $routes->add('ouf', '/ouf')
         ->schemes(array('https'))

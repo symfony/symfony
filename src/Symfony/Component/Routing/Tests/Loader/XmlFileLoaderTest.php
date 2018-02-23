@@ -411,4 +411,13 @@ class XmlFileLoaderTest extends TestCase
         $this->assertNotNull($routeCollection->get('api_app_blog'));
         $this->assertEquals('/api/blog', $routeCollection->get('api_app_blog')->getPath());
     }
+
+    public function testImportRouteWithNoTrailingSlash()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_no_trailing_slash')));
+        $routeCollection = $loader->load('routing.xml');
+
+        $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());
+        $this->assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
+    }
 }

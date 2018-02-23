@@ -28,7 +28,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root',
     );
     private $yamlParser;
 
@@ -155,6 +155,7 @@ class YamlFileLoader extends FileLoader
         $condition = isset($config['condition']) ? $config['condition'] : null;
         $schemes = isset($config['schemes']) ? $config['schemes'] : null;
         $methods = isset($config['methods']) ? $config['methods'] : null;
+        $trailingSlashOnRoot = $config['trailing_slash_on_root'] ?? true;
 
         if (isset($config['controller'])) {
             $defaults['_controller'] = $config['controller'];
@@ -167,6 +168,14 @@ class YamlFileLoader extends FileLoader
 
         if (!\is_array($prefix)) {
             $subCollection->addPrefix($prefix);
+            if (!$trailingSlashOnRoot) {
+                $rootPath = (new Route(trim(trim($prefix), '/').'/'))->getPath();
+                foreach ($subCollection->all() as $route) {
+                    if ($route->getPath() === $rootPath) {
+                        $route->setPath(rtrim($rootPath, '/'));
+                    }
+                }
+            }
         } else {
             foreach ($prefix as $locale => $localePrefix) {
                 $prefix[$locale] = trim(trim($localePrefix), '/');
@@ -178,13 +187,13 @@ class YamlFileLoader extends FileLoader
                         $localizedRoute = clone $route;
                         $localizedRoute->setDefault('_locale', $locale);
                         $localizedRoute->setDefault('_canonical_route', $name);
-                        $localizedRoute->setPath($localePrefix.$route->getPath());
+                        $localizedRoute->setPath($localePrefix.(!$trailingSlashOnRoot && '/' === $route->getPath() ? '' : $route->getPath()));
                         $subCollection->add($name.'.'.$locale, $localizedRoute);
                     }
                 } elseif (!isset($prefix[$locale])) {
                     throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding prefix when imported in "%s".', $name, $locale, $file));
                 } else {
-                    $route->setPath($prefix[$locale].$route->getPath());
+                    $route->setPath($prefix[$locale].(!$trailingSlashOnRoot && '/' === $route->getPath() ? '' : $route->getPath()));
                     $subCollection->add($name, $route);
                 }
             }

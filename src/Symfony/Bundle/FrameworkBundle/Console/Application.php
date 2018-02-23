@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
+use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -79,11 +80,23 @@ class Application extends BaseApplication
      */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {
-        if ($this->registrationErrors) {
-            $this->renderRegistrationErrors($input, $output);
+        if (!$command instanceof ListCommand) {
+            if ($this->registrationErrors) {
+                $this->renderRegistrationErrors($input, $output);
+                $this->registrationErrors = array();
+            }
+
+            return parent::doRunCommand($command, $input, $output);
         }
 
-        return parent::doRunCommand($command, $input, $output);
+        $returnCode = parent::doRunCommand($command, $input, $output);
+
+        if ($this->registrationErrors) {
+            $this->renderRegistrationErrors($input, $output);
+            $this->registrationErrors = array();
+        }
+
+        return $returnCode;
     }
 
     /**
@@ -192,7 +205,5 @@ class Application extends BaseApplication
         foreach ($this->registrationErrors as $error) {
             $this->doRenderException($error, $output);
         }
-
-        $this->registrationErrors = array();
     }
 }

@@ -485,18 +485,10 @@ class ApplicationTest extends TestCase
         $tester = new ApplicationTester($application);
         $tester->setInputs(array('y'));
         $tester->run(array('command' => 'foos'), array('decorated' => false));
-        $this->assertSame(<<<OUTPUT
-
-                                                                                
- Command "foos" is not defined.                                                 
-                                                                                
-
- Do you want to run "foo" instead?  (yes/no) [no]:
- > 
-called
-
-OUTPUT
-, $tester->getDisplay(true));
+        $display = trim($tester->getDisplay(true));
+        $this->assertContains('Command "foos" is not defined', $display);
+        $this->assertContains('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
+        $this->assertContains('called', $display);
     }
 
     public function testDontRunAlternativeCommandName()
@@ -508,17 +500,9 @@ OUTPUT
         $tester->setInputs(array('n'));
         $exitCode = $tester->run(array('command' => 'foos'), array('decorated' => false));
         $this->assertSame(1, $exitCode);
-        $this->assertSame(<<<OUTPUT
-
-                                                                                
- Command "foos" is not defined.                                                 
-                                                                                
-
- Do you want to run "foo" instead?  (yes/no) [no]:
- > 
-
-OUTPUT
-            , $tester->getDisplay(true));
+        $display = trim($tester->getDisplay(true));
+        $this->assertContains('Command "foos" is not defined', $display);
+        $this->assertContains('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
     }
 
     public function provideInvalidCommandNamesSingle()

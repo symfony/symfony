@@ -56,6 +56,15 @@ DependencyInjection
            autowire: true
     ```
 
+ * Autowiring services based on the types they implement is deprecated and will not be supported anymore in Symfony 4.0
+   where it will only match an alias or a service id that matches then given FQCN. You can opt in the behavior of Symfony
+   4 by the enabling the `container.autowiring.strict_mode` parameter:
+
+   ```yml
+   parameters:
+       container.autowiring.strict_mode: true
+   ```
+
  * Top-level anonymous services in XML are deprecated and will throw an exception in Symfony 4.0.
 
  * Case insensitivity of parameter names is deprecated and will be removed in 4.0.

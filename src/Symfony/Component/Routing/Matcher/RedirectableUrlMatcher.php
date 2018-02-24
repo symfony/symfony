@@ -25,22 +25,21 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
     public function match($pathinfo)
     {
         try {
-            $parameters = parent::match($pathinfo);
+            return parent::match($pathinfo);
         } catch (ResourceNotFoundException $e) {
-            if ('/' === substr($pathinfo, -1) || !in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
+            if ('/' === $pathinfo || !\in_array($this->context->getMethod(), array('HEAD', 'GET'), true)) {
                 throw $e;
             }
 
             try {
-                $parameters = parent::match($pathinfo.'/');
+                $pathinfo = '/' !== $pathinfo[-1] ? $pathinfo.'/' : substr($pathinfo, 0, -1);
+                $ret = parent::match($pathinfo);
 
-                return array_replace($parameters, $this->redirect($pathinfo.'/', isset($parameters['_route']) ? $parameters['_route'] : null));
+                return $this->redirect($pathinfo, $ret['_route'] ?? null) + $ret;
             } catch (ResourceNotFoundException $e2) {
                 throw $e;
             }
         }
-
-        return $parameters;
     }
 
     /**

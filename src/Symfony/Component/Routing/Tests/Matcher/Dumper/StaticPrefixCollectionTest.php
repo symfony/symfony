@@ -48,7 +48,7 @@ EOF
                 ),
                 <<<EOF
 root
-/prefix/segment
+/prefix/segment/
 -> prefix_segment
 -> leading_segment
 EOF
@@ -61,7 +61,7 @@ EOF
                 ),
                 <<<EOF
 root
-/prefix/segment
+/prefix/segment/
 -> prefix_segment
 -> leading_segment
 EOF
@@ -75,7 +75,7 @@ EOF
                 ),
                 <<<EOF
 root
-/group
+/group/
 -> nested_segment
 -> some_segment
 -> other_segment
@@ -92,12 +92,12 @@ EOF
                     array('/group/ff/', 'ff'),
                 ),
                 <<<EOF
-/group
+/group/
 -> aa
 -> bb
 -> cc
 root
-/group
+/group/
 -> dd
 -> ee
 -> ff
@@ -118,17 +118,17 @@ EOF
                     array('/aaa/333/', 'third_aaa'),
                 ),
                 <<<EOF
-/aaa
+/aaa/
 -> first_aaa
 -> second_aaa
 -> third_aaa
-/prefixed
--> /prefixed/group
+/prefixed/
+-> /prefixed/group/
 -> -> aa
 -> -> bb
 -> -> cc
 -> root
--> /prefixed/group
+-> /prefixed/group/
 -> -> dd
 -> -> ee
 -> -> ff

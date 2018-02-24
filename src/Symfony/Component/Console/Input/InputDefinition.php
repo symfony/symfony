@@ -228,6 +228,19 @@ class InputDefinition
      */
     public function addOption(InputOption $option)
     {
+        $this->doAddOption($option);
+
+        if ($option->isNegatable()) {
+            $negatedOption = new NegatedInputOption($option);
+            $this->doAddOption($negatedOption);
+        }
+    }
+
+    /**
+     * @throws LogicException When option given already exist
+     */
+    private function doAddOption(InputOption $option)
+    {
         if (isset($this->options[$option->getName()]) && !$option->equals($this->options[$option->getName()])) {
             throw new LogicException(sprintf('An option named "%s" already exists.', $option->getName()));
         }
@@ -316,7 +329,7 @@ class InputDefinition
     {
         $values = [];
         foreach ($this->options as $option) {
-            $values[$option->getName()] = $option->getDefault();
+            $values[$option->effectiveName()] = $option->getDefault();
         }
 
         return $values;
@@ -351,6 +364,9 @@ class InputDefinition
             $elements[] = '[options]';
         } elseif (!$short) {
             foreach ($this->getOptions() as $option) {
+                if ($option->isHidden()) {
+                    continue;
+                }
                 $value = '';
                 if ($option->acceptValue()) {
                     $value = sprintf(

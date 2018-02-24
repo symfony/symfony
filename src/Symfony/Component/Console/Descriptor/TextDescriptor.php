@@ -56,10 +56,12 @@ class TextDescriptor extends Descriptor
      */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
+        $default = '';
         if ($option->acceptValue() && null !== $option->getDefault() && (!\is_array($option->getDefault()) || \count($option->getDefault()))) {
             $default = sprintf('<comment> [default: %s]</comment>', $this->formatDefaultValue($option->getDefault()));
-        } else {
-            $default = '';
+        } elseif ($option->isNegatable() && (null !== $option->getDefault())) {
+            $negative_default = $option->getDefault() ? '' : 'no-';
+            $default = sprintf('<comment> [default: --%s%s]</comment>', $negative_default, $option->getName());
         }
 
         $value = '';
@@ -72,9 +74,10 @@ class TextDescriptor extends Descriptor
         }
 
         $totalWidth = isset($options['total_width']) ? $options['total_width'] : $this->calculateTotalWidthForOptions([$option]);
+        $negatable = $option->isNegatable() ? '[no-]' : '';
         $synopsis = sprintf('%s%s',
             $option->getShortcut() ? sprintf('-%s, ', $option->getShortcut()) : '    ',
-            sprintf('--%s%s', $option->getName(), $value)
+            sprintf('--%s%s%s', $negatable, $option->getName(), $value)
         );
 
         $spacingWidth = $totalWidth - Helper::strlen($synopsis);
@@ -117,6 +120,9 @@ class TextDescriptor extends Descriptor
 
             $this->writeText('<comment>Options:</comment>', $options);
             foreach ($definition->getOptions() as $option) {
+                if ($option->isHidden()) {
+                    continue;
+                }
                 if (\strlen($option->getShortcut()) > 1) {
                     $laterOptions[] = $option;
                     continue;

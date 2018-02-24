@@ -68,7 +68,8 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
-        $name = '--'.$option->getName();
+        $negatable = $option->isNegatable() ? '[no-]' : '';
+        $name = '--'.$negatable.$option->getName();
         if ($option->getShortcut()) {
             $name .= '|-'.str_replace('|', '|-', $option->getShortcut()).'';
         }
@@ -79,6 +80,7 @@ class MarkdownDescriptor extends Descriptor
             .'* Accept value: '.($option->acceptValue() ? 'yes' : 'no')."\n"
             .'* Is value required: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
             .'* Is multiple: '.($option->isArray() ? 'yes' : 'no')."\n"
+            .'* Is negatable: '.($option->isNegatable() ? 'yes' : 'no')."\n"
             .'* Default: `'.str_replace("\n", '', var_export($option->getDefault(), true)).'`'
         );
     }
@@ -105,6 +107,9 @@ class MarkdownDescriptor extends Descriptor
 
             $this->write('### Options');
             foreach ($definition->getOptions() as $option) {
+                if ($option->isHidden()) {
+                    continue;
+                }
                 $this->write("\n\n");
                 if (null !== $describeInputOption = $this->describeInputOption($option)) {
                     $this->write($describeInputOption);

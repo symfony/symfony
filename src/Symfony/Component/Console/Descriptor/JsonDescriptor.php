@@ -119,6 +119,7 @@ class JsonDescriptor extends Descriptor
             'accept_value' => $option->acceptValue(),
             'is_value_required' => $option->isValueRequired(),
             'is_multiple' => $option->isArray(),
+            'is_negatable' => $option->isNegatable(),
             'description' => preg_replace('/\s*[\r\n]\s*/', ' ', $option->getDescription()),
             'default' => \INF === $option->getDefault() ? 'INF' : $option->getDefault(),
         ];
@@ -133,6 +134,9 @@ class JsonDescriptor extends Descriptor
 
         $inputOptions = [];
         foreach ($definition->getOptions() as $name => $option) {
+            if ($option->isHidden()) {
+                continue;
+            }
             $inputOptions[$name] = $this->getInputOptionData($option);
         }
 

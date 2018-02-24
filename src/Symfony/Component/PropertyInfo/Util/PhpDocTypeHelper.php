@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Util;
 
 use phpDocumentor\Reflection\Type as DocType;
+use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Null_;
 use Symfony\Component\PropertyInfo\Type;
@@ -39,7 +40,7 @@ final class PhpDocTypeHelper
                 $nullable = true;
             }
 
-            $type = $this->createType((string) $varType, $nullable);
+            $type = $this->createType($varType, $nullable);
             if (null !== $type) {
                 $types[] = $type;
             }
@@ -49,16 +50,15 @@ final class PhpDocTypeHelper
 
         $varTypes = array();
         for ($typeIndex = 0; $varType->has($typeIndex); ++$typeIndex) {
-            $varTypes[] = (string) $varType->get($typeIndex);
-        }
+            $type = $varType->get($typeIndex);
 
-        // If null is present, all types are nullable
-        $nullKey = array_search(Type::BUILTIN_TYPE_NULL, $varTypes);
-        $nullable = false !== $nullKey;
+            // If null is present, all types are nullable
+            if ($type instanceof Null_) {
+                $nullable = true;
+                continue;
+            }
 
-        // Remove the null type from the type if other types are defined
-        if ($nullable && count($varTypes) > 1) {
-            unset($varTypes[$nullKey]);
+            $varTypes[] = $type;
         }
 
         foreach ($varTypes as $varType) {
@@ -74,8 +74,24 @@ final class PhpDocTypeHelper
     /**
      * Creates a {@see Type} from a PHPDoc type.
      */
-    private function createType(string $docType, bool $nullable): ?Type
+    private function createType(DocType $type, bool $nullable): ?Type
     {
+        $docType = (string) $type;
+
+        if ($type instanceof Collection) {
+            list($phpType, $class) = $this->getPhpTypeAndClass((string) $type->getFqsen());
+
+            $key = $this->getTypes($type->getKeyType());
+            $value = $this->getTypes($type->getValueType());
+
+            // More than 1 type returned means it is a Compound type, which is
+            // not handled by Type, so better use a null value.
+            $key = 1 === \count($key) ? $key[0] : null;
+            $value = 1 === \count($value) ? $value[0] : null;
+
+            return new Type($phpType, $nullable, $class, true, $key, $value);
+        }
+
         // Cannot guess
         if (!$docType || 'mixed' === $docType) {
             return null;

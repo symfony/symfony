@@ -75,6 +75,21 @@ class Dummy extends ParentDummy
      */
     public $emptyVar;
 
+    /**
+     * @var \Iterator<string>
+     */
+    public $iteratorCollection;
+
+    /**
+     * @var \Iterator<integer,string>
+     */
+    public $iteratorCollectionWithKey;
+
+    /**
+     * @var \Iterator<integer,\Iterator<integer,string>>
+     */
+    public $nestedIterators;
+
     public static function getStatic()
     {
     }

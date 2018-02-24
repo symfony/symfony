@@ -397,7 +397,12 @@ class SymfonyStyle extends OutputStyle
                 $message = OutputFormatter::escape($message);
             }
 
-            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - $prefixLength - $indentLength, PHP_EOL, true)));
+            $length = $this->lineLength;
+            if (preg_match('(<\/.+>)', $message, $match)) {
+                $length += \strlen($match[0]); // this counts the number of character in order to be sure that it's not at the end of the line
+            }
+
+            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $length - $prefixLength - $indentLength, PHP_EOL, true)));
 
             if (count($messages) > 1 && $key < count($messages) - 1) {
                 $lines[] = '';
@@ -417,7 +422,7 @@ class SymfonyStyle extends OutputStyle
             }
 
             $line = $prefix.$line;
-            $line .= str_repeat(' ', $this->lineLength - Helper::strlenWithoutDecoration($this->getFormatter(), $line));
+            $line .= \str_repeat(' ', $length - Helper::strlenWithoutDecoration($this->getFormatter(), $line));
 
             if ($style) {
                 $line = sprintf('<%s>%s</>', $style, $line);

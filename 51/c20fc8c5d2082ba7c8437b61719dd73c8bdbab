@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-02-14T18:19:58Z
+
+and we should actually change it in 3.4, supporting *both* `app.php` and `index.php`, as 3.4 supports both Flex and the standard-edition
+
+---------------------------------------------------------------------------
+
+by jenaye at 2018-02-21T11:33:52Z
+
+hi @stof  thanks for u're review, you want something like this ?
+`/((app.php)|(index|app?(_dev)?)?\.php)?.(_wdt)/`
+
+![capture d ecran 2018-02-21 a 12 30 33](https://user-images.githubusercontent.com/15458329/36477947-3d443d9c-1703-11e8-8fe1-81d7701bb15c.png)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-21T13:07:16Z
+
+it matches `appxphpx_wdt` as well :)
+
+try something like
+
+```
+^/((?:index|app(_[\w]+)?)\.php/)?_wdt
+```
+
+![image](https://user-images.githubusercontent.com/1047696/36481549-7456e804-1710-11e8-860a-084651e2fb55.png)
+
+---------------------------------------------------------------------------
+
+by jenaye at 2018-02-21T13:51:58Z
+
+@ro0NL thanks, i tried with  `app_dev.php` `index.php` and  `app.php`and  it works fine
+i'll update documentation PR and unit test soon
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-24T10:52:49Z
+
+For 3.4 i guess

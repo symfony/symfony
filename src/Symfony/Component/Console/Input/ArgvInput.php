@@ -214,6 +214,9 @@ class ArgvInput extends Input
     private function addLongOption($name, $value)
     {
         if (!$this->definition->hasOption($name)) {
+            if ($this->addNegativeBinaryLongOption($name, $value)) {
+                return;
+            }
             throw new RuntimeException(sprintf('The "--%s" option does not exist.', $name));
         }
 
@@ -249,6 +252,36 @@ class ArgvInput extends Input
         } else {
             $this->options[$name] = $value;
         }
+    }
+
+    /**
+     * Adds a long option value.
+     *
+     * @param string $name  The long option key
+     * @param mixed  $value The value for the option
+     *
+     * @return boolean if negative option was found and added
+     */
+    private function addNegativeBinaryLongOption($name, $value)
+    {
+        // Negative binary options always start with 'no-'.
+        if ('no-' != substr($name, 0, 3)) {
+            return false;
+        }
+        $binary_option_name = substr($name, 3);
+        if (!$this->definition->hasOption($binary_option_name)) {
+            return false;
+        }
+
+        $option = $this->definition->getOption($binary_option_name);
+        if (!$option->isNegatable()) {
+            return false;
+        }
+        if (null !== $value && !$option->acceptValue()) {
+            throw new RuntimeException(sprintf('The "--%s" option does not accept a value.', $name));
+        }
+        $this->options[$binary_option_name] = false;
+        return true;
     }
 
     /**

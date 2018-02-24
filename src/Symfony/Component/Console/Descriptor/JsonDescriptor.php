@@ -125,6 +125,7 @@ class JsonDescriptor extends Descriptor
             'accept_value' => $option->acceptValue(),
             'is_value_required' => $option->isValueRequired(),
             'is_multiple' => $option->isArray(),
+            'is_negatable' => $option->isNegatable(),
             'description' => preg_replace('/\s*[\r\n]\s*/', ' ', $option->getDescription()),
             'default' => INF === $option->getDefault() ? 'INF' : $option->getDefault(),
         );

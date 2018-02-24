@@ -225,6 +225,7 @@ class XmlDescriptor extends Descriptor
         $objectXML->setAttribute('accept_value', $option->acceptValue() ? 1 : 0);
         $objectXML->setAttribute('is_value_required', $option->isValueRequired() ? 1 : 0);
         $objectXML->setAttribute('is_multiple', $option->isArray() ? 1 : 0);
+        $objectXML->setAttribute('is_negatable', $option->isNegatable() ? 1 : 0);
         $objectXML->appendChild($descriptionXML = $dom->createElement('description'));
         $descriptionXML->appendChild($dom->createTextNode($option->getDescription()));
 

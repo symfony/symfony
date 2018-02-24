@@ -25,6 +25,8 @@ class InputOption
     const VALUE_REQUIRED = 2;
     const VALUE_OPTIONAL = 4;
     const VALUE_IS_ARRAY = 8;
+    const VALUE_NEGATABLE = 16;
+    const VALUE_BINARY = (self::VALUE_NONE | self::VALUE_NEGATABLE);
 
     private $name;
     private $shortcut;
@@ -70,7 +72,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif ($mode > 15 || $mode < 1) {
+        } elseif ($mode > 31 || $mode < 1) {
             throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -147,6 +149,28 @@ class InputOption
     }
 
     /**
+     * Returns true if the option is negatable (option --foo can be forced
+     * to 'false' via the --no-foo option).
+     *
+     * @return bool true if mode is self::VALUE_NEGATABLE, false otherwise
+     */
+    public function isNegatable()
+    {
+        return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
+    }
+
+    /**
+     * Returns true if the option is binary (can be --foo or --no-foo, and
+     * nothing else).
+     *
+     * @return bool true if negatable and does not have a value.
+     */
+    public function isBinary()
+    {
+        return $this->isNegatable() && !$this->acceptValue();
+    }
+
+    /**
      * Sets the default value.
      *
      * @param mixed $default The default value
@@ -155,7 +179,7 @@ class InputOption
      */
     public function setDefault($default = null)
     {
-        if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
+        if (self::VALUE_NONE === ((self::VALUE_NONE | self::VALUE_NEGATABLE) & $this->mode) && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
         }
 
@@ -167,7 +191,7 @@ class InputOption
             }
         }
 
-        $this->default = $this->acceptValue() ? $default : false;
+        $this->default = ($this->acceptValue() || $this->isNegatable()) ? $default : false;
     }
 
     /**
@@ -200,6 +224,7 @@ class InputOption
         return $option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()
             && $option->getDefault() === $this->getDefault()
+            && $option->isBinary() === $this->isBinary()
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()

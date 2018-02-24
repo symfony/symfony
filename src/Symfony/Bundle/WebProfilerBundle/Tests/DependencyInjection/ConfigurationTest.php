@@ -57,8 +57,8 @@ class ConfigurationTest extends TestCase
     public function getPositionConfig()
     {
         return array(
-            array(array('position' => 'top'), array('intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt', 'position' => 'top')),
-            array(array('position' => 'bottom'), array('intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/(app(_[\\w]+)?\\.php/)?_wdt', 'position' => 'bottom')),
+            array(array('position' => 'top'), array('intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt', 'position' => 'top')),
+            array(array('position' => 'bottom'), array('intercept_redirects' => false, 'toolbar' => false, 'excluded_ajax_paths' => '^/((index|app(_[\w]+)?)\.php/)?_wdt', 'position' => 'bottom')),
         );
     }
 }

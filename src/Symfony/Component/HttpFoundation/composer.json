@@ -21,18 +21,20 @@
     },
     "require-dev": {
         "predis/predis": "~1.0",
-        "symfony/expression-language": "~3.4|~4.0"
+        "symfony/expression-language": "~3.4 || ~4.0"
     },
-    "autoload": {
-        "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },
-        "exclude-from-classmap": [
-            "/Tests/"
-        ]
-    },
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "4.1-dev"
         }
-    }
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\HttpFoundation\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
 }

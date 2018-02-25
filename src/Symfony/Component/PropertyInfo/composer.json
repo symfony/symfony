@@ -24,36 +24,38 @@
     ],
     "require": {
         "php": "^7.1.3",
-        "symfony/inflector": "~3.4|~4.0"
-    },
-    "require-dev": {
-        "symfony/serializer": "~3.4|~4.0",
-        "symfony/cache": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
-        "phpdocumentor/reflection-docblock": "^3.0|^4.0",
-        "doctrine/annotations": "~1.0"
+        "symfony/inflector": "~3.4 || ~4.0"
     },
     "conflict": {
-        "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
+        "phpdocumentor/reflection-docblock": "<3.0 || >=3.2.0,<3.2.2",
         "phpdocumentor/type-resolver": "<0.2.1",
         "symfony/dependency-injection": "<3.4"
     },
+    "require-dev": {
+        "doctrine/annotations": "~1.0",
+        "phpdocumentor/reflection-docblock": "^3.0 || ^4.0",
+        "symfony/cache": "~3.4 || ~4.0",
+        "symfony/dependency-injection": "~3.4 || ~4.0",
+        "symfony/serializer": "~3.4 || ~4.0"
+    },
     "suggest": {
+        "phpdocumentor/reflection-docblock": "To use the PHPDoc",
         "psr/cache-implementation": "To cache results",
         "symfony/doctrine-bridge": "To use Doctrine metadata",
-        "phpdocumentor/reflection-docblock": "To use the PHPDoc",
         "symfony/serializer": "To use Serializer metadata"
     },
-    "autoload": {
-        "psr-4": { "Symfony\\Component\\PropertyInfo\\": "" },
-        "exclude-from-classmap": [
-            "/Tests/"
-        ]
-    },
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "4.1-dev"
         }
-    }
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\PropertyInfo\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
 }

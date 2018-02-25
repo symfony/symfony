@@ -20,21 +20,23 @@
         "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/css-selector": "~3.4|~4.0"
+        "symfony/css-selector": "~3.4 || ~4.0"
     },
     "suggest": {
         "symfony/css-selector": ""
     },
-    "autoload": {
-        "psr-4": { "Symfony\\Component\\DomCrawler\\": "" },
-        "exclude-from-classmap": [
-            "/Tests/"
-        ]
-    },
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "4.1-dev"
         }
-    }
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\DomCrawler\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
 }

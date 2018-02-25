@@ -17,41 +17,43 @@
     ],
     "require": {
         "php": "^7.1.3",
-        "symfony/config": "~3.4|~4.0",
-        "symfony/twig-bridge": "^3.4.3|^4.0.3",
-        "symfony/http-foundation": "~3.4|~4.0",
-        "symfony/http-kernel": "~3.4|~4.0",
-        "twig/twig": "~1.34|~2.4"
-    },
-    "require-dev": {
-        "symfony/asset": "~3.4|~4.0",
-        "symfony/stopwatch": "~3.4|~4.0",
-        "symfony/dependency-injection": "~3.4|~4.0",
-        "symfony/expression-language": "~3.4|~4.0",
-        "symfony/finder": "~3.4|~4.0",
-        "symfony/form": "~3.4|~4.0",
-        "symfony/routing": "~3.4|~4.0",
-        "symfony/templating": "~3.4|~4.0",
-        "symfony/yaml": "~3.4|~4.0",
-        "symfony/framework-bundle": "~3.4|~4.0",
-        "symfony/web-link": "~3.4|~4.0",
-        "doctrine/annotations": "~1.0",
-        "doctrine/cache": "~1.0"
+        "symfony/config": "~3.4 || ~4.0",
+        "symfony/http-foundation": "~3.4 || ~4.0",
+        "symfony/http-kernel": "~3.4 || ~4.0",
+        "symfony/twig-bridge": "^3.4.3 || ^4.0.3",
+        "twig/twig": "~1.34 || ~2.4"
     },
     "conflict": {
         "symfony/dependency-injection": "<3.4",
         "symfony/event-dispatcher": "<3.4"
     },
-    "autoload": {
-        "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },
-        "exclude-from-classmap": [
-            "/Tests/"
-        ]
+    "require-dev": {
+        "doctrine/annotations": "~1.0",
+        "doctrine/cache": "~1.0",
+        "symfony/asset": "~3.4 || ~4.0",
+        "symfony/dependency-injection": "~3.4 || ~4.0",
+        "symfony/expression-language": "~3.4 || ~4.0",
+        "symfony/finder": "~3.4 || ~4.0",
+        "symfony/form": "~3.4 || ~4.0",
+        "symfony/framework-bundle": "~3.4 || ~4.0",
+        "symfony/routing": "~3.4 || ~4.0",
+        "symfony/stopwatch": "~3.4 || ~4.0",
+        "symfony/templating": "~3.4 || ~4.0",
+        "symfony/web-link": "~3.4 || ~4.0",
+        "symfony/yaml": "~3.4 || ~4.0"
     },
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "4.1-dev"
         }
-    }
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Bundle\\TwigBundle\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
 }

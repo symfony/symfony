@@ -186,7 +186,7 @@ class NodeBuilder implements NodeParentInterface
      */
     public function append(NodeDefinition $node)
     {
-        if ($node instanceof ParentNodeDefinitionInterface) {
+        if ($node instanceof BuilderAwareInterface) {
             $builder = clone $this;
             $builder->setParent(null);
             $node->setBuilder($builder);

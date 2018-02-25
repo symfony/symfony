@@ -9,6 +9,8 @@ CHANGELOG
  * Allowed the `Router` to work with any PSR-11 container
  * Added option in workflow dump command to label graph with a custom label
  * Using a `RouterInterface` that does not implement the `WarmableInterface` is deprecated.
+ * Warming up a router in `RouterCacheWarmer` that does not implement the `WarmableInterface` is deprecated and will not
+   be supported anymore in 5.0.
  * The `RequestDataCollector` class has been deprecated. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
  * The `RedirectController` class allows for 307/308 HTTP status codes
  * Deprecated `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead where `serviceOrFqcn`

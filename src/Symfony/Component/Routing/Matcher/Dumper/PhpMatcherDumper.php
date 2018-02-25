@@ -264,7 +264,6 @@ EOF;
             if ('/' === substr(\$pathinfo, -1)) {
                 // no-op
             } elseif (!in_array(\$this->context->getMethod(), array('HEAD', 'GET'))) {
-                \$allow[] = 'GET';
                 goto $gotoname;
             } else {
                 return \$this->redirect(\$rawPathinfo.'/', '$name');
@@ -283,7 +282,6 @@ EOF;
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
                 if (!in_array(\$this->context->getMethod(), array('HEAD', 'GET'))) {
-                    \$allow[] = 'GET';
                     goto $gotoname;
                 }
 

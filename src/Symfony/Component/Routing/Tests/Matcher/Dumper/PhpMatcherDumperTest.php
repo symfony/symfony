@@ -46,24 +46,6 @@ class PhpMatcherDumperTest extends TestCase
         @unlink($this->dumpPath);
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
-    {
-        $collection = new RouteCollection();
-        $collection->add('secure', new Route(
-            '/secure',
-            array(),
-            array(),
-            array(),
-            '',
-            array('https')
-        ));
-        $dumper = new PhpMatcherDumper($collection);
-        $dumper->dump();
-    }
-
     public function testRedirectPreservesUrlEncoding()
     {
         $collection = new RouteCollection();

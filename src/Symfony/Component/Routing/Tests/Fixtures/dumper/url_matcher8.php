@@ -17,7 +17,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
     public function match($rawPathinfo)
     {
-        $allow = array();
+        $allow = $allowSchemes = array();
         $pathinfo = rawurldecode($rawPathinfo);
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
@@ -57,8 +57,15 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                             }
                         }
 
+                        $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
                         if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
-                            $allow += $requiredMethods;
+                            if ($hasRequiredScheme) {
+                                $allow += $requiredMethods;
+                            }
+                            break;
+                        }
+                        if (!$hasRequiredScheme) {
+                            $allowSchemes += $requiredSchemes;
                             break;
                         }
 

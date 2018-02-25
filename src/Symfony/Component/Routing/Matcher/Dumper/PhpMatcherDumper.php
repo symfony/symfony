@@ -29,7 +29,6 @@ class PhpMatcherDumper extends MatcherDumper
 {
     private $expressionLanguage;
     private $signalingException;
-    private $supportsRedirections;
 
     /**
      * @var ExpressionFunctionProviderInterface[]
@@ -57,7 +56,7 @@ class PhpMatcherDumper extends MatcherDumper
 
         // trailing slash support is only enabled if we know how to redirect the user
         $interfaces = class_implements($options['base_class']);
-        $this->supportsRedirections = isset($interfaces[RedirectableUrlMatcherInterface::class]);
+        $supportsRedirections = isset($interfaces[RedirectableUrlMatcherInterface::class]);
 
         return <<<EOF
 <?php
@@ -77,7 +76,7 @@ class {$options['class']} extends {$options['base_class']}
         \$this->context = \$context;
     }
 
-{$this->generateMatchMethod()}
+{$this->generateMatchMethod($supportsRedirections)}
 }
 
 EOF;
@@ -91,7 +90,7 @@ EOF;
     /**
      * Generates the code for the match method implementing UrlMatcherInterface.
      */
-    private function generateMatchMethod(): string
+    private function generateMatchMethod(bool $supportsRedirections): string
     {
         // Group hosts by same-suffix, re-order when possible
         $matchHost = false;
@@ -111,7 +110,7 @@ EOF;
 
         $code = <<<EOF
     {
-        \$allow = array();
+        \$allow = \$allowSchemes = array();
         \$pathinfo = rawurldecode(\$rawPathinfo);
         \$context = \$this->context;
         \$requestMethod = \$canonicalMethod = \$context->getMethod();
@@ -124,25 +123,44 @@ $code
 
 EOF;
 
-        if ($this->supportsRedirections) {
+        if ($supportsRedirections) {
             return <<<'EOF'
     public function match($pathinfo)
     {
-        $allow = array();
-        if ($ret = $this->doMatch($pathinfo, $allow)) {
+        $allow = $allowSchemes = array();
+        if ($ret = $this->doMatch($pathinfo, $allow, $allowSchemes)) {
             return $ret;
         }
-        if ('/' !== $pathinfo && in_array($this->context->getMethod(), array('HEAD', 'GET'), true)) {
+        if ($allow) {
+            throw new MethodNotAllowedException(array_keys($allow));
+        }
+        if (!in_array($this->context->getMethod(), array('HEAD', 'GET'), true)) {
+            // no-op
+        } elseif ($allowSchemes) {
+            redirect_scheme:
+            $scheme = $this->context->getScheme();
+            $this->context->setScheme(key($allowSchemes));
+            try {
+                if ($ret = $this->doMatch($pathinfo)) {
+                    return $this->redirect($pathinfo, $ret['_route'], $this->context->getScheme()) + $ret;
+                }
+            } finally {
+                $this->context->setScheme($scheme);
+            }
+        } elseif ('/' !== $pathinfo) {
             $pathinfo = '/' !== $pathinfo[-1] ? $pathinfo.'/' : substr($pathinfo, 0, -1);
-            if ($ret = $this->doMatch($pathinfo)) {
+            if ($ret = $this->doMatch($pathinfo, $allow, $allowSchemes)) {
                 return $this->redirect($pathinfo, $ret['_route']) + $ret;
+            }
+            if ($allowSchemes) {
+                goto redirect_scheme;
             }
         }
 
-        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
+        throw new ResourceNotFoundException();
     }
 
-    private function doMatch(string $rawPathinfo, array &$allow = array()): ?array
+    private function doMatch(string $rawPathinfo, array &$allow = array(), array &$allowSchemes = array()): ?array
 
 EOF
                 .$code."\n        return null;\n    }";
@@ -238,9 +256,6 @@ EOF
                 }
 
                 if (!$route->getCondition()) {
-                    if (!$this->supportsRedirections && $route->getSchemes()) {
-                        throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
-                    }
                     $default .= sprintf(
                         "%s => array(%s, %s, %s, %s),\n",
                         self::export($url),
@@ -535,8 +550,8 @@ EOF;
         } else {
             $code = '';
         }
-        if ($this->supportsRedirections) {
-            $code .= <<<EOF
+
+        $code .= <<<EOF
 
             \$hasRequiredScheme = !\$requiredSchemes || isset(\$requiredSchemes[\$context->getScheme()]);
             if (\$requiredMethods && !isset(\$requiredMethods[\$canonicalMethod]) && !isset(\$requiredMethods[\$requestMethod])) {
@@ -546,28 +561,13 @@ EOF;
                 break;
             }
             if (!\$hasRequiredScheme) {
-                if ('GET' !== \$canonicalMethod) {
-                    break;
-                }
-
-                return \$this->redirect(\$rawPathinfo, \$ret['_route'], key(\$requiredSchemes)) + \$ret;
-            }
-
-            return \$ret;
-
-EOF;
-        } else {
-            $code .= <<<EOF
-
-            if (\$requiredMethods && !isset(\$requiredMethods[\$canonicalMethod]) && !isset(\$requiredMethods[\$requestMethod])) {
-                \$allow += \$requiredMethods;
+                \$allowSchemes += \$requiredSchemes;
                 break;
             }
 
             return \$ret;
 
 EOF;
-        }
 
         return $code;
     }
@@ -647,9 +647,6 @@ EOF;
         }
 
         if ($schemes = $route->getSchemes()) {
-            if (!$this->supportsRedirections) {
-                throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
-            }
             $schemes = self::export(array_flip($schemes));
             if ($methods) {
                 $code .= <<<EOF
@@ -662,11 +659,8 @@ EOF;
                 goto $gotoname;
             }
             if (!\$hasRequiredScheme) {
-                if ('GET' !== \$canonicalMethod) {
-                    goto $gotoname;
-                }
-
-                return \$this->redirect(\$rawPathinfo, '$name', key(\$requiredSchemes)) + \$ret;
+                \$allowSchemes += \$requiredSchemes;
+                goto $gotoname;
             }
 
 
@@ -675,11 +669,8 @@ EOF;
                 $code .= <<<EOF
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$context->getScheme()])) {
-                if ('GET' !== \$canonicalMethod) {
-                    goto $gotoname;
-                }
-
-                return \$this->redirect(\$rawPathinfo, '$name', key(\$requiredSchemes)) + \$ret;
+                \$allowSchemes += \$requiredSchemes;
+                goto $gotoname;
             }
 
 

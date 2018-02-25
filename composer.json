@@ -2,7 +2,9 @@
     "name": "symfony/symfony",
     "type": "library",
     "description": "The Symfony PHP framework",
-    "keywords": ["framework"],
+    "keywords": [
+        "framework"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -20,7 +22,6 @@
         "ext-xml": "*",
         "doctrine/common": "~2.4",
         "fig/link-util": "^1.0",
-        "twig/twig": "^1.35|^2.4.4",
         "psr/cache": "~1.0",
         "psr/container": "^1.0",
         "psr/link": "^1.0",
@@ -28,7 +29,8 @@
         "psr/simple-cache": "^1.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php72": "~1.5"
+        "symfony/polyfill-php72": "~1.5",
+        "twig/twig": "^1.35 || ^2.4.4"
     },
     "replace": {
         "symfony/asset": "self.version",
@@ -37,9 +39,9 @@
         "symfony/config": "self.version",
         "symfony/console": "self.version",
         "symfony/css-selector": "self.version",
-        "symfony/dependency-injection": "self.version",
         "symfony/debug": "self.version",
         "symfony/debug-bundle": "self.version",
+        "symfony/dependency-injection": "self.version",
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
         "symfony/dotenv": "self.version",
@@ -63,11 +65,11 @@
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",
+        "symfony/security-bundle": "self.version",
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",
         "symfony/security-guard": "self.version",
         "symfony/security-http": "self.version",
-        "symfony/security-bundle": "self.version",
         "symfony/serializer": "self.version",
         "symfony/stopwatch": "self.version",
         "symfony/templating": "self.version",
@@ -82,24 +84,8 @@
         "symfony/workflow": "self.version",
         "symfony/yaml": "self.version"
     },
-    "require-dev": {
-        "cache/integration-tests": "dev-master",
-        "doctrine/annotations": "~1.0",
-        "doctrine/cache": "~1.6",
-        "doctrine/data-fixtures": "1.0.*",
-        "doctrine/dbal": "~2.4",
-        "doctrine/orm": "~2.4,>=2.4.5",
-        "doctrine/doctrine-bundle": "~1.4",
-        "monolog/monolog": "~1.11",
-        "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
-        "predis/predis": "~1.0",
-        "egulias/email-validator": "~1.2,>=1.2.8|~2.0",
-        "symfony/phpunit-bridge": "~3.4|~4.0",
-        "symfony/security-acl": "~2.8|~3.0",
-        "phpdocumentor/reflection-docblock": "^3.0|^4.0"
-    },
     "conflict": {
-        "phpdocumentor/reflection-docblock": "<3.0||>=3.2.0,<3.2.2",
+        "phpdocumentor/reflection-docblock": "<3.0 || >=3.2.0,<3.2.2",
         "phpdocumentor/type-resolver": "<0.2.1",
         "phpunit/phpunit": "<5.4.3"
     },
@@ -108,6 +94,27 @@
         "psr/container-implementation": "1.0",
         "psr/log-implementation": "1.0",
         "psr/simple-cache-implementation": "1.0"
+    },
+    "require-dev": {
+        "cache/integration-tests": "dev-master",
+        "doctrine/annotations": "~1.0",
+        "doctrine/cache": "~1.6",
+        "doctrine/data-fixtures": "1.0.*",
+        "doctrine/dbal": "~2.4",
+        "doctrine/doctrine-bundle": "~1.4",
+        "doctrine/orm": "~2.4,>=2.4.5",
+        "egulias/email-validator": "~1.2,>=1.2.8 || ~2.0",
+        "monolog/monolog": "~1.11",
+        "ocramius/proxy-manager": "~0.4 || ~1.0 || ~2.0",
+        "phpdocumentor/reflection-docblock": "^3.0 || ^4.0",
+        "predis/predis": "~1.0",
+        "symfony/phpunit-bridge": "~3.4 || ~4.0",
+        "symfony/security-acl": "~2.8 || ~3.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "4.1-dev"
+        }
     },
     "autoload": {
         "psr-4": {
@@ -126,12 +133,9 @@
         ]
     },
     "autoload-dev": {
-        "files": [ "src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
+        "files": [
+            "src/Symfony/Component/VarDumper/Resources/functions/dump.php"
+        ]
     },
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "4.1-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }

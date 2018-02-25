@@ -12,13 +12,11 @@
 namespace Symfony\Component\Config\Definition\Builder;
 
 /**
- * An interface that must be implemented by nodes which can have children.
+ * An interface that can be implemented by nodes which build other nodes.
  *
- * @author Victor Berchet <victor@suumit.com>
+ * @author Roland Franssen <franssen.roland@gmail.com>
  */
-interface ParentNodeDefinitionInterface extends BuilderAwareInterface
+interface BuilderAwareInterface
 {
-    public function children();
-
-    public function append(NodeDefinition $node);
+    public function setBuilder(NodeBuilder $builder);
 }

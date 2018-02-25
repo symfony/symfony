@@ -748,9 +748,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         // See validateClassNode()
         $cascadedGroups = null !== $cascadedGroups && count($cascadedGroups) > 0 ? $cascadedGroups : $groups;
 
+//        if (is_array($value) || $value instanceof \IteratorAggregate) {
         if (is_array($value)) {
-            // Arrays are always traversed, independent of the specified
-            // traversal strategy
+            // Arrays and instance of IteratorAggregate are always traversed, independent of the
+            // specified traversal strategy
             // (BC with Symfony < 2.5)
             $this->validateEachObjectIn(
                 $value,

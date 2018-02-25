@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\All;
@@ -19,6 +20,9 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Tests\Fixtures\Timer;
+use Symfony\Component\Validator\Tests\Fixtures\TimerCollection;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\ValidationVisitor;
 
 /**
@@ -326,6 +330,27 @@ class LegacyExecutionContextTest extends TestCase
         }
 
         $this->assertEquals($expectedViolationPaths, $violationPaths);
+    }
+
+    public function testGetPropertyPathWithNestedCollectionsAndAllMixedWithIteratorAggregate()
+    {
+        $data = new TimerCollection(array(
+            new Timer(null),
+            new Timer('PT10M'),
+            new Timer(null),
+        ));
+
+        $validator = Validation::createValidatorBuilder()->getValidator();
+        $metadata = $validator->getMetadataFor('Symfony\Component\Validator\Tests\Fixtures\Timer');
+        $metadata->addPropertyConstraint('duration', new NotBlank());
+
+        $violationPaths = array();
+
+        foreach ($validator->validate($data) as $violation) {
+            $violationPaths[] = $violation->getPropertyPath();
+        }
+
+        $this->assertSame(array('[0].duration', '[2].duration'), $violationPaths);
     }
 }
 

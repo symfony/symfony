@@ -64,6 +64,10 @@
             <tag name="console.command" command="debug:event-dispatcher" />
         </service>
 
+        <service id="console.command.repl" class="Symfony\Bundle\FrameworkBundle\Command\ReplCommand">
+            <tag name="console.command" command="repl" />
+        </service>
+
         <service id="console.command.router_debug" class="Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand">
             <argument type="service" id="router" />
             <tag name="console.command" command="debug:router" />

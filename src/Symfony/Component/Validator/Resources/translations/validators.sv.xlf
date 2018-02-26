@@ -314,6 +314,10 @@
                 <source>This is not a valid Business Identifier Code (BIC).</source>
                 <target>Detta är inte en giltig BIC-kod.</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Fel</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

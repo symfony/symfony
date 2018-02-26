@@ -41,7 +41,7 @@
         "symfony/doctrine-bridge": "<2.7",
         "symfony/framework-bundle": "<3.4",
         "symfony/http-kernel": "<3.3.5",
-        "symfony/twig-bridge": "<3.4"
+        "symfony/twig-bridge": "<3.4.5|<4.0.5,>=4.0"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

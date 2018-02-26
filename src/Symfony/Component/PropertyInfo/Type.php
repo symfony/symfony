@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyInfo;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
 class Type
 {

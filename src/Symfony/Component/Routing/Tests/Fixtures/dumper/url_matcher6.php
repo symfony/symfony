@@ -19,7 +19,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     {
         $allow = array();
         $pathinfo = rawurldecode($rawPathinfo);
-        $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
 
@@ -56,17 +55,17 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $matchedPathinfo = $pathinfo;
         $regexList = array(
             0 => '{^(?'
-                    .'|/trailing/regex(?'
-                        .'|/no\\-methods/([^/]++)/(*:47)'
-                        .'|/get\\-method/([^/]++)/(*:76)'
-                        .'|/head\\-method/([^/]++)/(*:106)'
-                        .'|/post\\-method/([^/]++)/(*:137)'
+                    .'|/trailing/regex/(?'
+                        .'|no\\-methods/([^/]++)/(*:47)'
+                        .'|get\\-method/([^/]++)/(*:75)'
+                        .'|head\\-method/([^/]++)/(*:104)'
+                        .'|post\\-method/([^/]++)/(*:134)'
                     .')'
-                    .'|/not\\-trailing/regex(?'
-                        .'|/no\\-methods/([^/]++)(*:190)'
-                        .'|/get\\-method/([^/]++)(*:219)'
-                        .'|/head\\-method/([^/]++)(*:249)'
-                        .'|/post\\-method/([^/]++)(*:279)'
+                    .'|/not\\-trailing/regex/(?'
+                        .'|no\\-methods/([^/]++)(*:187)'
+                        .'|get\\-method/([^/]++)(*:215)'
+                        .'|head\\-method/([^/]++)(*:244)'
+                        .'|post\\-method/([^/]++)(*:273)'
                     .')'
                 .')$}sD',
         );
@@ -77,13 +76,13 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                     default:
                         $routes = array(
                             47 => array(array('_route' => 'regex_trailing_slash_no_methods'), array('param'), null, null),
-                            76 => array(array('_route' => 'regex_trailing_slash_GET_method'), array('param'), array('GET' => 0), null),
-                            106 => array(array('_route' => 'regex_trailing_slash_HEAD_method'), array('param'), array('HEAD' => 0), null),
-                            137 => array(array('_route' => 'regex_trailing_slash_POST_method'), array('param'), array('POST' => 0), null),
-                            190 => array(array('_route' => 'regex_not_trailing_slash_no_methods'), array('param'), null, null),
-                            219 => array(array('_route' => 'regex_not_trailing_slash_GET_method'), array('param'), array('GET' => 0), null),
-                            249 => array(array('_route' => 'regex_not_trailing_slash_HEAD_method'), array('param'), array('HEAD' => 0), null),
-                            279 => array(array('_route' => 'regex_not_trailing_slash_POST_method'), array('param'), array('POST' => 0), null),
+                            75 => array(array('_route' => 'regex_trailing_slash_GET_method'), array('param'), array('GET' => 0), null),
+                            104 => array(array('_route' => 'regex_trailing_slash_HEAD_method'), array('param'), array('HEAD' => 0), null),
+                            134 => array(array('_route' => 'regex_trailing_slash_POST_method'), array('param'), array('POST' => 0), null),
+                            187 => array(array('_route' => 'regex_not_trailing_slash_no_methods'), array('param'), null, null),
+                            215 => array(array('_route' => 'regex_not_trailing_slash_GET_method'), array('param'), array('GET' => 0), null),
+                            244 => array(array('_route' => 'regex_not_trailing_slash_HEAD_method'), array('param'), array('HEAD' => 0), null),
+                            273 => array(array('_route' => 'regex_not_trailing_slash_POST_method'), array('param'), array('POST' => 0), null),
                         );
 
                         list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
@@ -102,7 +101,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                         return $ret;
                 }
 
-                if (279 === $m) {
+                if (273 === $m) {
                     break;
                 }
                 $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));

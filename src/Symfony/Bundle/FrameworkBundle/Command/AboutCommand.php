@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
  *
- * @final since version 3.4
+ * @final
  */
 class AboutCommand extends Command
 {

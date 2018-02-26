@@ -17,9 +17,30 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  * Argon2iPasswordEncoder uses the Argon2i hashing algorithm.
  *
  * @author Zan Baldwin <hello@zanbaldwin.com>
+ * @author Dominik Müller <dominik.mueller@jkweb.ch>
  */
 class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEncoderInterface
 {
+    private $config = array();
+
+    /**
+     * Argon2iPasswordEncoder constructor.
+     *
+     * @param int|null $memoryCost memory usage of the algorithm
+     * @param int|null $timeCost   number of iterations
+     * @param int|null $threads    number of parallel threads
+     */
+    public function __construct(int $memoryCost = null, int $timeCost = null, int $threads = null)
+    {
+        if (\defined('PASSWORD_ARGON2I')) {
+            $this->config = array(
+                'memory_cost' => $memoryCost ?? \PASSWORD_ARGON2_DEFAULT_MEMORY_COST,
+                'time_cost' => $timeCost ?? \PASSWORD_ARGON2_DEFAULT_TIME_COST,
+                'threads' => $threads ?? \PASSWORD_ARGON2_DEFAULT_THREADS,
+            );
+        }
+    }
+
     public static function isSupported()
     {
         if (\defined('PASSWORD_ARGON2I')) {
@@ -81,7 +102,7 @@ class Argon2iPasswordEncoder extends BasePasswordEncoder implements SelfSaltingE
 
     private function encodePasswordNative($raw)
     {
-        return password_hash($raw, \PASSWORD_ARGON2I);
+        return password_hash($raw, \PASSWORD_ARGON2I, $this->config);
     }
 
     private function encodePasswordSodiumFunction($raw)

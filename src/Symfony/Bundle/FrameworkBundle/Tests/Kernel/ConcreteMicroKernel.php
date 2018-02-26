@@ -72,8 +72,8 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 
     protected function configureRoutes(RouteCollectionBuilder $routes)
     {
-        $routes->add('/', 'kernel:halloweenAction');
-        $routes->add('/danger', 'kernel:dangerousAction');
+        $routes->add('/', 'kernel::halloweenAction');
+        $routes->add('/danger', 'kernel::dangerousAction');
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)

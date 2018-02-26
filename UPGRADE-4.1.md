@@ -15,7 +15,40 @@ EventDispatcher
 FrameworkBundle
 ---------------
 
- * A `RouterInterface` that does not implement the `WarmableInterface` is deprecated.
+ * Deprecated `bundle:controller:action` and `service:action` syntaxes to reference controllers. Use `serviceOrFqcn::method`
+   instead where `serviceOrFqcn` is either the service ID when using controllers as services or the FQCN of the controller.
+
+   Before:
+
+   ```yml
+   bundle_controller:
+       path: /
+       defaults:
+           _controller: FrameworkBundle:Redirect:redirect
+
+   service_controller:
+       path: /
+       defaults:
+           _controller: app.my_controller:myAction
+   ```
+
+   After:
+
+   ```yml
+   bundle_controller:
+       path: /
+       defaults:
+           _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
+
+   service_controller:
+       path: /
+       defaults:
+           _controller: app.my_controller::myAction
+   ```
+
+ * Deprecated `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`
+ * Warming up a router in `RouterCacheWarmer` that does not implement the `WarmableInterface` is deprecated and will not be
+   supported anymore in 5.0.
  * The `RequestDataCollector` class has been deprecated. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
 
 HttpFoundation

@@ -164,7 +164,7 @@ class PdoSessionHandler extends AbstractSessionHandler
      *  * db_connection_options: An array of driver-specific connection options [default: array()]
      *  * lock_mode: The strategy for locking, see constants [default: LOCK_TRANSACTIONAL]
      *
-     * @param \PDO|string|null $pdoOrDsn A \PDO instance or DSN string or null
+     * @param \PDO|string|null $pdoOrDsn A \PDO instance or DSN string or URL string or null
      * @param array            $options  An associative array of options
      *
      * @throws \InvalidArgumentException When PDO error mode is not PDO::ERRMODE_EXCEPTION
@@ -178,6 +178,8 @@ class PdoSessionHandler extends AbstractSessionHandler
 
             $this->pdo = $pdoOrDsn;
             $this->driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        } elseif (is_string($pdoOrDsn) && false !== strpos($pdoOrDsn, '://')) {
+            $this->dsn = $this->buildDsnFromUrl($pdoOrDsn);
         } else {
             $this->dsn = $pdoOrDsn;
         }
@@ -429,6 +431,102 @@ class PdoSessionHandler extends AbstractSessionHandler
         $this->pdo = new \PDO($dsn, $this->username, $this->password, $this->connectionOptions);
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $this->driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+    }
+
+    /**
+     * Builds a PDO DSN from a URL-like connection string.
+     *
+     * @param string $dsnOrUrl
+     *
+     * @return string
+     *
+     * @todo implement missing support for oci DSN (which look totally different from other PDO ones)
+     */
+    private function buildDsnFromUrl($dsnOrUrl)
+    {
+        // (pdo_)?sqlite3?:///... => (pdo_)?sqlite3?://localhost/... or else the URL will be invalid
+        $url = preg_replace('#^((?:pdo_)?sqlite3?):///#', '$1://localhost/', $dsnOrUrl);
+
+        $params = parse_url($url);
+
+        if (false === $params) {
+            return $dsnOrUrl; // If the URL is not valid, let's assume it might be a DSN already.
+        }
+
+        $params = array_map('rawurldecode', $params);
+
+        // Override the default username and password. Values passed through options will still win over these in the constructor.
+        if (isset($params['user'])) {
+            $this->username = $params['user'];
+        }
+
+        if (isset($params['pass'])) {
+            $this->password = $params['pass'];
+        }
+
+        if (!isset($params['scheme'])) {
+            throw new \InvalidArgumentException('URLs without scheme are not supported to configure the PdoSessionHandler');
+        }
+
+        $driverAliasMap = array(
+            'mssql' => 'sqlsrv',
+            'mysql2' => 'mysql', // Amazon RDS, for some weird reason
+            'postgres' => 'pgsql',
+            'postgresql' => 'pgsql',
+            'sqlite3' => 'sqlite',
+        );
+
+        $driver = isset($driverAliasMap[$params['scheme']]) ? $driverAliasMap[$params['scheme']] : $params['scheme'];
+
+        // Doctrine DBAL supports passing its internal pdo_* driver names directly too (allowing both dashes and underscores). This allows supporting the same here.
+        if (0 === strpos($driver, 'pdo_') || 0 === strpos($driver, 'pdo-')) {
+            $driver = substr($driver, 4);
+        }
+
+        switch ($driver) {
+            case 'mysql':
+            case 'pgsql':
+                $dsn = $driver.':';
+
+                if (isset($params['host']) && '' !== $params['host']) {
+                    $dsn .= 'host='.$params['host'].';';
+                }
+
+                if (isset($params['port']) && '' !== $params['port']) {
+                    $dsn .= 'port='.$params['port'].';';
+                }
+
+                if (isset($params['path'])) {
+                    $dbName = substr($params['path'], 1); // Remove the leading slash
+                    $dsn .= 'dbname='.$dbName.';';
+                }
+
+                return $dsn;
+
+            case 'sqlite':
+                return 'sqlite:'.substr($params['path'], 1);
+
+            case 'sqlsrv':
+                $dsn = 'sqlsrv:server=';
+
+                if (isset($params['host'])) {
+                    $dsn .= $params['host'];
+                }
+
+                if (isset($params['port']) && '' !== $params['port']) {
+                    $dsn .= ','.$params['port'];
+                }
+
+                if (isset($params['path'])) {
+                    $dbName = substr($params['path'], 1); // Remove the leading slash
+                    $dsn .= ';Database='.$dbName;
+                }
+
+                return $dsn;
+
+            default:
+                throw new \InvalidArgumentException(sprintf('The scheme "%s" is not supported by the PdoSessionHandler URL configuration. Pass a PDO DSN directly.', $params['scheme']));
+        }
     }
 
     /**

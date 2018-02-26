@@ -25,7 +25,7 @@ use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
 class PhpDocExtractor implements PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface
 {
@@ -53,6 +53,10 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     public function __construct(DocBlockFactoryInterface $docBlockFactory = null, array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
     {
+        if (!class_exists(DocBlockFactory::class)) {
+            throw new \RuntimeException(sprintf('Unable to use the "%s" class as the "phpdocumentor/reflection-docblock" package is not installed.', __CLASS__));
+        }
+
         $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
         $this->contextFactory = new ContextFactory();
         $this->phpDocTypeHelper = new PhpDocTypeHelper();

@@ -18,7 +18,7 @@ use Psr\Container\ContainerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.3
+ * @final
  */
 class SessionListener extends AbstractSessionListener
 {

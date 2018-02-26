@@ -170,5 +170,8 @@ class ArrayInputTest extends TestCase
 
         $input = new ArrayInput(array('-b' => array('bval_1', 'bval_2'), '--f' => array('fval_1', 'fval_2')));
         $this->assertSame('-b=bval_1 -b=bval_2 --f=fval_1 --f=fval_2', (string) $input);
+
+        $input = new ArrayInput(array('array_arg' => array('val_1', 'val_2')));
+        $this->assertSame('val_1 val_2', (string) $input);
     }
 }

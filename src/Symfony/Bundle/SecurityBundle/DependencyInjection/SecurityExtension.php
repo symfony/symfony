@@ -523,7 +523,11 @@ class SecurityExtension extends Extension
 
             return array(
                 'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-                'arguments' => array(),
+                'arguments' => array(
+                    $config['memory_cost'],
+                    $config['time_cost'],
+                    $config['threads'],
+                ),
             );
         }
 

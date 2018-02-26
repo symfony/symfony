@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added option to run suggested command if command is not found and only 1 alternative is available
+
 4.0.0
 -----
 

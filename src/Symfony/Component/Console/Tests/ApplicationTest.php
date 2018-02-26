@@ -16,6 +16,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\FactoryCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\Console\Exception\NamespaceNotFoundException;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -56,6 +57,7 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/BarBucCommand.php';
         require_once self::$fixturesPath.'/FooSubnamespaced1Command.php';
         require_once self::$fixturesPath.'/FooSubnamespaced2Command.php';
+        require_once self::$fixturesPath.'/FooWithoutAliasCommand.php';
         require_once self::$fixturesPath.'/TestTiti.php';
         require_once self::$fixturesPath.'/TestToto.php';
     }
@@ -275,10 +277,10 @@ class ApplicationTest extends TestCase
         $expectedMsg = "The namespace \"f\" is ambiguous.\nDid you mean one of these?\n    foo\n    foo1";
 
         if (method_exists($this, 'expectException')) {
-            $this->expectException(CommandNotFoundException::class);
+            $this->expectException(NamespaceNotFoundException::class);
             $this->expectExceptionMessage($expectedMsg);
         } else {
-            $this->setExpectedException(CommandNotFoundException::class, $expectedMsg);
+            $this->setExpectedException(NamespaceNotFoundException::class, $expectedMsg);
         }
 
         $application->findNamespace('f');
@@ -293,7 +295,7 @@ class ApplicationTest extends TestCase
     }
 
     /**
-     * @expectedException        \Symfony\Component\Console\Exception\CommandNotFoundException
+     * @expectedException        \Symfony\Component\Console\Exception\NamespaceNotFoundException
      * @expectedExceptionMessage There are no commands defined in the "bar" namespace.
      */
     public function testFindInvalidNamespace()
@@ -457,6 +459,52 @@ class ApplicationTest extends TestCase
         $application->find($name);
     }
 
+    public function testDontRunAlternativeNamespaceName()
+    {
+        $application = new Application();
+        $application->add(new \Foo1Command());
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foos:bar1'), array('decorated' => false));
+        $this->assertSame('
+                                                          
+  There are no commands defined in the "foos" namespace.  
+                                                          
+  Did you mean this?                                      
+      foo                                                 
+                                                          
+
+', $tester->getDisplay(true));
+    }
+
+    public function testCanRunAlternativeCommandName()
+    {
+        $application = new Application();
+        $application->add(new \FooWithoutAliasCommand());
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $tester->setInputs(array('y'));
+        $tester->run(array('command' => 'foos'), array('decorated' => false));
+        $display = trim($tester->getDisplay(true));
+        $this->assertContains('Command "foos" is not defined', $display);
+        $this->assertContains('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
+        $this->assertContains('called', $display);
+    }
+
+    public function testDontRunAlternativeCommandName()
+    {
+        $application = new Application();
+        $application->add(new \FooWithoutAliasCommand());
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        $tester->setInputs(array('n'));
+        $exitCode = $tester->run(array('command' => 'foos'), array('decorated' => false));
+        $this->assertSame(1, $exitCode);
+        $display = trim($tester->getDisplay(true));
+        $this->assertContains('Command "foos" is not defined', $display);
+        $this->assertContains('Do you want to run "foo" instead?  (yes/no) [no]:', $display);
+    }
+
     public function provideInvalidCommandNamesSingle()
     {
         return array(
@@ -574,7 +622,8 @@ class ApplicationTest extends TestCase
             $application->find('foo2:command');
             $this->fail('->find() throws a CommandNotFoundException if namespace does not exist');
         } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, '->find() throws a CommandNotFoundException if namespace does not exist');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\NamespaceNotFoundException', $e, '->find() throws a NamespaceNotFoundException if namespace does not exist');
+            $this->assertInstanceOf('Symfony\Component\Console\Exception\CommandNotFoundException', $e, 'NamespaceNotFoundException extends from CommandNotFoundException');
             $this->assertCount(3, $e->getAlternatives());
             $this->assertContains('foo', $e->getAlternatives());
             $this->assertContains('foo1', $e->getAlternatives());

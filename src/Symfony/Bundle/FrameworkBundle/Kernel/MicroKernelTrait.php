@@ -64,7 +64,7 @@ trait MicroKernelTrait
         $loader->load(function (ContainerBuilder $container) use ($loader) {
             $container->loadFromExtension('framework', array(
                 'router' => array(
-                    'resource' => 'kernel:loadRoutes',
+                    'resource' => 'kernel::loadRoutes',
                     'type' => 'service',
                 ),
             ));

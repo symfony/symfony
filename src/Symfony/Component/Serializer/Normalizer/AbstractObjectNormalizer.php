@@ -214,7 +214,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     abstract protected function getAttributeValue($object, $attribute, $format = null, array $context = array());
 
     /**
-     * Sets an handler function that will be called when the max depth is reached.
+     * Sets a handler function that will be called when the max depth is reached.
      */
     public function setMaxDepthHandler(?callable $handler): void
     {

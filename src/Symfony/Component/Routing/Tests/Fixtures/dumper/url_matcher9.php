@@ -19,7 +19,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     {
         $allow = array();
         $pathinfo = rawurldecode($rawPathinfo);
-        $trimmedPathinfo = rtrim($pathinfo, '/');
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();
         $host = strtolower($context->getHost());
@@ -32,11 +31,11 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             case '/':
                 // a
                 if (preg_match('#^(?P<d>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', $host, $hostMatches)) {
-                    return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'a')), array());
+                    return $this->mergeDefaults(array('_route' => 'a') + $hostMatches, array());
                 }
                 // c
                 if (preg_match('#^(?P<e>[^\\.]++)\\.e\\.c\\.b\\.a$#sDi', $host, $hostMatches)) {
-                    return $this->mergeDefaults(array_replace($hostMatches, array('_route' => 'c')), array());
+                    return $this->mergeDefaults(array('_route' => 'c') + $hostMatches, array());
                 }
                 // b
                 if ('d.c.b.a' === $host) {

@@ -18,7 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
 class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
 {

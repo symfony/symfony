@@ -140,10 +140,10 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
 
-        $this->assertEquals(array('foo:fooAction'), array_keys($locator));
-        $this->assertInstanceof(ServiceClosureArgument::class, $locator['foo:fooAction']);
+        $this->assertEquals(array('foo::fooAction'), array_keys($locator));
+        $this->assertInstanceof(ServiceClosureArgument::class, $locator['foo::fooAction']);
 
-        $locator = $container->getDefinition((string) $locator['foo:fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
 
         $this->assertSame(ServiceLocator::class, $locator->getClass());
         $this->assertFalse($locator->isPublic());
@@ -166,7 +166,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $locator = $container->getDefinition((string) $locator['foo:fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
 
         $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, RegisterTestController::class)));
         $this->assertEquals($expected, $locator->getArgument(0));
@@ -185,7 +185,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $locator = $container->getDefinition((string) $locator['foo:fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
 
         $expected = array('bar' => new ServiceClosureArgument(new TypedReference('bar', ControllerDummy::class, RegisterTestController::class, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
         $this->assertEquals($expected, $locator->getArgument(0));
@@ -203,7 +203,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertSame(array('foo:fooAction'), array_keys($locator));
+        $this->assertSame(array('foo::fooAction'), array_keys($locator));
     }
 
     /**
@@ -250,7 +250,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $this->assertSame(array('foo:barAction', 'foo:fooAction'), array_keys($locator));
+        $this->assertSame(array('foo::barAction', 'foo::fooAction'), array_keys($locator));
     }
 
     public function testArgumentWithNoTypeHintIsOk()
@@ -300,7 +300,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
 
-        $locator = $container->getDefinition((string) $locator['foo:fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
 
         $expected = array('bar' => new ServiceClosureArgument(new Reference('foo')));
         $this->assertEquals($expected, $locator->getArgument(0));

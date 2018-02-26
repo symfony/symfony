@@ -34,7 +34,7 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         [
             ./div[
                 ./ul
-                    [./li[.="[trans]Error![/trans]"]]
+                    [./li[.="❌ [trans]Error![/trans]"]]
                     [count(./li)=1]
             ]
         ]
@@ -166,9 +166,9 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
             [@class="list-unstyled mb-0"]
             [
                 ./li
-                    [.="[trans]Error 1[/trans]"]
+                    [.="❌ [trans]Error 1[/trans]"]
                 /following-sibling::li
-                    [.="[trans]Error 2[/trans]"]
+                    [.="❌ [trans]Error 2[/trans]"]
             ]
             [count(./li)=2]
     ]

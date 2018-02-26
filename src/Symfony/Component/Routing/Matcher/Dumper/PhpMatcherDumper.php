@@ -347,7 +347,7 @@ EOF;
             } else {
                 $code .= <<<EOF
             \$requiredSchemes = $schemes;
-            if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
+            if (!isset(\$requiredSchemes[\$context->getScheme()])) {
                 if ('GET' !== \$canonicalMethod) {
                     goto $gotoname;
                 }

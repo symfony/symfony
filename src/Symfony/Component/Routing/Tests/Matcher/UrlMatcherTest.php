@@ -464,6 +464,18 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(array('_route' => 'buz'), $matcher->match('/prefix/buz'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testSchemeAndMethodMismatch()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/', array(), array(), array(), null, array('https'), array('POST')));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $matcher->match('/');
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?: new RequestContext());

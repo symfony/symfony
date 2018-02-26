@@ -69,7 +69,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                     if ('/' === substr($pathinfo, -1)) {
                         // no-op
                     } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
-                        $allow[] = 'GET';
                         goto not_baz3;
                     } else {
                         return $this->redirect($rawPathinfo.'/', 'baz3');
@@ -86,7 +85,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
-                    $allow[] = 'GET';
                     goto not_baz4;
                 } else {
                     return $this->redirect($rawPathinfo.'/', 'baz4');
@@ -185,7 +183,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
-                    $allow[] = 'GET';
                     goto not_hey;
                 } else {
                     return $this->redirect($rawPathinfo.'/', 'hey');
@@ -337,7 +334,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $requiredSchemes = array (  'https' => 0,);
             if (!isset($requiredSchemes[$this->context->getScheme()])) {
                 if (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
-                    $allow[] = 'GET';
                     goto not_secure;
                 }
 
@@ -353,7 +349,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             $requiredSchemes = array (  'http' => 0,);
             if (!isset($requiredSchemes[$this->context->getScheme()])) {
                 if (!in_array($this->context->getMethod(), array('HEAD', 'GET'))) {
-                    $allow[] = 'GET';
                     goto not_nonsecure;
                 }
 

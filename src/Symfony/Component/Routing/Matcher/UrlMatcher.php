@@ -129,6 +129,12 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
+            $status = $this->handleRouteRequirements($pathinfo, $name, $route);
+
+            if (self::REQUIREMENT_MISMATCH === $status[0]) {
+                continue;
+            }
+
             // check HTTP method requirement
             if ($requiredMethods = $route->getMethods()) {
                 // HEAD and GET are equivalent as per RFC
@@ -137,20 +143,16 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 }
 
                 if (!in_array($method, $requiredMethods)) {
-                    $this->allow = array_merge($this->allow, $requiredMethods);
+                    if (self::REQUIREMENT_MATCH === $status[0]) {
+                        $this->allow = array_merge($this->allow, $requiredMethods);
+                    }
 
                     continue;
                 }
             }
 
-            $status = $this->handleRouteRequirements($pathinfo, $name, $route);
-
             if (self::ROUTE_MATCH === $status[0]) {
                 return $status[1];
-            }
-
-            if (self::REQUIREMENT_MISMATCH === $status[0]) {
-                continue;
             }
 
             return $this->getAttributes($route, $name, array_replace($matches, $hostMatches));

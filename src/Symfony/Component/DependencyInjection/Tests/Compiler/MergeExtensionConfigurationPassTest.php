@@ -110,7 +110,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new BarExtension());
-        $container->prependExtensionConfig('bar', []);
+        $container->prependExtensionConfig('bar', array());
 
         (new MergeExtensionConfigurationPass())->process($container);
     }

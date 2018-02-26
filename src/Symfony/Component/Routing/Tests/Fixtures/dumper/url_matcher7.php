@@ -35,7 +35,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
-                    $allow[] = 'GET';
                     goto not_simple_trailing_slash_no_methods;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'simple_trailing_slash_no_methods'));
@@ -51,7 +50,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
-                    $allow[] = 'GET';
                     goto not_simple_trailing_slash_GET_method;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'simple_trailing_slash_GET_method'));
@@ -99,7 +97,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
-                    $allow[] = 'GET';
                     goto not_regex_trailing_slash_no_methods;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'regex_trailing_slash_no_methods'));
@@ -115,7 +112,6 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 if ('/' === substr($pathinfo, -1)) {
                     // no-op
                 } elseif ('GET' !== $canonicalMethod) {
-                    $allow[] = 'GET';
                     goto not_regex_trailing_slash_GET_method;
                 } else {
                     return array_replace($ret, $this->redirect($rawPathinfo.'/', 'regex_trailing_slash_GET_method'));

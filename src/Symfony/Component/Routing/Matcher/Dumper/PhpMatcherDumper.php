@@ -641,14 +641,17 @@ EOF;
             $code .= sprintf("            \$ret = array('_route' => '%s');\n", $name);
         }
 
+        if ($methods) {
+            $methodVariable = isset($methods['GET']) ? '$canonicalMethod' : '$requestMethod';
+            $methods = self::export($methods);
+        }
+
         if ($schemes = $route->getSchemes()) {
             if (!$this->supportsRedirections) {
                 throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
             $schemes = self::export(array_flip($schemes));
             if ($methods) {
-                $methodVariable = isset($methods['GET']) ? '$canonicalMethod' : '$requestMethod';
-                $methods = self::export($methods);
                 $code .= <<<EOF
             \$requiredSchemes = $schemes;
             \$hasRequiredScheme = isset(\$requiredSchemes[\$context->getScheme()]);
@@ -683,9 +686,6 @@ EOF;
 EOF;
             }
         } elseif ($methods) {
-            $methodVariable = isset($methods['GET']) ? '$canonicalMethod' : '$requestMethod';
-            $methods = self::export($methods);
-
             $code .= <<<EOF
             if (!isset((\$a = {$methods})[{$methodVariable}])) {
                 \$allow += \$a;

@@ -278,7 +278,29 @@ EOF;
                 throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
             $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
-            $code .= <<<EOF
+            if ($methods) {
+                $methods = implode("', '", $methods);
+                $code .= <<<EOF
+            \$requiredSchemes = $schemes;
+            \$hasRequiredScheme = isset(\$requiredSchemes[\$this->context->getScheme()]);
+            if (!in_array(\$this->context->getMethod(), array('$methods'))) {
+                if (\$hasRequiredScheme) {
+                    \$allow = array_merge(\$allow, array('$methods'));
+                }
+                goto $gotoname;
+            }
+            if (!\$hasRequiredScheme) {
+                if (!in_array(\$this->context->getMethod(), array('HEAD', 'GET'))) {
+                    goto $gotoname;
+                }
+
+                return \$this->redirect(\$rawPathinfo, '$name', key(\$requiredSchemes));
+            }
+
+
+EOF;
+            } else {
+                $code .= <<<EOF
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
                 if (!in_array(\$this->context->getMethod(), array('HEAD', 'GET'))) {
@@ -290,9 +312,8 @@ EOF;
 
 
 EOF;
-        }
-
-        if ($methods) {
+            }
+        } elseif ($methods) {
             if (1 === count($methods)) {
                 $code .= <<<EOF
             if (\$this->context->getMethod() != '$methods[0]') {

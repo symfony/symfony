@@ -309,7 +309,6 @@ EOF;
             if ('/' === substr(\$pathinfo, -1)) {
                 // no-op
             } elseif ('GET' !== \$canonicalMethod) {
-                \$allow[] = 'GET';
                 goto $gotoname;
             } else {
                 return array_replace(\$ret, \$this->redirect(\$rawPathinfo.'/', '$name'));
@@ -324,11 +323,19 @@ EOF;
                 throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
             $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
-            $code .= <<<EOF
+            if ($methods) {
+                $methods = implode("', '", $methods);
+                $code .= <<<EOF
             \$requiredSchemes = $schemes;
-            if (!isset(\$requiredSchemes[\$context->getScheme()])) {
+            \$hasRequiredScheme = isset(\$requiredSchemes[\$context->getScheme()]);
+            if (!in_array(\$context->getMethod(), array('$methods'))) {
+                if (\$hasRequiredScheme) {
+                    \$allow = array_merge(\$allow, array('$methods'));
+                }
+                goto $gotoname;
+            }
+            if (!\$hasRequiredScheme) {
                 if ('GET' !== \$canonicalMethod) {
-                    \$allow[] = 'GET';
                     goto $gotoname;
                 }
 
@@ -337,9 +344,21 @@ EOF;
 
 
 EOF;
-        }
+            } else {
+                $code .= <<<EOF
+            \$requiredSchemes = $schemes;
+            if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
+                if ('GET' !== \$canonicalMethod) {
+                    goto $gotoname;
+                }
 
-        if ($methods) {
+                return array_replace(\$ret, \$this->redirect(\$rawPathinfo, '$name', key(\$requiredSchemes)));
+            }
+
+
+EOF;
+            }
+        } elseif ($methods) {
             if (1 === count($methods)) {
                 if ('HEAD' === $methods[0]) {
                     $code .= <<<EOF

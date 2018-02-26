@@ -31,8 +31,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         // just_head
         if ('/just_head' === $pathinfo) {
             $ret = array('_route' => 'just_head');
-            if ('HEAD' !== $requestMethod) {
-                $allow[] = 'HEAD';
+            if (!in_array($requestMethod, array('HEAD'))) {
+                $allow = array_merge($allow, array('HEAD'));
                 goto not_just_head;
             }
 
@@ -43,8 +43,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         // head_and_get
         if ('/head_and_get' === $pathinfo) {
             $ret = array('_route' => 'head_and_get');
-            if ('GET' !== $canonicalMethod) {
-                $allow[] = 'GET';
+            if (!in_array($canonicalMethod, array('HEAD', 'GET'))) {
+                $allow = array_merge($allow, array('HEAD', 'GET'));
                 goto not_head_and_get;
             }
 
@@ -55,8 +55,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         // get_and_head
         if ('/get_and_head' === $pathinfo) {
             $ret = array('_route' => 'get_and_head');
-            if ('GET' !== $canonicalMethod) {
-                $allow[] = 'GET';
+            if (!in_array($canonicalMethod, array('GET', 'HEAD'))) {
+                $allow = array_merge($allow, array('GET', 'HEAD'));
                 goto not_get_and_head;
             }
 
@@ -92,8 +92,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             // put_and_get_and_head
             if ('/put_and_post' === $pathinfo) {
                 $ret = array('_route' => 'put_and_get_and_head');
-                if (!in_array($canonicalMethod, array('PUT', 'GET'))) {
-                    $allow = array_merge($allow, array('PUT', 'GET'));
+                if (!in_array($canonicalMethod, array('PUT', 'GET', 'HEAD'))) {
+                    $allow = array_merge($allow, array('PUT', 'GET', 'HEAD'));
                     goto not_put_and_get_and_head;
                 }
 

@@ -105,18 +105,19 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                             }
                         }
 
-                        if ($requiredSchemes && !isset($requiredSchemes[$context->getScheme()])) {
+                        $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
+                        if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
+                            if ($hasRequiredScheme) {
+                                $allow += $requiredMethods;
+                            }
+                            break;
+                        }
+                        if (!$hasRequiredScheme) {
                             if ('GET' !== $canonicalMethod) {
-                                $allow['GET'] = 'GET';
                                 break;
                             }
 
                             return $this->redirect($rawPathinfo, $ret['_route'], key($requiredSchemes)) + $ret;
-                        }
-
-                        if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
-                            $allow += $requiredMethods;
-                            break;
                         }
 
                         return $ret;

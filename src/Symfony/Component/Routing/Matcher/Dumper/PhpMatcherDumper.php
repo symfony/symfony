@@ -538,18 +538,26 @@ EOF;
         if ($this->supportsRedirections) {
             $code .= <<<EOF
 
-            if (\$requiredSchemes && !isset(\$requiredSchemes[\$context->getScheme()])) {
+            \$hasRequiredScheme = !\$requiredSchemes || isset(\$requiredSchemes[\$context->getScheme()]);
+            if (\$requiredMethods && !isset(\$requiredMethods[\$canonicalMethod]) && !isset(\$requiredMethods[\$requestMethod])) {
+                if (\$hasRequiredScheme) {
+                    \$allow += \$requiredMethods;
+                }
+                break;
+            }
+            if (!\$hasRequiredScheme) {
                 if ('GET' !== \$canonicalMethod) {
-                    \$allow['GET'] = 'GET';
                     break;
                 }
 
                 return \$this->redirect(\$rawPathinfo, \$ret['_route'], key(\$requiredSchemes)) + \$ret;
             }
 
+            return \$ret;
+
 EOF;
-        }
-        $code .= <<<EOF
+        } else {
+            $code .= <<<EOF
 
             if (\$requiredMethods && !isset(\$requiredMethods[\$canonicalMethod]) && !isset(\$requiredMethods[\$requestMethod])) {
                 \$allow += \$requiredMethods;
@@ -559,6 +567,7 @@ EOF;
             return \$ret;
 
 EOF;
+        }
 
         return $code;
     }
@@ -637,11 +646,20 @@ EOF;
                 throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
             $schemes = self::export(array_flip($schemes));
-            $code .= <<<EOF
+            if ($methods) {
+                $methodVariable = isset($methods['GET']) ? '$canonicalMethod' : '$requestMethod';
+                $methods = self::export($methods);
+                $code .= <<<EOF
             \$requiredSchemes = $schemes;
-            if (!isset(\$requiredSchemes[\$context->getScheme()])) {
+            \$hasRequiredScheme = isset(\$requiredSchemes[\$context->getScheme()]);
+            if (!isset((\$a = {$methods})[{$methodVariable}])) {
+                if (\$hasRequiredScheme) {
+                    \$allow += \$a;
+                }
+                goto $gotoname;
+            }
+            if (!\$hasRequiredScheme) {
                 if ('GET' !== \$canonicalMethod) {
-                    \$allow['GET'] = 'GET';
                     goto $gotoname;
                 }
 
@@ -650,9 +668,21 @@ EOF;
 
 
 EOF;
-        }
+            } else {
+                $code .= <<<EOF
+            \$requiredSchemes = $schemes;
+            if (!isset(\$requiredSchemes[\$context->getScheme()])) {
+                if ('GET' !== \$canonicalMethod) {
+                    goto $gotoname;
+                }
 
-        if ($methods) {
+                return \$this->redirect(\$rawPathinfo, '$name', key(\$requiredSchemes)) + \$ret;
+            }
+
+
+EOF;
+            }
+        } elseif ($methods) {
             $methodVariable = isset($methods['GET']) ? '$canonicalMethod' : '$requestMethod';
             $methods = self::export($methods);
 

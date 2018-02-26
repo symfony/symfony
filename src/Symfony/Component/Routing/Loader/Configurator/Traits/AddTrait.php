@@ -29,9 +29,10 @@ trait AddTrait
      */
     final public function add(string $name, string $path): RouteConfigurator
     {
+        $parentConfigurator = $this instanceof RouteConfigurator ? $this->parentConfigurator : null;
         $this->collection->add($this->name.$name, $route = new Route($path));
 
-        return new RouteConfigurator($this->collection, $route);
+        return new RouteConfigurator($this->collection, $route, '', $parentConfigurator);
     }
 
     /**

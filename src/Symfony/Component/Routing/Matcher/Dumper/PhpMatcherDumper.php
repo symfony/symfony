@@ -318,17 +318,21 @@ EOF;
 EOF;
         }
 
+        if ($methods) {
+            $methodVariable = in_array('GET', $methods) ? '$canonicalMethod' : '$requestMethod';
+            $methods = implode("', '", $methods);
+        }
+
         if ($schemes = $route->getSchemes()) {
             if (!$supportsRedirections) {
                 throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
             $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
             if ($methods) {
-                $methods = implode("', '", $methods);
                 $code .= <<<EOF
             \$requiredSchemes = $schemes;
             \$hasRequiredScheme = isset(\$requiredSchemes[\$context->getScheme()]);
-            if (!in_array(\$context->getMethod(), array('$methods'))) {
+            if (!in_array($methodVariable, array('$methods'))) {
                 if (\$hasRequiredScheme) {
                     \$allow = array_merge(\$allow, array('$methods'));
                 }
@@ -359,56 +363,14 @@ EOF;
 EOF;
             }
         } elseif ($methods) {
-            if (1 === count($methods)) {
-                if ('HEAD' === $methods[0]) {
-                    $code .= <<<EOF
-            if ('HEAD' !== \$requestMethod) {
-                \$allow[] = 'HEAD';
-                goto $gotoname;
-            }
-
-
-EOF;
-                } else {
-                    $code .= <<<EOF
-            if ('$methods[0]' !== \$canonicalMethod) {
-                \$allow[] = '$methods[0]';
-                goto $gotoname;
-            }
-
-
-EOF;
-                }
-            } else {
-                $methodVariable = 'requestMethod';
-
-                if (in_array('GET', $methods)) {
-                    // Since we treat HEAD requests like GET requests we don't need to match it.
-                    $methodVariable = 'canonicalMethod';
-                    $methods = array_values(array_filter($methods, function ($method) { return 'HEAD' !== $method; }));
-                }
-
-                if (1 === count($methods)) {
-                    $code .= <<<EOF
-            if ('$methods[0]' !== \$$methodVariable) {
-                \$allow[] = '$methods[0]';
-                goto $gotoname;
-            }
-
-
-EOF;
-                } else {
-                    $methods = implode("', '", $methods);
-                    $code .= <<<EOF
-            if (!in_array(\$$methodVariable, array('$methods'))) {
+                $code .= <<<EOF
+            if (!in_array($methodVariable, array('$methods'))) {
                 \$allow = array_merge(\$allow, array('$methods'));
                 goto $gotoname;
             }
 
 
 EOF;
-                }
-            }
         }
 
         if ($hasTrailingSlash || $schemes || $methods) {

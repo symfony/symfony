@@ -45,8 +45,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#sD', $pathinfo, $matches)) {
                 $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'bar')), array ());
-                if ('GET' !== $canonicalMethod) {
-                    $allow[] = 'GET';
+                if (!in_array($canonicalMethod, array('GET', 'HEAD'))) {
+                    $allow = array_merge($allow, array('GET', 'HEAD'));
                     goto not_bar;
                 }
 
@@ -57,8 +57,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             // barhead
             if (0 === strpos($pathinfo, '/barhead') && preg_match('#^/barhead/(?P<foo>[^/]++)$#sD', $pathinfo, $matches)) {
                 $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'barhead')), array ());
-                if ('GET' !== $canonicalMethod) {
-                    $allow[] = 'GET';
+                if (!in_array($canonicalMethod, array('GET'))) {
+                    $allow = array_merge($allow, array('GET'));
                     goto not_barhead;
                 }
 
@@ -115,8 +115,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             // baz5
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#sD', $pathinfo, $matches)) {
                 $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz5')), array ());
-                if ('POST' !== $canonicalMethod) {
-                    $allow[] = 'POST';
+                if (!in_array($requestMethod, array('POST'))) {
+                    $allow = array_merge($allow, array('POST'));
                     goto not_baz5;
                 }
 
@@ -127,8 +127,8 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             // baz.baz6
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#sD', $pathinfo, $matches)) {
                 $ret = $this->mergeDefaults(array_replace($matches, array('_route' => 'baz.baz6')), array ());
-                if ('PUT' !== $canonicalMethod) {
-                    $allow[] = 'PUT';
+                if (!in_array($requestMethod, array('PUT'))) {
+                    $allow = array_merge($allow, array('PUT'));
                     goto not_bazbaz6;
                 }
 

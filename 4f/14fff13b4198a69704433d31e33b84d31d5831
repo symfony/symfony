@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-25T22:53:56Z
+
+LGTM but I'm not sure it's worth to change such things as a bugfix. It totally depends what you write in your expression conditions. And it depends what you interpret as a HTTP target resource.
+
+> The 405 (Method Not Allowed) status code indicates that the method
+   received in the request-line is known by the origin server but not
+   supported by the target resource.
+
+If you have a condition like in the ticket `request.headers.get('User-Agent') matches '/firefox/i'`
+I'd argue that this header is not part of the target resource you requested. Otherwise all resources on te internet would depend on the User-Agent, wich means everybody sees different resources when browing the same page. So getting a 405 is just as valid if you request such a route with the wrong method.

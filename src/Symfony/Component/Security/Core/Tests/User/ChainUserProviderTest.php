@@ -65,6 +65,31 @@ class ChainUserProviderTest extends TestCase
         $provider->loadUserByUsername('foo');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\LogicException
+     */
+    public function testLoadUserByUsernameWithNullUserThrowsLogicException()
+    {
+        $provider1 = $this->getProvider();
+        $provider1
+            ->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with($this->equalTo('foo'))
+            ->will($this->throwException(new UsernameNotFoundException('not found')))
+        ;
+
+        $provider2 = $this->getProvider();
+        $provider2
+            ->expects($this->once())
+            ->method('loadUserByUsername')
+            ->with($this->equalTo('foo'))
+            ->will($this->returnValue(null))
+        ;
+
+        $provider = new ChainUserProvider(array($provider1, $provider2));
+        $provider->loadUserByUsername('foo');
+    }
+
     public function testRefreshUser()
     {
         $provider1 = $this->getProvider();

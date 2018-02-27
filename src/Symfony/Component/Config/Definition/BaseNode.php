@@ -40,7 +40,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function __construct($name, NodeInterface $parent = null)
     {
-        if (false !== strpos($name, '.')) {
+        if (null !== $name && false !== strpos($name, '.')) {
             throw new \InvalidArgumentException('The name must not contain ".".');
         }
 
@@ -186,7 +186,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function getName()
     {
-        return $this->name;
+        return null === $this->name ? '' : $this->name;
     }
 
     /**

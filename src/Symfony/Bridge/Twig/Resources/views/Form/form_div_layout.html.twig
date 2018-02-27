@@ -287,6 +287,14 @@
 
 {%- block button_label -%}{%- endblock -%}
 
+{# Help #}
+
+{% block form_help -%}
+    {% if form.vars.help is not empty %}
+        <p class="form-help">{{ form.vars.help|raw }}</p>
+    {% endif %}
+{%- endblock form_help %}
+
 {# Rows #}
 
 {%- block repeated_row -%}
@@ -302,6 +310,7 @@
         {{- form_label(form) -}}
         {{- form_errors(form) -}}
         {{- form_widget(form) -}}
+        {{- form_help(form) -}}
     </div>
 {%- endblock form_row -%}
 

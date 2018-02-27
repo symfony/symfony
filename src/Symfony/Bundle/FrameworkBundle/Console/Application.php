@@ -65,6 +65,8 @@ class Application extends BaseApplication
 
         $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
 
+        $this->registerCommands();
+
         if ($this->registrationErrors) {
             $this->renderRegistrationErrors($input, $output);
         }

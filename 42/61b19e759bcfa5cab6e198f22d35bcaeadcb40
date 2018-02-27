@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-02-23T19:04:40Z
+
+Qualifies as a bug since an exception was thrown before 3.4, breaking the whole console with a clear stack trace, currently you have no information at all.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-23T20:33:14Z
+
+We can’t do that because of input and ouput we don’t have them
+Le ven. 23 févr. 2018 à 20:08, Robin Chalas <notifications@github.com> a
+écrit :
+
+> *@chalasr* commented on this pull request.
+> ------------------------------
+>
+> In src/Symfony/Bundle/FrameworkBundle/Console/Application.php
+> <https://github.com/symfony/symfony/pull/26290#discussion_r170339065>:
+>
+> > @@ -91,7 +93,18 @@ public function find($name)
+>      {
+>          $this->registerCommands();
+>
+> -        return parent::find($name);
+> +        try {
+> +            return parent::find($name);
+> +        } catch (CommandNotFoundException $e) {
+> +            if ($this->registrationErrors) {
+> +                foreach ($this->registrationErrors as $error) {
+> +                    $errors[] = $error->getMessage();
+> +                }
+> +                throw new CommandNotRegisteredException(implode('
+> +            ', $errors), 0, $e);
+> +            }
+> +            throw $e;
+>
+> IMO we should just call renderRegistrationErrors() before callingfind().
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/26290#pullrequestreview-99018837>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/ADSq8rH-L4mX5Tdfb4REbJKzvxDsO0b_ks5tXwy5gaJpZM4SRR46>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by chr-hertel at 2018-02-24T10:29:54Z
+
+if i get this right, wrapping the `parent::doRun()` call should do the trick:
+
+```php
+    public function doRun(...)
+    {
+        // ...
+
+        try {
+            return parent::doRun($input, $output);
+        } catch (CommandNotFoundException $e) {
+            if ($this->registrationErrors) {
+                $this->renderRegistrationErrors($input, $output);
+            }
+
+            throw $e;
+        }
+    }
+```
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-24T15:41:03Z
+
+Thanks @chr-hertel ! it's clearly better than what I thought.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-25T08:26:51Z
+
+Status: Needs Review

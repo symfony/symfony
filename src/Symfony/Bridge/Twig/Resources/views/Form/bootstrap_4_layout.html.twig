@@ -281,7 +281,7 @@
 {# Help #}
 
 {% block form_help -%}
-    {% if form.vars.help is not empty %}
-        <small class="form-text text-muted">{{ form.vars.help|raw }}</small>
+    {% if help is not empty %}
+        <small class="form-text text-muted">{{ help|raw }}</small>
     {% endif %}
 {%- endblock form_help %}

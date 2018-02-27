@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-27T07:06:16Z
+
+This one is indeed rather odd. Anyway, let's merge this one in 3.4. I would also change the other forms, but only on master (4.1).

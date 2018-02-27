@@ -33,6 +33,7 @@
                 "by_reference",
                 "data",
                 "disabled",
+                "help",
                 "inherit_data",
                 "label",
                 "label_attr",

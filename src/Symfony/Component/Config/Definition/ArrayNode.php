@@ -150,9 +150,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Sets the node Name.
-     *
-     * @param string $name The node's name
+     * {@inheritdoc}
      */
     public function setName($name)
     {
@@ -160,9 +158,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Checks if the node has a default value.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasDefaultValue()
     {
@@ -170,11 +166,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
-     * Retrieves the default value.
-     *
-     * @return array The default value
-     *
-     * @throws \RuntimeException if the node has no default value
+     * {@inheritdoc}
      */
     public function getDefaultValue()
     {

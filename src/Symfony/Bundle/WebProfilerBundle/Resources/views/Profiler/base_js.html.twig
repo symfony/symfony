@@ -122,6 +122,11 @@
                 return;
             }
 
+            var nbOfAjaxRequest = tbody.rows.count();
+            if (nbOfAjaxRequest >= 100) {
+                tbody.deleteRow(nbOfAjaxRequest - 1);
+            }
+
             var request = requestStack[index];
             pendingRequests++;
             var row = document.createElement('tr');

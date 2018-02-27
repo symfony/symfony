@@ -41,7 +41,7 @@
             {{- form_errors(form.date) -}}
             {{- form_errors(form.time) -}}
 
-            <div style="display:none">
+            <div class="sr-only">
                 {%- if form.date.year is defined %}{{ form_label(form.date.year) }}{% endif -%}
                 {%- if form.date.month is defined %}{{ form_label(form.date.month) }}{% endif -%}
                 {%- if form.date.day is defined %}{{ form_label(form.date.day) }}{% endif -%}
@@ -64,7 +64,7 @@
         {%- if datetime is not defined or not datetime -%}
             <div {{ block('widget_container_attributes') -}}>
         {%- endif %}
-            <div style="display:none">
+            <div class="sr-only">
                 {{ form_label(form.year) }}
                 {{ form_label(form.month) }}
                 {{ form_label(form.day) }}
@@ -89,10 +89,10 @@
         {%- if datetime is not defined or false == datetime -%}
             <div {{ block('widget_container_attributes') -}}>
         {%- endif -%}
-        <div style="display:none">{{ form_label(form.hour) }}</div>
+        <div class="sr-only">{{ form_label(form.hour) }}</div>
         {{- form_widget(form.hour) -}}
-        {%- if with_minutes -%}:<div style="display:none">{{ form_label(form.minute) }}</div>{{ form_widget(form.minute) }}{%- endif -%}
-        {%- if with_seconds -%}:<div style="display:none">{{ form_label(form.second) }}</div>{{ form_widget(form.second) }}{%- endif -%}
+        {%- if with_minutes -%}:<div class="sr-only">{{ form_label(form.minute) }}</div>{{ form_widget(form.minute) }}{%- endif -%}
+        {%- if with_seconds -%}:<div class="sr-only">{{ form_label(form.second) }}</div>{{ form_widget(form.second) }}{%- endif -%}
         {%- if datetime is not defined or false == datetime -%}
             </div>
         {%- endif -%}

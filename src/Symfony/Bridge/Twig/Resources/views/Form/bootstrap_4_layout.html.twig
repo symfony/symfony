@@ -282,6 +282,6 @@
 
 {% block form_help -%}
     {% if help is not empty %}
-        <small class="form-text text-muted">{{ help }}</small>
+        <small class="form-text text-muted">{{ help|trans }}</small>
     {% endif %}
 {%- endblock form_help %}

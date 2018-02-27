@@ -291,7 +291,7 @@
 
 {% block form_help -%}
     {% if help is not empty %}
-        <p class="form-help">{{ help }}</p>
+        <p class="form-help">{{ help|trans }}</p>
     {% endif %}
 {%- endblock form_help %}
 

@@ -17,7 +17,7 @@
             <http-basic />
             <form-login />
             <anonymous />
-            <switch-user stateless="true" />
+            <switch-user />
             <x509 />
             <remote-user />
             <user-checker />

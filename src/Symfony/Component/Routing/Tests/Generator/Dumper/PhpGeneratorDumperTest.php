@@ -86,8 +86,8 @@ class PhpGeneratorDumperTest extends TestCase
 
     public function testDumpWithLocalizedRoutes()
     {
-        $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en'));
-        $this->routeCollection->add('test.nl', (new Route('/testen/is/leuk'))->setDefault('_locale', 'nl'));
+        $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test'));
+        $this->routeCollection->add('test.nl', (new Route('/testen/is/leuk'))->setDefault('_locale', 'nl')->setDefault('_canonical_route', 'test'));
 
         $code = $this->generatorDumper->dump([
             'class' => 'LocalizedProjectUrlGenerator',

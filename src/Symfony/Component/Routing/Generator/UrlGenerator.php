@@ -116,7 +116,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             ?? $this->context->getParameter('_locale')
             ?: $this->defaultLocale;
 
-        if (null !== $locale && null !== $route = $this->routes->get($name.'.'.$locale)) {
+        if (null !== $locale && null !== ($route = $this->routes->get($name.'.'.$locale)) && $route->getDefault('_canonical_route') === $name) {
             unset($parameters['_locale']);
         } elseif (null === $route = $this->routes->get($name)) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));

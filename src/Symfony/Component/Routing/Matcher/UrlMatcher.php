@@ -194,9 +194,14 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected function getAttributes(Route $route, $name, array $attributes)
     {
+        $defaults = $route->getDefaults();
+        if (isset($defaults['_canonical_route'])) {
+            $name = $defaults['_canonical_route'];
+            unset($defaults['_canonical_route']);
+        }
         $attributes['_route'] = $name;
 
-        return $this->mergeDefaults($attributes, $route->getDefaults());
+        return $this->mergeDefaults($attributes, $defaults);
     }
 
     /**

@@ -256,10 +256,15 @@ EOF
                 }
 
                 if (!$route->getCondition()) {
+                    $defaults = $route->getDefaults();
+                    if (isset($defaults['_canonical_route'])) {
+                        $name = $defaults['_canonical_route'];
+                        unset($defaults['_canonical_route']);
+                    }
                     $default .= sprintf(
                         "%s => array(%s, %s, %s, %s),\n",
                         self::export($url),
-                        self::export(array('_route' => $name) + $route->getDefaults()),
+                        self::export(array('_route' => $name) + $defaults),
                         self::export(!$route->compile()->getHostVariables() ? $route->getHost() : $route->compile()->getHostRegex() ?: null),
                         self::export(array_flip($route->getMethods()) ?: null),
                         self::export(array_flip($route->getSchemes()) ?: null)
@@ -490,10 +495,15 @@ EOF;
 
             if (!$route->getCondition() && (!is_array($next = $routes[1 + $i] ?? null) || $regex !== $next[1])) {
                 $prevRegex = null;
+                $defaults = $route->getDefaults();
+                if (isset($defaults['_canonical_route'])) {
+                    $name = $defaults['_canonical_route'];
+                    unset($defaults['_canonical_route']);
+                }
                 $state->default .= sprintf(
                     "%s => array(%s, %s, %s, %s),\n",
                     $state->mark,
-                    self::export(array('_route' => $name) + $route->getDefaults()),
+                    self::export(array('_route' => $name) + $defaults),
                     self::export($vars),
                     self::export(array_flip($route->getMethods()) ?: null),
                     self::export(array_flip($route->getSchemes()) ?: null)
@@ -619,6 +629,11 @@ EOF;
 
         // the offset where the return value is appended below, with indendation
         $retOffset = 12 + strlen($code);
+        $defaults = $route->getDefaults();
+        if (isset($defaults['_canonical_route'])) {
+            $name = $defaults['_canonical_route'];
+            unset($defaults['_canonical_route']);
+        }
 
         // optimize parameters array
         if ($matches || $hostMatches) {
@@ -633,10 +648,10 @@ EOF;
             $code .= sprintf(
                 "            \$ret = \$this->mergeDefaults(%s, %s);\n",
                 implode(' + ', $vars),
-                self::export($route->getDefaults())
+                self::export($defaults)
             );
-        } elseif ($route->getDefaults()) {
-            $code .= sprintf("            \$ret = %s;\n", self::export(array_replace($route->getDefaults(), array('_route' => $name))));
+        } elseif ($defaults) {
+            $code .= sprintf("            \$ret = %s;\n", self::export(array('_route' => $name) + $defaults));
         } else {
             $code .= sprintf("            \$ret = array('_route' => '%s');\n", $name);
         }

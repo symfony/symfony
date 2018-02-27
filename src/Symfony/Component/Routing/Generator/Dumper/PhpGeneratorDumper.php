@@ -113,9 +113,9 @@ EOF;
             ?? $this->context->getParameter('_locale')
             ?: $this->defaultLocale;
 
-        if (null !== $locale && isset(self::$declaredRoutes[$name.'.'.$locale])) {
+        if (null !== $locale && (self::$declaredRoutes[$name.'.'.$locale][1]['_canonical_route'] ?? null) === $name) {
             unset($parameters['_locale']);
-            $name = $name.'.'.$locale;
+            $name .= '.'.$locale;
         } elseif (!isset(self::$declaredRoutes[$name])) {
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
         }

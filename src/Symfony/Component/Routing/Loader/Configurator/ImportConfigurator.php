@@ -54,6 +54,7 @@ class ImportConfigurator
                     foreach ($prefix as $locale => $localePrefix) {
                         $localizedRoute = clone $route;
                         $localizedRoute->setDefault('_locale', $locale);
+                        $localizedRoute->setDefault('_canonical_route', $name);
                         $localizedRoute->setPath($localePrefix.$route->getPath());
                         $this->route->add($name.'.'.$locale, $localizedRoute);
                     }

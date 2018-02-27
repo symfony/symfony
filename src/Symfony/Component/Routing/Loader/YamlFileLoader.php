@@ -126,6 +126,7 @@ class YamlFileLoader extends FileLoader
             foreach ($config['path'] as $locale => $path) {
                 $localizedRoute = clone $route;
                 $localizedRoute->setDefault('_locale', $locale);
+                $localizedRoute->setDefault('_canonical_route', $name);
                 $localizedRoute->setPath($path);
                 $collection->add($name.'.'.$locale, $localizedRoute);
             }
@@ -176,6 +177,7 @@ class YamlFileLoader extends FileLoader
                     foreach ($prefix as $locale => $localePrefix) {
                         $localizedRoute = clone $route;
                         $localizedRoute->setDefault('_locale', $locale);
+                        $localizedRoute->setDefault('_canonical_route', $name);
                         $localizedRoute->setPath($localePrefix.$route->getPath());
                         $subCollection->add($name.'.'.$locale, $localizedRoute);
                     }

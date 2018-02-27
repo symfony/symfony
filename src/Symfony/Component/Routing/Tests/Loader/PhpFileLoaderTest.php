@@ -126,11 +126,11 @@ class PhpFileLoaderTest extends TestCase
 
         $expectedCollection = new RouteCollection();
 
-        $expectedCollection->add('foo.en', (new Route('/glish/foo'))->setDefaults(array('_locale' => 'en')));
-        $expectedCollection->add('bar.en', (new Route('/glish/bar'))->setDefaults(array('_locale' => 'en')));
-        $expectedCollection->add('baz.en', (new Route('/baz'))->setDefaults(array('_locale' => 'en')));
-        $expectedCollection->add('c_foo.fr', (new Route('/ench/pub/foo'))->setDefaults(array('_locale' => 'fr')));
-        $expectedCollection->add('c_bar.fr', (new Route('/ench/pub/bar'))->setDefaults(array('_locale' => 'fr')));
+        $expectedCollection->add('foo.en', (new Route('/glish/foo'))->setDefaults(array('_locale' => 'en', '_canonical_route' => 'foo')));
+        $expectedCollection->add('bar.en', (new Route('/glish/bar'))->setDefaults(array('_locale' => 'en', '_canonical_route' => 'bar')));
+        $expectedCollection->add('baz.en', (new Route('/baz'))->setDefaults(array('_locale' => 'en', '_canonical_route' => 'baz')));
+        $expectedCollection->add('c_foo.fr', (new Route('/ench/pub/foo'))->setDefaults(array('_locale' => 'fr', '_canonical_route' => 'c_foo')));
+        $expectedCollection->add('c_bar.fr', (new Route('/ench/pub/bar'))->setDefaults(array('_locale' => 'fr', '_canonical_route' => 'c_bar')));
 
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub_i18n.php')));
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_i18n.php')));

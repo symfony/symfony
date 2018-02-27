@@ -67,6 +67,7 @@ trait AddTrait
             $routes->add($name.'.'.$locale, $route = $this->createRoute($path));
             $this->collection->add($this->name.$name.'.'.$locale, $route);
             $route->setDefault('_locale', $locale);
+            $route->setDefault('_canonical_route', $this->name.$name);
         }
 
         return new RouteConfigurator($this->collection, $routes, $this->name, $parentConfigurator, $this->prefixes);

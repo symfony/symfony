@@ -130,9 +130,9 @@ class XmlFileLoader extends FileLoader
         } else {
             foreach ($paths as $locale => $p) {
                 $defaults['_locale'] = $locale;
-                $routeName = $id.'.'.$locale;
+                $defaults['_canonical_route'] = $id;
                 $route = new Route($p, $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
-                $collection->add($routeName, $route);
+                $collection->add($id.'.'.$locale, $route);
             }
         }
     }
@@ -183,6 +183,7 @@ class XmlFileLoader extends FileLoader
                         $localizedRoute = clone $route;
                         $localizedRoute->setPath($localePrefix.$route->getPath());
                         $localizedRoute->setDefault('_locale', $locale);
+                        $localizedRoute->setDefault('_canonical_route', $name);
                         $subCollection->add($name.'.'.$locale, $localizedRoute);
                     }
                 } elseif (!isset($prefixes[$locale])) {

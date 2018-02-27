@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Config\Definition;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
 /**
  * Common Interface among all nodes.
  *
@@ -59,9 +63,9 @@ interface NodeInterface
     public function getDefaultValue();
 
     /**
-     * Normalizes the supplied value.
+     * Normalizes a value.
      *
-     * @param mixed $value The value to normalize
+     * @param mixed $value Value to normalize
      *
      * @return mixed The normalized value
      */
@@ -73,7 +77,9 @@ interface NodeInterface
      * @param mixed $leftSide
      * @param mixed $rightSide
      *
-     * @return mixed The merged values
+     * @return mixed The merged value
+     *
+     * @throws ForbiddenOverwriteException
      */
     public function merge($leftSide, $rightSide);
 
@@ -83,6 +89,9 @@ interface NodeInterface
      * @param mixed $value The value to finalize
      *
      * @return mixed The finalized value
+     *
+     * @throws Exception
+     * @throws InvalidConfigurationException
      */
     public function finalize($value);
 }

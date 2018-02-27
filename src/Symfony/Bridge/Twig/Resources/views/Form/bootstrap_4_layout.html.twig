@@ -260,6 +260,7 @@
     <{{ element|default('div') }} class="form-group">
         {{- form_label(form) -}}
         {{- form_widget(form) -}}
+        {{- form_help(form) -}}
     </{{ element|default('div') }}>
 {%- endblock form_row %}
 
@@ -276,3 +277,11 @@
         </span>
     {%- endif %}
 {%- endblock form_errors %}
+
+{# Help #}
+
+{% block form_help -%}
+    {% if form.vars.help is not empty %}
+        <small class="form-text text-muted">{{ form.vars.help|raw }}</small>
+    {% endif %}
+{%- endblock form_help %}

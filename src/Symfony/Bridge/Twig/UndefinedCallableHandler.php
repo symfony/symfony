@@ -34,6 +34,7 @@ class UndefinedCallableHandler
         'form_widget' => 'form',
         'form_errors' => 'form',
         'form_label' => 'form',
+        'form_help' => 'form',
         'form_row' => 'form',
         'form_rest' => 'form',
         'form' => 'form',

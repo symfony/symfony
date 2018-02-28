@@ -56,7 +56,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo');
     }
 
-    public function testNoSchemaRedirectIfOnOfMultipleSchemesMatches()
+    public function testNoSchemaRedirectIfOneOfMultipleSchemesMatches()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https', 'http')));

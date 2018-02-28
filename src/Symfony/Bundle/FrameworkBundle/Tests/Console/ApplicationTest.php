@@ -165,6 +165,33 @@ class ApplicationTest extends TestCase
         $this->assertContains('fine', $output);
     }
 
+    public function testRegistrationErrorsAreDisplayedOnCommandNotFound()
+    {
+        $container = new ContainerBuilder();
+        $container->register('event_dispatcher', EventDispatcher::class);
+
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel
+            ->method('getBundles')
+            ->willReturn(array($this->createBundleMock(
+                array((new Command(null))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); }))
+            )));
+        $kernel
+            ->method('getContainer')
+            ->willReturn($container);
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'fine'));
+        $output = $tester->getDisplay();
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertContains('Some commands could not be registered:', $output);
+        $this->assertContains('Command "fine" is not defined.', $output);
+    }
+
     private function getKernel(array $bundles, $useDispatcher = false)
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();

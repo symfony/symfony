@@ -220,16 +220,17 @@ class RouterTest extends TestCase
 
     public function testGetRouteCollectionAddsContainerParametersResource()
     {
-        $routeCollection = $this->getMockBuilder(RouteCollection::class)->getMock();
-        $routeCollection->method('getIterator')->willReturn(new \ArrayIterator(array(new Route('/%locale%'))));
-        $routeCollection->expects($this->once())->method('addResource')->with(new ContainerParametersResource(array('locale' => 'en')));
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('foo', new Route('/%locale%'));
 
         $sc = $this->getServiceContainer($routeCollection);
         $sc->setParameter('locale', 'en');
 
         $router = new Router($sc, 'foo');
 
-        $router->getRouteCollection();
+        $routeCollection = $router->getRouteCollection();
+
+        $this->assertEquals(array(new ContainerParametersResource(array('locale' => 'en'))), $routeCollection->getResources());
     }
 
     public function getNonStringValues()

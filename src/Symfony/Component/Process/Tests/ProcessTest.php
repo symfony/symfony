@@ -1380,13 +1380,13 @@ class ProcessTest extends TestCase
 
     public function testSetBadEnv()
     {
-        $process = $this->getProcess('echo hello');
+        $process = $this->getProcess('echo {{ hello }}');
         $process->setEnv(array('bad%%' => '123'));
         $process->inheritEnvironmentVariables(true);
 
         $process->run();
 
-        $this->assertSame('hello'.PHP_EOL, $process->getOutput());
+        $this->assertSame('{{ hello }}'.PHP_EOL, $process->getOutput());
         $this->assertSame('', $process->getErrorOutput());
     }
 
@@ -1476,7 +1476,7 @@ EOTXT;
 
     public function testPreparedCommand()
     {
-        $p = new Process('echo {{ abc }}DEF');
+        $p = new Process('!echo {{ abc }}DEF');
         $p->run(null, array('abc' => 'ABC'));
 
         $this->assertSame('ABCDEF', rtrim($p->getOutput()));
@@ -1488,7 +1488,7 @@ EOTXT;
      */
     public function testPreparedCommandWithMissingValue()
     {
-        $p = new Process('echo {{ abc }}');
+        $p = new Process('!echo {{ abc }}');
         $p->run(null, array('bcd' => 'BCD'));
     }
 
@@ -1498,7 +1498,17 @@ EOTXT;
      */
     public function testPreparedCommandWithNoValues()
     {
-        $p = new Process('echo {{ abc }}');
+        $p = new Process('!echo {{ abc }}');
+        $p->run();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Double quotes are invalid in prepared command line: !echo "{{ abc }}"
+     */
+    public function testPreparedCommandWithDoubleQuote()
+    {
+        $p = new Process('!echo "{{ abc }}"');
         $p->run();
     }
 

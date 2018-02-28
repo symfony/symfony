@@ -269,7 +269,8 @@ class Process implements \IteratorAggregate
                 // exec is mandatory to deal with sending a signal to the process
                 $commandline = 'exec '.$commandline;
             }
-        } else {
+        } elseif ('!' === substr($commandline = trim($commandline), 0, 1)) {
+            $commandline = ltrim(substr($commandline, 1));
             $commandline = $this->replacePlaceholders($commandline, $env);
         }
 
@@ -1554,7 +1555,11 @@ class Process implements \IteratorAggregate
 
     private function replacePlaceholders(string $commandline, array $env)
     {
-        $pattern = '\\' === DIRECTORY_SEPARATOR ? '!%s!' : '${%s}';
+        if (false !== strpos($commandline, '"')) {
+            throw new InvalidArgumentException(sprintf('Double quotes are invalid in prepared command line: !%s', $commandline));
+        }
+
+        $pattern = '\\' === DIRECTORY_SEPARATOR ? '!%s!' : '"$%s"';
 
         return preg_replace_callback('/\{\{ ?([_a-zA-Z0-9]++) ?\}\}/', function ($m) use ($pattern, $commandline, $env) {
             if (!isset($env[$m[1]]) || false === $env[$m[1]]) {

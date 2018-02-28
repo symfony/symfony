@@ -34,7 +34,10 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
         [
             ./div[
                 ./ul
-                    [./li[.="❌ [trans]Error![/trans]"]]
+                    [./li
+                        [./span[.="[trans]error[/trans]"]]
+                        [./span[.="[trans]Error![/trans]"]]
+                    ]
                     [count(./li)=1]
             ]
         ]

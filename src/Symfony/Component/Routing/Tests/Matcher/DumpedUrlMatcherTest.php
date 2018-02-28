@@ -17,24 +17,6 @@ use Symfony\Component\Routing\RequestContext;
 
 class DumpedUrlMatcherTest extends UrlMatcherTest
 {
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.
-     */
-    public function testSchemeRequirement()
-    {
-        parent::testSchemeRequirement();
-    }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.
-     */
-    public function testSchemeAndMethodMismatch()
-    {
-        parent::testSchemeRequirement();
-    }
-
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         static $i = 0;

@@ -17,7 +17,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
 
     public function match($rawPathinfo)
     {
-        $allow = array();
+        $allow = $allowSchemes = array();
         $pathinfo = rawurldecode($rawPathinfo);
         $context = $this->context;
         $requestMethod = $canonicalMethod = $context->getMethod();

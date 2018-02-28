@@ -113,6 +113,8 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
 
+    abstract protected function renderHelp(FormView $view, array $vars = array());
+
     abstract protected function renderErrors(FormView $view);
 
     abstract protected function renderWidget(FormView $view, array $vars = array());
@@ -404,6 +406,22 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     [@type="button"]
     [@name="myform[mybutton]"]
     [.="[trans]form.myform_mybutton[/trans]"]
+'
+        );
+    }
+
+    public function testHelp()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'help' => 'Help text test!'
+        ]);
+        $view = $form->createView();
+        $html = $this->renderHelp($view);
+
+        $this->assertMatchesXpath($html,
+'/p
+    [@class="help-text"]
+    [.="[trans]Help text test![/trans]"]
 '
         );
     }

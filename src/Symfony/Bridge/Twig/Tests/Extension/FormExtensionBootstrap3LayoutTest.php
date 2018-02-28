@@ -89,6 +89,11 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
         return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
+    protected function renderHelp(FormView $view, array $vars = array())
+    {
+        return (string) $this->renderer->searchAndRenderBlock($view, 'help', $vars);
+    }
+
     protected function renderErrors(FormView $view)
     {
         return (string) $this->renderer->searchAndRenderBlock($view, 'errors');

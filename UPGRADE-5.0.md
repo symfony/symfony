@@ -65,6 +65,7 @@ SecurityBundle
 --------------
 
  * The `logout_on_user_change` firewall option has been removed.
+ * The `switch_user.stateless` firewall option has been removed.
  * The `SecurityUserValueResolver` class has been removed.
 
 Translation

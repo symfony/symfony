@@ -132,7 +132,7 @@ class SecurityExtensionTest extends TestCase
                 'some_firewall' => array(
                     'stateless' => true,
                     'http_basic' => null,
-                    'switch_user' => array('stateless' => false),
+                    'switch_user' => true,
                 ),
             ),
         ));

@@ -70,6 +70,7 @@ SecurityBundle
 --------------
 
  * The `logout_on_user_change` firewall option is deprecated.
+ * The `switch_user.stateless` firewall option is deprecated, use the `stateless` option instead.
  * The `SecurityUserValueResolver` class is deprecated, use
    `Symfony\Component\Security\Http\Controller\UserValueResolver` instead.
 

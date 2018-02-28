@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Philipp91 at 2018-02-27T21:58:17Z
+
+Seems like GitHub won't easily let me propose this for the `2.7` branch, but it should be mergeable there without conflicts.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2018-02-28T05:25:31Z
+
+This PR needs a descriptive title.
+
+---------------------------------------------------------------------------
+
+by Philipp91 at 2018-02-28T20:40:08Z
+
+Sorry about the PR title. The CI failure on one of three PHP versions seems unrelated, I don't think my change causes a segmentation fault.

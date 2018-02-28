@@ -7,6 +7,30 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.42 (2018-02-28)
+
+ * bug #26338 [Debug] Keep previous errors of Error instances (Philipp91)
+ * bug #26312 [Routing] Don't throw 405 when scheme requirement doesn't match (nicolas-grekas)
+ * bug #26298 Fix ArrayInput::toString() for InputArgument::IS_ARRAY args (maximium)
+ * bug #25557 [WebProfilerBundle] add a way to limit ajax request (Simperfit)
+ * bug #26228 [HttpFoundation] Fix missing "throw" in JsonResponse (nicolas-grekas)
+ * bug #26211 [Console] Suppress warning from sapi_windows_vt100_support (adawolfa)
+ * bug #26156 Fixes #26136: Avoid emitting warning in hasParameterOption() (greg-1-anderson)
+ * bug #26183 [DI] Add null check for removeChild (changmin.keum)
+ * bug #26159 created validator.tl.xlf for Form/Translations (ergiegonzaga)
+ * bug #26100 [Routing] Throw 405 instead of 404 when redirect is not possible (nicolas-grekas)
+ * bug #26040 [Process] Check PHP_BINDIR before $PATH in PhpExecutableFinder (nicolas-grekas)
+ * bug #26012 Exit as late as possible (greg0ire)
+ * bug #25893 [Console] Fix hasParameterOption / getParameterOption when used with multiple flags (greg-1-anderson)
+ * bug #25940 [Form] keep the context when validating forms (xabbuh)
+ * bug #25373 Use the PCRE_DOLLAR_ENDONLY modifier in route regexes (mpdude)
+ * bug #26010 [CssSelector] For AND operator, the left operand should have parentheses, not only right operand (Arnaud CHASSEUX)
+ * bug #25971 [Debug] Fix bad registration of exception handler, leading to mem leak (nicolas-grekas)
+ * bug #25962 [Routing] Fix trailing slash redirection for non-safe verbs (nicolas-grekas)
+ * bug #25948 [Form] Fixed empty data on expanded ChoiceType and FileType (HeahDude)
+ * bug #25972 support sapi_windows_vt100_support for php 7.2+ (jhdxr)
+ * bug #25744 [TwigBridge] Allow label translation to be safe (MatTheCat)
+
 * 2.7.41 (2018-01-29)
 
  * bug #25922 [HttpFoundation] Use the correct syntax for session gc based on Pdo driver (tanasecosminromeo)

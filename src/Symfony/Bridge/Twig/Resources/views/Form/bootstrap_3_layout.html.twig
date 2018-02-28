@@ -92,6 +92,7 @@
     <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
         {{- form_label(form) -}}
         {{- form_widget(form) -}}
+        {{- form_help(form) -}}
         {{- form_errors(form) -}}
     </div>
 {%- endblock form_row %}
@@ -149,3 +150,11 @@
     {% if form is not rootform %}</span>{% else %}</div>{% endif %}
     {%- endif %}
 {%- endblock form_errors %}
+
+{# Help #}
+
+{% block form_help -%}
+    {% if help is not empty %}
+        <span class="help-block">{{ translation_domain is same as(false) ? help : help|trans({}, translation_domain) }}</span>
+    {% endif %}
+{%- endblock form_help %}

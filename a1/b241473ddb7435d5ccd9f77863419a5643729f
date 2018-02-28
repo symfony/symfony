@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-25T13:28:25Z
+
+> the $supportsRedirections property should be turned back to a local variable
+
+We would still need to pass the var to `generateMatchMethod`. As a property it's more flexible IMO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-26T17:43:46Z
+
+ready for rebase
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-26T22:22:41Z
+
+Rebased
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-28T09:21:11Z
+
+@Tobion scheme redirection now does a match before, similar to trailing slash redirection. I also added another redirection, doing a trailing slash + scheme redirection when possible.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-28T10:59:51Z
+
+Please add a test for scheme + trailing slash redirect. Then good to merge.

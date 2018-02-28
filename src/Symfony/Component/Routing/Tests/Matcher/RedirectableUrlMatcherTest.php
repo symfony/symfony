@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RedirectableUrlMatcherTest extends UrlMatcherTest
 {
-    public function testRedirectWhenNoSlash()
+    public function testMissingTrailingSlash()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));

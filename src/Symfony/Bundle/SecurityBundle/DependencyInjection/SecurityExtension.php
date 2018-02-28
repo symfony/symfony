@@ -16,6 +16,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\User
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -583,12 +584,22 @@ class SecurityExtension extends Extension
             return $this->expressions[$id];
         }
 
-        $container
-            ->register($id, 'Symfony\Component\ExpressionLanguage\SerializedParsedExpression')
-            ->setPublic(false)
-            ->addArgument($expression)
-            ->addArgument(serialize($this->getExpressionLanguage()->parse($expression, array('token', 'user', 'object', 'roles', 'request', 'trust_resolver'))->getNodes()))
-        ;
+        try {
+            // due to the missing Cache component we try to parse the expression on Symfony < 3 as this will improve the performance.
+            // this can fail if custom functions are used inside the expression so we fallback to using a normal Expression instead
+            $container
+                ->register($id, 'Symfony\Component\ExpressionLanguage\SerializedParsedExpression')
+                ->setPublic(false)
+                ->addArgument($expression)
+                ->addArgument(serialize($this->getExpressionLanguage()->parse($expression, array('token', 'user', 'object', 'roles', 'request', 'trust_resolver'))->getNodes()))
+            ;
+        } catch (SyntaxError $error) {
+            $container
+                ->register($id, 'Symfony\Component\ExpressionLanguage\Expression')
+                ->setPublic(false)
+                ->addArgument($expression)
+            ;
+        }
 
         return $this->expressions[$id] = new Reference($id);
     }

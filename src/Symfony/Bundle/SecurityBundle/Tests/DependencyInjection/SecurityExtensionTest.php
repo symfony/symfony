@@ -95,6 +95,60 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
+    public function testRegisterRequestMatchersWithAllowIfExpression()
+    {
+        $container = $this->getRawContainer();
+
+        $rawExpression = "'foo' == 'bar' or 1 in [1, 3, 3]";
+        $rawExpressionWithCustomFunction = "foo('bar')";
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => array(),
+                ),
+            ),
+
+            'access_control' => array(
+                array('path' => '/', 'allow_if' => $rawExpression),
+                array('path' => '/foo', 'allow_if' => $rawExpressionWithCustomFunction),
+            ),
+        ));
+
+        $container->compile();
+
+        $accessMap = $container->getDefinition('security.access_map');
+        $this->assertCount(2, $accessMap->getMethodCalls());
+
+        // first expression without any custom functions can be parsed already
+        $call = $accessMap->getMethodCalls()[0];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+        $this->assertCount(3, $args);
+        $expressionId = $args[1][0];
+        $this->assertTrue($container->hasDefinition($expressionId));
+        $expressionDef = $container->getDefinition($expressionId);
+        $this->assertSame('Symfony\Component\ExpressionLanguage\SerializedParsedExpression', $expressionDef->getClass());
+        $this->assertSame($rawExpression, $expressionDef->getArgument(0));
+        $this->assertInstanceOf('Symfony\Component\ExpressionLanguage\Node\BinaryNode', unserialize($expressionDef->getArgument(1)));
+
+        // second expression cannot be parsed at compile-time so we use an Expression instead and let it be parsed at run-time
+        $call = $accessMap->getMethodCalls()[1];
+        $this->assertSame('add', $call[0]);
+        $args = $call[1];
+        $this->assertCount(3, $args);
+        $expressionId = $args[1][0];
+        $this->assertTrue($container->hasDefinition($expressionId));
+        $expressionDef = $container->getDefinition($expressionId);
+        $this->assertSame('Symfony\Component\ExpressionLanguage\Expression', $expressionDef->getClass());
+        $this->assertSame($rawExpressionWithCustomFunction, $expressionDef->getArgument(0));
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

@@ -92,9 +92,9 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
         return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
-    protected function renderHelp(FormView $view, array $vars = array())
+    protected function renderHelp(FormView $view)
     {
-        return (string) $this->renderer->searchAndRenderBlock($view, 'help', $vars);
+        return (string) $this->renderer->searchAndRenderBlock($view, 'help');
     }
 
     protected function renderErrors(FormView $view)

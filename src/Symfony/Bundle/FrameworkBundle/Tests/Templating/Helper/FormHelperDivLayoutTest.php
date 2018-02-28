@@ -91,7 +91,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return (string) $this->engine->get('form')->label($view, $label, $vars);
     }
 
-    protected function renderHelp(FormView $view, array $vars = array())
+    protected function renderHelp(FormView $view)
     {
         return (string) $this->engine->get('form')->help($view);
     }

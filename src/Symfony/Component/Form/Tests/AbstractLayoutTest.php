@@ -113,7 +113,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
 
-    abstract protected function renderHelp(FormView $view, array $vars = array());
+    abstract protected function renderHelp(FormView $view);
 
     abstract protected function renderErrors(FormView $view);
 

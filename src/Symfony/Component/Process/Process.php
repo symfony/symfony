@@ -1554,7 +1554,7 @@ class Process implements \IteratorAggregate
 
     private function replacePlaceholders(string $commandline, array $env)
     {
-        $pattern = '\\' === DIRECTORY_SEPARATOR ? '!%s!' : '${%s}';
+        $pattern = '\\' === DIRECTORY_SEPARATOR ? '!%s!' : '"$%s"';
 
         return preg_replace_callback('/\{\{ ?([_a-zA-Z0-9]++) ?\}\}/', function ($m) use ($pattern, $commandline, $env) {
             if (!isset($env[$m[1]]) || false === $env[$m[1]]) {

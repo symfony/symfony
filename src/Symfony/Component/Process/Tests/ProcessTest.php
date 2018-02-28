@@ -1476,10 +1476,10 @@ EOTXT;
 
     public function testPreparedCommand()
     {
-        $p = new Process('echo {{ abc }}DEF');
-        $p->run(null, array('abc' => 'ABC'));
+        $p = new Process(self::$phpBin.' -r \'print_r($argv);\' {{ abc }}DEF');
+        $p->run(null, array('abc' => 'A" B "C'));
 
-        $this->assertSame('ABCDEF', rtrim($p->getOutput()));
+        $this->assertContains('A" B "CDEF', $p->getOutput());
     }
 
     /**

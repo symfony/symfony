@@ -78,6 +78,30 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
+	 * @param $objectOrArray
+	 * @param $propertyPath
+	 *
+	 * @return null|string
+	 * @throws \ReflectionException
+	 */
+	public function getType(&$objectOrArray, $propertyPath): ? string
+	{
+		$propertyPath = $this->getPropertyPath($propertyPath);
+		$property  = $propertyPath->getElement($propertyPath->getLength() - 1);
+		$access = $this->getWriteAccessInfo(get_class($objectOrArray), $property, []);
+
+		if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
+            $reflMethod = new \ReflectionMethod(get_class($objectOrArray), $access[self::ACCESS_NAME]);
+			
+			if ($reflMethod->getNumberOfParameters() == 1) {
+				return $reflMethod->getParameters()[0]->getType()->getName();
+			}
+		}
+
+		return null;
+	}
+    
+    /**
      * {@inheritdoc}
      */
     public function getValue($objectOrArray, $propertyPath)

@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-27T07:09:16Z
+
+The only downside is that there is no way to easily customize the chosen icon. Would it be possible to. do the same via CSS?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-27T08:58:12Z
+
+Bootstrap 4 does not have any icons included. They do have 8 base64 images in their CSS but none that we can use.
+I do not like the idea do provide a "symfony-bootstrap4" css file.
+
+A way to customize the icon would be to introduce a twig block and let the user to override it.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-27T09:13:55Z
+
+Not sure if it's relevant, but in EasyAdmin we use a word (`Error`) translated into the user's language instead of an icon:
+
+![error-en](https://user-images.githubusercontent.com/73419/36719943-cc94184e-1ba6-11e8-835e-9c96d5b719bb.png)
+
+![error-ru](https://user-images.githubusercontent.com/73419/36719945-cdcf3fa4-1ba6-11e8-9d41-d2ebb14d0997.png)
+
+In any case, no matter if we use an icon or a translated text, we should wrap it with `<span>` or something else so people can quickly hide it, change its styles, etc.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-02-27T09:18:22Z
+
+But that could be easily achieved on userland using CSS I guess. Bootstrap 4 does not showcase anything regarding this AFAIK, so if it's really a good practice recommended by the WCAG2, perhaps it should be fixed on bootstrap side rather than on our own by arbitrary choosing a way to make it more visual.
+
+Otherwise, I do prefer the EasyAdmin way as shown by @javiereguiluz.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-27T09:23:28Z
+
+Yes, I do like that as well. Since we have that clear background and the word "error" it should be okey.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-27T18:14:47Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-28T17:50:04Z
+
+I've added the "error badge":
+
+![screen shot 2018-02-28 at 18 38 35](https://user-images.githubusercontent.com/1275206/36803492-f92ace54-1cb7-11e8-8c56-dbe86a21291b.png)
+
+I need some guidance with where to put the translation for key "error". I would like to put it in the TwigBridge because that's where we use it. As alternative one could put it in the validator component.
+
+I would also like to use the "validator" domain.
+
+Any suggestions?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-28T19:33:45Z
+
+Another quick comment just for your consideration. In EasyAdmin, when there are multiple errors in a single field, to avoid displaying too many `ERROR` badges, we display a single `ERRORS` badge (in plural) and a `<ul>` of the error messages:
+
+![multiple-errors](https://user-images.githubusercontent.com/73419/36808845-90814932-1cc6-11e8-8805-4a1d343b26f1.png)
+
+But maybe this is too much attention to detail for Symfony core. Not sure.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-01T08:45:22Z
+
+the repeated "ERROR" label LGTM
+but before merging, the composer.json of the Form component must be updated to conflict with symfony/twig-bridge `<3.4.5|<4.0.5,>=4.0`
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-01T09:55:05Z
+
+I've added more translations. Fabbot is a false negative.

@@ -112,7 +112,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
         $this->assertMatchesXpath($html,
 '/span
-    [@id="name_help"]
+    [@id="nameHelpBlock"]
     [@class="help-block"]
     [.="[trans]Help text test![/trans]"]
 '

@@ -433,7 +433,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $view = $form->createView();
         $html = $this->renderHelp($view);
 
-        $this->assertMatchesXpath($html, '');
+        $this->assertMatchesXpath($html, '/p', 0);
     }
 
     public function testHelpSetLinkFromWidget()

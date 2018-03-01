@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-02-26T21:30:11Z
+
+> But we should consider not using a table here.
+
+I agree. I'm the one who introduced the table layout in #20887 for the bootstrap 3 layout in order to provide a good-enough default output for this type. At the time, bootstrap 3 wasn't offering much (AFAIK) for displaying such a heavy type and my guess is that the base theme is overridden for most accessibility needs.
+However, bootstrap 4 is now offering [form grid](https://getbootstrap.com/docs/4.0/components/forms/#form-grid) with [`col-auto` sizing](https://getbootstrap.com/docs/4.0/components/forms/#auto-sizing) which may have suited better 😕
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-27T07:04:58Z
+
+As we are still doing fundamental changes to the Bootstrap 4 integration, wouldn't it be better to remove usage of tables as indicated by @ogizanagi?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-27T09:09:56Z
+
+Thank you @ogizanagi for clearing this out. I did not know why we are using a table.
+
+@fabpot: Yes, we are still doing changes to the Bootstrap 4 theme. I will be done within a few (2-3) weeks. I suggest to "release" Bootstrap 4 theme with 4.1.
+
+I agree with you both. I think we should redo this without tables. I'll update the PR today
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-27T18:14:58Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-28T17:26:34Z
+
+What do you think about something like this:
+
+Before:
+![screen shot 2018-02-28 at 18 21 37](https://user-images.githubusercontent.com/1275206/36802307-d3ef54f0-1cb4-11e8-94b7-82a2b06cf261.png)
+
+After:
+![screen shot 2018-02-28 at 18 25 18](https://user-images.githubusercontent.com/1275206/36802309-d4275b66-1cb4-11e8-8e69-3c6598c46a3d.png)

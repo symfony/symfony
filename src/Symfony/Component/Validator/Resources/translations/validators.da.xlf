@@ -242,6 +242,10 @@
                 <source>This value is not a valid ISSN.</source>
                 <target>Værdien er ikke en gyldig ISSN.</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Fejl</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

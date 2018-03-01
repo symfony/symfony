@@ -291,7 +291,7 @@
 
 {% block form_help -%}
     {% if help is not empty %}
-        <p id="{{ id }}HelpBlock" class="help-text">{{ translation_domain is same as(false) ? help : help|trans({}, translation_domain) }}</p>
+        <p id="{{ id }}_help" class="help-text">{{ translation_domain is same as(false) ? help : help|trans({}, translation_domain) }}</p>
     {% endif %}
 {%- endblock form_help %}
 
@@ -397,7 +397,7 @@
     id="{{ id }}" name="{{ full_name }}"
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
-    {%- if helpBlockDisplayed is defined and helpBlockDisplayed and help is not empty %} aria-describedby="{{ id }}HelpBlock"{% endif -%}
+    {%- if helpBlockDisplayed is defined and helpBlockDisplayed is same as(true) and help is not empty %} aria-describedby="{{ id }}_help"{% endif -%}
     {{ block('attributes') }}
 {%- endblock widget_attributes -%}
 

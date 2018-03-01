@@ -420,7 +420,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertMatchesXpath($html,
 '/p
-    [@id="nameHelpBlock"]
+    [@id="name_help"]
     [@class="help-text"]
     [.="[trans]Help text test![/trans]"]
 '
@@ -446,7 +446,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
         $this->assertMatchesXpath($html,
 '/input
-    [@aria-describedby="nameHelpBlock"]
+    [@aria-describedby="name_help"]
 '
         );
     }

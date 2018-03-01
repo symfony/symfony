@@ -434,9 +434,8 @@ class RouterTest extends TestCase
 
     public function testGetRouteCollectionAddsContainerParametersResourceWithSfContainer()
     {
-        $routeCollection = $this->getMockBuilder(RouteCollection::class)->getMock();
-        $routeCollection->method('getIterator')->willReturn(new \ArrayIterator(array(new Route('/%locale%'))));
-        $routeCollection->expects($this->once())->method('addResource')->with(new ContainerParametersResource(array('locale' => 'en')));
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('foo', new Route('/%locale%'));
 
         $sc = $this->getServiceContainer($routeCollection);
         $sc->setParameter('locale', 'en');

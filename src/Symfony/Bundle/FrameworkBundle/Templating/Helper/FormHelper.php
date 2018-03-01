@@ -172,7 +172,7 @@ class FormHelper extends Helper
     /**
      * Renders the help of the given view.
      *
-     * @param FormView $view      The parent view
+     * @param FormView $view The parent view
      *
      * @return string The HTML markup
      */

@@ -140,7 +140,7 @@
     {%- else -%}
         <div {{ block('widget_container_attributes') }}>
             {{- form_errors(form) -}}
-            <table class="{{ table_class|default('') }}">
+            <table class="{{ table_class|default('') }}" role="presentation">
                 <thead>
                     <tr>
                         {%- if with_years %}<th>{{ form_label(form.years) }}</th>{% endif -%}

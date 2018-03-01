@@ -1232,9 +1232,9 @@ EOF;
         $code = "        \$this->aliases = array(\n";
         ksort($aliases);
         foreach ($aliases as $alias => $id) {
-            $id = (string) $id;
+            $id = $this->container->normalizeId($id);
             while (isset($aliases[$id])) {
-                $id = (string) $aliases[$id];
+                $id = $this->container->normalizeId($aliases[$id]);
             }
             $code .= '            '.$this->doExport($alias).' => '.$this->doExport($id).",\n";
         }
@@ -1555,7 +1555,7 @@ EOF;
             if (is_array($argument)) {
                 $this->getServiceCallsFromArguments($argument, $calls, $isPreInstance, $callerId, $behavior, $step);
             } elseif ($argument instanceof Reference) {
-                $id = (string) $argument;
+                $id = $this->container->normalizeId($argument);
 
                 if (!isset($calls[$id])) {
                     $calls[$id] = (int) ($isPreInstance && isset($this->circularReferences[$callerId][$id]));
@@ -1625,7 +1625,7 @@ EOF;
 
                 continue;
             } elseif ($argument instanceof Reference) {
-                $argumentId = (string) $argument;
+                $argumentId = $this->container->normalizeId($argument);
                 if ($id === $argumentId) {
                     return true;
                 }
@@ -1790,11 +1790,12 @@ EOF;
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {
-            if (null !== $this->referenceVariables && isset($this->referenceVariables[$id = (string) $value])) {
+            $id = $this->container->normalizeId($value);
+            if (null !== $this->referenceVariables && isset($this->referenceVariables[$id])) {
                 return $this->dumpValue($this->referenceVariables[$id], $interpolate);
             }
 
-            return $this->getServiceCall((string) $value, $value);
+            return $this->getServiceCall($id, $value);
         } elseif ($value instanceof Expression) {
             return $this->getExpressionLanguage()->compile((string) $value, array('this' => 'container'));
         } elseif ($value instanceof Parameter) {
@@ -1881,6 +1882,7 @@ EOF;
         while ($this->container->hasAlias($id)) {
             $id = (string) $this->container->getAlias($id);
         }
+        $id = $this->container->normalizeId($id);
 
         if ('service_container' === $id) {
             return '$this';

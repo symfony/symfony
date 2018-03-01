@@ -55,7 +55,7 @@ class ResolveHotPathPass extends AbstractRecursivePass
         if ($value instanceof Definition && $isRoot && (isset($this->resolvedIds[$this->currentId]) || !$value->hasTag($this->tagName) || $value->isDeprecated())) {
             return $value->isDeprecated() ? $value->clearTag($this->tagName) : $value;
         }
-        if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->has($id = (string) $value)) {
+        if ($value instanceof Reference && ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE !== $value->getInvalidBehavior() && $this->container->has($id = $this->container->normalizeId($value))) {
             $definition = $this->container->findDefinition($id);
             if (!$definition->hasTag($this->tagName) && !$definition->isDeprecated()) {
                 $this->resolvedIds[$id] = true;

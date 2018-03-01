@@ -175,8 +175,7 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->update($masterResponse);
 
         $this->assertTrue($masterResponse->headers->hasCacheControlDirective('private'));
-        // Not sure if we should pass "max-age: 60" in this case, as long as the response is private and
-        // that's the more conservative of both the master and embedded response...?
+        $this->assertSame('60', $masterResponse->headers->getCacheControlDirective('max-age'));
     }
 
     public function testResponseIsExiprableWhenEmbeddedResponseCombinesExpiryAndValidation()
@@ -238,5 +237,56 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($masterResponse->headers->hasCacheControlDirective('no-cache'));
         $this->assertFalse($masterResponse->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertTrue($masterResponse->headers->hasCacheControlDirective('private'));
+    }
+
+    public function testMasterResponseHasLowestPrivateMaxAge()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $response1 = new Response();
+        $response1->setMaxAge(3600);
+        $response1->setPrivate();
+        $cacheStrategy->add($response1);
+
+        $response2 = new Response();
+        $response2->setSharedMaxAge(60);
+        $cacheStrategy->add($response2);
+
+        $response3 = new Response();
+        $response3->setMaxAge(60);
+        $response3->setPrivate();
+        $cacheStrategy->add($response3);
+
+        $response = new Response();
+        $cacheStrategy->update($response);
+
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+        $this->assertSame('60', $response->headers->getCacheControlDirective('max-age'));
+    }
+
+    public function testMasterResponseHasBothMaxAges()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $response1 = new Response();
+        $response1->setMaxAge(3600);
+        $cacheStrategy->add($response1);
+
+        $response2 = new Response();
+        $response2->setSharedMaxAge(30);
+        $cacheStrategy->add($response2);
+
+        $response3 = new Response();
+        $response3->setMaxAge(60);
+        $cacheStrategy->add($response3);
+
+        $response = new Response();
+        $cacheStrategy->update($response);
+
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+        $this->assertSame('30', $response->headers->getCacheControlDirective('s-maxage'));
+        $this->assertSame('60', $response->headers->getCacheControlDirective('max-age'));
     }
 }

@@ -184,7 +184,7 @@ class FormType extends BaseType
 
         $resolver->setAllowedTypes('label_attr', 'array');
         $resolver->setAllowedTypes('upload_max_size_message', array('callable'));
-        $resolver->setAllowedTypes('help', ['string', 'NULL']);
+        $resolver->setAllowedTypes('help', array('string', 'NULL'));
     }
 
     /**

@@ -91,7 +91,7 @@
 {% block form_row -%}
     <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
         {{- form_label(form) -}}
-        {{- form_widget(form) -}}
+        {{- form_widget(form, { 'helpBlockDisplayed': true }) -}}
         {{- form_help(form) -}}
         {{- form_errors(form) -}}
     </div>

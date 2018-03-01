@@ -259,7 +259,7 @@
     {%- endif -%}
     <{{ element|default('div') }} class="form-group">
         {{- form_label(form) -}}
-        {{- form_widget(form) -}}
+        {{- form_widget(form, { 'helpBlockDisplayed': true }) -}}
         {{- form_help(form) -}}
     </{{ element|default('div') }}>
 {%- endblock form_row %}

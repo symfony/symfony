@@ -302,6 +302,10 @@
                 <source>An empty file is not allowed.</source>
                 <target>Ficheiro vazio não é permitido.</target>
             </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Erro</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

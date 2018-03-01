@@ -264,7 +264,7 @@
         <div class="{% if form is not rootform %}invalid-feedback d-block{% else %}alert alert-danger{% endif %}">
             <ul class="list-unstyled mb-0">
                 {%- for error in errors -%}
-                    <li>{{ error.message }}</li>
+                    <li><span class="initialism form-error-icon badge badge-danger">{{ 'Error'|trans({}, 'validators') }}</span> <span class="form-error-message">{{ error.message }}</span></li>
                 {%- endfor -%}
             </ul>
         </div>

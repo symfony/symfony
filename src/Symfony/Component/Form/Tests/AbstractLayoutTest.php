@@ -436,6 +436,62 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
         $this->assertMatchesXpath($html, '');
     }
 
+    public function testHelpSetLinkFromWidget()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+            'help' => 'Help text test!',
+        ));
+        $view = $form->createView();
+        $html = $this->renderWidget($view, array('helpBlockDisplayed' => true));
+
+        $this->assertMatchesXpath($html,
+'/input
+    [@aria-describedby="nameHelpBlock"]
+'
+        );
+    }
+
+    public function testHelpSetNotLinkedFromWidget()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+            'help' => 'Help text test!',
+        ));
+        $view = $form->createView();
+        $html = $this->renderWidget($view);
+
+        $this->assertMatchesXpath($html,
+            '/input
+    [not(@aria-describedby)]
+'
+        );
+    }
+
+    public function testHelpNotSetLinkFromWidget()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $view = $form->createView();
+        $html = $this->renderWidget($view, array('helpBlockDisplayed' => true));
+
+        $this->assertMatchesXpath($html,
+            '/input
+    [not(@aria-describedby)]
+'
+        );
+    }
+
+    public function testHelpNotSetNotLinkedFromWidget()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $view = $form->createView();
+        $html = $this->renderWidget($view);
+
+        $this->assertMatchesXpath($html,
+            '/input
+    [not(@aria-describedby)]
+'
+        );
+    }
+
     public function testErrors()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');

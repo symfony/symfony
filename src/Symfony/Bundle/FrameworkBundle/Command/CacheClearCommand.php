@@ -156,7 +156,9 @@ EOF
         try {
             $fs->remove($oldCacheDir);
         } catch (IOException $e) {
-            $io->warning($e->getMessage());
+            if ($output->isVerbose()) {
+                $io->warning($e->getMessage());
+            }
         }
 
         if ($output->isVerbose()) {

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Config\Definition;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 /**
  * Common Interface among all nodes.
@@ -68,6 +68,8 @@ interface NodeInterface
      * @param mixed $value Value to normalize
      *
      * @return mixed The normalized value
+     *
+     * @throws InvalidTypeException if the value type is invalid
      */
     public function normalize($value);
 
@@ -79,7 +81,8 @@ interface NodeInterface
      *
      * @return mixed The merged value
      *
-     * @throws ForbiddenOverwriteException
+     * @throws ForbiddenOverwriteException if the configuration path cannot be overwritten
+     * @throws InvalidTypeException        if the value type is invalid
      */
     public function merge($leftSide, $rightSide);
 
@@ -90,8 +93,8 @@ interface NodeInterface
      *
      * @return mixed The finalized value
      *
-     * @throws Exception
-     * @throws InvalidConfigurationException
+     * @throws InvalidTypeException          if the value type is invalid
+     * @throws InvalidConfigurationException if the value is invalid configuration
      */
     public function finalize($value);
 }

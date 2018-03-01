@@ -30,6 +30,13 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
 {
     private $cacheable = true;
     private $embeddedResponses = 0;
+    private $cacheDirectives = array(
+        'no-cache' => false,
+        'no-store' => false,
+        'must-revalidate' => false,
+        'private' => false,
+        'proxy-revalidate' => false,
+    );
     private $ttls = array();
     private $maxAges = array();
     private $isNotCacheableResponseEmbedded = false;
@@ -41,6 +48,17 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
     {
         if (!$response->isFresh() || !$response->isCacheable()) {
             $this->cacheable = false;
+
+            $hasCacheDirective = $response->headers->hasCacheControlDirective('public');
+            foreach ($this->cacheDirectives as $directive => $status) {
+                if ($response->headers->hasCacheControlDirective($directive)) {
+                    $this->cacheDirectives[$directive] = $hasCacheDirective = true;
+                }
+            }
+
+            if (!$hasCacheDirective || !$response->isFresh()) {
+                $this->cacheDirectives['no-cache'] = $this->cacheDirectives['must-revalidate'] = true;
+            }
         } else {
             $maxAge = $response->getMaxAge();
             $this->ttls[] = $response->getTtl();
@@ -72,18 +90,13 @@ class ResponseCacheStrategy implements ResponseCacheStrategyInterface
             $response->setLastModified(null);
         }
 
-        if (!$response->isFresh()) {
-            $this->cacheable = false;
-        }
+        $this->add($response);
 
         if (!$this->cacheable) {
-            $response->headers->set('Cache-Control', 'no-cache, must-revalidate');
+            $response->headers->set('Cache-Control', implode(', ', array_keys(array_filter($this->cacheDirectives))));
 
             return;
         }
-
-        $this->ttls[] = $response->getTtl();
-        $this->maxAges[] = $response->getMaxAge();
 
         if ($this->isNotCacheableResponseEmbedded) {
             $response->headers->removeCacheControlDirective('s-maxage');

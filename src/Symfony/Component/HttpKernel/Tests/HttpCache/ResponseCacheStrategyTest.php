@@ -219,4 +219,24 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertSame('60', $masterResponse->headers->getCacheControlDirective('s-maxage'));
         $this->assertFalse($masterResponse->isValidateable());
     }
+
+    public function testResponseIsPrivateWhenCombiningPrivateResponses()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $masterResponse = new Response();
+        $masterResponse->setSharedMaxAge(60);
+        $masterResponse->setPrivate();
+
+        $embeddedResponse = new Response();
+        $embeddedResponse->setSharedMaxAge(60);
+        $embeddedResponse->setPrivate();
+
+        $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($masterResponse);
+
+        $this->assertFalse($masterResponse->headers->hasCacheControlDirective('no-cache'));
+        $this->assertFalse($masterResponse->headers->hasCacheControlDirective('must-revalidate'));
+        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('private'));
+    }
 }

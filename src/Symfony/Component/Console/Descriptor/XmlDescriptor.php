@@ -41,7 +41,9 @@ class XmlDescriptor extends Descriptor
 
         $definitionXML->appendChild($optionsXML = $dom->createElement('options'));
         foreach ($definition->getOptions() as $option) {
-            $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
+            if (!$option->isHidden()) {
+                $this->appendDocument($optionsXML, $this->getInputOptionDocument($option));
+            }
         }
 
         return $dom;

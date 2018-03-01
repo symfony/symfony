@@ -105,6 +105,9 @@ class MarkdownDescriptor extends Descriptor
 
             $this->write('### Options');
             foreach ($definition->getOptions() as $option) {
+                if ($option->isHidden()) {
+                    continue;
+                }
                 $this->write("\n\n");
                 $this->write($this->describeInputOption($option));
             }

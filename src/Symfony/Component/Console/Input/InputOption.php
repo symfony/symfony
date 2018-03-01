@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Input;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
 
 /**
@@ -26,6 +27,7 @@ class InputOption
     const VALUE_OPTIONAL = 4;
     const VALUE_IS_ARRAY = 8;
     const VALUE_NEGATABLE = 16;
+    const VALUE_HIDDEN = 32;
     const VALUE_BINARY = (self::VALUE_NONE | self::VALUE_NEGATABLE);
 
     private $name;
@@ -72,7 +74,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif ($mode > 31 || $mode < 1) {
+        } elseif ($mode >= (self::VALUE_HIDDEN << 1) || $mode < 1) {
             throw new InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -106,6 +108,11 @@ class InputOption
     public function getName()
     {
         return $this->name;
+    }
+
+    public function effectiveName()
+    {
+        return $this->getName();
     }
 
     /**
@@ -157,6 +164,17 @@ class InputOption
     public function isNegatable()
     {
         return self::VALUE_NEGATABLE === (self::VALUE_NEGATABLE & $this->mode);
+    }
+
+    /**
+     * Returns true if the option should not be shown in help (e.g. a negated
+     * option).
+     *
+     * @return bool true if mode is self::VALUE_HIDDEN, false otherwise
+     */
+    public function isHidden()
+    {
+        return self::VALUE_HIDDEN === (self::VALUE_HIDDEN & $this->mode);
     }
 
     /**
@@ -215,6 +233,27 @@ class InputOption
     }
 
     /**
+     * Checks the validity of a value, and alters it as necessary
+     *
+     * @param mixed $value
+     *
+     * @return @mixed
+     */
+    public function checkValue($value)
+    {
+        if (null === $value) {
+            if ($this->isValueRequired()) {
+                throw new InvalidOptionException(sprintf('The "--%s" option requires a value.', $this->getName()));
+            }
+
+            if (!$this->isValueOptional()) {
+                return true;
+            }
+        }
+        return $value;
+    }
+
+    /**
      * Checks whether the given option equals this one.
      *
      * @return bool
@@ -224,7 +263,8 @@ class InputOption
         return $option->getName() === $this->getName()
             && $option->getShortcut() === $this->getShortcut()
             && $option->getDefault() === $this->getDefault()
-            && $option->isBinary() === $this->isBinary()
+            && $option->isHidden() === $this->isHidden()
+            && $option->isNegatable() === $this->isNegatable()
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()

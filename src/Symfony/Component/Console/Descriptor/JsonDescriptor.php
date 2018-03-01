@@ -143,6 +143,9 @@ class JsonDescriptor extends Descriptor
 
         $inputOptions = array();
         foreach ($definition->getOptions() as $name => $option) {
+            if ($option->isHidden()) {
+                continue;
+            }
             $inputOptions[$name] = $this->getInputOptionData($option);
         }
 

@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-02T12:39:44Z
+
+ping @xkobal @Simperfit for double checking
+
+---------------------------------------------------------------------------
+
+by xkobal at 2018-03-02T12:45:41Z
+
+That was `tbodies` before my fix but after reading another time the code, it seems that `tbody` is the correct object. @Simperfit must have the last word.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-02T13:04:47Z
+
+Let me take this time to test this. But I think this is right too.
+
+I'll test it today.
+
+---------------------------------------------------------------------------
+
+by n3o77 at 2018-03-02T14:50:12Z
+
+@nicolas-grekas sorry for hijacking this PR. As i'm having trouble with the code affected in this PR it might make sense to coordinate this here before I create a PR.
+
+~~@Simperfit your code caused some problems for me too. I'm loading a angular2 app which seems to make ajax requests before the `tbodies.rows` is defined ( error below ). I just fixed it with [surrounding your code with an if to check for that](https://github.com/n3o77/symfony/commit/c8c257a2a5624be07e4a76f04656c12e0e160055).~~
+
+~~Unfortunately I wasn't able to create a minimum code version to reproduce this. Maybe you have an idea under which circumstances exactly this could be the case.~~
+
+```
+Uncaught TypeError: Cannot read property 'count' of undefined
+    at Object.renderAjaxRequests (order_now:267)
+    at Sfjs.load.maxTries (order_now:267)
+    at order_now:267
+    at XMLHttpRequest.xhr.onreadystatechange (order_now:267)
+    at XMLHttpRequest.wrapFn [as __zone_symbol___onreadystatechange] (vendor.bundle.js?v=1:5630)
+    at ZoneDelegate.invokeTask (vendor.bundle.js?v=1:5063)
+    at Zone.runTask (vendor.bundle.js?v=1:4871)
+    at ZoneTask.invokeTask [as invoke] (vendor.bundle.js?v=1:5131)
+    at invokeTask (vendor.bundle.js?v=1:5871)
+    at XMLHttpRequest.globalZoneAwareCallback (vendor.bundle.js?v=1:5883)
+```
+(order_now is the pagename and references to the profiler code)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-02T14:52:32Z
+
+@n3o77 can you test the code in this PR and report if it fixes the issue for you?
+
+---------------------------------------------------------------------------
+
+by n3o77 at 2018-03-02T15:02:41Z
+
+@nicolas-grekas yes, fixes the problem for me. Thank you @marinnicolae .
+
+---------------------------------------------------------------------------
+
+by n3o77 at 2018-03-02T15:07:32Z
+
+Same problem is in v2.8
+
+---------------------------------------------------------------------------
+
+by tanasecosminromeo at 2018-03-02T15:10:06Z
+
+@n3o77 Yep, problem is on v2.8 also - Fix works good. Thank you @marinnicolae

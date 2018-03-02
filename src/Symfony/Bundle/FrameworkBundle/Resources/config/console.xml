@@ -38,6 +38,11 @@
             <tag name="console.command" command="cache:pool:prune" />
         </service>
 
+        <service id="console.command.cache_pool_delete" class="Symfony\Bundle\FrameworkBundle\Command\CachePoolDeleteCommand">
+            <argument type="service" id="cache.global_clearer" />
+            <tag name="console.command" command="cache:pool:delete" />
+        </service>
+
         <service id="console.command.cache_warmup" class="Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand">
             <argument type="service" id="cache_warmer" />
             <tag name="console.command" command="cache:warmup" />

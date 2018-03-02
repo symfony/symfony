@@ -118,9 +118,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * ccaaedf: [Form] PropertyPathMapper::mapDataToForms() *always* calls setData() on every child to ensure that all *_DATA events were fired when the initialization phase is over (except for virtual forms)
  * 00bc270: [Form] Fixed: submit() reacts to dynamic modifications of the form children
  * 05fdb12: Fixed issue #6932 - Inconsistent locale handling in subrequests
- * b3c3159: fixed locale of sub-requests when explicitely set by the developer (refs #8821)
+ * b3c3159: fixed locale of sub-requests when explicitly set by the developer (refs #8821)
  * b72bc0b: [Locale] fixed build-data exit code in case of an error
- * 9bb7a3d: fixed request format of sub-requests when explicitely set by the developer (closes #8787)
+ * 9bb7a3d: fixed request format of sub-requests when explicitly set by the developer (closes #8787)
  * fa35597: Sets _format attribute only if it wasn't set previously by the user.
  * f946108: fixed the format of the request used to render an exception
  * 51022c3: Fix typo in the check_path validator

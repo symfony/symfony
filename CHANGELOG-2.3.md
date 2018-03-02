@@ -158,7 +158,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #16971 [HttpFoundation] Added the ability of using BinaryFileResponse with stream wrappers (jakzal, Sander-Toonen)
  * bug #17048 Fix the logout path when not using the router (stof)
  * bug #17057 [FrameworkBundle][HttpKernel] the finder is required to discover bundle commands (xabbuh)
- * bug #16915 [Process] Enhance compatiblity with --enable-sigchild (nicolas-grekas)
+ * bug #16915 [Process] Enhance compatibility with --enable-sigchild (nicolas-grekas)
  * bug #16829 [FrameworkBundle] prevent cache:clear creating too long paths (Tobion)
  * bug #16870 [FrameworkBundle] Disable the server:run command when Process component is missing (gnugat, xabbuh)
  * bug #16799 Improve error message for undefined DIC aliases (mpdude)
@@ -897,8 +897,8 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * 00bc270: [Form] Fixed: submit() reacts to dynamic modifications of the form children
  * c4636e1: added a functional test for locale handling in sub-requests
  * 05fdb12: Fixed issue #6932 - Inconsistent locale handling in subrequests
- * b3c3159: fixed locale of sub-requests when explicitely set by the developer (refs #8821)
- * 9bb7a3d: fixed request format of sub-requests when explicitely set by the developer (closes #8787)
+ * b3c3159: fixed locale of sub-requests when explicitly set by the developer (refs #8821)
+ * 9bb7a3d: fixed request format of sub-requests when explicitly set by the developer (closes #8787)
  * fa35597: Sets _format attribute only if it wasn't set previously by the user.
  * f946108: fixed the format of the request used to render an exception
  * 51022c3: Fix typo in the check_path validator

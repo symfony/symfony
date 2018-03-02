@@ -1001,6 +1001,26 @@ class PhpDumperTest extends TestCase
 
         $this->assertSame('bar', $container->getParameter('FOO'));
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Service identifiers will be made case sensitive in Symfony 4.0. Using "foo" instead of "Foo" is deprecated since Symfony 3.3.
+     * @expectedDeprecation The "Foo" service is deprecated. You should stop using it, as it will soon be removed.
+     */
+    public function testReferenceWithLowerCaseId()
+    {
+        $container = new ContainerBuilder();
+        $container->register('Bar', 'stdClass')->setProperty('foo', new Reference('foo'))->setPublic(true);
+        $container->register('Foo', 'stdClass')->setDeprecated();
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Reference_With_Lower_Case_Id')));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Reference_With_Lower_Case_Id();
+
+        $this->assertEquals((object) array('foo' => (object) array()), $container->get('Bar'));
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface

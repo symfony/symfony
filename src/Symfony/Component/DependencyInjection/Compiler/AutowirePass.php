@@ -281,7 +281,7 @@ class AutowirePass extends AbstractRecursivePass
         $this->lastFailure = null;
         $type = $reference->getType();
 
-        if ($type !== (string) $reference || ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract())) {
+        if ($type !== $this->container->normalizeId($reference) || ($this->container->has($type) && !$this->container->findDefinition($type)->isAbstract())) {
             return $reference;
         }
 

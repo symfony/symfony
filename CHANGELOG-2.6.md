@@ -50,7 +50,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #14930 Bug #14836 [HttpFoundation] Moves default JSON encoding assignment fr… (Incognito)
  * bug #14897  Allow new lines in Messages translated with transchoice() (replacement for #14867)  (azine)
  * bug #14895 [Form] Support DateTimeImmutable in transform() (c960657)
- * bug #14891 without this change allways the legacy code get called (dominikzogg)
+ * bug #14891 without this change always the legacy code get called (dominikzogg)
  * bug #14859 Improve the config validation in TwigBundle (stof)
  * bug #14785 [BrowserKit] Fix bug when uri starts with http. (amouhzi)
  * bug #14807 [Security][Acl] enforce string identifiers (xabbuh)

@@ -111,7 +111,7 @@
                     var rows = document.createDocumentFragment();
 
                     if (requestStack.length) {
-                        var nbOfAjaxRequest = tbodies.rows.count();
+                        var nbOfAjaxRequest = tbodies.rows.length;
                         if (nbOfAjaxRequest >= 100) {
                             tbodies.deleteRow(nbOfAjaxRequest - 1);
                         }

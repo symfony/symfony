@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by phansys at 2018-02-23T03:21:30Z
+
+I don't know if the provided description is enough, please let me know if any change is required.
+I think there are no changes for this param at 4.0, so I didn't upgrade `UPGRADE-4.0.md` at all.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-23T10:39:22Z
+
+I think it does make sense also for 4.0 (same reasoning as #26278 vs #26251)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-27T18:17:51Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by phansys at 2018-02-27T19:07:34Z
+
+Added entry at `UPGRADE-4.0.md`.

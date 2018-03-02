@@ -104,13 +104,11 @@ class ClientTest extends TestCase
         $this->assertNull($client->getRequest());
     }
 
-    public function testGetRequestWithXHR()
+    public function testXmlHttpRequest()
     {
         $client = new TestClient();
-        $client->switchToXHR();
-        $client->request('GET', 'http://example.com/', array(), array(), array(), null, true, true);
+        $client->xmlHttpRequest('GET', 'http://example.com/', array(), array(), array(), null, true);
         $this->assertEquals($client->getRequest()->getServer()['HTTP_X_REQUESTED_WITH'], 'XMLHttpRequest');
-        $client->removeXHR();
         $this->assertFalse($client->getServerParameter('HTTP_X_REQUESTED_WITH', false));
     }
 

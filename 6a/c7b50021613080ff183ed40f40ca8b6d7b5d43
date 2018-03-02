@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-01T14:29:50Z
+
+I'm not able to write tests for all the situations that where missing normalization of references.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-02T13:54:15Z
+
+Now with a test case that covers the reported issue, and with µ-optimizations found meanwhile, following reports of noticeable CPU usage in (env)parameters resolving.

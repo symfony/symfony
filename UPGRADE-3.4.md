@@ -72,6 +72,16 @@ DependencyInjection
  * The `ResolveDefinitionTemplatesPass` class is deprecated and will be removed in 4.0.
    Use the `ResolveChildDefinitionsPass` class instead.
 
+ * Unless you're using a custom autoloader, you should enable the `container.dumper.inline_class_loader`
+   parameter. This can drastically improve DX by reducing the time to load classes
+   when the `DebugClassLoader` is enabled. If you're using `FrameworkBundle`, this
+   performance improvement will also impact the "dev" environment:
+
+   ```yml
+   parameters:
+       container.dumper.inline_class_loader: true
+   ```
+
 Debug
 -----
 

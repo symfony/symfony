@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\User;
 
+use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
@@ -53,7 +54,13 @@ class ChainUserProvider implements UserProviderInterface
     {
         foreach ($this->providers as $provider) {
             try {
-                return $provider->loadUserByUsername($username);
+                $user = $provider->loadUserByUsername($username);
+
+                if (!$user instanceof UserInterface) {
+                    throw new LogicException(sprintf('%s should return an object implementing UserInterface or throw UsernameNotFoundException. "%s" given.', get_class($provider), is_object($user) ? get_class($user) : gettype($user)));
+                }
+
+                return $user;
             } catch (UsernameNotFoundException $e) {
                 // try next one
             }

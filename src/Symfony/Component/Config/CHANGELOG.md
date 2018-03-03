@@ -6,6 +6,7 @@ CHANGELOG
 
  * added `setPathSeparator` method to `NodeBuilder` class
  * added third `$pathSeparator` constructor argument to `BaseNode`
+ * the `Processor` class has been made final
 
 4.0.0
 -----

@@ -19,7 +19,9 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class EnvPlaceholderParameterBag extends ParameterBag
 {
+    private $envPlaceholderUniquePrefix;
     private $envPlaceholders = array();
+    private $unusedEnvPlaceholders = array();
     private $providedTypes = array();
 
     /**
@@ -32,6 +34,11 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
             if (isset($this->envPlaceholders[$env])) {
                 foreach ($this->envPlaceholders[$env] as $placeholder) {
+                    return $placeholder; // return first result
+                }
+            }
+            if (isset($this->unusedEnvPlaceholders[$env])) {
+                foreach ($this->unusedEnvPlaceholders[$env] as $placeholder) {
                     return $placeholder; // return first result
                 }
             }
@@ -48,13 +55,21 @@ class EnvPlaceholderParameterBag extends ParameterBag
             }
 
             $uniqueName = md5($name.uniqid(mt_rand(), true));
-            $placeholder = sprintf('env_%s_%s', str_replace(':', '_', $env), $uniqueName);
+            $placeholder = sprintf('%s_%s_%s', $this->getEnvPlaceholderUniquePrefix(), str_replace(':', '_', $env), $uniqueName);
             $this->envPlaceholders[$env][$placeholder] = $placeholder;
 
             return $placeholder;
         }
 
         return parent::get($name);
+    }
+
+    /**
+     * Gets the common env placeholder prefix for env vars created by this bag.
+     */
+    public function getEnvPlaceholderUniquePrefix(): string
+    {
+        return $this->envPlaceholderUniquePrefix ?? $this->envPlaceholderUniquePrefix = 'env_'.bin2hex(random_bytes(8));
     }
 
     /**
@@ -67,6 +82,11 @@ class EnvPlaceholderParameterBag extends ParameterBag
         return $this->envPlaceholders;
     }
 
+    public function getUnusedEnvPlaceholders(): array
+    {
+        return $this->unusedEnvPlaceholders;
+    }
+
     /**
      * Merges the env placeholders of another EnvPlaceholderParameterBag.
      */
@@ -77,6 +97,14 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
             foreach ($newPlaceholders as $env => $placeholders) {
                 $this->envPlaceholders[$env] += $placeholders;
+            }
+        }
+
+        if ($newUnusedPlaceholders = $bag->getUnusedEnvPlaceholders()) {
+            $this->unusedEnvPlaceholders += $newUnusedPlaceholders;
+
+            foreach ($newUnusedPlaceholders as $env => $placeholders) {
+                $this->unusedEnvPlaceholders[$env] += $placeholders;
             }
         }
     }

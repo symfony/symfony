@@ -5,6 +5,7 @@ Config
 ------
 
  * Added the `getChildNodeDefinitions()` method to `ParentNodeDefinitionInterface`.
+ * The `Processor` class has been made final
 
 Console
 -------

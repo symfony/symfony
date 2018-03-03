@@ -47,6 +47,22 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
             'scalar_node' => '%env(NULLED)%',
             'int_node' => '%env(int:FOO)%',
             'float_node' => '%env(float:BAR)%',
+        ));
+
+        $this->doProcess($container);
+
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
+     * @expectedExceptionMessage Invalid type for path "env_extension.bool_node". Expected "bool", but got one of "bool", "int", "float", "string", "array".
+     */
+    public function testEnvsAreValidatedInConfigWithInvalidPlaceholder()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = array(
             'bool_node' => '%env(const:BAZ)%',
         ));
 
@@ -57,7 +73,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
-     * @expectedExceptionMessage Invalid type for path "env_extension.int_node". Expected int, but got array.
+     * @expectedExceptionMessage Invalid type for path "env_extension.int_node". Expected "int", but got "array".
      */
     public function testInvalidEnvInConfig()
     {
@@ -91,7 +107,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
         $container->prependExtensionConfig('env_extension', array(
-            'int_node' => '%env(const:FOO)%',
+            'int_node' => '%env(int:const:FOO)%',
             'bool_node' => true,
         ));
         $container->prependExtensionConfig('env_extension', array(
@@ -103,7 +119,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
 
         $expected = array(
-            'int_node' => '%env(const:FOO)%',
+            'int_node' => '%env(int:const:FOO)%',
             'bool_node' => true,
             'scalar_node' => '%env(BAZ)%',
         );

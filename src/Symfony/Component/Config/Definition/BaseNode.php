@@ -40,7 +40,7 @@ abstract class BaseNode implements NodeInterface
     protected $attributes = array();
     protected $pathSeparator;
 
-    private $handlingPlaceholder = false;
+    private $handlingPlaceholder;
 
     /**
      * @throws \InvalidArgumentException if the name contains a period
@@ -289,47 +289,33 @@ abstract class BaseNode implements NodeInterface
         }
 
         if ($leftSide !== $leftPlaceholders = self::resolvePlaceholderValue($leftSide)) {
-            if (!$leftPlaceholders) {
-                return $rightSide;
-            }
-
             foreach ($leftPlaceholders as $leftPlaceholder) {
-                $this->handlingPlaceholder = true;
+                $this->handlingPlaceholder = $leftSide;
                 try {
                     $this->merge($leftPlaceholder, $rightSide);
-
-                    return $rightSide;
-                } catch (InvalidConfigurationException $e) {
                 } finally {
-                    $this->handlingPlaceholder = false;
+                    $this->handlingPlaceholder = null;
                 }
             }
 
-            throw $e;
+            return $rightSide;
         }
 
         if ($rightSide !== $rightPlaceholders = self::resolvePlaceholderValue($rightSide)) {
-            if (!$rightPlaceholders) {
-                return $rightSide;
-            }
-
             foreach ($rightPlaceholders as $rightPlaceholder) {
-                $this->handlingPlaceholder = true;
+                $this->handlingPlaceholder = $rightSide;
                 try {
                     $this->merge($leftSide, $rightPlaceholder);
-
-                    return $rightSide;
-                } catch (InvalidConfigurationException $e) {
                 } finally {
-                    $this->handlingPlaceholder = false;
+                    $this->handlingPlaceholder = null;
                 }
             }
 
-            throw $e;
+            return $rightSide;
         }
 
-        $this->validateType($leftSide);
-        $this->validateType($rightSide);
+        $this->doValidateType($leftSide);
+        $this->doValidateType($rightSide);
 
         return $this->mergeValues($leftSide, $rightSide);
     }
@@ -348,23 +334,16 @@ abstract class BaseNode implements NodeInterface
 
         // resolve placeholder value
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
-            if (!$placeholders) {
-                return $value;
-            }
-
             foreach ($placeholders as $placeholder) {
-                $this->handlingPlaceholder = true;
+                $this->handlingPlaceholder = $value;
                 try {
                     $this->normalize($placeholder);
-
-                    return $value;
-                } catch (InvalidConfigurationException $e) {
                 } finally {
-                    $this->handlingPlaceholder = false;
+                    $this->handlingPlaceholder = null;
                 }
             }
 
-            throw $e;
+            return $value;
         }
 
         // replace value with their equivalent
@@ -375,7 +354,7 @@ abstract class BaseNode implements NodeInterface
         }
 
         // validate type
-        $this->validateType($value);
+        $this->doValidateType($value);
 
         // normalize value
         return $this->normalizeValue($value);
@@ -409,33 +388,19 @@ abstract class BaseNode implements NodeInterface
     final public function finalize($value)
     {
         if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
-            if (!$placeholders) {
-                return $value;
-            }
-
             foreach ($placeholders as $placeholder) {
-                $this->handlingPlaceholder = true;
+                $this->handlingPlaceholder = $value;
                 try {
                     $this->finalize($placeholder);
-
-                    return $value;
-                } catch (InvalidConfigurationException $e) {
                 } finally {
-                    $this->handlingPlaceholder = false;
+                    $this->handlingPlaceholder = null;
                 }
             }
 
-            throw $e;
+            return $value;
         }
 
-        $this->validateType($value);
-
-        if ($this->handlingPlaceholder && !$this->allowPlaceholders()) {
-            $e = new InvalidConfigurationException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', get_class($this), $this->getPath()));
-            $e->setPath($this->getPath());
-
-            throw $e;
-        }
+        $this->doValidateType($value);
 
         $value = $this->finalizeValue($value);
 
@@ -445,7 +410,7 @@ abstract class BaseNode implements NodeInterface
             try {
                 $value = $closure($value);
             } catch (Exception $e) {
-                if ($e instanceof UnsetKeyException && $this->handlingPlaceholder) {
+                if ($e instanceof UnsetKeyException && null !== $this->handlingPlaceholder) {
                     continue;
                 }
 
@@ -503,6 +468,14 @@ abstract class BaseNode implements NodeInterface
         return true;
     }
 
+    /**
+     * Get allowed dynamic types for this node.
+     */
+    protected function getValidPlaceholderTypes(): array
+    {
+        return array();
+    }
+
     private static function resolvePlaceholderValue($value)
     {
         if (\is_string($value)) {
@@ -516,5 +489,55 @@ abstract class BaseNode implements NodeInterface
         }
 
         return $value;
+    }
+
+    private static function getType($value): string
+    {
+        switch ($type = gettype($value)) {
+            case 'boolean':
+                return 'bool';
+            case 'double':
+                return 'float';
+            case 'integer':
+                return 'int';
+        }
+
+        return $type;
+    }
+
+    private function doValidateType($value): void
+    {
+        if (null === $this->handlingPlaceholder || null === $value) {
+            $this->validateType($value);
+
+            return;
+        }
+
+        if (!$this->allowPlaceholders()) {
+            $e = new InvalidTypeException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', get_class($this), $this->getPath()));
+            $e->setPath($this->getPath());
+
+            throw $e;
+        }
+
+        $knownTypes = array_keys(self::$placeholders[$this->handlingPlaceholder]);
+        $validTypes = $this->getValidPlaceholderTypes();
+
+        if (array_diff($knownTypes, $validTypes)) {
+            $e = new InvalidTypeException(sprintf(
+                'Invalid type for path "%s". Expected %s, but got %s.',
+                $this->getPath(),
+                1 === count($validTypes) ? '"'.reset($validTypes).'"' : 'one of "'.implode('", "', $validTypes).'"',
+                1 === count($knownTypes) ? '"'.reset($knownTypes).'"' : 'one of "'.implode('", "', $knownTypes).'"'
+            ));
+            if ($hint = $this->getInfo()) {
+                $e->addHint($hint);
+            }
+            $e->setPath($this->getPath());
+
+            throw $e;
+        }
+
+        $this->validateType($value);
     }
 }

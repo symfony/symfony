@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 
 /**
  * The base node class.
@@ -24,6 +25,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 abstract class BaseNode implements NodeInterface
 {
     const DEFAULT_PATH_SEPARATOR = '.';
+
+    private static $placeholderUniquePrefix;
+    private static $placeholders = array();
 
     protected $name;
     protected $parent;
@@ -35,6 +39,8 @@ abstract class BaseNode implements NodeInterface
     protected $equivalentValues = array();
     protected $attributes = array();
     protected $pathSeparator;
+
+    private $handlingPlaceholder = false;
 
     /**
      * @throws \InvalidArgumentException if the name contains a period
@@ -48,6 +54,39 @@ abstract class BaseNode implements NodeInterface
         $this->name = $name;
         $this->parent = $parent;
         $this->pathSeparator = $pathSeparator;
+    }
+
+    /**
+     * Register possible (dummy) values for a dynamic placeholder value. Matching configuration values will be processed
+     * with a provided value, one by one. After a provided value is successfully processed the configuration value is
+     * returned as is, thus preserving the placeholder.
+     */
+    public static function setPlaceholder(string $placeholder, array $values): void
+    {
+        if (!$values) {
+            throw new \InvalidArgumentException('At least one value must be provided.');
+        }
+
+        self::$placeholders[$placeholder] = $values;
+    }
+
+    /**
+     * Set a common prefix for dynamic placeholder values. Matching configuration values will be skipped from being
+     * processed and are returned as is, thus preserving the placeholder. An exact match provided by {@see setPlaceholder()}
+     * might take precedence.
+     */
+    public static function setPlaceholderUniquePrefix(string $prefix): void
+    {
+        self::$placeholderUniquePrefix = $prefix;
+    }
+
+    /**
+     * Reset all current placeholders available.
+     */
+    public static function resetPlaceholders(): void
+    {
+        self::$placeholderUniquePrefix = null;
+        self::$placeholders = array();
     }
 
     public function setAttribute($key, $value)
@@ -249,6 +288,46 @@ abstract class BaseNode implements NodeInterface
             ));
         }
 
+        if ($leftSide !== $leftPlaceholders = self::resolvePlaceholderValue($leftSide)) {
+            if (!$leftPlaceholders) {
+                return $rightSide;
+            }
+
+            foreach ($leftPlaceholders as $leftPlaceholder) {
+                $this->handlingPlaceholder = true;
+                try {
+                    $this->merge($leftPlaceholder, $rightSide);
+
+                    return $rightSide;
+                } catch (InvalidConfigurationException $e) {
+                } finally {
+                    $this->handlingPlaceholder = false;
+                }
+            }
+
+            throw $e;
+        }
+
+        if ($rightSide !== $rightPlaceholders = self::resolvePlaceholderValue($rightSide)) {
+            if (!$rightPlaceholders) {
+                return $rightSide;
+            }
+
+            foreach ($rightPlaceholders as $rightPlaceholder) {
+                $this->handlingPlaceholder = true;
+                try {
+                    $this->merge($leftSide, $rightPlaceholder);
+
+                    return $rightSide;
+                } catch (InvalidConfigurationException $e) {
+                } finally {
+                    $this->handlingPlaceholder = false;
+                }
+            }
+
+            throw $e;
+        }
+
         $this->validateType($leftSide);
         $this->validateType($rightSide);
 
@@ -265,6 +344,27 @@ abstract class BaseNode implements NodeInterface
         // run custom normalization closures
         foreach ($this->normalizationClosures as $closure) {
             $value = $closure($value);
+        }
+
+        // resolve placeholder value
+        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
+            if (!$placeholders) {
+                return $value;
+            }
+
+            foreach ($placeholders as $placeholder) {
+                $this->handlingPlaceholder = true;
+                try {
+                    $this->normalize($placeholder);
+
+                    return $value;
+                } catch (InvalidConfigurationException $e) {
+                } finally {
+                    $this->handlingPlaceholder = false;
+                }
+            }
+
+            throw $e;
         }
 
         // replace value with their equivalent
@@ -308,7 +408,34 @@ abstract class BaseNode implements NodeInterface
      */
     final public function finalize($value)
     {
+        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
+            if (!$placeholders) {
+                return $value;
+            }
+
+            foreach ($placeholders as $placeholder) {
+                $this->handlingPlaceholder = true;
+                try {
+                    $this->finalize($placeholder);
+
+                    return $value;
+                } catch (InvalidConfigurationException $e) {
+                } finally {
+                    $this->handlingPlaceholder = false;
+                }
+            }
+
+            throw $e;
+        }
+
         $this->validateType($value);
+
+        if ($this->handlingPlaceholder && !$this->allowPlaceholders()) {
+            $e = new InvalidConfigurationException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', get_class($this), $this->getPath()));
+            $e->setPath($this->getPath());
+
+            throw $e;
+        }
 
         $value = $this->finalizeValue($value);
 
@@ -318,6 +445,10 @@ abstract class BaseNode implements NodeInterface
             try {
                 $value = $closure($value);
             } catch (Exception $e) {
+                if ($e instanceof UnsetKeyException && $this->handlingPlaceholder) {
+                    continue;
+                }
+
                 throw $e;
             } catch (\Exception $e) {
                 throw new InvalidConfigurationException(sprintf('Invalid configuration for path "%s": %s', $this->getPath(), $e->getMessage()), $e->getCode(), $e);
@@ -363,4 +494,27 @@ abstract class BaseNode implements NodeInterface
      * @return mixed The finalized value
      */
     abstract protected function finalizeValue($value);
+
+    /**
+     * Test if placeholder values are allowed for this node.
+     */
+    protected function allowPlaceholders(): bool
+    {
+        return true;
+    }
+
+    private static function resolvePlaceholderValue($value)
+    {
+        if (\is_string($value)) {
+            if (isset(self::$placeholders[$value])) {
+                return self::$placeholders[$value];
+            }
+
+            if (0 === strpos($value, self::$placeholderUniquePrefix, 0)) {
+                return array();
+            }
+        }
+
+        return $value;
+    }
 }

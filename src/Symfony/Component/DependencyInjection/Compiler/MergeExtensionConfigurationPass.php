@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -37,6 +38,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
         $definitions = $container->getDefinitions();
         $aliases = $container->getAliases();
         $exprLangProviders = $container->getExpressionLanguageProviders();
+        $configAvailable = class_exists(BaseNode::class);
 
         foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof PrependExtensionInterface) {
@@ -53,6 +55,9 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             if ($resolvingBag instanceof EnvPlaceholderParameterBag && $extension instanceof Extension) {
                 // create a dedicated bag so that we can track env vars per-extension
                 $resolvingBag = new MergeExtensionConfigurationParameterBag($resolvingBag);
+                if ($configAvailable) {
+                    BaseNode::setPlaceholderUniquePrefix($resolvingBag->getEnvPlaceholderUniquePrefix());
+                }
             }
             $config = $resolvingBag->resolveValue($config);
 
@@ -75,6 +80,10 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 }
 
                 throw $e;
+            } finally {
+                if ($configAvailable) {
+                    BaseNode::resetPlaceholders();
+                }
             }
 
             if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
@@ -131,6 +140,11 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
     public function getEnvPlaceholders()
     {
         return null !== $this->processedEnvPlaceholders ? $this->processedEnvPlaceholders : parent::getEnvPlaceholders();
+    }
+
+    public function getUnusedEnvPlaceholders(): array
+    {
+        return null === $this->processedEnvPlaceholders ? array() : array_diff_key(parent::getEnvPlaceholders(), $this->processedEnvPlaceholders);
     }
 }
 

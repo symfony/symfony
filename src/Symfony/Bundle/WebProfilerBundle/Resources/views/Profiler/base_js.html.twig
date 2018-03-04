@@ -338,13 +338,14 @@
                     var tabNavigation = document.createElement('ul');
                     tabNavigation.className = 'tab-navigation';
 
+                    var selectedTabId = 'tab-' + i + '-0'; /* select the first tab by default */
                     for (var j = 0; j < tabs.length; j++) {
                         var tabId = 'tab-' + i + '-' + j;
                         var tabTitle = tabs[j].querySelector('.tab-title').innerHTML;
 
                         var tabNavigationItem = document.createElement('li');
                         tabNavigationItem.setAttribute('data-tab-id', tabId);
-                        if (j == 0) { Sfjs.addClass(tabNavigationItem, 'active'); }
+                        if (hasClass(tabs[j], 'tab-active')) { selectedTabId = tabId; }
                         if (Sfjs.hasClass(tabs[j], 'disabled')) { Sfjs.addClass(tabNavigationItem, 'disabled'); }
                         tabNavigationItem.innerHTML = tabTitle;
                         tabNavigation.appendChild(tabNavigationItem);
@@ -354,6 +355,7 @@
                     }
 
                     tabGroups[i].insertBefore(tabNavigation, tabGroups[i].firstChild);
+                    addClass(document.querySelector('[data-tab-id="' + selectedTabId + '"]'), 'active');
                 }
 
                 /* display the active tab and add the 'click' event listeners */

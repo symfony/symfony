@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
+use Symfony\Component\Finder\Finder;
+
 /**
  * Test class for Filesystem.
  */
@@ -1063,6 +1065,27 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue(is_dir($targetPath));
         $this->assertFileExists($targetPath.'source');
         $this->assertFileNotExists($targetPath.'target');
+    }
+
+    public function testMirrorWithIterator()
+    {
+        $sourcePath = $this->workspace.DIRECTORY_SEPARATOR.'source'.DIRECTORY_SEPARATOR;
+
+        mkdir($sourcePath);
+        mkdir($sourcePath.'source1');
+        mkdir($sourcePath.'source2');
+
+        $targetPath = $this->workspace.DIRECTORY_SEPARATOR.'target'.DIRECTORY_SEPARATOR;
+
+        // Mirror everything except `source2`
+        $iterator = new Finder;
+        $iterator->in($sourcePath)
+            ->exclude('source2');
+        $this->filesystem->mirror($sourcePath, $targetPath, $iterator);
+
+        $this->assertTrue(is_dir($targetPath));
+        $this->assertDirectoryExists($targetPath.'source1');
+        $this->assertDirectoryNotExists($targetPath.'source2');
     }
 
     /**

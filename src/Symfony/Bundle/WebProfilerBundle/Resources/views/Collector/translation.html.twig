@@ -117,7 +117,7 @@
     {% endfor %}
 
     <div class="sf-tabs">
-        <div class="tab">
+        <div class="tab {{ collector.countMissings == 0 ? 'active' }}">
             <h3 class="tab-title">Defined <span class="badge">{{ collector.countDefines }}</span></h3>
 
             <div class="tab-content">
@@ -158,7 +158,7 @@
             </div>
         </div>
 
-        <div class="tab">
+        <div class="tab {{ collector.countMissings > 0 ? 'active' }}">
             <h3 class="tab-title">Missing <span class="badge {{ collector.countMissings ? 'status-error' }}">{{ collector.countMissings }}</span></h3>
 
             <div class="tab-content">

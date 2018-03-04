@@ -39,14 +39,15 @@ class SimpleAuthenticationProvider implements AuthenticationProviderInterface
     public function authenticate(TokenInterface $token)
     {
         $authToken = $this->simpleAuthenticator->authenticateToken($token, $this->userProvider, $this->providerKey);
+
+        if (!($authToken instanceof TokenInterface)) {
+            throw new AuthenticationException('Simple authenticator failed to return an authenticated token.');
+        }
+
         $this->userChecker->checkPreAuth($authToken->getUser());
         $this->userChecker->checkPostAuth($authToken->getUser());
 
-        if ($authToken instanceof TokenInterface) {
-            return $authToken;
-        }
-
-        throw new AuthenticationException('Simple authenticator failed to return an authenticated token.');
+        return $authToken;
     }
 
     public function supports(TokenInterface $token)

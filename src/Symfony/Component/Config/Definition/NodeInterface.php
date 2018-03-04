@@ -65,7 +65,7 @@ interface NodeInterface
     /**
      * Normalizes a value.
      *
-     * @param mixed $value Value to normalize
+     * @param mixed $value The value to normalize
      *
      * @return mixed The normalized value
      *

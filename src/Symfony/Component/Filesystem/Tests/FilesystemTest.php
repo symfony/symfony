@@ -1078,7 +1078,7 @@ class FilesystemTest extends FilesystemTestCase
         $targetPath = $this->workspace.DIRECTORY_SEPARATOR.'target'.DIRECTORY_SEPARATOR;
 
         // Mirror everything except `source2`
-        $iterator = new Finder;
+        $iterator = new Finder();
         $iterator->in($sourcePath)
             ->exclude('source2');
         $this->filesystem->mirror($sourcePath, $targetPath, $iterator);
@@ -1104,7 +1104,7 @@ class FilesystemTest extends FilesystemTestCase
         mkdir($targetPath.'target');
 
         // Mirror everything except `source2`
-        $iterator = new Finder;
+        $iterator = new Finder();
         $iterator->in($sourcePath)
             ->exclude('source2');
         $this->filesystem->mirror($sourcePath, $targetPath, $iterator, array('delete' => true));

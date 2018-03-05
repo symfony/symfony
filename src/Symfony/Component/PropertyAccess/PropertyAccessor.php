@@ -77,29 +77,33 @@ class PropertyAccessor implements PropertyAccessorInterface
         $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value
     }
 
-    /**
-	 * @param $objectOrArray
-	 * @param $propertyPath
-	 *
-	 * @return null|string
-	 * @throws \ReflectionException
-	 */
-	public function getType(&$objectOrArray, $propertyPath): ? string
-	{
-		$propertyPath = $this->getPropertyPath($propertyPath);
-		$property  = $propertyPath->getElement($propertyPath->getLength() - 1);
-		$access = $this->getWriteAccessInfo(get_class($objectOrArray), $property, []);
+   /**
+     * @param $objectOrArray
+     * @param $propertyPath
+     *
+     * @return null|string
+     * @throws \ReflectionException
+     */
+    public function getType(&$objectOrArray, $propertyPath): ? string
+    {
+        if (!is_object($objectOrArray)) {
+            throw new UnexpectedTypeException($objectOrArray, $propertyPath, 0);
+        }
 
-		if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
+        $propertyPath = $this->getPropertyPath($propertyPath);
+        $property = $propertyPath->getElement($propertyPath->getLength() - 1);
+        $access = $this->getWriteAccessInfo(get_class($objectOrArray), $property, []);
+
+        if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
             $reflMethod = new \ReflectionMethod(get_class($objectOrArray), $access[self::ACCESS_NAME]);
-			
-			if ($reflMethod->getNumberOfParameters() == 1) {
-				return $reflMethod->getParameters()[0]->getType()->getName();
-			}
-		}
 
-		return null;
-	}
+            if ($reflMethod->getNumberOfParameters() == 1) {
+                return $reflMethod->getParameters()[0]->getType()->getName();
+            }
+        }
+
+        return null;
+    }
     
     /**
      * {@inheritdoc}

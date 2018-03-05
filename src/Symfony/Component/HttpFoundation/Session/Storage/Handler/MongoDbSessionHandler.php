@@ -180,6 +180,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
         if ($this->mongo instanceof \MongoDB\Client) {
             return new \MongoDB\BSON\UTCDateTime($seconds * 1000);
         }
+
         return new \MongoDate($seconds);
     }
 

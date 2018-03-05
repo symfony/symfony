@@ -164,6 +164,26 @@ class MongoDbSessionHandler extends AbstractSessionHandler
     }
 
     /**
+     * Create a date object using the class appropriate for the current mongo connection.
+     *
+     * Return an instance of a MongoDate or \MongoDB\BSON\UTCDateTime
+     *
+     * @param int $seconds An integer representing UTC seconds since Jan 1 1970.  Defaults to now.
+     *
+     * @return \MongoDate|\MongoDB\BSON\UTCDateTime
+     */
+    private function createDateTime($seconds = null)
+    {
+        if (null === $seconds) {
+            $seconds = time();
+        }
+        if ($this->mongo instanceof \MongoDB\Client) {
+            return new \MongoDB\BSON\UTCDateTime($seconds * 1000);
+        }
+        return new \MongoDate($seconds);
+    }
+    
+    /**
      * {@inheritdoc}
      */
     protected function doRead($sessionId)

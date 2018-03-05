@@ -7,6 +7,14 @@ in 3.4 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.4.0...v3.4.1
 
+* 3.4.6 (2018-03-05)
+
+ * bug #26393  [DI] Skip resource tracking if disabled (chalasr)
+ * bug #26355 [DI] Fix missing "id" normalization when dumping the container (nicolas-grekas)
+ * bug #26368 [WebProfilerBundle] Fix Debug toolbar breaks app (xkobal)
+ * bug #26369 Use fill instead of style for svg colors (rpkamp)
+ * bug #26358 [FrameworkBundle] Silence "Failed to remove directory" on cache:clear (nicolas-grekas)
+
 * 3.4.5 (2018-03-01)
 
  * bug #26327 [Form][WCAG] Errors sign for people that do not see colors (Nyholm)

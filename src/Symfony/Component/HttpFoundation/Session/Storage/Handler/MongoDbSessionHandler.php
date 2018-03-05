@@ -141,7 +141,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
      */
     public function updateTimestamp($sessionId, $data)
     {
-        $expiry = $this->createDateTime(time() + (int) ini_get('session.gc_maxlifetime'));
+        $expiry = new \MongoDB\BSON\UTCDateTime((time() + (int) ini_get('session.gc_maxlifetime')) * 1000);
 
         if ($this->mongo instanceof \MongoDB\Client) {
             $methodName = 'updateOne';
@@ -154,7 +154,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
         $this->getCollection()->$methodName(
             array($this->options['id_field'] => $sessionId),
             array('$set' => array(
-                $this->options['time_field'] => $this->createDateTime(),
+                $this->options['time_field'] => new \MongoDB\BSON\UTCDateTime(),
                 $this->options['expiry_field'] => $expiry,
             )),
             $options

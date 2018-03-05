@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by hjanuschka at 2018-03-05T12:02:08Z
+
+i need help with **fabbot**   the code is PSR2 - what am i doing wrong here?
+
+---------------------------------------------------------------------------
+
+by phansys at 2018-03-05T15:11:33Z
+
+https://github.com/symfony/symfony/pull/26403#issuecomment-370398254
+The LF previous to `return` statement is missing, try to apply the suggested patch:
+```
+curl https://fabbot.io/patch/symfony/symfony/26403/33f80b7659a3b757f791b5fa7ced534c0b9a06f2/cs.diff | patch -p0
+```
+
+---------------------------------------------------------------------------
+
+by hjanuschka at 2018-03-05T15:14:27Z
+
+@phansys 🚀  you sir deserve a ☕️ -  many thx!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-03-05T15:24:27Z
+
+#24447 made some cleanup to other places where `createDateTime()` was used. Shouldn't we change the `updateTimestamp()` method similarly instead?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-05T15:28:00Z
+
+We should indeed
+
+---------------------------------------------------------------------------
+
+by hjanuschka at 2018-03-05T15:39:25Z
+
+@xabbuh many thx, so using `new \MongoDB\BSON\UTCDateTime()`  instead of the method is the real fix ?
+going to update my PR
+
+---------------------------------------------------------------------------
+
+by hjanuschka at 2018-03-05T15:47:36Z
+
+@xabbuh feedback adressed, looks much nicer now, many thx for your guidance 🚀
+
+---------------------------------------------------------------------------
+
+by hjanuschka at 2018-03-05T15:56:55Z
+
+i am pretty confident, that the changes in this particular pr have nothing todo with the failing build in appveyor, anything i can do to fix this?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-05T15:58:53Z
+
+@nicolas-grekas could you check why the test about prepared command is failing on Appveyor ? is it a volatile test ?

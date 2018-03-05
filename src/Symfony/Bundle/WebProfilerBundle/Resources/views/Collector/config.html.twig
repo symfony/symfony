@@ -50,10 +50,10 @@
                 </span>
             </div>
 
-            {% if 'n/a' is not same as(collector.appname) %}
+            {% if 'n/a' is not same as(collector.kernelclass) %}
                 <div class="sf-toolbar-info-piece">
-                    <b>Kernel name</b>
-                    <span>{{ collector.appname }}</span>
+                    <b>Kernel class</b>
+                    <span>{{ collector.kernelclass }}</span>
                 </div>
             {% endif %}
 
@@ -161,10 +161,10 @@
                 <span class="label">Symfony version</span>
             </div>
 
-            {% if 'n/a' != collector.appname %}
+            {% if 'n/a' != collector.kernelclass %}
                 <div class="metric">
-                    <span class="value">{{ collector.appname }}</span>
-                    <span class="label">Application name</span>
+                    <span class="value">{{ collector.kernelclass }}</span>
+                    <span class="label">Kernel class</span>
                 </div>
             {% endif %}
 

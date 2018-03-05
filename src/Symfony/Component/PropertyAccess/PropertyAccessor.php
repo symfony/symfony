@@ -77,34 +77,61 @@ class PropertyAccessor implements PropertyAccessorInterface
         $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value
     }
 
-   /**
-     * @param $objectOrArray
-     * @param $propertyPath
+    /**
+     * @param object|array                 $objectOrArray
+     * @param string|PropertyPathInterface $propertyPath
      *
      * @return null|string
      * @throws \ReflectionException
      */
     public function getType(&$objectOrArray, $propertyPath): ? string
     {
-        if (!is_object($objectOrArray)) {
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
             throw new UnexpectedTypeException($objectOrArray, $propertyPath, 0);
         }
 
         $propertyPath = $this->getPropertyPath($propertyPath);
-        $property = $propertyPath->getElement($propertyPath->getLength() - 1);
-        $access = $this->getWriteAccessInfo(get_class($objectOrArray), $property, []);
 
-        if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
-            $reflMethod = new \ReflectionMethod(get_class($objectOrArray), $access[self::ACCESS_NAME]);
+        $zval = [
+            self::VALUE => $objectOrArray,
+        ];
 
-            if ($reflMethod->getNumberOfParameters() == 1) {
-                return $reflMethod->getParameters()[0]->getType()->getName();
+        for ($i = 0; $i < $propertyPath->getLength(); ++$i) {
+            $property = $propertyPath->getElement($i);
+            $isIndex = $propertyPath->isIndex($i);
+
+            // final element
+            if ($i + 1 == $propertyPath->getLength()) {
+                if ($isIndex || !is_object($zval[self::VALUE])) {
+                    throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, $i + 1);
+                }
+
+                $access = $this->getWriteAccessInfo(get_class($zval[self::VALUE]), $property, []);
+
+                if (self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]) {
+                    $reflMethod = new \ReflectionMethod(get_class($zval[self::VALUE]), $access[self::ACCESS_NAME]);
+
+                    if ($reflMethod->getParameters()[0]->hasType()) {
+                        return $reflMethod->getParameters()[0]->getType()->getName();
+                    }
+                }
+                return null;
+            }
+
+            if ($isIndex) {
+                $zval = $this->readIndex($zval, $property);
+            } else {
+                $zval = $this->readProperty($zval, $property);
+            }
+
+            if ($i + 1 < $propertyPath->getLength() && !is_object($zval[self::VALUE]) && !is_array($zval[self::VALUE])) {
+                throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, $i + 1);
             }
         }
 
         return null;
     }
-    
+
     /**
      * {@inheritdoc}
      */

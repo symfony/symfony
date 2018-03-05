@@ -258,10 +258,6 @@ class Process implements \IteratorAggregate
         $this->hasCallback = null !== $callback;
         $descriptors = $this->getDescriptors();
 
-        if ($this->env) {
-            $env += $this->env;
-        }
-
         if (is_array($commandline = $this->commandline)) {
             $commandline = implode(' ', array_map(array($this, 'escapeArgument'), $commandline));
 
@@ -269,10 +265,11 @@ class Process implements \IteratorAggregate
                 // exec is mandatory to deal with sending a signal to the process
                 $commandline = 'exec '.$commandline;
             }
-        } else {
-            $commandline = $this->replacePlaceholders($commandline, $env);
         }
 
+        if ($this->env) {
+            $env += $this->env;
+        }
         $env += $this->getDefaultEnv();
 
         $options = array('suppress_errors' => true);
@@ -1550,29 +1547,6 @@ class Process implements \IteratorAggregate
         $argument = preg_replace('/(\\\\+)$/', '$1$1', $argument);
 
         return '"'.str_replace(array('"', '^', '%', '!', "\n"), array('""', '"^^"', '"^%"', '"^!"', '!LF!'), $argument).'"';
-    }
-
-    private function replacePlaceholders(string $commandline, array $env)
-    {
-        $pattern = '\\' === DIRECTORY_SEPARATOR ? '!%s!' : '"$%s"';
-
-        return preg_replace_callback('/\{\{ ?([_a-zA-Z0-9]++) ?\}\}/', function ($m) use ($pattern, $commandline, $env) {
-            if (!isset($env[$m[1]]) || false === $env[$m[1]]) {
-                foreach ($env as $k => $v) {
-                    if (false === $v) {
-                        unset($env[$k]);
-                    }
-                }
-                if (!$env) {
-                    throw new InvalidArgumentException(sprintf('Invalid command line "%s": no values provided for any placeholders.', $commandline));
-                }
-                $env = implode('", "', array_keys($env));
-
-                throw new InvalidArgumentException(sprintf('Invalid command line "%s": no value provided for placeholder "%s", did you mean "%s"?', $commandline, $m[1], $env));
-            }
-
-            return sprintf($pattern, $m[1]);
-        }, $commandline);
     }
 
     private function getDefaultEnv()

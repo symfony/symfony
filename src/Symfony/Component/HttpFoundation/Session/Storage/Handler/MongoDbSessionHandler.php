@@ -182,7 +182,7 @@ class MongoDbSessionHandler extends AbstractSessionHandler
         }
         return new \MongoDate($seconds);
     }
-    
+
     /**
      * {@inheritdoc}
      */

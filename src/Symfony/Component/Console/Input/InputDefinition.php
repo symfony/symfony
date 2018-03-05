@@ -397,6 +397,6 @@ class InputDefinition
             $elements[] = $element;
         }
 
-        return implode(' ', $elements) . $tail;
+        return implode(' ', $elements).$tail;
     }
 }

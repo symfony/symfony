@@ -605,6 +605,10 @@ class FrameworkExtension extends Extension
             $definition->replaceArgument(1, null);
         }
 
+        if (\is_int($config['log']) && $config['log']) {
+            $definition->replaceArgument(4, $config['log']);
+        }
+
         if (!$config['throw']) {
             $container->setParameter('debug.error_handler.throw_at', 0);
         }

@@ -63,4 +63,22 @@ class IntlTest extends TestCase
     {
         $this->assertDirectoryExists(Intl::getDataDirectory());
     }
+
+    /**
+     * @requires extension intl
+     */
+    public function testLocaleAliasesAreLoaded()
+    {
+        \Locale::setDefault('zh_TW');
+        $countryNameZhTw = Intl::getRegionBundle()->getCountryName('AD');
+
+        \Locale::setDefault('zh_Hant_TW');
+        $countryNameHantZhTw = Intl::getRegionBundle()->getCountryName('AD');
+
+        \Locale::setDefault('zh');
+        $countryNameZh = Intl::getRegionBundle()->getCountryName('AD');
+
+        $this->assertSame($countryNameZhTw, $countryNameHantZhTw, 'zh_TW is an alias to zh_Hant_TW');
+        $this->assertNotSame($countryNameZh, $countryNameZhTw, 'zh_TW does not fall back to zh');
+    }
 }

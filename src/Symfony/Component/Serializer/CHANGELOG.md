@@ -11,6 +11,8 @@ CHANGELOG
 * added optional `bool $escapeFormulas = false` argument to `CsvEncoder::__construct`
 * added `AbstractObjectNormalizer::setMaxDepthHandler` to set a handler to call when the configured
   maximum depth is reached
+* added optional `int[] $ignoredNodeTypes` argument to `XmlEncoder::__construct`. XML decoding now
+  ignores comment node types by default.
 
 4.0.0
 -----

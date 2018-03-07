@@ -37,16 +37,19 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     private $context;
     private $rootNodeName = 'response';
     private $loadOptions;
+    private $ignoredNodeTypes;
 
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param int|null $loadOptions A bit field of LIBXML_* constants
+     * @param int|null $loadOptions      A bit field of LIBXML_* constants
+     * @param int[]    $ignoredNodeTypes an array of ignored XML node types, each one of the DOM Predefined XML_* Constants
      */
-    public function __construct(string $rootNodeName = 'response', int $loadOptions = null)
+    public function __construct(string $rootNodeName = 'response', int $loadOptions = null, array $ignoredNodeTypes = array(XML_PI_NODE, XML_COMMENT_NODE))
     {
         $this->rootNodeName = $rootNodeName;
         $this->loadOptions = null !== $loadOptions ? $loadOptions : LIBXML_NONET | LIBXML_NOBLANKS;
+        $this->ignoredNodeTypes = $ignoredNodeTypes;
     }
 
     /**
@@ -105,7 +108,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
                 throw new NotEncodableValueException('Document types are not allowed.');
             }
-            if (!$rootNode && XML_PI_NODE !== $child->nodeType) {
+            if (!$rootNode && !\in_array($child->nodeType, $this->ignoredNodeTypes, true)) {
                 $rootNode = $child;
             }
         }
@@ -316,7 +319,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $value = array();
 
         foreach ($node->childNodes as $subnode) {
-            if (XML_PI_NODE === $subnode->nodeType) {
+            if (\in_array($subnode->nodeType, $this->ignoredNodeTypes, true)) {
                 continue;
             }
 

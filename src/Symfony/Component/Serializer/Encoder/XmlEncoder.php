@@ -42,8 +42,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param int|null $loadOptions A bit field of LIBXML_* constants
-     * @param array $ignoredNodeTypes An array of ignored XML node types, each one of the DOM Predefined XML_* Constants.
+     * @param int|null $loadOptions      A bit field of LIBXML_* constants
+     * @param int[]    $ignoredNodeTypes an array of ignored XML node types, each one of the DOM Predefined XML_* Constants
      */
     public function __construct(string $rootNodeName = 'response', int $loadOptions = null, array $ignoredNodeTypes = null)
     {
@@ -108,7 +108,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
                 throw new NotEncodableValueException('Document types are not allowed.');
             }
-            if (!$rootNode && !\in_array($child->nodeType, $this->ignoredNodeTypes, TRUE)) {
+            if (!$rootNode && !\in_array($child->nodeType, $this->ignoredNodeTypes, true)) {
                 $rootNode = $child;
             }
         }
@@ -319,7 +319,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $value = array();
 
         foreach ($node->childNodes as $subnode) {
-            if (\in_array($subnode->nodeType, $this->ignoredNodeTypes, TRUE)) {
+            if (\in_array($subnode->nodeType, $this->ignoredNodeTypes, true)) {
                 continue;
             }
 

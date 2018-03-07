@@ -45,11 +45,11 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
      * @param int|null $loadOptions      A bit field of LIBXML_* constants
      * @param int[]    $ignoredNodeTypes an array of ignored XML node types, each one of the DOM Predefined XML_* Constants
      */
-    public function __construct(string $rootNodeName = 'response', int $loadOptions = null, array $ignoredNodeTypes = null)
+    public function __construct(string $rootNodeName = 'response', int $loadOptions = null, array $ignoredNodeTypes = array(XML_PI_NODE, XML_COMMENT_NODE))
     {
         $this->rootNodeName = $rootNodeName;
         $this->loadOptions = null !== $loadOptions ? $loadOptions : LIBXML_NONET | LIBXML_NOBLANKS;
-        $this->ignoredNodeTypes = !empty($ignoredNodeTypes) ? $ignoredNodeTypes : array(XML_PI_NODE, XML_COMMENT_NODE);
+        $this->ignoredNodeTypes = $ignoredNodeTypes;
     }
 
     /**

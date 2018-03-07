@@ -592,6 +592,29 @@ class ProgressBarTest extends TestCase
         );
     }
 
+    public function testSettingMaxStepsDuringProgressing()
+    {
+        $output = $this->getOutputStream();
+        $bar = new ProgressBar($output);
+        $bar->start();
+        $bar->setProgress(2);
+        $bar->setMaxSteps(10);
+        $bar->setProgress(5);
+        $bar->setMaxSteps(100);
+        $bar->setProgress(10);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            rtrim('    0 [>---------------------------]').
+            rtrim($this->generateOutput('    2 [-->-------------------------]')).
+            rtrim($this->generateOutput('  5/10 [==============>-------------]  50%')).
+            rtrim($this->generateOutput('  10/100 [==>-------------------------]  10%')).
+            rtrim($this->generateOutput(' 100/100 [============================] 100%')),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testWithSmallScreen()
     {
         $output = $this->getOutputStream();

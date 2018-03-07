@@ -295,6 +295,13 @@ final class ProgressBar
         }
     }
 
+    public function setMaxSteps(int $max)
+    {
+        $this->format = null;
+        $this->max = max(0, $max);
+        $this->stepWidth = $this->max ? Helper::strlen((string) $this->max) : 4;
+    }
+
     /**
      * Finishes the progress output.
      */
@@ -360,12 +367,6 @@ final class ProgressBar
         }
 
         $this->formatLineCount = substr_count($this->format, "\n");
-    }
-
-    private function setMaxSteps(int $max)
-    {
-        $this->max = max(0, $max);
-        $this->stepWidth = $this->max ? Helper::strlen((string) $this->max) : 4;
     }
 
     /**

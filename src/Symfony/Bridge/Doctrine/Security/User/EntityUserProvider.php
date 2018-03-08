@@ -104,7 +104,7 @@ class EntityUserProvider implements UserProviderInterface
      */
     public function supportsClass($class)
     {
-        return $class === $this->getClass() || is_subclass_of($class, $this->getClass());
+        return $class === $this->getClass() || (class_exists($class, false) && is_subclass_of($class, $this->getClass()));
     }
 
     private function getObjectManager()

@@ -31,6 +31,10 @@ class TranslatorHelper extends Helper
      */
     public function trans($id, array $parameters = array(), $domain = 'messages', $locale = null)
     {
+        if (false === $domain) {
+            return $id;
+        }
+
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
 

@@ -94,6 +94,10 @@ class TranslationExtension extends AbstractExtension
 
     public function trans($message, array $arguments = array(), $domain = null, $locale = null)
     {
+        if (false === $domain) {
+            return $message;
+        }
+
         return $this->translator->trans($message, $arguments, $domain, $locale);
     }
 

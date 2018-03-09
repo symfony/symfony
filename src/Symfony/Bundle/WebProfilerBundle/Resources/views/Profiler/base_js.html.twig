@@ -413,7 +413,7 @@
 
                         var tabNavigationItem = document.createElement('li');
                         tabNavigationItem.setAttribute('data-tab-id', tabId);
-                        if (hasClass(tabs[j], 'tab-active')) { selectedTabId = tabId; }
+                        if (hasClass(tabs[j], 'active')) { selectedTabId = tabId; }
                         if (hasClass(tabs[j], 'disabled')) { addClass(tabNavigationItem, 'disabled'); }
                         tabNavigationItem.innerHTML = tabTitle;
                         tabNavigation.appendChild(tabNavigationItem);

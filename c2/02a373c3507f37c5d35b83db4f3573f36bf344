@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2018-03-08T09:29:11Z
+
+@javiereguiluz all our icu data providers use an entry reader to actually read icu data from (currently) json files we bundle with the intl component. The entry reader already supports handling aliases. However, we never told it to use any aliases. Now we do :)

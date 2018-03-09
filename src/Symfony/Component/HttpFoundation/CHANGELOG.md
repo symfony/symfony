@@ -12,6 +12,9 @@ CHANGELOG
    `*` and `*/*` default values (if they are present in the Accept HTTP header)
    when looking for items.
  * deprecated `Request::getSession()` when no session has been set. Use `Request::hasSession()` instead.
+ * added `CannotWriteFileException`, `ExtensionFileException`, `FormSizeFileException`,
+   `IniSizeFileException`, `NoFileException`, `NoTmpDirFileException`, `PartialFileException` to
+   handle failed `UploadedFile`.
 
 4.0.0
 -----

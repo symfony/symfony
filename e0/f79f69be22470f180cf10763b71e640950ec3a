@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-03-09T13:46:53Z
+
+:+1: as internally the `loadUserByUsername` is often called, which should bubble up the throwable exceptions
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-03-09T17:36:18Z
+
+Our own user providers throw this exception. So this change actually just reflects the existing implementations.

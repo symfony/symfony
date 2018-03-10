@@ -145,7 +145,7 @@ class UploadedFile extends File
      * It is extracted from the request from which the file has been uploaded.
      * Then it should not be considered as a safe value.
      *
-     * @deprecated since 4.1, use getSize() instead.
+     * @deprecated since Symfony 4.1, use getSize() instead.
      *
      * @return int|null The file sizes
      */

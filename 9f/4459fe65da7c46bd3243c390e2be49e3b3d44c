@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-03-09T15:34:43Z
+
+Well, the Kernel still manages an environment based on bundles. The Flex structure moved many project-level resources at the kernel level (so avoiding a project-specific bundle), but you still have bundles in your project.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-09T15:37:04Z
+
+If you don't have any bundles installed, it doesn't manage environment made of bundles, does it? You can have bundle-less environment, so that sentence is misleading.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-10T22:36:48Z
+
+status: needs review

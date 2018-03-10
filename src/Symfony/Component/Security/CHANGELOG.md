@@ -9,6 +9,7 @@ CHANGELOG
  * Using the AdvancedUserInterface is now deprecated. To use the existing
    functionality, create a custom user-checker based on the
    `Symfony\Component\Security\Core\User\UserChecker`.
+ * `AuthenticationUtils::getLastUsername()` now always returns a string.
 
 4.0.0
 -----

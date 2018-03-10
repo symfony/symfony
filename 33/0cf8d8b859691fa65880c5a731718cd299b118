@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-07T19:35:07Z
+
+@noniagriconomie For other descriptors, I also think they don't need to be updated. In fact, the TextDescriptor seems to be the only one that does not contain the description.
+
+By the way, I must say that you're working on a part which is quite hard to update and not very "first-time-contribution friendly" (not contribution friendly at all in fact), and you just do it perfectly for now!
+Congratz, welcome and thank you for contributing to Symfony :)
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2018-03-07T20:38:17Z
+
+@chalasr PR code updated accordingly
+Ok for others command descriptors :)
+
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2018-03-09T14:54:33Z
+
+@javiereguiluz hope this help a lot of sf devs :)
+regards
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-10T19:50:28Z
+
+@noniagriconomie Thanks for the pull request. I don't think this qualifies as a bug. So, I'm going to merge it into master into 2.7.

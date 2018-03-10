@@ -1,0 +1,131 @@
+---------------------------------------------------------------------------
+
+by iltar at 2017-07-05T10:52:50Z
+
+This would break every single `null !==` check though. I suggest to update the docs rather than the actual return type. Either you have a username or you don't, but you don't have a username or an empty username imo.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-07-05T12:09:00Z
+
+@iltar , what if it always returns an nonempty string or null? This shouldn't break BC
+see commit above
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-07-05T12:10:26Z
+
+The case that the session is not set, is one that in theory should not happen frequently
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-07-05T12:15:46Z
+
+@iltar , I agree. But that's how it was done before, the `null === $session` check existed before my pull request. The only difference is that now the method never returns an empty string and we can safely use `null !== AuthenticationUtils::getLastUsername()` which will cover all cases.
+
+My point is to make returning type consistent and more DX-friendly.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-05T14:12:06Z
+
+Not sure it will be accepted for 2.8, but +1 for this API :)
+
+edit; on 2nd though `Session::get` defaults to `null`.. so we already should expect this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-19T06:19:54Z
+
+Given that username should never be empty, I would prefer `getLastUsername` to always return a string and never `null`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-19T06:20:17Z
+
+In any case, that would be for 3.4.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-07-21T07:04:49Z
+
+While username may not be empty, the "last" one might not exist (yet). Hence it's a nullable imo.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-07-21T07:07:04Z
+
+Right, if there is no last username, it's an empty string.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-07-21T10:44:34Z
+
+What about the case where the input type was named wrongly (e.g. `username` instead of `_username`)? Doesn't it make sense to return `null` then (because there was actually no submitted username and not an empty username)?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-10-31T10:55:03Z
+
+Let's finish this PR?
+It doesn't require much effort but needs a final decision on the nullability.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-31T11:15:20Z
+
+:+1: as well for always string (means session default changes)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-10-31T19:08:17Z
+
+I agree with @ro0NL - return a string always.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2017-11-01T06:58:22Z
+
+Same for me 👍 for a string return.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-11-01T09:21:12Z
+
+Rebased onto `3.4` and now it **always** returns a string.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2017-11-01T09:26:36Z
+
+But I think we should merge this into `4.0` because as @iltar said, we are breaking all the `null ===` checks.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-02-02T09:26:20Z
+
+Could this be merged or smth else needs to be done?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-02T09:45:38Z
+
+Perhaps add a changelog entry?
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-02-11T11:31:47Z
+
+Rebased, squashed, added a changelog entry, changed base to master, ready to merge :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-02-13T12:16:23Z
+
+I think we should document this change in the upgrade file for 4.1 too.
+
+---------------------------------------------------------------------------
+
+by vudaltsov at 2018-03-10T19:17:15Z
+
+Ready!

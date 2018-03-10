@@ -1,3 +1,6 @@
+Description:
+  Displays help for a command
+
 Usage:
   list [options] [--] [<namespace>]
 

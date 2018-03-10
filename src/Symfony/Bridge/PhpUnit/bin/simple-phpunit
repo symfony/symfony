@@ -26,8 +26,10 @@ if (PHP_VERSION_ID >= 70200) {
     $PHPUNIT_VERSION = '4.8';
 }
 
+COMPOSER_FILE_NAME = getenv('COMPOSER_FILE_NAME') ? : 'composer.json';
+
 $root = __DIR__;
-while (!file_exists($root.'/composer.json') || file_exists($root.'/DeprecationErrorHandler.php')) {
+while (!file_exists($root.'/'.$COMPOSER_FILE_NAME) || file_exists($root.'/DeprecationErrorHandler.php')) {
     if ($root === dirname($root)) {
         break;
     }

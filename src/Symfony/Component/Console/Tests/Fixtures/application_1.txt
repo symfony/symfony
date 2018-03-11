@@ -1,8 +1,5 @@
 Console Tool
 
-<comment>Description:</comment>
-  description
-
 <comment>Usage:</comment>
   command [options] [arguments]
 

@@ -62,6 +62,10 @@ class UrlValidator extends ConstraintValidator
             return;
         }
 
+        if (null !== $constraint->normalizer) {
+            $value = ($constraint->normalizer)($value);
+        }
+
         $pattern = $constraint->relativeProtocol ? str_replace('(%s):', '(?:(%s):)?', static::PATTERN) : static::PATTERN;
         $pattern = sprintf($pattern, implode('|', $constraint->protocols));
 

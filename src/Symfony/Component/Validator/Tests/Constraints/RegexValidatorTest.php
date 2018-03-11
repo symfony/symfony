@@ -55,6 +55,17 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @dataProvider getValidValuesWithWhitespaces
+     */
+    public function testValidValuesWithWhitespaces($value)
+    {
+        $constraint = new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'trim']);
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
     public function getValidValues()
     {
         return [
@@ -68,6 +79,18 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
                     return '090909';
                 }
             }],
+        ];
+    }
+
+    public function getValidValuesWithWhitespaces()
+    {
+        return [
+            ["\x207"],
+            ["\x09\x09070707\x09\x09"],
+            ["70707\x0A"],
+            ["7\x0D\x0D"],
+            ["\x00070707\x00"],
+            ["\x0B\x0B70707\x0B\x0B"],
         ];
     }
 

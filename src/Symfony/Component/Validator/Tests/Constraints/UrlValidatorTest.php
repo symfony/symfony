@@ -66,6 +66,16 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
+     * @dataProvider getValidUrlsWithWhitespaces
+     */
+    public function testValidUrlsWithWhitespaces($url)
+    {
+        $this->validator->validate($url, new Url(['normalizer' => 'trim']));
+
+        $this->assertNoViolation();
+    }
+
+    /**
      * @dataProvider getValidRelativeUrls
      * @dataProvider getValidUrls
      */
@@ -151,6 +161,18 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ['http://symfony.com#fragment'],
             ['http://symfony.com/#fragment'],
             ['http://symfony.com/#one_more%20test'],
+        ];
+    }
+
+    public function getValidUrlsWithWhitespaces()
+    {
+        return [
+            ["\x20http://www.google.com"],
+            ["\x09\x09http://www.google.com."],
+            ["http://symfony.fake/blog/\x0A"],
+            ["http://symfony.com/search?type=&q=url+validator\x0D\x0D"],
+            ["\x00https://google.com:80\x00"],
+            ["\x0B\x0Bhttp://username:password@symfony.com\x0B\x0B"],
         ];
     }
 

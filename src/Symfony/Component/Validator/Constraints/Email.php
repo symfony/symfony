@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Egulias\EmailValidator\EmailValidator as StrictEmailValidator;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
@@ -73,6 +74,7 @@ class Email extends Constraint
      */
     public $strict;
     public $mode;
+    public $normalizer;
 
     public function __construct($options = null)
     {
@@ -89,7 +91,7 @@ class Email extends Constraint
         }
 
         if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::$validationModes, true)) {
-            throw new \InvalidArgumentException('The "mode" parameter value is not valid.');
+            throw new InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 
         parent::__construct($options);
@@ -97,6 +99,10 @@ class Email extends Constraint
         if ((self::VALIDATION_MODE_STRICT === $this->mode || true === $this->strict) && !class_exists(StrictEmailValidator::class)) {
             // throw new LogicException(sprintf('The "egulias/email-validator" component is required to use the "%s" constraint in strict mode.', __CLASS__));
             @trigger_error(sprintf('Using the "%s" constraint in strict mode without the "egulias/email-validator" component installed is deprecated since Symfony 4.2.', __CLASS__), E_USER_DEPRECATED);
+        }
+
+        if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
+            throw new InvalidArgumentException(sprintf('The "normalizer" option must be a valid callable ("%s" given).', \is_object($this->normalizer) ? \get_class($this->normalizer) : \gettype($this->normalizer)));
         }
     }
 }

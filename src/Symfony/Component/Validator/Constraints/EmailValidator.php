@@ -81,6 +81,10 @@ class EmailValidator extends ConstraintValidator
 
         $value = (string) $value;
 
+        if (null !== $constraint->normalizer) {
+            $value = ($constraint->normalizer)($value);
+        }
+
         if (null !== $constraint->strict) {
             @trigger_error(sprintf('The %s::$strict property is deprecated since Symfony 4.1. Use %s::mode="%s" instead.', Email::class, Email::class, Email::VALIDATION_MODE_STRICT), E_USER_DEPRECATED);
 

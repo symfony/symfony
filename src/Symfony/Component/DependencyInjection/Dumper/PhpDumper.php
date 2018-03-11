@@ -1604,7 +1604,7 @@ EOF;
 
     private function dumpParameter(string $name): string
     {
-        if ($this->container->isCompiled() && $this->container->hasParameter($name)) {
+        if ($this->container->hasParameter($name)) {
             $value = $this->container->getParameter($name);
             $dumpedValue = $this->dumpValue($value, false);
 

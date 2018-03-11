@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T16:50:46Z
+
+I'm +1 on the intend.
+The UrlMatcher class also needs an update, and the corresponding tests I suppose.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-02-04T20:02:09Z
+
+Definitely 👍
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-02-04T22:08:15Z
+
+Hey Javier, I like your proposal and in the same direction we might need to make some additional changes:
+
+The phrase `... and you haven't configured any URLs.` could be incomplete now. What about finishing this statement with `... at root path.` or something similar?
+https://github.com/symfony/symfony/blob/ae252916108f3006ebdc26545f130442054f0eec/src/Symfony/Component/HttpKernel/Resources/welcome.html.php#L79
+
+According to your idea, this part should also be updated:
+https://github.com/symfony/symfony/blob/ae252916108f3006ebdc26545f130442054f0eec/src/Symfony/Component/Routing/Matcher/UrlMatcher.php#L79-L81
+
+Related fixtures that require updating ([files](https://github.com/symfony/symfony/tree/3.4/src/Symfony/Component/Routing/Tests/Fixtures/dumper)):
+https://github.com/symfony/symfony/blob/ae252916108f3006ebdc26545f130442054f0eec/src/Symfony/Component/Routing/Tests/Matcher/Dumper/PhpMatcherDumperTest.php#L423-L429
+
+In the other hand, I have a concern now about the name/description of this exception, because it does not fit his new scenario, i.e. it'll be thrown even with routes configuration:
+https://github.com/symfony/symfony/blob/ae252916108f3006ebdc26545f130442054f0eec/src/Symfony/Component/Routing/Exception/NoConfigurationException.php#L14-L21
+Do you think we can add another exception `NoRootConfiguration extends NoConfiguration` and throw it instead? In that case we might need deprecate the `NoConfiguration` class or use it only when `'' === $code`:
+```php
+$code .= "        if ('/' === \$pathinfo) {\n";
+if ('' === $code) {
+    $code .= "            throw new Symfony\Component\Routing\Exception\NoConfigurationException();\n";
+} else {
+    $code .= "            throw new Symfony\Component\Routing\Exception\NoRootConfigurationException();\n";
+}
+$code .= "        }\n";
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-11T14:47:36Z
+
+> NoRootConfiguration extends NoConfiguration
+
+I think it doesn't matter much, let's keep things simple IMHO
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-19T10:54:22Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ChrisWMichel at 2018-02-23T23:47:45Z
+
+So is there a quick fix?
+
+---------------------------------------------------------------------------
+
+by sunnz at 2018-03-06T23:44:17Z
+
+I found this affects 4.0 too. (I just started following the getting started guide with 4.0.)
+
+But I see that this is about the 3.4 branch and the other 4.0 pull requests and issues are closed... so I am wondering if this fix will apply to 4.x too?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-09T11:19:54Z
+
+@yceruto I'm sorry but I don't know how to make the changes you mentioned in `UrlMatcher.php` and `PhpMatcherDumperTest.php`. Can you please give me more details ... or maybe you can take over this PR? Thanks!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2018-03-09T18:49:41Z
+
+About the changes in `UrlMatcher` you need to remove this statement: `0 === count($this->routes) &&` from [here](https://github.com/symfony/symfony/blob/ae252916108f3006ebdc26545f130442054f0eec/src/Symfony/Component/Routing/Matcher/UrlMatcher.php#L79), thus we're removing `"there are no routes defined"` constraint.
+
+And the fixtures related to `PhpMatcherDumperTest.php` need to be re-dumped. See the diff [here](https://travis-ci.org/symfony/symfony/jobs/351259752#L3299-L3302).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-11T09:40:47Z
+
+@yceruto thanks for your great help! I made the change and tests are now green. Ready for review!

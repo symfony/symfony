@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.2.0
+-----
+
+ * added `getAcceptableFormats()` for reading acceptable formats based on Accept header
+
 4.1.0
 -----
 

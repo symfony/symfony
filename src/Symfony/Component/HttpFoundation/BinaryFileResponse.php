@@ -350,7 +350,7 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      */
-    public function deleteFileAfterSend($shouldDelete)
+    public function deleteFileAfterSend($shouldDelete = true)
     {
         $this->deleteFileAfterSend = $shouldDelete;
 

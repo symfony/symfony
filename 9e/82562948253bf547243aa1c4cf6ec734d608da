@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by noniagriconomie at 2018-03-12T06:07:24Z
+
+@ogizanagi my PR was done on 2.7 (as it was requested on the original issue by @Simperfit), all test were ok
+but at the end it was merged on master :/
+thank for reviewing tests on this branch
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-12T07:09:00Z
+
+@noniagriconomie : Yes, no worries! You did nothing wrong. This indeed happened while changing the branch for merging your PR into master :)

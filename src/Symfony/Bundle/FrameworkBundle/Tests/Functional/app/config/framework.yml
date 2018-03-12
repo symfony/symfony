@@ -4,7 +4,7 @@ framework:
     validation:    { enabled: true, enable_annotations: true }
     csrf_protection: true
     form: true
-    test: ~
+    test: true
     default_locale: en
     session:
         storage_id:     session.storage.mock_file

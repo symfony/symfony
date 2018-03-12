@@ -75,8 +75,6 @@ abstract class FormField
         if ($labels->length > 0) {
             return $labels->item(0);
         }
-
-        return;
     }
 
     /**

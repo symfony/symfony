@@ -1083,7 +1083,7 @@ class Crawler implements \Countable, \IteratorAggregate
 
         $currentNode = $this->getNode(0);
         do {
-            if ($node !== $currentNode && 1 === $node->nodeType) {
+            if ($node !== $currentNode && XML_ELEMENT_NODE === $node->nodeType) {
                 $nodes[] = $node;
             }
         } while ($node = $node->$siblingDir);

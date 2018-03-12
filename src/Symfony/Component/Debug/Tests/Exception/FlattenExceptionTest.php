@@ -126,11 +126,21 @@ class FlattenExceptionTest extends TestCase
 
     public function testThrowable()
     {
-        $exception = new FatalThrowableError(new \DivisionByZeroError('Ouch', 42));
+        $exception = new \DivisionByZeroError('Ouch', 42);
         $flattened = FlattenException::create($exception);
 
         $this->assertSame('Ouch', $flattened->getMessage(), 'The message is copied from the original error.');
         $this->assertSame(42, $flattened->getCode(), 'The code is copied from the original error.');
+        $this->assertSame('DivisionByZeroError', $flattened->getClass(), 'The class is set to the class of the original error');
+    }
+
+    public function testFatalThrowableError()
+    {
+        $exception = new FatalThrowableError(new \DivisionByZeroError('Ouch', 11));
+        $flattened = FlattenException::create($exception);
+
+        $this->assertSame('Ouch', $flattened->getMessage(), 'The message is copied from the original error.');
+        $this->assertSame(11, $flattened->getCode(), 'The code is copied from the original error.');
         $this->assertSame('DivisionByZeroError', $flattened->getClass(), 'The class is set to the class of the original error');
     }
 

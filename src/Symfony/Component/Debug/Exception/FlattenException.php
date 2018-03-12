@@ -33,7 +33,7 @@ class FlattenException
     private $file;
     private $line;
 
-    public static function create(\Exception $exception, $statusCode = null, array $headers = array())
+    public static function create(\Throwable $exception, $statusCode = null, array $headers = array())
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
@@ -178,7 +178,7 @@ class FlattenException
         return $this->trace;
     }
 
-    public function setTraceFromException(\Exception $exception)
+    public function setTraceFromException(\Throwable $exception)
     {
         $this->setTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
     }

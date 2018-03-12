@@ -432,6 +432,27 @@ class PhpDumperTest extends TestCase
         $this->assertSame(array('foo', 'bar'), $container->getParameter('hello'));
     }
 
+    public function testDumpedJsonEnvParameters()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(foo)', '["foo","bar"]');
+        $container->setParameter('env(bar)', 'null');
+        $container->setParameter('hello', '%env(json:foo)%');
+        $container->setParameter('hello-bar', '%env(json:bar)%');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_json_env.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_JsonParameters')));
+
+        putenv('foobar="hello"');
+        require self::$fixturesPath.'/php/services_json_env.php';
+        $container = new \Symfony_DI_PhpDumper_Test_JsonParameters();
+        $this->assertSame(array('foo', 'bar'), $container->getParameter('hello'));
+        $this->assertNull($container->getParameter('hello-bar'));
+    }
+
     public function testCustomEnvParameters()
     {
         $container = new ContainerBuilder();

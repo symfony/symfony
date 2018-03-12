@@ -117,7 +117,7 @@
 
 {% block form_widget_simple -%}
     {% if type is not defined or type != 'hidden' %}
-        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control' ~ (type|default('') == 'file' ? '-file' : ''))|trim}) -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' ? ' custom-file-input' : ' form-control'))|trim}) -%}
     {% endif %}
     {%- if type is defined and (type == 'range' or type == 'color') %}
         {# Attribute "required" is not supported #}
@@ -187,6 +187,8 @@
         {%- if compound is defined and compound -%}
             {%- set element = 'legend' -%}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
+        {% elseif type is defined and type == 'file' %}
+            {%- set label_attr = label_attr|merge({for: id, class: (label_attr.class|default('') ~ ' custom-file-label')|trim}) -%}
         {%- else -%}
             {%- set label_attr = label_attr|merge({for: id, class: (label_attr.class|default('') ~ ' form-control-label')|trim}) -%}
         {%- endif -%}
@@ -256,6 +258,15 @@
         {{- form_widget(form) -}}
     </{{ element|default('div') }}>
 {%- endblock form_row %}
+
+{% block file_row -%}
+    <div class="form-group">
+        <{{ element|default('div') }} class="custom-file">
+            {{- form_widget(form) -}}
+            {{- form_label(form) -}}
+        </{{ element|default('div') }}>
+    </div>
+{% endblock %}
 
 {# Errors #}
 

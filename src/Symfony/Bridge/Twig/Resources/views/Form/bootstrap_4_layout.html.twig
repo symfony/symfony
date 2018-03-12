@@ -180,6 +180,11 @@
     </div>
 {%- endblock choice_widget_expanded %}
 
+{% block file_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-file-input')|trim}) -%}
+    {{- block('form_widget_simple') }}
+{%- endblock %}
+
 {# Labels #}
 
 {% block form_label -%}
@@ -245,6 +250,11 @@
     {%- endif -%}
 {%- endblock checkbox_radio_label %}
 
+{% block file_label -%}
+    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' custom-file-label')|trim}) -%}
+    {{- block('form_label') -}}
+{%- endblock %}
+
 {# Rows #}
 
 {% block form_row -%}
@@ -256,6 +266,16 @@
         {{- form_widget(form) -}}
     </{{ element|default('div') }}>
 {%- endblock form_row %}
+
+{% block file_row -%}
+    <{{ element|default('div') }} class="form-group">
+    <div class="custom-file">
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+    </{{ element|default('div') }}>
+{% endblock %}
 
 {# Errors #}
 

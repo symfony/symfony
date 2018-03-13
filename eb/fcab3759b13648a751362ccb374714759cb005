@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-06T09:31:39Z
+
+What is the use case for this ?
+
+---------------------------------------------------------------------------
+
+by DavidPrevot at 2018-03-06T09:42:40Z
+
+In Debian, we use versions like `3.4.0~rc2+dfsg-1` (for Symfony v3.4.0-RC2), and this strings appears in the build path. See for example `/<<BUILDDIR>>/symfony-3.4.0~rc2+dfsg/` in https://buildd.debian.org/status/fetch.php?pkg=symfony&arch=all&ver=3.4.0%7Erc2%2Bdfsg-1&stamp=1511692166&raw=0

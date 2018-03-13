@@ -365,7 +365,7 @@ abstract class Client
             unlink($deprecationsFile);
             foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
                 if ($deprecation[0]) {
-                    trigger_error($deprecation[1], E_USER_DEPRECATED);
+                    @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 } else {
                     @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 }
@@ -608,6 +608,7 @@ abstract class Client
 
     /**
      * Update the server setting from the given URI.
+     *
      * @param array  $server  The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
      * @param string $uri     A URI
      *

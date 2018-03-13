@@ -94,6 +94,16 @@ class ClientTest extends TestCase
         $this->assertEquals('http://example.com/', $client->getRequest()->getUri(), '->getCrawler() returns the Request of the last request');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     */
+    public function testGetRequestNull()
+    {
+        $client = new TestClient();
+        $this->assertNull($client->getRequest());
+    }
+
     public function testGetRequestWithXHR()
     {
         $client = new TestClient();
@@ -124,6 +134,16 @@ class ClientTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getResponse(), '->getCrawler() returns the Response of the last request');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     */
+    public function testGetResponseNull()
+    {
+        $client = new TestClient();
+        $this->assertNull($client->getResponse());
+    }
+
     public function testGetInternalResponse()
     {
         $client = new TestClient();
@@ -133,6 +153,16 @@ class ClientTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\BrowserKit\Response', $client->getInternalResponse());
         $this->assertNotInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getInternalResponse());
         $this->assertInstanceOf('Symfony\Component\BrowserKit\Tests\SpecialResponse', $client->getResponse());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getInternalResponse()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     */
+    public function testGetInternalResponseNull()
+    {
+        $client = new TestClient();
+        $this->assertNull($client->getInternalResponse());
     }
 
     public function testGetContent()
@@ -151,6 +181,16 @@ class ClientTest extends TestCase
         $crawler = $client->request('GET', 'http://example.com/');
 
         $this->assertSame($crawler, $client->getCrawler(), '->getCrawler() returns the Crawler of the last request');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getCrawler()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     */
+    public function testGetCrawlerNull()
+    {
+        $client = new TestClient();
+        $this->assertNull($client->getCrawler());
     }
 
     public function testRequestHttpHeaders()
@@ -720,6 +760,10 @@ class ClientTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\BrowserKit\Request', $client->getInternalRequest());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Calling the "Symfony\Component\BrowserKit\Client::getInternalRequest()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.
+     */
     public function testInternalRequestNull()
     {
         $client = new TestClient();

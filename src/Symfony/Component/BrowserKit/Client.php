@@ -365,7 +365,7 @@ abstract class Client
             unlink($deprecationsFile);
             foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
                 if ($deprecation[0]) {
-                    @trigger_error($deprecation[1], E_USER_DEPRECATED);
+                    trigger_error($deprecation[1], E_USER_DEPRECATED);
                 } else {
                     @trigger_error($deprecation[1], E_USER_DEPRECATED);
                 }
@@ -606,14 +606,6 @@ abstract class Client
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }
 
-    /**
-     * Update the server setting from the given URI.
-     *
-     * @param array  $server  The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
-     * @param string $uri     A URI
-     *
-     * @return array
-     */
     private function updateServerFromUri($server, $uri)
     {
         $server['HTTP_HOST'] = $this->extractHost($uri);
@@ -624,13 +616,6 @@ abstract class Client
         return $server;
     }
 
-    /**
-     * Extract host value from the URI.
-     *
-     * @param string $uri  A URI
-     *
-     * @return string
-     */
     private function extractHost($uri)
     {
         $host = parse_url($uri, PHP_URL_HOST);

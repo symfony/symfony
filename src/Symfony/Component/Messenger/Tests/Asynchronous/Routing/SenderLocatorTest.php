@@ -22,40 +22,40 @@ class SenderLocatorTest extends TestCase
 {
     public function testItReturnsTheSenderBasedOnTheMessageClass()
     {
-        $sender = $this->createMock(SenderInterface::class);
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $container = new Container();
         $container->set('my_amqp_sender', $sender);
 
-        $locator = new SenderLocator($container, [
-            DummyMessage::class => [
+        $locator = new SenderLocator($container, array(
+            DummyMessage::class => array(
                 'my_amqp_sender',
-            ]
-        ]);
+            ),
+        ));
 
-        $this->assertEquals([$sender], $locator->getSendersForMessage(new DummyMessage('Hello')));
-        $this->assertEquals([], $locator->getSendersForMessage(new SecondMessage()));
+        $this->assertEquals(array($sender), $locator->getSendersForMessage(new DummyMessage('Hello')));
+        $this->assertEquals(array(), $locator->getSendersForMessage(new SecondMessage()));
     }
 
     public function testItSupportsAWildcardInsteadOfTheMessageClass()
     {
         $container = new Container();
 
-        $sender = $this->createMock(SenderInterface::class);
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $container->set('my_amqp_sender', $sender);
 
-        $apiSender = $this->createMock(SenderInterface::class);
+        $apiSender = $this->getMockBuilder(SenderInterface::class)->getMock();
         $container->set('my_api_sender', $apiSender);
 
-        $locator = new SenderLocator($container, [
-            DummyMessage::class => [
+        $locator = new SenderLocator($container, array(
+            DummyMessage::class => array(
                 'my_amqp_sender',
-            ],
-            '*' => [
-                'my_api_sender'
-            ]
-        ]);
+            ),
+            '*' => array(
+                'my_api_sender',
+            ),
+        ));
 
-        $this->assertEquals([$sender], $locator->getSendersForMessage(new DummyMessage('Hello')));
-        $this->assertEquals([$apiSender], $locator->getSendersForMessage(new SecondMessage()));
+        $this->assertEquals(array($sender), $locator->getSendersForMessage(new DummyMessage('Hello')));
+        $this->assertEquals(array($apiSender), $locator->getSendersForMessage(new SecondMessage()));
     }
 }

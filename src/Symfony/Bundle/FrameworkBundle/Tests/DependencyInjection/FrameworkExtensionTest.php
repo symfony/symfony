@@ -517,6 +517,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testMessenger()
     {
         $container = $this->createContainerFromFile('messenger');
+        $this->assertTrue($container->hasDefinition('message_bus'));
         $this->assertFalse($container->hasDefinition('messenger.middleware.doctrine_transaction'));
     }
 
@@ -530,6 +531,33 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('messenger_validation_disabled');
         $this->assertFalse($container->hasDefinition('messenger.middleware.validator'));
+    }
+
+    public function testMessengerAdapter()
+    {
+        $container = $this->createContainerFromFile('messenger_adapter');
+        $this->assertTrue($container->hasDefinition('messenger.sender.default'));
+        $this->assertTrue($container->getDefinition('messenger.sender.default')->hasTag('messenger.sender'));
+        $this->assertTrue($container->hasDefinition('messenger.receiver.default'));
+        $this->assertTrue($container->getDefinition('messenger.receiver.default')->hasTag('messenger.receiver'));
+
+        $this->assertTrue($container->hasDefinition('messenger.sender.customised'));
+        $senderFactory = $container->getDefinition('messenger.sender.customised')->getFactory();
+        $senderArguments = $container->getDefinition('messenger.sender.customised')->getArguments();
+
+        $this->assertEquals(array(new Reference('messenger.adapter_factory'), 'createSender'), $senderFactory);
+        $this->assertCount(2, $senderArguments);
+        $this->assertEquals('amqp://localhost/%2f/messages?exchange_name=exchange_name', $senderArguments[0]);
+        $this->assertEquals(array('queue_name' => 'Queue'), $senderArguments[1]);
+
+        $this->assertTrue($container->hasDefinition('messenger.receiver.customised'));
+        $receiverFactory = $container->getDefinition('messenger.receiver.customised')->getFactory();
+        $receiverArguments = $container->getDefinition('messenger.receiver.customised')->getArguments();
+
+        $this->assertEquals(array(new Reference('messenger.adapter_factory'), 'createReceiver'), $receiverFactory);
+        $this->assertCount(2, $receiverArguments);
+        $this->assertEquals('amqp://localhost/%2f/messages?exchange_name=exchange_name', $receiverArguments[0]);
+        $this->assertEquals(array('queue_name' => 'Queue'), $receiverArguments[1]);
     }
 
     public function testTranslator()

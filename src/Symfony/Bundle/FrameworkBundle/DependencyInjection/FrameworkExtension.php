@@ -1470,6 +1470,24 @@ class FrameworkExtension extends Extension
         } else {
             $container->removeDefinition('messenger.middleware.validator');
         }
+
+        foreach ($config['adapters'] as $name => $adapter) {
+            $container->setDefinition('messenger.sender.'.$name, (new Definition(SenderInterface::class))->setFactory(array(
+                new Reference('messenger.adapter_factory'),
+                'createSender',
+            ))->setArguments(array(
+                $adapter['dsn'],
+                $adapter['options'],
+            ))->addTag('messenger.sender'));
+
+            $container->setDefinition('messenger.receiver.'.$name, (new Definition(ReceiverInterface::class))->setFactory(array(
+                new Reference('messenger.adapter_factory'),
+                'createReceiver',
+            ))->setArguments(array(
+                $adapter['dsn'],
+                $adapter['options'],
+            ))->addTag('messenger.receiver'));
+        }
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

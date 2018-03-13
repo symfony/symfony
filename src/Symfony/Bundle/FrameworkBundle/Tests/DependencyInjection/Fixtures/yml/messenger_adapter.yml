@@ -1,0 +1,8 @@
+framework:
+    messenger:
+        adapters:
+            default: 'amqp://localhost/%2f/messages'
+            customised:
+                dsn: 'amqp://localhost/%2f/messages?exchange_name=exchange_name'
+                options:
+                    queue_name: Queue

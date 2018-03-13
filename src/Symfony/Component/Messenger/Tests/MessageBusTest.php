@@ -31,24 +31,24 @@ class MessageBusTest extends TestCase
         $message = new DummyMessage('Hello');
         $responseFromDepthMiddleware = 1234;
 
-        $firstMiddleware = $this->createMock(MiddlewareInterface::class);
+        $firstMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $firstMiddleware->expects($this->once())
             ->method('handle')
             ->with($message, $this->anything())
-            ->will($this->returnCallback(function($message, $next) {
+            ->will($this->returnCallback(function ($message, $next) {
                 return $next($message);
             }));
 
-        $secondMiddleware = $this->createMock(MiddlewareInterface::class);
+        $secondMiddleware = $this->getMockBuilder(MiddlewareInterface::class)->getMock();
         $secondMiddleware->expects($this->once())
             ->method('handle')
             ->with($message, $this->anything())
             ->willReturn($responseFromDepthMiddleware);
 
-        $bus = new MessageBus([
+        $bus = new MessageBus(array(
             $firstMiddleware,
             $secondMiddleware,
-        ]);
+        ));
 
         $this->assertEquals($responseFromDepthMiddleware, $bus->dispatch($message));
     }

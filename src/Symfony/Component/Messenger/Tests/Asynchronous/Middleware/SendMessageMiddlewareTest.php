@@ -23,8 +23,8 @@ class SendMessageMiddlewareTest extends TestCase
     public function testItSendsTheMessageToAssignedSender()
     {
         $message = new DummyMessage('Hey');
-        $sender = $this->createMock(SenderInterface::class);
-        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
         $middleware = new SendMessageMiddleware(new InMemorySenderLocator(array(
             $sender,
@@ -39,8 +39,8 @@ class SendMessageMiddlewareTest extends TestCase
     public function testItAlsoCallsTheNextMiddlewareIfASenderIsNull()
     {
         $message = new DummyMessage('Hey');
-        $sender = $this->createMock(SenderInterface::class);
-        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
         $middleware = new SendMessageMiddleware(new InMemorySenderLocator(array(
             $sender,
@@ -56,7 +56,7 @@ class SendMessageMiddlewareTest extends TestCase
     public function testItCallsTheNextMiddlewareWhenNoSenderForThisMessage()
     {
         $message = new DummyMessage('Hey');
-        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
+        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
         $middleware = new SendMessageMiddleware(new InMemorySenderLocator(array()));
 
@@ -70,8 +70,8 @@ class SendMessageMiddlewareTest extends TestCase
         $innerMessage = new DummyMessage('Hey');
         $message = new ReceivedMessage($innerMessage);
 
-        $sender = $this->createMock(SenderInterface::class);
-        $next = $this->createPartialMock(\stdClass::class, ['__invoke']);
+        $sender = $this->getMockBuilder(SenderInterface::class)->getMock();
+        $next = $this->createPartialMock(\stdClass::class, array('__invoke'));
 
         $middleware = new SendMessageMiddleware(new InMemorySenderLocator(array(
             $sender,

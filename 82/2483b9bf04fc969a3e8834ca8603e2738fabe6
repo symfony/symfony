@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by amcastror at 2018-03-10T20:41:46Z
+
+@fabpot, if we used COMPOSER as the var name, then other composer calls would fail:
+
+![screen shot 2018-03-10 at 5 39 31 pm](https://user-images.githubusercontent.com/3622318/37246558-13b5dd3e-248a-11e8-9645-a1b1dcad5b92.png)
+(composer-dev.json is the alternative name for composer.json in my project).
+
+I'm not sure at which point it fails, I could look in to it but I'll need some more time. Do you have any ideas why that fails?
+
+---------------------------------------------------------------------------
+
+by amcastror at 2018-03-12T16:22:14Z
+
+@nicolas-grekas, I can confirm it works using "COMPOSER":
+
+![screen shot 2018-03-12 at 1 19 22 pm](https://user-images.githubusercontent.com/3622318/37295934-409e69f0-25f8-11e8-8d24-16dc4d45918a.png)
+
+I updated the PR.

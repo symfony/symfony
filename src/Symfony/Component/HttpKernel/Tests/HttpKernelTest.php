@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
@@ -109,6 +110,100 @@ class HttpKernelTest extends TestCase
 
         $this->assertEquals('405', $response->getStatusCode());
         $this->assertEquals('POST', $response->headers->get('Allow'));
+    }
+
+    public function testUnhandledError()
+    {
+        $expectedError = new \DivisionByZeroError('Ouch');
+
+        $kernel = $this->getHttpKernel(new EventDispatcher(), function () use ($expectedError) {
+            throw $expectedError;
+        });
+
+        $actualError = null;
+        try {
+            $kernel->handle(new Request());
+        } catch (\Throwable $actualError) {
+        }
+
+        $this->assertSame($expectedError, $actualError);
+    }
+
+    public function testReplacedError()
+    {
+        $expectedException = new \RuntimeException('Replacement');
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (GetResponseForExceptionEvent $event) use ($expectedException) {
+            $event->setException($expectedException);
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, function () {
+            throw new \DivisionByZeroError('Ouch');
+        });
+
+        $actualException = null;
+        try {
+            $kernel->handle(new Request());
+        } catch (\Throwable $actualException) {
+        }
+
+        $this->assertSame($expectedException, $actualException);
+    }
+
+    public function testHandleError()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (GetResponseForExceptionEvent $event) {
+            $this->assertInstanceOf(FatalThrowableError::class, $event->getException());
+            $event->setResponse(new Response($event->getException()->getMessage()));
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, function () {
+            throw new \DivisionByZeroError('Ouch');
+        });
+        $response = $kernel->handle(new Request());
+
+        $this->assertEquals('500', $response->getStatusCode());
+        $this->assertEquals('Ouch', $response->getContent());
+    }
+
+    public function testResponseFilterThrowsAnotherException()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (GetResponseForExceptionEvent $event) {
+            $event->setResponse(new Response($event->getException()->getMessage()));
+        });
+        $dispatcher->addListener(KernelEvents::RESPONSE, function () {
+            throw new \RuntimeException('Ouch');
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, function () {
+            throw new \RuntimeException('Ouch');
+        });
+        $response = $kernel->handle(new Request());
+
+        $this->assertEquals('500', $response->getStatusCode());
+        $this->assertEquals('Ouch', $response->getContent());
+    }
+
+    public function testResponseFilterRaisesErrorAfterException()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (GetResponseForExceptionEvent $event) {
+            $event->setResponse(new Response($event->getException()->getMessage()));
+        });
+        $dispatcher->addListener(KernelEvents::RESPONSE, function () {
+            throw new \DivisionByZeroError('Ouch');
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, function () {
+            throw new \RuntimeException('Ouch');
+        });
+        $response = $kernel->handle(new Request());
+
+        $this->assertEquals('500', $response->getStatusCode());
+        $this->assertEquals('Ouch', $response->getContent());
     }
 
     public function getStatusCodes()

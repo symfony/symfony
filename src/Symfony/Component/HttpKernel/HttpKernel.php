@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
@@ -64,7 +65,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         try {
             return $this->handleRaw($request, $type);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             if ($e instanceof RequestExceptionInterface) {
                 $e = new BadRequestHttpException($e->getMessage(), $e);
             }
@@ -74,7 +75,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 throw $e;
             }
 
-            return $this->handleException($e, $request, $type);
+            return $this->handleThrowable($e, $request, $type);
         }
     }
 
@@ -95,7 +96,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
             throw $exception;
         }
 
-        $response = $this->handleException($exception, $request, self::MASTER_REQUEST);
+        $response = $this->handleThrowable($exception, $request, self::MASTER_REQUEST);
 
         $response->sendHeaders();
         $response->sendContent();
@@ -207,19 +208,20 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
     /**
      * Handles an exception by trying to convert it to a Response.
      *
-     * @param \Exception $e       An \Exception instance
-     * @param Request    $request A Request instance
-     * @param int        $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
+     * @param int $type The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
      *
      * @throws \Exception
      */
-    private function handleException(\Exception $e, Request $request, int $type): Response
+    private function handleThrowable(\Throwable $e, Request $request, int $type): Response
     {
-        $event = new GetResponseForExceptionEvent($this, $request, $type, $e);
+        $eventException = $e instanceof \Exception ? $e : new FatalThrowableError($e);
+
+        $event = new GetResponseForExceptionEvent($this, $request, $type, $eventException);
         $this->dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
 
         // a listener might have replaced the exception
-        $e = $event->getException();
+        $processedException = $event->getException();
+        $e = $eventException === $processedException ? $e : $processedException;
 
         if (!$event->hasResponse()) {
             $this->finishRequest($request, $type);
@@ -243,7 +245,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         try {
             return $this->filterResponse($response, $request, $type);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $response;
         }
     }

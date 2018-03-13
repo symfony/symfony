@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-03-07T10:59:44Z
+
+does it even make sense to support an empty list of extracted attributes ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-10T11:03:29Z
+
+@stof the method should either return an empty array (like in my patch) or throw, but a notice isn't acceptable. Returning an empty array if an empty list of args has been provided looks ok to me, but I can change to an exception, your call.

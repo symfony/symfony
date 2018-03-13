@@ -78,7 +78,7 @@ abstract class Client
     }
 
     /**
-     * Sets the maximum number of requests that crawler can follow.
+     * Sets the maximum number of redirects that crawler can follow.
      *
      * @param int $maxRedirects
      */
@@ -89,7 +89,7 @@ abstract class Client
     }
 
     /**
-     * Returns the maximum number of requests that crawler can follow.
+     * Returns the maximum number of redirects that crawler can follow.
      *
      * @return int
      */
@@ -606,6 +606,13 @@ abstract class Client
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
     }
 
+    /**
+     * Update the server setting from the given URI.
+     * @param array  $server  The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
+     * @param string $uri     A URI
+     *
+     * @return array
+     */
     private function updateServerFromUri($server, $uri)
     {
         $server['HTTP_HOST'] = $this->extractHost($uri);
@@ -616,6 +623,13 @@ abstract class Client
         return $server;
     }
 
+    /**
+     * Extract host value from the URI.
+     *
+     * @param string $uri  A URI
+     *
+     * @return string
+     */
     private function extractHost($uri)
     {
         $host = parse_url($uri, PHP_URL_HOST);

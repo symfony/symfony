@@ -11,11 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
+use Symfony\Bridge\Doctrine\Form\DataTransformer\NumberToStringTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DecimalType extends AbstractType
 {
@@ -24,27 +24,20 @@ class DecimalType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addModelTransformer(new CallbackTransformer(function ($value) {
-            if (null === $value) {
-                return null;
-            }
+        $builder->addModelTransformer(new NumberToStringTransformer($options['force_full_scale'], $options['scale']));
+    }
 
-            if (!is_string($value)) {
-                throw new TransformationFailedException('Expected a string.');
-            }
-
-            return $value;
-        }, function ($value) {
-            if (null === $value) {
-                return null;
-            }
-
-            if (!is_int($value) && !is_float($value)) {
-                throw new TransformationFailedException('Expected an int or a float.');
-            }
-
-            return (string) $value;
-        }));
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'force_full_scale' => false
+        ));
+        $resolver->setAllowedTypes('force_full_scale', array(
+            'boolean'
+        ));
     }
 
     /**

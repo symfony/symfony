@@ -155,12 +155,16 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
             }
         }
 
-        if ($class->isSubclassOf(EventSubscriberInterface::class)) {
+        if ($class->isAbstract() || $class->isInterface() || $class->isTrait()) {
+            return;
+        }
+
+        if (interface_exists(EventSubscriberInterface::class, false) && $class->isSubclassOf(EventSubscriberInterface::class)) {
             yield EventSubscriberInterface::class;
             yield print_r(\call_user_func(array($class->name, 'getSubscribedEvents')), true);
         }
 
-        if ($class->isSubclassOf(ServiceSubscriberInterface::class)) {
+        if (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
             yield ServiceSubscriberInterface::class;
             yield print_r(\call_user_func(array($class->name, 'getSubscribedServices')), true);
         }

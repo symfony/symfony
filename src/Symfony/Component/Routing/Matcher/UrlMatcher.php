@@ -33,7 +33,19 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     const ROUTE_MATCH = 2;
 
     protected $context;
+
+    /**
+     * Collects HTTP methods that would be allowed for the request.
+     */
     protected $allow = array();
+
+    /**
+     * Collects URI schemes that would be allowed for the request.
+     *
+     * @internal
+     */
+    protected $allowSchemes = array();
+
     protected $routes;
     protected $request;
     protected $expressionLanguage;
@@ -70,7 +82,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     public function match($pathinfo)
     {
-        $this->allow = array();
+        $this->allow = $this->allowSchemes = array();
 
         if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {
             return $ret;
@@ -135,7 +147,13 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            // check HTTP method requirement
+            $status = $this->handleRouteRequirements($pathinfo, $name, $route);
+
+            if (self::REQUIREMENT_MISMATCH === $status[0]) {
+                continue;
+            }
+
+            $hasRequiredScheme = !$route->getSchemes() || $route->hasScheme($this->context->getScheme());
             if ($requiredMethods = $route->getMethods()) {
                 // HEAD and GET are equivalent as per RFC
                 if ('HEAD' === $method = $this->context->getMethod()) {
@@ -143,15 +161,17 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 }
 
                 if (!in_array($method, $requiredMethods)) {
-                    $this->allow = array_merge($this->allow, $requiredMethods);
+                    if ($hasRequiredScheme) {
+                        $this->allow = array_merge($this->allow, $requiredMethods);
+                    }
 
                     continue;
                 }
             }
 
-            $status = $this->handleRouteRequirements($pathinfo, $name, $route);
+            if (!$hasRequiredScheme) {
+                $this->allowSchemes = array_merge($this->allowSchemes, $route->getSchemes());
 
-            if (self::REQUIREMENT_MISMATCH === $status[0]) {
                 continue;
             }
 
@@ -195,11 +215,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             return array(self::REQUIREMENT_MISMATCH, null);
         }
 
-        // check HTTP scheme requirement
-        $scheme = $this->context->getScheme();
-        $status = $route->getSchemes() && !$route->hasScheme($scheme) ? self::REQUIREMENT_MISMATCH : self::REQUIREMENT_MATCH;
-
-        return array($status, null);
+        return array(self::REQUIREMENT_MATCH, null);
     }
 
     /**
@@ -213,7 +229,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function mergeDefaults($params, $defaults)
     {
         foreach ($params as $key => $value) {
-            if (!is_int($key)) {
+            if (!\is_int($key) && null !== $value) {
                 $defaults[$key] = $value;
             }
         }

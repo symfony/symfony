@@ -156,10 +156,9 @@ class AppVariable
      */
     public function getFlashes($types = null)
     {
-        // needed to avoid starting the session automatically when looking for flash messages
         try {
             $session = $this->getSession();
-            if (null === $session || !$session->isStarted()) {
+            if (null === $session) {
                 return array();
             }
         } catch (\RuntimeException $e) {

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\SecurityBundle\Tests;
+namespace Symfony\Bundle\SecurityBundle\Tests\Debug;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;

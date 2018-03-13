@@ -17,7 +17,7 @@
                 "%parameter%",
                 {
                     "class": "inline_service",
-                    "public": true,
+                    "public": false,
                     "synthetic": false,
                     "lazy": false,
                     "shared": true,
@@ -39,7 +39,7 @@
                     },
                     {
                         "class": "inline_service",
-                        "public": true,
+                        "public": false,
                         "synthetic": false,
                         "lazy": false,
                         "shared": true,

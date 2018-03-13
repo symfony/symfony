@@ -47,7 +47,7 @@ class FormError implements \Serializable
      *
      * @see \Symfony\Component\Translation\Translator
      */
-    public function __construct($message, $messageTemplate = null, array $messageParameters = array(), $messagePluralization = null, $cause = null)
+    public function __construct(?string $message, string $messageTemplate = null, array $messageParameters = array(), int $messagePluralization = null, $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate ?: $message;

@@ -51,6 +51,8 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->serverParams = $this->getMockBuilder('Symfony\Component\Form\Extension\Validator\Util\ServerParams')->setMethods(array('getNormalizedIniPostMaxSize', 'getContentLength'))->getMock();
 
         parent::setUp();
+
+        $this->constraint = new Form();
     }
 
     protected function createValidator()
@@ -644,14 +646,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         return $context;
     }
 
-    /**
-     * @param string $name
-     * @param string $dataClass
-     * @param array  $options
-     *
-     * @return FormBuilder
-     */
-    private function getBuilder($name = 'name', $dataClass = null, array $options = array())
+    private function getBuilder(string $name = 'name', string $dataClass = null, array $options = array()): FormBuilder
     {
         $options = array_replace(array(
             'constraints' => array(),

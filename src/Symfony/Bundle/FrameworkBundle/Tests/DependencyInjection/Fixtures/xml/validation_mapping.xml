@@ -7,9 +7,9 @@
     <framework:config>
         <framework:validation>
             <framework:mapping>
-                <framework:path>%kernel.root_dir%/Fixtures/TestBundle/Resources/config/validation_mapping/files</framework:path>
-                <framework:path>%kernel.root_dir%/Fixtures/TestBundle/Resources/config/validation_mapping/validation.yml</framework:path>
-                <framework:path>%kernel.root_dir%/Fixtures/TestBundle/Resources/config/validation_mapping/validation.yaml</framework:path>
+                <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/validation_mapping/files</framework:path>
+                <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/validation_mapping/validation.yml</framework:path>
+                <framework:path>%kernel.project_dir%/Fixtures/TestBundle/Resources/config/validation_mapping/validation.yaml</framework:path>
             </framework:mapping>
         </framework:validation>
     </framework:config>

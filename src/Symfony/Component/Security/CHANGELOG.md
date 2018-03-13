@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * The `ContextListener::setLogoutOnUserChange()` method is deprecated.
+ * added `UserValueResolver`.
+ * Using the AdvancedUserInterface is now deprecated. To use the existing
+   functionality, create a custom user-checker based on the
+   `Symfony\Component\Security\Core\User\UserChecker`.
+ * `AuthenticationUtils::getLastUsername()` now always returns a string.
+
 4.0.0
 -----
 
@@ -13,6 +23,7 @@ CHANGELOG
  * removed HTTP digest authentication
  * removed `GuardAuthenticatorInterface` in favor of `AuthenticatorInterface`
  * removed `AbstractGuardAuthenticator::supports()`
+ * added target user to `SwitchUserListener`
 
 3.4.0
 -----

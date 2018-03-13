@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.11",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -72,6 +72,7 @@
         "ER": "Eritrea",
         "ES": "Španělsko",
         "ET": "Etiopie",
+        "EZ": "eurozóna",
         "FI": "Finsko",
         "FJ": "Fidži",
         "FK": "Falklandské ostrovy",
@@ -236,7 +237,7 @@
         "UA": "Ukrajina",
         "UG": "Uganda",
         "UM": "Menší odlehlé ostrovy USA",
-        "UN": "OSN",
+        "UN": "Organizace spojených národů",
         "US": "Spojené státy",
         "UY": "Uruguay",
         "UZ": "Uzbekistán",

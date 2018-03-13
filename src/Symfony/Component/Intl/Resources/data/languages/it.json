@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.60",
+    "Version": "2.1.37.1",
     "Names": {
         "aa": "afar",
         "ab": "abcaso",
@@ -26,7 +26,7 @@
         "ar": "arabo",
         "ar_001": "arabo moderno standard",
         "arc": "aramaico",
-        "arn": "mapuche",
+        "arn": "mapudungun",
         "aro": "araona",
         "arp": "arapaho",
         "arq": "arabo algerino",
@@ -314,6 +314,7 @@
         "ln": "lingala",
         "lo": "lao",
         "lol": "lolo bantu",
+        "lou": "creolo della Louisiana",
         "loz": "lozi",
         "lrc": "luri settentrionale",
         "lt": "lituano",
@@ -565,7 +566,7 @@
         "umb": "mbundu",
         "und": "lingua imprecisata",
         "ur": "urdu",
-        "uz": "usbeco",
+        "uz": "uzbeco",
         "vai": "vai",
         "ve": "venda",
         "vec": "veneto",

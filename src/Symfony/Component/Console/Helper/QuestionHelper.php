@@ -46,6 +46,12 @@ class QuestionHelper extends Helper
         }
 
         if (!$input->isInteractive()) {
+            if ($question instanceof ChoiceQuestion) {
+                $choices = $question->getChoices();
+
+                return $choices[$question->getDefault()];
+            }
+
             return $question->getDefault();
         }
 
@@ -114,7 +120,7 @@ class QuestionHelper extends Helper
                 $ret = trim($ret);
             }
         } else {
-            $ret = trim($this->autocomplete($output, $question, $inputStream));
+            $ret = trim($this->autocomplete($output, $question, $inputStream, is_array($autocomplete) ? $autocomplete : iterator_to_array($autocomplete, false)));
         }
 
         $ret = strlen($ret) > 0 ? $ret : $question->getDefault();
@@ -170,12 +176,9 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output
      * @param Question        $question
      * @param resource        $inputStream
-     *
-     * @return string
      */
-    private function autocomplete(OutputInterface $output, Question $question, $inputStream)
+    private function autocomplete(OutputInterface $output, Question $question, $inputStream, array $autocomplete): string
     {
-        $autocomplete = $question->getAutocompleterValues();
         $ret = '';
 
         $i = 0;
@@ -289,11 +292,9 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output      An Output instance
      * @param resource        $inputStream The handler resource
      *
-     * @return string The answer
-     *
      * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
-    private function getHiddenResponse(OutputInterface $output, $inputStream)
+    private function getHiddenResponse(OutputInterface $output, $inputStream): string
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
@@ -404,10 +405,8 @@ class QuestionHelper extends Helper
 
     /**
      * Returns whether Stty is available or not.
-     *
-     * @return bool
      */
-    private function hasSttyAvailable()
+    private function hasSttyAvailable(): bool
     {
         if (null !== self::$stty) {
             return self::$stty;

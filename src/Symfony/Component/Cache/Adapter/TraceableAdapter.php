@@ -204,11 +204,12 @@ class TraceableAdapter implements AdapterInterface, PruneableInterface, Resettab
 
     public function getCalls()
     {
-        try {
-            return $this->calls;
-        } finally {
-            $this->calls = array();
-        }
+        return $this->calls;
+    }
+
+    public function clearCalls()
+    {
+        $this->calls = array();
     }
 
     protected function start($name)

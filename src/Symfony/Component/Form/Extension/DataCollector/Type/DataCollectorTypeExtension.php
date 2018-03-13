@@ -25,7 +25,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class DataCollectorTypeExtension extends AbstractTypeExtension
 {
     /**
-     * @var \Symfony\Component\EventDispatcher\EventSubscriberInterface
+     * @var DataCollectorListener
      */
     private $listener;
 

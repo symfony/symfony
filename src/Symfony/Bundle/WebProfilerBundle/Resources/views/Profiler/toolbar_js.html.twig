@@ -3,7 +3,7 @@
 <style{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
     {{ include('@WebProfiler/Profiler/toolbar.css.twig') }}
 </style>
-<script{% if csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>/*<![CDATA[*/
+<script{% if csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>/*<![CDATA[*/
     (function () {
         Sfjs.load(
             'sfwdt{{ token }}',
@@ -90,6 +90,16 @@
 
                     Sfjs.toggleClass(this.parentNode, 'hover');
                 });
+
+                var dumpInfo = document.querySelector('.sf-toolbar-block-dump .sf-toolbar-info');
+                if (null !== dumpInfo) {
+                    Sfjs.addEventListener(dumpInfo, 'sfbeforedumpcollapse', function () {
+                        dumpInfo.style.minHeight = dumpInfo.getBoundingClientRect().height+'px';
+                    });
+                    Sfjs.addEventListener(dumpInfo, 'mouseleave', function () {
+                        dumpInfo.style.minHeight = '';
+                    });
+                }
             },
             function(xhr) {
                 if (xhr.status !== 0) {

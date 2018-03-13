@@ -46,7 +46,7 @@ class TextBundleWriter implements BundleWriterInterface
      * @param resource $file       The file handle to write to
      * @param string   $bundleName The name of the bundle
      * @param mixed    $value      The value of the node
-     * @param bool     $fallback   whether the resource bundle should be merged
+     * @param bool     $fallback   Whether the resource bundle should be merged
      *                             with the fallback locale
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
@@ -66,8 +66,7 @@ class TextBundleWriter implements BundleWriterInterface
      * @param resource $file          The file handle to write to
      * @param mixed    $value         The value of the node
      * @param int      $indentation   The number of levels to indent
-     * @param bool     $requireBraces whether to require braces to be printed
-     *                                around the value
+     * @param bool     $requireBraces Whether to require braces to be printedaround the value
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
@@ -153,7 +152,7 @@ class TextBundleWriter implements BundleWriterInterface
      *
      * @param resource $file          The file handle to write to
      * @param string   $value         The value of the node
-     * @param bool     $requireBraces whether to require braces to be printed
+     * @param bool     $requireBraces Whether to require braces to be printed
      *                                around the value
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
@@ -196,11 +195,11 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes a "table" node.
      *
-     * @param resource           $file        The file handle to write to
-     * @param array|\Traversable $value       The value of the node
-     * @param int                $indentation The number of levels to indent
-     * @param bool               $fallback    whether the table should be merged
-     *                                        with the fallback locale
+     * @param resource $file        The file handle to write to
+     * @param iterable $value       The value of the node
+     * @param int      $indentation The number of levels to indent
+     * @param bool     $fallback    Whether the table should be merged
+     *                              with the fallback locale
      *
      * @throws UnexpectedTypeException when $value is not an array and not a
      *                                 \Traversable instance

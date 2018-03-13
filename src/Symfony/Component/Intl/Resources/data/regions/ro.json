@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.60",
+    "Version": "2.1.37.5",
     "Names": {
         "AC": "Insula Ascension",
         "AD": "Andorra",
@@ -27,7 +27,7 @@
         "BH": "Bahrain",
         "BI": "Burundi",
         "BJ": "Benin",
-        "BL": "Sfântul Bartolomeu",
+        "BL": "Saint-Barthélemy",
         "BM": "Bermuda",
         "BN": "Brunei",
         "BO": "Bolivia",
@@ -72,6 +72,7 @@
         "ER": "Eritreea",
         "ES": "Spania",
         "ET": "Etiopia",
+        "EZ": "Zona euro",
         "FI": "Finlanda",
         "FJ": "Fiji",
         "FK": "Insulele Falkland",
@@ -211,7 +212,7 @@
         "SO": "Somalia",
         "SR": "Suriname",
         "SS": "Sudanul de Sud",
-        "ST": "Sao Tomé și Príncipe",
+        "ST": "Sao Tome și Principe",
         "SV": "El Salvador",
         "SX": "Sint-Maarten",
         "SY": "Siria",

@@ -32,7 +32,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @var NativeRequestHandler
      */
-    private static $nativeRequestProcessor;
+    private static $nativeRequestHandler;
 
     /**
      * The accepted request methods.
@@ -188,7 +188,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @throws InvalidArgumentException if the data class is not a valid class or if
      *                                  the name contains invalid characters
      */
-    public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
+    public function __construct($name, ?string $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
         self::validateName($name);
 
@@ -496,10 +496,10 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     public function getRequestHandler()
     {
         if (null === $this->requestHandler) {
-            if (null === self::$nativeRequestProcessor) {
-                self::$nativeRequestProcessor = new NativeRequestHandler();
+            if (null === self::$nativeRequestHandler) {
+                self::$nativeRequestHandler = new NativeRequestHandler();
             }
-            $this->requestHandler = self::$nativeRequestProcessor;
+            $this->requestHandler = self::$nativeRequestHandler;
         }
 
         return $this->requestHandler;

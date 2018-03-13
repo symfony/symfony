@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine;
 
 use ProxyManager\Proxy\LazyLoadingInterface;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Doctrine\Common\Persistence\AbstractManagerRegistry;
 
@@ -24,7 +23,7 @@ use Doctrine\Common\Persistence\AbstractManagerRegistry;
 abstract class ManagerRegistry extends AbstractManagerRegistry
 {
     /**
-     * @var ContainerInterface
+     * @var Container
      */
     protected $container;
 
@@ -58,7 +57,7 @@ abstract class ManagerRegistry extends AbstractManagerRegistry
                     $name = $this->aliases[$name];
                 }
                 if (isset($this->fileMap[$name])) {
-                    $wrappedInstance = $this->load($this->fileMap[$name], false);
+                    $wrappedInstance = $this->load($this->fileMap[$name]);
                 } else {
                     $method = $this->methodMap[$name] ?? 'get'.strtr($name, $this->underscoreMap).'Service'; // BC with DI v3.4
                     $wrappedInstance = $this->{$method}(false);

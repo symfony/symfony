@@ -24,7 +24,7 @@ interface LockInterface
 {
     /**
      * Acquires the lock. If the lock is acquired by someone else, the parameter `blocking` determines whether or not
-     * the the call should block until the release of the lock.
+     * the call should block until the release of the lock.
      *
      * @param bool $blocking Whether or not the Lock should wait for the release of someone else
      *
@@ -38,10 +38,12 @@ interface LockInterface
     /**
      * Increase the duration of an acquired lock.
      *
+     * @param float|null $ttl Maximum expected lock duration in seconds
+     *
      * @throws LockConflictedException If the lock is acquired by someone else
      * @throws LockAcquiringException  If the lock can not be refreshed
      */
-    public function refresh();
+    public function refresh(/* $ttl = null */);
 
     /**
      * Returns whether or not the lock is acquired.

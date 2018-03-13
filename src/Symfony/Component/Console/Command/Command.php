@@ -66,7 +66,7 @@ class Command
      *
      * @throws LogicException When the command name is empty
      */
-    public function __construct($name = null)
+    public function __construct(string $name = null)
     {
         $this->definition = new InputDefinition();
 
@@ -636,11 +636,9 @@ class Command
      *
      * It must be non-empty and parts can optionally be separated by ":".
      *
-     * @param string $name
-     *
      * @throws InvalidArgumentException When the name is invalid
      */
-    private function validateName($name)
+    private function validateName(string $name)
     {
         if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));

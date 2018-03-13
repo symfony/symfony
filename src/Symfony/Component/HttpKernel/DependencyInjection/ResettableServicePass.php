@@ -25,7 +25,7 @@ class ResettableServicePass implements CompilerPassInterface
 {
     private $tagName;
 
-    public function __construct($tagName = 'kernel.reset')
+    public function __construct(string $tagName = 'kernel.reset')
     {
         $this->tagName = $tagName;
     }
@@ -53,6 +53,7 @@ class ResettableServicePass implements CompilerPassInterface
         }
 
         if (empty($services)) {
+            $container->removeAlias('services_resetter');
             $container->removeDefinition('services_resetter');
 
             return;

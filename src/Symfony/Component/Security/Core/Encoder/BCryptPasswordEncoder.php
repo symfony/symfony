@@ -21,9 +21,6 @@ class BCryptPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEn
 {
     const MAX_PASSWORD_LENGTH = 72;
 
-    /**
-     * @var string
-     */
     private $cost;
 
     /**
@@ -32,9 +29,8 @@ class BCryptPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEn
      * @throws \RuntimeException         When no BCrypt encoder is available
      * @throws \InvalidArgumentException if cost is out of range
      */
-    public function __construct($cost)
+    public function __construct(int $cost)
     {
-        $cost = (int) $cost;
         if ($cost < 4 || $cost > 31) {
             throw new \InvalidArgumentException('Cost must be in the range of 4-31.');
         }

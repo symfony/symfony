@@ -13,6 +13,8 @@
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="event_dispatcher" on-invalid="null" />
         </service>
+        
+        <service id="Symfony\Component\Security\Guard\GuardAuthenticatorHandler" alias="security.authentication.guard_handler" />
 
         <!-- See GuardAuthenticationFactory -->
         <service id="security.authentication.provider.guard"

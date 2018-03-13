@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Form\Command\DebugCommand;
 
 /**
  * Adds all services with the tags "form.type", "form.type_extension" and
@@ -36,7 +35,7 @@ class FormPass implements CompilerPassInterface
     private $formTypeGuesserTag;
     private $formDebugCommandService;
 
-    public function __construct($formExtensionService = 'form.extension', $formTypeTag = 'form.type', $formTypeExtensionTag = 'form.type_extension', $formTypeGuesserTag = 'form.type_guesser', $formDebugCommandService = DebugCommand::class)
+    public function __construct(string $formExtensionService = 'form.extension', string $formTypeTag = 'form.type', string $formTypeExtensionTag = 'form.type_extension', string $formTypeGuesserTag = 'form.type_guesser', string $formDebugCommandService = 'console.command.form_debug')
     {
         $this->formExtensionService = $formExtensionService;
         $this->formTypeTag = $formTypeTag;

@@ -47,14 +47,9 @@ class SymfonyTestsListenerTrait
     public function __construct(array $mockedNamespaces = array())
     {
         if (class_exists('PHPUnit_Util_Blacklist')) {
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\DeprecationErrorHandler'] = 1;
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListener'] = 1;
-            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 1;
+            \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
         } else {
-            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\DeprecationErrorHandler'] = 1;
-            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
-            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 1;
+            Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait'] = 2;
         }
 
         foreach ($mockedNamespaces as $type => $namespaces) {
@@ -102,12 +97,25 @@ class SymfonyTestsListenerTrait
         $suiteName = $suite->getName();
         $this->testsWithWarnings = array();
 
+        foreach ($suite->tests() as $test) {
+            if (!($test instanceof \PHPUnit_Framework_TestCase || $test instanceof TestCase)) {
+                continue;
+            }
+            if (null === $Test::getPreserveGlobalStateSettings(get_class($test), $test->getName(false))) {
+                $test->setPreserveGlobalState(false);
+            }
+        }
+
         if (-1 === $this->state) {
             echo "Testing $suiteName\n";
             $this->state = 0;
 
             if (!class_exists('Doctrine\Common\Annotations\AnnotationRegistry', false) && class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
-                AnnotationRegistry::registerLoader('class_exists');
+                if (method_exists('Doctrine\Common\Annotations\AnnotationRegistry', 'registerUniqueLoader')) {
+                    AnnotationRegistry::registerUniqueLoader('class_exists');
+                } else {
+                    AnnotationRegistry::registerLoader('class_exists');
+                }
             }
 
             if ($this->skippedFile = getenv('SYMFONY_PHPUNIT_SKIPPED_TESTS')) {
@@ -255,10 +263,11 @@ class SymfonyTestsListenerTrait
             unlink($this->runsInSeparateProcess);
             putenv('SYMFONY_DEPRECATIONS_SERIALIZE');
             foreach ($deprecations ? unserialize($deprecations) : array() as $deprecation) {
+                $error = serialize(array('deprecation' => $deprecation[1], 'class' => $className, 'method' => $test->getName(false), 'triggering_file' => isset($deprecation[2]) ? $deprecation[2] : null));
                 if ($deprecation[0]) {
-                    trigger_error(serialize(array('deprecation' => $deprecation[1], 'class' => $className, 'method' => $test->getName(false))), E_USER_DEPRECATED);
+                    trigger_error($error, E_USER_DEPRECATED);
                 } else {
-                    @trigger_error(serialize(array('deprecation' => $deprecation[1], 'class' => $className, 'method' => $test->getName(false))), E_USER_DEPRECATED);
+                    @trigger_error($error, E_USER_DEPRECATED);
                 }
             }
             $this->runsInSeparateProcess = false;
@@ -315,7 +324,7 @@ class SymfonyTestsListenerTrait
     }
 
     /**
-     * @param Test $test
+     * @param TestCase $test
      *
      * @return bool
      */

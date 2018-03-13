@@ -300,7 +300,7 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Expires', -1);
-        $this->assertEquals('Sat, 01 Jan 00 00:00:00 +0000', $response->getExpires()->format(DATE_RFC822));
+        $this->assertLessThanOrEqual(time() - 2*86400, $response->getExpires()->format('U'));
 
         $response = new Response();
         $this->assertNull($response->getMaxAge(), '->getMaxAge() returns null if no freshness information available');
@@ -989,7 +989,7 @@ class ResponseTest extends ResponseTestCase
 
         $ianaCodesReasonPhrases = array();
 
-        $xpath = new \DomXPath($ianaHttpStatusCodes);
+        $xpath = new \DOMXPath($ianaHttpStatusCodes);
         $xpath->registerNamespace('ns', 'http://www.iana.org/assignments');
 
         $records = $xpath->query('//ns:record');

@@ -1,9 +1,11 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.37.6",
     "Names": {
         "BA": "Bosnia ja Hercegovina",
+        "EZ": "Euroavádat",
         "KH": "Kamboža",
         "SD": "Sudan",
-        "TD": "Chad"
+        "TD": "Chad",
+        "UN": "Ovttastuvvan Našuvnnat"
     }
 }

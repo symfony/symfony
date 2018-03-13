@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "AC": "Ascension",
         "AD": "Andorra",
@@ -72,6 +72,7 @@
         "ER": "Eritrea",
         "ES": "Spanien",
         "ET": "Etiopien",
+        "EZ": "eurozonen",
         "FI": "Finland",
         "FJ": "Fiji",
         "FK": "Falklandsöarna",
@@ -97,7 +98,7 @@
         "GU": "Guam",
         "GW": "Guinea-Bissau",
         "GY": "Guyana",
-        "HK": "Hongkong, S.A.R. Kina",
+        "HK": "Hongkong",
         "HN": "Honduras",
         "HR": "Kroatien",
         "HT": "Haiti",
@@ -150,7 +151,7 @@
         "ML": "Mali",
         "MM": "Myanmar (Burma)",
         "MN": "Mongoliet",
-        "MO": "Macao, S.A.R. Kina",
+        "MO": "Macao",
         "MP": "Nordmarianerna",
         "MQ": "Martinique",
         "MR": "Mauretanien",

@@ -113,6 +113,7 @@ class FormValidator extends ConstraintValidator
                     ? (string) $form->getViewData()
                     : gettype($form->getViewData());
 
+                $this->context->setConstraint($constraint);
                 $this->context->buildViolation($config->getOption('invalid_message'))
                     ->setParameters(array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')))
                     ->setInvalidValue($form->getViewData())
@@ -124,6 +125,7 @@ class FormValidator extends ConstraintValidator
 
         // Mark the form with an error if it contains extra fields
         if (!$config->getOption('allow_extra_fields') && count($form->getExtraData()) > 0) {
+            $this->context->setConstraint($constraint);
             $this->context->buildViolation($config->getOption('extra_fields_message'))
                 ->setParameter('{{ extra_fields }}', implode('", "', array_keys($form->getExtraData())))
                 ->setInvalidValue($form->getExtraData())

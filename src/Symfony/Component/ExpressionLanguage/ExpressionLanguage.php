@@ -21,9 +21,6 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
  */
 class ExpressionLanguage
 {
-    /**
-     * @var CacheItemPoolInterface
-     */
     private $cache;
     private $lexer;
     private $parser;

@@ -101,13 +101,16 @@ class VarCloner extends AbstractCloner
                 // Create $stub when the original value $v can not be used directly
                 // If $v is a nested structure, put that structure in array $a
                 switch (true) {
-                    case empty($v):
-                    case true === $v:
+                    case null === $v:
+                    case \is_bool($v):
                     case \is_int($v):
                     case \is_float($v):
                         continue 2;
 
                     case \is_string($v):
+                        if ('' === $v) {
+                            continue 2;
+                        }
                         if (!\preg_match('//u', $v)) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_STRING;
@@ -131,6 +134,9 @@ class VarCloner extends AbstractCloner
                         break;
 
                     case \is_array($v):
+                        if (!$v) {
+                            continue 2;
+                        }
                         $stub = $arrayStub;
                         $stub->class = Stub::ARRAY_INDEXED;
 

@@ -31,17 +31,11 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
-use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceType extends AbstractType
 {
-    /**
-     * Caches created choice lists.
-     *
-     * @var ChoiceListFactoryInterface
-     */
     private $choiceListFactory;
 
     public function __construct(ChoiceListFactoryInterface $choiceListFactory = null)
@@ -92,12 +86,12 @@ class ChoiceType extends AbstractType
                 $form = $event->getForm();
                 $data = $event->getData();
 
+                // Since the type always use mapper an empty array will not be
+                // considered as empty in Form::submit(), we need to evaluate
+                // empty data here so its value is submitted to sub forms
                 if (null === $data) {
                     $emptyData = $form->getConfig()->getEmptyData();
-
-                    if (false === FormUtil::isEmpty($emptyData) && array() !== $emptyData) {
-                        $data = is_callable($emptyData) ? call_user_func($emptyData, $form, $data) : $emptyData;
-                    }
+                    $data = $emptyData instanceof \Closure ? $emptyData($form, $data) : $emptyData;
                 }
 
                 // Convert the submitted data to a string, if scalar, before
@@ -351,10 +345,6 @@ class ChoiceType extends AbstractType
 
     /**
      * Adds the sub fields for an expanded choice field.
-     *
-     * @param FormBuilderInterface $builder     The form builder
-     * @param array                $choiceViews The choice view objects
-     * @param array                $options     The build options
      */
     private function addSubForms(FormBuilderInterface $builder, array $choiceViews, array $options)
     {
@@ -375,14 +365,9 @@ class ChoiceType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param                      $name
-     * @param                      $choiceView
-     * @param array                $options
-     *
      * @return mixed
      */
-    private function addSubForm(FormBuilderInterface $builder, $name, ChoiceView $choiceView, array $options)
+    private function addSubForm(FormBuilderInterface $builder, string $name, ChoiceView $choiceView, array $options)
     {
         $choiceOpts = array(
             'value' => $choiceView->value,

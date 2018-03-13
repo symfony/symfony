@@ -16,7 +16,7 @@ namespace Symfony\Component\Yaml;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class Dumper
 {
@@ -62,8 +62,11 @@ class Dumper
             $dumpAsMap = Inline::isHash($input);
 
             foreach ($input as $key => $value) {
-                if ($inline >= 1 && Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && is_string($value) && false !== strpos($value, "\n")) {
-                    $output .= sprintf("%s%s%s |\n", $prefix, $dumpAsMap ? Inline::dump($key, $flags).':' : '-', '');
+                if ($inline >= 1 && Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && is_string($value) && false !== strpos($value, "\n") && false === strpos($value, "\r\n")) {
+                    // If the first line starts with a space character, the spec requires a blockIndicationIndicator
+                    // http://www.yaml.org/spec/1.2/spec.html#id2793979
+                    $blockIndentationIndicator = (' ' === substr($value, 0, 1)) ? (string) $this->indentation : '';
+                    $output .= sprintf("%s%s%s |%s\n", $prefix, $dumpAsMap ? Inline::dump($key, $flags).':' : '-', '', $blockIndentationIndicator);
 
                     foreach (preg_split('/\n|\r\n/', $value) as $row) {
                         $output .= sprintf("%s%s%s\n", $prefix, str_repeat(' ', $this->indentation), $row);

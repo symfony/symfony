@@ -24,8 +24,6 @@ trait RouteTrait
     /**
      * Adds defaults.
      *
-     * @param array $defaults
-     *
      * @return $this
      */
     final public function defaults(array $defaults)
@@ -37,8 +35,6 @@ trait RouteTrait
 
     /**
      * Adds requirements.
-     *
-     * @param array $requirements
      *
      * @return $this
      */
@@ -52,8 +48,6 @@ trait RouteTrait
     /**
      * Adds options.
      *
-     * @param array $options
-     *
      * @return $this
      */
     final public function options(array $options)
@@ -66,11 +60,9 @@ trait RouteTrait
     /**
      * Sets the condition.
      *
-     * @param string $condition
-     *
      * @return $this
      */
-    final public function condition($condition)
+    final public function condition(string $condition)
     {
         $this->route->setCondition($condition);
 
@@ -80,11 +72,9 @@ trait RouteTrait
     /**
      * Sets the pattern for the host.
      *
-     * @param string $pattern
-     *
      * @return $this
      */
-    final public function host($pattern)
+    final public function host(string $pattern)
     {
         $this->route->setHost($pattern);
 
@@ -131,6 +121,16 @@ trait RouteTrait
     final public function controller($controller)
     {
         $this->route->addDefaults(array('_controller' => $controller));
+
+        return $this;
+    }
+
+    /**
+     * Adds a prefix to the name of all the routes within the collection.
+     */
+    final public function addNamePrefix(string $prefix): self
+    {
+        $this->route->addNamePrefix($prefix);
 
         return $this;
     }

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.5",
     "Names": {
         "aa": "afar",
         "ab": "abchaski",
@@ -118,7 +118,7 @@
         "dav": "taita",
         "de": "niemiecki",
         "de_AT": "austriacki niemiecki",
-        "de_CH": "wysokoniemiecki (Szwajcaria)",
+        "de_CH": "szwajcarski wysokoniemiecki",
         "del": "delaware",
         "den": "slave",
         "dgr": "dogrib",
@@ -318,6 +318,7 @@
         "ln": "lingala",
         "lo": "laotański",
         "lol": "mongo",
+        "lou": "kreolski luizjański",
         "loz": "lozi",
         "lrc": "luryjski północny",
         "lt": "litewski",

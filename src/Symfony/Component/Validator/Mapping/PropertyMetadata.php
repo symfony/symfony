@@ -34,7 +34,7 @@ class PropertyMetadata extends MemberMetadata
      *
      * @throws ValidatorException
      */
-    public function __construct($class, $name)
+    public function __construct(string $class, string $name)
     {
         if (!property_exists($class, $name)) {
             throw new ValidatorException(sprintf('Property "%s" does not exist in class "%s"', $name, $class));

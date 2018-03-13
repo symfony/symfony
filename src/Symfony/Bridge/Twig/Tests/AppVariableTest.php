@@ -173,12 +173,8 @@ class AppVariableTest extends TestCase
      */
     public function testGetFlashesWithNoSessionStarted()
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
-        $request->method('getSession')->willReturn(new Session());
-
-        $this->setRequestStack($request);
-
-        $this->assertEquals(array(), $this->appVariable->getFlashes());
+        $flashMessages = $this->setFlashMessages(false);
+        $this->assertEquals($flashMessages, $this->appVariable->getFlashes());
     }
 
     /**
@@ -256,7 +252,7 @@ class AppVariableTest extends TestCase
         $token->method('getUser')->willReturn($user);
     }
 
-    private function setFlashMessages()
+    private function setFlashMessages($sessionHasStarted = true)
     {
         $flashMessages = array(
             'notice' => array('Notice #1 message'),
@@ -266,8 +262,8 @@ class AppVariableTest extends TestCase
         $flashBag = new FlashBag();
         $flashBag->initialize($flashMessages);
 
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->getMock();
-        $session->method('isStarted')->willReturn(true);
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->disableOriginalConstructor()->getMock();
+        $session->method('isStarted')->willReturn($sessionHasStarted);
         $session->method('getFlashBag')->willReturn($flashBag);
 
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();

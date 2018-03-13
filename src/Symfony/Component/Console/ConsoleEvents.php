@@ -24,8 +24,6 @@ final class ConsoleEvents
      * before they are handled to the command.
      *
      * @Event("Symfony\Component\Console\Event\ConsoleCommandEvent")
-     *
-     * @var string
      */
     const COMMAND = 'console.command';
 
@@ -34,8 +32,6 @@ final class ConsoleEvents
      * executed by the console.
      *
      * @Event("Symfony\Component\Console\Event\ConsoleTerminateEvent")
-     *
-     * @var string
      */
     const TERMINATE = 'console.terminate';
 
@@ -46,8 +42,6 @@ final class ConsoleEvents
      * to modify the thrown exception.
      *
      * @Event("Symfony\Component\Console\Event\ConsoleErrorEvent")
-     *
-     * @var string
      */
     const ERROR = 'console.error';
 }

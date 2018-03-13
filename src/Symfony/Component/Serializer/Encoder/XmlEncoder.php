@@ -41,10 +41,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param string   $rootNodeName
-     * @param int|null $loadOptions  A bit field of LIBXML_* constants
+     * @param int|null $loadOptions A bit field of LIBXML_* constants
      */
-    public function __construct($rootNodeName = 'response', $loadOptions = null)
+    public function __construct(string $rootNodeName = 'response', int $loadOptions = null)
     {
         $this->rootNodeName = $rootNodeName;
         $this->loadOptions = null !== $loadOptions ? $loadOptions : LIBXML_NONET | LIBXML_NOBLANKS;
@@ -163,7 +162,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Sets the root node name.
      *
-     * @param string $name root node name
+     * @param string $name Root node name
      */
     public function setRootNodeName($name)
     {
@@ -180,15 +179,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         return $this->rootNodeName;
     }
 
-    /**
-     * @param \DOMNode $node
-     * @param string   $val
-     *
-     * @return bool
-     */
-    final protected function appendXMLString(\DOMNode $node, $val)
+    final protected function appendXMLString(\DOMNode $node, string $val): bool
     {
-        if (strlen($val) > 0) {
+        if ('' !== $val) {
             $frag = $this->dom->createDocumentFragment();
             $frag->appendXML($val);
             $node->appendChild($frag);
@@ -199,13 +192,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         return false;
     }
 
-    /**
-     * @param \DOMNode $node
-     * @param string   $val
-     *
-     * @return bool
-     */
-    final protected function appendText(\DOMNode $node, $val)
+    final protected function appendText(\DOMNode $node, string $val): bool
     {
         $nodeText = $this->dom->createTextNode($val);
         $node->appendChild($nodeText);
@@ -213,13 +200,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         return true;
     }
 
-    /**
-     * @param \DOMNode $node
-     * @param string   $val
-     *
-     * @return bool
-     */
-    final protected function appendCData(\DOMNode $node, $val)
+    final protected function appendCData(\DOMNode $node, string $val): bool
     {
         $nodeText = $this->dom->createCDATASection($val);
         $node->appendChild($nodeText);
@@ -230,10 +211,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * @param \DOMNode             $node
      * @param \DOMDocumentFragment $fragment
-     *
-     * @return bool
      */
-    final protected function appendDocumentFragment(\DOMNode $node, $fragment)
+    final protected function appendDocumentFragment(\DOMNode $node, $fragment): bool
     {
         if ($fragment instanceof \DOMDocumentFragment) {
             $node->appendChild($fragment);
@@ -246,12 +225,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Checks the name is a valid xml element name.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
-    final protected function isElementNameValid($name)
+    final protected function isElementNameValid(string $name): bool
     {
         return $name &&
             false === strpos($name, ' ') &&
@@ -261,8 +236,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Parse the input DOMNode into an array or a string.
      *
-     * @param \DOMNode $node xml to parse
-     *
      * @return array|string
      */
     private function parseXml(\DOMNode $node, array $context = array())
@@ -271,17 +244,17 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
         $value = $this->parseXmlValue($node, $context);
 
-        if (!count($data)) {
+        if (!\count($data)) {
             return $value;
         }
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $data['#'] = $value;
 
             return $data;
         }
 
-        if (1 === count($value) && key($value)) {
+        if (1 === \count($value) && key($value)) {
             $data[key($value)] = current($value);
 
             return $data;
@@ -296,12 +269,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Parse the input DOMNode attributes into an array.
-     *
-     * @param \DOMNode $node xml to parse
-     *
-     * @return array
      */
-    private function parseXmlAttributes(\DOMNode $node, array $context = array())
+    private function parseXmlAttributes(\DOMNode $node, array $context = array()): array
     {
         if (!$node->hasAttributes()) {
             return array();
@@ -332,8 +301,6 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Parse the input DOMNode value (content and children) into an array or a string.
      *
-     * @param \DOMNode $node xml to parse
-     *
      * @return array|string
      */
     private function parseXmlValue(\DOMNode $node, array $context = array())
@@ -342,7 +309,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             return $node->nodeValue;
         }
 
-        if (1 === $node->childNodes->length && in_array($node->firstChild->nodeType, array(XML_TEXT_NODE, XML_CDATA_SECTION_NODE))) {
+        if (1 === $node->childNodes->length && \in_array($node->firstChild->nodeType, array(XML_TEXT_NODE, XML_CDATA_SECTION_NODE))) {
             return $node->firstChild->nodeValue;
         }
 
@@ -367,7 +334,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         }
 
         foreach ($value as $key => $val) {
-            if (is_array($val) && 1 === count($val)) {
+            if (empty($context['as_collection']) && \is_array($val) && 1 === \count($val)) {
                 $value[$key] = current($val);
             }
         }
@@ -378,19 +345,15 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Parse the data and convert it to DOMElements.
      *
-     * @param \DOMNode     $parentNode
      * @param array|object $data
-     * @param string|null  $xmlRootNodeName
-     *
-     * @return bool
      *
      * @throws NotEncodableValueException
      */
-    private function buildXml(\DOMNode $parentNode, $data, $xmlRootNodeName = null)
+    private function buildXml(\DOMNode $parentNode, $data, string $xmlRootNodeName = null): bool
     {
         $append = true;
 
-        if (is_array($data) || ($data instanceof \Traversable && !$this->serializer->supportsNormalization($data, $this->format))) {
+        if (\is_array($data) || ($data instanceof \Traversable && !$this->serializer->supportsNormalization($data, $this->format))) {
             foreach ($data as $key => $data) {
                 //Ah this is the magic @ attribute types.
                 if (0 === strpos($key, '@') && $this->isElementNameValid($attributeName = substr($key, 1))) {
@@ -400,7 +363,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                     $parentNode->setAttribute($attributeName, $data);
                 } elseif ('#' === $key) {
                     $append = $this->selectNodeType($parentNode, $data);
-                } elseif (is_array($data) && false === is_numeric($key)) {
+                } elseif (\is_array($data) && false === is_numeric($key)) {
                     // Is this array fully numeric keys?
                     if (ctype_digit(implode('', array_keys($data)))) {
                         /*
@@ -424,7 +387,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             return $append;
         }
 
-        if (is_object($data)) {
+        if (\is_object($data)) {
             $data = $this->serializer->normalize($data, $this->format, $this->context);
             if (null !== $data && !is_scalar($data)) {
                 return $this->buildXml($parentNode, $data, $xmlRootNodeName);
@@ -447,14 +410,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Selects the type of node to create and appends it to the parent.
      *
-     * @param \DOMNode     $parentNode
      * @param array|object $data
-     * @param string       $nodeName
-     * @param string       $key
-     *
-     * @return bool
      */
-    private function appendNode(\DOMNode $parentNode, $data, $nodeName, $key = null)
+    private function appendNode(\DOMNode $parentNode, $data, string $nodeName, string $key = null): bool
     {
         $node = $this->dom->createElement($nodeName);
         if (null !== $key) {
@@ -471,12 +429,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Checks if a value contains any characters which would require CDATA wrapping.
-     *
-     * @param string $val
-     *
-     * @return bool
      */
-    private function needsCdataWrapping($val)
+    private function needsCdataWrapping(string $val): bool
     {
         return 0 < preg_match('/[<>&]/', $val);
     }
@@ -484,31 +438,28 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     /**
      * Tests the value being passed and decide what sort of element to create.
      *
-     * @param \DOMNode $node
-     * @param mixed    $val
-     *
-     * @return bool
+     * @param mixed $val
      *
      * @throws NotEncodableValueException
      */
-    private function selectNodeType(\DOMNode $node, $val)
+    private function selectNodeType(\DOMNode $node, $val): bool
     {
-        if (is_array($val)) {
+        if (\is_array($val)) {
             return $this->buildXml($node, $val);
         } elseif ($val instanceof \SimpleXMLElement) {
             $child = $this->dom->importNode(dom_import_simplexml($val), true);
             $node->appendChild($child);
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
-        } elseif (is_object($val)) {
+        } elseif (\is_object($val)) {
             return $this->selectNodeType($node, $this->serializer->normalize($val, $this->format, $this->context));
         } elseif (is_numeric($val)) {
             return $this->appendText($node, (string) $val);
-        } elseif (is_string($val) && $this->needsCdataWrapping($val)) {
+        } elseif (\is_string($val) && $this->needsCdataWrapping($val)) {
             return $this->appendCData($node, $val);
-        } elseif (is_string($val)) {
+        } elseif (\is_string($val)) {
             return $this->appendText($node, $val);
-        } elseif (is_bool($val)) {
+        } elseif (\is_bool($val)) {
             return $this->appendText($node, (int) $val);
         } elseif ($val instanceof \DOMNode) {
             $child = $this->dom->importNode($val, true);
@@ -520,10 +471,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Get real XML root node name, taking serializer options into account.
-     *
-     * @return string
      */
-    private function resolveXmlRootName(array $context = array())
+    private function resolveXmlRootName(array $context = array()): string
     {
         return isset($context['xml_root_node_name'])
             ? $context['xml_root_node_name']
@@ -532,12 +481,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Get XML option for type casting attributes Defaults to true.
-     *
-     * @param array $context
-     *
-     * @return bool
      */
-    private function resolveXmlTypeCastAttributes(array $context = array())
+    private function resolveXmlTypeCastAttributes(array $context = array()): bool
     {
         return isset($context['xml_type_cast_attributes'])
             ? (bool) $context['xml_type_cast_attributes']
@@ -546,12 +491,8 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
     /**
      * Create a DOM document, taking serializer options into account.
-     *
-     * @param array $context options that the encoder has access to
-     *
-     * @return \DOMDocument
      */
-    private function createDomDocument(array $context)
+    private function createDomDocument(array $context): \DOMDocument
     {
         $document = new \DOMDocument();
 

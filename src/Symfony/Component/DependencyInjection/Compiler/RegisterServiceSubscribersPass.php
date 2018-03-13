@@ -56,14 +56,14 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
         }
         $class = $value->getClass();
 
-        if (!is_subclass_of($class, ServiceSubscriberInterface::class)) {
-            if (!class_exists($class, false)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $this->currentId));
-            }
-
+        if (!$r = $this->container->getReflectionClass($class)) {
+            throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $this->currentId));
+        }
+        if (!$r->isSubclassOf(ServiceSubscriberInterface::class)) {
             throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $this->currentId, ServiceSubscriberInterface::class));
         }
-        $this->container->addObjectResource($class);
+        $class = $r->name;
+
         $subscriberMap = array();
         $declaringClass = (new \ReflectionMethod($class, 'getSubscribedServices'))->class;
 
@@ -74,9 +74,6 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             if ($optionalBehavior = '?' === $type[0]) {
                 $type = substr($type, 1);
                 $optionalBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-            } elseif ($optionalBehavior = '!' === $type[0]) {
-                $type = substr($type, 1);
-                $optionalBehavior = ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE;
             }
             if (is_int($key)) {
                 $key = $type;
@@ -97,7 +94,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
             throw new InvalidArgumentException(sprintf('Service %s not exist in the map returned by "%s::getSubscribedServices()" for service "%s".', $message, $class, $this->currentId));
         }
 
-        $value->addTag('container.service_subscriber.locator', array('id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap)));
+        $value->addTag('container.service_subscriber.locator', array('id' => (string) ServiceLocatorTagPass::register($this->container, $subscriberMap, $this->currentId)));
 
         return parent::processValue($value);
     }

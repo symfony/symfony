@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added information about orphaned events
+
 4.0.0
 -----
 

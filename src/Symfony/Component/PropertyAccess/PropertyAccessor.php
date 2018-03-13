@@ -69,12 +69,8 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
-     *
-     * @param bool                   $magicCall
-     * @param bool                   $throwExceptionOnInvalidIndex
-     * @param CacheItemPoolInterface $cacheItemPool
      */
-    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null)
+    public function __construct(bool $magicCall = false, bool $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null)
     {
         $this->magicCall = $magicCall;
         $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
@@ -170,7 +166,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $type = $trace[$i]['args'][0];
             $type = is_object($type) ? get_class($type) : gettype($type);
 
-            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given', substr($message, $pos, strpos($message, ',', $pos) - $pos), $type));
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given.', substr($message, $pos, strpos($message, ',', $pos) - $pos), $type));
         }
     }
 
@@ -503,7 +499,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function writeIndex($zval, $index, $value)
     {
         if (!$zval[self::VALUE] instanceof \ArrayAccess && !is_array($zval[self::VALUE])) {
-            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($zval[self::VALUE])));
+            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, get_class($zval[self::VALUE])));
         }
 
         $zval[self::REF][$index] = $value;
@@ -544,7 +540,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]}($value);
         } elseif (self::ACCESS_TYPE_NOT_FOUND === $access[self::ACCESS_TYPE]) {
-            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s".', $property, get_class($object)));
+            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s" in class "%s"%s.', $property, get_class($object), isset($access[self::ACCESS_NAME]) ? ': '.$access[self::ACCESS_NAME] : ''));
         } else {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }
@@ -553,11 +549,11 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Adjusts a collection-valued property by calling add*() and remove*() methods.
      *
-     * @param array              $zval         The array containing the object to write to
-     * @param string             $property     The property to write
-     * @param array|\Traversable $collection   The collection to write
-     * @param string             $addMethod    The add*() method
-     * @param string             $removeMethod The remove*() method
+     * @param array    $zval         The array containing the object to write to
+     * @param string   $property     The property to write
+     * @param iterable $collection   The collection to write
+     * @param string   $addMethod    The add*() method
+     * @param string   $removeMethod The remove*() method
      */
     private function writeCollection($zval, $property, $collection, $addMethod, $removeMethod)
     {
@@ -592,13 +588,9 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Guesses how to write the property value.
      *
-     * @param string $class
-     * @param string $property
-     * @param mixed  $value
-     *
-     * @return array
+     * @param mixed $value
      */
-    private function getWriteAccessInfo($class, $property, $value)
+    private function getWriteAccessInfo(string $class, string $property, $value): array
     {
         $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 
@@ -687,12 +679,9 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Returns whether a property is writable in the given object.
      *
-     * @param object $object   The object to write to
-     * @param string $property The property to write
-     *
-     * @return bool Whether the property is writable
+     * @param object $object The object to write to
      */
-    private function isPropertyWritable($object, $property)
+    private function isPropertyWritable($object, string $property): bool
     {
         if (!is_object($object)) {
             return false;
@@ -709,12 +698,8 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * Camelizes a given string.
-     *
-     * @param string $string Some string
-     *
-     * @return string The camelized version of the string
      */
-    private function camelize($string)
+    private function camelize(string $string): string
     {
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
     }
@@ -744,14 +729,8 @@ class PropertyAccessor implements PropertyAccessorInterface
 
     /**
      * Returns whether a method is public and has the number of required parameters.
-     *
-     * @param \ReflectionClass $class      The class of the method
-     * @param string           $methodName The method name
-     * @param int              $parameters The number of parameters
-     *
-     * @return bool Whether the method is public and has $parameters required parameters
      */
-    private function isMethodAccessible(\ReflectionClass $class, $methodName, $parameters)
+    private function isMethodAccessible(\ReflectionClass $class, string $methodName, int $parameters): bool
     {
         if ($class->hasMethod($methodName)) {
             $method = $class->getMethod($methodName);
@@ -770,10 +749,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Gets a PropertyPath instance and caches it.
      *
      * @param string|PropertyPath $propertyPath
-     *
-     * @return PropertyPath
      */
-    private function getPropertyPath($propertyPath)
+    private function getPropertyPath($propertyPath): PropertyPath
     {
         if ($propertyPath instanceof PropertyPathInterface) {
             // Don't call the copy constructor has it is not needed here

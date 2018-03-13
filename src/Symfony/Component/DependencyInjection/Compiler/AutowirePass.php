@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
@@ -32,10 +33,7 @@ class AutowirePass extends AbstractRecursivePass
     private $lastFailure;
     private $throwOnAutowiringException;
 
-    /**
-     * @param bool $throwOnAutowireException Errors can be retrieved via Definition::getErrors()
-     */
-    public function __construct($throwOnAutowireException = true)
+    public function __construct(bool $throwOnAutowireException = true)
     {
         $this->throwOnAutowiringException = $throwOnAutowireException;
     }
@@ -150,14 +148,11 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Autowires the constructor or a method.
      *
-     * @param \ReflectionFunctionAbstract $reflectionMethod
-     * @param array                       $arguments
-     *
      * @return array The autowired arguments
      *
      * @throws AutowiringFailedException
      */
-    private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments)
+    private function autowireMethod(\ReflectionFunctionAbstract $reflectionMethod, array $arguments): array
     {
         $class = $reflectionMethod instanceof \ReflectionMethod ? $reflectionMethod->class : $this->currentId;
         $method = $reflectionMethod->name;
@@ -269,11 +264,8 @@ class AutowirePass extends AbstractRecursivePass
 
     /**
      * Populates the list of available types for a given definition.
-     *
-     * @param string     $id
-     * @param Definition $definition
      */
-    private function populateAvailableType($id, Definition $definition)
+    private function populateAvailableType(string $id, Definition $definition)
     {
         // Never use abstract services
         if ($definition->isAbstract()) {
@@ -295,11 +287,8 @@ class AutowirePass extends AbstractRecursivePass
 
     /**
      * Associates a type and a service id if applicable.
-     *
-     * @param string $type
-     * @param string $id
      */
-    private function set($type, $id)
+    private function set(string $type, string $id)
     {
         // is this already a type/class that is known to match multiple services?
         if (isset($this->ambiguousServiceTypes[$type])) {
@@ -326,10 +315,24 @@ class AutowirePass extends AbstractRecursivePass
     private function createTypeNotFoundMessage(TypedReference $reference, $label)
     {
         if (!$r = $this->container->getReflectionClass($type = $reference->getType(), false)) {
-            $message = sprintf('has type "%s" but this class cannot be loaded.', $type);
+            // either $type does not exist or a parent class does not exist
+            try {
+                $resource = new ClassExistenceResource($type, false);
+                // isFresh() will explode ONLY if a parent class/trait does not exist
+                $resource->isFresh(0);
+                $parentMsg = false;
+            } catch (\ReflectionException $e) {
+                $parentMsg = $e->getMessage();
+            }
+
+            $message = sprintf('has type "%s" but this class %s.', $type, $parentMsg ? sprintf('is missing a parent class (%s)', $parentMsg) : 'was not found');
         } else {
             $message = $this->container->has($type) ? 'this service is abstract' : 'no such service exists';
             $message = sprintf('references %s "%s" but %s.%s', $r->isInterface() ? 'interface' : 'class', $type, $message, $this->createTypeAlternatives($reference));
+
+            if ($r->isInterface()) {
+                $message .= ' Did you create a class that implements this interface?';
+            }
         }
 
         $message = sprintf('Cannot autowire service "%s": %s %s', $this->currentId, $label, $message);
@@ -349,7 +352,10 @@ class AutowirePass extends AbstractRecursivePass
             return ' '.$message;
         }
 
-        if (isset($this->ambiguousServiceTypes[$type])) {
+        $servicesAndAliases = $this->container->getServiceIds();
+        if (!$this->container->has($type) && false !== $key = array_search(strtolower($type), array_map('strtolower', $servicesAndAliases))) {
+            return sprintf(' Did you mean "%s"?', $servicesAndAliases[$key]);
+        } elseif (isset($this->ambiguousServiceTypes[$type])) {
             $message = sprintf('one of these existing services: "%s"', implode('", "', $this->ambiguousServiceTypes[$type]));
         } elseif (isset($this->types[$type])) {
             $message = sprintf('the existing "%s" service', $this->types[$type]);

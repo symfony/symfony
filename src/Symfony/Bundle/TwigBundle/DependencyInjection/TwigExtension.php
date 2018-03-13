@@ -80,6 +80,7 @@ class TwigExtension extends Extension
         $container->setParameter('twig.exception_listener.controller', $config['exception_controller']);
 
         $container->setParameter('twig.form.resources', $config['form_themes']);
+        $container->setParameter('twig.default_path', $config['default_path']);
 
         $envConfiguratorDefinition = $container->getDefinition('twig.configurator.environment');
         $envConfiguratorDefinition->replaceArgument(0, $config['date']['format']);

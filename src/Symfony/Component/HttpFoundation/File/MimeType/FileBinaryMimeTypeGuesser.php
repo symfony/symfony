@@ -31,7 +31,7 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @param string $cmd The command to run to get the mime type of a file
      */
-    public function __construct($cmd = 'file -b --mime %s 2>/dev/null')
+    public function __construct(string $cmd = 'file -b --mime %s 2>/dev/null')
     {
         $this->cmd = $cmd;
     }

@@ -32,7 +32,8 @@
     "suggest": {
         "symfony/http-kernel": "For using the debugging handlers together with the response life cycle of the HTTP kernel.",
         "symfony/console": "For the possibility to show log messages in console commands depending on verbosity settings. You need version ~2.3 of the console for it.",
-        "symfony/event-dispatcher": "Needed when using log messages in console commands."
+        "symfony/event-dispatcher": "Needed when using log messages in console commands.",
+        "symfony/var-dumper": "For using the debugging handlers like the console handler or the log server handler."
      },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Monolog\\": "" },
@@ -43,7 +44,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "4.0-dev"
+            "dev-master": "4.1-dev"
         }
     }
 }

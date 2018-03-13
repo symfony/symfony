@@ -25,7 +25,7 @@ class UrlValidator extends ConstraintValidator
             (%s)://                                 # protocol
             (([\.\pL\pN-]+:)?([\.\pL\pN-]+)@)?      # basic auth
             (
-                ([\pL\pN\pS-\.])+(\.?([\pL\pN]|xn\-\-[\pL\pN-]+)+\.?) # a domain name
+                ([\pL\pN\pS\-\.])+(\.?([\pL\pN]|xn\-\-[\pL\pN-]+)+\.?) # a domain name
                     |                                                 # or
                 \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}                    # an IP address
                     |                                                 # or
@@ -61,7 +61,8 @@ class UrlValidator extends ConstraintValidator
             return;
         }
 
-        $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
+        $pattern = $constraint->relativeProtocol ? str_replace('(%s):', '(?:(%s):)?', static::PATTERN) : static::PATTERN;
+        $pattern = sprintf($pattern, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
             $this->context->buildViolation($constraint->message)

@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * The `FileDumper::setBackup()` method is deprecated.
+ * The `TranslationWriter::disableBackup()` method is deprecated.
+ * The `XliffFileDumper` will write "name" on the "unit" node when dumping XLIFF 2.0.
+
 4.0.0
 -----
 

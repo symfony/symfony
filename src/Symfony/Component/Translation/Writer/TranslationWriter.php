@@ -38,10 +38,13 @@ class TranslationWriter implements TranslationWriterInterface
 
     /**
      * Disables dumper backup.
+     *
+     * @deprecated since Symfony 4.1
      */
     public function disableBackup()
     {
-        // to be deprecated in 4.1
+        @trigger_error(sprintf('The %s() method is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
+
         foreach ($this->dumpers as $dumper) {
             if (method_exists($dumper, 'setBackup')) {
                 $dumper->setBackup(false);

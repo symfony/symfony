@@ -40,7 +40,7 @@ class StreamOutput extends Output
      *
      * @throws InvalidArgumentException When first argument is not a real stream
      */
-    public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
+    public function __construct($stream, int $verbosity = self::VERBOSITY_NORMAL, bool $decorated = null, OutputFormatterInterface $formatter = null)
     {
         if (!is_resource($stream) || 'stream' !== get_resource_type($stream)) {
             throw new InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
@@ -92,7 +92,8 @@ class StreamOutput extends Output
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             return
-                '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD
+                function_exists('sapi_windows_vt100_support') && @sapi_windows_vt100_support($this->stream)
+                || '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');

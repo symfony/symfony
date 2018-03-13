@@ -24,6 +24,12 @@
 
         <service id="serializer.property_accessor" alias="property_accessor" />
 
+        <!-- Discriminator Map -->
+        <service id="serializer.mapping.class_discriminator_resolver" class="Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata">
+            <argument type="service" id="serializer.mapping.class_metadata_factory" />
+        </service>
+        <service id="Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface" alias="serializer.mapping.class_discriminator_resolver" />
+
         <!-- Normalizer -->
         <service id="serializer.normalizer.dateinterval" class="Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer">
             <!-- Run before serializer.normalizer.object -->
@@ -50,6 +56,7 @@
             <argument>null</argument> <!-- name converter -->
             <argument type="service" id="serializer.property_accessor" />
             <argument type="service" id="property_info" on-invalid="ignore" />
+            <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
 
             <!-- Run after all custom normalizers -->
             <tag name="serializer.normalizer" priority="-1000" />

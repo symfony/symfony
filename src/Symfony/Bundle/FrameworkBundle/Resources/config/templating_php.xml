@@ -52,7 +52,7 @@
         <service id="templating.helper.code" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper">
             <tag name="templating.helper" alias="code" />
             <argument type="service" id="debug.file_link_formatter"></argument>
-            <argument>%kernel.root_dir%</argument>
+            <argument>%kernel.project_dir%</argument>
             <argument>%kernel.charset%</argument>
         </service>
 

@@ -31,7 +31,6 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 
@@ -1120,10 +1119,7 @@ class EntityTypeTest extends BaseTypeTest
 
         $repo = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
 
-        $entityType = new EntityType(
-            $this->emRegistry,
-            PropertyAccess::createPropertyAccessor()
-        );
+        $entityType = new EntityType($this->emRegistry);
 
         $entityTypeGuesser = new DoctrineOrmTypeGuesser($this->emRegistry);
 
@@ -1183,10 +1179,7 @@ class EntityTypeTest extends BaseTypeTest
 
         $repo = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
 
-        $entityType = new EntityType(
-            $this->emRegistry,
-            PropertyAccess::createPropertyAccessor()
-        );
+        $entityType = new EntityType($this->emRegistry);
 
         $entityTypeGuesser = new DoctrineOrmTypeGuesser($this->emRegistry);
 

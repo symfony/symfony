@@ -74,9 +74,9 @@ class PhpBridgeSessionStorageTest extends TestCase
         $this->assertFalse($storage->isStarted());
 
         $key = $storage->getMetadataBag()->getStorageKey();
-        $this->assertFalse(isset($_SESSION[$key]));
+        $this->assertArrayNotHasKey($key, $_SESSION);
         $storage->start();
-        $this->assertTrue(isset($_SESSION[$key]));
+        $this->assertArrayHasKey($key, $_SESSION);
     }
 
     public function testClear()

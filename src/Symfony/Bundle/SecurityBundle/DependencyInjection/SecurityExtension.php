@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
-use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
+use Symfony\Bundle\SecurityBundle\SecurityUserValueResolver;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Alias;
@@ -23,11 +23,13 @@ use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder;
+use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
 /**
  * SecurityExtension.
@@ -109,7 +111,11 @@ class SecurityExtension extends Extension
 
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
-            $container->getDefinition(UserPasswordEncoderCommand::class)->replaceArgument(1, array_keys($config['encoders']));
+            $container->getDefinition('security.command.user_password_encoder')->replaceArgument(1, array_keys($config['encoders']));
+        }
+
+        if (!class_exists(UserValueResolver::class)) {
+            $container->getDefinition('security.user_value_resolver')->setClass(SecurityUserValueResolver::class);
         }
 
         $container->registerForAutoconfiguration(VoterInterface::class)
@@ -182,8 +188,6 @@ class SecurityExtension extends Extension
                 $customUserChecker = true;
             }
 
-            $contextListenerDefinition->addMethodCall('setLogoutOnUserChange', array($firewall['logout_on_user_change']));
-
             $configId = 'security.firewall.map.config.'.$name;
 
             list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
@@ -244,17 +248,14 @@ class SecurityExtension extends Extension
 
         $config->replaceArgument(4, $firewall['stateless']);
 
-        // Provider id (take the first registered provider if none defined)
+        // Provider id (must be configured explicitly per firewall/authenticator if more than one provider is set)
+        $defaultProvider = null;
         if (isset($firewall['provider'])) {
             if (!isset($providerIds[$normalizedName = str_replace('-', '_', $firewall['provider'])])) {
                 throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall['provider']));
             }
             $defaultProvider = $providerIds[$normalizedName];
-        } else {
-            if (count($providerIds) > 1) {
-                throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
-            }
-
+        } elseif (1 === count($providerIds)) {
             $defaultProvider = reset($providerIds);
         }
 
@@ -353,7 +354,7 @@ class SecurityExtension extends Extension
         // Switch user listener
         if (isset($firewall['switch_user'])) {
             $listenerKeys[] = 'switch_user';
-            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider, $firewall['stateless']));
+            $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider, $firewall['stateless'], $providerIds));
         }
 
         // Access listener
@@ -399,7 +400,7 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, array $providerIds, $defaultEntryPoint)
+    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider = null, array $providerIds, $defaultEntryPoint)
     {
         $listeners = array();
         $hasListeners = false;
@@ -414,8 +415,13 @@ class SecurityExtension extends Extension
                             throw new InvalidConfigurationException(sprintf('Invalid firewall "%s": user provider "%s" not found.', $id, $firewall[$key]['provider']));
                         }
                         $userProvider = $providerIds[$normalizedName];
-                    } else {
+                    } elseif ('remember_me' === $key) {
+                        // RememberMeFactory will use the firewall secret when created
+                        $userProvider = null;
+                    } elseif ($defaultProvider) {
                         $userProvider = $defaultProvider;
+                    } else {
+                        throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "%s" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $key, $id));
                     }
 
                     list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
@@ -429,6 +435,10 @@ class SecurityExtension extends Extension
 
         // Anonymous
         if (isset($firewall['anonymous'])) {
+            if (null === $firewall['anonymous']['secret']) {
+                $firewall['anonymous']['secret'] = new Parameter('container.build_hash');
+            }
+
             $listenerId = 'security.authentication.listener.anonymous.'.$id;
             $container
                 ->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.anonymous'))
@@ -513,7 +523,11 @@ class SecurityExtension extends Extension
 
             return array(
                 'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-                'arguments' => array(),
+                'arguments' => array(
+                    $config['memory_cost'],
+                    $config['time_cost'],
+                    $config['threads'],
+                ),
             );
         }
 
@@ -596,9 +610,13 @@ class SecurityExtension extends Extension
         return $exceptionListenerId;
     }
 
-    private function createSwitchUserListener($container, $id, $config, $defaultProvider, $stateless)
+    private function createSwitchUserListener($container, $id, $config, $defaultProvider, $stateless, $providerIds)
     {
         $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
+
+        if (!$userProvider) {
+            throw new InvalidConfigurationException(sprintf('Not configuring explicitly the provider for the "switch_user" listener on "%s" firewall is ambiguous as there is more than one registered provider.', $id));
+        }
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
         $listener = $container->setDefinition($switchUserListenerId, new ChildDefinition('security.authentication.switchuser_listener'));

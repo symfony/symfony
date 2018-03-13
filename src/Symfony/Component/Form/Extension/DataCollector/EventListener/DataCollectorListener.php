@@ -24,9 +24,6 @@ use Symfony\Component\Form\FormEvents;
  */
 class DataCollectorListener implements EventSubscriberInterface
 {
-    /**
-     * @var FormDataCollectorInterface
-     */
     private $dataCollector;
 
     public function __construct(FormDataCollectorInterface $dataCollector)

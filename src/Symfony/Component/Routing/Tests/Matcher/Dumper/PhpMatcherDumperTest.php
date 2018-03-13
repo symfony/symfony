@@ -13,27 +13,54 @@ namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
+use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class PhpMatcherDumperTest extends TestCase
 {
     /**
-     * @expectedException \LogicException
+     * @var string
      */
-    public function testDumpWhenSchemeIsUsedWithoutAProperDumper()
+    private $matcherClass;
+
+    /**
+     * @var string
+     */
+    private $dumpPath;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->matcherClass = uniqid('ProjectUrlMatcher');
+        $this->dumpPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_matcher.'.$this->matcherClass.'.php';
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        @unlink($this->dumpPath);
+    }
+
+    public function testRedirectPreservesUrlEncoding()
     {
         $collection = new RouteCollection();
-        $collection->add('secure', new Route(
-            '/secure',
-            array(),
-            array(),
-            array(),
-            '',
-            array('https')
-        ));
-        $dumper = new PhpMatcherDumper($collection);
-        $dumper->dump();
+        $collection->add('foo', new Route('/foo:bar/'));
+
+        $class = $this->generateDumpedMatcher($collection, true);
+
+        $matcher = $this->getMockBuilder($class)
+                        ->setMethods(array('redirect'))
+                        ->setConstructorArgs(array(new RequestContext()))
+                        ->getMock();
+
+        $matcher->expects($this->once())->method('redirect')->with('/foo%3Abar/', 'foo')->willReturn(array());
+
+        $matcher->match('/foo%3Abar');
     }
 
     /**
@@ -136,7 +163,7 @@ class PhpMatcherDumperTest extends TestCase
         // prefixes
         $collection1 = new RouteCollection();
         $collection1->add('overridden', new Route('/overridden1'));
-        $collection1->add('foo1', new Route('/{foo}'));
+        $collection1->add('foo1', (new Route('/{foo}'))->setMethods('PUT'));
         $collection1->add('bar1', new Route('/{bar}'));
         $collection1->addPrefix('/b\'b');
         $collection2 = new RouteCollection();
@@ -309,7 +336,7 @@ class PhpMatcherDumperTest extends TestCase
             array('GET', 'HEAD')
         ));
         $headMatchCasesCollection->add('post_and_head', new Route(
-            '/post_and_get',
+            '/post_and_head',
             array(),
             array(),
             array(),
@@ -354,6 +381,7 @@ class PhpMatcherDumperTest extends TestCase
         $groupOptimisedCollection->add('slashed_b', new Route('/slashed/group/b/'));
         $groupOptimisedCollection->add('slashed_c', new Route('/slashed/group/c/'));
 
+        /* test case 6 & 7 */
         $trailingSlashCollection = new RouteCollection();
         $trailingSlashCollection->add('simple_trailing_slash_no_methods', new Route('/trailing/simple/no-methods/', array(), array(), array(), '', array(), array()));
         $trailingSlashCollection->add('simple_trailing_slash_GET_method', new Route('/trailing/simple/get-method/', array(), array(), array(), '', array(), array('GET')));
@@ -373,6 +401,59 @@ class PhpMatcherDumperTest extends TestCase
         $trailingSlashCollection->add('regex_not_trailing_slash_HEAD_method', new Route('/not-trailing/regex/head-method/{param}', array(), array(), array(), '', array(), array('HEAD')));
         $trailingSlashCollection->add('regex_not_trailing_slash_POST_method', new Route('/not-trailing/regex/post-method/{param}', array(), array(), array(), '', array(), array('POST')));
 
+        /* test case 8 */
+        $unicodeCollection = new RouteCollection();
+        $unicodeCollection->add('a', new Route('/{a}', array(), array('a' => 'a'), array('utf8' => false)));
+        $unicodeCollection->add('b', new Route('/{a}', array(), array('a' => '.'), array('utf8' => true)));
+        $unicodeCollection->add('c', new Route('/{a}', array(), array('a' => '.'), array('utf8' => false)));
+
+        /* test case 9 */
+        $hostTreeCollection = new RouteCollection();
+        $hostTreeCollection->add('a', (new Route('/'))->setHost('{d}.e.c.b.a'));
+        $hostTreeCollection->add('b', (new Route('/'))->setHost('d.c.b.a'));
+        $hostTreeCollection->add('c', (new Route('/'))->setHost('{e}.e.c.b.a'));
+
+        /* test case 10 */
+        $chunkedCollection = new RouteCollection();
+        for ($i = 0; $i < 1000; ++$i) {
+            $h = substr(md5($i), 0, 6);
+            $chunkedCollection->add('_'.$i, new Route('/'.$h.'/{a}/{b}/{c}/'.$h));
+        }
+
+        /* test case 11 */
+        $demoCollection = new RouteCollection();
+        $demoCollection->add('a', new Route('/admin/post/'));
+        $demoCollection->add('b', new Route('/admin/post/new'));
+        $demoCollection->add('c', (new Route('/admin/post/{id}'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('d', (new Route('/admin/post/{id}/edit'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('e', (new Route('/admin/post/{id}/delete'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('f', new Route('/blog/'));
+        $demoCollection->add('g', new Route('/blog/rss.xml'));
+        $demoCollection->add('h', (new Route('/blog/page/{page}'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('i', (new Route('/blog/posts/{page}'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('j', (new Route('/blog/comments/{id}/new'))->setRequirements(array('id' => '\d+')));
+        $demoCollection->add('k', new Route('/blog/search'));
+        $demoCollection->add('l', new Route('/login'));
+        $demoCollection->add('m', new Route('/logout'));
+        $demoCollection->addPrefix('/{_locale}');
+        $demoCollection->add('n', new Route('/{_locale}'));
+        $demoCollection->addRequirements(array('_locale' => 'en|fr'));
+        $demoCollection->addDefaults(array('_locale' => 'en'));
+
+        /* test case 12 */
+        $suffixCollection = new RouteCollection();
+        $suffixCollection->add('r1', new Route('abc{foo}/1'));
+        $suffixCollection->add('r2', new Route('abc{foo}/2'));
+        $suffixCollection->add('r10', new Route('abc{foo}/10'));
+        $suffixCollection->add('r20', new Route('abc{foo}/20'));
+        $suffixCollection->add('r100', new Route('abc{foo}/100'));
+        $suffixCollection->add('r200', new Route('abc{foo}/200'));
+
+        /* test case 13 */
+        $hostCollection = new RouteCollection();
+        $hostCollection->add('r1', (new Route('abc{foo}'))->setHost('{foo}.exampple.com'));
+        $hostCollection->add('r2', (new Route('abc{foo}'))->setHost('{foo}.exampple.com'));
+
         return array(
            array(new RouteCollection(), 'url_matcher0.php', array()),
            array($collection, 'url_matcher1.php', array()),
@@ -382,6 +463,39 @@ class PhpMatcherDumperTest extends TestCase
            array($groupOptimisedCollection, 'url_matcher5.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
            array($trailingSlashCollection, 'url_matcher6.php', array()),
            array($trailingSlashCollection, 'url_matcher7.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
+           array($unicodeCollection, 'url_matcher8.php', array()),
+           array($hostTreeCollection, 'url_matcher9.php', array()),
+           array($chunkedCollection, 'url_matcher10.php', array()),
+           array($demoCollection, 'url_matcher11.php', array('base_class' => 'Symfony\Component\Routing\Tests\Fixtures\RedirectableUrlMatcher')),
+           array($suffixCollection, 'url_matcher12.php', array()),
+           array($hostCollection, 'url_matcher13.php', array()),
         );
+    }
+
+    /**
+     * @param $dumper
+     */
+    private function generateDumpedMatcher(RouteCollection $collection, $redirectableStub = false)
+    {
+        $options = array('class' => $this->matcherClass);
+
+        if ($redirectableStub) {
+            $options['base_class'] = '\Symfony\Component\Routing\Tests\Matcher\Dumper\RedirectableUrlMatcherStub';
+        }
+
+        $dumper = new PhpMatcherDumper($collection);
+        $code = $dumper->dump($options);
+
+        file_put_contents($this->dumpPath, $code);
+        include $this->dumpPath;
+
+        return $this->matcherClass;
+    }
+}
+
+abstract class RedirectableUrlMatcherStub extends UrlMatcher implements RedirectableUrlMatcherInterface
+{
+    public function redirect($path, $route, $scheme = null)
+    {
     }
 }

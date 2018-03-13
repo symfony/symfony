@@ -24,7 +24,7 @@ class ServerLogHandler extends AbstractHandler
     private $context;
     private $socket;
 
-    public function __construct($host, $level = Logger::DEBUG, $bubble = true, $context = array())
+    public function __construct(string $host, int $level = Logger::DEBUG, bool $bubble = true, array $context = array())
     {
         parent::__construct($level, $bubble);
 

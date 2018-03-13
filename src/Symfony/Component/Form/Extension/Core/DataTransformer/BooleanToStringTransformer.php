@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
@@ -22,21 +23,21 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class BooleanToStringTransformer implements DataTransformerInterface
 {
-    /**
-     * The value emitted upon transform if the input is true.
-     *
-     * @var string
-     */
     private $trueValue;
 
+    private $falseValues;
+
     /**
-     * Sets the value emitted upon transform if the input is true.
-     *
-     * @param string $trueValue
+     * @param string $trueValue   The value emitted upon transform if the input is true
+     * @param array  $falseValues
      */
-    public function __construct($trueValue)
+    public function __construct(string $trueValue, array $falseValues = array(null))
     {
         $this->trueValue = $trueValue;
+        $this->falseValues = $falseValues;
+        if (in_array($this->trueValue, $this->falseValues, true)) {
+            throw new InvalidArgumentException('The specified "true" value is contained in the false-values');
+        }
     }
 
     /**
@@ -72,7 +73,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (null === $value) {
+        if (in_array($value, $this->falseValues, true)) {
             return false;
         }
 

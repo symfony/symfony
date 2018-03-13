@@ -2,6 +2,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub;
 
-class Bar
+class Bar implements BarInterface
 {
 }

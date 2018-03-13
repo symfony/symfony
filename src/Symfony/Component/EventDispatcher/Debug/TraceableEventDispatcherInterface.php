@@ -14,6 +14,8 @@ namespace Symfony\Component\EventDispatcher\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * @deprecated since Symfony 4.1
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface TraceableEventDispatcherInterface extends EventDispatcherInterface

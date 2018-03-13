@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.1",
     "Names": {
         "AC": "Otok Ascension",
         "AD": "Andora",
@@ -72,6 +72,7 @@
         "ER": "Eritreja",
         "ES": "Španija",
         "ET": "Etiopija",
+        "EZ": "evroobmočje",
         "FI": "Finska",
         "FJ": "Fidži",
         "FK": "Falklandski otoki",
@@ -89,7 +90,7 @@
         "GL": "Grenlandija",
         "GM": "Gambija",
         "GN": "Gvineja",
-        "GP": "Gvadalupe",
+        "GP": "Guadeloupe",
         "GQ": "Ekvatorialna Gvineja",
         "GR": "Grčija",
         "GS": "Južna Georgia in Južni Sandwichevi otoki",

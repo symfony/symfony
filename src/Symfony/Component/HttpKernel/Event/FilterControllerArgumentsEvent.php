@@ -30,7 +30,7 @@ class FilterControllerArgumentsEvent extends FilterControllerEvent
 {
     private $arguments;
 
-    public function __construct(HttpKernelInterface $kernel, callable $controller, array $arguments, Request $request, $requestType)
+    public function __construct(HttpKernelInterface $kernel, callable $controller, array $arguments, Request $request, ?int $requestType)
     {
         parent::__construct($kernel, $controller, $request, $requestType);
 
@@ -45,9 +45,6 @@ class FilterControllerArgumentsEvent extends FilterControllerEvent
         return $this->arguments;
     }
 
-    /**
-     * @param array $arguments
-     */
     public function setArguments(array $arguments)
     {
         $this->arguments = $arguments;

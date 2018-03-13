@@ -150,6 +150,16 @@ abstract class Client
         return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
+    public function switchToXHR()
+    {
+        $this->setServerParameter('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
+    }
+
+    public function removeXHR()
+    {
+        unset($this->server['HTTP_X_REQUESTED_WITH']);
+    }
+
     /**
      * Returns the History instance.
      *
@@ -272,7 +282,7 @@ abstract class Client
      *
      * @return Crawler
      */
-    public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
+    public function request(string $method, string $uri, array $parameters = array(), array $files = array(), array $server = array(), string $content = null, bool $changeHistory = true)
     {
         if ($this->isMainRequest) {
             $this->redirectCount = 0;
@@ -346,6 +356,7 @@ abstract class Client
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
         putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
+        $_ENV['SYMFONY_DEPRECATIONS_SERIALIZE'] = $deprecationsFile;
         $process = new PhpProcess($this->getScript($request), null, null);
         $process->run();
 

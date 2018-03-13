@@ -29,7 +29,7 @@ use Symfony\Component\Config\FileLocator;
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  *
- * @internal since version 3.4
+ * @internal
  */
 class ContainerDebugCommand extends Command
 {
@@ -221,9 +221,8 @@ EOF
     {
         $serviceIds = $builder->getServiceIds();
         $foundServiceIds = array();
-        $name = strtolower($name);
         foreach ($serviceIds as $serviceId) {
-            if (false === strpos($serviceId, $name)) {
+            if (false === stripos($serviceId, $name)) {
                 continue;
             }
             $foundServiceIds[] = $serviceId;
@@ -248,7 +247,7 @@ EOF
         }
 
         try {
-            $r = new \ReflectionClass($serviceId);
+            new \ReflectionClass($serviceId);
 
             return true;
         } catch (\ReflectionException $e) {

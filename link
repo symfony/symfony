@@ -1,0 +1,71 @@
+#!/usr/bin/env php
+<?php
+
+/*
+* This file is part of the Symfony package.
+*
+* (c) Fabien Potencier <fabien@symfony.com>
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+
+require __DIR__.'/src/Symfony/Component/Filesystem/Exception/ExceptionInterface.php';
+require __DIR__.'/src/Symfony/Component/Filesystem/Exception/IOExceptionInterface.php';
+require __DIR__.'/src/Symfony/Component/Filesystem/Exception/IOException.php';
+require __DIR__.'/src/Symfony/Component/Filesystem/Filesystem.php';
+
+use Symfony\Component\Filesystem\Filesystem;
+
+/**
+ * Links dependencies to components to a local clone of the main symfony/symfony GitHub repository.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+
+if (2 !== $argc) {
+    echo 'Link dependencies to components to a local clone of the main symfony/symfony GitHub repository.'.PHP_EOL.PHP_EOL;
+    echo "Usage: $argv[0] /path/to/the/project".PHP_EOL;
+    exit(1);
+}
+
+if (!is_dir("$argv[1]/vendor/symfony")) {
+    echo "The directory \"$argv[1]\" does not exist or the dependencies are not installed, did you forget to run \"composer install\" in your project?".PHP_EOL;
+    exit(1);
+}
+
+$sfPackages = array('symfony/symfony' => __DIR__);
+
+$filesystem = new Filesystem();
+$braces = array('Bundle', 'Bridge', 'Component', 'Component/Security');
+$directories = call_user_func_array('array_merge', array_values(array_map(function ($part) {
+    return glob(__DIR__.'/src/Symfony/'.$part.'/*', GLOB_ONLYDIR | GLOB_NOSORT);
+}, $braces)));
+
+foreach ($directories as $dir) {
+    if ($filesystem->exists($composer = "$dir/composer.json")) {
+        $sfPackages[json_decode(file_get_contents($composer))->name] = $dir;
+    }
+}
+
+foreach (glob("$argv[1]/vendor/symfony/*", GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
+    $package = 'symfony/'.basename($dir);
+    if (is_link($dir)) {
+        echo "\"$package\" is already a symlink, skipping.".PHP_EOL;
+        continue;
+    }
+
+    if (!isset($sfPackages[$package])) {
+        continue;
+    }
+
+    $sfDir = '\\' === DIRECTORY_SEPARATOR ? $sfPackages[$package] : $filesystem->makePathRelative($sfPackages[$package], dirname(realpath($dir)));
+
+    $filesystem->remove($dir);
+    $filesystem->symlink($sfDir, $dir);
+    echo "\"$package\" has been linked to \"$sfPackages[$package]\".".PHP_EOL;
+}
+
+foreach (glob("$argv[1]/var/cache/*") as $cacheDir) {
+    $filesystem->remove($cacheDir);
+}

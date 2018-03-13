@@ -37,24 +37,9 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
  */
 class ValidatorBuilder implements ValidatorBuilderInterface
 {
-    /**
-     * @var array
-     */
     private $initializers = array();
-
-    /**
-     * @var array
-     */
     private $xmlMappings = array();
-
-    /**
-     * @var array
-     */
     private $yamlMappings = array();
-
-    /**
-     * @var array
-     */
     private $methodMappings = array();
 
     /**

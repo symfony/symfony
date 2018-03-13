@@ -19,13 +19,10 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
 class SerializerExtractor implements PropertyListExtractorInterface
 {
-    /**
-     * @var ClassMetadataFactoryInterface
-     */
     private $classMetadataFactory;
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory)

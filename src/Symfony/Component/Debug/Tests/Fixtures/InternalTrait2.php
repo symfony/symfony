@@ -8,7 +8,7 @@ namespace Symfony\Component\Debug\Tests\Fixtures;
 trait InternalTrait2
 {
     /**
-     * @internal since version 3.4
+     * @internal
      */
     public function internalMethod()
     {

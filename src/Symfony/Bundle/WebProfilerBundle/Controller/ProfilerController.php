@@ -35,15 +35,7 @@ class ProfilerController
     private $cspHandler;
     private $baseDir;
 
-    /**
-     * @param UrlGeneratorInterface        $generator  The URL Generator
-     * @param Profiler                     $profiler   The profiler
-     * @param Environment                  $twig       The twig environment
-     * @param array                        $templates  The templates
-     * @param ContentSecurityPolicyHandler $cspHandler The Content-Security-Policy handler
-     * @param string                       $baseDir    The project root directory
-     */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null)
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, Environment $twig, array $templates, ContentSecurityPolicyHandler $cspHandler = null, string $baseDir = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
@@ -376,7 +368,7 @@ class ProfilerController
 
         $filename = $this->baseDir.DIRECTORY_SEPARATOR.$file;
 
-        if (preg_match("'(^|[/\\\\])\.\.?([/\\\\]|$)'", $file) || !is_readable($filename)) {
+        if (preg_match("'(^|[/\\\\])\.'", $file) || !is_readable($filename)) {
             throw new NotFoundHttpException(sprintf('The file "%s" cannot be opened.', $file));
         }
 

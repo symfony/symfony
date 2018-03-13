@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Dumper;
 
 use Symfony\Component\VarDumper\Cloner\Cursor;
+use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * CliDumper dumps variables for command line output.
@@ -57,7 +58,7 @@ class CliDumper extends AbstractDumper
     /**
      * {@inheritdoc}
      */
-    public function __construct($output = null, $charset = null, $flags = 0)
+    public function __construct($output = null, string $charset = null, int $flags = 0)
     {
         parent::__construct($output, $charset, $flags);
 
@@ -496,7 +497,8 @@ class CliDumper extends AbstractDumper
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             static::$defaultColors = @(
-                '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD
+                function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support($this->outputStream)
+                || '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM')
@@ -525,10 +527,12 @@ class CliDumper extends AbstractDumper
 
     protected function endValue(Cursor $cursor)
     {
-        if (self::DUMP_TRAILING_COMMA & $this->flags && 0 < $cursor->depth) {
-            $this->line .= ',';
-        } elseif (self::DUMP_COMMA_SEPARATOR & $this->flags && 1 < $cursor->hashLength - $cursor->hashIndex) {
-            $this->line .= ',';
+        if (Stub::ARRAY_INDEXED === $cursor->hashType || Stub::ARRAY_ASSOC === $cursor->hashType) {
+            if (self::DUMP_TRAILING_COMMA & $this->flags && 0 < $cursor->depth) {
+                $this->line .= ',';
+            } elseif (self::DUMP_COMMA_SEPARATOR & $this->flags && 1 < $cursor->hashLength - $cursor->hashIndex) {
+                $this->line .= ',';
+            }
         }
 
         $this->dumpLine($cursor->depth, true);

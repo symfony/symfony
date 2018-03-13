@@ -31,9 +31,9 @@ interface ChoiceListFactoryInterface
      * The callable receives the choice as first and the array key as the second
      * argument.
      *
-     * @param array|\Traversable $choices The choices
-     * @param null|callable      $value   The callable generating the choice
-     *                                    values
+     * @param iterable      $choices The choices
+     * @param null|callable $value   The callable generating the choice
+     *                               values
      *
      * @return ChoiceListInterface The choice list
      */

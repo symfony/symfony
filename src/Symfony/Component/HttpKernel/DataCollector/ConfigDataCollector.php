@@ -34,7 +34,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      * @param string $name    The name of the application using the web profiler
      * @param string $version The version of the application using the web profiler
      */
-    public function __construct($name = null, $version = null)
+    public function __construct(string $name = null, string $version = null)
     {
         $this->name = $name;
         $this->version = $version;

@@ -10,4 +10,5 @@ data:
         empty line:
         
         baz
+    multi_line_with_carriage_return: "foo\nbar\r\nbaz"
     nested_inlined_multi_line_string: { inlined_multi_line: "foo\nbar\r\nempty line:\n\nbaz" }

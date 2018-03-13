@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.1",
     "Names": {
         "ADP": [
             "ADP",
@@ -62,7 +62,7 @@
             "avstrijski šiling"
         ],
         "AUD": [
-            "A$",
+            "AUD",
             "avstralski dolar"
         ],
         "AWG": [
@@ -154,7 +154,7 @@
             "stari brazilski kruzeiro (1990–1993)"
         ],
         "BRL": [
-            "R$",
+            "BRL",
             "brazilski real"
         ],
         "BRN": [
@@ -224,6 +224,10 @@
         "CLP": [
             "CLP",
             "čilski peso"
+        ],
+        "CNH": [
+            "CNH",
+            "kitajski juan (offshore)"
         ],
         "CNY": [
             "CN¥",
@@ -350,7 +354,7 @@
             "francoski frank"
         ],
         "GBP": [
-            "£",
+            "GBP",
             "britanski funt"
         ],
         "GEK": [
@@ -634,7 +638,7 @@
             "malavijska kvača"
         ],
         "MXN": [
-            "MX$",
+            "MXN",
             "mehiški peso"
         ],
         "MXP": [
@@ -690,7 +694,7 @@
             "nepalska rupija"
         ],
         "NZD": [
-            "NZ$",
+            "NZD",
             "novozelandski dolar"
         ],
         "OMR": [
@@ -858,7 +862,7 @@
             "svazijski lilangeni"
         ],
         "THB": [
-            "฿",
+            "THB",
             "tajski baht"
         ],
         "TJR": [
@@ -902,7 +906,7 @@
             "dolar Trinidada in Tobaga"
         ],
         "TWD": [
-            "NT$",
+            "TWD",
             "novi tajvanski dolar"
         ],
         "TZS": [
@@ -974,7 +978,7 @@
             "CFA frank BEAC"
         ],
         "XCD": [
-            "EC$",
+            "XCD",
             "vzhodnokaribski dolar"
         ],
         "XEU": [

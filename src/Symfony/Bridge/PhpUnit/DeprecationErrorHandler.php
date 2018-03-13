@@ -75,9 +75,12 @@ class DeprecationErrorHandler
                     }
                 }
             }
-            $path = realpath($path) ?: $path;
+            $realPath = realpath($path);
+            if (false === $realPath && '-' !== $path && 'Standard input code' !== $path) {
+                return true;
+            }
             foreach ($vendors as $vendor) {
-                if (0 === strpos($path, $vendor) && false !== strpbrk(substr($path, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
+                if (0 === strpos($realPath, $vendor) && false !== strpbrk(substr($realPath, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
                     return true;
                 }
             }
@@ -107,8 +110,7 @@ class DeprecationErrorHandler
 
             $trace = debug_backtrace(true);
             $group = 'other';
-
-            $isWeak = DeprecationErrorHandler::MODE_WEAK === $mode || (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor = $inVendors($file));
+            $isVendor = DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $inVendors($file);
 
             $i = count($trace);
             while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_') || 0 === strpos($trace[$i]['class'], 'PHPUnit\\')))) {
@@ -121,6 +123,11 @@ class DeprecationErrorHandler
                     $msg = $parsedMsg['deprecation'];
                     $class = $parsedMsg['class'];
                     $method = $parsedMsg['method'];
+                    // If the deprecation has been triggered via
+                    // \Symfony\Bridge\PhpUnit\Legacy\SymfonyTestsListenerTrait::endTest()
+                    // then we need to use the serialized information to determine
+                    // if the error has been triggered from vendor code.
+                    $isVendor = DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && isset($parsedMsg['triggering_file']) && $inVendors($parsedMsg['triggering_file']);
                 } else {
                     $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
                     $method = $trace[$i]['function'];
@@ -137,7 +144,7 @@ class DeprecationErrorHandler
                     || in_array('legacy', $Test::getGroups($class, $method), true)
                 ) {
                     $group = 'legacy';
-                } elseif (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode && $isVendor) {
+                } elseif ($isVendor) {
                     $group = 'remaining vendor';
                 } else {
                     $group = 'remaining';
@@ -157,13 +164,13 @@ class DeprecationErrorHandler
 
                     exit(1);
                 }
-                if ('legacy' !== $group && !$isWeak) {
+                if ('legacy' !== $group && DeprecationErrorHandler::MODE_WEAK !== $mode) {
                     $ref = &$deprecations[$group][$msg]['count'];
                     ++$ref;
                     $ref = &$deprecations[$group][$msg][$class.'::'.$method];
                     ++$ref;
                 }
-            } elseif (!$isWeak) {
+            } elseif (DeprecationErrorHandler::MODE_WEAK !== $mode) {
                 $ref = &$deprecations[$group][$msg]['count'];
                 ++$ref;
             }
@@ -209,39 +216,60 @@ class DeprecationErrorHandler
 
                 $groups = array('unsilenced', 'remaining');
                 if (DeprecationErrorHandler::MODE_WEAK_VENDORS === $mode) {
-                    $groups[] = 'remaining vendor';
+                        $groups[] = 'remaining vendor';
                 }
                 array_push($groups, 'legacy', 'other');
 
-                foreach ($groups as $group) {
-                    if ($deprecations[$group.'Count']) {
-                        echo "\n", $colorize(
-                            sprintf('%s deprecation notices (%d)', ucfirst($group), $deprecations[$group.'Count']),
-                            'legacy' !== $group && 'remaining vendor' !== $group
-                        ), "\n";
+                $displayDeprecations = function ($deprecations) use ($colorize, $cmp, $groups) {
+                    foreach ($groups as $group) {
+                        if ($deprecations[$group.'Count']) {
+                            echo "\n", $colorize(
+                                sprintf('%s deprecation notices (%d)', ucfirst($group), $deprecations[$group.'Count']),
+                                'legacy' !== $group && 'remaining vendor' !== $group
+                            ), "\n";
 
-                        uasort($deprecations[$group], $cmp);
+                            uasort($deprecations[$group], $cmp);
 
-                        foreach ($deprecations[$group] as $msg => $notices) {
-                            echo "\n", rtrim($msg, '.'), ': ', $notices['count'], "x\n";
+                            foreach ($deprecations[$group] as $msg => $notices) {
+                                echo "\n  ", $notices['count'], 'x: ', $msg, "\n";
 
-                            arsort($notices);
+                                arsort($notices);
 
-                            foreach ($notices as $method => $count) {
-                                if ('count' !== $method) {
-                                    echo '    ', $count, 'x in ', preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method), "\n";
+                                foreach ($notices as $method => $count) {
+                                    if ('count' !== $method) {
+                                        echo '    ', $count, 'x in ', preg_replace('/(.*)\\\\(.*?::.*?)$/', '$2 from $1', $method), "\n";
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                if (!empty($notices)) {
-                    echo "\n";
+                    if (!empty($notices)) {
+                        echo "\n";
+                    }
+                };
+
+                $displayDeprecations($deprecations);
+
+                // store failing status
+                $isFailing = DeprecationErrorHandler::MODE_WEAK !== $mode && $mode < $deprecations['unsilencedCount'] + $deprecations['remainingCount'] + $deprecations['otherCount'];
+
+                // reset deprecations array
+                foreach ($deprecations as $group => $arrayOrInt) {
+                    $deprecations[$group] = is_int($arrayOrInt) ? 0 : array();
                 }
 
-                if (DeprecationErrorHandler::MODE_WEAK !== $mode && $mode < $deprecations['unsilencedCount'] + $deprecations['remainingCount'] + $deprecations['otherCount']) {
-                    exit(1);
-                }
+                register_shutdown_function(function () use (&$deprecations, $isFailing, $displayDeprecations, $mode) {
+                    foreach ($deprecations as $group => $arrayOrInt) {
+                        if (0 < (is_int($arrayOrInt) ? $arrayOrInt : count($arrayOrInt))) {
+                            echo "Shutdown-time deprecations:\n";
+                            break;
+                        }
+                    }
+                    $displayDeprecations($deprecations);
+                    if ($isFailing || DeprecationErrorHandler::MODE_WEAK !== $mode && $mode < $deprecations['unsilencedCount'] + $deprecations['remainingCount'] + $deprecations['otherCount']) {
+                        exit(1);
+                    }
+                });
             });
         }
     }
@@ -261,7 +289,7 @@ class DeprecationErrorHandler
 
                 return $ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
-            $deprecations[] = array(error_reporting(), $msg);
+            $deprecations[] = array(error_reporting(), $msg, $file);
         });
 
         register_shutdown_function(function () use ($outputFile, &$deprecations) {
@@ -273,7 +301,8 @@ class DeprecationErrorHandler
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             return
-                '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD
+                defined('STDOUT') && function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT)
+                || '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');

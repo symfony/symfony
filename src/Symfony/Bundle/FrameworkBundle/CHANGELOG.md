@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * Allowed to pass an optional `LoggerInterface $logger` instance to the `Router`
+ * Added a new `parameter_bag` service with related autowiring aliases to access parameters as-a-service
+ * Allowed the `Router` to work with any PSR-11 container
+ * Added option in workflow dump command to label graph with a custom label
+ * Using a `RouterInterface` that does not implement the `WarmableInterface` is deprecated.
+ * Warming up a router in `RouterCacheWarmer` that does not implement the `WarmableInterface` is deprecated and will not
+   be supported anymore in 5.0.
+ * The `RequestDataCollector` class has been deprecated. Use the `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector` class instead.
+ * The `RedirectController` class allows for 307/308 HTTP status codes
+ * Deprecated `bundle:controller:action` syntax to reference controllers. Use `serviceOrFqcn::method` instead where `serviceOrFqcn`
+   is either the service ID or the FQCN of the controller.
+ * Deprecated `Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser`
+ * The `container.service_locator` tag of `ServiceLocator`s is now autoconfigured.
+
 4.0.0
 -----
 
@@ -27,6 +44,7 @@ CHANGELOG
 3.4.0
 -----
 
+ * Added `translator.default_path` option and parameter
  * Session `use_strict_mode` is now enabled by default and the corresponding option has been deprecated
  * Made the `cache:clear` command to *not* clear "app" PSR-6 cache pools anymore,
    but to still clear "system" ones; use the `cache:pool:clear` command to clear "app" pools instead
@@ -66,10 +84,10 @@ CHANGELOG
    `Symfony\Component\EventDispatcher\EventDispatcherInterface` as
     first argument
  * `RouterDebugCommand::__construct()` now takes an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument
  * `RouterMatchCommand::__construct()` now takes an instance of
-   `Symfony\Component\Routing\RouterInteface` as
+   `Symfony\Component\Routing\RouterInterface` as
     first argument
  * `TranslationDebugCommand::__construct()` now takes an instance of
    `Symfony\Component\Translation\TranslatorInterface` as

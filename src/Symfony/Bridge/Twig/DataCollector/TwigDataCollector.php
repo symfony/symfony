@@ -31,7 +31,7 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     private $twig;
     private $computed;
 
-    public function __construct(Profile $profile, Environment $twig)
+    public function __construct(Profile $profile, Environment $twig = null)
     {
         $this->profile = $profile;
         $this->twig = $twig;
@@ -61,6 +61,10 @@ class TwigDataCollector extends DataCollector implements LateDataCollectorInterf
     {
         $this->data['profile'] = serialize($this->profile);
         $this->data['template_paths'] = array();
+
+        if (null === $this->twig) {
+            return;
+        }
 
         $templateFinder = function (Profile $profile) use (&$templateFinder) {
             if ($profile->isTemplate()) {

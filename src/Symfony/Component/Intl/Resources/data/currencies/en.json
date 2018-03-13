@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.44",
     "Names": {
         "ADP": [
             "ADP",
@@ -260,6 +260,10 @@
         "CLP": [
             "CLP",
             "Chilean Peso"
+        ],
+        "CNH": [
+            "CNH",
+            "Chinese Yuan (offshore)"
         ],
         "CNX": [
             "CNX",
@@ -791,7 +795,7 @@
         ],
         "PHP": [
             "PHP",
-            "Philippine Peso"
+            "Philippine Piso"
         ],
         "PKR": [
             "PKR",
@@ -912,6 +916,10 @@
         "STD": [
             "STD",
             "São Tomé & Príncipe Dobra"
+        ],
+        "STN": [
+            "STN",
+            "São Tomé & Príncipe Dobra (2018)"
         ],
         "SUR": [
             "SUR",

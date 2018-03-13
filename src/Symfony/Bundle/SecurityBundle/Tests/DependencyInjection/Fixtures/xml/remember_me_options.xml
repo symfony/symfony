@@ -9,7 +9,7 @@
         <sec:providers>
             <sec:default id="foo"/>
         </sec:providers>
-        <sec:firewall name="main" logout-on-user-change="true">
+        <sec:firewall name="main">
             <sec:form-login/>
             <sec:remember-me secret="TheSecret" catch-exceptions="false" token-provider="token_provider_id" />
         </sec:firewall>

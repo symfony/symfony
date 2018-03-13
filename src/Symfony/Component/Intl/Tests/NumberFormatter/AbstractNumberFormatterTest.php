@@ -644,7 +644,7 @@ abstract class AbstractNumberFormatterTest extends TestCase
             array('1.4suffix', (float) 1.4, '->parse() parses a number with a string suffix.', 3),
             array('-.4suffix', (float) -0.4, '->parse() parses a negative dot float with suffix.', 3),
             array('-123,4', false, '->parse() does not parse when invalid grouping used.', 6),
-            array('-1234,567', false, '->parse() does not parse when invalid grouping used.', 5),
+            array('-123,4567', false, '->parse() does not parse when invalid grouping used.', 9),
             array('-123,,456', false, '->parse() does not parse when invalid grouping used.', 4),
             array('-123,,456', -123.0, '->parse() parses when grouping is disabled.', 4, false),
         );

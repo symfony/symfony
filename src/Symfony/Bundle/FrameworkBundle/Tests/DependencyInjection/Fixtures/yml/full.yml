@@ -14,7 +14,7 @@ framework:
         only_exceptions: true
         enabled: false
     router:
-        resource:     '%kernel.root_dir%/config/routing.xml'
+        resource:     '%kernel.project_dir%/config/routing.xml'
         type:         xml
     session:
         storage_id:      session.storage.native
@@ -42,7 +42,8 @@ framework:
     translator:
         enabled:  true
         fallback: fr
-        paths: ['%kernel.root_dir%/Fixtures/translations']
+        default_path: '%kernel.project_dir%/translations'
+        paths: ['%kernel.project_dir%/Fixtures/translations']
     validation:
         enabled: true
     annotations:
@@ -50,9 +51,11 @@ framework:
         debug:   true
         file_cache_dir: '%kernel.cache_dir%/annotations'
     serializer:
-         enabled:        true
-         enable_annotations: true
-         name_converter: serializer.name_converter.camel_case_to_snake_case
+         enabled:                    true
+         enable_annotations:         true
+         name_converter:             serializer.name_converter.camel_case_to_snake_case
+         circular_reference_handler: my.circular.reference.handler
+         max_depth_handler:          my.max.depth.handler
     property_info: ~
     ide: file%%link%%format
     request:

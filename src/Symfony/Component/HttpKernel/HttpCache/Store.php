@@ -29,11 +29,9 @@ class Store implements StoreInterface
     private $locks;
 
     /**
-     * @param string $root The path to the cache directory
-     *
      * @throws \RuntimeException
      */
-    public function __construct($root)
+    public function __construct(string $root)
     {
         $this->root = $root;
         if (!file_exists($this->root) && !@mkdir($this->root, 0777, true) && !is_dir($this->root)) {
@@ -151,7 +149,7 @@ class Store implements StoreInterface
             return;
         }
 
-        list($req, $headers) = $match;
+        $headers = $match[1];
         if (file_exists($body = $this->getPath($headers['x-content-digest'][0]))) {
             return $this->restoreResponse($headers, $body);
         }

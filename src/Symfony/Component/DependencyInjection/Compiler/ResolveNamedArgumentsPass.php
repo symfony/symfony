@@ -55,7 +55,13 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                 if (isset($key[0]) && '$' === $key[0]) {
                     foreach ($parameters as $j => $p) {
                         if ($key === '$'.$p->name) {
-                            $resolvedArguments[$j] = $argument;
+                            if ($p->isVariadic() && \is_array($argument)) {
+                                foreach ($argument as $variadicArgument) {
+                                    $resolvedArguments[$j++] = $variadicArgument;
+                                }
+                            } else {
+                                $resolvedArguments[$j] = $argument;
+                            }
 
                             continue 2;
                         }
@@ -68,15 +74,17 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                     throw new InvalidArgumentException(sprintf('Invalid service "%s": the value of argument "%s" of method "%s()" must be null, an instance of %s or an instance of %s, %s given.', $this->currentId, $key, $class !== $this->currentId ? $class.'::'.$method : $method, Reference::class, Definition::class, gettype($argument)));
                 }
 
+                $typeFound = false;
                 foreach ($parameters as $j => $p) {
-                    if (ProxyHelper::getTypeHint($r, $p, true) === $key) {
+                    if (!array_key_exists($j, $resolvedArguments) && ProxyHelper::getTypeHint($r, $p, true) === $key) {
                         $resolvedArguments[$j] = $argument;
-
-                        continue 2;
+                        $typeFound = true;
                     }
                 }
 
-                throw new InvalidArgumentException(sprintf('Invalid service "%s": method "%s()" has no argument type-hinted as "%s". Check your service definition.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method, $key));
+                if (!$typeFound) {
+                    throw new InvalidArgumentException(sprintf('Invalid service "%s": method "%s()" has no argument type-hinted as "%s". Check your service definition.', $this->currentId, $class !== $this->currentId ? $class.'::'.$method : $method, $key));
+                }
             }
 
             if ($resolvedArguments !== $call[1]) {

@@ -9,7 +9,7 @@ return function (ContainerConfigurator $c) {
         ->tag('baz');
     $di->load(Prototype::class.'\\', '../Prototype')
         ->autoconfigure()
-        ->exclude('../Prototype/{OtherDir}')
+        ->exclude('../Prototype/{OtherDir,BadClasses}')
         ->factory('f')
         ->deprecate('%service_id%')
         ->args(array(0))

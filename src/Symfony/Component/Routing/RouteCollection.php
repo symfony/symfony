@@ -117,7 +117,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Adds a route collection at the end of the current set by appending all
      * routes of the added collection.
      */
-    public function addCollection(RouteCollection $collection)
+    public function addCollection(self $collection)
     {
         // we need to remove all routes with the same names first because just replacing them
         // would not place the new route at the end of the merged array
@@ -151,6 +151,20 @@ class RouteCollection implements \IteratorAggregate, \Countable
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
         }
+    }
+
+    /**
+     * Adds a prefix to the name of all the routes within in the collection.
+     */
+    public function addNamePrefix(string $prefix)
+    {
+        $prefixedRoutes = array();
+
+        foreach ($this->routes as $name => $route) {
+            $prefixedRoutes[$prefix.$name] = $route;
+        }
+
+        $this->routes = $prefixedRoutes;
     }
 
     /**

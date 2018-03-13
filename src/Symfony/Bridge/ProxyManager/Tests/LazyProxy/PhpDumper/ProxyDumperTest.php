@@ -37,11 +37,8 @@ class ProxyDumperTest extends TestCase
 
     /**
      * @dataProvider getProxyCandidates
-     *
-     * @param Definition $definition
-     * @param bool       $expected
      */
-    public function testIsProxyCandidate(Definition $definition, $expected)
+    public function testIsProxyCandidate(Definition $definition, bool $expected)
     {
         $this->assertSame($expected, $this->dumper->isProxyCandidate($definition));
     }
@@ -59,6 +56,14 @@ class ProxyDumperTest extends TestCase
                 .'\Symfony\Bridge\ProxyManager\Tests\LazyProxy\PhpDumper\ProxyDumperTest%a',
             $code
         );
+    }
+
+    public function testDeterministicProxyCode()
+    {
+        $definition = new Definition(__CLASS__);
+        $definition->setLazy(true);
+
+        $this->assertSame($this->dumper->getProxyCode($definition), $this->dumper->getProxyCode($definition));
     }
 
     public function testGetProxyFactoryCode()

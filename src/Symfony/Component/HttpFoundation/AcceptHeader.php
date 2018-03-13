@@ -91,7 +91,7 @@ class AcceptHeader
      */
     public function get($value)
     {
-        return isset($this->items[$value]) ? $this->items[$value] : null;
+        return $this->items[$value] ?? $this->items[explode('/', $value)[0].'/*'] ?? $this->items['*/*'] ?? $this->items['*'] ?? null;
     }
 
     /**

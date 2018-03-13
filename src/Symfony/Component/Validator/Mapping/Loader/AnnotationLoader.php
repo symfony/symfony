@@ -26,9 +26,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class AnnotationLoader implements LoaderInterface
 {
-    /**
-     * @var Reader
-     */
     protected $reader;
 
     public function __construct(Reader $reader)

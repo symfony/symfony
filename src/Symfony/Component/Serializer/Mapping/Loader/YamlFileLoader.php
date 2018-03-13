@@ -13,8 +13,10 @@ namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * YAML File Loader.
@@ -30,7 +32,7 @@ class YamlFileLoader extends FileLoader
      *
      * @var array
      */
-    private $classes = null;
+    private $classes;
 
     /**
      * {@inheritdoc}
@@ -51,7 +53,7 @@ class YamlFileLoader extends FileLoader
 
         $yaml = $this->classes[$classMetadata->getName()];
 
-        if (isset($yaml['attributes']) && is_array($yaml['attributes'])) {
+        if (isset($yaml['attributes']) && \is_array($yaml['attributes'])) {
             $attributesMetadata = $classMetadata->getAttributesMetadata();
 
             foreach ($yaml['attributes'] as $attribute => $data) {
@@ -63,12 +65,12 @@ class YamlFileLoader extends FileLoader
                 }
 
                 if (isset($data['groups'])) {
-                    if (!is_array($data['groups'])) {
+                    if (!\is_array($data['groups'])) {
                         throw new MappingException(sprintf('The "groups" key must be an array of strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                     }
 
                     foreach ($data['groups'] as $group) {
-                        if (!is_string($group)) {
+                        if (!\is_string($group)) {
                             throw new MappingException(sprintf('Group names must be strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
                         }
 
@@ -84,6 +86,21 @@ class YamlFileLoader extends FileLoader
                     $attributeMetadata->setMaxDepth($data['max_depth']);
                 }
             }
+        }
+
+        if (isset($yaml['discriminator_map'])) {
+            if (!isset($yaml['discriminator_map']['type_property'])) {
+                throw new MappingException(sprintf('The "type_property" key must be set for the discriminator map of the class "%s" in "%s".', $classMetadata->getName(), $this->file));
+            }
+
+            if (!isset($yaml['discriminator_map']['mapping'])) {
+                throw new MappingException(sprintf('The "mapping" key must be set for the discriminator map of the class "%s" in "%s".', $classMetadata->getName(), $this->file));
+            }
+
+            $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
+                $yaml['discriminator_map']['type_property'],
+                $yaml['discriminator_map']['mapping']
+            ));
         }
 
         return true;
@@ -113,13 +130,13 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new Parser();
         }
 
-        $classes = $this->yamlParser->parseFile($this->file);
+        $classes = $this->yamlParser->parseFile($this->file, Yaml::PARSE_CONSTANT);
 
         if (empty($classes)) {
             return array();
         }
 
-        if (!is_array($classes)) {
+        if (!\is_array($classes)) {
             throw new MappingException(sprintf('The file "%s" must contain a YAML array.', $this->file));
         }
 

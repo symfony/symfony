@@ -39,8 +39,9 @@ class Application extends BaseApplication
 
         parent::__construct('Symfony', Kernel::VERSION);
 
-        $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The environment name', $kernel->getEnvironment()));
-        $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode'));
+        $inputDefinition = $this->getDefinition();
+        $inputDefinition->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $kernel->getEnvironment()));
+        $inputDefinition->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
     }
 
     /**
@@ -63,6 +64,8 @@ class Application extends BaseApplication
         $this->kernel->boot();
 
         $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
+
+        $this->registerCommands();
 
         if ($this->registrationErrors) {
             $this->renderRegistrationErrors($input, $output);

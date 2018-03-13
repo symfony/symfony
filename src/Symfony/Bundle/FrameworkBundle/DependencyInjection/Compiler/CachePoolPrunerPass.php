@@ -27,7 +27,7 @@ class CachePoolPrunerPass implements CompilerPassInterface
     private $cacheCommandServiceId;
     private $cachePoolTag;
 
-    public function __construct($cacheCommandServiceId = CachePoolPruneCommand::class, $cachePoolTag = 'cache.pool')
+    public function __construct(string $cacheCommandServiceId = CachePoolPruneCommand::class, string $cachePoolTag = 'cache.pool')
     {
         $this->cacheCommandServiceId = $cacheCommandServiceId;
         $this->cachePoolTag = $cachePoolTag;

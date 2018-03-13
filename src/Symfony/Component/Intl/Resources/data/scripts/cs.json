@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.32.59",
+    "Version": "2.1.37.11",
     "Names": {
         "Afak": "afaka",
         "Aghb": "kavkazskoalbánské",
@@ -28,7 +28,7 @@
         "Cprt": "kyperské",
         "Cyrl": "cyrilice",
         "Cyrs": "cyrilce - staroslověnská",
-        "Deva": "dévanágárí",
+        "Deva": "dévanágarí",
         "Dsrt": "deseret",
         "Dupl": "Duployého těsnopis",
         "Egyd": "egyptské démotické",
@@ -94,7 +94,7 @@
         "Mlym": "malajlámské",
         "Modi": "modí",
         "Mong": "mongolské",
-        "Moon": "Moonovo",
+        "Moon": "Moonovo písmo",
         "Mroo": "mro",
         "Mtei": "mejtej majek (manipurské)",
         "Mymr": "myanmarské",

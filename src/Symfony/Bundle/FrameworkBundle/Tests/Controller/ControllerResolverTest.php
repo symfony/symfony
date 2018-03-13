@@ -32,6 +32,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
 
         $controller = $resolver->getController($request);
 
+        $this->assertInstanceOf('Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController', $controller[0]);
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller[0]->getContainer());
         $this->assertSame('testAction', $controller[1]);
     }
@@ -48,6 +49,10 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $controller->getContainer());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Referencing controllers with FooBundle:Default:test is deprecated since Symfony 4.1. Use Symfony\Bundle\FrameworkBundle\Tests\Controller\ContainerAwareController::testAction instead.
+     */
     public function testGetControllerWithBundleNotation()
     {
         $shortName = 'FooBundle:Default:test';
@@ -81,7 +86,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $resolver = $this->createControllerResolver(null, $container);
 
         $request = Request::create('/');
-        $request->attributes->set('_controller', TestAbstractController::class.':testAction');
+        $request->attributes->set('_controller', TestAbstractController::class.'::testAction');
 
         $this->assertSame(array($controller, 'testAction'), $resolver->getController($request));
         $this->assertSame($container, $controller->getContainer());
@@ -117,7 +122,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $resolver = $this->createControllerResolver(null, $container);
 
         $request = Request::create('/');
-        $request->attributes->set('_controller', DummyController::class.':fooAction');
+        $request->attributes->set('_controller', DummyController::class.'::fooAction');
 
         $this->assertSame(array($controller, 'fooAction'), $resolver->getController($request));
         $this->assertSame($container, $controller->getContainer());
@@ -157,7 +162,7 @@ class ControllerResolverTest extends ContainerControllerResolverTest
         $resolver = $this->createControllerResolver(null, $container);
 
         $request = Request::create('/');
-        $request->attributes->set('_controller', DummyController::class.':fooAction');
+        $request->attributes->set('_controller', DummyController::class.'::fooAction');
 
         $this->assertSame(array($controller, 'fooAction'), $resolver->getController($request));
         $this->assertSame($controllerContainer, $controller->getContainer());

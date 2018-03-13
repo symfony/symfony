@@ -306,7 +306,7 @@ class InputDefinition
     /**
      * Gets an InputOption by shortcut.
      *
-     * @param string $shortcut the Shortcut name
+     * @param string $shortcut The Shortcut name
      *
      * @return InputOption An InputOption object
      */

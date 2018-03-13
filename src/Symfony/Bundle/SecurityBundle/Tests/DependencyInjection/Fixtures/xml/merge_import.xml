@@ -6,7 +6,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <config>
-        <firewall name="main" logout-on-user-change="true">
+        <firewall name="main">
             <form-login login-path="/login" />
         </firewall>
 

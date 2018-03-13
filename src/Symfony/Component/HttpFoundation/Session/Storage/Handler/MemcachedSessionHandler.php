@@ -21,9 +21,6 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  */
 class MemcachedSessionHandler extends AbstractSessionHandler
 {
-    /**
-     * @var \Memcached Memcached driver
-     */
     private $memcached;
 
     /**
@@ -37,6 +34,8 @@ class MemcachedSessionHandler extends AbstractSessionHandler
     private $prefix;
 
     /**
+     * Constructor.
+     *
      * List of available options:
      *  * prefix: The prefix to use for the memcached keys in order to avoid collision
      *  * expiretime: The time to live in seconds.

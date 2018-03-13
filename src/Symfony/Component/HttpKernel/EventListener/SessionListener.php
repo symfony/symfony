@@ -18,12 +18,10 @@ use Psr\Container\ContainerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.3
+ * @final
  */
 class SessionListener extends AbstractSessionListener
 {
-    private $container;
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

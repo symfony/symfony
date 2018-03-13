@@ -36,7 +36,7 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar')));
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&0=integer')));
 
-        $this->assertTrue($signer->sign('http://example.com/foo?foo=bar&bar=foo') === $signer->sign('http://example.com/foo?bar=foo&foo=bar'));
+        $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo'), $signer->sign('http://example.com/foo?bar=foo&foo=bar'));
     }
 
     public function testCheckWithDifferentArgSeparator()

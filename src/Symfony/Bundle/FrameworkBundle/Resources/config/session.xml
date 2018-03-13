@@ -63,13 +63,14 @@
                     <tag name="container.service_locator" />
                     <argument type="collection">
                         <argument key="session" type="service" id="session" on-invalid="ignore" />
+                        <argument key="initialized_session" type="service" id="session" on-invalid="ignore_uninitialized" />
                     </argument>
                 </service>
             </argument>
         </service>
 
         <service id="session.save_listener" class="Symfony\Component\HttpKernel\EventListener\SaveSessionListener">
-            <tag name="kernel.event_subscriber" />
+            <deprecated>The "%service_id%" service is deprecated since Symfony 4.1. Use the "session_listener" service instead.</deprecated>
         </service>
 
         <!-- for BC -->

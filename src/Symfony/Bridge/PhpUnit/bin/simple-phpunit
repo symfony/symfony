@@ -11,13 +11,13 @@
  */
 
 // Please update when phpunit needs to be reinstalled with fresh deps:
-// Cache-Id-Version: 2016-10-20 14:00 UTC
+// Cache-Id-Version: 2017-11-22 09:30 UTC
 
 error_reporting(-1);
 
 if (PHP_VERSION_ID >= 70200) {
     // PHPUnit 6 is required for PHP 7.2+
-    $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '6.3';
+    $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '6.5';
 } elseif (PHP_VERSION_ID >= 50600) {
     // PHPUnit 4 does not support PHP 7
     $PHPUNIT_VERSION = getenv('SYMFONY_PHPUNIT_VERSION') ?: '5.7';
@@ -26,8 +26,16 @@ if (PHP_VERSION_ID >= 70200) {
     $PHPUNIT_VERSION = '4.8';
 }
 
+$root = __DIR__;
+while (!file_exists($root.'/composer.json') || file_exists($root.'/DeprecationErrorHandler.php')) {
+    if ($root === dirname($root)) {
+        break;
+    }
+    $root = dirname($root);
+}
+
 $oldPwd = getcwd();
-$PHPUNIT_DIR = getenv('SYMFONY_PHPUNIT_DIR') ?: (__DIR__.'/.phpunit');
+$PHPUNIT_DIR = getenv('SYMFONY_PHPUNIT_DIR') ?: ($root.'/vendor/bin/.phpunit');
 $PHP = defined('PHP_BINARY') ? PHP_BINARY : 'php';
 $PHP = escapeshellarg($PHP);
 if ('phpdbg' === PHP_SAPI) {
@@ -51,7 +59,12 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
         passthru(sprintf('\\' === DIRECTORY_SEPARATOR ? '(del /S /F /Q %s & rmdir %1$s) >nul': 'rm -rf %s', "phpunit-$PHPUNIT_VERSION"));
     }
     if (extension_loaded('openssl') && ini_get('allow_url_fopen') && !isset($_SERVER['http_proxy']) && !isset($_SERVER['https_proxy'])) {
-        stream_copy_to_stream(fopen("https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip", 'rb'), fopen("$PHPUNIT_VERSION.zip", 'wb'));
+        $remoteZip = "https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip";
+        $remoteZipStream = @fopen($remoteZip, 'rb');
+        if (!$remoteZipStream) {
+            throw new \RuntimeException("Could not find $remoteZip");
+        }
+        stream_copy_to_stream($remoteZipStream, fopen("$PHPUNIT_VERSION.zip", 'wb'));
     } else {
         @unlink("$PHPUNIT_VERSION.zip");
         passthru("wget https://github.com/sebastianbergmann/phpunit/archive/$PHPUNIT_VERSION.zip");
@@ -64,14 +77,24 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     $zip->extractTo(getcwd());
     $zip->close();
     chdir("phpunit-$PHPUNIT_VERSION");
-    passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
+    if ($SYMFONY_PHPUNIT_REMOVE) {
+        passthru("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
+    }
     if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
         passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
     }
-    passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"~3.3.11@dev|~3.4.0-beta2@dev|^4.0.0-beta2@dev\"");
+    if (file_exists($path = $root.'/vendor/symfony/phpunit-bridge')) {
+        passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"*@dev\"");
+        passthru("$COMPOSER config repositories.phpunit-bridge path ".escapeshellarg(str_replace('/', DIRECTORY_SEPARATOR, $path)));
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            file_put_contents('composer.json', preg_replace('/^( {8})"phpunit-bridge": \{$/m', "$0\n$1    ".'"options": {"symlink": false},', file_get_contents('composer.json')));
+        }
+    } else {
+        passthru("$COMPOSER require --no-update symfony/phpunit-bridge \"*\"");
+    }
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
-    $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));
+    $exit = proc_close(proc_open("$COMPOSER install --no-dev --prefer-dist --no-suggest --no-progress --ansi", array(), $p, getcwd(), null, array('bypass_shell' => true)));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
     if ($exit) {
         exit($exit);
@@ -103,6 +126,9 @@ EOPHP
 
 }
 
+global $argv, $argc;
+$argv = isset($_SERVER['argv']) ? $_SERVER['argv'] : array();
+$argc = isset($_SERVER['argc']) ? $_SERVER['argc'] : 0;
 $components = array();
 $cmd = array_map('escapeshellarg', $argv);
 $exit = 0;

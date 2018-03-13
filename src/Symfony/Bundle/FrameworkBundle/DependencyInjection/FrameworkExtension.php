@@ -12,17 +12,12 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
-use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
-use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
-use Symfony\Bundle\FrameworkBundle\Command\TranslationUpdateCommand;
-use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
-use Symfony\Bundle\FrameworkBundle\Command\XliffLintCommand;
-use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader;
+use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -34,6 +29,7 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -42,7 +38,11 @@ use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -67,8 +67,10 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Routing\Loader\AnnotationFileLoader;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -81,6 +83,7 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * FrameworkExtension.
@@ -116,14 +119,20 @@ class FrameworkExtension extends Extension
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
 
+        if (!interface_exists(ContainerBagInterface::class)) {
+            $container->removeDefinition('parameter_bag');
+            $container->removeAlias(ContainerBagInterface::class);
+            $container->removeAlias(ParameterBagInterface::class);
+        }
+
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
 
             if (!class_exists(BaseXliffLintCommand::class)) {
-                $container->removeDefinition(XliffLintCommand::class);
+                $container->removeDefinition('console.command.xliff_lint');
             }
             if (!class_exists(BaseYamlLintCommand::class)) {
-                $container->removeDefinition(YamlLintCommand::class);
+                $container->removeDefinition('console.command.yaml_lint');
             }
         }
 
@@ -142,10 +151,6 @@ class FrameworkExtension extends Extension
         if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation'])) {
             if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['translator'])) {
                 throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
-            }
-
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['validation'])) {
-                throw new LogicException('Validation support cannot be enabled as the Translation component is not installed.');
             }
 
             if (class_exists(Translator::class)) {
@@ -169,6 +174,7 @@ class FrameworkExtension extends Extension
                     'emacs' => 'emacs://open?url=file://%%f&line=%%l',
                     'sublime' => 'subl://open?url=file://%%f&line=%%l',
                     'phpstorm' => 'phpstorm://open?file=%%f&line=%%l',
+                    'atom' => 'atom://core/open/file?filename=%%f&line=%%l',
                 );
                 $ide = $config['ide'];
 
@@ -190,22 +196,30 @@ class FrameworkExtension extends Extension
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
 
+        if (null === $config['csrf_protection']['enabled']) {
+            $config['csrf_protection']['enabled'] = $this->sessionConfigEnabled && !class_exists(FullStack::class) && interface_exists(CsrfTokenManagerInterface::class);
+        }
+        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+
         if ($this->isConfigEnabled($container, $config['form'])) {
+            if (!class_exists('Symfony\Component\Form\Form')) {
+                throw new LogicException('Form support cannot be enabled as the Form component is not installed.');
+            }
+
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
-            $config['validation']['enabled'] = true;
 
-            if (!class_exists('Symfony\Component\Validator\Validation')) {
+            if (class_exists('Symfony\Component\Validator\Validation')) {
+                $config['validation']['enabled'] = true;
+            } else {
                 $container->setParameter('validator.translation_domain', 'validators');
 
                 $container->removeDefinition('form.type_extension.form.validator');
                 $container->removeDefinition('form.type_guesser.validator');
             }
         } else {
-            $container->removeDefinition('Symfony\Component\Form\Command\DebugCommand');
+            $container->removeDefinition('console.command.form_debug');
         }
-
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['assets'])) {
             if (!class_exists('Symfony\Component\Asset\Package')) {
@@ -237,6 +251,10 @@ class FrameworkExtension extends Extension
         $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
+            if (!class_exists('Symfony\Component\Serializer\Serializer')) {
+                throw new LogicException('Serializer support cannot be enabled as the Serializer component is not installed.');
+            }
+
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
@@ -261,6 +279,7 @@ class FrameworkExtension extends Extension
             '**\\Entity\\',
 
             // Added explicitly so that we don't rely on the class map being dumped to make it work
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
         ));
 
@@ -270,6 +289,8 @@ class FrameworkExtension extends Extension
             ->addTag('config_cache.resource_checker');
         $container->registerForAutoconfiguration(EnvVarProcessorInterface::class)
             ->addTag('container.env_var_processor');
+        $container->registerForAutoconfiguration(ServiceLocator::class)
+            ->addTag('container.service_locator');
         $container->registerForAutoconfiguration(ServiceSubscriberInterface::class)
             ->addTag('container.service_subscriber');
         $container->registerForAutoconfiguration(ArgumentValueResolverInterface::class)
@@ -312,6 +333,11 @@ class FrameworkExtension extends Extension
             ->addTag('validator.constraint_validator');
         $container->registerForAutoconfiguration(ObjectInitializerInterface::class)
             ->addTag('validator.initializer');
+
+        if (!$container->getParameter('kernel.debug')) {
+            // remove tagged iterator argument for resource checkers
+            $container->getDefinition('config_cache_factory')->setArguments(array());
+        }
     }
 
     /**
@@ -424,7 +450,7 @@ class FrameworkExtension extends Extension
     private function registerWorkflowConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$config['enabled']) {
-            $container->removeDefinition(WorkflowDumpCommand::class);
+            $container->removeDefinition('console.command.workflow_dump');
 
             return;
         }
@@ -493,7 +519,7 @@ class FrameworkExtension extends Extension
             // Add workflow to Registry
             if ($workflow['supports']) {
                 foreach ($workflow['supports'] as $supportedClassName) {
-                    $strategyDefinition = new Definition(Workflow\SupportStrategy\ClassInstanceSupportStrategy::class, array($supportedClassName));
+                    $strategyDefinition = new Definition(Workflow\SupportStrategy\InstanceOfSupportStrategy::class, array($supportedClassName));
                     $strategyDefinition->setPublic(false);
                     $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $strategyDefinition));
                 }
@@ -596,13 +622,20 @@ class FrameworkExtension extends Extension
     private function registerRouterConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
-            $container->removeDefinition(RouterDebugCommand::class);
-            $container->removeDefinition(RouterMatchCommand::class);
+            $container->removeDefinition('console.command.router_debug');
+            $container->removeDefinition('console.command.router_match');
 
             return;
         }
 
         $loader->load('routing.xml');
+
+        if (!interface_exists(ContainerBagInterface::class)) {
+            $container->getDefinition('router.default')
+                ->replaceArgument(0, new Reference('service_container'))
+                ->clearTag('container.service_subscriber')
+            ;
+        }
 
         $container->setParameter('router.resource', $config['resource']);
         $container->setParameter('router.cache_class_prefix', $container->getParameter('kernel.container_class'));
@@ -647,7 +680,7 @@ class FrameworkExtension extends Extension
 
         // session storage
         $container->setAlias('session.storage', $config['storage_id'])->setPrivate(true);
-        $options = array();
+        $options = array('cache_limiter' => '0');
         foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
@@ -728,8 +761,9 @@ class FrameworkExtension extends Extension
         if (1 === count($engines)) {
             $container->setAlias('templating', (string) reset($engines))->setPublic(true);
         } else {
+            $templateEngineDefinition = $container->getDefinition('templating.engine.delegating');
             foreach ($engines as $engine) {
-                $container->getDefinition('templating.engine.delegating')->addMethodCall('addEngine', array($engine));
+                $templateEngineDefinition->addMethodCall('addEngine', array($engine));
             }
             $container->setAlias('templating', 'templating.engine.delegating')->setPublic(true);
         }
@@ -850,8 +884,8 @@ class FrameworkExtension extends Extension
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
-            $container->removeDefinition(TranslationDebugCommand::class);
-            $container->removeDefinition(TranslationUpdateCommand::class);
+            $container->removeDefinition('console.command.translation_debug');
+            $container->removeDefinition('console.command.translation_update');
 
             return;
         }
@@ -865,6 +899,7 @@ class FrameworkExtension extends Extension
         $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));
 
         $container->setParameter('translator.logging', $config['logging']);
+        $container->setParameter('translator.default_path', $config['default_path']);
 
         // Discover translation directories
         $dirs = array();
@@ -883,6 +918,7 @@ class FrameworkExtension extends Extension
 
             $dirs[] = dirname(dirname($r->getFileName())).'/Resources/translations';
         }
+        $defaultDir = $container->getParameterBag()->resolveValue($config['default_path']);
         $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
             if ($container->fileExists($dir = $bundle['path'].'/Resources/translations')) {
@@ -901,6 +937,9 @@ class FrameworkExtension extends Extension
             }
         }
 
+        if ($container->fileExists($defaultDir)) {
+            $dirs[] = $defaultDir;
+        }
         if ($container->fileExists($dir = $rootDir.'/Resources/translations')) {
             $dirs[] = $dir;
         }
@@ -915,6 +954,7 @@ class FrameworkExtension extends Extension
                     return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
                 })
                 ->in($dirs)
+                ->sortByName()
             ;
 
             foreach ($finder as $file) {
@@ -945,6 +985,10 @@ class FrameworkExtension extends Extension
             throw new LogicException('Validation support cannot be enabled as the Validator component is not installed.');
         }
 
+        if (!isset($config['email_validation_mode'])) {
+            $config['email_validation_mode'] = 'loose';
+        }
+
         $loader->load('validator.xml');
 
         $validatorBuilder = $container->getDefinition('validator.builder');
@@ -963,7 +1007,7 @@ class FrameworkExtension extends Extension
         }
 
         $definition = $container->findDefinition('validator.email');
-        $definition->replaceArgument(0, $config['strict_email']);
+        $definition->replaceArgument(0, $config['email_validation_mode']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled) {
@@ -1014,12 +1058,17 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $projectDir = $container->getParameter('kernel.project_dir');
+        if ($container->fileExists($dir = $projectDir.'/config/validator', '/^$/')) {
+            $this->registerMappingFilesFromDir($dir, $fileRecorder);
+        }
+
         $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
     }
 
     private function registerMappingFilesFromDir($dir, callable $fileRecorder)
     {
-        foreach (Finder::create()->followLinks()->files()->in($dir)->name('/\.(xml|ya?ml)$/') as $file) {
+        foreach (Finder::create()->followLinks()->files()->in($dir)->name('/\.(xml|ya?ml)$/')->sortByName() as $file) {
             $fileRecorder($file->getExtension(), $file->getRealPath());
         }
     }
@@ -1053,6 +1102,11 @@ class FrameworkExtension extends Extension
 
         $loader->load('annotations.xml');
 
+        if (!method_exists(AnnotationRegistry::class, 'registerUniqueLoader')) {
+            $container->getDefinition('annotations.dummy_registry')
+                ->setMethodCalls(array(array('registerLoader', array('class_exists'))));
+        }
+
         if ('none' !== $config['cache']) {
             if (!class_exists('Doctrine\Common\Cache\CacheProvider')) {
                 throw new LogicException('Annotations cannot be enabled as the Doctrine Cache library is not installed.');
@@ -1084,8 +1138,11 @@ class FrameworkExtension extends Extension
             $container
                 ->getDefinition('annotations.cached_reader')
                 ->replaceArgument(2, $config['debug'])
-                ->addTag('annotations.cached_reader', array('provider' => $cacheService))
+                // temporary property to lazy-reference the cache provider without using it until AddAnnotationsCachedReaderPass runs
+                ->setProperty('cacheProviderBackup', new ServiceClosureArgument(new Reference($cacheService)))
+                ->addTag('annotations.cached_reader')
             ;
+
             $container->setAlias('annotation_reader', 'annotations.cached_reader')->setPrivate(true);
             $container->setAlias(Reader::class, new Alias('annotations.cached_reader', false));
         } else {
@@ -1115,7 +1172,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!class_exists('Symfony\Component\Security\Csrf\CsrfToken')) {
-            throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed.');
+            throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed. Try running "composer require symfony/security-csrf".');
         }
 
         if (!$this->sessionConfigEnabled) {
@@ -1134,11 +1191,20 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('serializer.normalizer.dateinterval');
         }
 
+        if (!class_exists(ClassDiscriminatorFromClassMetadata::class)) {
+            $container->removeAlias('Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface');
+            $container->removeDefinition('serializer.mapping.class_discriminator_resolver');
+        }
+
         $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
 
         if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccessor')) {
             $container->removeAlias('serializer.property_accessor');
             $container->removeDefinition('serializer.normalizer.object');
+        }
+
+        if (!class_exists(Yaml::class)) {
+            $container->removeDefinition('serializer.encoder.yaml');
         }
 
         $serializerLoaders = array();
@@ -1181,6 +1247,11 @@ class FrameworkExtension extends Extension
             }
         }
 
+        $projectDir = $container->getParameter('kernel.project_dir');
+        if ($container->fileExists($dir = $projectDir.'/config/serializer', '/^$/')) {
+            $this->registerMappingFilesFromDir($dir, $fileRecorder);
+        }
+
         $this->registerMappingFilesFromConfig($container, $config, $fileRecorder);
 
         $chainLoader->replaceArgument(0, $serializerLoaders);
@@ -1206,6 +1277,10 @@ class FrameworkExtension extends Extension
 
         if (isset($config['circular_reference_handler']) && $config['circular_reference_handler']) {
             $container->getDefinition('serializer.normalizer.object')->addMethodCall('setCircularReferenceHandler', array(new Reference($config['circular_reference_handler'])));
+        }
+
+        if ($config['max_depth_handler'] ?? false) {
+            $container->getDefinition('serializer.normalizer.object')->addMethodCall('setMaxDepthHandler', array(new Reference($config['max_depth_handler'])));
         }
     }
 
@@ -1246,7 +1321,7 @@ class FrameworkExtension extends Extension
                             $connectionDefinition = new Definition(\stdClass::class);
                             $connectionDefinition->setPublic(false);
                             $connectionDefinition->setFactory(array(AbstractAdapter::class, 'createConnection'));
-                            $connectionDefinition->setArguments(array($storeDsn));
+                            $connectionDefinition->setArguments(array($storeDsn, array('lazy' => true)));
                             $container->setDefinition($connectionDefinitionId, $connectionDefinition);
                         }
 
@@ -1301,7 +1376,7 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)
     {
-        $version = substr(str_replace('/', '-', base64_encode(hash('sha256', uniqid(mt_rand(), true), true))), 0, 22);
+        $version = new Parameter('container.build_id');
         $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);

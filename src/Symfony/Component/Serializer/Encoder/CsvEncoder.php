@@ -27,24 +27,22 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     const ESCAPE_CHAR_KEY = 'csv_escape_char';
     const KEY_SEPARATOR_KEY = 'csv_key_separator';
     const HEADERS_KEY = 'csv_headers';
+    const ESCAPE_FORMULAS_KEY = 'csv_escape_formulas';
 
     private $delimiter;
     private $enclosure;
     private $escapeChar;
     private $keySeparator;
+    private $escapeFormulas;
+    private $formulasStartCharacters = array('=', '-', '+', '@');
 
-    /**
-     * @param string $delimiter
-     * @param string $enclosure
-     * @param string $escapeChar
-     * @param string $keySeparator
-     */
-    public function __construct($delimiter = ',', $enclosure = '"', $escapeChar = '\\', $keySeparator = '.')
+    public function __construct(string $delimiter = ',', string $enclosure = '"', string $escapeChar = '\\', string $keySeparator = '.', bool $escapeFormulas = false)
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
         $this->escapeChar = $escapeChar;
         $this->keySeparator = $keySeparator;
+        $this->escapeFormulas = $escapeFormulas;
     }
 
     /**
@@ -71,11 +69,11 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
             }
         }
 
-        list($delimiter, $enclosure, $escapeChar, $keySeparator, $headers) = $this->getCsvOptions($context);
+        list($delimiter, $enclosure, $escapeChar, $keySeparator, $headers, $escapeFormulas) = $this->getCsvOptions($context);
 
         foreach ($data as &$value) {
             $flattened = array();
-            $this->flatten($value, $flattened, $keySeparator);
+            $this->flatten($value, $flattened, $keySeparator, '', $escapeFormulas);
             $value = $flattened;
         }
         unset($value);
@@ -115,6 +113,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         $headers = null;
         $nbHeaders = 0;
+        $headerCount = array();
         $result = array();
 
         list($delimiter, $enclosure, $escapeChar, $keySeparator) = $this->getCsvOptions($context);
@@ -126,7 +125,9 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                 $nbHeaders = $nbCols;
 
                 foreach ($cols as $col) {
-                    $headers[] = explode($keySeparator, $col);
+                    $header = explode($keySeparator, $col);
+                    $headers[] = $header;
+                    $headerCount[] = count($header);
                 }
 
                 continue;
@@ -134,7 +135,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
             $item = array();
             for ($i = 0; ($i < $nbCols) && ($i < $nbHeaders); ++$i) {
-                $depth = count($headers[$i]);
+                $depth = $headerCount[$i];
                 $arr = &$item;
                 for ($j = 0; $j < $depth; ++$j) {
                     // Handle nested arrays
@@ -156,6 +157,10 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         }
         fclose($handle);
 
+        if ($context['as_collection'] ?? false) {
+            return $result;
+        }
+
         if (empty($result) || isset($result[1])) {
             return $result;
         }
@@ -174,19 +179,18 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * Flattens an array and generates keys including the path.
-     *
-     * @param array  $array
-     * @param array  $result
-     * @param string $keySeparator
-     * @param string $parentKey
      */
-    private function flatten(array $array, array &$result, $keySeparator, $parentKey = '')
+    private function flatten(array $array, array &$result, string $keySeparator, string $parentKey = '', bool $escapeFormulas = false)
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $this->flatten($value, $result, $keySeparator, $parentKey.$key.$keySeparator);
+                $this->flatten($value, $result, $keySeparator, $parentKey.$key.$keySeparator, $escapeFormulas);
             } else {
-                $result[$parentKey.$key] = $value;
+                if ($escapeFormulas && \in_array(substr($value, 0, 1), $this->formulasStartCharacters, true)) {
+                    $result[$parentKey.$key] = "\t".$value;
+                } else {
+                    $result[$parentKey.$key] = $value;
+                }
             }
         }
     }
@@ -198,17 +202,16 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $escapeChar = isset($context[self::ESCAPE_CHAR_KEY]) ? $context[self::ESCAPE_CHAR_KEY] : $this->escapeChar;
         $keySeparator = isset($context[self::KEY_SEPARATOR_KEY]) ? $context[self::KEY_SEPARATOR_KEY] : $this->keySeparator;
         $headers = isset($context[self::HEADERS_KEY]) ? $context[self::HEADERS_KEY] : array();
+        $escapeFormulas = isset($context[self::ESCAPE_FORMULAS_KEY]) ? $context[self::ESCAPE_FORMULAS_KEY] : $this->escapeFormulas;
 
         if (!is_array($headers)) {
             throw new InvalidArgumentException(sprintf('The "%s" context variable must be an array or null, given "%s".', self::HEADERS_KEY, gettype($headers)));
         }
 
-        return array($delimiter, $enclosure, $escapeChar, $keySeparator, $headers);
+        return array($delimiter, $enclosure, $escapeChar, $keySeparator, $headers, $escapeFormulas);
     }
 
     /**
-     * @param array $data
-     *
      * @return string[]
      */
     private function extractHeaders(array $data)

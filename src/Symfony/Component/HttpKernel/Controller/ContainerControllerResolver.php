@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Controller;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\Container;
 
 /**
  * A controller resolver searching for a controller in a psr-11 container when using the "service:method" notation.
@@ -32,49 +32,14 @@ class ContainerControllerResolver extends ControllerResolver
         parent::__construct($logger);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getController(Request $request)
-    {
-        $controller = parent::getController($request);
-
-        if (is_array($controller) && isset($controller[0]) && is_string($controller[0]) && $this->container->has($controller[0])) {
-            $controller[0] = $this->instantiateController($controller[0]);
-        }
-
-        return $controller;
-    }
-
-    /**
-     * Returns a callable for the given controller.
-     *
-     * @param string $controller A Controller string
-     *
-     * @return mixed A PHP callable
-     *
-     * @throws \LogicException           When the name could not be parsed
-     * @throws \InvalidArgumentException When the controller class does not exist
-     */
     protected function createController($controller)
     {
-        if (false !== strpos($controller, '::')) {
-            return parent::createController($controller);
+        if (1 === substr_count($controller, ':')) {
+            $controller = str_replace(':', '::', $controller);
+            @trigger_error(sprintf('Referencing controllers with a single colon is deprecated since Symfony 4.1. Use %s instead.', $controller), E_USER_DEPRECATED);
         }
 
-        if (1 == substr_count($controller, ':')) {
-            // controller in the "service:method" notation
-            list($service, $method) = explode(':', $controller, 2);
-
-            return array($this->container->get($service), $method);
-        }
-
-        if ($this->container->has($controller) && method_exists($service = $this->container->get($controller), '__invoke')) {
-            // invokable controller in the "service" notation
-            return $service;
-        }
-
-        throw new \LogicException(sprintf('Unable to parse the controller name "%s".', $controller));
+        return parent::createController($controller);
     }
 
     /**
@@ -86,6 +51,24 @@ class ContainerControllerResolver extends ControllerResolver
             return $this->container->get($class);
         }
 
-        return parent::instantiateController($class);
+        try {
+            return parent::instantiateController($class);
+        } catch (\Error $e) {
+        }
+
+        $this->throwExceptionIfControllerWasRemoved($class, $e);
+
+        if ($e instanceof \ArgumentCountError) {
+            throw new \InvalidArgumentException(sprintf('Controller "%s" has required constructor arguments and does not exist in the container. Did you forget to define such a service?', $class), 0, $e);
+        }
+
+        throw new \InvalidArgumentException(sprintf('Controller "%s" does neither exist as service nor as class', $class), 0, $e);
+    }
+
+    private function throwExceptionIfControllerWasRemoved(string $controller, \Throwable $previous)
+    {
+        if ($this->container instanceof Container && isset($this->container->getRemovedIds()[$controller])) {
+            throw new \InvalidArgumentException(sprintf('Controller "%s" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?', $controller), 0, $previous);
+        }
     }
 }

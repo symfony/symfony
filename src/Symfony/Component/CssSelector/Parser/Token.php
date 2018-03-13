@@ -31,53 +31,28 @@ class Token
     const TYPE_NUMBER = 'number';
     const TYPE_STRING = 'string';
 
-    /**
-     * @var int
-     */
     private $type;
-
-    /**
-     * @var string
-     */
     private $value;
-
-    /**
-     * @var int
-     */
     private $position;
 
-    /**
-     * @param string $type
-     * @param string $value
-     * @param int    $position
-     */
-    public function __construct($type, $value, $position)
+    public function __construct(?string $type, ?string $value, ?int $position)
     {
         $this->type = $type;
         $this->value = $value;
         $this->position = $position;
     }
 
-    /**
-     * @return int
-     */
-    public function getType()
+    public function getType(): ?int
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    /**
-     * @return int
-     */
-    public function getPosition()
+    public function getPosition(): ?int
     {
         return $this->position;
     }

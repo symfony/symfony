@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\PhpUnit\Legacy;
 
 use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Warning;
 
 /**
@@ -36,6 +37,10 @@ class CoverageListenerTrait
 
     public function startTest($test)
     {
+        if (!$test instanceof TestCase) {
+            return;
+        }
+
         $annotations = $test->getAnnotations();
 
         $ignoredAnnotations = array('covers', 'coversDefaultClass', 'coversNothing');

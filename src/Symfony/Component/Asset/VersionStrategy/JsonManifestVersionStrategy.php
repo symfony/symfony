@@ -30,7 +30,7 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
     /**
      * @param string $manifestPath Absolute path to the manifest file
      */
-    public function __construct($manifestPath)
+    public function __construct(string $manifestPath)
     {
         $this->manifestPath = $manifestPath;
     }

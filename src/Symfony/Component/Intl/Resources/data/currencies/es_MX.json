@@ -1,125 +1,13 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.37.32",
     "Names": {
-        "AFN": [
-            "Af",
-            "afgani afgano"
+        "CNH": [
+            "CNH",
+            "CNH"
         ],
-        "ALL": [
-            "ALL",
-            "lek albanés"
-        ],
-        "ANG": [
-            "Naf",
-            "florín de las Antillas Neerlandesas"
-        ],
-        "AOA": [
-            "Kz",
-            "kwanza angoleño"
-        ],
-        "ARS": [
-            "$a",
-            "peso argentino"
-        ],
-        "AUD": [
-            "AU$",
-            "dólar australiano"
-        ],
-        "AWG": [
-            "Afl.",
-            "florín arubeño"
-        ],
-        "BDT": [
-            "BDT",
-            "taka de Bangladesh"
-        ],
-        "BND": [
-            "BND",
-            "dólar de Brunéi"
-        ],
-        "BTN": [
-            "BTN",
-            "ngultrum butanés"
-        ],
-        "BWP": [
-            "BWP",
-            "pula botsuano"
-        ],
-        "CNY": [
-            "CN¥",
-            "yuan chino"
-        ],
-        "ETB": [
-            "ETB",
-            "birr etíope"
-        ],
-        "GEL": [
-            "GEL",
-            "lari georgiano"
-        ],
-        "GHS": [
-            "GHS",
-            "cedi ghanés"
-        ],
-        "GMD": [
-            "GMD",
-            "dalasi gambiano"
-        ],
-        "HKD": [
-            "HKD",
-            "dólar de Hong Kong"
-        ],
-        "HRK": [
-            "HRK",
-            "kuna croata"
-        ],
-        "ILS": [
-            "ILS",
-            "nuevo shéquel israelí"
-        ],
-        "JPY": [
-            "JPY",
-            "yen japonés"
-        ],
-        "KGS": [
-            "KGS",
-            "som kirguís"
-        ],
-        "KHR": [
-            "KHR",
-            "riel camboyano"
-        ],
-        "KZT": [
-            "KZT",
-            "tenge kazajo"
-        ],
-        "LAK": [
-            "LAK",
-            "kip laosiano"
-        ],
-        "LKR": [
-            "LKR",
-            "rupia de Sri Lanka"
-        ],
-        "MGA": [
-            "MGA",
-            "ariary malgache"
-        ],
-        "MMK": [
-            "MMK",
-            "kyat de Myanmar"
-        ],
-        "MNT": [
-            "MNT",
-            "tugrik mongol"
-        ],
-        "MRO": [
-            "MRO",
-            "ouguiya mauritano"
-        ],
-        "MVR": [
-            "MVR",
-            "rufiyaa de Maldivas"
+        "ERN": [
+            "ERN",
+            "nakfa"
         ],
         "MXN": [
             "$",
@@ -127,91 +15,15 @@
         ],
         "MYR": [
             "MYR",
-            "ringgit malayo"
-        ],
-        "MZN": [
-            "MZN",
-            "metical mozambiqueño"
-        ],
-        "NGN": [
-            "NGN",
-            "naira nigeriano"
-        ],
-        "PGK": [
-            "PGK",
-            "kina de Papúa Nueva Guinea"
-        ],
-        "PLN": [
-            "PLN",
-            "zloty polaco"
-        ],
-        "QAR": [
-            "QAR",
-            "riyal de Qatar"
-        ],
-        "SAR": [
-            "SAR",
-            "riyal saudí"
-        ],
-        "SBD": [
-            "SBD",
-            "dólar de las Islas Salomón"
-        ],
-        "SCR": [
-            "SCR",
-            "rupia de Seychelles"
-        ],
-        "SLL": [
-            "SLL",
-            "leone de Sierra Leona"
-        ],
-        "STD": [
-            "STD",
-            "dobra de Santo Tomé y Príncipe"
-        ],
-        "SZL": [
-            "SZL",
-            "lilangeni suazi"
+            "ringit"
         ],
         "THB": [
             "THB",
             "baht tailandés"
         ],
-        "TMT": [
-            "TMT",
-            "manat turkmeno"
-        ],
-        "TOP": [
-            "TOP",
-            "paʻanga tongano"
-        ],
-        "UAH": [
-            "UAH",
-            "grivna ucraniana"
-        ],
         "UZS": [
             "UZS",
-            "som uzbeko"
-        ],
-        "VND": [
-            "VND",
-            "dong vietnamita"
-        ],
-        "VUV": [
-            "VUV",
-            "vatu vanuatuense"
-        ],
-        "WST": [
-            "WST",
-            "tala samoano"
-        ],
-        "XPF": [
-            "XPF",
-            "franco CFP"
-        ],
-        "ZAR": [
-            "ZAR",
-            "rand sudafricano"
+            "sum"
         ],
         "ZMW": [
             "ZMW",

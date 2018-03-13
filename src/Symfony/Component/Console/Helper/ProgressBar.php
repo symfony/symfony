@@ -24,7 +24,6 @@ use Symfony\Component\Console\Terminal;
  */
 final class ProgressBar
 {
-    // options
     private $barWidth = 28;
     private $barChar;
     private $emptyBarChar = '-';
@@ -32,10 +31,6 @@ final class ProgressBar
     private $format;
     private $internalFormat;
     private $redrawFreq = 1;
-
-    /**
-     * @var OutputInterface
-     */
     private $output;
     private $step = 0;
     private $max;
@@ -277,8 +272,6 @@ final class ProgressBar
 
     /**
      * Sets whether to overwrite the progressbar, false for new line.
-     *
-     * @param bool $overwrite
      */
     public function setOverwrite(bool $overwrite)
     {
@@ -377,8 +370,6 @@ final class ProgressBar
 
     /**
      * Overwrites a previous message to the output.
-     *
-     * @param string $message The message
      */
     private function overwrite(string $message): void
     {

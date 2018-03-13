@@ -26,7 +26,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     private $useRefHandles = -1;
 
     /**
-     * @param array $data A array as returned by ClonerInterface::cloneVar()
+     * @param array $data An array as returned by ClonerInterface::cloneVar()
      */
     public function __construct(array $data)
     {
@@ -34,7 +34,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * @return string the type of the value
+     * @return string The type of the value
      */
     public function getType()
     {
@@ -61,9 +61,9 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * @param bool $recursive whether values should be resolved recursively or not
+     * @param bool $recursive Whether values should be resolved recursively or not
      *
-     * @return scalar|array|null|Data[] a native representation of the original value
+     * @return string|int|float|bool|array|null|Data[] A native representation of the original value
      */
     public function getValue($recursive = false)
     {
@@ -215,7 +215,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param string|int $key The key to seek to
      *
-     * @return self|null A clone of $this of null if the key is not set
+     * @return self|null A clone of $this or null if the key is not set
      */
     public function seek($key)
     {

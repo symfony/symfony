@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.31.33",
+    "Version": "2.1.37.8",
     "Names": {
         "BYN": [
             "BYN",
@@ -8,6 +8,14 @@
         "BYR": [
             "BYR",
             "Weissrussischer Rubel (2000–2016)"
+        ],
+        "EUR": [
+            "EUR",
+            "Euro"
+        ],
+        "PEN": [
+            "PEN",
+            "Peruanischer Neuer Sol"
         ]
     }
 }

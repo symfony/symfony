@@ -45,7 +45,7 @@ class GuardAuthenticationProvider implements AuthenticationProviderInterface
      * @param string                            $providerKey         The provider (i.e. firewall) key
      * @param UserCheckerInterface              $userChecker
      */
-    public function __construct($guardAuthenticators, UserProviderInterface $userProvider, $providerKey, UserCheckerInterface $userChecker)
+    public function __construct($guardAuthenticators, UserProviderInterface $userProvider, string $providerKey, UserCheckerInterface $userChecker)
     {
         $this->guardAuthenticators = $guardAuthenticators;
         $this->userProvider = $userProvider;

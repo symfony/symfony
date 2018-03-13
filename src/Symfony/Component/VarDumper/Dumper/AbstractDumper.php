@@ -42,9 +42,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      * @param string                        $charset The default character encoding to use for non-UTF8 strings
      * @param int                           $flags   A bit field of static::DUMP_* constants to fine tune dumps representation
      */
-    public function __construct($output = null, $charset = null, $flags = 0)
+    public function __construct($output = null, string $charset = null, int $flags = 0)
     {
-        $this->flags = (int) $flags;
+        $this->flags = $flags;
         $this->setCharset($charset ?: ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8');
         $this->decimalPoint = localeconv();
         $this->decimalPoint = $this->decimalPoint['decimal_point'];
@@ -101,9 +101,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Sets the indentation pad string.
      *
-     * @param string $pad A string the will be prepended to dumped lines, repeated by nesting level
+     * @param string $pad A string that will be prepended to dumped lines, repeated by nesting level
      *
-     * @return string The indent pad
+     * @return string The previous indent pad
      */
     public function setIndentPad($pad)
     {

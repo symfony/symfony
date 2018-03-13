@@ -140,6 +140,13 @@ class TextDescriptor extends Descriptor
         $command->getSynopsis(false);
         $command->mergeApplicationDefinition(false);
 
+        if ($description = $command->getDescription()) {
+            $this->writeText('<comment>Description:</comment>', $options);
+            $this->writeText("\n");
+            $this->writeText('  '.$description);
+            $this->writeText("\n\n");
+        }
+
         $this->writeText('<comment>Usage:</comment>', $options);
         foreach (array_merge(array($command->getSynopsis(true)), $command->getAliases(), $command->getUsages()) as $usage) {
             $this->writeText("\n");
@@ -154,7 +161,8 @@ class TextDescriptor extends Descriptor
             $this->writeText("\n");
         }
 
-        if ($help = $command->getProcessedHelp()) {
+        $help = $command->getProcessedHelp();
+        if ($help && $help !== $description) {
             $this->writeText("\n");
             $this->writeText('<comment>Help:</comment>', $options);
             $this->writeText("\n");
@@ -252,12 +260,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * Formats command aliases to show them in the command description.
-     *
-     * @param Command $command
-     *
-     * @return string
      */
-    private function getCommandAliasesText($command)
+    private function getCommandAliasesText(Command $command): string
     {
         $text = '';
         $aliases = $command->getAliases();
@@ -273,10 +277,8 @@ class TextDescriptor extends Descriptor
      * Formats input option/argument default value.
      *
      * @param mixed $default
-     *
-     * @return string
      */
-    private function formatDefaultValue($default)
+    private function formatDefaultValue($default): string
     {
         if (INF === $default) {
             return 'INF';
@@ -297,10 +299,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * @param (Command|string)[] $commands
-     *
-     * @return int
      */
-    private function getColumnWidth(array $commands)
+    private function getColumnWidth(array $commands): int
     {
         $widths = array();
 
@@ -320,10 +320,8 @@ class TextDescriptor extends Descriptor
 
     /**
      * @param InputOption[] $options
-     *
-     * @return int
      */
-    private function calculateTotalWidthForOptions(array $options)
+    private function calculateTotalWidthForOptions(array $options): int
     {
         $totalWidth = 0;
         foreach ($options as $option) {

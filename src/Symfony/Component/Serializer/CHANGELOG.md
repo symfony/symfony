@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+* added `MissingConstructorArgumentsException` new exception for deserialization failure
+  of objects that needs data insertion in constructor
+* added an optional `default_constructor_arguments` option of context to specify a default data in
+  case the object is not initializable by its constructor because of data missing
+* added optional `bool $escapeFormulas = false` argument to `CsvEncoder::__construct`
+* added `AbstractObjectNormalizer::setMaxDepthHandler` to set a handler to call when the configured
+  maximum depth is reached
+
 4.0.0
 -----
 
@@ -21,6 +32,7 @@ CHANGELOG
  * added getter for extra attributes in `ExtraAttributesException`
  * improved `CsvEncoder` to handle variable nested structures
  * CSV headers can be passed to the `CsvEncoder` via the `csv_headers` serialization context variable 
+ * added `$context` when checking for encoding, decoding and normalizing in `Serializer`
 
 3.3.0
 -----

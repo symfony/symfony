@@ -21,8 +21,11 @@ class Price
     /** @Id @Column(type="integer") */
     public $id;
 
-    /** @Column(type="decimal") */
-    public $value;
+    /** @Column(type="decimal", scale=2) */
+    public $doesNotPreserveFullScaleValue;
+
+    /** @Column(type="string") */
+    public $preserveFullScaleValueSimulation;
 
     /**
      * @param int $id
@@ -31,6 +34,7 @@ class Price
     public function __construct(int $id, float $value)
     {
         $this->id = $id;
-        $this->value = $value;
+        $this->doesNotPreserveFullScaleValue = $value;
+        $this->preserveFullScaleValueSimulation = number_format($value, 2, '.', '');
     }
 }

@@ -60,33 +60,114 @@ class DecimalTypeTest extends BaseTypeTest
         $this->em = null;
     }
 
-    public function testSubmitWithSameStringValue()
+    // On some platforms, fetched decimal values are rounded (the full scale is not preserved)
+    // eg : on SQLite, inserted float value 4.50 will be fetched as string value "4.5"
+    public function testSubmitWithSameStringValueOnAPlatformThatDoesNotPreserveFullScaleValueWithoutForceFullScale()
     {
-        $price = new Price(1, 1.23);
-        $this->em->persist($price);
+        $fullScalePrice = new Price(1, 1.23);
+        $nonFullScalePrice = new Price(2, 4.50);
+        $this->em->persist($fullScalePrice);
+        $this->em->persist($nonFullScalePrice);
         $this->em->flush();
 
-        $this->em->refresh($price);
+        $this->em->refresh($fullScalePrice);
+        $this->em->refresh($nonFullScalePrice);
 
-        $this->assertInternalType('string', $price->value);
-        $stringValue = $price->value;
+        $this->assertInternalType('string', $fullScalePrice->doesNotPreserveFullScaleValue);
+        $fullScalePriceStringValue = $fullScalePrice->doesNotPreserveFullScaleValue;
 
-        $formBuilder = $this->factory->createBuilder(FormType::class, $price, array(
+        $formBuilder = $this->factory->createBuilder(FormType::class, $fullScalePrice, array(
             'data_class' => Price::class
         ));
-        $formBuilder->add('value', static::TESTED_TYPE);
+        $formBuilder->add('doesNotPreserveFullScaleValue', static::TESTED_TYPE, array(
+            'force_full_scale' => false
+        ));
 
         $form = $formBuilder->getForm();
         $form->submit(array(
-            'value' => $stringValue
+            'doesNotPreserveFullScaleValue' => $fullScalePriceStringValue
         ));
 
-        $this->assertSame($stringValue, $price->value);
+        $this->assertSame($fullScalePriceStringValue, $fullScalePrice->doesNotPreserveFullScaleValue);
+
+        $this->assertInternalType('string', $nonFullScalePrice->doesNotPreserveFullScaleValue);
+        $nonFullScalePriceStringValue = $nonFullScalePrice->doesNotPreserveFullScaleValue;
+
+        $formBuilder = $this->factory->createBuilder(FormType::class, $nonFullScalePrice, array(
+            'data_class' => Price::class
+        ));
+        $formBuilder->add('doesNotPreserveFullScaleValue', static::TESTED_TYPE, array(
+            'force_full_scale' => false
+        ));
+
+        $form = $formBuilder->getForm();
+        $form->submit(array(
+            'doesNotPreserveFullScaleValue' => $nonFullScalePriceStringValue
+        ));
+
+        $this->assertSame($nonFullScalePriceStringValue, $nonFullScalePrice->doesNotPreserveFullScaleValue);
 
         $unitOfWork = $this->em->getUnitOfWork();
         $unitOfWork->computeChangeSets();
 
-        $this->assertSame(array(), $unitOfWork->getEntityChangeSet($price));
+        $this->assertSame(array(), $unitOfWork->getEntityChangeSet($fullScalePrice));
+        $this->assertSame(array(), $unitOfWork->getEntityChangeSet($nonFullScalePrice));
+    }
+
+    // On some platforms, fetched decimal values are not rounded at all (the full scale is preserved)
+    // eg : on PostgreSQL, inserted float value 4.50 will be fetched as string value "4.50"
+    public function testSubmitWithSameStringValueOnAPlatformThatPreserveFullScaleValueWithForceFullScale()
+    {
+        $fullScalePrice = new Price(1, 1.23);
+        $nonFullScalePrice = new Price(2, 4.50);
+        $this->em->persist($fullScalePrice);
+        $this->em->persist($nonFullScalePrice);
+        $this->em->flush();
+
+        $this->em->refresh($fullScalePrice);
+        $this->em->refresh($nonFullScalePrice);
+
+        $this->assertInternalType('string', $fullScalePrice->preserveFullScaleValueSimulation);
+        $fullScalePriceStringValue = $fullScalePrice->preserveFullScaleValueSimulation;
+
+        $formBuilder = $this->factory->createBuilder(FormType::class, $fullScalePrice, array(
+            'data_class' => Price::class
+        ));
+        $formBuilder->add('preserveFullScaleValueSimulation', static::TESTED_TYPE, array(
+            'force_full_scale' => true,
+            'scale' => 2
+        ));
+
+        $form = $formBuilder->getForm();
+        $form->submit(array(
+            'preserveFullScaleValueSimulation' => $fullScalePriceStringValue
+        ));
+
+        $this->assertSame($fullScalePriceStringValue, $fullScalePrice->preserveFullScaleValueSimulation);
+
+        $this->assertInternalType('string', $nonFullScalePrice->preserveFullScaleValueSimulation);
+        $nonFullScalePriceStringValue = $nonFullScalePrice->preserveFullScaleValueSimulation;
+
+        $formBuilder = $this->factory->createBuilder(FormType::class, $nonFullScalePrice, array(
+            'data_class' => Price::class
+        ));
+        $formBuilder->add('preserveFullScaleValueSimulation', static::TESTED_TYPE, array(
+            'force_full_scale' => true,
+            'scale' => 2
+        ));
+
+        $form = $formBuilder->getForm();
+        $form->submit(array(
+            'preserveFullScaleValueSimulation' => $nonFullScalePriceStringValue
+        ));
+
+        $this->assertSame($nonFullScalePriceStringValue, $nonFullScalePrice->preserveFullScaleValueSimulation);
+
+        $unitOfWork = $this->em->getUnitOfWork();
+        $unitOfWork->computeChangeSets();
+
+        $this->assertSame(array(), $unitOfWork->getEntityChangeSet($fullScalePrice));
+        $this->assertSame(array(), $unitOfWork->getEntityChangeSet($nonFullScalePrice));
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

@@ -268,12 +268,10 @@
 {%- endblock form_row %}
 
 {% block file_row -%}
-    <{{ element|default('div') }} class="form-group">
-    <div class="custom-file">
+    <{{ element|default('div') }} class="form-group custom-file">
         {{- form_label(form) -}}
         {{- form_widget(form) -}}
         {{- form_errors(form) -}}
-    </div>
     </{{ element|default('div') }}>
 {% endblock %}
 

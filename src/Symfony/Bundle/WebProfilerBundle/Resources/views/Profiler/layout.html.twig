@@ -77,7 +77,7 @@
                             </dd>
 
                             <dt>Profiled on</dt>
-                            <dd>{{ profile.time|date('r') }}</dd>
+                            <dd><time datetime="{{ profile.time|date('c') }}">{{ profile.time|date('r') }}</time></dd>
 
                             <dt>Token</dt>
                             <dd>{{ profile.token }}</dd>

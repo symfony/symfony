@@ -17,12 +17,12 @@
 
         <div class="form-group">
             <label for="status_code">Status</label>
-            <input type="number" name="status_code" id="status_code" value="{{ status_code }}">
+            <input type="number" name="status_code" id="status_code" min="100" max="599" value="{{ status_code }}">
         </div>
 
         <div class="form-group">
             <label for="url">URL</label>
-            <input type="text" name="url" id="url" value="{{ url }}">
+            <input type="url" name="url" id="url" value="{{ url }}">
         </div>
 
         <div class="form-group">

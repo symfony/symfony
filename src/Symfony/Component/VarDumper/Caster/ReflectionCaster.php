@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ReflectionCaster
 {
-    private static $extraMap = array(
+    private const EXTRA_MAP = array(
         'docComment' => 'getDocComment',
         'extension' => 'getExtensionName',
         'isDisabled' => 'isDisabled',
@@ -303,7 +303,7 @@ class ReflectionCaster
             $x['line'] = $c->getStartLine().' to '.$c->getEndLine();
         }
 
-        self::addMap($x, $c, self::$extraMap, '');
+        self::addMap($x, $c, self::EXTRA_MAP, '');
 
         if ($x) {
             $a[Caster::PREFIX_VIRTUAL.'extra'] = new EnumStub($x);

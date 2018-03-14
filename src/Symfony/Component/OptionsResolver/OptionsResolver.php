@@ -85,7 +85,7 @@ class OptionsResolver implements Options
      */
     private $locked = false;
 
-    private static $typeAliases = array(
+    private const TYPE_ALIASES = array(
         'boolean' => 'bool',
         'integer' => 'int',
         'double' => 'float',
@@ -777,7 +777,7 @@ class OptionsResolver implements Options
             $invalidTypes = array();
 
             foreach ($this->allowedTypes[$option] as $type) {
-                $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
+                $type = isset(self::TYPE_ALIASES[$type]) ? self::TYPE_ALIASES[$type] : $type;
 
                 if ($valid = $this->verifyTypes($type, $value, $invalidTypes)) {
                     break;

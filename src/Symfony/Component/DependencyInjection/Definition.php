@@ -47,7 +47,7 @@ class Definition
 
     protected $arguments = array();
 
-    private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
+    private const DEFAULT_DEPRECATION_TEMPLATE = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
 
     /**
      * @param string|null $class     The service class
@@ -769,7 +769,7 @@ class Definition
      */
     public function getDeprecationMessage($id)
     {
-        return str_replace('%service_id%', $id, $this->deprecationTemplate ?: self::$defaultDeprecationTemplate);
+        return str_replace('%service_id%', $id, $this->deprecationTemplate ?: self::DEFAULT_DEPRECATION_TEMPLATE);
     }
 
     /**

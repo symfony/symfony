@@ -30,14 +30,14 @@ class DateType extends AbstractType
     const DEFAULT_FORMAT = \IntlDateFormatter::MEDIUM;
     const HTML5_FORMAT = 'yyyy-MM-dd';
 
-    private static $acceptedFormats = array(
+    private const ACCEPTED_FORMATS = array(
         \IntlDateFormatter::FULL,
         \IntlDateFormatter::LONG,
         \IntlDateFormatter::MEDIUM,
         \IntlDateFormatter::SHORT,
     );
 
-    private static $widgets = array(
+    private const WIDGETS = array(
         'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
     );
@@ -52,7 +52,7 @@ class DateType extends AbstractType
         $calendar = \IntlDateFormatter::GREGORIAN;
         $pattern = is_string($options['format']) ? $options['format'] : null;
 
-        if (!in_array($dateFormat, self::$acceptedFormats, true)) {
+        if (!in_array($dateFormat, self::ACCEPTED_FORMATS, true)) {
             throw new InvalidOptionsException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
@@ -114,9 +114,9 @@ class DateType extends AbstractType
             }
 
             $builder
-                ->add('year', self::$widgets[$options['widget']], $yearOptions)
-                ->add('month', self::$widgets[$options['widget']], $monthOptions)
-                ->add('day', self::$widgets[$options['widget']], $dayOptions)
+                ->add('year', self::WIDGETS[$options['widget']], $yearOptions)
+                ->add('month', self::WIDGETS[$options['widget']], $monthOptions)
+                ->add('day', self::WIDGETS[$options['widget']], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
                     $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))

@@ -29,7 +29,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
     /**
      * Source: http://www-01.sil.org/iso639-3/codes.asp.
      */
-    private static $preferredAlpha2ToAlpha3Mapping = array(
+    private const PREFERRED_ALPHA2_TO_ALPHA3_MAPPING = array(
         'ak' => 'aka',
         'ar' => 'ara',
         'ay' => 'aym',
@@ -172,18 +172,18 @@ class LanguageDataGenerator extends AbstractDataGenerator
         foreach ($aliases as $alias => $language) {
             $language = $language['replacement'];
             if (2 === strlen($language) && 3 === strlen($alias)) {
-                if (isset(self::$preferredAlpha2ToAlpha3Mapping[$language])) {
+                if (isset(self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$language])) {
                     // Validate to prevent typos
-                    if (!isset($aliases[self::$preferredAlpha2ToAlpha3Mapping[$language]])) {
+                    if (!isset($aliases[self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$language]])) {
                         throw new RuntimeException(
                             'The statically set three-letter mapping '.
-                            self::$preferredAlpha2ToAlpha3Mapping[$language].' '.
+                            self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$language].' '.
                             'for the language code '.$language.' seems to be '.
                             'invalid. Typo?'
                         );
                     }
 
-                    $alpha3 = self::$preferredAlpha2ToAlpha3Mapping[$language];
+                    $alpha3 = self::PREFERRED_ALPHA2_TO_ALPHA3_MAPPING[$language];
                     $alpha2 = $aliases[$alpha3]['replacement'];
 
                     if ($language !== $alpha2) {
@@ -199,7 +199,7 @@ class LanguageDataGenerator extends AbstractDataGenerator
                     throw new RuntimeException(
                         'Multiple three-letter mappings exist for the language '.
                         'code '.$language.'. Please add one of them to the '.
-                        'property $preferredAlpha2ToAlpha3Mapping.'
+                        'constant PREFERRED_ALPHA2_TO_ALPHA3_MAPPING.'
                     );
                 } else {
                     $alpha2ToAlpha3[$language] = $alias;

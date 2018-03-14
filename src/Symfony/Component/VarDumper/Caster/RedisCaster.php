@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class RedisCaster
 {
-    private static $serializer = array(
+    private const SERIALIZER = array(
         \Redis::SERIALIZER_NONE => 'NONE',
         \Redis::SERIALIZER_PHP => 'PHP',
         2 => 'IGBINARY', // Optional Redis::SERIALIZER_IGBINARY
@@ -49,7 +49,7 @@ class RedisCaster
             $prefix.'persistentId' => $c->getPersistentID(),
             $prefix.'options' => new EnumStub(array(
                 'READ_TIMEOUT' => $c->getOption(\Redis::OPT_READ_TIMEOUT),
-                'SERIALIZER' => isset(self::$serializer[$ser]) ? new ConstStub(self::$serializer[$ser], $ser) : $ser,
+                'SERIALIZER' => isset(self::SERIALIZER[$ser]) ? new ConstStub(self::SERIALIZER[$ser], $ser) : $ser,
                 'PREFIX' => $c->getOption(\Redis::OPT_PREFIX),
                 'SCAN' => new ConstStub($retry ? 'RETRY' : 'NORETRY', $retry),
             )),

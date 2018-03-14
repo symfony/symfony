@@ -20,8 +20,8 @@ use Twig\Node\Node;
 
 class TranslationDefaultDomainNodeVisitorTest extends TestCase
 {
-    private static $message = 'message';
-    private static $domain = 'domain';
+    private const MESSAGE = 'message';
+    private const DOMAIN = 'domain';
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
     public function testDefaultDomainAssignment(Node $node)
@@ -30,7 +30,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor = new TranslationDefaultDomainNodeVisitor();
 
         // visit trans_default_domain tag
-        $defaultDomain = TwigNodeProvider::getTransDefaultDomainTag(self::$domain);
+        $defaultDomain = TwigNodeProvider::getTransDefaultDomainTag(self::DOMAIN);
         $visitor->enterNode($defaultDomain, $env);
         $visitor->leaveNode($defaultDomain, $env);
 
@@ -46,7 +46,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor->enterNode($node, $env);
         $visitor->leaveNode($node, $env);
 
-        $this->assertEquals(array(array(self::$message, self::$domain)), $visitor->getMessages());
+        $this->assertEquals(array(array(self::MESSAGE, self::DOMAIN)), $visitor->getMessages());
     }
 
     /** @dataProvider getDefaultDomainAssignmentTestData */
@@ -72,20 +72,20 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
         $visitor->enterNode($node, $env);
         $visitor->leaveNode($node, $env);
 
-        $this->assertEquals(array(array(self::$message, null)), $visitor->getMessages());
+        $this->assertEquals(array(array(self::MESSAGE, null)), $visitor->getMessages());
     }
 
     public function getDefaultDomainAssignmentTestData()
     {
         return array(
-            array(TwigNodeProvider::getTransFilter(self::$message)),
-            array(TwigNodeProvider::getTransChoiceFilter(self::$message)),
-            array(TwigNodeProvider::getTransTag(self::$message)),
+            array(TwigNodeProvider::getTransFilter(self::MESSAGE)),
+            array(TwigNodeProvider::getTransChoiceFilter(self::MESSAGE)),
+            array(TwigNodeProvider::getTransTag(self::MESSAGE)),
             // with named arguments
-            array(TwigNodeProvider::getTransFilter(self::$message, null, array(
+            array(TwigNodeProvider::getTransFilter(self::MESSAGE, null, array(
                 'arguments' => new ArrayExpression(array(), 0),
             ))),
-            array(TwigNodeProvider::getTransChoiceFilter(self::$message), null, array(
+            array(TwigNodeProvider::getTransChoiceFilter(self::MESSAGE), null, array(
                 'arguments' => new ArrayExpression(array(), 0),
             )),
         );

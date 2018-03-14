@@ -512,7 +512,7 @@ class PropertyCamelizedDummy
 
 class StaticPropertyDummy
 {
-    private static $property = 'value';
+    private const PROPERTY = 'value';
 }
 
 class PropertyParentDummy

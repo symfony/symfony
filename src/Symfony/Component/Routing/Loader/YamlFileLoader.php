@@ -27,7 +27,7 @@ use Symfony\Component\Config\Loader\FileLoader;
  */
 class YamlFileLoader extends FileLoader
 {
-    private static $availableKeys = array(
+    private const AVAILABLE_KEYS = array(
         'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix',
     );
     private $yamlParser;
@@ -192,10 +192,10 @@ class YamlFileLoader extends FileLoader
         if (!is_array($config)) {
             throw new \InvalidArgumentException(sprintf('The definition of "%s" in "%s" must be a YAML array.', $name, $path));
         }
-        if ($extraKeys = array_diff(array_keys($config), self::$availableKeys)) {
+        if ($extraKeys = array_diff(array_keys($config), self::AVAILABLE_KEYS)) {
             throw new \InvalidArgumentException(sprintf(
                 'The routing file "%s" contains unsupported keys for "%s": "%s". Expected one of: "%s".',
-                $path, $name, implode('", "', $extraKeys), implode('", "', self::$availableKeys)
+                $path, $name, implode('", "', $extraKeys), implode('", "', self::AVAILABLE_KEYS)
             ));
         }
         if (isset($config['resource']) && isset($config['path'])) {

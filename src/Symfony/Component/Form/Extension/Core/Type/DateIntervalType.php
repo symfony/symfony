@@ -37,7 +37,7 @@ class DateIntervalType extends AbstractType
         'minutes',
         'seconds',
     );
-    private static $widgets = array(
+    private const WIDGETS = array(
         'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         'integer' => 'Symfony\Component\Form\Extension\Core\Type\IntegerType',
         'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
@@ -120,7 +120,7 @@ class DateIntervalType extends AbstractType
             }
             foreach ($this->timeParts as $part) {
                 if ($options['with_'.$part]) {
-                    $childForm = $builder->create($part, self::$widgets[$options['widget']], $childOptions[$part]);
+                    $childForm = $builder->create($part, self::WIDGETS[$options['widget']], $childOptions[$part]);
                     if ('integer' === $options['widget']) {
                         $childForm->addModelTransformer(
                             new ReversedTransformer(

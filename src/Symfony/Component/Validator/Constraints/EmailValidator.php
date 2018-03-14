@@ -33,7 +33,7 @@ class EmailValidator extends ConstraintValidator
      */
     const PATTERN_LOOSE = '/^.+\@\S+\.\S+$/';
 
-    private static $emailPatterns = array(
+    private const EMAIL_PATTERNS = array(
         Email::VALIDATION_MODE_LOOSE => self::PATTERN_LOOSE,
         Email::VALIDATION_MODE_HTML5 => self::PATTERN_HTML5,
     );
@@ -120,7 +120,7 @@ class EmailValidator extends ConstraintValidator
 
                 return;
             }
-        } elseif (!preg_match(self::$emailPatterns[$constraint->mode], $value)) {
+        } elseif (!preg_match(self::EMAIL_PATTERNS[$constraint->mode], $value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Email::INVALID_FORMAT_ERROR)

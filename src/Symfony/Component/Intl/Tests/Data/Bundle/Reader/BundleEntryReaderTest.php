@@ -32,7 +32,7 @@ class BundleEntryReaderTest extends TestCase
      */
     private $readerImpl;
 
-    private static $data = array(
+    private const DATA = array(
         'Entries' => array(
             'Foo' => 'Bar',
             'Bar' => 'Baz',
@@ -41,7 +41,7 @@ class BundleEntryReaderTest extends TestCase
         'Version' => '2.0',
     );
 
-    private static $fallbackData = array(
+    private const FALLBACK_DATA = array(
         'Entries' => array(
             'Foo' => 'Foo',
             'Bam' => 'Lah',
@@ -50,7 +50,7 @@ class BundleEntryReaderTest extends TestCase
         'Version' => '1.0',
     );
 
-    private static $mergedData = array(
+    private const MERGED_DATA = array(
         // no recursive merging -> too complicated
         'Entries' => array(
             'Foo' => 'Bar',
@@ -72,9 +72,9 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
-            ->will($this->returnValue(self::$data));
+            ->will($this->returnValue(self::DATA));
 
-        $this->assertSame(self::$data, $this->reader->read(self::RES_DIR, 'root'));
+        $this->assertSame(self::DATA, $this->reader->read(self::RES_DIR, 'root'));
     }
 
     public function testReadEntireDataFileIfNoIndicesGiven()
@@ -82,14 +82,14 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue(self::$data));
+            ->will($this->returnValue(self::DATA));
 
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'root')
-            ->will($this->returnValue(self::$fallbackData));
+            ->will($this->returnValue(self::FALLBACK_DATA));
 
-        $this->assertSame(self::$mergedData, $this->reader->readEntry(self::RES_DIR, 'en', array()));
+        $this->assertSame(self::MERGED_DATA, $this->reader->readEntry(self::RES_DIR, 'en', array()));
     }
 
     public function testReadExistingEntry()
@@ -97,7 +97,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
-            ->will($this->returnValue(self::$data));
+            ->will($this->returnValue(self::DATA));
 
         $this->assertSame('Bar', $this->reader->readEntry(self::RES_DIR, 'root', array('Entries', 'Foo')));
     }
@@ -110,7 +110,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'root')
-            ->will($this->returnValue(self::$data));
+            ->will($this->returnValue(self::DATA));
 
         $this->reader->readEntry(self::RES_DIR, 'root', array('Entries', 'NonExisting'));
     }
@@ -120,12 +120,12 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->at(0))
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->returnValue(self::$data));
+            ->will($this->returnValue(self::DATA));
 
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue(self::$fallbackData));
+            ->will($this->returnValue(self::FALLBACK_DATA));
 
         $this->assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Entries', 'Bam')));
     }
@@ -138,7 +138,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->once())
             ->method('read')
             ->with(self::RES_DIR, 'en_GB')
-            ->will($this->returnValue(self::$data));
+            ->will($this->returnValue(self::DATA));
 
         $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Entries', 'Bam'), false);
     }
@@ -153,7 +153,7 @@ class BundleEntryReaderTest extends TestCase
         $this->readerImpl->expects($this->at(1))
             ->method('read')
             ->with(self::RES_DIR, 'en')
-            ->will($this->returnValue(self::$fallbackData));
+            ->will($this->returnValue(self::FALLBACK_DATA));
 
         $this->assertSame('Lah', $this->reader->readEntry(self::RES_DIR, 'en_GB', array('Entries', 'Bam')));
     }

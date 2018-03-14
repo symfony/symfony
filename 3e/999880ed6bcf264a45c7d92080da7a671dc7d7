@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-07T06:34:39Z
+
+Changing weak to strict comparison in public method is potentially breaking change and should not be done in patch release
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-07T06:58:44Z
+
+@ostrolucky not here, because the test is in a `foreach` (https://3v4l.org/ElUI2) and the parameter is documented as `int` in the PHPDoc.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-07T09:51:12Z
+
+I know `$i` is guaranteed to be integer, but not `$position`. Yes, blame can be put on user if they didn't make sure argument is integer. That's why I consider this change ok to do in minor release without migration path. For patch release IMHO it is too risky to change how code processes arguments with no good reason, regardless if it's documented in phpdoc. Few years back double equals operator was more common and applications could count with the fact that `int` in API meant more like `number`.
+
+Also, it seems this provides no performance boost if data types compared are same https://stackoverflow.com/a/14520998/524965
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-08T08:11:06Z
+
+I agree with @ostrolucky about the strict comparison: this kind of changes is too risky in a patch version. Better do that in master. Thanks!
+
+---------------------------------------------------------------------------
+
+by jakzal at 2018-03-08T09:41:29Z
+
+How big is the performance gain?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-10T11:06:23Z
+
+`$position` is documented as int in the Docblock, we don't garantee BC on unsupported types, but I'll target master as it's not a bug fix.
+
+@jakzal I've not benchmarked it, but on large documents it should be important (calling a method in a loop for nothing always come with a big cost).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-10T20:34:21Z
+
+Looks like there are some unrelated commits here.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-11T08:49:45Z
+
+@fabpot Fixed.
+
+@ostrolucky @javiereguiluz the comparison has already been removed in master, problem fixed!

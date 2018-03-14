@@ -68,7 +68,7 @@ class CommandTesterTest extends TestCase
         );
     }
 
-    public function testGetOutput()
+    public function testGetOutput(): void
     {
         rewind($this->tester->getOutput()->getStream());
         $this->assertEquals(

@@ -37,8 +37,8 @@ class CommandTesterTest extends TestCase
 
         $this->tester = new CommandTester($this->command);
         $this->tester->execute(
-            ['foo' => 'bar'],
-            ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]
+            array('foo' => 'bar'),
+            array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE)
         );
     }
 
@@ -112,14 +112,14 @@ class CommandTesterTest extends TestCase
 
     public function testCommandWithInputs(): void
     {
-        $questions = [
+        $questions = array(
             'What\'s your name?',
             'How are you?',
             'Where do you come from?',
-        ];
+        );
 
         $command = new Command('foo');
-        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
+        $command->setHelperSet(new HelperSet(array(new QuestionHelper())));
         $command->setCode(function ($input, $output) use ($questions, $command) {
             $helper = $command->getHelper('question');
             $helper->ask($input, $output, new Question($questions[0]));
@@ -128,7 +128,7 @@ class CommandTesterTest extends TestCase
         });
 
         $tester = new CommandTester($command);
-        $tester->setInputs(['Bobby', 'Fine', 'France']);
+        $tester->setInputs(array('Bobby', 'Fine', 'France'));
         $tester->execute();
 
         $this->assertEquals(0, $tester->getStatusCode());
@@ -141,14 +141,14 @@ class CommandTesterTest extends TestCase
      */
     public function testCommandWithWrongInputsNumber(): void
     {
-        $questions = [
+        $questions = array(
             'What\'s your name?',
             'How are you?',
             'Where do you come from?',
-        ];
+        );
 
         $command = new Command('foo');
-        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
+        $command->setHelperSet(new HelperSet(array(new QuestionHelper())));
         $command->setCode(function ($input, $output) use ($questions, $command) {
             $helper = $command->getHelper('question');
             $helper->ask($input, $output, new Question($questions[0]));
@@ -157,17 +157,17 @@ class CommandTesterTest extends TestCase
         });
 
         $tester = new CommandTester($command);
-        $tester->setInputs(['Bobby', 'Fine']);
+        $tester->setInputs(array('Bobby', 'Fine'));
         $tester->execute();
     }
 
     public function testSymfonyStyleCommandWithInputs(): void
     {
-        $questions = [
+        $questions = array(
             'What\'s your name?',
             'How are you?',
             'Where do you come from?',
-        ];
+        );
 
         $command = new Command('foo');
         $command->setCode(function ($input, $output) use ($questions, $command) {
@@ -178,7 +178,7 @@ class CommandTesterTest extends TestCase
         });
 
         $tester = new CommandTester($command);
-        $tester->setInputs(['Bobby', 'Fine', 'France']);
+        $tester->setInputs(array('Bobby', 'Fine', 'France'));
         $tester->execute();
 
         $this->assertEquals(0, $tester->getStatusCode());

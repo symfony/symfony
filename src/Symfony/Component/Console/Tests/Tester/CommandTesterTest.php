@@ -26,77 +26,100 @@ class CommandTesterTest extends TestCase
     protected $command;
     protected $tester;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->command = new Command('foo');
         $this->command->addArgument('command');
         $this->command->addArgument('foo');
-        $this->command->setCode(function ($input, $output) { $output->writeln('foo'); });
+        $this->command->setCode(function ($input, $output) {
+            $output->writeln('foo');
+        });
 
         $this->tester = new CommandTester($this->command);
-        $this->tester->execute(array('foo' => 'bar'), array('interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE));
+        $this->tester->execute(
+            ['foo' => 'bar'],
+            ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]
+        );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->command = null;
         $this->tester = null;
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
         $this->assertFalse($this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
-        $this->assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
+        $this->assertEquals(
+            Output::VERBOSITY_VERBOSE,
+            $this->tester->getOutput()->getVerbosity(),
+            '->execute() takes a verbosity option'
+        );
     }
 
-    public function testGetInput()
+    public function testGetInput(): void
     {
-        $this->assertEquals('bar', $this->tester->getInput()->getArgument('foo'), '->getInput() returns the current input instance');
+        $this->assertEquals(
+            'bar',
+            $this->tester->getInput()->getArgument('foo'),
+            '->getInput() returns the current input instance'
+        );
     }
 
     public function testGetOutput()
     {
         rewind($this->tester->getOutput()->getStream());
-        $this->assertEquals('foo'.PHP_EOL, stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
+        $this->assertEquals(
+            'foo'.PHP_EOL,
+            stream_get_contents($this->tester->getOutput()->getStream()),
+            '->getOutput() returns the current output instance'
+        );
     }
 
-    public function testGetDisplay()
+    public function testGetDisplay(): void
     {
-        $this->assertEquals('foo'.PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
+        $this->assertEquals(
+            'foo'.PHP_EOL,
+            $this->tester->getDisplay(),
+            '->getDisplay() returns the display of the last execution'
+        );
     }
 
-    public function testGetStatusCode()
+    public function testGetStatusCode(): void
     {
         $this->assertSame(0, $this->tester->getStatusCode(), '->getStatusCode() returns the status code');
     }
 
-    public function testCommandFromApplication()
+    public function testCommandFromApplication(): void
     {
         $application = new Application();
         $application->setAutoExit(false);
 
         $command = new Command('foo');
-        $command->setCode(function ($input, $output) { $output->writeln('foo'); });
+        $command->setCode(function ($input, $output) {
+            $output->writeln('foo');
+        });
 
         $application->add($command);
 
         $tester = new CommandTester($application->find('foo'));
 
         // check that there is no need to pass the command name here
-        $this->assertEquals(0, $tester->execute(array()));
+        $this->assertEquals(0, $tester->execute());
     }
 
-    public function testCommandWithInputs()
+    public function testCommandWithInputs(): void
     {
-        $questions = array(
+        $questions = [
             'What\'s your name?',
             'How are you?',
             'Where do you come from?',
-        );
+        ];
 
         $command = new Command('foo');
-        $command->setHelperSet(new HelperSet(array(new QuestionHelper())));
+        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
             $helper = $command->getHelper('question');
             $helper->ask($input, $output, new Question($questions[0]));
@@ -105,8 +128,8 @@ class CommandTesterTest extends TestCase
         });
 
         $tester = new CommandTester($command);
-        $tester->setInputs(array('Bobby', 'Fine', 'France'));
-        $tester->execute(array());
+        $tester->setInputs(['Bobby', 'Fine', 'France']);
+        $tester->execute();
 
         $this->assertEquals(0, $tester->getStatusCode());
         $this->assertEquals(implode('', $questions), $tester->getDisplay(true));
@@ -116,16 +139,16 @@ class CommandTesterTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedMessage   Aborted
      */
-    public function testCommandWithWrongInputsNumber()
+    public function testCommandWithWrongInputsNumber(): void
     {
-        $questions = array(
+        $questions = [
             'What\'s your name?',
             'How are you?',
             'Where do you come from?',
-        );
+        ];
 
         $command = new Command('foo');
-        $command->setHelperSet(new HelperSet(array(new QuestionHelper())));
+        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
         $command->setCode(function ($input, $output) use ($questions, $command) {
             $helper = $command->getHelper('question');
             $helper->ask($input, $output, new Question($questions[0]));
@@ -134,17 +157,17 @@ class CommandTesterTest extends TestCase
         });
 
         $tester = new CommandTester($command);
-        $tester->setInputs(array('Bobby', 'Fine'));
-        $tester->execute(array());
+        $tester->setInputs(['Bobby', 'Fine']);
+        $tester->execute();
     }
 
-    public function testSymfonyStyleCommandWithInputs()
+    public function testSymfonyStyleCommandWithInputs(): void
     {
-        $questions = array(
+        $questions = [
             'What\'s your name?',
             'How are you?',
             'Where do you come from?',
-        );
+        ];
 
         $command = new Command('foo');
         $command->setCode(function ($input, $output) use ($questions, $command) {
@@ -155,8 +178,8 @@ class CommandTesterTest extends TestCase
         });
 
         $tester = new CommandTester($command);
-        $tester->setInputs(array('Bobby', 'Fine', 'France'));
-        $tester->execute(array());
+        $tester->setInputs(['Bobby', 'Fine', 'France']);
+        $tester->execute();
 
         $this->assertEquals(0, $tester->getStatusCode());
     }

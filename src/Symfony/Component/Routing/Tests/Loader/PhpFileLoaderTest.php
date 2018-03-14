@@ -113,6 +113,7 @@ class PhpFileLoaderTest extends TestCase
             ->setMethods(array('GET'))
             ->setDefaults(array('id' => 0))
         );
+        $expectedCollection->setSubroutine('number', '\d');
 
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub.php')));
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl.php')));

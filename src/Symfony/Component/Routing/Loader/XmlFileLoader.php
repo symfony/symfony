@@ -83,6 +83,9 @@ class XmlFileLoader extends FileLoader
             case 'import':
                 $this->parseImport($collection, $node, $path, $file);
                 break;
+            case 'subroutine':
+                $collection->setSubroutine($node->getAttribute('id'), $node->getAttribute('pattern'));
+                break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "route" or "import".', $node->localName, $path));
         }

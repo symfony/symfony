@@ -37,6 +37,7 @@ class RouteCollectionBuilder
     private $schemes;
     private $methods;
     private $resources = array();
+    private $subroutines = array();
 
     public function __construct(LoaderInterface $loader = null)
     {
@@ -75,6 +76,10 @@ class RouteCollectionBuilder
 
             foreach ($collection->getResources() as $resource) {
                 $builder->addResource($resource);
+            }
+
+            foreach ($collection->getSubroutines() as $name => $pattern) {
+                $builder->setSubroutine($name, $pattern);
             }
         }
 
@@ -263,6 +268,22 @@ class RouteCollectionBuilder
     }
 
     /**
+     * Sets a subroutine that can be reused in requirements.
+     */
+    public function setSubroutine(string $name, string $pattern)
+    {
+        $this->subroutines[$name] = $pattern;
+    }
+
+    /**
+     * Returns the defined subroutines.
+     */
+    public function getSubroutines()
+    {
+        return $this->subroutines;
+    }
+
+    /**
      * Creates the final RouteCollection and returns it.
      *
      * @return RouteCollection
@@ -319,6 +340,10 @@ class RouteCollectionBuilder
 
         foreach ($this->resources as $resource) {
             $routeCollection->addResource($resource);
+        }
+
+        foreach ($this->subroutines as $name => $pattern) {
+            $routeCollection->setSubroutine($name, $pattern);
         }
 
         return $routeCollection;

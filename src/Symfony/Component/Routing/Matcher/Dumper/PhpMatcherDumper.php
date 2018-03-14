@@ -404,6 +404,11 @@ EOF;
                 $code .= "\n                .')'";
                 $state->regex .= ')';
             }
+            foreach ($this->getRoutes()->getSubroutines() as $name => $rx) {
+                $rx = sprintf('(?(DEFINE)(?P<%s>%s))', $name, $rx);
+                $code .= "\n                .'{$rx}'";
+                $state->regex .= $rx;
+            }
             $rx = ")$}{$modifiers}";
             $code .= "\n                .'{$rx}',";
             $state->regex .= $rx;

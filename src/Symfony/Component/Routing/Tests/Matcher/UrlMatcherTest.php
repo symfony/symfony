@@ -596,6 +596,16 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(array('_route' => 'a', 'a' => 'a', 'b' => 'b'), $matcher->match('/a/b'));
     }
 
+    public function testSubroutine()
+    {
+        $coll = new RouteCollection();
+        $coll->setSubroutine('date', '\d{4}-\d{2}-\d{2}');
+        $coll->add('a', new Route('/{a}', array(), array('a' => '(?&date)')));
+
+        $matcher = $this->getUrlMatcher($coll);
+        $this->assertEquals(array('_route' => 'a', 'a' => '2018-03-14'), $matcher->match('/2018-03-14'));
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?: new RequestContext());

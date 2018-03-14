@@ -35,6 +35,11 @@ class RouteCollection implements \IteratorAggregate, \Countable
      */
     private $resources = array();
 
+    /**
+     * @var array
+     */
+    private $subroutines = array();
+
     public function __clone()
     {
         foreach ($this->routes as $name => $route) {
@@ -128,6 +133,10 @@ class RouteCollection implements \IteratorAggregate, \Countable
 
         foreach ($collection->getResources() as $resource) {
             $this->addResource($resource);
+        }
+
+        foreach ($collection->getSubroutines() as $name => $pattern) {
+            $this->setSubroutine($name, $pattern);
         }
     }
 
@@ -290,5 +299,24 @@ class RouteCollection implements \IteratorAggregate, \Countable
         if (!isset($this->resources[$key])) {
             $this->resources[$key] = $resource;
         }
+    }
+
+    /**
+     * Sets a subroutine that can be reused in requirements.
+     */
+    public function setSubroutine(string $name, string $pattern)
+    {
+        if (\strlen($name) > RouteCompiler::VARIABLE_MAXIMUM_LENGTH) {
+            throw new \DomainException(sprintf('Subroutine name "%s" cannot be longer than %s characters. Please use a shorter name for pattern "%s".', $name, RouteCompiler::VARIABLE_MAXIMUM_LENGTH, $pattern));
+        }
+        $this->subroutines[$name] = $pattern;
+    }
+
+    /**
+     * Returns the defined subroutines.
+     */
+    public function getSubroutines(): array
+    {
+        return $this->subroutines;
     }
 }

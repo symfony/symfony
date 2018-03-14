@@ -17,7 +17,7 @@ namespace Symfony\Bridge\PhpUnit;
 class DnsMock
 {
     private static $hosts = array();
-    private static $dnsTypes = array(
+    private const DNS_TYPES = array(
         'A' => DNS_A,
         'MX' => DNS_MX,
         'NS' => DNS_NS,
@@ -54,7 +54,7 @@ class DnsMock
                 if ($record['type'] === $type) {
                     return true;
                 }
-                if ('ANY' === $type && isset(self::$dnsTypes[$record['type']]) && 'HINFO' !== $record['type']) {
+                if ('ANY' === $type && isset(self::DNS_TYPES[$record['type']]) && 'HINFO' !== $record['type']) {
                     return true;
                 }
             }
@@ -152,7 +152,7 @@ class DnsMock
             $records = array();
 
             foreach (self::$hosts[$hostname] as $record) {
-                if (isset(self::$dnsTypes[$record['type']]) && (self::$dnsTypes[$record['type']] & $type)) {
+                if (isset(self::DNS_TYPES[$record['type']]) && (self::DNS_TYPES[$record['type']] & $type)) {
                     $records[] = array_merge(array('host' => $hostname, 'class' => 'IN', 'ttl' => 1, 'type' => $record['type']), $record);
                 }
             }

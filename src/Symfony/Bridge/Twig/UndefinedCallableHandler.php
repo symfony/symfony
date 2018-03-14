@@ -18,7 +18,7 @@ use Twig\Error\SyntaxError;
  */
 class UndefinedCallableHandler
 {
-    private static $filterComponents = array(
+    private const FILTER_COMPONENTS = array(
         'humanize' => 'form',
         'trans' => 'translation',
         'transchoice' => 'translation',
@@ -26,7 +26,7 @@ class UndefinedCallableHandler
         'yaml_dump' => 'yaml',
     );
 
-    private static $functionComponents = array(
+    private const FUNCTION_COMPONENTS = array(
         'asset' => 'asset',
         'asset_version' => 'asset',
         'dump' => 'debug-bundle',
@@ -57,20 +57,20 @@ class UndefinedCallableHandler
 
     public static function onUndefinedFilter($name)
     {
-        if (!isset(self::$filterComponents[$name])) {
+        if (!isset(self::FILTER_COMPONENTS[$name])) {
             return false;
         }
 
         // Twig will append the source context to the message, so that it will end up being like "[...] Unknown filter "%s" in foo.html.twig on line 123."
-        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown filter "%s".', self::$filterComponents[$name], $name));
+        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown filter "%s".', self::FILTER_COMPONENTS[$name], $name));
     }
 
     public static function onUndefinedFunction($name)
     {
-        if (!isset(self::$functionComponents[$name])) {
+        if (!isset(self::FUNCTION_COMPONENTS[$name])) {
             return false;
         }
 
-        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown function "%s".', self::$functionComponents[$name], $name));
+        throw new SyntaxError(sprintf('Did you forget to run "composer require symfony/%s"? Unknown function "%s".', self::FUNCTION_COMPONENTS[$name], $name));
     }
 }

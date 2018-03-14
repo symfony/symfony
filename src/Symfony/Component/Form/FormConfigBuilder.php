@@ -39,7 +39,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @var array
      */
-    private static $allowedMethods = array(
+    private const ALLOWED_METHODS = array(
         'GET',
         'PUT',
         'POST',
@@ -790,11 +790,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
 
         $upperCaseMethod = strtoupper($method);
 
-        if (!in_array($upperCaseMethod, self::$allowedMethods)) {
+        if (!in_array($upperCaseMethod, self::ALLOWED_METHODS)) {
             throw new InvalidArgumentException(sprintf(
                 'The form method is "%s", but should be one of "%s".',
                 $method,
-                implode('", "', self::$allowedMethods)
+                implode('", "', self::ALLOWED_METHODS)
             ));
         }
 

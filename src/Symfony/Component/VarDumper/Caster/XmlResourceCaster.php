@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class XmlResourceCaster
 {
-    private static $xmlErrors = array(
+    private const XML_ERRORS = array(
         XML_ERROR_NONE => 'XML_ERROR_NONE',
         XML_ERROR_NO_MEMORY => 'XML_ERROR_NO_MEMORY',
         XML_ERROR_SYNTAX => 'XML_ERROR_SYNTAX',
@@ -52,8 +52,8 @@ class XmlResourceCaster
         $a['current_line_number'] = xml_get_current_line_number($h);
         $a['error_code'] = xml_get_error_code($h);
 
-        if (isset(self::$xmlErrors[$a['error_code']])) {
-            $a['error_code'] = new ConstStub(self::$xmlErrors[$a['error_code']], $a['error_code']);
+        if (isset(self::XML_ERRORS[$a['error_code']])) {
+            $a['error_code'] = new ConstStub(self::XML_ERRORS[$a['error_code']], $a['error_code']);
         }
 
         return $a;

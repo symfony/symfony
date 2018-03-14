@@ -42,7 +42,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     /**
      * Monetary units excluded from generation.
      */
-    private static $blacklist = array(
+    private const BLACKLIST = array(
         self::UNKNOWN_CURRENCY_ID => true,
         self::EUROPEAN_COMPOSITE_UNIT_ID => true,
         self::EUROPEAN_MONETARY_UNIT_ID => true,
@@ -155,7 +155,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
         $symbolNamePairs = iterator_to_array($rootBundle['Currencies']);
 
         // Remove unwanted currencies
-        $symbolNamePairs = array_diff_key($symbolNamePairs, self::$blacklist);
+        $symbolNamePairs = array_diff_key($symbolNamePairs, self::BLACKLIST);
 
         return $symbolNamePairs;
     }

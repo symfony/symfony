@@ -57,7 +57,7 @@ class DateTimeType extends AbstractType
      */
     const HTML5_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
-    private static $acceptedFormats = array(
+    private const ACCEPTED_FORMATS = array(
         \IntlDateFormatter::FULL,
         \IntlDateFormatter::LONG,
         \IntlDateFormatter::MEDIUM,
@@ -88,7 +88,7 @@ class DateTimeType extends AbstractType
         $calendar = \IntlDateFormatter::GREGORIAN;
         $pattern = is_string($options['format']) ? $options['format'] : null;
 
-        if (!in_array($dateFormat, self::$acceptedFormats, true)) {
+        if (!in_array($dateFormat, self::ACCEPTED_FORMATS, true)) {
             throw new InvalidOptionsException('The "date_format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 

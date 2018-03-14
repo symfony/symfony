@@ -30,7 +30,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
     const SECONDS = 'seconds';
     const INVERT = 'invert';
 
-    private static $availableFields = array(
+    private const AVAILABLE_FIELDS = array(
         self::YEARS => 'y',
         self::MONTHS => 'm',
         self::DAYS => 'd',
@@ -85,7 +85,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($dateInterval, '\DateInterval');
         }
         $result = array();
-        foreach (self::$availableFields as $field => $char) {
+        foreach (self::AVAILABLE_FIELDS as $field => $char) {
             $result[$field] = $dateInterval->format('%'.($this->pad ? strtoupper($char) : $char));
         }
         if (in_array('weeks', $this->fields, true)) {
@@ -134,7 +134,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         if (isset($value['invert']) && !is_bool($value['invert'])) {
             throw new TransformationFailedException('The value of "invert" must be boolean');
         }
-        foreach (self::$availableFields as $field => $char) {
+        foreach (self::AVAILABLE_FIELDS as $field => $char) {
             if ('invert' !== $field && isset($value[$field]) && !ctype_digit((string) $value[$field])) {
                 throw new TransformationFailedException(sprintf('This amount of "%s" is invalid', $field));
             }

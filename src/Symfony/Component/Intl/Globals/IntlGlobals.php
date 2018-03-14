@@ -38,7 +38,7 @@ abstract class IntlGlobals
     /**
      * All known error codes.
      */
-    private static $errorCodes = array(
+    private const ERROR_CODES = array(
         self::U_ZERO_ERROR => 'U_ZERO_ERROR',
         self::U_ILLEGAL_ARGUMENT_ERROR => 'U_ILLEGAL_ARGUMENT_ERROR',
         self::U_PARSE_ERROR => 'U_PARSE_ERROR',
@@ -63,7 +63,7 @@ abstract class IntlGlobals
      */
     public static function isFailure($errorCode)
     {
-        return isset(self::$errorCodes[$errorCode])
+        return isset(self::ERROR_CODES[$errorCode])
             && $errorCode > self::U_ZERO_ERROR;
     }
 
@@ -100,8 +100,8 @@ abstract class IntlGlobals
      */
     public static function getErrorName($code)
     {
-        if (isset(self::$errorCodes[$code])) {
-            return self::$errorCodes[$code];
+        if (isset(self::ERROR_CODES[$code])) {
+            return self::ERROR_CODES[$code];
         }
 
         return '[BOGUS UErrorCode]';
@@ -117,11 +117,11 @@ abstract class IntlGlobals
      */
     public static function setError($code, $message = '')
     {
-        if (!isset(self::$errorCodes[$code])) {
+        if (!isset(self::ERROR_CODES[$code])) {
             throw new \InvalidArgumentException(sprintf('No such error code: "%s"', $code));
         }
 
-        self::$errorMessage = $message ? sprintf('%s: %s', $message, self::$errorCodes[$code]) : self::$errorCodes[$code];
+        self::$errorMessage = $message ? sprintf('%s: %s', $message, self::ERROR_CODES[$code]) : self::ERROR_CODES[$code];
         self::$errorCode = $code;
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class DOMCaster
 {
-    private static $errorCodes = array(
+    private const ERROR_CODES = array(
         DOM_PHP_ERR => 'DOM_PHP_ERR',
         DOM_INDEX_SIZE_ERR => 'DOM_INDEX_SIZE_ERR',
         DOMSTRING_SIZE_ERR => 'DOMSTRING_SIZE_ERR',
@@ -40,7 +40,7 @@ class DOMCaster
         DOM_VALIDATION_ERR => 'DOM_VALIDATION_ERR',
     );
 
-    private static $nodeTypes = array(
+    private const NODE_TYPES = array(
         XML_ELEMENT_NODE => 'XML_ELEMENT_NODE',
         XML_ATTRIBUTE_NODE => 'XML_ATTRIBUTE_NODE',
         XML_TEXT_NODE => 'XML_TEXT_NODE',
@@ -64,8 +64,8 @@ class DOMCaster
     public static function castException(\DOMException $e, array $a, Stub $stub, $isNested)
     {
         $k = Caster::PREFIX_PROTECTED.'code';
-        if (isset($a[$k], self::$errorCodes[$a[$k]])) {
-            $a[$k] = new ConstStub(self::$errorCodes[$a[$k]], $a[$k]);
+        if (isset($a[$k], self::ERROR_CODES[$a[$k]])) {
+            $a[$k] = new ConstStub(self::ERROR_CODES[$a[$k]], $a[$k]);
         }
 
         return $a;
@@ -95,7 +95,7 @@ class DOMCaster
         $a += array(
             'nodeName' => $dom->nodeName,
             'nodeValue' => new CutStub($dom->nodeValue),
-            'nodeType' => new ConstStub(self::$nodeTypes[$dom->nodeType], $dom->nodeType),
+            'nodeType' => new ConstStub(self::NODE_TYPES[$dom->nodeType], $dom->nodeType),
             'parentNode' => new CutStub($dom->parentNode),
             'childNodes' => $dom->childNodes,
             'firstChild' => new CutStub($dom->firstChild),
@@ -119,7 +119,7 @@ class DOMCaster
         $a += array(
             'nodeName' => $dom->nodeName,
             'nodeValue' => new CutStub($dom->nodeValue),
-            'nodeType' => new ConstStub(self::$nodeTypes[$dom->nodeType], $dom->nodeType),
+            'nodeType' => new ConstStub(self::NODE_TYPES[$dom->nodeType], $dom->nodeType),
             'prefix' => $dom->prefix,
             'localName' => $dom->localName,
             'namespaceURI' => $dom->namespaceURI,

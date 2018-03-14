@@ -38,7 +38,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     /**
      * Regions excluded from generation.
      */
-    private static $blacklist = array(
+    private const BLACKLIST = array(
         self::UNKNOWN_REGION_ID => true,
         // Look like countries, but are sub-continents
         self::OUTLYING_OCEANIA_REGION_ID => true,
@@ -135,7 +135,7 @@ class RegionDataGenerator extends AbstractDataGenerator
         $regionNames = array();
 
         foreach ($unfilteredRegionNames as $region => $regionName) {
-            if (isset(self::$blacklist[$region])) {
+            if (isset(self::BLACKLIST[$region])) {
                 continue;
             }
 

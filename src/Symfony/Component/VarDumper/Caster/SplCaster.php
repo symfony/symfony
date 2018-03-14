@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class SplCaster
 {
-    private static $splFileObjectFlags = array(
+    private const SPL_FILE_OBJECT_FLAGS = array(
         \SplFileObject::DROP_NEW_LINE => 'DROP_NEW_LINE',
         \SplFileObject::READ_AHEAD => 'READ_AHEAD',
         \SplFileObject::SKIP_EMPTY => 'SKIP_EMPTY',
@@ -155,7 +155,7 @@ class SplCaster
 
         if (isset($a[$prefix.'flags'])) {
             $flagsArray = array();
-            foreach (self::$splFileObjectFlags as $value => $name) {
+            foreach (self::SPL_FILE_OBJECT_FLAGS as $value => $name) {
                 if ($a[$prefix.'flags'] & $value) {
                     $flagsArray[] = $name;
                 }

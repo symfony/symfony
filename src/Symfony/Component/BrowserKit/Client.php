@@ -190,7 +190,7 @@ abstract class Client
     {
         if (null === $this->crawler) {
             @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
-            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
         }
 
         return $this->crawler;
@@ -205,7 +205,7 @@ abstract class Client
     {
         if (null === $this->internalResponse) {
             @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
-            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
         }
 
         return $this->internalResponse;
@@ -225,7 +225,7 @@ abstract class Client
     {
         if (null === $this->response) {
             @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
-            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
         }
 
         return $this->response;
@@ -240,7 +240,7 @@ abstract class Client
     {
         if (null === $this->internalRequest) {
             @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
-            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
         }
 
         return $this->internalRequest;
@@ -260,7 +260,7 @@ abstract class Client
     {
         if (null === $this->request) {
             @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
-            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before "%s()".', __METHOD__));
         }
 
         return $this->request;

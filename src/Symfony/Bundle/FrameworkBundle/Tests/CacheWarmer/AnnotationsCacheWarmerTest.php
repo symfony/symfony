@@ -19,7 +19,7 @@ class AnnotationsCacheWarmerTest extends TestCase
 
     protected function setUp()
     {
-        $this->cacheDir = sys_get_temp_dir() . '/' . uniqid();
+        $this->cacheDir = sys_get_temp_dir().'/'.uniqid();
         $fs = new Filesystem();
         $fs->mkdir($this->cacheDir);
         parent::setUp();
@@ -34,7 +34,7 @@ class AnnotationsCacheWarmerTest extends TestCase
 
     public function testAnnotationsCacheWarmerWithDebugDisabled()
     {
-        file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([__CLASS__], true)));
+        file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export(array(__CLASS__), true)));
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
         $reader = new AnnotationReader();
         $fallbackPool = new ArrayAdapter();
@@ -68,7 +68,7 @@ class AnnotationsCacheWarmerTest extends TestCase
 
     public function testAnnotationsCacheWarmerWithDebugEnabled()
     {
-        file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export([__CLASS__], true)));
+        file_put_contents($this->cacheDir.'/annotations.map', sprintf('<?php return %s;', var_export(array(__CLASS__), true)));
         $cacheFile = tempnam($this->cacheDir, __FUNCTION__);
         $reader = new AnnotationReader();
         $fallbackPool = new ArrayAdapter();

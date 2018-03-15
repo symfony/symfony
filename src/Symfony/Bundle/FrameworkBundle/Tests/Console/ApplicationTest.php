@@ -192,6 +192,35 @@ class ApplicationTest extends TestCase
         $this->assertContains('Command "fine" is not defined.', $output);
     }
 
+    public function testRunOnlyWarnsOnUnregistrableCommandAtTheEnd()
+    {
+        $container = new ContainerBuilder();
+        $container->register('event_dispatcher', EventDispatcher::class);
+        $container->register(ThrowingCommand::class, ThrowingCommand::class);
+        $container->setParameter('console.command.ids', array(ThrowingCommand::class => ThrowingCommand::class));
+
+        $kernel = $this->getMockBuilder(KernelInterface::class)->getMock();
+        $kernel
+            ->method('getBundles')
+            ->willReturn(array($this->createBundleMock(
+                array((new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output) { $output->write('fine'); }))
+            )));
+        $kernel
+            ->method('getContainer')
+            ->willReturn($container);
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'list'));
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $display = explode('Lists commands', $tester->getDisplay());
+
+        $this->assertContains(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
+    }
+
     private function getKernel(array $bundles, $useDispatcher = false)
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();

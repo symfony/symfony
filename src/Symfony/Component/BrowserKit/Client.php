@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\BrowserKit;
 
+use Symfony\Component\BrowserKit\Exception\BadMethodCallException;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\DomCrawler\Form;
@@ -183,20 +184,30 @@ abstract class Client
     /**
      * Returns the current Crawler instance.
      *
-     * @return Crawler|null A Crawler instance
+     * @return Crawler A Crawler instance
      */
     public function getCrawler()
     {
+        if (null === $this->crawler) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+        }
+
         return $this->crawler;
     }
 
     /**
      * Returns the current BrowserKit Response instance.
      *
-     * @return Response|null A BrowserKit Response instance
+     * @return Response A BrowserKit Response instance
      */
     public function getInternalResponse()
     {
+        if (null === $this->internalResponse) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+        }
+
         return $this->internalResponse;
     }
 
@@ -206,22 +217,32 @@ abstract class Client
      * The origin response is the response instance that is returned
      * by the code that handles requests.
      *
-     * @return object|null A response instance
+     * @return object A response instance
      *
      * @see doRequest()
      */
     public function getResponse()
     {
+        if (null === $this->response) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+        }
+
         return $this->response;
     }
 
     /**
      * Returns the current BrowserKit Request instance.
      *
-     * @return Request|null A BrowserKit Request instance
+     * @return Request A BrowserKit Request instance
      */
     public function getInternalRequest()
     {
+        if (null === $this->internalRequest) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+        }
+
         return $this->internalRequest;
     }
 
@@ -231,12 +252,17 @@ abstract class Client
      * The origin request is the request instance that is sent
      * to the code that handles requests.
      *
-     * @return object|null A Request instance
+     * @return object A Request instance
      *
      * @see doRequest()
      */
     public function getRequest()
     {
+        if (null === $this->request) {
+            @trigger_error(sprintf('Calling the "%s()" method before the "request()" one is deprecated since Symfony 4.1 and will throw an exception in 5.0.', __METHOD__), E_USER_DEPRECATED);
+            // throw new BadMethodCallException(sprintf('The "request()" method must be called before the "%s()" one', __METHOD__));
+        }
+
         return $this->request;
     }
 

@@ -18,7 +18,14 @@
             <argument type="service" id="twig" />
         </service>
 
-        <service id="twig.form.renderer" class="Symfony\Component\Form\FormRenderer">
+        <service id="twig.form.renderer" class="Symfony\Bridge\Twig\Form\TwigRenderer">
+            <argument type="service" id="twig.form.engine" />
+            <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
+            <tag name="twig.runtime" />
+        </service>
+
+        <!-- used to allow forward-compatibility when retrieving non-deprecated "FormRenderer" twig runtime by FQCN -->
+        <service id="twig.form.renderer.non_deprecated" class="Symfony\Component\Form\FormRenderer">
             <argument type="service" id="twig.form.engine" />
             <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
             <tag name="twig.runtime" />

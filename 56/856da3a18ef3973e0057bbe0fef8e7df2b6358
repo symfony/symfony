@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-03-01T14:12:30Z
+
+this was never necessary AFAICT. It looks like a mistake by trying make it parallel to AppKernel extending the Symfony class, while there was actually nothing to implement in AppCache from day one.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-01T14:13:34Z
+
+However, this class has a typehinting issue in the constructor. It typehints HttpKernelInterface, but the implementation actually expects a KernelInterface (which has much more methods)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-01T14:15:21Z
+
+So is it a bug fix ?
+Should I also fix the type-hint ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-14T16:45:51Z
+
+lets' make it a bug fix and fix the type hint?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-14T17:43:29Z
+
+OK, I will do that
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-14T17:49:53Z
+
+done
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-16T09:30:40Z
+
+I'm confused: is this a bug fix or a new feature? The branch is `2.7` but the milestone is `4.1.`. Also, just asking: won't this need any change at all in end-users code in any case? If yes, we'd need a note in the UPGRADE file.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-16T09:33:59Z
+
+@javiereguiluz I updated the PR to be a "bug fix" as requested. Indeed the milestone should be changes.
+
+And this change does not require any change in end-users code.

@@ -47,13 +47,13 @@ class CookieJar
             foreach ($this->cookieJar as $cookieDomain => $pathCookies) {
                 if ($cookieDomain) {
                     $cookieDomain = '.'.ltrim($cookieDomain, '.');
-                    if ($cookieDomain != substr('.'.$domain, -strlen($cookieDomain))) {
+                    if ($cookieDomain !== substr('.'.$domain, -\strlen($cookieDomain))) {
                         continue;
                     }
                 }
 
                 foreach ($pathCookies as $cookiePath => $namedCookies) {
-                    if ($cookiePath != substr($path, 0, strlen($cookiePath))) {
+                    if (0 !== strpos($path, $cookiePath)) {
                         continue;
                     }
                     if (isset($namedCookies[$name])) {

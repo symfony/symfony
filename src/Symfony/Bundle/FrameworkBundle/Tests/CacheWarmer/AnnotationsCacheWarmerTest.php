@@ -48,14 +48,6 @@ class AnnotationsCacheWarmerTest extends TestCase
         $this->assertFileExists($cacheFile);
 
         // Assert cache is valid
-        /** @var Reader|\PHPUnit_Framework_MockObject_MockObject $readerMock */
-        $readerMock = $this->createMock(Reader::class);
-        $readerMock->expects($this->exactly(0))->method('getClassAnnotations');
-        $readerMock->expects($this->exactly(0))->method('getClassAnnotation');
-        $readerMock->expects($this->exactly(0))->method('getMethodAnnotations');
-        $readerMock->expects($this->exactly(0))->method('getMethodAnnotation');
-        $readerMock->expects($this->exactly(0))->method('getPropertyAnnotations');
-        $readerMock->expects($this->exactly(0))->method('getPropertyAnnotation');
         $reader = new CachedReader(
             $this->getReadOnlyReader(),
             new DoctrineProvider(new PhpArrayAdapter($cacheFile, new NullAdapter()))
@@ -98,7 +90,7 @@ class AnnotationsCacheWarmerTest extends TestCase
      */
     private function getReadOnlyReader()
     {
-        $readerMock = $this->getMockBuilder(Reader::class)->getMock();
+        $readerMock = $this->getMockBuilder('Doctrine\Common\Annotations\Reader')->getMock();
         $readerMock->expects($this->exactly(0))->method('getClassAnnotations');
         $readerMock->expects($this->exactly(0))->method('getClassAnnotation');
         $readerMock->expects($this->exactly(0))->method('getMethodAnnotations');

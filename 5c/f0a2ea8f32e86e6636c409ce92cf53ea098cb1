@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2018-03-12T20:09:07Z
+
+Looks promising! The only issue I see is that it currently requires the `Client`, while a common use case is to extend the `KernelTestCase` and fetch the container from kernel.
+
+Edit: I guess in such scenario we can still do `$container->get('test.service_container')->get('my_private_service')`
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-12T20:10:07Z
+
+In my experience, this would be useful for any `KernelTestCase`, not only `WebTestCase`. So should the service be public and a getter provided in `KernelTestCase`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-12T20:41:55Z
+
+> In my experience, this would be useful for any KernelTestCase
+
+OK, what about the new patch?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-12T20:58:48Z
+
+Better :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-13T11:06:41Z
+
+PR ready. Unused private services are still removed. This is a requirement because not all private services are valid. Since they are removed, this is not an issue but a feature. Keeping a reference to all private services would be a BC break (as experienced on the test suite before handling this.)

@@ -7,6 +7,11 @@ Config
  * Implementing `ParentNodeDefinitionInterface` without the `getChildNodeDefinitions()` method
    is deprecated.
 
+Console
+-------
+
+ * Deprecated the `setCrossingChar()` method in favor of the `setDefaultCrossingChar()` method in `TableStyle`.
+
 EventDispatcher
 ---------------
 

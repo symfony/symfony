@@ -21,9 +21,14 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  * @author Саша Стаменковић <umpirsky@gmail.com>
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  * @author Max Grigorian <maxakawizard@gmail.com>
+ * @author Dany Maillard <danymaillard93b@gmail.com>
  */
 class Table
 {
+    private const SEPARATOR_TOP = 0;
+    private const SEPARATOR_MID = 1;
+    private const SEPARATOR_BOTTOM = 2;
+
     /**
      * Table headers.
      */
@@ -300,7 +305,7 @@ class Table
             }
 
             if ($isHeader || $isFirstRow) {
-                $this->renderRowSeparator();
+                $this->renderRowSeparator($isFirstRow ? self::SEPARATOR_MID : self::SEPARATOR_TOP);
                 if ($isFirstRow) {
                     $isFirstRow = false;
                 }
@@ -308,7 +313,7 @@ class Table
 
             $this->renderRow($row, $isHeader ? $this->style->getCellHeaderFormat() : $this->style->getCellRowFormat());
         }
-        $this->renderRowSeparator();
+        $this->renderRowSeparator(self::SEPARATOR_BOTTOM);
 
         $this->cleanup();
     }
@@ -318,7 +323,7 @@ class Table
      *
      * Example: <code>+-----+-----------+-------+</code>
      */
-    private function renderRowSeparator()
+    private function renderRowSeparator(int $type = self::SEPARATOR_MID)
     {
         if (0 === $count = $this->numberOfColumns) {
             return;
@@ -328,9 +333,19 @@ class Table
             return;
         }
 
-        $markup = $this->style->getCrossingChar();
+        $chars = $this->style->getCrossingChars();
+        if (self::SEPARATOR_MID === $type) {
+            list($leftChar, $midChar, $rightChar) = array($chars[8], $chars[0], $chars[4]);
+        } elseif (self::SEPARATOR_TOP === $type) {
+            list($leftChar, $midChar, $rightChar) = array($chars[1], $chars[2], $chars[3]);
+        } else {
+            list($leftChar, $midChar, $rightChar) = array($chars[7], $chars[6], $chars[5]);
+        }
+
+        $markup = $leftChar;
         for ($column = 0; $column < $count; ++$column) {
-            $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->effectiveColumnWidths[$column]).$this->style->getCrossingChar();
+            $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->effectiveColumnWidths[$column]);
+            $markup .= $column === $count - 1 ? $rightChar : $midChar;
         }
 
         $this->output->writeln(sprintf($this->style->getBorderFormat(), $markup));
@@ -628,14 +643,14 @@ class Table
         $borderless
             ->setHorizontalBorderChar('=')
             ->setVerticalBorderChar(' ')
-            ->setCrossingChar(' ')
+            ->setDefaultCrossingChar(' ')
         ;
 
         $compact = new TableStyle();
         $compact
             ->setHorizontalBorderChar('')
             ->setVerticalBorderChar(' ')
-            ->setCrossingChar('')
+            ->setDefaultCrossingChar('')
             ->setCellRowContentFormat('%s')
         ;
 
@@ -643,14 +658,14 @@ class Table
         $styleGuide
             ->setHorizontalBorderChar('-')
             ->setVerticalBorderChar(' ')
-            ->setCrossingChar(' ')
+            ->setDefaultCrossingChar(' ')
             ->setCellHeaderFormat('%s')
         ;
 
         $box = (new TableStyle())
             ->setHorizontalBorderChar('─')
             ->setVerticalBorderChar('│')
-            ->setCrossingChar('┼')
+            ->setCrossingChars('┼', '┌', '┬', '┐', '┤', '┘', '┴', '└', '├')
         ;
 
         return array(

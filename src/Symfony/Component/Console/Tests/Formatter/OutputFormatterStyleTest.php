@@ -32,11 +32,14 @@ class OutputFormatterStyleTest extends TestCase
     {
         $style = new OutputFormatterStyle();
 
+        $style->setForeground(null);
+        $this->assertEquals('foo', $style->apply('foo'));
+
         $style->setForeground('black');
         $this->assertEquals("\033[30mfoo\033[39m", $style->apply('foo'));
 
-        $style->setForeground('blue');
-        $this->assertEquals("\033[34mfoo\033[39m", $style->apply('foo'));
+        $style->setForeground('red');
+        $this->assertEquals("\033[31mfoo\033[39m", $style->apply('foo'));
 
         $style->setForeground('default');
         $this->assertEquals("\033[39mfoo\033[39m", $style->apply('foo'));
@@ -45,21 +48,78 @@ class OutputFormatterStyleTest extends TestCase
         $style->setForeground('undefined-color');
     }
 
+    public function testForegroundBright()
+    {
+        $style = new OutputFormatterStyle();
+
+        $style->setForeground('bright-green');
+        $this->assertEquals("\033[92mfoo\033[39m", $style->apply('foo'));
+
+        $style->setForeground('bright-yellow');
+        $this->assertEquals("\033[93mfoo\033[39m", $style->apply('foo'));
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $style->setForeground('bright-undefined-color');
+    }
+
+    public function testForegroundMode()
+    {
+        $style = new OutputFormatterStyle();
+
+        for ($i = 0; $i <= 255; ++$i) {
+            $style->setForeground(sprintf('mode-%d', $i));
+            $this->assertEquals(sprintf("\033[38;5;%dmfoo\033[39m", $i), $style->apply('foo'));
+        }
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $style->setForeground('mode-500');
+    }
+
     public function testBackground()
     {
         $style = new OutputFormatterStyle();
 
-        $style->setBackground('black');
-        $this->assertEquals("\033[40mfoo\033[49m", $style->apply('foo'));
+        $style->setBackground(null);
+        $this->assertEquals('foo', $style->apply('foo'));
 
-        $style->setBackground('yellow');
-        $this->assertEquals("\033[43mfoo\033[49m", $style->apply('foo'));
+        $style->setBackground('blue');
+        $this->assertEquals("\033[44mfoo\033[49m", $style->apply('foo'));
+
+        $style->setBackground('magenta');
+        $this->assertEquals("\033[45mfoo\033[49m", $style->apply('foo'));
 
         $style->setBackground('default');
         $this->assertEquals("\033[49mfoo\033[49m", $style->apply('foo'));
 
         $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
         $style->setBackground('undefined-color');
+    }
+
+    public function testBackgroundBright()
+    {
+        $style = new OutputFormatterStyle();
+
+        $style->setBackground('bright-cyan');
+        $this->assertEquals("\033[106mfoo\033[49m", $style->apply('foo'));
+
+        $style->setBackground('bright-white');
+        $this->assertEquals("\033[107mfoo\033[49m", $style->apply('foo'));
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $style->setBackground('bright-undefined-color');
+    }
+
+    public function testBackgroundMode()
+    {
+        $style = new OutputFormatterStyle();
+
+        for ($i = 0; $i <= 255; ++$i) {
+            $style->setBackground(sprintf('mode-%d', $i));
+            $this->assertEquals(sprintf("\033[48;5;%dmfoo\033[49m", $i), $style->apply('foo'));
+        }
+
+        $this->{method_exists($this, $_ = 'expectException') ? $_ : 'setExpectedException'}('InvalidArgumentException');
+        $style->setBackground('mode-500');
     }
 
     public function testOptions()

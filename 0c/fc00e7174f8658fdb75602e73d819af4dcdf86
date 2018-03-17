@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-12-12T10:16:35Z
+
+@javiereguiluz Indeed, my current implementation provides only an unique style. The library which you mentionned allow to apply a different style between outside and inside borders. That doesn't look essential, but I like it. It can be useful for rendering a thinner separateur in the rows. I'm +1.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-12-12T17:39:37Z
+
+The new style looks much better than the initial one. Looks great!
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2017-12-16T17:17:35Z
+
+(@ro0NL For generating your message review, I hope that you have used:
+```php
+(new Table(new ConsoleOutput()))->setStyle('box')->setRows([['lookin good']])->render();
+```
+:smile:)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-01-05T03:16:59Z
+
+@stof Do we need more changes with this PR?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-19T14:49:52Z
+
+I agree with @Taluu that keeping `get/setCrossingChar` feels weird. We should either rename it to make it clear that it sets the crossing chars for all sides or drop it, deprecation needed in all cases.
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-01-20T03:51:45Z
+
+@chalasr `get/setGenericCrossingChar()` would make sense?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-22T14:33:16Z
+
+`setDefaultCrossingChar()` maybe? Works for me anyways
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-01-25T11:48:53Z
+
+@chalasr I deprecated `setCrossingChar()` in favor of `setDefaultCrossingChar()`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-07T08:39:29Z
+
+@maidmaid im afraid #23582 causes some conflicts.. easy to solve?
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-02-17T07:28:21Z
+
+@ro0NL conflicts fixed :)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-03-11T04:56:36Z
+
+Does this PR need some work still? (Travis failure not related)
+
+---------------------------------------------------------------------------
+
+by maidmaid at 2018-03-14T10:40:10Z
+
+> including Windows
+
+It's supposed to work with DOS too (cf https://en.wikipedia.org/wiki/Box-drawing_character#DOS).
+
+> I would switch the default table theme to the new one
+
+Yes! But switching to the new theme breaks some tests and it's more complicated than expected. I suggest to do that in an another PR.

@@ -76,7 +76,7 @@ trait ControllerTrait
     /**
      * Forwards the request to another controller.
      *
-     * @param string $controller The controller name (a string like BlogBundle:Post:index)
+     * @param string $controller The controller name (a string like Bundle\BlogBundle\Controller\PostController::indexAction)
      *
      * @final
      */

@@ -60,8 +60,8 @@ HttpFoundation
 --------------
 
  * Passing the file size to the constructor of the `UploadedFile` class is deprecated.
-
  * The `getClientSize()` method of the `UploadedFile` class is deprecated. Use `getSize()` instead.
+ * Deprecated `Symfony\Component\HttpFoundation\Request::getSession()` when no session has been set. Use `Symfony\Component\HttpFoundation\Request::hasSession()` instead.
 
 Security
 --------

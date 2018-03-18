@@ -10,6 +10,7 @@ CHANGELOG
  * The `get()` method of the `AcceptHeader` class now takes into account the
    `*` and `*/*` default values (if they are present in the Accept HTTP header)
    when looking for items.
+ * deprecated `Request::getSession()` when no session has been set. Use `Request::hasSession()` instead.
 
 4.0.0
 -----

@@ -32,14 +32,12 @@ abstract class AbstractBootstrap4HorizontalLayoutTest extends AbstractBootstrap4
     [
         ./label[@for="name"]
         [
-            ./div[
-                ./ul
-                    [./li
-                        [./span[.="[trans]Error[/trans]"]]
-                        [./span[.="[trans]Error![/trans]"]]
-                    ]
-                    [count(./li)=1]
-            ]
+            ./span[@class="alert alert-danger"]
+                [./span[@class="mb-0 d-block"]
+                    [./span[.="[trans]Error[/trans]"]]
+                    [./span[.="[trans]Error![/trans]"]]
+                ]
+                [count(./span)=1]
         ]
         /following-sibling::div[./input[@id="name"]]
     ]

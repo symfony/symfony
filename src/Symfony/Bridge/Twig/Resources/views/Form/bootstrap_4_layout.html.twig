@@ -261,12 +261,12 @@
 
 {% block form_errors -%}
     {%- if errors|length > 0 -%}
-        <div class="{% if form is not rootform %}invalid-feedback d-block{% else %}alert alert-danger{% endif %}">
-            <ul class="list-unstyled mb-0">
-                {%- for error in errors -%}
-                    <li><span class="initialism form-error-icon badge badge-danger">{{ 'Error'|trans({}, 'validators') }}</span> <span class="form-error-message">{{ error.message }}</span></li>
-                {%- endfor -%}
-            </ul>
-        </div>
+        <span class="{% if form is not rootform %}invalid-feedback d-block{% else %}alert alert-danger{% endif %}">
+            {%- for error in errors -%}
+                <span class="mb-0 d-block">
+                    <span class="initialism form-error-icon badge badge-danger">{{ 'Error'|trans({}, 'validators') }}</span> <span class="form-error-message">{{ error.message }}</span>
+                </span>
+            {%- endfor -%}
+        </span>
     {%- endif %}
 {%- endblock form_errors %}

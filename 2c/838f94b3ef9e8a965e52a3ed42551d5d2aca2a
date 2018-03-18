@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-05T13:42:15Z
+
+Thank you for this PR.
+I had that block in my initial PR (#24435). I think it is a good way to opt-out form having the errors in the labels. However, I would strongly recommend against opting-out.
+
+Btw, This is a **feature** and not a bug.
+
+Protip: There is no need of closing the PR and open a new one. Just push your changes to the same branch and the PR will be updated.
+
+---------------------------------------------------------------------------
+
+by birkof at 2018-03-05T14:11:48Z
+
+Made the previous pull request in the wrong branch and it collects all the differences & shown as comments... that's why I prefer to close it & open another one.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-06T09:37:26Z
+
+@Nyholm This a is a new feature that we want to introduce in the 3.4 branch, shouldn't it go to master instead ?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-06T09:37:51Z
+
+@birkof Thanks for the first contribution on symfony! ;)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-06T09:55:21Z
+
+Okey, Lets consider it a bugfix then. It is for users that does not use `form_row`. They will have a (real) hard time customizing the the form.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-07T13:46:02Z
+
+If somebody needs to do this on per-field basis, this is better approach:
+```twig
+{{ form_label(addUserForm.userByEmail, null, {errors: []}) }}
+```
+
+If you want to disable all errors for form, you can currently do this:
+```twig
+{% form_theme addUserForm _self %}
+{% block form_errors %}{% endblock %}
+```
+
+This PR is still a bit different though, because someone might want to disable errors in labels, but not errors via `form_errors`
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-07T14:58:39Z
+
+Exactly. The point is not to disable errors. The point is to disable errors **in labels**.
+
+---------------------------------------------------------------------------
+
+by birkof at 2018-03-08T09:15:56Z
+
+@ostrolucky didn't know you could disable errors per-field like that. Thanks for the hint!
+
+---------------------------------------------------------------------------
+
+by veteran29 at 2018-03-15T15:41:09Z
+
+As _form_errors_ call was removed from _form_row_ in this [commit](https://github.com/symfony/symfony/commit/a0b40f5c4a5d46a2df789d223b46b91e08b339f8#diff-62cb2a10f5a37db0e87e3bd81609b17dL172), will disabling errors in labels cause error blocks to be not rendered at all?
+
+A simple way to restore old behavior could be useful as errors in labels don't play nice with some Bootstrap 4 themes.

@@ -7,6 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\Exception\TransitionException;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
@@ -163,7 +164,7 @@ class WorkflowTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
+     * @expectedException \Symfony\Component\Workflow\Exception\TransitionException
      * @expectedExceptionMessage Unable to apply transition "t2" for workflow "unnamed".
      */
     public function testApplyWithImpossibleTransition()
@@ -174,6 +175,22 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $workflow->apply($subject, 't2');
+    }
+
+    public function testTransitionExceptionHasCorrectFields()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        try {
+            $workflow->apply($subject, 't2');
+        } catch (TransitionException $exception) {
+            $this->assertEquals('t2', $exception->getTransitionName());
+            $this->assertEquals('unnamed', $exception->getWorkflowName());
+            $this->assertEquals($subject, $exception->getSubject());
+        }
     }
 
     public function testCanWithSameNameTransition()

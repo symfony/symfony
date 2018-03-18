@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Exception\LogicException;
+use Symfony\Component\Workflow\Exception\TransitionException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 
@@ -138,7 +139,7 @@ class Workflow implements WorkflowInterface
         }
 
         if (!$applied) {
-            throw new LogicException(sprintf('Unable to apply transition "%s" for workflow "%s".', $transitionName, $this->name));
+            throw new TransitionException($subject, $transitionName, $this->name);
         }
 
         return $marking;

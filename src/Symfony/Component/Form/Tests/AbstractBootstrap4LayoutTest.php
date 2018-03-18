@@ -32,14 +32,12 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
     [
         ./label[@for="name"]
         [
-            ./div[
-                ./ul
-                    [./li
-                        [./span[.="[trans]Error[/trans]"]]
-                        [./span[.="[trans]Error![/trans]"]]
-                    ]
-                    [count(./li)=1]
-            ]
+            ./span[@class="alert alert-danger"]
+                [./span[@class="mb-0 d-block"]
+                    [./span[.="[trans]Error[/trans]"]]
+                    [./span[.="[trans]Error![/trans]"]]
+                ]
+                [count(./span)=1]
         ]
         /following-sibling::input[@id="name"]
     ]
@@ -162,22 +160,18 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         $html = $this->renderErrors($view);
 
         $this->assertMatchesXpath($html,
-'/div
+'/span
     [@class="alert alert-danger"]
     [
-        ./ul
-            [@class="list-unstyled mb-0"]
-            [
-                ./li
-                    [./span[.="[trans]Error[/trans]"]]
-                    [./span[.="[trans]Error 1[/trans]"]]
-                  
-                /following-sibling::li
-                    [./span[.="[trans]Error[/trans]"]]
-                    [./span[.="[trans]Error 2[/trans]"]]
-            ]
-            [count(./li)=2]
+        ./span[@class="mb-0 d-block"]
+            [./span[.="[trans]Error[/trans]"]]
+            [./span[.="[trans]Error 1[/trans]"]]
+          
+        /following-sibling::span[@class="mb-0 d-block"]
+            [./span[.="[trans]Error[/trans]"]]
+            [./span[.="[trans]Error 2[/trans]"]]    
     ]
+    [count(./span)=2]
 '
         );
     }

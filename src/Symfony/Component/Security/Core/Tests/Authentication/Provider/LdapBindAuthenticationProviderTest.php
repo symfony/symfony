@@ -41,6 +41,23 @@ class LdapBindAuthenticationProviderTest extends TestCase
 
     /**
      * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedExceptionMessage The presented password must not be empty.
+     */
+    public function testNullPasswordShouldThrowAnException()
+    {
+        $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
+        $ldap = $this->getMockBuilder('Symfony\Component\Ldap\LdapClientInterface')->getMock();
+        $userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+
+        $provider = new LdapBindAuthenticationProvider($userProvider, $userChecker, 'key', $ldap);
+        $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
+        $reflection->setAccessible(true);
+
+        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', null, 'key'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
      * @expectedExceptionMessage The presented password is invalid.
      */
     public function testBindFailureShouldThrowAnException()

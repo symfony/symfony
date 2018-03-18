@@ -42,6 +42,8 @@
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />
     <xsd:attribute name="controller" type="xsd:string" />
+    <xsd:attribute name="redirect-to" type="xsd:string" />
+    <xsd:attribute name="redirect-permanent" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="import">

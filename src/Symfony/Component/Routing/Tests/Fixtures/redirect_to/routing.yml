@@ -1,0 +1,12 @@
+app_homepage:
+    path: /
+    controller: AppBundle:Homepage:show
+
+app_temporary_redirect:
+    path: /home
+    redirect_to: app_homepage
+
+app_permanent_redirect:
+    path: /permanent-home
+    redirect_to: /
+    redirect_permanent: true

@@ -1,0 +1,4 @@
+app_symfony:
+    path: /symfony
+    controller: App\Controller\Symfony
+    redirect_to: https://symfony.com

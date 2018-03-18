@@ -75,5 +75,9 @@
             <argument type="service" id="controller_name_converter" />
             <tag name="kernel.event_subscriber" />
         </service>
+
+        <service id="resolve_redirect_controller_name_subscriber" class="Symfony\Bundle\FrameworkBundle\EventListener\ResolveRedirectControllerSubscriber">
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 </container>

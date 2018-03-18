@@ -28,7 +28,7 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'redirect_to', 'redirect_permanent',
     );
     private $yamlParser;
 
@@ -118,6 +118,15 @@ class YamlFileLoader extends FileLoader
 
         if (isset($config['controller'])) {
             $defaults['_controller'] = $config['controller'];
+        }
+
+        if (isset($config['redirect_to'])) {
+            if (isset($defaults['_controller'])) {
+                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both a controller and a redirection.', $path));
+            }
+
+            $defaults['_redirect_to'] = $config['redirect_to'];
+            $defaults['_redirect_permanent'] = $config['redirect_permanent'] ?? false;
         }
 
         $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);

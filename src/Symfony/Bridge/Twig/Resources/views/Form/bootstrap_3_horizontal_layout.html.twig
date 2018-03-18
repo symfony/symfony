@@ -23,10 +23,15 @@ col-sm-2
 {# Rows #}
 
 {% block form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
     <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
         {{- form_label(form) -}}
         <div class="{{ block('form_group_class') }}">
-            {{- form_widget(form) -}}
+            {{- form_widget(form, widget_attr) -}}
+            {{- form_help(form) -}}
             {{- form_errors(form) -}}
         </div>
 {##}</div>

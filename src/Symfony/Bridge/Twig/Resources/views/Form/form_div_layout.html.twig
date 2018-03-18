@@ -306,10 +306,14 @@
 {%- endblock repeated_row -%}
 
 {%- block form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
     <div>
         {{- form_label(form) -}}
         {{- form_errors(form) -}}
-        {{- form_widget(form, { 'helpBlockDisplayed': true }) -}}
+        {{- form_widget(form, widget_attr) -}}
         {{- form_help(form) -}}
     </div>
 {%- endblock form_row -%}
@@ -397,7 +401,6 @@
     id="{{ id }}" name="{{ full_name }}"
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
-    {%- if helpBlockDisplayed is defined and helpBlockDisplayed is same as(true) and help is not empty %} aria-describedby="{{ id }}_help"{% endif -%}
     {{ block('attributes') }}
 {%- endblock widget_attributes -%}
 

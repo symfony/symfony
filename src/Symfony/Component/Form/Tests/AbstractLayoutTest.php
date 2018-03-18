@@ -442,39 +442,11 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'help' => 'Help text test!',
         ));
         $view = $form->createView();
-        $html = $this->renderWidget($view, array('helpBlockDisplayed' => true));
+        $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
-'/input
+'//input
     [@aria-describedby="name_help"]
-'
-        );
-    }
-
-    public function testHelpSetNotLinkedFromWidget()
-    {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
-            'help' => 'Help text test!',
-        ));
-        $view = $form->createView();
-        $html = $this->renderWidget($view);
-
-        $this->assertMatchesXpath($html,
-            '/input
-    [not(@aria-describedby)]
-'
-        );
-    }
-
-    public function testHelpNotSetLinkFromWidget()
-    {
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
-        $view = $form->createView();
-        $html = $this->renderWidget($view, array('helpBlockDisplayed' => true));
-
-        $this->assertMatchesXpath($html,
-            '/input
-    [not(@aria-describedby)]
 '
         );
     }
@@ -483,10 +455,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $view = $form->createView();
-        $html = $this->renderWidget($view);
+        $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
-            '/input
+'//input
     [not(@aria-describedby)]
 '
         );

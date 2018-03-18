@@ -204,6 +204,12 @@
             {%- endif -%}
         {%- endif -%}
         <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}{{- form_errors(form) -}}</{{ element|default('label') }}>
+    {%- else -%}
+        {%- if errors|length > 0 -%}
+        <div id="{{ id }}_errors" class="mb-2">
+            {{- form_errors(form) -}}
+        </div>
+        {%- endif -%}
     {%- endif -%}
 {%- endblock form_label %}
 

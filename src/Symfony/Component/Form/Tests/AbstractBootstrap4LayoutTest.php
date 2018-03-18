@@ -182,6 +182,16 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         );
     }
 
+    public function testErrorWithNoLabel()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', array('label'=>false));
+        $form->addError(new FormError('[trans]Error 1[/trans]'));
+        $view = $form->createView();
+        $html = $this->renderLabel($view);
+
+        $this->assertMatchesXpath($html, '//span[.="[trans]Error[/trans]"]');
+    }
+
     public function testCheckedCheckbox()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', true);

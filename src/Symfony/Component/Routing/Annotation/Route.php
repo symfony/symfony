@@ -22,7 +22,7 @@ namespace Symfony\Component\Routing\Annotation;
 class Route
 {
     private $path;
-    private $locales = array();
+    private $localizedPaths = array();
     private $name;
     private $requirements = array();
     private $options = array();
@@ -39,17 +39,17 @@ class Route
      */
     public function __construct(array $data)
     {
-        if (isset($data['locales'])) {
-            throw new \BadMethodCallException(sprintf('Unknown property "locales" on annotation "%s".', get_class($this)));
+        if (isset($data['localized_paths'])) {
+            throw new \BadMethodCallException(sprintf('Unknown property "localized_paths" on annotation "%s".', get_class($this)));
         }
 
         if (isset($data['value'])) {
-            $data[is_array($data['value']) ? 'locales' : 'path'] = $data['value'];
+            $data[is_array($data['value']) ? 'localized_paths' : 'path'] = $data['value'];
             unset($data['value']);
         }
 
         if (isset($data['path']) && is_array($data['path'])) {
-            $data['locales'] = $data['path'];
+            $data['localized_paths'] = $data['path'];
             unset($data['path']);
         }
 
@@ -72,14 +72,14 @@ class Route
         return $this->path;
     }
 
-    public function setLocales(array $locales)
+    public function setLocalizedPaths(array $localizedPaths)
     {
-        $this->locales = $locales;
+        $this->localizedPaths = $localizedPaths;
     }
 
-    public function getLocales(): array
+    public function getLocalizedPaths(): array
     {
-        return $this->locales;
+        return $this->localizedPaths;
     }
 
     public function setHost($pattern)

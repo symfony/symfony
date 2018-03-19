@@ -124,7 +124,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         if (0 === $collection->count() && $class->hasMethod('__invoke') && $annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
             $globals['path'] = null;
             $globals['name'] = '';
-            $globals['locales'] = array();
+            $globals['localized_paths'] = array();
             $this->addRoute($collection, $annot, $globals, $class, $class->getMethod('__invoke'));
         }
 
@@ -155,8 +155,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $condition = $globals['condition'];
         }
 
-        $path = $annot->getLocales() ?: $annot->getPath();
-        $prefix = $globals['locales'] ?: $globals['path'];
+        $path = $annot->getLocalizedPaths() ?: $annot->getPath();
+        $prefix = $globals['localized_paths'] ?: $globals['path'];
         $paths = array();
 
         if (\is_array($path)) {
@@ -253,7 +253,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
     {
         $globals = array(
             'path' => null,
-            'locales' => array(),
+            'localized_paths' => array(),
             'requirements' => array(),
             'options' => array(),
             'defaults' => array(),
@@ -273,7 +273,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
                 $globals['path'] = $annot->getPath();
             }
 
-            $globals['locales'] = $annot->getLocales();
+            $globals['localized_paths'] = $annot->getLocalizedPaths();
 
             if (null !== $annot->getRequirements()) {
                 $globals['requirements'] = $annot->getRequirements();

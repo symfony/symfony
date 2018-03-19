@@ -130,6 +130,11 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      */
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
+        $subroutines = '';
+        foreach ($routes->getSubroutines() as $name => $pattern) {
+            $subroutines .= sprintf('(?(DEFINE)(?P<%s>%s))', $name, $pattern);
+        }
+
         foreach ($routes as $name => $route) {
             $compiledRoute = $route->compile();
 
@@ -138,13 +143,22 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
-            if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
+            $rx = $compiledRoute->getRegex();
+            if ('' !== $subroutines) {
+                $rx = substr_replace($rx, $subroutines, strrpos($rx, '#'), 0);
+            }
+            if (!preg_match($rx, $pathinfo, $matches)) {
                 continue;
             }
 
             $hostMatches = array();
-            if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
-                continue;
+            if ($rx = $compiledRoute->getHostRegex()) {
+                if ('' !== $subroutines) {
+                    $rx = substr_replace($rx, $subroutines, strrpos($rx, '#'), 0);
+                }
+                if (!preg_match($rx, $this->context->getHost(), $hostMatches)) {
+                    continue;
+                }
             }
 
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);

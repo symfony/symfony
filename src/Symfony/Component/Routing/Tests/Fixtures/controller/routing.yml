@@ -1,3 +1,6 @@
+_subroutines:
+    number: \d
+
 app_homepage:
     path: /
     controller: AppBundle:Homepage:show

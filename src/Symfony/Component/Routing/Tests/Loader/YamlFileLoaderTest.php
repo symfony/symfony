@@ -275,4 +275,12 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('DefaultController::defaultAction', $routes->get('home.nl')->getDefault('_controller'));
         $this->assertEquals('DefaultController::defaultAction', $routes->get('not_localized')->getDefault('_controller'));
     }
+
+    public function testSubroutine()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/controller')));
+        $routeCollection = $loader->load('routing.yml');
+
+        $this->assertSame(array('number' => '\d'), $routeCollection->getSubroutines());
+    }
 }

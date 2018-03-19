@@ -51,4 +51,11 @@ class RoutingConfigurator
     {
         return new CollectionConfigurator($this->collection, $name);
     }
+
+    final public function subroutine(string $name, string $pattern): self
+    {
+        $this->collection->setSubroutine($name, $pattern);
+
+        return $this;
+    }
 }

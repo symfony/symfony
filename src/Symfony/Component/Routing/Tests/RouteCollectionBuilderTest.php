@@ -361,4 +361,13 @@ class RouteCollectionBuilderTest extends TestCase
         $this->assertEquals('/other/a', $routes['a']->getPath());
         $this->assertEquals('/other/b', $routes['b']->getPath());
     }
+
+    public function testSubroutine()
+    {
+        $routeCollectionBuilder = new RouteCollectionBuilder(new YamlFileLoader(new FileLocator(array(__DIR__.'/Fixtures/controller'))));
+        $routeCollectionBuilder->import('routing.yml');
+        $routeCollection = $routeCollectionBuilder->build();
+
+        $this->assertSame(array('number' => '\d'), $routeCollection->getSubroutines());
+    }
 }

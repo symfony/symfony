@@ -78,6 +78,12 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($parsedConfig as $name => $config) {
+            if ('_subroutines' === $name && \is_array($config) && !isset($config['resource']) && !isset($config['path'])) {
+                foreach ($config as $name => $pattern) {
+                    $collection->setSubroutine($name, $pattern);
+                }
+                continue;
+            }
             $this->validate($config, $name, $path);
 
             if (isset($config['resource'])) {

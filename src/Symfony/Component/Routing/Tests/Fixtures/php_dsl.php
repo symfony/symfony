@@ -3,6 +3,8 @@
 namespace Symfony\Component\Routing\Loader\Configurator;
 
 return function (RoutingConfigurator $routes) {
+    $routes->subroutine('number', '\d');
+
     $routes
         ->collection()
         ->add('foo', '/foo')

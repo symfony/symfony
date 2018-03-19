@@ -40,8 +40,14 @@ class ImportConfigurator
      *
      * @return $this
      */
-    final public function prefix($prefix)
+    final public function prefix($prefix, string $namePrefix = '')
     {
+        if ('' !== $namePrefix) {
+            $this->route->addNamePrefix($namePrefix);
+        }
+        if (!$prefix) {
+            return $this;
+        }
         if (!\is_array($prefix)) {
             $this->route->addPrefix($prefix);
         } else {

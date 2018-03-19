@@ -106,6 +106,8 @@ class PhpFileLoaderTest extends TestCase
             ->setHost('host')
             ->setRequirements(array('id' => '\d+'))
         );
+        $expectedCollection->add('z_c_bar', new Route('/zub/pub/bar'));
+        $expectedCollection->add('z_c_pub_buz', (new Route('/zub/pub/buz'))->setHost('host'));
         $expectedCollection->add('ouf', (new Route('/ouf'))
             ->setSchemes(array('https'))
             ->setMethods(array('GET'))

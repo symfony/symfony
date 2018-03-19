@@ -124,14 +124,4 @@ trait RouteTrait
 
         return $this;
     }
-
-    /**
-     * Adds a prefix to the name of all the routes within the collection.
-     */
-    final public function addNamePrefix(string $prefix): self
-    {
-        $this->route->addNamePrefix($prefix);
-
-        return $this;
-    }
 }

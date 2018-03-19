@@ -15,6 +15,9 @@ return function (RoutingConfigurator $routes) {
         ->prefix('/sub')
         ->requirements(array('id' => '\d+'));
 
+    $routes->import('php_dsl_sub.php')
+        ->prefix('/zub', 'z_');
+
     $routes->add('ouf', '/ouf')
         ->schemes(array('https'))
         ->methods(array('GET'))

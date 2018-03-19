@@ -83,6 +83,45 @@ class XmlFileLoaderTest extends TestCase
         }
     }
 
+    public function testLoadLocalized()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('localised.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+
+        $this->assertEquals('/route', $routeCollection->get('localised.fr')->getPath());
+        $this->assertEquals('/path', $routeCollection->get('localised.en')->getPath());
+    }
+
+    public function testLocalisedImports()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routeCollection = $loader->load('importer-with-locale.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+
+        $this->assertEquals('/le-prefix/le-suffix', $routeCollection->get('imported.fr')->getPath());
+        $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
+    }
+
+    public function testLocalisedImportsOfNotLocalizedRoutes()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routeCollection = $loader->load('importer-with-locale-imports-non-localized-route.xml');
+        $routes = $routeCollection->all();
+
+        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+
+        $this->assertEquals('/le-prefix/suffix', $routeCollection->get('imported.fr')->getPath());
+        $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @dataProvider getPathsToInvalidFiles

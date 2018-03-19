@@ -36,11 +36,36 @@ class ImportConfigurator
     /**
      * Sets the prefix to add to the path of all child routes.
      *
+     * @param string|array $prefix the prefix, or the localized prefixes
+     *
      * @return $this
      */
-    final public function prefix(string $prefix)
+    final public function prefix($prefix)
     {
-        $this->route->addPrefix($prefix);
+        if (!\is_array($prefix)) {
+            $this->route->addPrefix($prefix);
+        } else {
+            foreach ($prefix as $locale => $localePrefix) {
+                $prefix[$locale] = trim(trim($localePrefix), '/');
+            }
+            foreach ($this->route->all() as $name => $route) {
+                if (null === $locale = $route->getDefault('_locale')) {
+                    $this->route->remove($name);
+                    foreach ($prefix as $locale => $localePrefix) {
+                        $localizedRoute = clone $route;
+                        $localizedRoute->setDefault('_locale', $locale);
+                        $localizedRoute->setDefault('_canonical_route', $name);
+                        $localizedRoute->setPath($localePrefix.$route->getPath());
+                        $this->route->add($name.'.'.$locale, $localizedRoute);
+                    }
+                } elseif (!isset($prefix[$locale])) {
+                    throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding prefix in its parent collection.', $name, $locale));
+                } else {
+                    $route->setPath($prefix[$locale].$route->getPath());
+                    $this->route->add($name, $route);
+                }
+            }
+        }
 
         return $this;
     }

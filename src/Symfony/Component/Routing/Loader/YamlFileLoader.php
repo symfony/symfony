@@ -120,9 +120,20 @@ class YamlFileLoader extends FileLoader
             $defaults['_controller'] = $config['controller'];
         }
 
-        $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+        if (is_array($config['path'])) {
+            $route = new Route('', $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
 
-        $collection->add($name, $route);
+            foreach ($config['path'] as $locale => $path) {
+                $localizedRoute = clone $route;
+                $localizedRoute->setDefault('_locale', $locale);
+                $localizedRoute->setDefault('_canonical_route', $name);
+                $localizedRoute->setPath($path);
+                $collection->add($name.'.'.$locale, $localizedRoute);
+            }
+        } else {
+            $route = new Route($config['path'], $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+            $collection->add($name, $route);
+        }
     }
 
     /**
@@ -151,9 +162,34 @@ class YamlFileLoader extends FileLoader
 
         $this->setCurrentDir(dirname($path));
 
+        /** @var RouteCollection $subCollection */
         $subCollection = $this->import($config['resource'], $type, false, $file);
-        /* @var $subCollection RouteCollection */
-        $subCollection->addPrefix($prefix);
+
+        if (!\is_array($prefix)) {
+            $subCollection->addPrefix($prefix);
+        } else {
+            foreach ($prefix as $locale => $localePrefix) {
+                $prefix[$locale] = trim(trim($localePrefix), '/');
+            }
+            foreach ($subCollection->all() as $name => $route) {
+                if (null === $locale = $route->getDefault('_locale')) {
+                    $subCollection->remove($name);
+                    foreach ($prefix as $locale => $localePrefix) {
+                        $localizedRoute = clone $route;
+                        $localizedRoute->setDefault('_locale', $locale);
+                        $localizedRoute->setDefault('_canonical_route', $name);
+                        $localizedRoute->setPath($localePrefix.$route->getPath());
+                        $subCollection->add($name.'.'.$locale, $localizedRoute);
+                    }
+                } elseif (!isset($prefix[$locale])) {
+                    throw new \InvalidArgumentException(sprintf('Route "%s" with locale "%s" is missing a corresponding prefix when imported in "%s".', $name, $locale, $file));
+                } else {
+                    $route->setPath($prefix[$locale].$route->getPath());
+                    $subCollection->add($name, $route);
+                }
+            }
+        }
+
         if (null !== $host) {
             $subCollection->setHost($host);
         }

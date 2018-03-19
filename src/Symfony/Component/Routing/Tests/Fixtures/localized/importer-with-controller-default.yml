@@ -1,0 +1,5 @@
+---
+i_need:
+    defaults:
+        _controller: DefaultController::defaultAction
+    resource: ./localized-route.yml

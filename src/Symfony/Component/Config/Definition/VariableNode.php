@@ -27,9 +27,6 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
     protected $defaultValue;
     protected $allowEmptyValue = true;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDefaultValue($value)
     {
         $this->defaultValueSet = true;

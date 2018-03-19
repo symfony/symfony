@@ -424,32 +424,30 @@ class Table
 
     private function buildTableRows($rows)
     {
-        $unmergedRows = array();
-        for ($rowKey = 0; $rowKey < count($rows); ++$rowKey) {
-            $rows = $this->fillNextRows($rows, $rowKey);
+        return new TableRows(function () use ($rows) {
+            $unmergedRows = array();
+            for ($rowKey = 0; isset($rows[$rowKey]); ++$rowKey) {
+                $rows = $this->fillNextRows($rows, $rowKey);
 
-            // Remove any new line breaks and replace it with a new line
-            foreach ($rows[$rowKey] as $column => $cell) {
-                if (!strstr($cell, "\n")) {
-                    continue;
-                }
-                $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
-                foreach ($lines as $lineKey => $line) {
-                    if ($cell instanceof TableCell) {
-                        $line = new TableCell($line, array('colspan' => $cell->getColspan()));
+                // Remove any new line breaks and replace it with a new line
+                foreach ($rows[$rowKey] as $column => $cell) {
+                    if (false === strpos($cell, "\n")) {
+                        continue;
                     }
-                    if (0 === $lineKey) {
-                        $rows[$rowKey][$column] = $line;
-                    } else {
-                        $unmergedRows[$rowKey][$lineKey][$column] = $line;
+                    $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
+                    foreach ($lines as $lineKey => $line) {
+                        if ($cell instanceof TableCell) {
+                            $line = new TableCell($line, array('colspan' => $cell->getColspan()));
+                        }
+                        if (0 === $lineKey) {
+                            $rows[$rowKey][$column] = $line;
+                        } else {
+                            $unmergedRows[$rowKey][$lineKey][$column] = $line;
+                        }
                     }
                 }
-            }
-        }
 
-        return new TableRows(function () use ($rows, $unmergedRows) {
-            foreach ($rows as $rowKey => $row) {
-                yield $this->fillCells($row);
+                yield $this->fillCells($rows[$rowKey]);
 
                 if (isset($unmergedRows[$rowKey])) {
                     foreach ($unmergedRows[$rowKey] as $row) {
@@ -475,7 +473,7 @@ class Table
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
                 $nbLines = $cell->getRowspan() - 1;
                 $lines = array($cell);
-                if (strstr($cell, "\n")) {
+                if (false !== strpos($cell, "\n")) {
                     $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
                     $nbLines = count($lines) > $nbLines ? substr_count($cell, "\n") : $nbLines;
 

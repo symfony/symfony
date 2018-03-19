@@ -547,14 +547,15 @@ class ErrorHandler
                 }
             }
         }
+        $exceptionHandler = $this->exceptionHandler;
+        $this->exceptionHandler = null;
         try {
-            if (null !== $this->exceptionHandler) {
-                return \call_user_func($this->exceptionHandler, $exception);
+            if (null !== $exceptionHandler) {
+                return \call_user_func($exceptionHandler, $exception);
             }
             $handlerException = $handlerException ?: $exception;
         } catch (\Throwable $handlerException) {
         }
-        $this->exceptionHandler = null;
         if ($exception === $handlerException) {
             self::$reservedMemory = null; // Disable the fatal error handler
             throw $exception; // Give back $exception to the native handler

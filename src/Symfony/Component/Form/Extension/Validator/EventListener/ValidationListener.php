@@ -52,9 +52,7 @@ class ValidationListener implements EventSubscriberInterface
 
         if ($form->isRoot()) {
             // Validate the form in group "Default"
-            $violations = $this->validator->validate($form);
-
-            foreach ($violations as $violation) {
+            foreach ($this->validator->validate($form) as $violation) {
                 // Allow the "invalid" constraint to be put onto
                 // non-synchronized forms
                 // ConstraintViolation::getConstraint() must not expect to provide a constraint as long as Symfony\Component\Validator\ExecutionContext exists (before 3.0)

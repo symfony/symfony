@@ -253,12 +253,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
         $classMetadata = $this->metadataFactory->getMetadataFor($class);
 
         if ($classMetadata instanceof ClassMetadataInterface && $classMetadata->hasPropertyMetadata($property)) {
-            $memberMetadatas = $classMetadata->getPropertyMetadata($property);
-
-            foreach ($memberMetadatas as $memberMetadata) {
-                $constraints = $memberMetadata->getConstraints();
-
-                foreach ($constraints as $constraint) {
+            foreach ($classMetadata->getPropertyMetadata($property) as $memberMetadata) {
+                foreach ($memberMetadata->getConstraints() as $constraint) {
                     if ($guess = $closure($constraint)) {
                         $guesses[] = $guess;
                     }

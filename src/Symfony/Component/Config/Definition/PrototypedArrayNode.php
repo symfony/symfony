@@ -102,9 +102,7 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Checks if the node has a default value.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasDefaultValue()
     {
@@ -126,12 +124,10 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Retrieves the default value.
+     * {@inheritdoc}
      *
      * The default value could be either explicited or derived from the prototype
      * default value.
-     *
-     * @return array The default value
      */
     public function getDefaultValue()
     {

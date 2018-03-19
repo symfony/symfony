@@ -38,7 +38,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function __construct(?string $name, NodeInterface $parent = null)
     {
-        if (false !== strpos($name, '.')) {
+        if (false !== strpos($name = (string) $name, '.')) {
             throw new \InvalidArgumentException('The name must not contain ".".');
         }
 
@@ -181,9 +181,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Checks if this node is required.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isRequired()
     {
@@ -214,9 +212,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Returns the name of this node.
-     *
-     * @return string The Node's name
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -224,9 +220,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Retrieves the path of this node.
-     *
-     * @return string The Node's path
+     * {@inheritdoc}
      */
     public function getPath()
     {
@@ -240,14 +234,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Merges two values together.
-     *
-     * @param mixed $leftSide
-     * @param mixed $rightSide
-     *
-     * @return mixed The merged value
-     *
-     * @throws ForbiddenOverwriteException
+     * {@inheritdoc}
      */
     final public function merge($leftSide, $rightSide)
     {
@@ -267,11 +254,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Normalizes a value, applying all normalization closures.
-     *
-     * @param mixed $value Value to normalize
-     *
-     * @return mixed The normalized value
+     * {@inheritdoc}
      */
     final public function normalize($value)
     {
@@ -319,14 +302,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Finalizes a value, applying all finalization closures.
-     *
-     * @param mixed $value The value to finalize
-     *
-     * @return mixed The finalized value
-     *
-     * @throws Exception
-     * @throws InvalidConfigurationException
+     * {@inheritdoc}
      */
     final public function finalize($value)
     {

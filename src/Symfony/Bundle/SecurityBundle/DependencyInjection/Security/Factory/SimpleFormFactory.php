@@ -55,6 +55,7 @@ class SimpleFormFactory extends FormLoginFactory
             ->replaceArgument(0, new Reference($config['authenticator']))
             ->replaceArgument(1, new Reference($userProviderId))
             ->replaceArgument(2, $id)
+            ->replaceArgument(3, new Reference('security.user_checker.'.$id))
         ;
 
         return $provider;

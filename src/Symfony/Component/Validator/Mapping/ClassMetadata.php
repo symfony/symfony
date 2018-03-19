@@ -48,7 +48,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
     public $defaultGroup;
 
     /**
-     * @var MemberMetadata[]
+     * @var MemberMetadata[][]
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use

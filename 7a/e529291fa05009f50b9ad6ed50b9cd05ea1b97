@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-02-22T17:30:02Z
+
+I suggest *also* adding my patch from https://github.com/symfony/symfony/issues/24127#issuecomment-367317851 (the second one), to use `profiler_dump(first)` when `first` represents a non-string value, instead of displaying the string-casting of the Data object (the class name with the number of property in it is totally useless).
+
+We might even consider this as a bugfix.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-22T17:44:31Z
+
+@stof  I addressed your comments.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-02-25T12:58:03Z
+
+Looks like a bug fix to me, no?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-28T08:34:22Z
+
+I have rebased my branch onto 3.4, and changed the base branch for this PR in order to merge it as a bug fix.

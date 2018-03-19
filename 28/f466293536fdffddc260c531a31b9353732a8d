@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Strate at 2018-03-16T07:16:13Z
+
+Just pushed fix for old phpunit, but seems it was useless as changes already aproved (travis ran on old code)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-16T09:55:55Z
+
+Still fails on PHP 5.5, missing "getMock()"
+
+---------------------------------------------------------------------------
+
+by Strate at 2018-03-16T11:09:03Z
+
+That's all, travis is happy now.

@@ -117,4 +117,17 @@ class PhpFileLoaderTest extends TestCase
 
         $this->assertEquals($expectedCollection, $routeCollection);
     }
+
+    public function testRoutingConfiguratorCanImportGlobPatterns()
+    {
+        $locator = new FileLocator(array(__DIR__.'/../Fixtures/glob'));
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl.php');
+
+        $route = $routeCollection->get('bar_route');
+        $this->assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
+
+        $route = $routeCollection->get('baz_route');
+        $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
+    }
 }

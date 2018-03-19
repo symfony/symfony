@@ -458,7 +458,7 @@ class Table
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
                 $nbLines = $cell->getRowspan() - 1;
                 $lines = array($cell);
-                if (strstr($cell, "\n")) {
+                if (false !== strpos($cell, "\n")) {
                     $lines = explode("\n", str_replace("\n", "<fg=default;bg=default>\n</>", $cell));
                     $nbLines = count($lines) > $nbLines ? substr_count($cell, "\n") : $nbLines;
 

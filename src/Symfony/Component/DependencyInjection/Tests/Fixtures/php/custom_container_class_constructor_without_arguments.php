@@ -24,6 +24,7 @@ class ProjectServiceContainer extends \Symfony\Component\DependencyInjection\Tes
     public function __construct()
     {
         parent::__construct();
+        $this->parameterBag = null;
 
         $this->services = array();
 

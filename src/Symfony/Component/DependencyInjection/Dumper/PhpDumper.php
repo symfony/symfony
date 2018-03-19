@@ -981,9 +981,13 @@ EOF;
         if ($this->container->isCompiled()) {
             if (Container::class !== $baseClassWithNamespace) {
                 $r = $this->container->getReflectionClass($baseClassWithNamespace, false);
-
-                if (null !== $r && (null !== $constructor = $r->getConstructor()) && 0 === $constructor->getNumberOfRequiredParameters()) {
-                    $code .= "        parent::__construct();\n\n";
+                if (null !== $r
+                    && (null !== $constructor = $r->getConstructor())
+                    && 0 === $constructor->getNumberOfRequiredParameters()
+                    && Container::class !== $constructor->getDeclaringClass()->name
+                ) {
+                    $code .= "        parent::__construct();\n";
+                    $code .= "        \$this->parameterBag = null;\n\n";
                 }
             }
 

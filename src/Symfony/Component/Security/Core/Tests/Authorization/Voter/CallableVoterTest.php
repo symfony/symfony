@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\CallableVoter;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class CallableVoterTest extends TestCase
 {
@@ -36,7 +36,7 @@ class CallableVoterTest extends TestCase
                 function () {
                     return true;
                 },
-                Voter::ACCESS_GRANTED,
+                VoterInterface::ACCESS_GRANTED,
             ),
             array(
                 array(
@@ -48,7 +48,7 @@ class CallableVoterTest extends TestCase
                     },
                     'get',
                 ),
-                Voter::ACCESS_GRANTED,
+                VoterInterface::ACCESS_GRANTED,
             ),
             array(
                 new class() {
@@ -57,13 +57,13 @@ class CallableVoterTest extends TestCase
                         return true;
                     }
                 },
-                Voter::ACCESS_GRANTED,
+                VoterInterface::ACCESS_GRANTED,
             ),
             array(
                 function () {
                     return false;
                 },
-                Voter::ACCESS_DENIED,
+                VoterInterface::ACCESS_DENIED,
             ),
             array(
                 array(
@@ -75,7 +75,7 @@ class CallableVoterTest extends TestCase
                     },
                     'get',
                 ),
-                Voter::ACCESS_DENIED,
+                VoterInterface::ACCESS_DENIED,
             ),
             array(
                 new class() {
@@ -84,13 +84,13 @@ class CallableVoterTest extends TestCase
                         return false;
                     }
                 },
-                Voter::ACCESS_DENIED,
+                VoterInterface::ACCESS_DENIED,
             ),
             array(
                 function () {
                     return null;
                 },
-                Voter::ACCESS_ABSTAIN,
+                VoterInterface::ACCESS_ABSTAIN,
             ),
             array(
                 array(
@@ -102,7 +102,7 @@ class CallableVoterTest extends TestCase
                     },
                     'get',
                 ),
-                Voter::ACCESS_ABSTAIN,
+                VoterInterface::ACCESS_ABSTAIN,
             ),
             array(
                 new class() {
@@ -111,7 +111,7 @@ class CallableVoterTest extends TestCase
                         return null;
                     }
                 },
-                Voter::ACCESS_ABSTAIN,
+                VoterInterface::ACCESS_ABSTAIN,
             ),
         );
     }

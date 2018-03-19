@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Destroy666x at 2018-03-08T10:15:01Z
+
+A test for the described use case would be nice. Also a test for setting the value for a progress bar that didn't have max steps earlier.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-08T19:34:12Z
+
+This is simple setter and is tested by proxy in existing integration tests. Will write test if required by maintainers.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-08T20:47:32Z
+
+If you change from private to public, I think a test is needed.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-08T22:40:56Z
+
+test added

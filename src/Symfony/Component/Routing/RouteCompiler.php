@@ -247,7 +247,7 @@ class RouteCompiler implements RouteCompilerInterface
     }
 
     /**
-     * Returns the next static character in the Route pattern that will serve as a separator (or the empty string when none available)
+     * Returns the next static character in the Route pattern that will serve as a separator (or the empty string when none available).
      */
     private static function findNextSeparator(string $pattern, bool $useUtf8): string
     {

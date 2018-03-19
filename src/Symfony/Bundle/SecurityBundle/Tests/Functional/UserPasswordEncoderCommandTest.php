@@ -120,7 +120,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         );
 
         $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
-        $this->assertContains(' Encoded password   p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertContains(' Encoded password │ p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
         $this->assertContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
@@ -136,7 +136,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         );
 
         $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
-        $this->assertContains(' Encoded password   p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertContains(' Encoded password │ p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
         $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
@@ -208,7 +208,7 @@ EOTXT
             'password' => 'password',
         ), array('interactive' => false));
 
-        $this->assertContains('Encoder used       Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertContains('Encoder used     │ Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     /**

@@ -130,6 +130,10 @@ class Table
      */
     public function setStyle($name)
     {
+        if ('symfony-style-guide' === $name) {
+            @trigger_error(sprintf('Style symfony-style-guide is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $this->style = $this->resolveStyle($name);
 
         return $this;
@@ -672,7 +676,7 @@ class Table
             'default' => new TableStyle(),
             'borderless' => $borderless,
             'compact' => $compact,
-            'symfony-style-guide' => $styleGuide,
+            'symfony-style-guide' => $styleGuide, // deprecated
             'box' => $box,
         );
     }

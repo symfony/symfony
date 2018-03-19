@@ -27,7 +27,7 @@ class RouterDebugCommandTest extends TestCase
         $ret = $tester->execute(array('name' => null), array('decorated' => false));
 
         $this->assertEquals(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('Name   Method   Scheme   Host   Path', $tester->getDisplay());
+        $this->assertContains('Name │ Method │ Scheme │ Host │ Path', $tester->getDisplay());
     }
 
     public function testDebugSingleRoute()

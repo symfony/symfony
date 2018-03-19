@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Definition\Builder;
  *
  * @method NodeDefinition[] getChildNodeDefinitions() should be implemented since 4.1
  */
-interface ParentNodeDefinitionInterface
+interface ParentNodeDefinitionInterface extends BuilderAwareInterface
 {
     /**
      * @return NodeBuilder
@@ -26,6 +26,4 @@ interface ParentNodeDefinitionInterface
     public function children();
 
     public function append(NodeDefinition $node);
-
-    public function setBuilder(NodeBuilder $builder);
 }

@@ -112,6 +112,7 @@
                     parent_label_class: label_attr.class|default(''),
                     translation_domain: choice_translation_domain,
                 }) -}}
+                {{ form_errors(child) }}
             {% endfor -%}
         </div>
     {%- endif %}
@@ -133,7 +134,7 @@
     {% if 'radio-inline' in parent_label_class %}
         {{- form_label(form, null, { widget: parent() }) -}}
     {% else -%}
-        <div class="radio">
+        <div class="radio{% if not valid %} has-error{% endif %}">
             {{- form_label(form, null, { widget: parent() }) -}}
         </div>
     {%- endif %}

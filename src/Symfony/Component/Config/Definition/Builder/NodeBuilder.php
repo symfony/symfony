@@ -143,8 +143,8 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Creates a child node.
      *
-     * @param string $name The name of the node
-     * @param string $type The type of the node
+     * @param string|null $name The name of the node
+     * @param string      $type The type of the node
      *
      * @return NodeDefinition The child node
      *

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2018-02-24T20:31:35Z
+
+For 2.7
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-25T09:53:36Z
+
+Fixed `ParentNodeDefinitionInterface` api docs as well :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-26T13:05:36Z
+
+@Tobion im leaning to revert the last `string|null` fix on node names for now. It's a dirty road.
+
+Still bugged on master:
+
+https://github.com/symfony/symfony/blob/cd5f4105a43208632c8b62fd75b4dad53dcd8a41/src/Symfony/Component/Config/Definition/BaseNode.php#L42-L45
+
+^ strpos on nullable
+
+https://github.com/symfony/symfony/blob/cd5f4105a43208632c8b62fd75b4dad53dcd8a41/src/Symfony/Component/Config/Definition/Builder/ArrayNodeDefinition.php#L381-L383
+
+^ not sure.. maybe dragons, maybe not. (my guess is it only runs for named children).
+
+Put different im not sure about fixing those on 2.7... but backporting `string|null` sounds reasonable.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-27T16:13:13Z
+
+Status: needs review
+
+to go along with #26335, applies until 3.4
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T16:56:25Z
+
+@Tobion OK for you?

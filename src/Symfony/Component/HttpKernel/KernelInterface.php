@@ -18,7 +18,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 /**
  * The Kernel is the heart of the Symfony system.
  *
- * It manages an environment made of bundles.
+ * It manages an environment made of application kernel and bundles.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -27,7 +27,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     /**
      * Returns an array of bundles to register.
      *
-     * @return BundleInterface[] An array of bundle instances
+     * @return iterable|BundleInterface[] An iterable of bundle instances
      */
     public function registerBundles();
 
@@ -67,7 +67,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function getBundle($name);
 
     /**
-     * Returns the file path for a given resource.
+     * Returns the file path for a given bundle resource.
      *
      * A Resource can be a file or a directory.
      *

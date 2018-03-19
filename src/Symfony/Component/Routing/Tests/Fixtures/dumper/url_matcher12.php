@@ -91,6 +91,9 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
                 $offset += strlen($m);
             }
         }
+        if ('/' === $pathinfo) {
+            throw new Symfony\Component\Routing\Exception\NoConfigurationException();
+        }
 
         throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
     }

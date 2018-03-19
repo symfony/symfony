@@ -935,9 +935,13 @@ EOF;
 
         if (Container::class !== $baseClassWithNamespace) {
             $r = $this->container->getReflectionClass($baseClassWithNamespace, false);
-
-            if (null !== $r && (null !== $constructor = $r->getConstructor()) && 0 === $constructor->getNumberOfRequiredParameters()) {
-                $code .= "        parent::__construct();\n\n";
+            if (null !== $r
+                && (null !== $constructor = $r->getConstructor())
+                && 0 === $constructor->getNumberOfRequiredParameters()
+                && Container::class !== $constructor->getDeclaringClass()->name
+            ) {
+                $code .= "        parent::__construct();\n";
+                $code .= "        \$this->parameterBag = null;\n\n";
             }
         }
 
@@ -1619,7 +1623,7 @@ EOF;
 
     private function dumpParameter(string $name): string
     {
-        if ($this->container->isCompiled() && $this->container->hasParameter($name)) {
+        if ($this->container->hasParameter($name)) {
             $value = $this->container->getParameter($name);
             $dumpedValue = $this->dumpValue($value, false);
 

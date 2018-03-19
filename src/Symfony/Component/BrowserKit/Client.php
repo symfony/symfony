@@ -79,7 +79,7 @@ abstract class Client
     }
 
     /**
-     * Sets the maximum number of requests that crawler can follow.
+     * Sets the maximum number of redirects that crawler can follow.
      *
      * @param int $maxRedirects
      */
@@ -90,7 +90,7 @@ abstract class Client
     }
 
     /**
-     * Returns the maximum number of requests that crawler can follow.
+     * Returns the maximum number of redirects that crawler can follow.
      *
      * @return int
      */

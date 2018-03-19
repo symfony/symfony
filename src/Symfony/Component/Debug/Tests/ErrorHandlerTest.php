@@ -533,6 +533,7 @@ class ErrorHandlerTest extends TestCase
 
     /**
      * @expectedException \Exception
+     * @group no-hhvm
      */
     public function testCustomExceptionHandler()
     {

@@ -65,6 +65,7 @@
                             <element><string>Cache\IntegrationTests</string></element>
                             <element><string>Doctrine\Common\Cache</string></element>
                             <element><string>Symfony\Component\Cache</string></element>
+                            <element><string>Symfony\Component\Cache\Tests\Fixtures</string></element>
                             <element><string>Symfony\Component\Cache\Traits</string></element>
                             <element><string>Symfony\Component\Console</string></element>
                             <element><string>Symfony\Component\HttpFoundation</string></element>

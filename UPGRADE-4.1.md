@@ -74,6 +74,11 @@ SecurityBundle
  * The `SecurityUserValueResolver` class is deprecated, use
    `Symfony\Component\Security\Http\Controller\UserValueResolver` instead.
 
+Serializer
+----------
+
+ * Decoding XML with `XmlEncoder` now ignores comment node types by default.
+
 Translation
 -----------
 

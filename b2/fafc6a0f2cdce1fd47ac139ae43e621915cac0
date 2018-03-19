@@ -1,0 +1,539 @@
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-12T08:25:13Z
+
+@stof as mentioned in the description this is a port of the bundle in order to discuss the feature before putting in more time to get it in a mergeable state, which includes following conventions more closely and reverting CS changes for project maintainability. I see your points about the coding style changes and am happy to revert them if the feature is accepted (if not it's just wasted energy ;-) )
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-12T08:30:40Z
+
+Go to continue on my side, having this in core would be great.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-02-12T15:30:35Z
+
+Nice work! This looks like a clear win to me to have in core. I recently worked with someone on a Symfony app who was really surprised this was *not* part of core, and then struggled through trying to use a community bundle (it was the worst part of his Symfony experience). Also, the bundle you created @frankdejonge looks great - but because it's not in core, there were a few "workarounds" you needed to do that aren't here (the `I18nRoute` and order of the bundle being registered).
+
+Later, I can also help write (or just write) the docs for this :).
+
++1 and 🎆
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-12T16:31:07Z
+
+@frankdejonge thanks for contributing this feature. I like it! I haven't looked into the internals, but I have some questions and comments:
+
+-----
+
+Question: would it be easier to understand if we allowed to use a map in the `path` option in addition to strings?
+
+### Before (no translation)
+
+```yaml
+contact:
+    controller: ContactController::formAction
+    path: /send-us-an-email
+```
+
+### After (original proposal)
+
+```yaml
+contact:
+    controller: ContactController::formAction
+    locales:
+        en: /send-us-an-email
+        nl: /stuur-ons-een-email
+```
+
+### After (alternative proposal)
+
+```yaml
+contact:
+    controller: ContactController::formAction
+    path:
+        en: /send-us-an-email
+        nl: /stuur-ons-een-email
+```
+
+-----
+
+Comment: locale codes can be super tricky and weird. `en`, `es`, etc. are the best case. But these are also valid: `pt-PT`, `pt_BR`, `fr.UTF-8`, `sr@latin`, etc.  Are we sure we support all those edge cases?
+
+-----
+
+Question: how can I define different requirements per locale?
+
+```yaml
+site:
+    controller: DefaultController::siteAction
+    path:
+        en: /site/{category}
+        es: /sitio/{category}
+    requirements:
+        # 'category' must be 'home|blog|contact' in English and 'inicio|blog|contacto' in Spanish
+        category: ????
+```
+
+-----
+
+Question: how can you define different route imports per locale?
+
+```php
+@Route("/site")   <-- in English
+@Route("/sitio")  <-- in Spanish
+class DefaultController extends Controller
+{
+    // ...
+}
+```
+
+```yaml
+site:
+    resource: '../src/Controller/'
+    prefix: '/site'   <-- in English
+    prefix: '/sitio'  <-- in Spanish
+    type: annotation
+```
+
+-----
+
+Comment: we should also need to update the debug:router and router:match commands and also the profiler panel. But maybe we can leave this for a separate PR.
+
+-----
+
+Question: can the placeholders of each locale be different? I ask because it's common to add the locale as a prefix for all URLs except for the ones of the default locale. Example:
+
+```
+/fr/voitures
+/es/coches
+/cars
+```
+
+This should be defined as:
+
+```yaml
+cars:
+    controller: DefaultController::carAction
+    path:
+        en: /cars
+        es: /{_locale}/coches
+        fr: /{_locale}/voitures
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-12T17:12:34Z
+
+@weaverryan the order of bundles being important is only because the bundle is not using proper service decoration features though AFAIK.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-12T17:15:45Z
+
+> Question: can the placeholders of each locale be different? I ask because it's common to add the locale as a prefix for all URLs except for the ones of the default locale. Example:
+>
+> ```
+> /fr/voitures
+> /es/coches
+> /cars
+> ```
+>
+> This should be defined as:
+>
+> ```yaml
+> cars:
+>     controller: DefaultController::carAction
+>     path:
+>         en: /cars
+>         es: /{_locale}/coches
+>         fr: /{_locale}/voitures
+> ```
+
+@javiereguiluz this would be better defined using the locale statically rather than using `{_locale}` though (as you need to have one pattern per locale anyway). It would avoid making the pattern dynamic (and so making matching faster thanks to existing optimizations)
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-12T21:48:36Z
+
+It took be the better part of an evening but I think I've reverted all the unneeded or seemingly unrelated changes from the PR.
+
+@javiereguiluz I like your proposal of just using the `path:` key in the `yaml` definitions. What do the others think about that? @nicolas-grekas? @weaverryan? We could do the same for the annotation one, for that one we'd use the constructor to hydrate the correct field so the `getLocales` method would still have the return type check for better guarantees.
+
+What are next steps? Can anybody help me with the XML one?
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-12T21:49:16Z
+
+@stof have all of your concerns been addressed now?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-12T22:24:51Z
+
+I like using an array for path also.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2018-02-13T14:18:08Z
+
++1 for using `path` as an array instead of `locales` :)
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-13T14:27:39Z
+
+@javiereguiluz Hi! If you want to import you can do that localised too:
+
+```yaml
+site:
+    resource: '../src/Controller/'
+    prefix:
+        en: '/site'
+        es: '/sitio'
+    type: annotation
+```
+
+```php
+<?php
+
+class DefaultController extends Controller
+{
+    /**
+     * @Route({"en": "/contact", "es": "/contacto"}, name="contact_form")
+     */
+    public function contactAction() {}
+
+    /**
+     * @Route("/send", name="contact_send")
+     */
+    public function contactAction() {}
+}
+```
+
+This results in:
+
+name | path
+-- | --
+contact_form.en | /site/contact
+contact_form.es | /sitio/contacto
+contact_send.en | /site/send
+contact_send.es | /sitio/send
+
+So you can use localised prefixes with non-localised paths. You can use localised prefixes with localised paths. You can also use non-localised prefixes with localised paths. The one restriction there is, when mixing prefixes and paths with locales all locales must match.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-13T14:37:07Z
+
+To further clarify, you can also prefix localised on class level:
+
+```php
+<?php
+
+/**
+  * @Route({"en": "/site", "es": "/sitio"})
+  */
+class DefaultController extends Controller
+{
+    /**
+     * @Route({"en": "/contact", "es": "/contacto"}, name="contact_form")
+     */
+    public function contactAction() {}
+
+    /**
+     * @Route("/send", name="contact_send")
+     */
+    public function contactAction() {}
+}
+```
+
+Which results in those same definitions as my previous example.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-13T14:53:29Z
+
+@frankdejonge fantastic! What a great job you have done in this pull request! Thank you (and thanks for your patience during the review process :pray:). The only two minor comments left from my previous comment are:
+
+* Double check that locales like this don't cause any problem -> `pt-PT`, `pt_BR`, `fr.UTF-8`, `sr@latin`, etc.
+* Update of the `debug:router` and `router:match` commands and also the routing profiler panel. But maybe we should leave this for a separate PR?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-13T14:57:59Z
+
+> Update of the debug:router and router:match commands and also the routing profiler panel
+
+Actually since this generates routes with the locale added as a suffix, there is nothing to do to have basic support. Should be enough, at least for a first round IMHO.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-13T15:14:05Z
+
+@javiereguiluz in order to reassure you I've added this test case:
+
+```php
+public function testImportingRoutesWithOfficialLocales()
+{
+    $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+    $routes = $loader->load('officially_formatted_locales.yml');
+
+    $this->assertCount(3, $routes);
+    $this->assertEquals('/omelette-du-fromage', $routes->get('official.fr.UTF-8')->getPath());
+    $this->assertEquals('/eu-não-sou-espanhol', $routes->get('official.pt-PT')->getPath());
+    $this->assertEquals('/churrasco', $routes->get('official.pt_BR')->getPath());
+}
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-13T20:19:26Z
+
+Great feature. Thank you.
+
+I would wish that there was a way to fetch all the localized version of a URL. It would be a real great thing if a future PR could support hreflang:
+
+```twig
+{% for locale in locales %}
+    {% set arr = routeParams|merge({'_locale':locale}) %}
+    <link rel="alternate" hreflang="{{ locale }}" href="{{ url(route, arr) }}" />
+{% endfor %}
+```
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-14T10:35:46Z
+
+I've adjusted the route XSD and XmlFileLoader to accept route definitions like these:
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+    <route id="localised">
+        <default key="_controller">MyBundle:Blog:show</default>
+        <path locale="en">/path</path>
+        <path locale="fr">/route</path>
+    </route>
+</routes>
+```
+
+I'm thinking of making the locale prefixes in imports like this:
+
+```xml
+<!-- config/routes.xml -->
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes xmlns="http://symfony.com/schema/routing"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/routing
+        http://symfony.com/schema/routing/routing-1.0.xsd">
+    <import resource="@AcmeOtherBundle/Resources/config/routing.yml">
+        <prefix locale="fr">/le-prefix</prefix>
+    </import>
+</routes>
+```
+
+@nicolas-grekas  what do you think?
+
+BTW I'm also looking for feedback on the XmlFileLoader implementation because I don't know how that stuff worked but I got it working.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-14T11:57:15Z
+
+@frankdejonge LGTM for the XML config.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-14T14:11:49Z
+
+@nicolas-grekas can I ask you to suggest a PHP configurator DSL? I can implement it and test it but you know that much better than I do.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-14T14:21:36Z
+
+the PHPDSL configurator should be about turning the `->prefix()` and `->add()` methods to handle a `string|array` instead of just a `string` for now.
+But there are some complexity, due to the fact that the registration needs to be delayed now (using a destructor as done for collections), to make this work: `$routes->add('foo', ['en' => '/abc', 'fr' => '/def'])->methods(['POST'])`.
+I looked in the morning, wasn't obvious and moved on for now :) I will try again later, unless you make it before me.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-14T16:24:44Z
+
+@nicolas-grekas I've implemented the XML loading. It seems the lowest version of doctrine/annotations is not liking the "first argument is an object" annotation. Is there an upgrade strategy for this?
+
+---------------------------------------------------------------------------
+
+by stof at 2018-02-14T18:14:47Z
+
+old versions of doctrine/annotations are supporting old `foo=bar` notation for hashes. Support for the JSON notation (using `:`) was added later. this might be the cause of your issue (if the lowest supported version is before adding this feature)
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-14T19:33:08Z
+
+@stof I've tracked down which version fixes it, which is `1.2.1` (https://github.com/doctrine/annotations/pull/38/files). I've made the annotations use use path= and added an extra test case for the "value" case.
+
+---------------------------------------------------------------------------
+
+by reyostallenberg at 2018-02-16T09:44:22Z
+
+Great work! Just a simple question (I also haven't looked into the internals deeply): Will it be possible to add an alternative localized route for an already defined route? For example when a bundle provides `en` and `fr` routes and I just want to add an `nl` route without redefining the whole route definition?
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-16T12:52:29Z
+
+@reyostallenberg this PR would technically allow that. Localised routes are resolves prior to not localised ones, which means you could redefined a route with locales if you use the same name. However the specific implications of such behaviour would be need to be checked case by case, as is with normal route overriding (which is currently also possible). TL;DR: yes, but that's already possible now to a certain extent.
+
+---------------------------------------------------------------------------
+
+by reyostallenberg at 2018-02-18T16:33:04Z
+
+@frankdejonge I think you didn't exactly understood my question so I'll elaborate.
+For example FosUserBundle has the route 'fos_user_group_list'
+```
+    <route id="fos_user_group_list" path="/list" methods="GET">
+        <default key="_controller">fos_user.group.controller:listAction</default>
+    </route>
+```
+
+If I want to translate this in my app to a localized path for my locale (for example Dutch '/lijst'), do I have to copy all of the route definition and add the localized part to that copy or is there a way to add '/lijst' to my apps route definition without defining stuff as methods and/or _controller.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-18T16:35:08Z
+
+@reyostallenberg ah like that. No there is not, this PR doesn't change that behaviour tho.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-19T18:40:47Z
+
+@nicolas-grekas I've corrected the PR based on your remarks. Are the exception messages clearer now? They couldn't be the same as the other routes because importing works different than class prefixing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-23T14:44:13Z
+
+@symfony/deciders votes pending, all good on my side.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-23T15:49:26Z
+
+I have some question about the DX.
+
+I personally define routes with annotation.
+So If I add a new language in my application, I will have to open all controllers, to add a new path, right?
+
+It could be a bit boring, and it's error prone because you can miss some controller.
+More over you can not let a translator do that, as it's in the PHP codebase
+Then, if the application support many language, the annotation will be huge, and so hard to maintain.
+
+More over, the implementation does not use the translator component.
+I'm currently working on an international application with translated routes and we are using jms/i18n-routing-bundle. I really don't want to advertise this bundle!
+But the workflow seems easier:
+1. you add a regular route
+2. in a .yaml (translation) file, you juste translate the the url (ex: city_show: 'destinations/{slug}')
+
+---
+
+Anyway, I really like the work done here and It's definitely a good thing to have I18N Routing in the core.
+But I'm not sure about the scalability and the robustness of this solution.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-23T15:55:44Z
+
+@lyrixx there's still a valid use-case for that bundle for exactly what you describe, but it also has a lot of downsides. You use annotations, a common argument for this is because it routes and controllers then live together, which is a benefit. But now the route definitions are once again separated and you loose that advantage. Using that external translation you also have double bookkeeping for route names, which is not great DX either. My point is that this implementation allows for a great number of cases while preventing context switches like the JMS bundle requires. For more specialised cases something like the bundle is a very good alternative.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-23T16:09:47Z
+
+> but it also has a lot of downsides
+
+Yes that's exactly why I don't recommend it ;)
+
+---
+
+I agree with you last comment. :+1 for the feature (I did not look at the code)
+
+---------------------------------------------------------------------------
+
+by reyostallenberg at 2018-02-23T16:15:01Z
+
+In my opinion the idea to use the translator for i18n of routes is also a better idea. I really like this PR for giving a possibility to do translations on routes. But why not improve DX even more.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-23T16:16:31Z
+
+@reyostallenberg PR welcome once this one is merged :)
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-23T16:17:07Z
+
+@reyostallenberg as stated above, that's entirely possible. Currently through a bundle, but now through the loading mechanism itself. The mechanism _could_ be expanded to account for that situation too.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-26T13:35:19Z
+
+Support for i18n routes added to PHP configurators.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-26T13:56:16Z
+
+Status: needs work
+
+> throw new \InvalidArgumentException(sprintf('Route "%s" doesn\'t have a locale.', $name));
+
+as talked about on Slack with Frank, these lines in the loaders could be replaced by locale-interpolation.
+
+---------------------------------------------------------------------------
+
+by frankdejonge at 2018-02-26T19:35:51Z
+
+@nicolas-grekas I've updated it based on our talk. There are some implementation caveats: in order to preserve routing order a new routing collection is built up during the loop. In order to preserve the "loaded resources" registration the new collection is built off the clone of the original (preserving all the metadata in a transparent way) then looping over its routes and removing them at the start. At the end of the loop all the original routes are removed and those without a localized path but imported with a locale are now properly expanded into their localized counterparts.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-28T11:43:33Z
+
+ping @Tobion if you want to have a look, it's ready on my side :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-28T12:08:56Z
+
+Will take a look soon
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-12T12:21:00Z
+
+Hello, I'm back :)
+Without further feedback, I'd like to merge this PR this week.
+It's on the path of (ie will conflict with) other improvements we're doing on the Routing component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-14T10:28:01Z
+
+For transparency, here are some questions that are left open:
+1. using the translator component somehow -> use JMSI18nRoutingBundle (which itself could leverage the new `_canonical_route` parameter if wanted)
+2. generalize param-dependent routes to more than just `_locale` -> would add complexity, and use case is unclear, left for the future
+3. allow maps of per-locale hosts when importing (similar to prefix maps added in this PR)
+4. allow maps of per-locale hosts when defining a route
+
+3 & 4 look quite achievable, with 3. being the most useful to my current understanding. I'd suggest to wait for someone to actually ask for it before implementing.

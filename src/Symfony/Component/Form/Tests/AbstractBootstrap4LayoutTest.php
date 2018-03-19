@@ -166,10 +166,10 @@ abstract class AbstractBootstrap4LayoutTest extends AbstractBootstrap3LayoutTest
         ./span[@class="mb-0 d-block"]
             [./span[.="[trans]Error[/trans]"]]
             [./span[.="[trans]Error 1[/trans]"]]
-          
+
         /following-sibling::span[@class="mb-0 d-block"]
             [./span[.="[trans]Error[/trans]"]]
-            [./span[.="[trans]Error 2[/trans]"]]    
+            [./span[.="[trans]Error 2[/trans]"]]
     ]
     [count(./span)=2]
 '

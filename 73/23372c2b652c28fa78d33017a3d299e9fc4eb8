@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-27T16:10:03Z
+
+Added all fixes that can be merged until master. Ill change #26297 to backport `string|null` fixes soley (which are type declarations as of 4.0>
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-27T17:48:13Z
+
+found a few more, derived from NodeInterface/PrototypeNodeInterface :sweat_smile:

@@ -84,7 +84,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
         $username = $token->getUsername();
         $password = $token->getCredentials();
 
-        if (empty($password)) {
+        if ('' === (string) $password) {
             throw new BadCredentialsException('The presented password must not be empty.');
         }
 

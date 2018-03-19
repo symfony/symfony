@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-03-16T13:16:21Z
+
+@derrabus Checking for badly encoded base64 is an option, but actually the current `EnvVarProcessor` just ignores bad base64, and this would be a breaking change, I have pushed a commit (90bc19f) that checks this, but as it would be break backwards compatibility, its probably not a good idea.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-03-16T13:22:20Z
+
+@mcfedr I wasn't aware of the current behavior of the base64 decoder. I agree that this PR should not change the behavior. We could tackle this with a later PR, maybe.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-03-16T13:36:46Z
+
+@derrabus I guess its one of PHPs fun features, where its just trying to be helpful...

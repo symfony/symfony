@@ -648,7 +648,7 @@ class Crawler implements \Countable, \IteratorAggregate
                 }
             }
 
-            $data[] = $count > 1 ? $elements : $elements[0];
+            $data[] = 1 === $count ? $elements[0] : $elements;
         }
 
         return $data;

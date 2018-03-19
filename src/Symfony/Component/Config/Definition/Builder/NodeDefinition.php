@@ -37,7 +37,7 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $attributes = array();
 
     /**
-     * @param string                   $name   The name of the node
+     * @param string|null              $name   The name of the node
      * @param NodeParentInterface|null $parent The parent
      */
     public function __construct($name, NodeParentInterface $parent = null)

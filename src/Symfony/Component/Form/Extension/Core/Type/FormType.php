@@ -80,6 +80,7 @@ class FormType extends BaseType
             }
         }
 
+        $formConfig = $form->getConfig();
         $view->vars = array_replace($view->vars, array(
             'errors' => $form->getErrors(),
             'valid' => $form->isSubmitted() ? $form->isValid() : true,
@@ -88,9 +89,9 @@ class FormType extends BaseType
             'required' => $form->isRequired(),
             'size' => null,
             'label_attr' => $options['label_attr'],
-            'compound' => $form->getConfig()->getCompound(),
-            'method' => $form->getConfig()->getMethod(),
-            'action' => $form->getConfig()->getAction(),
+            'compound' => $formConfig->getCompound(),
+            'method' => $formConfig->getMethod(),
+            'action' => $formConfig->getAction(),
             'submitted' => $form->isSubmitted(),
         ));
     }

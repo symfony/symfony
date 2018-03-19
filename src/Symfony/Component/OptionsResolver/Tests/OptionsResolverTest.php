@@ -486,6 +486,15 @@ class OptionsResolverTest extends TestCase
         $this->resolver->setAllowedTypes('foo', 'string');
     }
 
+    public function testResolveTypedArray()
+    {
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'string[]');
+        $options = $this->resolver->resolve(array('foo' => array('bar', 'baz')));
+
+        $this->assertSame(array('foo' => array('bar', 'baz')), $options);
+    }
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
      */
@@ -1504,12 +1513,12 @@ class OptionsResolverTest extends TestCase
         });
 
         $this->resolver->setDefault('lazy2', function (Options $options) {
-            Assert::assertTrue(isset($options['default1']));
-            Assert::assertTrue(isset($options['default2']));
-            Assert::assertTrue(isset($options['required']));
-            Assert::assertTrue(isset($options['lazy1']));
-            Assert::assertTrue(isset($options['lazy2']));
-            Assert::assertFalse(isset($options['defined']));
+            Assert::assertArrayHasKey('default1', $options);
+            Assert::assertArrayHasKey('default2', $options);
+            Assert::assertArrayHasKey('required', $options);
+            Assert::assertArrayHasKey('lazy1', $options);
+            Assert::assertArrayHasKey('lazy2', $options);
+            Assert::assertArrayNotHasKey('defined', $options);
 
             Assert::assertSame(0, $options['default1']);
             Assert::assertSame(42, $options['default2']);

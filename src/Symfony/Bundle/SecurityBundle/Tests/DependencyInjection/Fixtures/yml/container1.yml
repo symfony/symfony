@@ -49,7 +49,6 @@ security:
             form_login: true
             anonymous: true
             switch_user:
-                stateless: true
             x509: true
             remote_user: true
             logout: true

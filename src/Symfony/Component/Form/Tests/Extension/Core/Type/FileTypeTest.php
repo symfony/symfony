@@ -188,7 +188,7 @@ class FileTypeTest extends BaseTypeTest
     private function createUploadedFileMock(RequestHandlerInterface $requestHandler, $path, $originalName)
     {
         if ($requestHandler instanceof HttpFoundationRequestHandler) {
-            return new UploadedFile($path, $originalName, null, 10, null, true);
+            return new UploadedFile($path, $originalName, null, null, true);
         }
 
         return array(
@@ -196,7 +196,7 @@ class FileTypeTest extends BaseTypeTest
             'error' => 0,
             'type' => 'text/plain',
             'tmp_name' => $path,
-            'size' => 10,
+            'size' => null,
         );
     }
 }

@@ -162,7 +162,6 @@ class ConfigurationTest extends TestCase
                 'enable_annotations' => !class_exists(FullStack::class),
                 'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
-                'strict_email' => false,
                 'mapping' => array(
                     'paths' => array(),
                 ),

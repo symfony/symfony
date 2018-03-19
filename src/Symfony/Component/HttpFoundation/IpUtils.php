@@ -123,6 +123,10 @@ class IpUtils
         if (false !== strpos($ip, '/')) {
             list($address, $netmask) = explode('/', $ip, 2);
 
+            if ('0' === $netmask) {
+                return (bool) unpack('n*', @inet_pton($address));
+            }
+
             if ($netmask < 1 || $netmask > 128) {
                 return self::$checkedIps[$cacheKey] = false;
             }

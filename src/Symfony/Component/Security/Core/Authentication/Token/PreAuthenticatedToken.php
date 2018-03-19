@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Token;
 
+use Symfony\Component\Security\Core\Role\Role;
+
 /**
  * PreAuthenticatedToken implements a pre-authenticated token.
  *

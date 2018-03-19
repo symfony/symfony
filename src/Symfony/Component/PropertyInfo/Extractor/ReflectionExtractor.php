@@ -22,7 +22,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since version 3.3
+ * @final
  */
 class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
@@ -34,7 +34,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * @internal
      */
-    public static $defaultAccessorPrefixes = array('is', 'can', 'get');
+    public static $defaultAccessorPrefixes = array('is', 'can', 'get', 'has');
 
     /**
      * @internal
@@ -44,17 +44,19 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private $mutatorPrefixes;
     private $accessorPrefixes;
     private $arrayMutatorPrefixes;
+    private $enableConstructorExtraction;
 
     /**
      * @param string[]|null $mutatorPrefixes
      * @param string[]|null $accessorPrefixes
      * @param string[]|null $arrayMutatorPrefixes
      */
-    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null)
+    public function __construct(array $mutatorPrefixes = null, array $accessorPrefixes = null, array $arrayMutatorPrefixes = null, bool $enableConstructorExtraction = true)
     {
         $this->mutatorPrefixes = null !== $mutatorPrefixes ? $mutatorPrefixes : self::$defaultMutatorPrefixes;
         $this->accessorPrefixes = null !== $accessorPrefixes ? $accessorPrefixes : self::$defaultAccessorPrefixes;
         $this->arrayMutatorPrefixes = null !== $arrayMutatorPrefixes ? $arrayMutatorPrefixes : self::$defaultArrayMutatorPrefixes;
+        $this->enableConstructorExtraction = $enableConstructorExtraction;
     }
 
     /**
@@ -92,7 +94,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $properties[$propertyName] = $propertyName;
         }
 
-        return array_values($properties);
+        return $properties ? array_values($properties) : null;
     }
 
     /**
@@ -106,6 +108,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         if ($fromAccessor = $this->extractFromAccessor($class, $property)) {
             return $fromAccessor;
+        }
+
+        if (
+            $context['enable_constructor_extraction'] ?? $this->enableConstructorExtraction &&
+            $fromConstructor = $this->extractFromConstructor($class, $property)
+        ) {
+            return $fromConstructor;
         }
     }
 
@@ -178,8 +187,42 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return array($this->extractFromReflectionType($reflectionType));
         }
 
-        if (in_array($prefix, array('is', 'can'))) {
+        if (in_array($prefix, array('is', 'can', 'has'))) {
             return array(new Type(Type::BUILTIN_TYPE_BOOL));
+        }
+
+        return null;
+    }
+
+    /**
+     * Tries to extract type information from constructor.
+     *
+     * @return Type[]|null
+     */
+    private function extractFromConstructor(string $class, string $property): ?array
+    {
+        try {
+            $reflectionClass = new \ReflectionClass($class);
+        } catch (\ReflectionException $e) {
+            return null;
+        }
+
+        $constructor = $reflectionClass->getConstructor();
+
+        if (!$constructor) {
+            return null;
+        }
+
+        foreach ($constructor->getParameters() as $parameter) {
+            if ($property !== $parameter->name) {
+                continue;
+            }
+
+            return array($this->extractFromReflectionType($parameter->getType()));
+        }
+
+        if ($parentClass = $reflectionClass->getParentClass()) {
+            return $this->extractFromConstructor($parentClass->getName(), $property);
         }
 
         return null;

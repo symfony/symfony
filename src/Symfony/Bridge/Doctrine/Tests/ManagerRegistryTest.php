@@ -40,7 +40,7 @@ class ManagerRegistryTest extends TestCase
         $registry->resetManager();
 
         $this->assertSame($foo, $container->get('foo'));
-        $this->assertFalse(isset($foo->bar));
+        $this->assertObjectNotHasAttribute('bar', $foo);
     }
 }
 

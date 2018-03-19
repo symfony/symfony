@@ -95,9 +95,6 @@ class TextDescriptor extends Descriptor
             array('Defaults', $this->formatRouterConfig($route->getDefaults())),
             array('Options', $this->formatRouterConfig($route->getOptions())),
         );
-        if (isset($options['callable'])) {
-            $tableRows[] = array('Callable', $options['callable']);
-        }
 
         $table = new Table($this->getOutput());
         $table->setHeaders($tableHeaders)->setRows($tableRows);
@@ -194,7 +191,7 @@ class TextDescriptor extends Descriptor
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
             if ($definition instanceof Definition) {
                 // filter out private services unless shown explicitly
-                if (!$showPrivate && !$definition->isPublic()) {
+                if (!$showPrivate && (!$definition->isPublic() || $definition->isPrivate())) {
                     unset($serviceIds[$key]);
                     continue;
                 }
@@ -212,7 +209,7 @@ class TextDescriptor extends Descriptor
                     }
                 }
             } elseif ($definition instanceof Alias) {
-                if (!$showPrivate && !$definition->isPublic()) {
+                if (!$showPrivate && (!$definition->isPublic() || $definition->isPrivate())) {
                     unset($serviceIds[$key]);
                     continue;
                 }
@@ -302,7 +299,7 @@ class TextDescriptor extends Descriptor
             $tableRows[] = array('Calls', implode(', ', $callInformation));
         }
 
-        $tableRows[] = array('Public', $definition->isPublic() ? 'yes' : 'no');
+        $tableRows[] = array('Public', $definition->isPublic() && !$definition->isPrivate() ? 'yes' : 'no');
         $tableRows[] = array('Synthetic', $definition->isSynthetic() ? 'yes' : 'no');
         $tableRows[] = array('Lazy', $definition->isLazy() ? 'yes' : 'no');
         $tableRows[] = array('Shared', $definition->isShared() ? 'yes' : 'no');

@@ -16,6 +16,22 @@ namespace Symfony\Component\PropertyInfo\Tests\Fixtures;
  */
 class Php71Dummy
 {
+    public $string;
+
+    public $stringOrNull;
+
+    private $intPrivate;
+
+    private $intWithAccessor;
+
+    public function __construct(string $string, ?string $stringOrNull, int $intPrivate, int $intWithAccessor)
+    {
+        $this->string = $string;
+        $this->stringOrNull = $stringOrNull;
+        $this->intPrivate = $intPrivate;
+        $this->intWithAccessor = $intWithAccessor;
+    }
+
     public function getFoo(): ?array
     {
     }
@@ -30,5 +46,10 @@ class Php71Dummy
 
     public function addBaz(string $baz)
     {
+    }
+
+    public function getIntWithAccessor()
+    {
+        return $this->intWithAccessor;
     }
 }

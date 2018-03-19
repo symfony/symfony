@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Matthieu Auger <mail@matthieuauger.com>
  *
- * @final since version 3.4
+ * @final
  */
 class EventDispatcherDebugCommand extends Command
 {

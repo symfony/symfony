@@ -19,7 +19,7 @@ namespace Symfony\Bridge\PhpUnit\Legacy;
  *
  * @internal
  */
-class CoverageListener extends \PHPUnit_Framework_BaseTestListener
+class CoverageListenerForV5 extends \PHPUnit_Framework_BaseTestListener
 {
     private $trait;
 

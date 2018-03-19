@@ -1,5 +1,5 @@
 
-In ApplicationTest.php line 729:
+In ApplicationTest.php line %d:
                               
   コマンドの実行中にエラーが  
   発生しました。              

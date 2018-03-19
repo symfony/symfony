@@ -173,6 +173,109 @@ CSV;
         $this->assertEquals($csv, $this->encoder->encode($value, 'csv', $context));
     }
 
+    public function testEncodeFormulas()
+    {
+        $this->encoder = new CsvEncoder(',', '"', '\\', '.', true);
+
+        $this->assertSame(<<<'CSV'
+0
+"	=2+3"
+
+CSV
+            , $this->encoder->encode(array('=2+3'), 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+"	-2+3"
+
+CSV
+            , $this->encoder->encode(array('-2+3'), 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+"	+2+3"
+
+CSV
+            , $this->encoder->encode(array('+2+3'), 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+"	@MyDataColumn"
+
+CSV
+            , $this->encoder->encode(array('@MyDataColumn'), 'csv'));
+    }
+
+    public function testDoNotEncodeFormulas()
+    {
+        $this->assertSame(<<<'CSV'
+0
+=2+3
+
+CSV
+            , $this->encoder->encode(array('=2+3'), 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+-2+3
+
+CSV
+            , $this->encoder->encode(array('-2+3'), 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
++2+3
+
+CSV
+            , $this->encoder->encode(array('+2+3'), 'csv'));
+
+        $this->assertSame(<<<'CSV'
+0
+@MyDataColumn
+
+CSV
+            , $this->encoder->encode(array('@MyDataColumn'), 'csv'));
+    }
+
+    public function testEncodeFormulasWithSettingsPassedInContext()
+    {
+        $this->assertSame(<<<'CSV'
+0
+"	=2+3"
+
+CSV
+            , $this->encoder->encode(array('=2+3'), 'csv', array(
+                CsvEncoder::ESCAPE_FORMULAS_KEY => true,
+            )));
+
+        $this->assertSame(<<<'CSV'
+0
+"	-2+3"
+
+CSV
+            , $this->encoder->encode(array('-2+3'), 'csv', array(
+                CsvEncoder::ESCAPE_FORMULAS_KEY => true,
+            )));
+
+        $this->assertSame(<<<'CSV'
+0
+"	+2+3"
+
+CSV
+            , $this->encoder->encode(array('+2+3'), 'csv', array(
+                CsvEncoder::ESCAPE_FORMULAS_KEY => true,
+            )));
+
+        $this->assertSame(<<<'CSV'
+0
+"	@MyDataColumn"
+
+CSV
+            , $this->encoder->encode(array('@MyDataColumn'), 'csv', array(
+                CsvEncoder::ESCAPE_FORMULAS_KEY => true,
+            )));
+    }
+
     public function testSupportsDecoding()
     {
         $this->assertTrue($this->encoder->supportsDecoding('csv'));
@@ -206,6 +309,22 @@ f
 
 CSV
         , 'csv'));
+    }
+
+    public function testDecodeOnlyOneAsCollection()
+    {
+        $this->encoder = new CsvEncoder(',', '"', '\\', '.');
+
+        $expected = array(
+            array('foo' => 'a'),
+        );
+
+        $this->assertEquals($expected, $this->encoder->decode(<<<'CSV'
+foo
+a
+
+CSV
+            , 'csv', array('as_collection' => true)));
     }
 
     public function testDecodeToManyRelation()

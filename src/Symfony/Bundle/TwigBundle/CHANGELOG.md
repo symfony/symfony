@@ -1,7 +1,13 @@
 CHANGELOG
 =========
 
-4.4.0
+4.1.0
+-----
+
+ * added priority to Twig extensions 
+ * deprecated relying on the default value (`false`) of the `twig.strict_variables` configuration option. The `%kernel.debug%` parameter will be the new default in 5.0
+
+4.0.0
 -----
 
  * removed `ContainerAwareRuntimeLoader`

@@ -98,11 +98,11 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     final public function serialize($data, $format, array $context = array())
     {
-        if (!$this->supportsEncoding($format)) {
+        if (!$this->supportsEncoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Serialization for the format %s is not supported', $format));
         }
 
-        if ($this->encoder->needsNormalization($format)) {
+        if ($this->encoder->needsNormalization($format, $context)) {
             $data = $this->normalize($data, $format, $context);
         }
 
@@ -114,7 +114,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
      */
     final public function deserialize($data, $type, $format, array $context = array())
     {
-        if (!$this->supportsDecoding($format)) {
+        if (!$this->supportsDecoding($format, $context)) {
             throw new NotEncodableValueException(sprintf('Deserialization for the format %s is not supported', $format));
         }
 
@@ -137,7 +137,7 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $data;
         }
 
-        if (is_array($data) || $data instanceof \Traversable) {
+        if (\is_array($data) || $data instanceof \Traversable) {
             $normalized = array();
             foreach ($data as $key => $val) {
                 $normalized[$key] = $this->normalize($val, $format, $context);
@@ -146,12 +146,12 @@ class Serializer implements SerializerInterface, ContextAwareNormalizerInterface
             return $normalized;
         }
 
-        if (is_object($data)) {
+        if (\is_object($data)) {
             if (!$this->normalizers) {
                 throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
             }
 
-            throw new NotNormalizableValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', get_class($data)));
+            throw new NotNormalizableValueException(sprintf('Could not normalize object of type %s, no supporting normalizer found.', \get_class($data)));
         }
 
         throw new NotNormalizableValueException(sprintf('An unexpected value could not be normalized: %s', var_export($data, true)));

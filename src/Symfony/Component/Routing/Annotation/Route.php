@@ -22,6 +22,7 @@ namespace Symfony\Component\Routing\Annotation;
 class Route
 {
     private $path;
+    private $locales = array();
     private $name;
     private $requirements = array();
     private $options = array();
@@ -38,9 +39,18 @@ class Route
      */
     public function __construct(array $data)
     {
+        if (isset($data['locales'])) {
+            throw new \BadMethodCallException(sprintf('Unknown property "locales" on annotation "%s".', get_class($this)));
+        }
+
         if (isset($data['value'])) {
-            $data['path'] = $data['value'];
+            $data[is_array($data['value']) ? 'locales' : 'path'] = $data['value'];
             unset($data['value']);
+        }
+
+        if (isset($data['path']) && is_array($data['path'])) {
+            $data['locales'] = $data['path'];
+            unset($data['path']);
         }
 
         foreach ($data as $key => $value) {
@@ -60,6 +70,16 @@ class Route
     public function getPath()
     {
         return $this->path;
+    }
+
+    public function setLocales(array $locales)
+    {
+        $this->locales = $locales;
+    }
+
+    public function getLocales(): array
+    {
+        return $this->locales;
     }
 
     public function setHost($pattern)

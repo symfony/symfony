@@ -12,11 +12,9 @@ class CoverageListenerTest extends TestCase
             $this->markTestSkipped('This test cannot be run on Windows.');
         }
 
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('This test cannot be run on HHVM.');
-        }
+        exec('type phpdbg', $output, $returnCode);
 
-        if (\PHP_VERSION_ID >= 70000) {
+        if (\PHP_VERSION_ID >= 70000 && 0 === $returnCode) {
             $php = 'phpdbg -qrr';
         } else {
             exec('php --ri xdebug -d zend_extension=xdebug.so 2> /dev/null', $output, $returnCode);

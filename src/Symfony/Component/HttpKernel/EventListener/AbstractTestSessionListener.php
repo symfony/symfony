@@ -29,6 +29,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 abstract class AbstractTestSessionListener implements EventSubscriberInterface
 {
+    private $sessionId;
+
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {
@@ -44,7 +46,8 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
         $cookies = $event->getRequest()->cookies;
 
         if ($cookies->has($session->getName())) {
-            $session->setId($cookies->get($session->getName()));
+            $this->sessionId = $cookies->get($session->getName());
+            $session->setId($this->sessionId);
         }
     }
 
@@ -58,13 +61,18 @@ abstract class AbstractTestSessionListener implements EventSubscriberInterface
             return;
         }
 
-        $session = $event->getRequest()->getSession();
-        if ($session && $session->isStarted()) {
+        if (!$session = $event->getRequest()->getSession()) {
+            return;
+        }
+
+        if ($wasStarted = $session->isStarted()) {
             $session->save();
-            if (!$session instanceof Session || !\method_exists($session, 'isEmpty') || !$session->isEmpty()) {
-                $params = session_get_cookie_params();
-                $event->getResponse()->headers->setCookie(new Cookie($session->getName(), $session->getId(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
-            }
+        }
+
+        if ($session instanceof Session ? !$session->isEmpty() || $session->getId() !== $this->sessionId : $wasStarted) {
+            $params = session_get_cookie_params();
+            $event->getResponse()->headers->setCookie(new Cookie($session->getName(), $session->getId(), 0 === $params['lifetime'] ? 0 : time() + $params['lifetime'], $params['path'], $params['domain'], $params['secure'], $params['httponly']));
+            $this->sessionId = $session->getId();
         }
     }
 

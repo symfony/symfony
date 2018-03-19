@@ -10,14 +10,14 @@
         <service id="annotations.reader" class="Doctrine\Common\Annotations\AnnotationReader">
             <call method="addGlobalIgnoredName">
                 <argument>required</argument>
-                <argument type="service">
-                    <!-- dummy arg to register class_exists as annotation loader only when required -->
-                    <service class="Doctrine\Common\Annotations\AnnotationRegistry">
-                        <call method="registerLoader">
-                            <argument>class_exists</argument>
-                        </call>
-                    </service>
-                </argument>
+                <!-- dummy arg to register class_exists as annotation loader only when required -->
+                <argument type="service" id="annotations.dummy_registry" />
+            </call>
+        </service>
+
+        <service id="annotations.dummy_registry" class="Doctrine\Common\Annotations\AnnotationRegistry">
+            <call method="registerUniqueLoader">
+                <argument>class_exists</argument>
             </call>
         </service>
 

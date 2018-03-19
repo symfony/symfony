@@ -42,6 +42,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private $cache = array();
 
     /**
+     * @var callable|null
+     */
+    private $maxDepthHandler;
+
+    /**
      * @var ClassDiscriminatorResolverInterface|null
      */
     protected $classDiscriminatorResolver;
@@ -86,11 +91,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
 
         foreach ($attributes as $attribute) {
-            if (null !== $attributesMetadata && $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) {
+            $maxDepthReached = false;
+            if (null !== $attributesMetadata && ($maxDepthReached = $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) && !$this->maxDepthHandler) {
                 continue;
             }
 
             $attributeValue = $this->getAttributeValue($object, $attribute, $format, $context);
+            if ($maxDepthReached) {
+                $attributeValue = \call_user_func($this->maxDepthHandler, $attributeValue);
+            }
 
             if (isset($this->callbacks[$attribute])) {
                 $attributeValue = call_user_func($this->callbacks[$attribute], $attributeValue);
@@ -203,6 +212,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * @return mixed
      */
     abstract protected function getAttributeValue($object, $attribute, $format = null, array $context = array());
+
+    /**
+     * Sets a handler function that will be called when the max depth is reached.
+     */
+    public function setMaxDepthHandler(?callable $handler): void
+    {
+        $this->maxDepthHandler = $handler;
+    }
 
     /**
      * {@inheritdoc}

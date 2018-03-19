@@ -57,8 +57,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     {
         $this->data = array();
         foreach ($this->instances as $instance) {
-            // Calling getCalls() will clear the calls.
-            $instance->getCalls();
+            $instance->clearCalls();
         }
     }
 

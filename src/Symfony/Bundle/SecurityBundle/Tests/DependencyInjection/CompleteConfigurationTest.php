@@ -44,12 +44,8 @@ abstract class CompleteConfigurationTest extends TestCase
 
         $expectedProviders = array(
             'security.user.provider.concrete.default',
-            'security.user.provider.concrete.default_foo',
             'security.user.provider.concrete.digest',
-            'security.user.provider.concrete.digest_foo',
             'security.user.provider.concrete.basic',
-            'security.user.provider.concrete.basic_foo',
-            'security.user.provider.concrete.basic_bar',
             'security.user.provider.concrete.service',
             'security.user.provider.concrete.chain',
         );
@@ -115,7 +111,7 @@ abstract class CompleteConfigurationTest extends TestCase
                 array(
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
-                    'stateless' => true,
+                    'stateless' => false,
                 ),
             ),
             array(
@@ -236,7 +232,7 @@ abstract class CompleteConfigurationTest extends TestCase
         foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
-            $this->assertFalse(isset($matcherIds[$matcherId]));
+            $this->assertArrayNotHasKey($matcherId, $matcherIds);
             $matcherIds[$matcherId] = true;
 
             $i = count($matcherIds);
@@ -289,6 +285,9 @@ abstract class CompleteConfigurationTest extends TestCase
                 'key_length' => 40,
                 'ignore_case' => false,
                 'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
             ),
             'JMS\FooBundle\Entity\User3' => array(
                 'algorithm' => 'md5',
@@ -298,6 +297,9 @@ abstract class CompleteConfigurationTest extends TestCase
                 'encode_as_base64' => true,
                 'iterations' => 5000,
                 'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
             ),
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => array(
@@ -311,16 +313,57 @@ abstract class CompleteConfigurationTest extends TestCase
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
-    public function testArgon2iEncoder()
+    public function testEncodersWithLibsodium()
     {
         if (!Argon2iPasswordEncoder::isSupported()) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
         }
 
-        $this->assertSame(array(array('JMS\FooBundle\Entity\User7' => array(
-            'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
-            'arguments' => array(),
-        ))), $this->getContainer('argon2i_encoder')->getDefinition('security.encoder_factory.generic')->getArguments());
+        $container = $this->getContainer('argon2i_encoder');
+
+        $this->assertEquals(array(array(
+            'JMS\FooBundle\Entity\User1' => array(
+                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
+                'arguments' => array(false),
+            ),
+            'JMS\FooBundle\Entity\User2' => array(
+                'algorithm' => 'sha1',
+                'encode_as_base64' => false,
+                'iterations' => 5,
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+            ),
+            'JMS\FooBundle\Entity\User3' => array(
+                'algorithm' => 'md5',
+                'hash_algorithm' => 'sha512',
+                'key_length' => 40,
+                'ignore_case' => false,
+                'encode_as_base64' => true,
+                'iterations' => 5000,
+                'cost' => 13,
+                'memory_cost' => null,
+                'time_cost' => null,
+                'threads' => null,
+            ),
+            'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
+            'JMS\FooBundle\Entity\User5' => array(
+                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
+                'arguments' => array('sha1', false, 5, 30),
+            ),
+            'JMS\FooBundle\Entity\User6' => array(
+                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
+                'arguments' => array(15),
+            ),
+            'JMS\FooBundle\Entity\User7' => array(
+                'class' => 'Symfony\Component\Security\Core\Encoder\Argon2iPasswordEncoder',
+                'arguments' => array(256, 1, 2),
+            ),
+        )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
     }
 
     public function testRememberMeThrowExceptionsDefault()

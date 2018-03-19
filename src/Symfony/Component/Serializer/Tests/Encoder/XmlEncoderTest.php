@@ -515,6 +515,33 @@ XML;
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeAlwaysAsCollection()
+    {
+        $this->encoder = new XmlEncoder('response', null);
+        $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
+        $this->encoder->setSerializer($serializer);
+
+        $source = <<<'XML'
+<?xml version="1.0"?>
+<order_rows nodeType="order_row" virtualEntity="true">
+    <order_row>
+        <id><![CDATA[16]]></id>
+        <test><![CDATA[16]]></test>
+    </order_row>
+</order_rows>
+XML;
+        $expected = array(
+            '@nodeType' => 'order_row',
+            '@virtualEntity' => 'true',
+            'order_row' => array(array(
+                'id' => array(16),
+                'test' => array(16),
+            )),
+        );
+
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml', array('as_collection' => true)));
+    }
+
     public function testDecodeWithoutItemHash()
     {
         $obj = new ScalarDummy();

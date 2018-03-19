@@ -193,4 +193,86 @@ class YamlFileLoaderTest extends TestCase
         $this->assertNotNull($routeCollection->get('api_app_blog'));
         $this->assertEquals('/api/blog', $routeCollection->get('api_app_blog')->getPath());
     }
+
+    public function testRemoteSourcesAreNotAccepted()
+    {
+        $loader = new YamlFileLoader(new FileLocatorStub());
+        $this->expectException(\InvalidArgumentException::class);
+        $loader->load('http://remote.com/here.yml');
+    }
+
+    public function testLoadingLocalizedRoute()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routes = $loader->load('localized-route.yml');
+
+        $this->assertCount(3, $routes);
+    }
+
+
+    public function testImportingRoutesFromDefinition()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routes = $loader->load('importing-localized-route.yml');
+
+        $this->assertCount(3, $routes);
+        $this->assertEquals('/nl', $routes->get('home.nl')->getPath());
+        $this->assertEquals('/en', $routes->get('home.en')->getPath());
+        $this->assertEquals('/here', $routes->get('not_localized')->getPath());
+    }
+
+    public function testImportingRoutesWithLocales()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routes = $loader->load('importer-with-locale.yml');
+
+        $this->assertCount(2, $routes);
+        $this->assertEquals('/nl/voorbeeld', $routes->get('imported.nl')->getPath());
+        $this->assertEquals('/en/example', $routes->get('imported.en')->getPath());
+    }
+
+    public function testImportingNonLocalizedRoutesWithLocales()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routes = $loader->load('importer-with-locale-imports-non-localized-route.yml');
+
+        $this->assertCount(2, $routes);
+        $this->assertEquals('/nl/imported', $routes->get('imported.nl')->getPath());
+        $this->assertEquals('/en/imported', $routes->get('imported.en')->getPath());
+    }
+
+    public function testImportingRoutesWithOfficialLocales()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routes = $loader->load('officially_formatted_locales.yml');
+
+        $this->assertCount(3, $routes);
+        $this->assertEquals('/omelette-au-fromage', $routes->get('official.fr.UTF-8')->getPath());
+        $this->assertEquals('/eu-não-sou-espanhol', $routes->get('official.pt-PT')->getPath());
+        $this->assertEquals('/churrasco', $routes->get('official.pt_BR')->getPath());
+    }
+
+    public function testImportingRoutesFromDefinitionMissingLocalePrefix()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $this->expectException(\InvalidArgumentException::class);
+        $loader->load('missing-locale-in-importer.yml');
+    }
+
+    public function testImportingRouteWithoutPathOrLocales()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $this->expectException(\InvalidArgumentException::class);
+        $loader->load('route-without-path-or-locales.yml');
+    }
+
+    public function testImportingWithControllerDefault()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
+        $routes = $loader->load('importer-with-controller-default.yml');
+        $this->assertCount(3, $routes);
+        $this->assertEquals('DefaultController::defaultAction', $routes->get('home.en')->getDefault('_controller'));
+        $this->assertEquals('DefaultController::defaultAction', $routes->get('home.nl')->getDefault('_controller'));
+        $this->assertEquals('DefaultController::defaultAction', $routes->get('not_localized')->getDefault('_controller'));
+    }
 }

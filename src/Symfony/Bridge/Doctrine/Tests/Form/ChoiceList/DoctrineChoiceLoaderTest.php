@@ -19,12 +19,18 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class DoctrineChoiceLoaderTest extends TestCase
 {
+    /**
+     * @var ChoiceListFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $factory;
+
     /**
      * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
      */

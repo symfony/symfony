@@ -45,6 +45,26 @@
                     {% endif %}
                 </div>
             </div>
+
+            <div class="tab">
+                <h3 class="tab-title">Orphaned events <span class="badge">{{ collector.orphanedEvents|length }}</span></h3>
+                <div class="tab-content">
+                    {% if collector.orphanedEvents is empty %}
+                        <div class="empty">
+                            <p>
+                                <strong>There are no orphaned events</strong>.
+                            </p>
+                            <p>
+                                All dispatched events were handled or an error occurred
+                                when trying to collect orphaned events (in which case check the
+                                logs to get more information).
+                            </p>
+                        </div>
+                    {% else %}
+                        {{ helper.render_table(collector.orphanedEvents) }}
+                    {% endif %}
+                </div>
+            </div>
         </div>
     {% endif %}
 {% endblock %}
@@ -74,7 +94,7 @@
             {% endif %}
 
             <tr>
-                <td class="text-right">{{ listener.priority|default('-') }}</td>
+                <td class="text-right nowrap">{{ listener.priority|default('-') }}</td>
                 <td class="font-normal">{{ profiler_dump(listener.stub) }}</td>
             </tr>
 

@@ -23,7 +23,7 @@ class CacheLoaderTest extends TestCase
     public function testConstructor()
     {
         $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), sys_get_temp_dir());
-        $this->assertTrue($loader->getLoader() === $varLoader, '__construct() takes a template loader as its first argument');
+        $this->assertSame($loader->getLoader(), $varLoader, '__construct() takes a template loader as its first argument');
         $this->assertEquals(sys_get_temp_dir(), $loader->getDir(), '__construct() takes a directory where to store the cache as its second argument');
     }
 

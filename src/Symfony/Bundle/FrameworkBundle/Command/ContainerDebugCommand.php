@@ -29,7 +29,7 @@ use Symfony\Component\Config\FileLocator;
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  *
- * @internal since version 3.4
+ * @internal
  */
 class ContainerDebugCommand extends Command
 {

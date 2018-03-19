@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+4.1.0
+-----
+
+ * added support for invokable event listeners tagged with `kernel.event_listener` by default 
+ * The `TraceableEventDispatcher::getOrphanedEvents()` method has been added.
+ * The `TraceableEventDispatcherInterface` has been deprecated.
+
 4.0.0
 -----
 

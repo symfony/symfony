@@ -90,6 +90,13 @@ class J
     }
 }
 
+class K
+{
+    public function __construct(IInterface $i)
+    {
+    }
+}
+
 interface CollisionInterface
 {
 }

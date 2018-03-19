@@ -29,7 +29,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTest
 {
     use RuntimeLoaderProvider;
     /**
-     * @var FormRenderer;
+     * @var FormRenderer
      */
     private $renderer;
 

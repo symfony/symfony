@@ -106,6 +106,8 @@ class PhpFileLoaderTest extends TestCase
             ->setHost('host')
             ->setRequirements(array('id' => '\d+'))
         );
+        $expectedCollection->add('z_c_bar', new Route('/zub/pub/bar'));
+        $expectedCollection->add('z_c_pub_buz', (new Route('/zub/pub/buz'))->setHost('host'));
         $expectedCollection->add('ouf', (new Route('/ouf'))
             ->setSchemes(array('https'))
             ->setMethods(array('GET'))
@@ -114,6 +116,26 @@ class PhpFileLoaderTest extends TestCase
 
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub.php')));
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl.php')));
+
+        $this->assertEquals($expectedCollection, $routeCollection);
+    }
+
+    public function testRoutingI18nConfigurator()
+    {
+        $locator = new FileLocator(array(__DIR__.'/../Fixtures'));
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl_i18n.php');
+
+        $expectedCollection = new RouteCollection();
+
+        $expectedCollection->add('foo.en', (new Route('/glish/foo'))->setDefaults(array('_locale' => 'en', '_canonical_route' => 'foo')));
+        $expectedCollection->add('bar.en', (new Route('/glish/bar'))->setDefaults(array('_locale' => 'en', '_canonical_route' => 'bar')));
+        $expectedCollection->add('baz.en', (new Route('/baz'))->setDefaults(array('_locale' => 'en', '_canonical_route' => 'baz')));
+        $expectedCollection->add('c_foo.fr', (new Route('/ench/pub/foo'))->setDefaults(array('_locale' => 'fr', '_canonical_route' => 'c_foo')));
+        $expectedCollection->add('c_bar.fr', (new Route('/ench/pub/bar'))->setDefaults(array('_locale' => 'fr', '_canonical_route' => 'c_bar')));
+
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub_i18n.php')));
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_i18n.php')));
 
         $this->assertEquals($expectedCollection, $routeCollection);
     }

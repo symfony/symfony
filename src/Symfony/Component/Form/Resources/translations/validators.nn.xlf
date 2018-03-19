@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="28">
+                <source>This form should not contain extra fields.</source>
+                <target>Feltgruppa må ikkje innehalde ekstra felt.</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file.</source>
+                <target>Fila du lasta opp var for stor. Last opp ei mindre fil.</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>The CSRF token is invalid.</source>
+                <target>CSRF-nøkkelen er ikkje gyldig.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

@@ -122,6 +122,9 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
 
         if (0 != intl_get_error_code()) {
             throw new TransformationFailedException(intl_get_error_message());
+        } elseif ($timestamp > 253402214400) {
+            // This timestamp represents UTC midnight of 9999-12-31 to prevent 5+ digit years
+            throw new TransformationFailedException('Years beyond 9999 are not supported.');
         }
 
         try {

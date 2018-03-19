@@ -47,8 +47,7 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
             } else {
                 // any methods listed for call-at-instantiation cannot be actions
                 $reason = false;
-                $action = substr(strrchr($controller, ':'), 1);
-                $id = substr($controller, 0, -1 - strlen($action));
+                list($id, $action) = explode('::', $controller);
                 $controllerDef = $container->getDefinition($id);
                 foreach ($controllerDef->getMethodCalls() as list($method)) {
                     if (0 === strcasecmp($action, $method)) {
@@ -57,9 +56,9 @@ class RemoveEmptyControllerArgumentLocatorsPass implements CompilerPassInterface
                     }
                 }
                 if (!$reason) {
-                    if ($controllerDef->getClass() === $id) {
-                        $controllers[$id.'::'.$action] = $argumentRef;
-                    }
+                    // Deprecated since Symfony 4.1. See Symfony\Component\HttpKernel\Controller\ContainerControllerResolver
+                    $controllers[$id.':'.$action] = $argumentRef;
+
                     if ('__invoke' === $action) {
                         $controllers[$id] = $argumentRef;
                     }

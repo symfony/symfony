@@ -15,39 +15,95 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         $this->context = $context;
     }
 
-    public function match($pathinfo)
+    public function match($rawPathinfo)
     {
-        $allow = array();
-        $pathinfo = rawurldecode($pathinfo);
-        $trimmedPathinfo = rtrim($pathinfo, '/');
+        $allow = $allowSchemes = array();
+        $pathinfo = rawurldecode($rawPathinfo);
         $context = $this->context;
-        $request = $this->request;
         $requestMethod = $canonicalMethod = $context->getMethod();
-        $scheme = $context->getScheme();
 
         if ('HEAD' === $requestMethod) {
             $canonicalMethod = 'GET';
         }
 
+        switch ($pathinfo) {
+            case '/with-condition':
+                // with-condition
+                if (($context->getMethod() == "GET")) {
+                    return array('_route' => 'with-condition');
+                }
+                break;
+            default:
+                $routes = array(
+                    '/rootprefix/test' => array(array('_route' => 'static'), null, null, null),
+                );
 
-        if (0 === strpos($pathinfo, '/rootprefix')) {
-            // static
-            if ('/rootprefix/test' === $pathinfo) {
-                return array('_route' => 'static');
-            }
+                if (!isset($routes[$pathinfo])) {
+                    break;
+                }
+                list($ret, $requiredHost, $requiredMethods, $requiredSchemes) = $routes[$pathinfo];
 
-            // dynamic
-            if (preg_match('#^/rootprefix/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
-                return $this->mergeDefaults(array_replace($matches, array('_route' => 'dynamic')), array ());
-            }
+                $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
+                if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
+                    if ($hasRequiredScheme) {
+                        $allow += $requiredMethods;
+                    }
+                    break;
+                }
+                if (!$hasRequiredScheme) {
+                    $allowSchemes += $requiredSchemes;
+                    break;
+                }
 
+                return $ret;
         }
 
-        // with-condition
-        if ('/with-condition' === $pathinfo && ($context->getMethod() == "GET")) {
-            return array('_route' => 'with-condition');
+        $matchedPathinfo = $pathinfo;
+        $regexList = array(
+            0 => '{^(?'
+                    .'|/rootprefix/([^/]++)(*:27)'
+                .')$}sD',
+        );
+
+        foreach ($regexList as $offset => $regex) {
+            while (preg_match($regex, $matchedPathinfo, $matches)) {
+                switch ($m = (int) $matches['MARK']) {
+                    default:
+                        $routes = array(
+                            27 => array(array('_route' => 'dynamic'), array('var'), null, null),
+                        );
+
+                        list($ret, $vars, $requiredMethods, $requiredSchemes) = $routes[$m];
+
+                        foreach ($vars as $i => $v) {
+                            if (isset($matches[1 + $i])) {
+                                $ret[$v] = $matches[1 + $i];
+                            }
+                        }
+
+                        $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
+                        if ($requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
+                            if ($hasRequiredScheme) {
+                                $allow += $requiredMethods;
+                            }
+                            break;
+                        }
+                        if (!$hasRequiredScheme) {
+                            $allowSchemes += $requiredSchemes;
+                            break;
+                        }
+
+                        return $ret;
+                }
+
+                if (27 === $m) {
+                    break;
+                }
+                $regex = substr_replace($regex, 'F', $m - $offset, 1 + strlen($m));
+                $offset += strlen($m);
+            }
         }
 
-        throw 0 < count($allow) ? new MethodNotAllowedException(array_unique($allow)) : new ResourceNotFoundException();
+        throw $allow ? new MethodNotAllowedException(array_keys($allow)) : new ResourceNotFoundException();
     }
 }

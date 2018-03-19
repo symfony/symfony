@@ -1,26 +1,26 @@
 form_login:
     path:     /login
-    defaults: { _controller: FormLoginBundle:Login:login }
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::loginAction }
 
 form_login_check:
     path:     /login_check
-    defaults: { _controller: FormLoginBundle:Login:loginCheck }
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::loginCheckAction }
 
 form_login_homepage:
     path:     /
-    defaults: { _controller: FormLoginBundle:Login:afterLogin }
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::afterLoginAction }
 
 form_login_custom_target_path:
     path:     /foo
-    defaults: { _controller: FormLoginBundle:Login:afterLogin }
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::afterLoginAction }
 
 form_login_default_target_path:
     path:     /profile
-    defaults: { _controller: FormLoginBundle:Login:afterLogin }
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::afterLoginAction }
 
 form_login_redirect_to_protected_resource_after_login:
     path:     /protected_resource
-    defaults: { _controller: FormLoginBundle:Login:afterLogin }
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::afterLoginAction }
 
 highly_protected_resource:
     path:     /highly_protected_resource
@@ -36,7 +36,7 @@ form_logout:
 
 form_secure_action:
     path:     /secure-but-not-covered-by-access-control
-    defaults: { _controller: FormLoginBundle:Login:secure }
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::secureAction }
 
 protected-via-expression:
     path:     /protected-via-expression

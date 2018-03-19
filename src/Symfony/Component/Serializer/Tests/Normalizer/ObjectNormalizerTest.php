@@ -182,6 +182,23 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('rab', $obj->getInner()->bar);
     }
 
+    public function testConstructorWithUnconstructableNullableObjectTypeHintDenormalize()
+    {
+        $data = array(
+            'id' => 10,
+            'inner' => null,
+        );
+
+        $normalizer = new ObjectNormalizer();
+        $serializer = new Serializer(array($normalizer));
+        $normalizer->setSerializer($serializer);
+
+        $obj = $normalizer->denormalize($data, DummyWithNullableConstructorObject::class);
+        $this->assertInstanceOf(DummyWithNullableConstructorObject::class, $obj);
+        $this->assertEquals(10, $obj->getId());
+        $this->assertNull($obj->getInner());
+    }
+
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
      * @expectedExceptionMessage Could not determine the class of the parameter "unknown".
@@ -201,6 +218,38 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->setSerializer($serializer);
 
         $normalizer->denormalize($data, DummyWithConstructorInexistingObject::class);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException
+     * @expectedExceptionMessage Cannot create an instance of Symfony\Component\Serializer\Tests\Normalizer\DummyValueObject from serialized data because its constructor requires parameter "bar" to be present.
+     */
+    public function testConstructorWithMissingData()
+    {
+        $data = array(
+            'foo' => 10,
+        );
+
+        $normalizer = new ObjectNormalizer();
+
+        $normalizer->denormalize($data, DummyValueObject::class);
+    }
+
+    public function testFillWithEmptyDataWhenMissingData()
+    {
+        $data = array(
+            'foo' => 10,
+        );
+
+        $normalizer = new ObjectNormalizer();
+
+        $result = $normalizer->denormalize($data, DummyValueObject::class, 'json', array(
+            'default_constructor_arguments' => array(
+                DummyValueObject::class => array('foo' => '', 'bar' => ''),
+            ),
+        ));
+
+        $this->assertEquals(new DummyValueObject(10, ''), $result);
     }
 
     public function testGroupsNormalize()
@@ -563,6 +612,27 @@ class ObjectNormalizerTest extends TestCase
                 ),
         );
 
+        $this->assertEquals($expected, $result);
+
+        $expected = array(
+            'bar' => null,
+            'foo' => 'level1',
+            'child' => array(
+                'bar' => null,
+                'foo' => 'level2',
+                'child' => array(
+                    'bar' => null,
+                    'child' => null,
+                    'foo' => 'handler',
+                ),
+            ),
+        );
+
+        $this->normalizer->setMaxDepthHandler(function ($obj) {
+            return 'handler';
+        });
+
+        $result = $serializer->normalize($level1, null, array(ObjectNormalizer::ENABLE_MAX_DEPTH => true));
         $this->assertEquals($expected, $result);
     }
 
@@ -1025,6 +1095,17 @@ class DummyWithConstructorInexistingObject
     {
     }
 }
+class DummyValueObject
+{
+    private $foo;
+    private $bar;
+
+    public function __construct($foo, $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+}
 
 class JsonNumber
 {
@@ -1064,5 +1145,27 @@ class ObjectWithUpperCaseAttributeNames
     public function getFoo()
     {
         return $this->Foo;
+    }
+}
+
+class DummyWithNullableConstructorObject
+{
+    private $id;
+    private $inner;
+
+    public function __construct($id, ?ObjectConstructorDummy $inner)
+    {
+        $this->id = $id;
+        $this->inner = $inner;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getInner()
+    {
+        return $this->inner;
     }
 }

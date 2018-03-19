@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @final since version 3.4
+ * @final
  */
 class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {
@@ -45,7 +45,11 @@ class RouterCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterf
 
         if ($router instanceof WarmableInterface) {
             $router->warmUp($cacheDir);
+
+            return;
         }
+
+        @trigger_error(sprintf('Passing a %s without implementing %s is deprecated since Symfony 4.1.', RouterInterface::class, WarmableInterface::class), \E_USER_DEPRECATED);
     }
 
     /**

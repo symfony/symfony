@@ -11,6 +11,10 @@
             <tag name="cache.pool" clearer="cache.app_clearer" reset="reset" />
         </service>
 
+        <service id="cache.app.simple" class="Symfony\Component\Cache\Simple\Psr6Cache">
+            <argument type="service" id="cache.app" />
+        </service>
+
         <service id="cache.system" parent="cache.adapter.system" public="true">
             <tag name="cache.pool" />
         </service>
@@ -100,6 +104,15 @@
             </call>
         </service>
 
+        <service id="cache.adapter.array" class="Symfony\Component\Cache\Adapter\ArrayAdapter" abstract="true">
+            <tag name="cache.pool" clearer="cache.default_clearer" />
+            <tag name="monolog.logger" channel="cache" />
+            <argument>0</argument> <!-- default lifetime -->
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
+        </service>
+
         <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer">
             <argument type="collection" />
         </service>
@@ -109,6 +122,7 @@
         <service id="cache.global_clearer" parent="cache.default_clearer" public="true" />
         <service id="cache.app_clearer" alias="cache.default_clearer" public="true" />
         <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app" />
+        <service id="Psr\SimpleCache\CacheInterface" alias="cache.app.simple" />
         <service id="Symfony\Component\Cache\Adapter\AdapterInterface" alias="cache.app" />
     </services>
 </container>

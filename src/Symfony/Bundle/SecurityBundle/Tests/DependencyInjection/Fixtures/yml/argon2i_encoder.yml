@@ -1,12 +1,10 @@
+imports:
+    - { resource: container1.yml }
+
 security:
     encoders:
-        JMS\FooBundle\Entity\User6:
+        JMS\FooBundle\Entity\User7:
             algorithm: argon2i
-
-    providers:
-        default: { id: foo }
-
-    firewalls:
-        main:
-            form_login: false
-            http_basic: ~
+            memory_cost: 256
+            time_cost: 1
+            threads: 2

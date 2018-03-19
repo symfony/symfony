@@ -21,13 +21,17 @@
         "symfony/console": "~3.4|~4.0",
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/http-kernel": "~3.4|~4.0",
-        "symfony/process": "~3.4|~4.0"
+        "symfony/process": "^3.4.2|^4.0.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebServerBundle\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]
+    },
+    "suggest": {
+        "symfony/monolog-bridge": "For using the log server.",
+        "symfony/expression-language": "For using the filter option of the log server."
     },
     "minimum-stability": "dev",
     "extra": {

@@ -1,10 +1,10 @@
 - Path: /hello/{name}
-- Path Regex: #^/hello(?:/(?P<name>[a-z]+))?$#s
+- Path Regex: #PATH_REGEX#
 - Host: localhost
-- Host Regex: #^localhost$#si
+- Host Regex: #HOST_REGEX#
 - Scheme: http|https
 - Method: GET|HEAD
-- Class: Symfony\Component\Routing\Route
+- Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub
 - Defaults: 
     - `name`: Joseph
 - Requirements: 

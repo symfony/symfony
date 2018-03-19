@@ -32,7 +32,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->append($child);
 
         $this->assertCount(3, $this->getField($parent, 'children'));
-        $this->assertTrue(in_array($child, $this->getField($parent, 'children')));
+        $this->assertContains($child, $this->getField($parent, 'children'));
     }
 
     /**

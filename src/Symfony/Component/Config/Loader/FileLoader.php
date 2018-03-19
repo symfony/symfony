@@ -70,7 +70,7 @@ abstract class FileLoader extends Loader
      * @throws FileLoaderImportCircularReferenceException
      * @throws FileLocatorFileNotFoundException
      */
-    public function import($resource, $type = null, bool $ignoreErrors = false, $sourceResource = null)
+    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
     {
         if (is_string($resource) && strlen($resource) !== $i = strcspn($resource, '*?{[')) {
             $ret = array();

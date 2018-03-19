@@ -203,7 +203,7 @@
                         {% if show_level %}
                             <span class="colored text-bold">{{ log.priorityName }}</span>
                         {% endif %}
-                        <span class="text-muted newline">{{ log.timestamp|date('H:i:s') }}</span>
+                        <time class="text-muted newline" title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date('c') }}">{{ log.timestamp|date('H:i:s') }}</time>
                     </td>
 
                     {% if channel_is_defined %}

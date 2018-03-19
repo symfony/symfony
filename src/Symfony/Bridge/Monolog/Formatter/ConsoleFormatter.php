@@ -60,6 +60,7 @@ class ConsoleFormatter implements FormatterInterface
             'date_format' => self::SIMPLE_DATE,
             'colors' => true,
             'multiline' => false,
+            'level_name_format' => '%-9s',
         ), $options);
 
         if (class_exists(VarCloner::class)) {
@@ -119,7 +120,7 @@ class ConsoleFormatter implements FormatterInterface
         $formatted = strtr($this->options['format'], array(
             '%datetime%' => $record['datetime']->format($this->options['date_format']),
             '%start_tag%' => sprintf('<%s>', $levelColor),
-            '%level_name%' => sprintf('%-9s', $record['level_name']),
+            '%level_name%' => sprintf($this->options['level_name_format'], $record['level_name']),
             '%end_tag%' => '</>',
             '%channel%' => $record['channel'],
             '%message%' => $this->replacePlaceHolder($record)['message'],

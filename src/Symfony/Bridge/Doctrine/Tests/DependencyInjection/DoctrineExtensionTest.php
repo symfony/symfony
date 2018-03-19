@@ -181,7 +181,6 @@ class DoctrineExtensionTest extends TestCase
             array('doctrine.orm.cache.wincache.class',  array('type' => 'wincache')),
             array('doctrine.orm.cache.zenddata.class',  array('type' => 'zenddata')),
             array('doctrine.orm.cache.redis.class',     array('type' => 'redis'),     array('setRedis')),
-            array('doctrine.orm.cache.memcache.class',  array('type' => 'memcache'),  array('setMemcache')),
             array('doctrine.orm.cache.memcached.class', array('type' => 'memcached'), array('setMemcached')),
         );
     }

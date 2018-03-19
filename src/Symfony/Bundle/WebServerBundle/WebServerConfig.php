@@ -32,7 +32,7 @@ class WebServerConfig
             throw new \InvalidArgumentException(sprintf('Unable to find the front controller under "%s" (none of these files exist: %s).', $documentRoot, implode(', ', $this->getFrontControllerFileNames($env))));
         }
 
-        putenv('APP_FRONT_CONTROLLER='.$file);
+        $_ENV['APP_FRONT_CONTROLLER'] = $file;
 
         $this->documentRoot = $documentRoot;
         $this->env = $env;

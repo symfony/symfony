@@ -60,12 +60,19 @@ class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
             case Type::DATETIMETZ:
             case 'vardatetime':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', array(), Guess::HIGH_CONFIDENCE);
+            case 'datetime_immutable';
+            case 'datetimetz_immutable';
+                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', array('input' => 'datetime_immutable'), Guess::HIGH_CONFIDENCE);
             case 'dateinterval':
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateIntervalType', array(), Guess::HIGH_CONFIDENCE);
             case Type::DATE:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', array(), Guess::HIGH_CONFIDENCE);
+            case 'date_immutable':
+                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateType', array('input' => 'datetime_immutable'), Guess::HIGH_CONFIDENCE);
             case Type::TIME:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', array(), Guess::HIGH_CONFIDENCE);
+            case 'time_immutable':
+                return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\TimeType', array('input' => 'datetime_immutable'), Guess::HIGH_CONFIDENCE);
             case Type::DECIMAL:
             case Type::FLOAT:
                 return new TypeGuess('Symfony\Component\Form\Extension\Core\Type\NumberType', array(), Guess::MEDIUM_CONFIDENCE);

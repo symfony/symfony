@@ -405,7 +405,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected function createNode()
     {
         if (null === $this->prototype) {
-            $node = new ArrayNode($this->name, $this->parent);
+            $node = new ArrayNode($this->name, $this->parent, $this->pathSeparator);
 
             $this->validateConcreteNode($node);
 
@@ -416,7 +416,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 $node->addChild($child->getNode());
             }
         } else {
-            $node = new PrototypedArrayNode($this->name, $this->parent);
+            $node = new PrototypedArrayNode($this->name, $this->parent, $this->pathSeparator);
 
             $this->validatePrototypeNode($node);
 
@@ -542,5 +542,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 );
             }
         }
+    }
+
+    /**
+     * @return NodeDefinition[]
+     */
+    public function getChildNodeDefinitions()
+    {
+        return $this->children;
     }
 }

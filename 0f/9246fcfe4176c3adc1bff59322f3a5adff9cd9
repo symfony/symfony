@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2018-03-14T09:34:34Z
+
+Regarding the escaping: Could my default value contain curly braces?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-14T09:35:33Z
+
+> Could my default value contain curly braces?
+
+Not a closing one that's correct.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-03-14T09:52:23Z
+
+All right. We can probably live with that limitation, but we should document it.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-03-14T10:13:58Z
+
+I would also leave escaping out. If you have such a special regex or default, you can simply use the old long route definition.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-14T10:17:25Z
+
+will !php/const work inside?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-14T10:33:12Z
+
+> will !php/const work inside?
+
+no, but you could submit a PR on top to make constants work, eg
+
+```
+{bar!SOME_CONST} -- no requirement, with default value
+{bar<.*>!SOME_CONST} -- with requirement and default value
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-14T10:33:53Z
+
+> you could submit a PR on top to make constants work, eg
+
+or just use the existing syntax btw... (explicit `defaults: ...`)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-14T10:34:35Z
+
+Is it really so important to support PHP constants here? They could make routes really difficult to understand or very easy to override some typo or wrong character.
+
+---------------------------------------------------------------------------
+
+by Destroy666x at 2018-03-14T10:44:48Z
+
+Nice feature. What about a case like `{bar<test>?>?test}`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-14T10:48:47Z
+
+@Destroy666x see tests, that's covered: the shortest regexp is used
+(use e.g. `{bar<test[>]?>?test}` if you want the other way)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-14T10:49:50Z
+
+It's not so important, was just curious. Seems this syntax can be freely combined with _defaults anyway :+1:
+
+---------------------------------------------------------------------------
+
+by Destroy666x at 2018-03-14T10:57:54Z
+
+@nicolas-grekas I see a similar test but without `?` inside `<>`, which is allowed in requirements, right? It's kind of ambigous which `?` is the separator
+
+EDIT: I see, could you please add a test for `bar<test[>]?>?test` too then? Or maybe it's good to mention that in documentation
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-14T11:00:33Z
+
+> I don't think this is gonna work. Route::__construct calls setPath first, then setDefaults which erases those defaults first
+
+please review again, addDefaults is used ;)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-14T11:03:47Z
+
+Indeed. Can you add a test case for passing defaults both via path and via defaults tho?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-14T11:28:39Z
+
+> Indeed. Can you add a test case for passing defaults both via path and via defaults tho?
+
+review again :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-16T09:57:56Z
+
+@symfony/deciders votes pending

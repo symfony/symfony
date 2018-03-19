@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-03-19T12:02:12Z
+
+I think a matcher test for this would be good as the compiler test does not test if it actually works.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T12:07:52Z
+
+@Tobion ready, test added

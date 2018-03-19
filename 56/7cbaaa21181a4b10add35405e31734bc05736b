@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by Jean85 at 2018-03-16T21:38:19Z
+
+Appveyor build has some unrelated failures, but also it's failing on my regression test: https://ci.appveyor.com/project/fabpot/symfony/build/1.0.34059#L1515
+
+It's not calling back the third party exception handler... strange!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T10:29:48Z
+
+For some reason I cannot understand, the integration test fails on Windows (but not locally).
+I replaced it by a unit test.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2018-03-19T11:04:38Z
+
+It's now failing on both CI :cry:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T12:00:25Z
+
+@Jean85 for unrelated reasons, keep cool :)

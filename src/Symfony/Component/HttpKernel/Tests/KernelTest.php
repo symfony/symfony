@@ -523,6 +523,32 @@ EOF;
         $this->assertSame('foo', $kernel->getContainer()->getParameter('kernel.project_dir'));
     }
 
+    /**
+     * @dataProvider envAndContainerClassDataProviderForCustomProjectDirKernel
+     */
+    public function testContainerClassNormalization($env, $expected)
+    {
+        $kernel = new CustomProjectDirKernel(null, null, $env);
+
+        $containerClassMethod = (new \ReflectionObject($kernel))->getMethod('getContainerClass');
+        $containerClassMethod->setAccessible(true);
+        $class = $containerClassMethod->invoke($kernel);
+
+        $this->assertSame($expected, $class);
+    }
+
+    /**
+     * @return array
+     */
+    public function envAndContainerClassDataProviderForCustomProjectDirKernel()
+    {
+        return array(
+            array('dev-server', 'FixturesDevserverDebugProjectContainer'),
+            array('local', 'FixturesLocalDebugProjectContainer'),
+            array('env_#8---*1', 'FixturesEnv_81DebugProjectContainer'),
+        );
+    }
+
     public function testKernelReset()
     {
         (new Filesystem())->remove(__DIR__.'/Fixtures/cache');

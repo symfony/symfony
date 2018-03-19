@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-16T15:39:20Z
+
+`CoverageListener` also should get the same fix
+
+---------------------------------------------------------------------------
+
+by yakobe at 2018-03-16T16:31:57Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by yakobe at 2018-03-19T10:29:26Z
+
+The build failed with `appveyor`, so i rebased with latest changes and built again. Now it fails with `travis-ci`. The fails have nothing to do with this change.
+@nicolas-grekas are they just a bit fragile? Do i need to do anything else?

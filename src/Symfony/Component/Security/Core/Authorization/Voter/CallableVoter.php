@@ -39,13 +39,13 @@ class CallableVoter implements VoterInterface
         $result = ($this->callable)($token, $subject, $attributes);
 
         if (false === $result) {
-            return Voter::ACCESS_DENIED;
+            return VoterInterface::ACCESS_DENIED;
         }
 
         if (true === $result) {
-            return Voter::ACCESS_GRANTED;
+            return VoterInterface::ACCESS_GRANTED;
         }
 
-        return Voter::ACCESS_ABSTAIN;
+        return VoterInterface::ACCESS_ABSTAIN;
     }
 }

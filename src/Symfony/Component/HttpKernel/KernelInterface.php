@@ -27,7 +27,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     /**
      * Returns an array of bundles to register.
      *
-     * @return BundleInterface[] An array of bundle instances
+     * @return iterable|BundleInterface[] An iterable of bundle instances
      */
     public function registerBundles();
 

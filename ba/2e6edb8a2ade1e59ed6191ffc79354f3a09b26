@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-03-06T11:27:34Z
+
+Can we add a test case that would fail without the fix?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2018-03-06T11:28:37Z
+
+we definitely should .. I am a bit scared to creating a test case since it seems like such an obscure case.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2018-03-06T15:29:25Z
+
+travis result are also strange:
+https://travis-ci.org/symfony/symfony/builds/349789606?utm_source=github_status&utm_medium=notification
+
+don't understand how they can be passing on 5.6 an 7.0 but fail on other versions ..
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-07T10:06:08Z
+
+@lsmith77 read the output: `Intermediate PHP version 5.6 is skipped for pull requests.`
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-08T08:41:54Z
+
+as the only thing the Container constructor is doing is initializing the ParameterBag, and this is what we absolutely don't want to be done (as it breaks the lazy-initialization in the dumped container), we could simply reset the property to `null` after calling the parent constructor. This way, it would work even when the parent constructor is a custom one (needing to be called) which itself calls the Container one.
+The current PR still breaks in this case (as it would determine that the parent constructor needs to be called).
+
+So the code should become
+
+```diff
+-    $code .= "        parent::__construct();\n\n";
++    $code .= "        parent::__construct();\n";
++    $code .= "        $this->parameterBag = null;\n\n";
+```
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2018-03-08T09:20:58Z
+
+I have included your change @stof .. I also added some adjustments to the tests.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2018-03-08T15:36:36Z
+
+note the current tests simply do a string comparison on what code we expect to have generated, rather than testing if the generated code behaves the way we expect it to. the adjustments to the tests I did haven't improved things.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2018-03-10T10:50:59Z
+
+@stof ok now?

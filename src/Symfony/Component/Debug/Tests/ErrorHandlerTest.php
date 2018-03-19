@@ -601,4 +601,18 @@ class ErrorHandlerTest extends TestCase
             throw $e;
         }
     }
+
+    /**
+     * @expectedException \Exception
+     * @group no-hhvm
+     */
+    public function testCustomExceptionHandler()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler(function ($e) use ($handler) {
+            $handler->handleException($e);
+        });
+
+        $handler->handleException(new \Exception());
+    }
 }

@@ -1,0 +1,287 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-09-28T17:50:16Z
+
+I love this proposal! Just the other day I was playing with Yeoman Generator and they use a similar technique and it amazed me. They make things appear and disappear and change the previous contents, for example when asking several consecutive questions:
+
+![yeoman-generator](https://user-images.githubusercontent.com/73419/30981932-2ddbf9e8-a486-11e7-82c1-f827d233b685.gif)
+
+![yeoman-generator-2](https://user-images.githubusercontent.com/73419/30981937-3072180e-a486-11e7-9236-6a9736feb2cd.gif)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-09-29T11:58:26Z
+
+this is clearly lacking tests.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-09-29T12:05:29Z
+
+@stof The todo at the end of the description says that tests still needs to be added
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-10-01T00:51:08Z
+
+Only first example works properly for me. It also works based on a viewport, I don't think that's by purpose
+
+//edit: it has been fixed, removed images as they took too much space
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-01T06:55:33Z
+
+@ostrolucky Can you please try the examples again, there was some missing changes that I forgot to commit
+
+> It also works based on a viewport
+
+A limitation with the console is that you can only manipulate anything in the viewport. So if any content stretches outside the viewport, it becomes extremely difficult (if not impossible) to modify the contents.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-10-02T20:55:41Z
+
+This kinda changes behaviour of Table helper. I don't think it's acceptable. Table helper without this patch doesn't redraw it's content. Calling
+```php
+$table->render();
+$table->render();
+```
+
+would normally output table twice, but this patch makes it erase first one and replace it with second one
+
+Second thing is that ConsoleSectionOutput always appends newline to output.
+
+Third thing, ProgressBar only works thanks to special patch. Anything other utilizing escape sequences won't work.
+
+Trying to figure out how to make this universal.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-03T04:41:06Z
+
+The change in behaviour for the table helper is intented. The table is rendered in a section output, that can be modified. This adds a feature to the table helper where you can modify and re-render the table without rendering it twice. If you want the normal behaviour, just pass the normal console output instance to the table and not a sectioned output.
+
+> Second thing is that ConsoleSectionOutput always appends newline to output.
+
+The newline at the end is currently a requirement, as it becomes difficult to navigate the console and change the contents without it. But I am working on a patch.
+
+> Anything other utilizing escape sequences won't work.
+
+I'm not sure if we should cater for output with escape sequences. If a user wants to use escape sequences, they should just use the standard console output. If they want to modify the output, then they should use the section output.
+
+This PR is not finished, there are a lot of edge cases and some missing functionality that I'm working on to solve, which I will push once it's done. Thanks for the feedback so far
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-03T08:01:17Z
+
+@ostrolucky If the Table behavior is different only when using the new output class then that means Table just leverages the new feature. If passing the existing outputs gives the same result as before (reading the code I believe it does) then there is no issue.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-10-03T19:15:01Z
+
+@chalasr I still don't think this feature should affect behaviour of current components. Purpose of this feature is just ability to split screen to sections. How is forcing table to redraw itself related to that? Here is better example why is this wrong:
+```php
+$table1->render();
+$table2->render();
+```
+You would expect both tables to be shown on the screen. Instead, content of second table will overwrite content of first table, unless explicitly assigned different output section. I don't think this is expected. If you do this in a loop or have branching logic which determines if, when and which table is supposed to be outputted, you will quickly find out that this approach is unmaintainable.
+
+Rest of my points are not so important, solving them would require to make implementation a lot more complicated, I was just not sure if they are important for you so wanted to brought them up. If they aren't, they aren't for me either.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-03T19:26:04Z
+
+@ostrolucky How will the second table overwrite the first one? If you use different output sections, they will still render both, as the table is only redrawn within it's own section. If you use the normal console output and not the new class, both tables will still be shown as it won't use the new functionality. So IMO there is no unexpected behaviour. The only missing part in this instance is that the new class doesn't take into account the output of the normal console. But that is one of the fixes I'm working on. So if you combine thr normal console output and the output of the new class, then you might run into some rendering issue, but that should be fixed soon
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-10-03T19:34:36Z
+
+You didn't continue to read. I did mention that you if you want to avoid this, you must use different output sections and that's complicated when you have any kind of logic. For example:
+
+```php
+$section1 = $output->section();
+$section2 = $output->section();
+
+$section2->writeln('some stuff');
+
+while (true) {
+    $table = new Table($section1);
+    $table->setHeaders(['Stuff']);
+    $table->addRow([$rand]);
+    $table->render();
+}
+```
+
+Now, how do I output contents of these tables above section2 without redrawing them? Now I am forced to manipulate with order of the sections container directly, because I have to create new output sections on the fly and push them in between.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-03T19:37:26Z
+
+Then just use ` $table = new Table($output);` as you would normally have instead of using `$output->section()`
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-10-03T19:37:50Z
+
+That would render tables below $section2, wouldn't it?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-03T19:45:33Z
+
+Yes it would. But even with your first example if you want to use a section, the second table wom't overwrite the first one. Each table will still be rendered below each other as you expect it to do, as the table helper only clears the table it rendered and not the entire section output. There is still a todo thay needs to be addressed in the table helper and I'm still busy tweaking the functionality, so I don't think this is an issue
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-03T19:52:51Z
+
+I think I agree with @ostrolucky, having `Table` clearing the section seems wrong.
+If one needs to write two consecutive tables in a section so that the last table replaces the first, then one should just `clear()` the output section used to write the first table before writing the last one.
+I mean:
+
+```php
+// before
+$table = new Table($section)
+$table->render();
+$table->render();
+
+//after
+$table = new Table($section);
+$table->render(); // first
+$section->clear();
+$table->render(); // last
+```
+
+doesn't that work already?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-03T19:59:14Z
+
+Yes that does work already, but being able to append rows to a table seems like a nice feature to me. In most cases I've seen, the data needs to be collected in arrays during loops and added to the table which is then rendered at the end, where it would be easier to just append the rows in the table output. What about a new method on the table helper called `append(array $rows)` which clears and re-draws the table?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-10-03T20:59:53Z
+
+I agree it is nice. I think it's not obvious that `render()` should behave like that because the new output is used to construct the Table, `Table::appendRow()` (to be consistent with the current api) seems better to me because more explicit. I would make it throw if the current output is not a section (or create one internally if an instance of ConsoleOutputInterface?).
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2017-10-07T17:01:55Z
+
+@pierredup How is this going? Do you need help with anything?
+
+Also note that this patch is currently broken, as $content and $lines must be publicly accessible.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-07T17:22:05Z
+
+@ostrolucky I'm working on it as I get time, but since it can only go into Symfony 4.1 (to be released May next year) there's no rush. I'll have it ready for review after 4.0 is tagged so that I can rebase against master at that point
+
+---------------------------------------------------------------------------
+
+by pierredup at 2018-01-10T09:40:14Z
+
+Unit tests added, remaining todos addressed and comments  addressed.
+I think this one is now ready
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-01-10T09:58:30Z
+
+@keradus  No, stop it. We already talked about this. This class cannot be marked internal unless public interface is provided, which has lot more disadvantages than advantages. Not having ability to construct it also prevents advanced cases like I demonstrated.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2018-01-10T09:59:30Z
+
+@keradus I removed the coupling from `ConsoleOutput` and got rid of the reference and used a static property instead. This makes the class usable on it's own
+
+---------------------------------------------------------------------------
+
+by pierredup at 2018-01-10T11:43:32Z
+
+Inserting sections between others would be a difficult task, even if you have public access to the array. How would you determine where to add a new section in the array? Adding to the beginning or end would be easy, anything else needs some extra boilerplate code and re-indexing the array to prevent overwriting the section. I'm 👎  for allowing access to the sections array as it can cause more trouble than the benefit it can provide. An alternative would be to have named sections, which would make it easier to manage (clearing a section by name, removing a section from the output etc) but that is adding a bit more complexity.
+
+The global state of the static property is needed if the class needs to be used standalone, so that each new section can always be aware of the previous sections, regardless of where the class was instantiated. The only alternative I see is following @keradus advice and make the class internal and expose only an interface, which means the it can't be used as a standalone class and must be tied to the ConsoleOutput class
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-01-10T12:18:51Z
+
+> How would you determine where to add a new section in the array? Adding to the beginning or end would be easy, anything else needs some extra boilerplate code and re-indexing the array to prevent overwriting the section
+
+So? That's userspace job, you don't need to worry about that. I will know how I want to rearrange that in my application. I'm not asking to simplify this job, I'm asking to make it possible. At least make it protected, or create getter/setter, so I won't have to use dirty hacks like reflection.
+
+I think you don't need to follow mine and @keradus conflicting advices though yet, let proper symfony members review this and say their opinion.
+
+I just wanted to express myself that I really don't like such constrained code, I presented use case this doesn't allow. I also don't mind having container for sections outside the class at all, unlike @keradus . I think this was used just as an excuse to make this class as restricted as possible, which I'm not fan of. Future feature requests for such constrained code are guaranteed, why not allow it already now.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-01-12T14:36:24Z
+
+Could making `ConsoleSectionOutput::$sections` static lead to weird behaviors when running two commands in the same process? Just wondering, I'm fine with keeping it private, it can easily be changed to an optional by-reference constructor arg again if one asks for it.
+
+---------------------------------------------------------------------------
+
+by keradus at 2018-01-12T15:57:05Z
+
+If one would one to use Sections he will hopefully as well use them in tests, having `ConsoleSectionOutput::$sections` static will make the state consistent across executed tests (=global) and for heavy tests will create constant memory increase (slightly, yet without way to clean it).
+For that, :+1: for **not** having it **static**.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2018-01-22T16:48:20Z
+
+I reverted the changes to make the sections static. So the `ConsoleSectionOutoput` class stays coupled to `ConsoleOutput` and makes it just an implementation detail of the console output and not usable on it's own (Which was the original intention).
+
+I've also removed the changes to the Table helper so that it doesn't change any current behaviour if you use a section output. Instead I have added an `appendRow` method which will add a row the table and redraw the table
+
+---------------------------------------------------------------------------
+
+by pierredup at 2018-02-20T12:25:13Z
+
+Thanks for picking it up @ostrolucky, it should now be fixed
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-02-21T14:34:27Z
+
+There is one relevant test failure https://travis-ci.org/symfony/symfony/jobs/344188508#L4298
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-09T14:13:28Z
+
+@pierredup Feature freeze is coming. I would like to ensure this is ready soon. Are you working on resolving this, or should I take a look?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2018-03-10T17:08:49Z
+
+Previous bug fixed. ~I'm busy adding a test for the fix, will push the changes soon.~ Unit test added
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by pierredup at 2018-03-20T07:25:24Z
+
+Last comments addressed and table bug fixed. I tested all the original examples and every one now works as expected.
+
+@ostrolucky Thank you for all the effort in properly testing and reviewing this.
+
+Status: Needs Review

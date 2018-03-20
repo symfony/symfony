@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
  * Provides helpers to display a table.
@@ -74,6 +76,8 @@ class Table
     private $columnWidths = array();
 
     private static $styles;
+
+    private $rendered = false;
 
     public function __construct(OutputInterface $output)
     {
@@ -257,6 +261,25 @@ class Table
         return $this;
     }
 
+    /**
+     * Adds a row to the table, and re-renders the table.
+     */
+    public function appendRow($row): self
+    {
+        if (!$this->output instanceof ConsoleSectionOutput) {
+            throw new RuntimeException(sprintf('Output should be an instance of "%s" when calling "%s".', ConsoleSectionOutput::class, __METHOD__));
+        }
+
+        if ($this->rendered) {
+            $this->output->clear($this->calculateRowCount());
+        }
+
+        $this->addRow($row);
+        $this->render();
+
+        return $this;
+    }
+
     public function setRow($column, array $row)
     {
         $this->rows[$column] = $row;
@@ -316,6 +339,7 @@ class Table
         $this->renderRowSeparator(self::SEPARATOR_BOTTOM);
 
         $this->cleanup();
+        $this->rendered = true;
     }
 
     /**
@@ -458,6 +482,19 @@ class Table
                 }
             }
         });
+    }
+
+    private function calculateRowCount(): int
+    {
+        $numberOfRows = count(iterator_to_array($this->buildTableRows(array_merge($this->headers, array(new TableSeparator()), $this->rows))));
+
+        if ($this->headers) {
+            ++$numberOfRows; // Add row for header separator
+        }
+
+        ++$numberOfRows; // Add row for footer separator
+
+        return $numberOfRows;
     }
 
     /**

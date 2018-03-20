@@ -257,7 +257,7 @@ class Table
     }
 
     /**
-     * Add a row to the table, and re-render the table.
+     * Adds a row to the table, and re-renders the table.
      */
     public function appendRow($row): self
     {

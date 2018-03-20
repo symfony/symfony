@@ -373,6 +373,7 @@ class SecurityExtension extends Extension
                 $key = str_replace('-', '_', $factory->getKey());
                 if (array_key_exists($key, $firewall)) {
                     $listenerKeys[] = $key;
+                    $options[$key] = $firewall[$key];
                 }
             }
         }
@@ -383,6 +384,7 @@ class SecurityExtension extends Extension
 
         $config->replaceArgument(10, $listenerKeys);
         $config->replaceArgument(11, isset($firewall['switch_user']) ? $firewall['switch_user'] : null);
+        $config->replaceArgument(12, $options ?? []);
 
         return array($matcher, $listeners, $exceptionListener);
     }

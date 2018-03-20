@@ -102,5 +102,16 @@
             <argument type="service" id="translator"/>
             <argument type="string">%validator.translation_domain%</argument>
         </service>
+
+        <!-- LoginType -->
+        <service id="form.type.login" class="Symfony\Bundle\FrameworkBundle\Form\LoginType">
+            <argument type="service" id="Symfony\Component\HttpFoundation\RequestStack" />
+            <argument type="service" id="security.firewall.map" />
+            <argument type="service" id="Symfony\Component\Security\Http\Authentication\AuthenticationUtils" />
+            <argument type="service" id="Symfony\Component\Routing\Generator\UrlGeneratorInterface" />
+            <argument type="service" id="Symfony\Component\Translation\TranslatorInterface" />
+
+            <tag name="form.type" />
+        </service>
     </services>
 </container>

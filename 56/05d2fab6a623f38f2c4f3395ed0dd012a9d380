@@ -1,0 +1,128 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-15T18:05:53Z
+
+This PR is ready
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-16T10:24:37Z
+
+I would like to merge this PR today (because it's open for a week now), so I'm calling for a review :) Thanks
+(cc / @stof @nicolas-grekas @Nyholm @xabbuh )
+
+---------------------------------------------------------------------------
+
+by d-ph at 2018-02-18T18:02:51Z
+
+Hello,
+
+Sorry to muddle the PR even further, but there's a functionality regression in this PR that the [original PR](https://github.com/symfony/symfony/pull/24745) (although including an ugly sounding private method name: `getEnabledTransitionsByNameOrTransitionBlockerList()`) didn't have.
+
+Namely, my PR was optimised for not having to run the guards twice and still being able to tell what the transition blockers were, if they occurred.
+
+For example, imagine the following code:
+```php
+try {
+    $transitionBlockerList = $workflow->buildTransitionBlockerList($subject, 'foo-transition');
+
+    if (!$transitionBlockerList->isEmtpy()) {
+        // handle this exceptional case by e.g. showing an error in the UI.
+        return;
+    }
+
+    $workflow->apply($subject, 'foo-transition');
+} catch (UndefinedTransitionException $exception) {
+    // handle the exception and/or rethrow.
+
+    throw $exception;
+}
+```
+In the code above, the transition guards are run twice -- first for `buildTransitionBlockerList()` and second for `apply()`. This is not only not ideal but also potentially seriously time consuming. Imagine one of the guards are doing an API call to a 3rd party system for some reason. The API call would need to be done twice because of the way the Workflow code is written.
+
+As I mentioned, the original PR optimised for this scenario by allowing devs to do the following:
+```php
+try {
+    $workflow->apply($subject, 'foo-transition');
+} catch (BlockedTransitionException $exception) {
+    // handle this exceptional case by e.g. showing an error in the UI.
+
+    return;
+} catch (UndefinedTransitionException $exception) {
+    // handle the exception and/or rethrow.
+
+    throw $exception;
+}
+```
+In the code above, devs just call the 'apply()' method and let if fail, if the transition is blocked. If the devs are interested in the exact reason why, then they can catch the BlockedTransitionException exception and retrieve the TransitionBlockers that blocked the transition. Most importantly though, the guards are not called twice, which was one of the two reasons I created the original PR in the first place (the first reason was to introduce the TransitionBlockers). Maybe it'd be a good idea to further require this behaviour by writing a unit test for it (`testGuardsAreCalledOnceWhenApplyIsCalledAndTransitionBlockerListIsStillKnown()`).
+
+Although I appreciate the work put in this PR, the fact that guards are called twice doesn't make me very happy as a consumer of the Workflow component.
+
+Could something be done in this PR to make sure the guards are not called twice in the case scenario I brought forth here, please?
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2018-02-19T04:39:02Z
+
+I agree with @d-ph, but i would keep `buildTransitionBlockerList` because some users (like me :)) want to show the user what needs to be done in advance and not after he tried to transit into a new place.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-19T07:13:41Z
+
+I can put back the exception in the apply method.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-22T14:08:25Z
+
+Actually, I the more I think to this issue, the more I think is not the right way to go.
+Exception should remain exceptionnel and should not be used to control the flow.
+
+If you have some perf issue with guard, The best way is to add a cache layer in your application. I should be really easy to implement, since we have a very nice cache component.
+
+---------------------------------------------------------------------------
+
+by d-ph at 2018-02-24T18:21:19Z
+
+I'm sorry, but I fail to see what the problem here is.
+
+Firstly, the `Workflow::apply()` method, as it stands right now, is already throwing an exception (`LogicException`), when a transition isn't applied in the `::apply()` method for whatever reason. My solution just makes sure that the reason is clearly stated -- whether the transition wasn't applied because it's missing or whether it wasn't applied because some `Guard`s said "No". The same execution model and "principle", just more informative.
+
+Secondly, throwing specific exceptions, as a way to knowing what the TransitionBlockers are, is an alternative to the solution of doing it with the `if can(), then apply()`. If devs want less performant solution but more ideology-compliant, then they can go for the `if can(), then apply()`. Other devs can catch exceptions from the `apply()` method. Everyone's happy.
+
+Thirdly, as the old adage has it: "The two most difficult things in software development are: naming things and invalidating the caches". Sorry to sound harsh, but what you essentially said was: "I have personal/ideological issues with using the language's standard means to communicate errors in routines, but that's alright because you can fix the performance problems by using and maintaining caches, which is one of the two of the most annoying problems in software industry". Communicating errors in routines is not a new problem and we've all seen all the possible solutions out there already:
+
+1. Returning a valid value or an error code from a routine.
+2. Returning a valid value or `false` and offering a stateful getter for the last error in that routine (e.g. `json_last_error()`)
+3. Throwing an exception.
+
+None of these are pretty, but all of them solve the problem. I'd say it's highly contextual, as to which of these methods should be used when. And I'd say option 3. has the best "getting things done effectively"/ugliness factor in the case of `Workflow::apply()`.
+
+I have a feeling that the actual problem is in the fact, that in order to get `::apply()` throw specific exceptions, my ugly sounding `getEnabledTransitionsByNameOrTransitionBlockerList()` would need to be brought over from my PR and for some reason this is being tried to be avoided at all cost. I admit the name of this method is ugly, and that it returns two different things depending on circumstances. However, it's just a private method, so there should be no issues with the fact that it's a highly specialised and optimised method to achieve a specific goal (i.e. not to run the `Guard`s twice).
+
+I understand that this is your code and your component, so eventually whichever approach is chosen is down to you. I just wanted to express my humble dev feedback. Thanks for taking it into your consideration and consciously deciding what's best for this component.
+
+---------------------------------------------------------------------------
+
+by andrewtch at 2018-03-19T18:18:01Z
+
+As for #26581, the exception class should contain transition / workflow name instead merging them into string (that needs to be parsed to determine particular exception source when caught in somehow top-level exception handler).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-19T18:27:06Z
+
+@andrewtch Sure. It will be fixed with #26092
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-19T18:57:36Z
+
+@d-ph You are right. I have found a nice (I hope so) implementation. Now you will get Nice exception when using `apply` method.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-20T16:51:29Z
+
+@fabpot Thanks for the review. I have addressed your comments.

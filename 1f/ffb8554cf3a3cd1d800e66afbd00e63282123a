@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-03T07:15:09Z
+
+i think it should be either `xhr()` or `xmlHttpRequest()` :) preferring the first i guess.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-04T13:47:44Z
+
+@javiereguiluz WDYT of @ro0NL's advice ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-04T16:19:01Z
+
+On Symfony Slack `xmlHttpRequest()` won 2 to 1 to `xhrRequest()` Other proposals were `ajaxRequest()` and `asyncRequest()`
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-04T17:39:57Z
+
+:+1: for `xmlHttpRequest`
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-05T16:56:11Z
+
+PR updated.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-14T09:01:40Z
+
+Test modified, review taken in account.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-18T19:00:39Z
+
+Tests are apparently broken because of the changes done in this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-19T21:18:37Z
+
+@Simperfit Can you rebase on current master?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-20T07:55:40Z
+
+@fabpot PR Rebased

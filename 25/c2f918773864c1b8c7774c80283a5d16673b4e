@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-01T08:31:47Z
+
+Could you please check AppVeyor, it seems that the broken tests are related to this patch ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T20:43:26Z
+
+a test case is failing though
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-20T16:35:38Z
+
+@nicolas-grekas Thanks. Fixed

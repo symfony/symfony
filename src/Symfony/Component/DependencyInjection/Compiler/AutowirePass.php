@@ -32,6 +32,12 @@ class AutowirePass extends AbstractRecursivePass
     private $autowired = array();
     private $lastFailure;
     private $throwOnAutowiringException;
+    private $decoratedClass;
+    private $decoratedId;
+    private $methodCalls;
+    private $getPreviousValue;
+    private $decoratedMethodIndex;
+    private $decoratedMethodArgumentIndex;
 
     public function __construct(bool $throwOnAutowireException = true)
     {
@@ -49,6 +55,12 @@ class AutowirePass extends AbstractRecursivePass
             $this->types = null;
             $this->ambiguousServiceTypes = array();
             $this->autowired = array();
+            $this->decoratedClass = null;
+            $this->decoratedId = null;
+            $this->methodCalls = null;
+            $this->getPreviousValue = null;
+            $this->decoratedMethodIndex = null;
+            $this->decoratedMethodArgumentIndex = null;
         }
     }
 
@@ -89,7 +101,7 @@ class AutowirePass extends AbstractRecursivePass
             return $value;
         }
 
-        $methodCalls = $value->getMethodCalls();
+        $this->methodCalls = $value->getMethodCalls();
 
         try {
             $constructor = $this->getConstructor($value, false);
@@ -98,21 +110,21 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if ($constructor) {
-            array_unshift($methodCalls, array($constructor, $value->getArguments()));
+            array_unshift($this->methodCalls, array($constructor, $value->getArguments()));
         }
 
-        $methodCalls = $this->autowireCalls($reflectionClass, $methodCalls);
+        $this->methodCalls = $this->autowireCalls($reflectionClass, $isRoot);
 
         if ($constructor) {
-            list(, $arguments) = array_shift($methodCalls);
+            list(, $arguments) = array_shift($this->methodCalls);
 
             if ($arguments !== $value->getArguments()) {
                 $value->setArguments($arguments);
             }
         }
 
-        if ($methodCalls !== $value->getMethodCalls()) {
-            $value->setMethodCalls($methodCalls);
+        if ($this->methodCalls !== $value->getMethodCalls()) {
+            $value->setMethodCalls($this->methodCalls);
         }
 
         return $value;
@@ -120,13 +132,20 @@ class AutowirePass extends AbstractRecursivePass
 
     /**
      * @param \ReflectionClass $reflectionClass
-     * @param array            $methodCalls
      *
      * @return array
      */
-    private function autowireCalls(\ReflectionClass $reflectionClass, array $methodCalls)
+    private function autowireCalls(\ReflectionClass $reflectionClass, bool $isRoot): array
     {
-        foreach ($methodCalls as $i => $call) {
+        if ($isRoot && ($definition = $this->container->getDefinition($this->currentId)) && $this->container->has($this->decoratedId = $definition->innerServiceId)) {
+            $this->decoratedClass = $this->container->findDefinition($this->decoratedId)->getClass();
+        } else {
+            $this->decoratedId = null;
+            $this->decoratedClass = null;
+        }
+
+        foreach ($this->methodCalls as $i => $call) {
+            $this->decoratedMethodIndex = $i;
             list($method, $arguments) = $call;
 
             if ($method instanceof \ReflectionFunctionAbstract) {
@@ -138,11 +157,11 @@ class AutowirePass extends AbstractRecursivePass
             $arguments = $this->autowireMethod($reflectionMethod, $arguments);
 
             if ($arguments !== $call[1]) {
-                $methodCalls[$i][1] = $arguments;
+                $this->methodCalls[$i][1] = $arguments;
             }
         }
 
-        return $methodCalls;
+        return $this->methodCalls;
     }
 
     /**
@@ -190,18 +209,40 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
-            if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, !$parameter->isOptional() ? $class : ''), 'for '.sprintf('argument "$%s" of method "%s()"', $parameter->name, $class.'::'.$method))) {
-                $failureMessage = $this->createTypeNotFoundMessage($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
+            $getValue = function () use ($type, $parameter, $class, $method) {
+                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, !$parameter->isOptional() ? $class : ''), 'for '.sprintf('argument "$%s" of method "%s()"', $parameter->name, $class.'::'.$method))) {
+                    $failureMessage = $this->createTypeNotFoundMessage($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
 
-                if ($parameter->isDefaultValueAvailable()) {
-                    $value = $parameter->getDefaultValue();
-                } elseif (!$parameter->allowsNull()) {
-                    throw new AutowiringFailedException($this->currentId, $failureMessage);
+                    if ($parameter->isDefaultValueAvailable()) {
+                        $value = $parameter->getDefaultValue();
+                    } elseif (!$parameter->allowsNull()) {
+                        throw new AutowiringFailedException($this->currentId, $failureMessage);
+                    }
+                    $this->container->log($this, $failureMessage);
                 }
-                $this->container->log($this, $failureMessage);
+
+                return $value;
+            };
+
+            if ($this->decoratedClass && $isDecorated = is_a($this->decoratedClass, $type, true)) {
+                if ($this->getPreviousValue) {
+                    // The inner service is injected only if there is only 1 argument matching the type of the decorated class
+                    // across all arguments of all autowired methods.
+                    // If a second matching argument is found, the default behavior is restored.
+
+                    $getPreviousValue = $this->getPreviousValue;
+                    $this->methodCalls[$this->decoratedMethodIndex][1][$this->decoratedMethodArgumentIndex] = $getPreviousValue();
+                    $this->decoratedClass = null; // Prevent further checks
+                } else {
+                    $arguments[$index] = new TypedReference($this->decoratedId, $this->decoratedClass);
+                    $this->getPreviousValue = $getValue;
+                    $this->decoratedMethodArgumentIndex = $index;
+
+                    continue;
+                }
             }
 
-            $arguments[$index] = $value;
+            $arguments[$index] = $getValue();
         }
 
         if ($parameters && !isset($arguments[++$index])) {

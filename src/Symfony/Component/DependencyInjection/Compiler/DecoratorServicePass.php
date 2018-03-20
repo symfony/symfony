@@ -43,6 +43,7 @@ class DecoratorServicePass implements CompilerPassInterface
             if (!$renamedId) {
                 $renamedId = $id.'.inner';
             }
+            $definition->innerServiceId = $renamedId;
 
             // we create a new alias/service for the service we are replacing
             // to be able to reference it in the new one

@@ -50,6 +50,13 @@ class Definition
     private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
 
     /**
+     * @internal
+     *
+     * Used to store the name of the inner id when using service decoration together with autowiring
+     */
+    public $innerServiceId;
+
+    /**
      * @param string|null $class     The service class
      * @param array       $arguments An array of arguments to pass to the service constructor
      */

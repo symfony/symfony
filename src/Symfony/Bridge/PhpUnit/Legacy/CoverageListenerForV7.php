@@ -36,6 +36,6 @@ class CoverageListenerForV7 implements TestListener
 
     public function startTestSuite(TestSuite $suite): void
     {
-        $this->trait->startTest($test);
+        $this->trait->startTest($suite);
     }
 }

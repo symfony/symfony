@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-02T13:06:38Z
+
+Is browser support good enough?
+https://caniuse.com/#search=datetime-local
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-10-02T13:19:18Z
+
+Anyway, isn't it a BC break? JS apps may rely on `type="datetime"`. Not sure it is worth it.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-10-02T13:25:39Z
+
+`type="datetime"` is supported by exactly 0 browser out there, meaning checking the type DOM property gives you `text` due to the type fallback.
+And the `datetime` type is removed from the HTML spec.
+
+However, the HTML5_FORMAT constant has the timezone included in the format. So it should be updated for `datetime-local` to remove the timezone part.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-10-04T12:59:08Z
+
+Is this enough? I mean is the format in which data is sent by browsers the same as it was meant to with the old `datetime` type?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2017-10-04T16:56:58Z
+
+From my short test, it seems Chrome submits the `datetime-local` without a timezone. So @stof would be right that `\Symfony\Component\Form\Extension\Core\Type\DateTimeType::HTML5_FORMAT` needs to be changed.
+
+---------------------------------------------------------------------------
+
+by pierredup at 2017-10-04T17:32:21Z
+
+Would it not be considered a BC break to change the value of a constant?
+
+---------------------------------------------------------------------------
+
+by simPod at 2017-12-31T16:21:44Z
+
+What's the status of this? Can I help?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-04T15:37:36Z
+
+@pierredup let's do the change as requested by @Tobion /@stof
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T20:23:51Z
+
+@Tobion aren't we ready here?

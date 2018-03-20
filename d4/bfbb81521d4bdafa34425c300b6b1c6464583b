@@ -1,0 +1,148 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2017-12-30T09:24:25Z
+
+Good idea. I needed that feature recently.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-12-30T11:03:09Z
+
+Oh this is a nice improvement! But what about the following?
+
+> there is only one argument in the constructor of the type of the decorated service
+
+Often enough I decorate because of logging or caching, which would still make me configure everything. In your commit it does seem to work though, or am I mistaken? https://github.com/symfony/symfony/pull/25631/files#diff-0cd60484959ffb82f3498fcc8bdcac11R21
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-30T11:05:41Z
+
+@iltar I mean:
+
+```php
+// This is handled
+class BarDecorator implements BarInterface
+{
+    public function __construct(LoggerInterface $logger, BarInterface $decorated)
+    {
+    }
+}
+
+// This is ignored
+class BarDecorator implements BarInterface
+{
+    public function __construct(BarInterface $decorated, BarInterface $anotherBar)
+    {
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-12-30T11:17:09Z
+
+Ah okay, so I just misunderstood your sentence! In that case, big fat 👍 !
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-30T14:07:55Z
+
+I really like the idea.
+About the implementation, it feels like this duplicates a lot of logic.
+What about just adding a binding between the decorated name (if it's also a type), and the inner service? That should span just a few lines, and delegate the hard work to ResolveBindingsPass?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-30T15:03:20Z
+
+@nicolas-grekas, good idea I'll try that. The only difference I can see is this case:
+
+```php
+class BarDecorator implements BarInterface
+{
+    public function __construct(BarInterface $decorated, BarInterface $anotherBar)
+    {
+    }
+}
+```
+
+With the current implementation, it's ignored (and I think it's the right thing to do), with bindings, the decorated service will be injected in both parameters. IMO it's an edge case, if we're fine with that, I'll update the code.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-30T21:11:00Z
+
+In fact it's not possible to use bindings because they exact match the type. Here we need to use `is_a`.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-30T22:08:17Z
+
+> This misses checking for `@required` setters
+
+Actually I omitted setters willingly. Setter injection is sometime legit, but for a decorator it's more than weird to inject the decorated service this way. I think we should only support constructors (if someone has this specific use case, he can still use manual wiring).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-12-31T10:03:03Z
+
+> I omitted setters willingly
+
+Seems arbitrary to me, and inconsistent, we should support setters everywhere IMHO.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-12-31T10:38:57Z
+
+Ok I'll add support for setters, it cannot hurt if you don't use them :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-01-11T17:19:20Z
+
+I just pushed a new implementation that reuse much existing logic and supports `@required` methods.
+The code now belongs in the `AutowirePass` instead of the `DecoratorServicePass`.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-02-01T13:28:01Z
+
+The fabbot error is a false positive (and I don't get why it is not ignored, but it's not related to this PR anyway).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-03T22:49:56Z
+
+Does it work with decoration priority https://symfony.com/doc/current/service_container/service_decoration.html#decoration-priority ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-02-05T08:12:55Z
+
+@Tobion this PR changes nothing regarding service decoration. It will work as excepted.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-02-06T16:59:47Z
+
+@chalasr I added support for renamed id in an easy but a bit hacky way. WDYT?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-02-10T00:54:42Z
+
+@dunglas Looks good enough to me.
+I'm wondering how this behaves with multiple levels of decoration e.g. `service1 -> service2 decorates service1 -> service3 decorates service2`, which one wins? A test case would be good :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-02-13T08:07:07Z
+
+@chalasr AFAIK, this PR doesn't change anything to this behavior.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-16T15:20:18Z
+
+Failures not related, ping @symfony/deciders. It would be great to have it in 4.1.

@@ -529,7 +529,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        if ($this->isCompiled() && isset($this->removedIds[$id = (string) $id]) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+        if ($this->isCompiled() && isset($this->removedIds[$id = (string) $id]) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $invalidBehavior) {
             return parent::get($id);
         }
 
@@ -555,11 +555,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         try {
             $definition = $this->getDefinition($id);
         } catch (ServiceNotFoundException $e) {
-            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE < $invalidBehavior) {
                 return;
             }
 
             throw $e;
+        }
+
+        if ($e = $definition->getErrors()) {
+            throw new RuntimeException(reset($e));
         }
 
         $loading = isset($this->alreadyLoading[$id]) ? 'loading' : 'alreadyLoading';

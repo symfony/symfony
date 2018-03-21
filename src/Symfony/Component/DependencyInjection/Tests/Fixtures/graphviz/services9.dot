@@ -34,6 +34,8 @@ digraph sc {
   node_BAR2 [label="BAR2\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_tagged_iterator_foo [label="tagged_iterator_foo\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_tagged_iterator [label="tagged_iterator\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_runtime_error [label="runtime_error\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_errored_definition [label="errored_definition\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo2 [label="foo2\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo3 [label="foo3\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foobaz [label="foobaz\n\n", shape=record, fillcolor="#ff9999", style="filled"];
@@ -57,4 +59,5 @@ digraph sc {
   node_lazy_context_ignore_invalid_ref -> node_foo_baz [label="" style="filled" color="#9999ff"];
   node_lazy_context_ignore_invalid_ref -> node_invalid [label="" style="filled" color="#9999ff"];
   node_BAR -> node_bar [label="" style="dashed"];
+  node_runtime_error -> node_errored_definition [label="" style="filled"];
 }

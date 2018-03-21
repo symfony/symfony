@@ -1367,6 +1367,21 @@ class ContainerBuilderTest extends TestCase
         $container->removeAlias($aliasId);
         $container->removeDefinition($id);
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Service "errored_definition" is broken.
+     */
+    public function testErroredDefinition()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('errored_definition', 'stdClass')
+            ->addError('Service "errored_definition" is broken.')
+            ->setPublic(true);
+
+        $container->get('errored_definition');
+    }
 }
 
 class FooClass

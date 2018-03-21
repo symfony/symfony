@@ -171,3 +171,9 @@ services:
     alias_for_alias:
         alias: 'foo'
         public: true
+    runtime_error:
+        class: stdClass
+        arguments: ['@errored_definition']
+        public: true
+    errored_definition:
+        class: stdClass

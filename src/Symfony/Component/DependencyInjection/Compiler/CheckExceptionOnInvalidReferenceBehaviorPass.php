@@ -28,7 +28,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         if (!$value instanceof Reference) {
             return parent::processValue($value, $isRoot);
         }
-        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $value->getInvalidBehavior() && !$this->container->has($id = (string) $value)) {
+        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $value->getInvalidBehavior() && !$this->container->has($id = (string) $value)) {
             throw new ServiceNotFoundException($id, $this->currentId);
         }
         if (ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $value->getInvalidBehavior() && $this->container->has($id = (string) $value) && !$this->container->findDefinition($id)->isShared()) {

@@ -266,6 +266,7 @@ class YamlDumper extends Dumper
     {
         if (null !== $reference) {
             switch ($reference->getInvalidBehavior()) {
+                case ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE: break;
                 case ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE: break;
                 case ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE: return sprintf('@!%s', $id);
                 default: return sprintf('@?%s', $id);

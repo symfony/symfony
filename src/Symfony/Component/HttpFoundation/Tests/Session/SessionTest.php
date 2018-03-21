@@ -219,4 +219,23 @@ class SessionTest extends TestCase
     {
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\MetadataBag', $this->session->getMetadataBag());
     }
+
+    public function testAdd()
+    {
+        $datas = [
+            'name' => 'Doe',
+            'firstname' => 'John',
+            'age' => '31',
+            'city' => 'Paris',
+            'country' => 'France',
+        ];
+
+        $this->session->add($datas);
+
+        $this->assertEquals('Doe', $this->session->get('name'));
+        $this->assertEquals('John', $this->session->get('firstname'));
+        $this->assertEquals('31', $this->session->get('age'));
+        $this->assertEquals('Paris', $this->session->get('city'));
+        $this->assertEquals('France', $this->session->get('country'));
+    }
 }

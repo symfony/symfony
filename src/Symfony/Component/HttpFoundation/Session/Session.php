@@ -258,4 +258,16 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     {
         return $this->storage->getBag($this->attributeName);
     }
+
+    /**
+     * Add many attributes in session at one time
+     *
+     */
+    public function add(array $datas)
+    {
+        foreach ($datas as $name => $value)
+        {
+            $this->set($name, $value);
+        }
+    }
 }

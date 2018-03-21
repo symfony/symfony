@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.1
  */
 interface EncoderInterface
 {

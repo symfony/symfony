@@ -15,6 +15,8 @@ use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
+ *
+ * @experimental in 4.1
  */
 interface HandlerLocatorInterface
 {

@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-09T15:48:49Z
+
+Travis failure is unrelated
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-02-09T22:15:08Z
+
+Can you add a test please?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-12T08:24:06Z
+
+@dunglas I will do, I'm searching a way to add one, I have to look on other command's tests to test the choices.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-14T12:04:26Z
+
+Status: needs review
+
+@dunglas test added
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-15T08:12:53Z
+
+New test added that test the whole behaviour of the search.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-02-15T09:40:07Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-05T17:06:10Z
+
+PR rebased.
+
+---------------------------------------------------------------------------
+
+by althaus at 2018-03-06T09:02:16Z
+
+Would be great, if it could be based on the 3.x-branch, too.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-06T09:13:07Z
+
+@althaus that's a new feature, it must go on 4.1
+
+---------------------------------------------------------------------------
+
+by althaus at 2018-03-06T09:40:52Z
+
+@chalasr No plans for a 3.5? That's a pity for devs stuck on the 3.x branch for a while. 👎
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-06T09:44:51Z
+
+@althaus Nope, 3.4 is the last 3.x version. That's the roadmap, nothing wrong, 4.0 is stable for a while.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-06T18:21:10Z
+
+I suggest to drop the existing `RouterDebugCommand` test, it is semi-functional (use a mocked kernel) and all of its tests are covered by the one added here.
+
+---------------------------------------------------------------------------
+
+by althaus at 2018-03-08T08:38:11Z
+
+@chalasr Oh... didn't know about the change in the release cycles and the limit of 5 minors.
+
+So I'll just overload the command with my own version of this change.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-14T08:48:05Z
+
+@chalasr @dunglas PR rebased, test fixed, semi-functional test deleted.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-16T11:04:15Z
+
+Travis failure is unrelated.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-21T08:33:21Z
+
+@fabpot done.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-21T08:51:38Z
+
+Status: Needs Review

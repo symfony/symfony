@@ -178,7 +178,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function table(array $headers, array $rows)
     {
-        $style = clone Table::getStyleDefinition('symfony-style-guide');
+        $style = clone Table::getStyleDefinition('box');
         $style->setCellHeaderFormat('<info>%s</info>');
 
         $table = new Table($this);

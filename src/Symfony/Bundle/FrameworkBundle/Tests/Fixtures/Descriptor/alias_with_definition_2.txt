@@ -3,23 +3,23 @@
 [33mInformation for Service "[39m[32mservice_2[39m[33m"[39m
 [33m===================================[39m
 
- ----------------- --------------------------------- 
- [32m Option          [39m [32m Value                           [39m 
- ----------------- --------------------------------- 
-  Service ID        service_2                        
-  Class             Full\Qualified\Class2            
-[39;49m  Tags              tag1 ([39;49m[32mattr1[39m[39;49m: val1, [39;49m[32mattr2[39m[39;49m: val2)[39;49m[39;49m  [39;49m
-[39;49m                    [39;49m[39;49mtag1 ([39;49m[32mattr3[39m[39;49m: val3)[39;49m[39;49m               [39;49m
-[39;49m                    [39;49mtag2                             
-  Calls             setMailer                        
-  Public            no                               
-  Synthetic         yes                              
-  Lazy              no                               
-  Shared            yes                              
-  Abstract          no                               
-  Autowired         no                               
-  Autoconfigured    no                               
-  Required File     /path/to/file                    
-  Factory Service   factory.service                  
-  Factory Method    get                              
- ----------------- ---------------------------------
+┌─────────────────┬─────────────────────────────────┐
+│[32m Option          [39m│[32m Value                           [39m│
+├─────────────────┼─────────────────────────────────┤
+│ Service ID      │ service_2                       │
+│ Class           │ Full\Qualified\Class2           │
+[39;49m│ Tags            │ tag1 ([39;49m[32mattr1[39m[39;49m: val1, [39;49m[32mattr2[39m[39;49m: val2)[39;49m[39;49m │[39;49m
+[39;49m│                 │ [39;49m[39;49mtag1 ([39;49m[32mattr3[39m[39;49m: val3)[39;49m[39;49m              │[39;49m
+[39;49m│                 │ [39;49mtag2                            │
+│ Calls           │ setMailer                       │
+│ Public          │ no                              │
+│ Synthetic       │ yes                             │
+│ Lazy            │ no                              │
+│ Shared          │ yes                             │
+│ Abstract        │ no                              │
+│ Autowired       │ no                              │
+│ Autoconfigured  │ no                              │
+│ Required File   │ /path/to/file                   │
+│ Factory Service │ factory.service                 │
+│ Factory Method  │ get                             │
+└─────────────────┴─────────────────────────────────┘

@@ -3,19 +3,19 @@
 [33mInformation for Service "[39m[32mservice_1[39m[33m"[39m
 [33m===================================[39m
 
- ---------------- ----------------------------- 
- [32m Option         [39m [32m Value                       [39m 
- ---------------- ----------------------------- 
-  Service ID       service_1                    
-  Class            Full\Qualified\Class1        
-  Tags             -                            
-  Public           yes                          
-  Synthetic        no                           
-  Lazy             yes                          
-  Shared           yes                          
-  Abstract         yes                          
-  Autowired        no                           
-  Autoconfigured   no                           
-  Factory Class    Full\Qualified\FactoryClass  
-  Factory Method   get                          
- ---------------- -----------------------------
+┌────────────────┬─────────────────────────────┐
+│[32m Option         [39m│[32m Value                       [39m│
+├────────────────┼─────────────────────────────┤
+│ Service ID     │ service_1                   │
+│ Class          │ Full\Qualified\Class1       │
+│ Tags           │ -                           │
+│ Public         │ yes                         │
+│ Synthetic      │ no                          │
+│ Lazy           │ yes                         │
+│ Shared         │ yes                         │
+│ Abstract       │ yes                         │
+│ Autowired      │ no                          │
+│ Autoconfigured │ no                          │
+│ Factory Class  │ Full\Qualified\FactoryClass │
+│ Factory Method │ get                         │
+└────────────────┴─────────────────────────────┘

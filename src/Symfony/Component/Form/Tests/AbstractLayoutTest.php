@@ -113,7 +113,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
 
-    abstract protected function renderHelp(FormView $view);
+    protected function renderHelp(FormView $view)
+    {
+        $this->markTestSkipped(sprintf('Legacy %s::renderHelp() is not implemented.', get_class($this)));
+    }
 
     abstract protected function renderErrors(FormView $view);
 

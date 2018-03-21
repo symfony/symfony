@@ -36,7 +36,7 @@ class RoleHierarchy implements RoleHierarchyInterface
      */
     public function getRoles()
     {
-        $roles = [];
+        $roles = array();
 
         foreach ($this->hierarchy as $main => $roles) {
             $roles[] = $main;

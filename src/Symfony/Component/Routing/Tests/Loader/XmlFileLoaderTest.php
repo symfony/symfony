@@ -86,17 +86,17 @@ class XmlFileLoaderTest extends TestCase
     public function testLoadLocalized()
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $routeCollection = $loader->load('localised.xml');
+        $routeCollection = $loader->load('localized.xml');
         $routes = $routeCollection->all();
 
         $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
-        $this->assertEquals('/route', $routeCollection->get('localised.fr')->getPath());
-        $this->assertEquals('/path', $routeCollection->get('localised.en')->getPath());
+        $this->assertEquals('/route', $routeCollection->get('localized.fr')->getPath());
+        $this->assertEquals('/path', $routeCollection->get('localized.en')->getPath());
     }
 
-    public function testLocalisedImports()
+    public function testLocalizedImports()
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
         $routeCollection = $loader->load('importer-with-locale.xml');
@@ -109,7 +109,7 @@ class XmlFileLoaderTest extends TestCase
         $this->assertEquals('/the-prefix/suffix', $routeCollection->get('imported.en')->getPath());
     }
 
-    public function testLocalisedImportsOfNotLocalizedRoutes()
+    public function testLocalizedImportsOfNotLocalizedRoutes()
     {
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
         $routeCollection = $loader->load('importer-with-locale-imports-non-localized-route.xml');

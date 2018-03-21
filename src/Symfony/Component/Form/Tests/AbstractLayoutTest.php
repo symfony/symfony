@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\SkippedTestError;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -115,7 +116,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
 
     protected function renderHelp(FormView $view)
     {
-        $this->markTestSkipped(sprintf('Legacy %s::renderHelp() is not implemented.', get_class($this)));
+        $this->markTestSkipped(sprintf('%s::renderHelp() is not implemented.', get_class($this)));
     }
 
     abstract protected function renderErrors(FormView $view);
@@ -445,6 +446,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'help' => 'Help text test!',
         ));
         $view = $form->createView();
+
+        // Test if renderHelp method is implemented
+        try {
+            $this->renderHelp($view);
+        }
+        catch (SkippedTestError $error) {
+            return $error;
+        }
+
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,
@@ -458,6 +468,15 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $view = $form->createView();
+
+        // Test if renderHelp method is implemented
+        try {
+            $this->renderHelp($view);
+        }
+        catch (SkippedTestError $error) {
+            return $error;
+        }
+
         $html = $this->renderRow($view);
 
         $this->assertMatchesXpath($html,

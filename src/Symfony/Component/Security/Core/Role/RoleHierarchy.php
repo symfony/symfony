@@ -38,8 +38,12 @@ class RoleHierarchy implements RoleHierarchyInterface
     {
         $roles = array();
 
-        foreach ($this->hierarchy as $main => $roles) {
-            $roles[] = $main;
+        foreach ($this->map as $role => $hierarchy) {
+            $roles[] = $role;
+
+            foreach ($hierarchy as $role) {
+                $roles[] = $role;
+            }
         }
 
         return array_unique($roles);

@@ -19,6 +19,7 @@ use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
+use Symfony\Component\Workflow\Metadata\MetadataStoreInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -219,6 +220,14 @@ class Workflow implements WorkflowInterface
         return $this->markingStore;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadataStore(): MetadataStoreInterface
+    {
+        return $this->definition->getMetadataStore();
+    }
+
     private function buildTransitionBlockerListForTransition($subject, Marking $marking, Transition $transition)
     {
         foreach ($transition->getFroms() as $place) {
@@ -248,7 +257,7 @@ class Workflow implements WorkflowInterface
             return null;
         }
 
-        $event = new GuardEvent($subject, $marking, $transition, $this->name);
+        $event = new GuardEvent($subject, $marking, $transition, $this);
 
         $this->dispatcher->dispatch('workflow.guard', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.guard', $this->name), $event);
@@ -262,7 +271,7 @@ class Workflow implements WorkflowInterface
         $places = $transition->getFroms();
 
         if (null !== $this->dispatcher) {
-            $event = new Event($subject, $marking, $transition, $this->name);
+            $event = new Event($subject, $marking, $transition, $this);
 
             $this->dispatcher->dispatch('workflow.leave', $event);
             $this->dispatcher->dispatch(sprintf('workflow.%s.leave', $this->name), $event);
@@ -283,7 +292,7 @@ class Workflow implements WorkflowInterface
             return;
         }
 
-        $event = new Event($subject, $marking, $transition, $this->name);
+        $event = new Event($subject, $marking, $transition, $this);
 
         $this->dispatcher->dispatch('workflow.transition', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.transition', $this->name), $event);
@@ -295,7 +304,7 @@ class Workflow implements WorkflowInterface
         $places = $transition->getTos();
 
         if (null !== $this->dispatcher) {
-            $event = new Event($subject, $marking, $transition, $this->name);
+            $event = new Event($subject, $marking, $transition, $this);
 
             $this->dispatcher->dispatch('workflow.enter', $event);
             $this->dispatcher->dispatch(sprintf('workflow.%s.enter', $this->name), $event);
@@ -316,7 +325,7 @@ class Workflow implements WorkflowInterface
             return;
         }
 
-        $event = new Event($subject, $marking, $transition, $this->name);
+        $event = new Event($subject, $marking, $transition, $this);
 
         $this->dispatcher->dispatch('workflow.entered', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.entered', $this->name), $event);
@@ -332,7 +341,7 @@ class Workflow implements WorkflowInterface
             return;
         }
 
-        $event = new Event($subject, $marking, $transition, $this->name);
+        $event = new Event($subject, $marking, $transition, $this);
 
         $this->dispatcher->dispatch('workflow.completed', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.completed', $this->name), $event);
@@ -345,7 +354,7 @@ class Workflow implements WorkflowInterface
             return;
         }
 
-        $event = new Event($subject, $marking, $initialTransition, $this->name);
+        $event = new Event($subject, $marking, $initialTransition, $this);
 
         $this->dispatcher->dispatch('workflow.announce', $event);
         $this->dispatcher->dispatch(sprintf('workflow.%s.announce', $this->name), $event);

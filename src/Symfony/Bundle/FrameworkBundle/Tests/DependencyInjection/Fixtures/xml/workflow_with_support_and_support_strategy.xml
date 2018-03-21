@@ -10,8 +10,8 @@
         <framework:workflow name="my_workflow" support-strategy="foobar">
             <framework:marking-store type="multiple_state"/>
             <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
-            <framework:place>first</framework:place>
-            <framework:place>last</framework:place>
+            <framework:place name="first" />
+            <framework:place name="last" />
             <framework:transition name="foobar">
                 <framework:from>a</framework:from>
                 <framework:to>a</framework:to>

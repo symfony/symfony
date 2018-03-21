@@ -466,32 +466,68 @@ class FrameworkExtension extends Extension
         foreach ($config['workflows'] as $name => $workflow) {
             $type = $workflow['type'];
 
+            // Process Metadata (workflow + places (transition is done in the "create transition" block))
+            $metadataStoreDefinition = new Definition(Workflow\Metadata\InMemoryMetadataStore::class, array(null, null, null));
+            if ($workflow['metadata']) {
+                $metadataStoreDefinition->replaceArgument(0, $workflow['metadata']);
+            }
+            $placesMetadata = array();
+            foreach ($workflow['places'] as $place) {
+                if ($place['metadata']) {
+                    $placesMetadata[$place['name']] = $place['metadata'];
+                }
+            }
+            if ($placesMetadata) {
+                $metadataStoreDefinition->replaceArgument(1, $placesMetadata);
+            }
+
+            // Create transitions
             $transitions = array();
+            $transitionsMetadataDefinition = new Definition(\SplObjectStorage::class);
             foreach ($workflow['transitions'] as $transition) {
                 if ('workflow' === $type) {
-                    $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
+                    $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $transition['from'], $transition['to']));
+                    $transitions[] = $transitionDefinition;
+                    if ($transition['metadata']) {
+                        $transitionsMetadataDefinition->addMethodCall('attach', array(
+                            $transitionDefinition,
+                            $transition['metadata'],
+                        ));
+                    }
                 } elseif ('state_machine' === $type) {
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
-                            $transitions[] = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
+                            $transitionDefinition = new Definition(Workflow\Transition::class, array($transition['name'], $from, $to));
+                            $transitions[] = $transitionDefinition;
+                            if ($transition['metadata']) {
+                                $transitionsMetadataDefinition->addMethodCall('attach', array(
+                                    $transitionDefinition,
+                                    $transition['metadata'],
+                                ));
+                            }
                         }
                     }
                 }
             }
+            $metadataStoreDefinition->replaceArgument(2, $transitionsMetadataDefinition);
+
+            // Create places
+            $places = array_map(function (array $place) {
+                return $place['name'];
+            }, $workflow['places']);
 
             // Create a Definition
             $definitionDefinition = new Definition(Workflow\Definition::class);
             $definitionDefinition->setPublic(false);
-            $definitionDefinition->addArgument($workflow['places']);
+            $definitionDefinition->addArgument($places);
             $definitionDefinition->addArgument($transitions);
+            $definitionDefinition->addArgument($workflow['initial_place'] ?? null);
+            $definitionDefinition->addArgument($metadataStoreDefinition);
             $definitionDefinition->addTag('workflow.definition', array(
                 'name' => $name,
                 'type' => $type,
                 'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
             ));
-            if (isset($workflow['initial_place'])) {
-                $definitionDefinition->addArgument($workflow['initial_place']);
-            }
 
             // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {

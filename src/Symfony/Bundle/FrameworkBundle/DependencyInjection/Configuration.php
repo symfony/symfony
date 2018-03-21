@@ -31,6 +31,7 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
  * FrameworkExtension configuration structure.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class Configuration implements ConfigurationInterface
 {
@@ -292,23 +293,61 @@ class Configuration implements ConfigurationInterface
                                         ->defaultNull()
                                     ->end()
                                     ->arrayNode('places')
+                                        ->beforeNormalization()
+                                            ->always()
+                                            ->then(function ($places) {
+                                                // It's an indexed array of shape  ['place1', 'place2']
+                                                if (isset($places[0]) && is_string($places[0])) {
+                                                    return array_map(function (string $place) {
+                                                        return array('name' => $place);
+                                                    }, $places);
+                                                }
+
+                                                // It's an indexed array, we let the validation occur
+                                                if (isset($places[0]) && is_array($places[0])) {
+                                                    return $places;
+                                                }
+
+                                                foreach ($places as $name => $place) {
+                                                    if (is_array($place) && array_key_exists('name', $place)) {
+                                                        continue;
+                                                    }
+                                                    $place['name'] = $name;
+                                                    $places[$name] = $place;
+                                                }
+
+                                                return array_values($places);
+                                            })
+                                        ->end()
                                         ->isRequired()
                                         ->requiresAtLeastOneElement()
-                                        ->prototype('scalar')
-                                            ->cannotBeEmpty()
+                                        ->prototype('array')
+                                            ->children()
+                                                ->scalarNode('name')
+                                                    ->isRequired()
+                                                    ->cannotBeEmpty()
+                                                ->end()
+                                                ->arrayNode('metadata')
+                                                    ->normalizeKeys(false)
+                                                    ->defaultValue(array())
+                                                    ->example(array('color' => 'blue', 'description' => 'Workflow to manage article.'))
+                                                    ->prototype('variable')
+                                                    ->end()
+                                                ->end()
+                                            ->end()
                                         ->end()
                                     ->end()
                                     ->arrayNode('transitions')
                                         ->beforeNormalization()
                                             ->always()
                                             ->then(function ($transitions) {
-                                                // It's an indexed array, we let the validation occurs
-                                                if (isset($transitions[0])) {
+                                                // It's an indexed array, we let the validation occur
+                                                if (isset($transitions[0]) && is_array($transitions[0])) {
                                                     return $transitions;
                                                 }
 
                                                 foreach ($transitions as $name => $transition) {
-                                                    if (array_key_exists('name', $transition)) {
+                                                    if (is_array($transition) && array_key_exists('name', $transition)) {
                                                         continue;
                                                     }
                                                     $transition['name'] = $name;
@@ -351,7 +390,21 @@ class Configuration implements ConfigurationInterface
                                                         ->cannotBeEmpty()
                                                     ->end()
                                                 ->end()
+                                                ->arrayNode('metadata')
+                                                    ->normalizeKeys(false)
+                                                    ->defaultValue(array())
+                                                    ->example(array('color' => 'blue', 'description' => 'Workflow to manage article.'))
+                                                    ->prototype('variable')
+                                                    ->end()
+                                                ->end()
                                             ->end()
+                                        ->end()
+                                    ->end()
+                                    ->arrayNode('metadata')
+                                        ->normalizeKeys(false)
+                                        ->defaultValue(array())
+                                        ->example(array('color' => 'blue', 'description' => 'Workflow to manage article.'))
+                                        ->prototype('variable')
                                         ->end()
                                     ->end()
                                 ->end()

@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-08T15:19:21Z
+
+Note: This PR is far from finished. I want to gather feedback before.
+
+ping @ostrolucky @userdude
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-08T16:10:44Z
+
+> should I introduce a Place class
+
+IMHO, this PR makes sense. A Place class would introduce a complex BC/FC layer, and create another issue: the strict equality operator to compare object would not work anymore, forcing to compare places using a method (eg getName()) - thus adding boilerplate.
+
+The current design is not stupid, extending should require refactoring it - and in fact it doesn't :)
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-02-08T18:26:44Z
+
+Don't have time to review this now, but just want to say that triple equal operator issue is same issue php enumeration libraries face and can be solved by replacing constructor with a factory method which caches instances in a private property and returns same instance for place which has already been instantiated before. This guarantees there cannot exist multiple instances for same place.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-09T17:24:07Z
+
+Okay, the PR is ready ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-15T18:10:01Z
+
+This PR is ready.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-16T10:24:24Z
+
+I would like to merge this PR today (because it's open for a week now), so I'm calling for a review :) Thanks
+(cc / @stof @nicolas-grekas @Nyholm @xabbuh )
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-19T18:30:54Z
+
+I just rebased this PR. It's ready. I would like to merge it this week.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-21T09:40:38Z
+
+@fabpot Thanks for your review. I have addressed your comments
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-21T10:06:49Z
+
+Thanks @nicolas-grekas for the review. I have addressed your comments.

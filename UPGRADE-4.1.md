@@ -11,6 +11,7 @@ Console
 -------
 
  * Deprecated the `setCrossingChar()` method in favor of the `setDefaultCrossingChar()` method in `TableStyle`.
+ * The `Processor` class has been made final
 
 DependencyInjection
 -------------------

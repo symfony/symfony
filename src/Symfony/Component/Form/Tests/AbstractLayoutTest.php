@@ -446,16 +446,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             'help' => 'Help text test!',
         ));
         $view = $form->createView();
-
-        // Test if renderHelp method is implemented
-        try {
-            $this->renderHelp($view);
-        }
-        catch (SkippedTestError $error) {
-            return $error;
-        }
-
         $html = $this->renderRow($view);
+
+        // Test if renderHelp method is implemented (throw SkippedTestError if not)
+        $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
 '//input
@@ -468,16 +462,10 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $view = $form->createView();
-
-        // Test if renderHelp method is implemented
-        try {
-            $this->renderHelp($view);
-        }
-        catch (SkippedTestError $error) {
-            return $error;
-        }
-
         $html = $this->renderRow($view);
+
+        // Test if renderHelp method is implemented (throw SkippedTestError if not)
+        $this->renderHelp($view);
 
         $this->assertMatchesXpath($html,
 '//input

@@ -34,12 +34,12 @@ class GuardEvent extends Event
         $this->transitionBlockerList = new TransitionBlockerList();
     }
 
-    public function isBlocked(): bool
+    public function isBlocked()
     {
         return !$this->transitionBlockerList->isEmpty();
     }
 
-    public function setBlocked(bool $blocked): void
+    public function setBlocked($blocked)
     {
         if (!$blocked) {
             $this->transitionBlockerList->reset();

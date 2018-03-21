@@ -415,7 +415,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @return array
      */
-    private function getReadAccessInfo($class, $property)
+    public function getReadAccessInfo($class, $property)
     {
         $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 
@@ -590,7 +590,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * @param mixed $value
      */
-    private function getWriteAccessInfo(string $class, string $property, $value): array
+    public function getWriteAccessInfo(string $class, string $property, $value): array
     {
         $key = (false !== strpos($class, '@') ? rawurlencode($class) : $class).'..'.$property;
 

@@ -32,6 +32,20 @@ class RoleHierarchy implements RoleHierarchyInterface
     }
 
     /**
+     * @return array
+     */
+    public function getRoles()
+    {
+        $roles = array();
+
+        foreach ($this->hierarchy as $main => $roles) {
+            $roles[] = $main;
+        }
+
+        return array_unique($roles);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getReachableRoles(array $roles)

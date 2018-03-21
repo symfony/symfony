@@ -1441,7 +1441,7 @@ class Process implements \IteratorAggregate
             }
         }
 
-        $this->latestSignal = (int) $signal;
+        $this->latestSignal = $signal;
         $this->fallbackStatus['signaled'] = true;
         $this->fallbackStatus['exitcode'] = -1;
         $this->fallbackStatus['termsig'] = $this->latestSignal;

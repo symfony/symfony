@@ -69,7 +69,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
      */
     public function getEnvPlaceholderUniquePrefix(): string
     {
-        return $this->envPlaceholderUniquePrefix ?? $this->envPlaceholderUniquePrefix = 'env_'.bin2hex(random_bytes(16));
+        return $this->envPlaceholderUniquePrefix ?? $this->envPlaceholderUniquePrefix = 'env_'.bin2hex(random_bytes(8));
     }
 
     /**

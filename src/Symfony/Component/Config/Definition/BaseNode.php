@@ -483,7 +483,7 @@ abstract class BaseNode implements NodeInterface
                 return self::$placeholders[$value];
             }
 
-            if (0 === strpos($value, self::$placeholderUniquePrefix, 0)) {
+            if (0 === strpos($value, self::$placeholderUniquePrefix)) {
                 return array();
             }
         }
@@ -493,7 +493,7 @@ abstract class BaseNode implements NodeInterface
 
     private static function getType($value): string
     {
-        switch ($type = gettype($value)) {
+        switch ($type = \gettype($value)) {
             case 'boolean':
                 return 'bool';
             case 'double':

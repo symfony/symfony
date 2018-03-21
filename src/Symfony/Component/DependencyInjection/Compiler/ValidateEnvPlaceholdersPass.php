@@ -86,7 +86,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
 
     private static function getType($value): string
     {
-        switch ($type = gettype($value)) {
+        switch ($type = \gettype($value)) {
             case 'boolean':
                 return 'bool';
             case 'double':

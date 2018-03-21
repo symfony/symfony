@@ -82,4 +82,12 @@ class UrlTypeTest extends TextTypeTest
             'default_protocol' => array(),
         ));
     }
+
+    public function testSubmitWithNonStringDataDoesNotBreakTheFixUrlProtocolListener()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE);
+        $form->submit(array('domain.com', 'www.domain.com'));
+
+        $this->assertSame(array('domain.com', 'www.domain.com'), $form->getData());
+    }
 }

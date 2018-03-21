@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-11-29T14:54:06Z
+
+Rather than coupling it to the `security-core` twig integration (which would forbid you to use CSRF without installing the security-core and then getting `is_granted`), I would rather define a separate Twig extension for the CSRF (and deprecate the fact of passing a CsrfManager to the FormExtension).
+
+The authorization layer and the CSRF layer are totally independant components (the CSRF one is not even configured by SecurityBundle but by FrameworkBundle)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-01T09:57:22Z
+
+I moved the new function into a new extension class inside FrameworkBundle. Do we nonetheless want to use a runtime class here?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-12-04T09:33:20Z
+
+@xabbuh just asking: is there any reason yo create so many small Twig extensions in https://github.com/xabbuh/symfony/tree/master/src/Symfony/Bridge/Twig/Extension? Could we add this tiny new function in the existing SecurityExtension instead? Thanks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-12-04T10:01:15Z
+
+@javiereguiluz see https://github.com/symfony/symfony/pull/25197#issuecomment-347884335
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-03-12T08:49:52Z
+
+> Isn't this missing the deprecation of the csrf_token in the FormExtension and FormRenderer? Otherwise we have the same thing in two different ways.
+
+Maybe I am missing something, but I don't see how to deprecate registering a single function from a Twig extension. But as far as I can see that's not a big deal as the extension being registered later will just replace the existing definition which does no harm as both implementations internally work the same.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-13T12:54:13Z
+
+@xabbuh https://twig.symfony.com/doc/2.x/advanced.html#deprecated-filters
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-03-13T13:10:14Z
+
+@fabpot in our case both filters have the same name. We could make registering the additional filters an opt-out feature. But I am not sure if it's worth it.

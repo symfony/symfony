@@ -208,7 +208,7 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             $getValue = function () use ($type, $parameter, $class, $method) {
-                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, !$parameter->isOptional() ? $class : ''))) {
+                if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type))) {
                     $failureMessage = $this->createTypeNotFoundMessage($ref, sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $this->currentId ? $class.'::'.$method : $method));
 
                     if ($parameter->isDefaultValueAvailable()) {

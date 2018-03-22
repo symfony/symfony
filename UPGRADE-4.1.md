@@ -12,6 +12,11 @@ Console
 
  * Deprecated the `setCrossingChar()` method in favor of the `setDefaultCrossingChar()` method in `TableStyle`.
 
+DependencyInjection
+-------------------
+
+ * Deprecated the `TypedReference::canBeAutoregistered()` and  `TypedReference::getRequiringClass()` methods.
+
 EventDispatcher
 ---------------
 

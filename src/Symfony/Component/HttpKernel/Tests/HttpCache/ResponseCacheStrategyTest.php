@@ -175,8 +175,26 @@ class ResponseCacheStrategyTest extends TestCase
         $cacheStrategy->update($masterResponse);
 
         $this->assertTrue($masterResponse->headers->hasCacheControlDirective('private'));
-        // Not sure if we should pass "max-age: 60" in this case, as long as the response is private and
-        // that's the more conservative of both the master and embedded response...?
+        $this->assertFalse($masterResponse->headers->hasCacheControlDirective('public'));
+    }
+
+    public function testEmbeddingPublicResponseDoesNotMakeMainResponsePublic()
+    {
+        $cacheStrategy = new ResponseCacheStrategy();
+
+        $masterResponse = new Response();
+        $masterResponse->setPrivate(); // this is the default, but let's be explicit
+        $masterResponse->setMaxAge(100);
+
+        $embeddedResponse = new Response();
+        $embeddedResponse->setPublic();
+        $embeddedResponse->setSharedMaxAge(100);
+
+        $cacheStrategy->add($embeddedResponse);
+        $cacheStrategy->update($masterResponse);
+
+        $this->assertTrue($masterResponse->headers->hasCacheControlDirective('private'));
+        $this->assertFalse($masterResponse->headers->hasCacheControlDirective('public'));
     }
 
     public function testResponseIsExiprableWhenEmbeddedResponseCombinesExpiryAndValidation()

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by skalpa at 2018-03-19T15:39:30Z
+
+Failures are unrelated.
+
+Also, I didn't know which branch to target: the source of the problem is a change in `Symfony\Component\Config\Loader\FileLoader` on the 3.3 branch, however in theory one could use  v3.3+ of the config component with an older version of the routing component... so I left it against 3.4 for now but can rebase to an older branch if you tell me which one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T15:58:35Z
+
+@skalpa thank you. Branch 3.4 is the good one. I think `RoutingConfigurator` also need a similar update (but not exact same logic: the `$subCollection` need to contain all the routes before passing it to the `ImportConfigurator` instance, you'll see.
+
+---------------------------------------------------------------------------
+
+by skalpa at 2018-03-19T16:58:37Z
+
+@nicolas-grekas I took care of `RoutingConfigurator` too, thanks for pointing that out.

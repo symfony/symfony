@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2018-03-22T13:43:14Z
+
+I would also make it return `false` all the time (maybe even in 4.0), as no reference can be auto-registered in 4.0 :smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T13:59:29Z
+
+This PR now also deprecates `TypedReference::getRequiringClass()` since it's also not used.
+
+> return false all the time
+
+hum, I'd better not do this, for hypothetical BC breaks and easing merges...

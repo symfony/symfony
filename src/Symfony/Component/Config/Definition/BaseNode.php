@@ -57,9 +57,10 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Register possible (dummy) values for a dynamic placeholder value. Matching configuration values will be processed
-     * with a provided value, one by one. After a provided value is successfully processed the configuration value is
-     * returned as is, thus preserving the placeholder.
+     * Register possible (dummy) values for a dynamic placeholder value.
+     *
+     * Matching configuration values will be processed with a provided value, one by one. After a provided value is
+     * successfully processed the configuration value is returned as is, thus preserving the placeholder.
      */
     public static function setPlaceholder(string $placeholder, array $values): void
     {
@@ -71,9 +72,10 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Set a common prefix for dynamic placeholder values. Matching configuration values will be skipped from being
-     * processed and are returned as is, thus preserving the placeholder. An exact match provided by {@see setPlaceholder()}
-     * might take precedence.
+     * Sets a common prefix for dynamic placeholder values.
+     *
+     * Matching configuration values will be skipped from being processed and are returned as is, thus preserving the
+     * placeholder. An exact match provided by {@see setPlaceholder()} might take precedence.
      */
     public static function setPlaceholderUniquePrefix(string $prefix): void
     {
@@ -81,7 +83,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Reset all current placeholders available.
+     * Resets all current placeholders available.
      */
     public static function resetPlaceholders(): void
     {
@@ -461,7 +463,7 @@ abstract class BaseNode implements NodeInterface
     abstract protected function finalizeValue($value);
 
     /**
-     * Test if placeholder values are allowed for this node.
+     * Tests if placeholder values are allowed for this node.
      */
     protected function allowPlaceholders(): bool
     {
@@ -469,7 +471,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Get allowed dynamic types for this node.
+     * Gets allowed dynamic types for this node.
      */
     protected function getValidPlaceholderTypes(): array
     {

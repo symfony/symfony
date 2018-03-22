@@ -1811,12 +1811,12 @@ EOF;
 
     private function doExport($value, $resolveEnv = false)
     {
-        if (is_string($value) && \in_array(preg_match('/[\x00-\x08\x0B\x0E-\x1A\x1C-\x1F\x7F]/u', $value), array(false, 1), true)) {
+        if (\is_string($value) && !preg_match('/^[^\x00-\x08\x0B\x0E-\x1A\x1C-\x1F\x7F]*+$/u', $value)) {
             $toHex = function (&$values, $char) {
                 return $values.sprintf('\\x%02x', ord($char));
             };
             $export = '"'.array_reduce(str_split($value), $toHex, '').'"';
-        } elseif (is_string($value) && false !== strpos($value, "\n")) {
+        } elseif (\is_string($value) && false !== strpos($value, "\n")) {
             $cleanParts = explode("\n", $value);
             $cleanParts = array_map(function ($part) { return var_export($part, true); }, $cleanParts);
             $export = implode('."\n".', $cleanParts);

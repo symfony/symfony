@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 class AutowirePass extends AbstractRecursivePass
 {
     private $types;
-    private $ambiguousServiceTypes = array();
+    private $ambiguousServiceTypes;
     private $lastFailure;
     private $throwOnAutowiringException;
 
@@ -46,7 +46,7 @@ class AutowirePass extends AbstractRecursivePass
             parent::process($container);
         } finally {
             $this->types = null;
-            $this->ambiguousServiceTypes = array();
+            $this->ambiguousServiceTypes = null;
         }
     }
 
@@ -238,6 +238,7 @@ class AutowirePass extends AbstractRecursivePass
     private function populateAvailableTypes()
     {
         $this->types = array();
+        $this->ambiguousServiceTypes = array();
 
         foreach ($this->container->getDefinitions() as $id => $definition) {
             $this->populateAvailableType($id, $definition);
@@ -333,7 +334,7 @@ class AutowirePass extends AbstractRecursivePass
         if ($message = $this->getAliasesSuggestionForType($type = $reference->getType())) {
             return ' '.$message;
         }
-        if (null === $this->types) {
+        if (null === $this->ambiguousServiceTypes) {
             $this->populateAvailableTypes();
         }
 

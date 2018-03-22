@@ -56,7 +56,20 @@
             <argument>%debug.file_link_format%</argument>
             <argument type="service" id="request_stack" on-invalid="ignore" />
             <argument>%kernel.project_dir%</argument>
-            <argument>/_profiler/open?file=%%f&amp;line=%%l#line%%l</argument>
+            <argument type="service">
+                <service class="string">
+                    <factory function="implode" />
+                    <argument type="collection">
+                        <argument type="service">
+                            <service class="string">
+                                <factory service="router" method="generate" />
+                                <argument>_profiler_open_file</argument>
+                            </service>
+                        </argument>
+                        <argument>?file=%%f&amp;line=%%l#line%%l</argument>
+                    </argument>
+                </service>
+            </argument>
         </service>
     </services>
 </container>

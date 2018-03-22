@@ -290,9 +290,9 @@
 {# Help #}
 
 {% block form_help -%}
-    {% if help is not empty %}
+    {%- if help is not empty -%}
         <p id="{{ id }}_help" class="help-text">{{ translation_domain is same as(false) ? help : help|trans({}, translation_domain) }}</p>
-    {% endif %}
+    {%- endif -%}
 {%- endblock form_help %}
 
 {# Rows #}

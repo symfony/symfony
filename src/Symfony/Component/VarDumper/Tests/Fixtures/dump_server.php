@@ -25,7 +25,7 @@ VarDumper::setHandler(function ($var) use ($cloner, $dumper) {
     $dumper->dump($data);
 });
 
-$server = new DumpServer();
+$server = new DumpServer(getenv('VAR_DUMPER_SERVER'));
 
 $server->start();
 

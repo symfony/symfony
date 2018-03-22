@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Command;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,14 +36,14 @@ class ServerDumpCommand extends Command
 {
     protected static $defaultName = 'server:dump';
 
-    private $logger;
+    private $server;
 
     /** @var DumpDescriptorInterface[] */
     private $descriptors;
 
-    public function __construct(array $descriptors = array(), LoggerInterface $logger = null)
+    public function __construct(DumpServer $server, array $descriptors = array())
     {
-        $this->logger = $logger;
+        $this->server = $server;
         $this->descriptors = $descriptors + array(
             'cli' => new CliDescriptor(new CliDumper()),
             'html' => new HtmlDescriptor(new HtmlDumper()),
@@ -58,7 +57,7 @@ class ServerDumpCommand extends Command
         $availableFormats = implode(', ', array_keys($this->descriptors));
 
         $this
-            ->addOption('format', null, InputOption::VALUE_REQUIRED, "The output format ($availableFormats)", 'cli')
+            ->addOption('format', null, InputOption::VALUE_REQUIRED, sprintf('The output format (%s)', $availableFormats), 'cli')
             ->setDescription('Starts a dump server that collects and displays dumps in a single place')
             ->setHelp(<<<'EOF'
 <info>%command.name%</info> starts a dump server that collects and displays
@@ -88,14 +87,13 @@ EOF
         $errorIo = $io->getErrorStyle();
         $errorIo->title('Symfony Var Dumper Server');
 
-        $server = new DumpServer(null, $this->logger);
-        $server->start();
+        $this->server->start();
 
-        $errorIo->success(sprintf('Server listening on %s', $server->getHost()));
+        $errorIo->success(sprintf('Server listening on %s', $this->server->getHost()));
         $errorIo->comment('Quit the server with CONTROL-C.');
 
-        $server->listen(function (Data $data, array $context, int $clientId) use ($descriptor, $output) {
-            $descriptor->describe($output, $data, $context, $clientId);
+        $this->server->listen(function (Data $data, array $context, int $clientId) use ($descriptor, $io) {
+            $descriptor->describe($io, $data, $context, $clientId);
         });
     }
 }

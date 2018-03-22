@@ -13,7 +13,6 @@ namespace Symfony\Component\VarDumper\Dumper;
 
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\ContextProviderInterface;
-use Symfony\Component\VarDumper\Server\DumpServer;
 
 /**
  * ServerDumper forwards serialized Data clones to a server.
@@ -43,7 +42,7 @@ class ServerDumper implements DataDumperInterface
         $this->contextProviders = $contextProviders;
     }
 
-    public function getContextProviders(): ?array
+    public function getContextProviders(): array
     {
         return $this->contextProviders;
     }

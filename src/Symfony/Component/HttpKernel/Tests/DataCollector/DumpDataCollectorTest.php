@@ -12,11 +12,10 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\VarDumper\Cloner\Data;
-use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 use Symfony\Component\VarDumper\Dumper\ServerDumper;
 
 /**
@@ -62,33 +61,11 @@ class DumpDataCollectorTest extends TestCase
         $data = new Data(array(array(123)));
 
         // Server is up, server dumper is used
-        $serverDumper = $this->getMockBuilder(ServerDumper::class)->getMock();
+        $serverDumper = $this->getMockBuilder(ServerDumper::class)->disableOriginalConstructor()->getMock();
         $serverDumper->expects($this->once())->method('dump');
         $serverDumper->method('isServerListening')->willReturn(true);
 
-        // configured dumper is never used
-        $dumper = $this->getMockBuilder(DataDumperInterface::class)->getMock();
-        $dumper->expects($this->never())->method('dump');
-
-        $collector = new DumpDataCollector(null, null, null, null, $dumper, $serverDumper);
-        $collector->dump($data);
-
-        // Collect doesn't re-trigger dump
-        ob_start();
-        $collector->collect(new Request(), new Response());
-        $this->assertEmpty(ob_get_clean());
-        $this->assertStringMatchesFormat('a:3:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', $collector->serialize());
-
-        // Server is down, server dumper is never used
-        $serverDumper = $this->getMockBuilder(ServerDumper::class)->getMock();
-        $serverDumper->expects($this->never())->method('dump');
-        $serverDumper->method('isServerListening')->willReturn(false);
-
-        // configured dumper is used
-        $dumper = $this->getMockBuilder(DataDumperInterface::class)->getMock();
-        $dumper->expects($this->exactly(2))->method('dump'); // called twice in doDump if not a CLiDumper instance
-
-        $collector = new DumpDataCollector(null, null, null, null, $dumper, $serverDumper);
+        $collector = new DumpDataCollector(null, null, null, null, $serverDumper);
         $collector->dump($data);
 
         // Collect doesn't re-trigger dump
@@ -148,36 +125,6 @@ EOTXT;
     {
         $data = new Data(array(array(456)));
         $collector = new DumpDataCollector();
-        $collector->dump($data);
-        $line = __LINE__ - 1;
-
-        ob_start();
-        $collector->__destruct();
-        $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", ob_get_clean());
-    }
-
-    public function testFlushWithServerDumper()
-    {
-        $data = new Data(array(array(456)));
-
-        // Server is up, server dumper is used
-        $serverDumper = $this->getMockBuilder(ServerDumper::class)->getMock();
-        $serverDumper->expects($this->once())->method('dump');
-        $serverDumper->method('isServerListening')->willReturn(true);
-
-        $collector = new DumpDataCollector(null, null, null, null, null, $serverDumper);
-        $collector->dump($data);
-
-        ob_start();
-        $collector->__destruct();
-        $this->assertEmpty(ob_get_clean());
-
-        // Server is down, buffered dump is flushed on destruct
-        $serverDumper = $this->getMockBuilder(ServerDumper::class)->getMock();
-        $serverDumper->expects($this->never())->method('dump');
-        $serverDumper->method('isServerListening')->willReturn(false);
-
-        $collector = new DumpDataCollector(null, null, null, null, null, $serverDumper);
         $collector->dump($data);
         $line = __LINE__ - 1;
 

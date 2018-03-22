@@ -7,7 +7,7 @@ CHANGELOG
  * added a `ServerDumper` to send serialized Data clones to a server
  * added a `ServerDumpCommand` and `DumpServer` to run a server collecting
    and displaying dumps on a single place with multiple formats support
- * added `CliDescriptor` and `HtmlDescriptor` descriptors for `server:dump` cli and html formats support
+ * added `CliDescriptor` and `HtmlDescriptor` descriptors for `server:dump` CLI and HTML formats support
 
 4.0.0
 -----

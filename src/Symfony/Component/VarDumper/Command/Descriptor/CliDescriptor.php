@@ -36,7 +36,7 @@ class CliDescriptor implements DumpDescriptorInterface
 
     public function describe(OutputInterface $output, Data $data, array $context, int $clientId): void
     {
-        $io = new SymfonyStyle(new ArrayInput(array()), $output);
+        $io = $output instanceof SymfonyStyle ? $output : new SymfonyStyle(new ArrayInput(array()), $output);
 
         $rows = array(array('date', date('r', $context['timestamp'])));
         $lastIdentifier = $this->lastIdentifier;

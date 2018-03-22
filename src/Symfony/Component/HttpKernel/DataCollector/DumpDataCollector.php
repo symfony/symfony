@@ -58,7 +58,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             &$this->clonesCount,
         );
 
-        $this->sourceContextProvider = $dumper instanceof ServerDumper ? $dumper->getContextProviders()['source'] : new SourceContextProvider($this->charset);
+        $this->sourceContextProvider = $dumper instanceof ServerDumper && isset($dumper->getContextProviders()['source']) ? $dumper->getContextProviders()['source'] : new SourceContextProvider($this->charset);
     }
 
     public function __clone()

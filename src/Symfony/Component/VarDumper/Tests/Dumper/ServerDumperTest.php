@@ -21,21 +21,13 @@ use Symfony\Component\VarDumper\Dumper\ServerDumper;
 
 class ServerDumperTest extends TestCase
 {
-    public static function setUpBeforeClass()
-    {
-        putenv('VAR_DUMPER_SERVER=tcp://127.0.0.1:9913');
-    }
-
-    public static function tearDownAfterClass()
-    {
-        putenv('VAR_DUMPER_SERVER');
-    }
+    private const VAR_DUMPER_SERVER = 'tcp://127.0.0.1:9913';
 
     public function testDumpForwardsToWrappedDumperWhenServerIsUnavailable()
     {
         $wrappedDumper = $this->getMockBuilder(DataDumperInterface::class)->getMock();
 
-        $dumper = new ServerDumper(null, $wrappedDumper);
+        $dumper = new ServerDumper(self::VAR_DUMPER_SERVER, $wrappedDumper);
 
         $cloner = new VarCloner();
         $data = $cloner->cloneVar('foo');
@@ -47,7 +39,7 @@ class ServerDumperTest extends TestCase
 
     public function testIsServerListening()
     {
-        $dumper = new ServerDumper();
+        $dumper = new ServerDumper(self::VAR_DUMPER_SERVER);
 
         $this->assertFalse($dumper->isServerListening());
 
@@ -73,7 +65,7 @@ class ServerDumperTest extends TestCase
 
         $cloner = new VarCloner();
         $data = $cloner->cloneVar('foo');
-        $dumper = new ServerDumper(null, $wrappedDumper, array(
+        $dumper = new ServerDumper(self::VAR_DUMPER_SERVER, $wrappedDumper, array(
             'foo_provider' => new class() implements ContextProviderInterface {
                 public function getContext(): ?array
                 {
@@ -117,7 +109,7 @@ DUMP
     {
         $process = new PhpProcess(file_get_contents(__DIR__.'/../Fixtures/dump_server.php'), null, array(
             'COMPONENT_ROOT' => __DIR__.'/../../',
-            'VAR_DUMPER_SERVER' => 'tcp://127.0.0.1:9913',
+            'VAR_DUMPER_SERVER' => self::VAR_DUMPER_SERVER,
         ));
         $process->inheritEnvironmentVariables(true);
 

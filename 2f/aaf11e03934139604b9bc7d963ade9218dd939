@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-22T10:18:09Z
+
+@nicolas-grekas my head exploded when trying to understand this ... but I'm glad this is working 🎉
+
+However, the main concern of Fabien in the other PR (see https://github.com/symfony/symfony/pull/24153#discussion_r142044250) was the configurability of this. So, can you please paste an example of the config needed if the user wants to customize the URL? We'd need it to update the docs. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T10:21:16Z
+
+@javiereguiluz there is no config needed, the URL will be generated based on the path of the `_profiler_open_file` route. If you want another route, do it yourself (but that's not what the original issue asked for.)

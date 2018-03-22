@@ -67,6 +67,7 @@
     <xsd:attribute name="schemes" type="xsd:string" />
     <xsd:attribute name="methods" type="xsd:string" />
     <xsd:attribute name="controller" type="xsd:string" />
+    <xsd:attribute name="trailing-slash-on-root" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="default" mixed="true">

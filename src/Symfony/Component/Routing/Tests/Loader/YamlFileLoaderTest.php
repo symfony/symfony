@@ -209,7 +209,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertCount(3, $routes);
     }
 
-
     public function testImportingRoutesFromDefinition()
     {
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/localized')));
@@ -274,5 +273,14 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('DefaultController::defaultAction', $routes->get('home.en')->getDefault('_controller'));
         $this->assertEquals('DefaultController::defaultAction', $routes->get('home.nl')->getDefault('_controller'));
         $this->assertEquals('DefaultController::defaultAction', $routes->get('not_localized')->getDefault('_controller'));
+    }
+
+    public function testImportRouteWithNoTrailingSlash()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures/import_with_no_trailing_slash')));
+        $routeCollection = $loader->load('routing.yml');
+
+        $this->assertEquals('/slash/', $routeCollection->get('a_app_homepage')->getPath());
+        $this->assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
     }
 }

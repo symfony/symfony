@@ -40,22 +40,22 @@ class DebugExtension extends Extension
             ->addMethodCall('setMinDepth', array($config['min_depth']))
             ->addMethodCall('setMaxString', array($config['max_string_length']));
 
-        if (null !== $config['dump_destination']) {
+        if (null === $config['dump_destination']) {
+            //no-op
+        } elseif (0 === strpos($config['dump_destination'], 'tcp://')) {
+            $container->getDefinition('debug.dump_listener')
+                ->replaceArgument(1, new Reference('var_dumper.server_dumper'))
+            ;
+            $container->getDefinition('var_dumper.command.server_dump')
+                ->replaceArgument(1, new Reference('var_dumper.server_dumper'))
+            ;
+        } else {
             $container->getDefinition('var_dumper.cli_dumper')
                 ->replaceArgument(0, $config['dump_destination'])
             ;
             $container->getDefinition('data_collector.dump')
                 ->replaceArgument(4, new Reference('var_dumper.cli_dumper'))
             ;
-        }
-
-        if ($config['server_dump']) {
-            $container->getDefinition('debug.dump_listener')
-                ->replaceArgument(1, new Reference('var_dumper.server_dumper'))
-            ;
-        } else {
-            $container->removeDefinition('var_dumper.server_dumper');
-            $container->removeDefinition('var_dumper.command.server_dump');
         }
     }
 

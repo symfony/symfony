@@ -28,16 +28,12 @@ class ServerDumper implements DataDumperInterface
     private $socket;
 
     /**
-     * @param string|null                $host             The server host or null to read it from the VAR_DUMPER_SERVER env var
+     * @param string                     $host             The server host
      * @param DataDumperInterface|null   $wrappedDumper    A wrapped instance used whenever we failed contacting the server
      * @param ContextProviderInterface[] $contextProviders Context providers indexed by context name
      */
-    public function __construct(string $host = null, DataDumperInterface $wrappedDumper = null, array $contextProviders = array())
+    public function __construct(string $host, DataDumperInterface $wrappedDumper = null, array $contextProviders = array())
     {
-        if (null === $host) {
-            $host = getenv(DumpServer::HOST_ENV_VAR) ?: DumpServer::DEFAULT_HOST;
-        }
-
         if (false === strpos($host, '://')) {
             $host = 'tcp://'.$host;
         }
@@ -47,9 +43,9 @@ class ServerDumper implements DataDumperInterface
         $this->contextProviders = $contextProviders;
     }
 
-    public function setWrappedDumper(DataDumperInterface $wrappedDumper = null): void
+    public function getContextProviders(): ?array
     {
-        $this->wrappedDumper = $wrappedDumper;
+        return $this->contextProviders;
     }
 
     /**
@@ -96,7 +92,7 @@ class ServerDumper implements DataDumperInterface
             }
         } finally {
             restore_error_handler();
-            if ($this->wrappedDumper && $failed) {
+            if ($failed && $this->wrappedDumper) {
                 $this->wrappedDumper->dump($data);
             }
         }

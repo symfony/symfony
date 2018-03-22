@@ -7,6 +7,8 @@
     <services>
         <defaults public="false" />
 
+        <parameter key="env(VAR_DUMPER_SERVER)">127.0.0.1:9912</parameter>
+
         <service id="twig.extension.dump" class="Symfony\Bridge\Twig\Extension\DumpExtension">
             <tag name="twig.extension" />
             <argument type="service" id="var_dumper.cloner" />
@@ -19,8 +21,7 @@
             <argument type="service" id="debug.file_link_formatter" on-invalid="ignore"></argument>
             <argument>%kernel.charset%</argument>
             <argument type="service" id="request_stack" />
-            <argument>null</argument><!-- var_dumper.cli_dumper when debug.dump_destination is set -->
-            <argument type="service" id="var_dumper.server_dumper" on-invalid="null" />
+            <argument>null</argument><!-- var_dumper.cli_dumper or var_dumper.server_dumper when debug.dump_destination is set -->
         </service>
 
         <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">
@@ -35,6 +36,7 @@
             <argument>%kernel.charset%</argument>
             <argument>0</argument> <!-- flags -->
         </service>
+
         <service id="var_dumper.html_dumper" class="Symfony\Component\VarDumper\Dumper\HtmlDumper">
             <argument>null</argument>
             <argument>%kernel.charset%</argument>
@@ -45,6 +47,7 @@
                 </argument>
             </call>
         </service>
+
         <service id="var_dumper.server_dumper" class="Symfony\Component\VarDumper\Dumper\ServerDumper">
             <argument>null</argument> <!-- server host -->
             <argument type="service" id="var_dumper.cli_dumper" />
@@ -66,6 +69,7 @@
                 </argument>
             </argument>
         </service>
+
         <service id="var_dumper.command.server_dump" class="Symfony\Component\VarDumper\Command\ServerDumpCommand">
             <argument type="collection">
                 <argument type="service" key="cli">

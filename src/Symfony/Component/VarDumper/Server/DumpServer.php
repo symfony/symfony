@@ -23,23 +23,12 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class DumpServer
 {
-    public const HOST_ENV_VAR = 'VAR_DUMPER_SERVER';
-    public const DEFAULT_HOST = 'tcp://0.0.0.0:9912';
-
     private $host;
     private $socket;
     private $logger;
 
-    /**
-     * @param string|null          $host   The server host or null to read it from the VAR_DUMPER_SERVER env var
-     * @param LoggerInterface|null $logger
-     */
-    public function __construct(string $host = null, LoggerInterface $logger = null)
+    public function __construct(string $host, LoggerInterface $logger = null)
     {
-        if (null === $host) {
-            $host = getenv(static::HOST_ENV_VAR) ?: static::DEFAULT_HOST;
-        }
-
         if (false === strpos($host, '://')) {
             $host = 'tcp://'.$host;
         }

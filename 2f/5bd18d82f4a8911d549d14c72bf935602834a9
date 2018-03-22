@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T14:43:27Z
+
+@ismail1432 would you mind adding a test case please?
+
+---------------------------------------------------------------------------
+
+by ismail1432 at 2018-03-21T20:51:30Z
+
+@nicolas-grekas sorry for answer now, this [test](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Authentication/Provider/LdapBindAuthenticationProvider.php#L72) is not enough ? To be honest I don't have enough experience in Security and Tests to go more far... Sorry.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-21T20:58:50Z
+
+I mean a test case, something in https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Tests/Authentication/Provider/LdapBindAuthenticationProviderTest.php
+that would ensure that passing a `null` password works.
+
+---------------------------------------------------------------------------
+
+by ismail1432 at 2018-03-21T21:28:30Z
+
+thanks for feedback, I add test with `null` password and it works

@@ -1,0 +1,253 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-23T11:56:41Z
+
+I agree that this is the cleanest and simplest solution. But I fear it's a BC break for some people.
+I've seen route definitions like `path: ~` and `path: ''` alot which then get imported with a prefix. So for all of them it will change the URL.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-23T12:43:48Z
+
+@Tobion yep.
+
+~~Here is a plan:~~
+- ~~for redirecteable URL matchers, #26283 fixes the issue for GET/HEAD. For other methods, we would make the two routes equivalent, ie no redirections and no 404.~~
+- ~~for non-redirecteable matchers, we would disable this behavior and keep the current one~~
+
+~~Since the behavior is in RouteCollection, and since RouteCollection doesn't know about the types of the matcher, we would in fact add a constructor argument to it, to opt-in low-level (and we would always pass true via FrameworkBundle.)~~
+
+---------------------------------------------------------------------------
+
+by sebastianblum at 2018-02-23T12:49:04Z
+
+@nicolas-grekas your code looks so easy, I tried it last year and stranded.
+
+Thank you very much.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-23T12:54:14Z
+
+> for redirecteable URL matchers, #26283 fixes the issue for GET/HEAD
+
+There is stll alot of potential for BC breaks. Like if someone used hardcoded relative links to assets, it doesn't work anymore. Or if you developed an API and the client does not support redirect, it breaks.
+So I don't think it makes sense to base the behavior on the matcher.
+The only solution I see is to create a new config on framework.router level that defaults to the old behavior. And for new projects we set the config to the new value in the recipes (which will be the new default in sf 5)
+
+---------------------------------------------------------------------------
+
+by sebastianblum at 2018-02-23T13:16:17Z
+
+@Tobion I don't understand what you mean.
+
+At the moment, we have this behaviour:
+routes:
+- /
+- /api/
+- /api/query
+
+these urls match: /, /api/, /api/query
+this url is redirected: /api -> /api/
+this url throws an 404: /api/query/
+
+#26283 will fix the last case, in my opinion it is a new feature and a good feature.
+
+---
+
+The case why I had the problem is, that for api url reasons and / or SEO reasons, I want to replace my custom api controller with a bundle (or subfolder) and leave the url the same.
+
+```yaml
+api_query:
+    prefix: /api/query
+    resource: ../src/Controller/Api/Query
+    type: annotation
+```
+
+and the controller
+
+```php
+    /**
+     * @Route("")
+     */
+    public function queryIndexAction()
+```
+
+doesn't work at the moment.
+
+In a second application (api.domain.com) I can reuse this controller / bundle without prefix and the url will be /
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-23T14:00:15Z
+
+> I've seen route definitions like `path: ~`
+
+Good news, that's actually not true!: loaders do not allow setting null, eg `YamlFileLoader::validate()` forbids it. And instantiating a Route object directly with a `null` path fails since 4.0, because the argument is type-hinted `string`.
+Which means we just have to make `null` behave as we want and done.
+
+PR updated.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-25T13:51:19Z
+
+https://github.com/symfony/symfony/issues/12141#issuecomment-368304910 made me realize that for annotations path="" works if you specify the prefix on the class. But for other use-cases path="" means something else. That inconsistency is unfortunate.
+
+@nicolas-grekas the difference between null and "" is probably hard to see for people. I think it would better in the long run to just use "" for this. Maybe we should reconsider adding a config/env variable to enable the new bahavior for path="". And when the config is not set and someone used an empty path so far, trigger a deprecation.
+Implementation wise it would be very easy as we don't need to touch any of the loaders.
+
+---------------------------------------------------------------------------
+
+by sebastianblum at 2018-02-25T14:45:54Z
+
+All examples for @Route annotation in the documentation has atleast @Route(„/„), so it is possible to trigger an deprecation warning in 3.4 / 4.0 if the path in the annotation is empty.
+
+Imo it is bug in 4.0. Is it a bc break?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-25T16:27:54Z
+
+Let's use "empty-path" for all configuration formats. We should certainly not create any new global flag for this.
+
+---------------------------------------------------------------------------
+
+by sebastianblum at 2018-02-25T17:27:40Z
+
+@nicolas-grekas empty-path is the best solution.
+
+Can / should we deprecate the use of ```@Route("")```.
+This configuration is not possible with yams nor with xml.
+I can try to create an pr for that if you agree that this is useful.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-02-25T23:12:48Z
+
+I think explaining the difference between path="" and empty-path="true" is more confusing than having a configuration that nobody cares about because it's either coming automatically with flex or you don't need the config because you didn't use path="" at all yet.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-02-28T09:57:57Z
+
+Status: needs work
+(waiting for #26143 ~and #26304~ for now)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-12T14:15:15Z
+
+I changed the approach: instead of being configured at the route level, the trailing slash is now configured while importing routes, thanks to a new "trim-root" option.
+This is already rebased on top of #26143, so reviews should focus on the 3rd commit only.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-12T14:22:53Z
+
+Can we rename the `trim-root` option to something like `add_trailing_slash` and set it to `true` as default?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-12T14:23:51Z
+
+> Can we rename the trim-root option to something like add_trailing_slash and set it to true as default?
+
+we can, but this misses the fact that this applies only to the root of the imported collection
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-12T15:01:11Z
+
+> we can, but this misses the fact that this applies only to the root of the imported collection
+
+I see. So my proposal is not enough. I love self-explanatory named options; that's why I'm having problems with `trim-root` (trim is usually for white spaces, not trailing slashes; the meaning of root is not clear to me either in this context).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-12T15:04:23Z
+
+What if we can finally allow to set the `path` to null or empty string and introduce this config option (set to `true` by default for BC reasons):
+
+```yaml
+empty_path_adds_trailing_slash: true
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-12T15:07:06Z
+
+I don't think it's a good idea to have a different behavior whether the root path is empty or a single slash. From the outside (the importer side), this is something I might want to ignore.
+What about `add_trailing_slash_to_root: true` (the default)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-12T15:10:00Z
+
+👍 I like your last proposal! But better if people with more experience than me about this double checks it. Thanks!
+
+---------------------------------------------------------------------------
+
+by Tobion at 2018-03-12T15:20:08Z
+
+This goes into the direction is originally proposed in #12141.
+
+> What about add_trailing_slash_to_root: true (the default)
+
+`trailing_slash_on_root: true` should be enough.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-12T20:52:46Z
+
+> trailing_slash_on_root: true should be enough.
+
+done, now waiting forr #26143 and a few tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T08:49:05Z
+
+PR rebased, ready.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T12:29:12Z
+
+Now tested, ready;
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-21T11:57:21Z
+
+(failures unrelated, PR ready)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-21T12:51:21Z
+
+This looks good to me.
+
+But this needs a doc PR. And it would also be good to update the PR description with the final solution to reduce confusion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-21T13:15:11Z
+
+description updated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-21T15:30:15Z
+
+> create a separate method like `removeTrailingSlash(string $path)`
+
+That is not possible: `$trailingSlashOnRoot` is really a parameter that configures the prefixing logic. Once prefixing is done, we cannot know which routes where root.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-21T15:31:55Z
+
+> create a separate method like removeTrailingSlash(string $path)
+
+I somehow missed that your proposal has the path as argument. But that requires prior knowledge of which paths are the root, and doesn't work with localized paths (or requires knowledge of all the variants, which is bad coupling.)

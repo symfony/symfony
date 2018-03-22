@@ -61,6 +61,8 @@ abstract class BaseNode implements NodeInterface
      *
      * Matching configuration values will be processed with a provided value, one by one. After a provided value is
      * successfully processed the configuration value is returned as is, thus preserving the placeholder.
+     *
+     * @internal
      */
     public static function setPlaceholder(string $placeholder, array $values): void
     {
@@ -76,6 +78,8 @@ abstract class BaseNode implements NodeInterface
      *
      * Matching configuration values will be skipped from being processed and are returned as is, thus preserving the
      * placeholder. An exact match provided by {@see setPlaceholder()} might take precedence.
+     *
+     * @internal
      */
     public static function setPlaceholderUniquePrefix(string $prefix): void
     {

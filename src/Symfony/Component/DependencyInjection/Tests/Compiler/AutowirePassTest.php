@@ -383,9 +383,9 @@ class AutowirePassTest extends TestCase
         $definition = $container->getDefinition('multiple');
         $this->assertEquals(
             array(
-                new TypedReference(A::class, A::class, MultipleArguments::class),
+                new TypedReference(A::class, A::class),
                 new Reference('foo'),
-                new TypedReference(Dunglas::class, Dunglas::class, MultipleArguments::class),
+                new TypedReference(Dunglas::class, Dunglas::class),
             ),
             $definition->getArguments()
         );
@@ -438,7 +438,7 @@ class AutowirePassTest extends TestCase
         $definition = $container->getDefinition('with_optional_scalar');
         $this->assertEquals(
             array(
-                new TypedReference(A::class, A::class, MultipleArgumentsOptionalScalar::class),
+                new TypedReference(A::class, A::class),
                 // use the default value
                 'default_val',
                 new TypedReference(Lille::class, Lille::class),
@@ -462,8 +462,8 @@ class AutowirePassTest extends TestCase
         $definition = $container->getDefinition('with_optional_scalar_last');
         $this->assertEquals(
             array(
-                new TypedReference(A::class, A::class, MultipleArgumentsOptionalScalarLast::class),
-                new TypedReference(Lille::class, Lille::class, MultipleArgumentsOptionalScalarLast::class),
+                new TypedReference(A::class, A::class),
+                new TypedReference(Lille::class, Lille::class),
             ),
             $definition->getArguments()
         );
@@ -519,7 +519,7 @@ class AutowirePassTest extends TestCase
         );
         // test setFoo args
         $this->assertEquals(
-            array(new TypedReference(Foo::class, Foo::class, SetterInjection::class)),
+            array(new TypedReference(Foo::class, Foo::class)),
             $methodCalls[1][1]
         );
     }
@@ -549,7 +549,7 @@ class AutowirePassTest extends TestCase
             array_column($methodCalls, 0)
         );
         $this->assertEquals(
-            array(new TypedReference(A::class, A::class, SetterInjection::class)),
+            array(new TypedReference(A::class, A::class)),
             $methodCalls[0][1]
         );
     }
@@ -647,7 +647,7 @@ class AutowirePassTest extends TestCase
         (new ResolveClassPass())->process($container);
         (new AutowirePass())->process($container);
 
-        $this->assertEquals(array(new TypedReference(A::class, A::class, MultipleArgumentsOptionalScalar::class), '', new TypedReference(Lille::class, Lille::class)), $container->getDefinition('foo')->getArguments());
+        $this->assertEquals(array(new TypedReference(A::class, A::class), '', new TypedReference(Lille::class, Lille::class)), $container->getDefinition('foo')->getArguments());
     }
 
     public function testWithFactory()
@@ -662,7 +662,7 @@ class AutowirePassTest extends TestCase
         (new ResolveClassPass())->process($container);
         (new AutowirePass())->process($container);
 
-        $this->assertEquals(array(new TypedReference(Foo::class, Foo::class, A::class)), $definition->getArguments());
+        $this->assertEquals(array(new TypedReference(Foo::class, Foo::class)), $definition->getArguments());
     }
 
     /**

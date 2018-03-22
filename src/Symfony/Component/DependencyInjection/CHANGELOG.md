@@ -7,6 +7,7 @@ CHANGELOG
  * added support for variadics in named arguments
  * added PSR-11 `ContainerBagInterface` and its `ContainerBag` implementation to access parameters as-a-service
  * added support for service's decorators autowiring
+ * deprecated the `TypedReference::canBeAutoregistered()` and  `TypedReference::getRequiringClass()` methods
 
 4.0.0
 -----

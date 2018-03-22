@@ -24,14 +24,18 @@ class TypedReference extends Reference
     /**
      * @param string $id              The service identifier
      * @param string $type            The PHP type of the identified service
-     * @param string $requiringClass  The class of the service that requires the referenced type
      * @param int    $invalidBehavior The behavior when the service does not exist
      */
-    public function __construct(string $id, string $type, string $requiringClass = '', int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
+    public function __construct(string $id, string $type, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
+        if (\is_string($invalidBehavior) || 3 < \func_num_args()) {
+            @trigger_error(sprintf('The $requiringClass argument of "%s" is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
+
+            $this->requiringClass = $invalidBehavior;
+            $invalidBehavior = 3 < \func_num_args() ? \func_get_arg(3) : ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+        }
         parent::__construct($id, $invalidBehavior);
         $this->type = $type;
-        $this->requiringClass = $requiringClass;
     }
 
     public function getType()
@@ -39,13 +43,23 @@ class TypedReference extends Reference
         return $this->type;
     }
 
+    /**
+     * @deprecated since Symfony 4.1
+     */
     public function getRequiringClass()
     {
-        return $this->requiringClass;
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
+
+        return $this->requiringClass ?? '';
     }
 
+    /**
+     * @deprecated since Symfony 4.1
+     */
     public function canBeAutoregistered()
     {
+        @trigger_error(sprintf('The "%s" method is deprecated since Symfony 4.1.', __METHOD__), E_USER_DEPRECATED);
+
         return $this->requiringClass && (false !== $i = strpos($this->type, '\\')) && 0 === strncasecmp($this->type, $this->requiringClass, 1 + $i);
     }
 }

@@ -30,7 +30,7 @@ class AutowirePass extends AbstractRecursivePass
 {
     private $definedTypes = array();
     private $types;
-    private $ambiguousServiceTypes = array();
+    private $ambiguousServiceTypes;
     private $autowired = array();
     private $lastFailure;
     private $throwOnAutowiringException;
@@ -71,7 +71,7 @@ class AutowirePass extends AbstractRecursivePass
         } finally {
             $this->definedTypes = array();
             $this->types = null;
-            $this->ambiguousServiceTypes = array();
+            $this->ambiguousServiceTypes = null;
             $this->autowired = array();
         }
     }
@@ -286,7 +286,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         if (null === $this->types) {
-            $this->populateAvailableTypes();
+            $this->populateAvailableTypes($this->strictMode);
         }
 
         if (isset($this->definedTypes[$type])) {
@@ -322,12 +322,15 @@ class AutowirePass extends AbstractRecursivePass
     /**
      * Populates the list of available types.
      */
-    private function populateAvailableTypes()
+    private function populateAvailableTypes($onlyAutowiringTypes = false)
     {
         $this->types = array();
+        if (!$onlyAutowiringTypes) {
+            $this->ambiguousServiceTypes = array();
+        }
 
         foreach ($this->container->getDefinitions() as $id => $definition) {
-            $this->populateAvailableType($id, $definition);
+            $this->populateAvailableType($id, $definition, $onlyAutowiringTypes);
         }
     }
 
@@ -337,7 +340,7 @@ class AutowirePass extends AbstractRecursivePass
      * @param string     $id
      * @param Definition $definition
      */
-    private function populateAvailableType($id, Definition $definition)
+    private function populateAvailableType($id, Definition $definition, $onlyAutowiringTypes)
     {
         // Never use abstract services
         if ($definition->isAbstract()) {
@@ -348,6 +351,10 @@ class AutowirePass extends AbstractRecursivePass
             $this->definedTypes[$type] = true;
             $this->types[$type] = $id;
             unset($this->ambiguousServiceTypes[$type]);
+        }
+
+        if ($onlyAutowiringTypes) {
+            return;
         }
 
         if (preg_match('/^\d+_[^~]++~[._a-zA-Z\d]{7}$/', $id) || $definition->isDeprecated() || !$reflectionClass = $this->container->getReflectionClass($definition->getClass(), false)) {
@@ -479,12 +486,15 @@ class AutowirePass extends AbstractRecursivePass
         if ($message = $this->getAliasesSuggestionForType($type = $reference->getType())) {
             return ' '.$message;
         }
+        if (null === $this->ambiguousServiceTypes) {
+            $this->populateAvailableTypes();
+        }
 
         if (isset($this->ambiguousServiceTypes[$type])) {
             $message = sprintf('one of these existing services: "%s"', implode('", "', $this->ambiguousServiceTypes[$type]));
         } elseif (isset($this->types[$type])) {
             $message = sprintf('the existing "%s" service', $this->types[$type]);
-        } elseif ($reference->getRequiringClass() && !$reference->canBeAutoregistered()) {
+        } elseif ($reference->getRequiringClass() && !$reference->canBeAutoregistered() && !$this->strictMode) {
             return ' It cannot be auto-registered because it is from a different root namespace.';
         } else {
             return;

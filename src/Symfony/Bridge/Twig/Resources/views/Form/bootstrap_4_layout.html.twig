@@ -117,7 +117,7 @@
 
 {% block form_widget_simple -%}
     {% if type is not defined or type != 'hidden' %}
-        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control' ~ (type|default('') == 'file' ? '-file' : ''))|trim}) -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ (type|default('') == 'file' ? ' custom-file-input' : ' form-control'))|trim}) -%}
     {% endif %}
     {%- if type is defined and (type == 'range' or type == 'color') %}
         {# Attribute "required" is not supported #}
@@ -179,11 +179,6 @@
         {% endfor -%}
     </div>
 {%- endblock choice_widget_expanded %}
-
-{% block file_widget -%}
-    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-file-input')|trim}) -%}
-    {{- block('form_widget_simple', 'form_div_layout.html.twig') -}}
-{%- endblock %}
 
 {# Labels #}
 
@@ -268,13 +263,13 @@
 {%- endblock form_row %}
 
 {% block file_row -%}
-    <{{ element|default('div') }} class="form-group">
+    <div class="form-group">
         <{{ element|default('div') }} class="custom-file">
             {{- form_widget(form) -}}
             {{- form_label(form) -}}
             {{- form_errors(form) -}}
         </{{ element|default('div') }}>
-    </{{ element|default('div') }}>
+    </div>
 {% endblock %}
 
 {# Errors #}

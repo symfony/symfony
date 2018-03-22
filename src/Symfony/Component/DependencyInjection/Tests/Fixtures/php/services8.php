@@ -135,8 +135,8 @@ class ProjectServiceContainer extends Container
                 6 => 'false',
                 7 => 'null',
             ),
-            'binary' => "\xf0\xf0\xf0\xf0",
-            'binary-control-char' => "\x54\x68\x69\x73\x20\x69\x73\x20\x61\x20\x42\x65\x6c\x6c\x20\x63\x68\x61\x72\x20\x07",
+            'binary' => 'ננננ',
+            'binary-control-char' => 'This is a Bell char ',
         );
     }
 }

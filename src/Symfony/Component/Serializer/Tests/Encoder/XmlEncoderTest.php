@@ -515,6 +515,62 @@ XML;
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeIgnoreComments()
+    {
+        $source = <<<'XML'
+<?xml version="1.0"?>
+<!-- This comment should not become the root node. -->
+<people>
+    <person>
+        <!-- Even if the first comment didn't become the root node, we don't
+             want this comment either. -->
+        <firstname>Benjamin</firstname>
+        <lastname>Alexandre</lastname>
+    </person>
+    <person>
+        <firstname>Damien</firstname>
+        <lastname>Clay</lastname>
+    </person>
+</people>
+XML;
+
+        $expected = array('person' => array(
+          array('firstname' => 'Benjamin', 'lastname' => 'Alexandre'),
+          array('firstname' => 'Damien', 'lastname' => 'Clay'),
+        ));
+
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }
+
+    public function testDecodePreserveComments()
+    {
+        $source = <<<'XML'
+<?xml version="1.0"?>
+<people>
+    <person>
+        <!-- This comment should be decoded. -->
+        <firstname>Benjamin</firstname>
+        <lastname>Alexandre</lastname>
+    </person>
+    <person>
+        <firstname>Damien</firstname>
+        <lastname>Clay</lastname>
+    </person>
+</people>
+XML;
+
+        $this->encoder = new XmlEncoder('people', null, array(XML_PI_NODE));
+        $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
+        $this->encoder->setSerializer($serializer);
+
+        $expected = array('person' => array(
+          array('firstname' => 'Benjamin', 'lastname' => 'Alexandre', '#comment' => ' This comment should be decoded. '),
+          array('firstname' => 'Damien', 'lastname' => 'Clay'),
+        ));
+
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }
+
     public function testDecodeAlwaysAsCollection()
     {
         $this->encoder = new XmlEncoder('response', null);

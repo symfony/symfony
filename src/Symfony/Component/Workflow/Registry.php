@@ -64,6 +64,23 @@ class Registry
         return $matched;
     }
 
+    /**
+     * @param object $subject
+     *
+     * @return Workflow[]
+     */
+    public function all($subject): array
+    {
+        $matched = array();
+        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+            if ($supportStrategy->supports($workflow, $subject)) {
+                $matched[] = $workflow;
+            }
+        }
+
+        return $matched;
+    }
+
     private function supports(Workflow $workflow, $supportStrategy, $subject, $workflowName)
     {
         if (null !== $workflowName && $workflowName !== $workflow->getName()) {

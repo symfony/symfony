@@ -36,10 +36,10 @@ class WrapsMessageHandlingInTransaction implements MiddlewareInterface
      * @param ManagerRegistry $managerRegistry
      * @param string $entityManagerName
      */
-    public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName = null)
+    public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName)
     {
         $this->managerRegistry = $managerRegistry;
-        $this->entityManagerName = $entityManagerName ?? 'default';
+        $this->entityManagerName = $entityManagerName;
     }
 
     public function handle($message, callable $next)

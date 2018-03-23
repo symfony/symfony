@@ -1445,6 +1445,10 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('messenger.sender_locator')->replaceArgument(0, $senderLocatorMapping);
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
+
+        if ($config['doctrine']['enabled']) {
+            $container->getDefinition('messenger.middleware.doctrine_transaction')->replaceArgument(1, $config['doctrine']['entity_manager']);
+        }
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

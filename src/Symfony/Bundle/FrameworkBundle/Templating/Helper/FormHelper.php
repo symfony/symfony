@@ -176,7 +176,7 @@ class FormHelper extends Helper
      *
      * @return string The HTML markup
      */
-    public function help(FormView $view)
+    public function help(FormView $view): string
     {
         return $this->renderer->searchAndRenderBlock($view, 'help');
     }

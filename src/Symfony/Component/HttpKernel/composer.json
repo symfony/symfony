@@ -36,7 +36,7 @@
         "symfony/stopwatch": "~3.4|~4.0",
         "symfony/templating": "~3.4|~4.0",
         "symfony/translation": "~3.4|~4.0",
-        "symfony/var-dumper": "~3.4|~4.0",
+        "symfony/var-dumper": "~4.1",
         "psr/cache": "~1.0"
     },
     "provide": {

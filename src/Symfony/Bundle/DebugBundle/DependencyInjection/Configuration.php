@@ -48,7 +48,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('dump_destination')
                     ->info('A stream URL where dumps should be written to')
-                    ->example('php://stderr')
+                    ->example('php://stderr, or tcp://%env(VAR_DUMPER_SERVER)% when using the "server:dump" command')
                     ->defaultNull()
                 ->end()
             ->end()

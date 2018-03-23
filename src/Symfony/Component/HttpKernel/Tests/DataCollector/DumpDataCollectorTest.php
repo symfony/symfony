@@ -12,10 +12,11 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Dumper\ServerDumper;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -53,6 +54,25 @@ class DumpDataCollectorTest extends TestCase
         $this->assertStringMatchesFormat('a:3:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', $collector->serialize());
         $this->assertSame(0, $collector->getDumpsCount());
         $this->assertSame('a:2:{i:0;b:0;i:1;s:5:"UTF-8";}', $collector->serialize());
+    }
+
+    public function testDumpWithServerDumper()
+    {
+        $data = new Data(array(array(123)));
+
+        // Server is up, server dumper is used
+        $serverDumper = $this->getMockBuilder(ServerDumper::class)->disableOriginalConstructor()->getMock();
+        $serverDumper->expects($this->once())->method('dump');
+        $serverDumper->method('isServerListening')->willReturn(true);
+
+        $collector = new DumpDataCollector(null, null, null, null, $serverDumper);
+        $collector->dump($data);
+
+        // Collect doesn't re-trigger dump
+        ob_start();
+        $collector->collect(new Request(), new Response());
+        $this->assertEmpty(ob_get_clean());
+        $this->assertStringMatchesFormat('a:3:{i:0;a:5:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', $collector->serialize());
     }
 
     public function testCollectDefault()

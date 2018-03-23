@@ -489,6 +489,20 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('web_link.add_link_header_listener'));
     }
 
+    public function testMessenger()
+    {
+        $container = $this->createContainerFromFile('messenger');
+        $this->assertFalse($container->hasDefinition('messenger.middleware.doctrine_transaction'));
+    }
+
+    public function testMessengerDoctrine()
+    {
+        $container = $this->createContainerFromFile('messenger_doctrine');
+        $this->assertTrue($container->hasDefinition('messenger.middleware.doctrine_transaction'));
+        $def = $container->getDefinition('messenger.middleware.doctrine_transaction');
+        $this->assertEquals('foobar', $def->getArgument(1));
+    }
+
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');

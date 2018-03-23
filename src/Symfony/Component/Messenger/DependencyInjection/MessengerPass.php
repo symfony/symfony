@@ -51,6 +51,12 @@ class MessengerPass implements CompilerPassInterface
             $container->removeDefinition('messenger.middleware.debug.logging');
         }
 
+        if (!$container->has('serializer')) {
+            $container->removeDefinition('messenger.transport.serialize_message_with_type_in_headers');
+            $container->removeAlias('messenger.transport.default_encoder');
+            $container->removeAlias('messenger.transport.default_decoder');
+        }
+
         $this->registerReceivers($container);
         $this->registerHandlers($container);
     }

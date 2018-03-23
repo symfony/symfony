@@ -34,24 +34,24 @@ col-sm-2
             {{- form_help(form) -}}
             {{- form_errors(form) -}}
         </div>
-{##}</div>
+    </div>
 {%- endblock form_row %}
 
 {% block submit_row -%}
-    <div class="form-group">{#--#}
-        <div class="{{ block('form_label_class') }}"></div>{#--#}
+    <div class="form-group">
+        <div class="{{ block('form_label_class') }}"></div>
         <div class="{{ block('form_group_class') }}">
             {{- form_widget(form) -}}
-        </div>{#--#}
+        </div>
     </div>
 {%- endblock submit_row %}
 
 {% block reset_row -%}
-    <div class="form-group">{#--#}
-        <div class="{{ block('form_label_class') }}"></div>{#--#}
+    <div class="form-group">
+        <div class="{{ block('form_label_class') }}"></div>
         <div class="{{ block('form_group_class') }}">
             {{- form_widget(form) -}}
-        </div>{#--#}
+        </div>
     </div>
 {%- endblock reset_row %}
 
@@ -60,11 +60,11 @@ col-sm-10
 {%- endblock form_group_class %}
 
 {% block checkbox_row -%}
-    <div class="form-group{% if not valid %} has-error{% endif %}">{#--#}
-        <div class="{{ block('form_label_class') }}"></div>{#--#}
+    <div class="form-group{% if not valid %} has-error{% endif %}">
+        <div class="{{ block('form_label_class') }}"></div>
         <div class="{{ block('form_group_class') }}">
             {{- form_widget(form) -}}
             {{- form_errors(form) -}}
-        </div>{#--#}
+        </div>
     </div>
 {%- endblock checkbox_row %}

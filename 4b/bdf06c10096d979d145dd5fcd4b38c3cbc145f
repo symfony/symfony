@@ -1,0 +1,174 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-08-08T16:31:10Z
+
+disabling dumps from the data collector by default may not be a good idea.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-08T17:37:50Z
+
+> disabling dumps from the data collector by default may not be a good idea.
+
+https://github.com/symfony/symfony/pull/23831/commits/f24712effc9fab1163c0053e2a0a0d5cc4f6473e might be a solution to this.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-11T22:22:13Z
+
+Last updates from yesterday (I've update the PR description & screens) with features I expected to add in a another PR, but here we are:
+
+- extracted the `DumpServer` in a dedicated class. So `ServerDumpCommand` is a server app consuming it and everyone could create its own app easily if he wants. So someone could imagine a full-featured app starting a dump server and exposing an http server to display the live stream of dumps, with more capabilities than the the simple html file provided in this PR.
+- introduced context providers as simple callables, which allows to add context to collected dumps.
+- enhanced the cli & html outputs with these new informations (cf screens).
+- mentioned how to manually wire the server dumper in the PR description.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-08-21T18:35:07Z
+
+I've brought some new changes and  added some tests. The PR is ready on my side.
+Tough part is the wiring with the framework and the `DumpDataCollector`. Hopefully I did it right, as much as possible. 🤞
+
+deps=high failure is expected.
+~~I might need some hints on the HHVM & AppVeyor failures, somehow related to the `PhpProcess` usage (and wrong working dir)?~~
+
+Fixed on HHVM build, probably not the best way. ~~The failure still remains on AppVeyor but is different:~~
+> ~~"stream_socket_client(): unable to connect to tcp://0.0.0.0:9912 (The requested address is not valid in its context.)"~~
+
+Fixed on AppVeyor by setting `VAR_DUMPER_SERVER` to use `127.0.0.1` as AppVeyor seems to dislike `0.0.0.0`
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-09-24T16:31:23Z
+
+Last update: remove the `--output` option in favor of using `--format=html|cli` and redirecting the output to a file.
+
+Feature freeze is coming very soon.
+Would you have some time to play with this @nicolas-grekas ? :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-10-10T04:11:23Z
+
+I'd like to test it more thoroughly. Let's move it to 4.1.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-11T20:35:50Z
+
+I may be a bit late to the party considering the upcoming 4.1 feature freeze. But in any case, this is now rebased, using PHP 7.1 features and tested on a 4.1 app. Everything still working fine :)
+
+Tests failures are unrelated (see https://github.com/symfony/symfony/pull/26489).
+
+---------------------------------------------------------------------------
+
+by antonmedv at 2018-03-12T04:17:33Z
+
+Will be cool to have it. Like output on rails or elixir/phoenix apps.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-21T17:37:51Z
+
+Oh btw, the HTML view is missing a date (and maybe the controller also, as displayed on the CLI):
+
+![image](https://user-images.githubusercontent.com/243674/37726972-f4b39a56-2d36-11e8-96af-c0f23689025a.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-21T20:32:34Z
+
+@nicolas-grekas  Regarding your dream, let's keep that for another time :) I like the Unix philosophy.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-21T21:09:35Z
+
+Though, his dream is something “by default” in other things like Phoenix
+(Elixir). I actually opened a proposal few months ago about it. Since we
+decided to promote webpack... that’s where we need to go IMHO
+
+On Wed, 21 Mar 2018 at 20:32, Fabien Potencier <notifications@github.com>
+wrote:
+
+> @nicolas-grekas <https://github.com/nicolas-grekas> Regarding your dream,
+> let's keep that for another time :) I like the Unix philosophy.
+>
+> —
+> You are receiving this because you are subscribed to this thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/23831#issuecomment-375085830>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAxHEXute5kJqiwNOohEphEaCl05gO6Aks5tgrjqgaJpZM4Ow5qX>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-22T15:49:35Z
+
+> If I may dream a bit, I'd like to be able to run server:run-all and have server:run, server:log and server:dump in the same console (we could add webpack dev server to the list :) )
+I would also love to replace the --format=html option by a proper webserver I could point my browser at, and see the live feed of dumps (and logs, etc.) in this tab.
+
+When I started this PR, I also have in mind to provide a full featured web & cli app to centralize dumps & logs, but didn't take enough time yet to experiment it. Anyway this PR is already a big step to me, and I already have some other small improvements to come first in order to help using it easily on any context.
+
+> Btw, you don't use the source context in the CLI/HTML. Don't you want to add some source code excerpt there?
+
+Currently, code excerpts are only retrieved by the SourceContextProvider for twig template. Being able to always getting the excerpt would require duplicating some logic from the twig bridge CodeExtension (or allow the HtmlDescriptor to use Twig and this extension fi available). I didn't want to pollute more this PR. So I'd suggest to try adding it into another PR :)
+
+> In the CLI, what about displaying the link to the file? cannot be an IDE link, but still a web link is possible (e.g. http://127.0.0.1:8000/_profiler/open?file=src/Controller/HelloController.php&line=15#line15)
+
+Actually, it's the reverse: cannot be a web link for a cli command (no context available). But IDE link works great for both web requests & cli commands:
+
+![capture d ecran 2018-03-22 a 16 35 16](https://user-images.githubusercontent.com/2211145/37780420-0530281e-2def-11e8-974b-8ff6941cdc79.png)
+
+> Oh btw, the HTML view is missing a date (and maybe the controller also, as displayed on the CLI):
+
+I guess you've missed it 😄 It's already displayed on the top right:
+
+![capture d ecran 2018-03-22 a 16 36 51](https://user-images.githubusercontent.com/2211145/37780553-447125dc-2def-11e8-9178-3829aee5f1ee.png)
+
+About the controller, I'd suggest to polish and add it into another PR. Right now I'm not sure where to display it and don't want to pollute more this PR.
+
+Thanks everyone for your reviews.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T20:15:56Z
+
+@ogizanagi FYI I've forked your branch in https://github.com/nicolas-grekas/symfony/tree/feature/server_dump - the first commit is your PR squashed, the second are some tweaks I'd like to merge here when ready. They break the feature for now, but I think you can get the idea. If you want to take over, please tell :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-22T22:56:21Z
+
+@nicolas-grekas : Here you are.
+
+The changes made to the data collector were indeed the ones I tried today, so let me explain:
+What was bothering me was the inconsistency between the behaviors with API calls when you set the `debug.dump_destination` to `tcp://*` and anything else:
+In the first case, even if the dump server isn't running, no more dump output appears in the response, while with `debug.dump_destination` set to anything else or null (i.e no server dumper <=> current behavior) cli dumps appears in the output.
+As stated in the PR description, getting a mix of your response and the cli dumped version of the data you asked is a mess, but at least you know it's there.
+Probably that I'm overthinking this and this behavior should have been considered undesirable in the first place...
+
+I also added a placeholder command in the debug bundle to easy discovery of the feature as you asked.
+
+Finally, I'm not really satisfied by the new `VAR_DUMPER_SERVER` env var handling. But you already heard the arguments [here](https://github.com/symfony/symfony/pull/23831#discussion_r176471840).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-23T08:35:58Z
+
+@ogizanagi Do you think you will have time (perhaps this week-end) to take comments into account (if not, someone can probably take over)? I would love to merge it for 4.1.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-23T08:44:54Z
+
+@fabpot : I've already taken all the comments into account & cherry-picked Nicolas' commit. This is already ready (at least for another round of reviews).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-23T09:15:40Z
+
+@fabpot : Fixed & squashed (I've kept Nicolas' commit and the next one finishing it).

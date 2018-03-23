@@ -382,4 +382,20 @@ trait ControllerTrait
 
         return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
     }
+
+    /**
+     * Dispatches a message to the bus.
+     *
+     * @param object $message The message to dispatch
+     *
+     * @final
+     */
+    protected function dispatchMessage($message)
+    {
+        if (!$this->container->has('message_bus')) {
+            throw new \LogicException('The message bus is not enabled in your application. Try running "composer require symfony/messenger".');
+        }
+
+        return $this->container->get('message_bus')->dispatch($message);
+    }
 }

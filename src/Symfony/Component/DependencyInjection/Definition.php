@@ -838,7 +838,7 @@ class Definition
     /**
      * Gets bindings.
      *
-     * @return array
+     * @return array|BoundArgument[]
      */
     public function getBindings()
     {

@@ -1459,6 +1459,14 @@ class FrameworkExtension extends Extension
         } else {
             $container->removeDefinition('messenger.middleware.doctrine_transaction');
         }
+
+        if ($config['middlewares']['validation']['enabled']) {
+            if (!$container->has('validator')) {
+                throw new LogicException('The Validation middleware is only available when the Validator component is installed and enabled. Try running "composer require symfony/validator".');
+            }
+        } else {
+            $container->removeDefinition('messenger.middleware.validator');
+        }
     }
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)

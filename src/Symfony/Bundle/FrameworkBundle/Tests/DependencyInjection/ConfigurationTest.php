@@ -258,6 +258,9 @@ class ConfigurationTest extends TestCase
                         'enabled' => false,
                         'entity_manager_name' => null,
                     ),
+                    'validation' => array(
+                        'enabled' => false,
+                    ),
                 ),
             ),
         );

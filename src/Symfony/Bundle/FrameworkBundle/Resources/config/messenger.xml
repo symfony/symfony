@@ -25,6 +25,12 @@
             <tag name="message_bus_middleware" priority="-10" />
         </service>
 
+        <service id="messenger.middleware.validator" class="Symfony\Component\Messenger\Middleware\ValidationMiddleware">
+            <argument type="service" id="validator" />
+
+            <tag name="message_bus_middleware" priority="100" />
+        </service>
+
         <service id="messenger.middleware.doctrine_transaction" class="Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware">
             <argument type="service" id="doctrine" />
             <argument /> <!-- Entity manager name -->

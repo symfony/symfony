@@ -467,7 +467,7 @@ class FrameworkExtension extends Extension
             $type = $workflow['type'];
 
             // Process Metadata (workflow + places (transition is done in the "create transition" block))
-            $metadataStoreDefinition = new Definition(Workflow\Metadata\InMemoryMetadataStore::class, array(null, null, null));
+            $metadataStoreDefinition = new Definition(Workflow\Metadata\InMemoryMetadataStore::class, array(array(), array(), null));
             if ($workflow['metadata']) {
                 $metadataStoreDefinition->replaceArgument(0, $workflow['metadata']);
             }

@@ -39,15 +39,13 @@ class WrapsMessageHandlingInTransaction implements MiddlewareInterface
             throw new \InvalidArgumentException(sprintf('The ObjectManager with name "%s" must be an instance of EntityManagerInterface', $this->entityManagerName));
         }
 
-        $result = null;
+        $entityManager->getConnection()->beginTransaction();
         try {
-            $entityManager->transactional(
-                function () use ($message, $next, &$result) {
-                    $result = $next($message);
-                }
-            );
+            $result = $next($message);
+            $entityManager->flush();
+            $entityManager->getConnection()->commit();
         } catch (\Throwable $exception) {
-            $this->managerRegistry->resetManager($this->entityManagerName);
+            $entityManager->getConnection()->rollBack();
 
             throw $exception;
         }

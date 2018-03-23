@@ -47,10 +47,11 @@ class WrapsMessageHandlingInTransaction implements MiddlewareInterface
         /** @var $entityManager EntityManagerInterface */
         $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
 
+        $result = null;
         try {
             $entityManager->transactional(
-                function () use ($message, $next) {
-                    $next($message);
+                function () use ($message, $next, &$result) {
+                    $result = $next($message);
                 }
             );
         } catch (\Throwable $exception) {
@@ -58,5 +59,7 @@ class WrapsMessageHandlingInTransaction implements MiddlewareInterface
 
             throw $exception;
         }
+
+        return $result;
     }
 }

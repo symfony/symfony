@@ -675,7 +675,7 @@ class RequestTest extends TestCase
     public function getQueryStringNormalizationData()
     {
         return array(
-            array('foo', 'foo', 'works with valueless parameters'),
+            array('foo', 'foo=', 'works with valueless parameters'),
             array('foo=', 'foo=', 'includes a dangling equal sign'),
             array('bar=&foo=bar', 'bar=&foo=bar', '->works with empty parameters'),
             array('foo=bar&bar=', 'bar=&foo=bar', 'sorts keys alphabetically'),
@@ -684,18 +684,24 @@ class RequestTest extends TestCase
             // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str.
             array('him=John%20Doe&her=Jane+Doe', 'her=Jane%20Doe&him=John%20Doe', 'normalizes spaces in both encodings "%20" and "+"'),
 
-            array('foo[]=1&foo[]=2', 'foo%5B%5D=1&foo%5B%5D=2', 'allows array notation'),
-            array('foo=1&foo=2', 'foo=1&foo=2', 'allows repeated parameters'),
+            array('foo[]=1&foo[]=2', 'foo%5B0%5D=1&foo%5B1%5D=2', 'allows array notation'),
+            array('foo=1&foo=2', 'foo=2', 'merges repeated parameters'),
             array('pa%3Dram=foo%26bar%3Dbaz&test=test', 'pa%3Dram=foo%26bar%3Dbaz&test=test', 'works with encoded delimiters'),
-            array('0', '0', 'allows "0"'),
-            array('Jane Doe&John%20Doe', 'Jane%20Doe&John%20Doe', 'normalizes encoding in keys'),
+            array('0', '0=', 'allows "0"'),
+            array('Jane Doe&John%20Doe', 'Jane_Doe=&John_Doe=', 'normalizes encoding in keys'),
             array('her=Jane Doe&him=John%20Doe', 'her=Jane%20Doe&him=John%20Doe', 'normalizes encoding in values'),
-            array('foo=bar&&&test&&', 'foo=bar&test', 'removes unneeded delimiters'),
+            array('foo=bar&&&test&&', 'foo=bar&test=', 'removes unneeded delimiters'),
             array('formula=e=m*c^2', 'formula=e%3Dm%2Ac%5E2', 'correctly treats only the first "=" as delimiter and the next as value'),
 
             // Ignore pairs with empty key, even if there was a value, e.g. "=value", as such nameless values cannot be retrieved anyway.
             // PHP also does not include them when building _GET.
             array('foo=bar&=a=b&=x=y', 'foo=bar', 'removes params with empty key'),
+
+            // Don't reorder nested query string keys
+            array('foo[]=Z&foo[]=A', 'foo%5B0%5D=Z&foo%5B1%5D=A', 'keeps order of values'),
+            array('foo[Z]=B&foo[A]=B', 'foo%5BZ%5D=B&foo%5BA%5D=B', 'keeps order of keys'),
+
+            array('utf8=✓', 'utf8=%E2%9C%93', 'encodes UTF-8'),
         );
     }
 

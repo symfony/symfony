@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInvalidReferencesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class ResolveInvalidReferencesPassTest extends TestCase
 {
@@ -125,6 +126,32 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->process($container);
 
         $this->assertSame(array(array(array())), $def->getArguments());
+    }
+
+    public function testProcessWithErroredDefinition()
+    {
+        $container = new ContainerBuilder();
+        $container->register('errored_definition', 'stdClass')
+            ->addError('Some error');
+
+        $container->register('foo', 'stdClass')
+            ->setArguments(array(
+                new Reference('errored_definition'),
+                new Reference('errored_definition', ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                new Reference('errored_definition', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+                array(new Reference('errored_definition', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            ));
+
+        $this->process($container);
+
+        $expected = (new Definition('stdClass'))
+            ->setArguments(array(
+                new Reference('errored_definition'),
+                null,
+                null,
+                array(),
+            ));
+        $this->assertEquals($expected, $container->getDefinition('foo'));
     }
 
     protected function process(ContainerBuilder $container)

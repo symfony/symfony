@@ -1448,6 +1448,8 @@ class FrameworkExtension extends Extension
 
         if ($config['doctrine']['enabled']) {
             $container->getDefinition('messenger.middleware.doctrine_transaction')->replaceArgument(1, $config['doctrine']['entity_manager']);
+        } else {
+            $container->removeDefinition('messenger.middleware.doctrine_transaction');
         }
     }
 

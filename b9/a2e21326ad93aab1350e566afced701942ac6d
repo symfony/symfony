@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-23T07:21:41Z
+
+I think I'd prefer we skip the tests that need globbing instead, WDYT?

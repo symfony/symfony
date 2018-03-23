@@ -22,20 +22,9 @@ use Symfony\Component\Messenger\MiddlewareInterface;
  */
 class WrapsMessageHandlingInTransaction implements MiddlewareInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
     private $managerRegistry;
-
-    /**
-     * @var string
-     */
     private $entityManagerName;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param string          $entityManagerName
-     */
     public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName)
     {
         $this->managerRegistry = $managerRegistry;
@@ -44,8 +33,11 @@ class WrapsMessageHandlingInTransaction implements MiddlewareInterface
 
     public function handle($message, callable $next)
     {
-        /** @var $entityManager EntityManagerInterface */
         $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
+
+        if (!$entityManager instanceof EntityManagerInterface) {
+            throw new \InvalidArgumentException(sprintf('The ObjectManager with name "%s" must be an instance of EntityManagerInterface', $this->entityManagerName));
+        }
 
         $result = null;
         try {

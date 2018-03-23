@@ -88,6 +88,8 @@ abstract class BaseNode implements NodeInterface
 
     /**
      * Resets all current placeholders available.
+     *
+     * @internal
      */
     public static function resetPlaceholders(): void
     {

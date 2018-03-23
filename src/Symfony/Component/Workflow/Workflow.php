@@ -124,7 +124,7 @@ class Workflow implements WorkflowInterface
         }
 
         if (!$transitionBlockerList) {
-            throw new UndefinedTransitionException($transitionName, $this->name);
+            throw new UndefinedTransitionException($subject, $transitionName, $this);
         }
 
         return $transitionBlockerList;
@@ -168,11 +168,11 @@ class Workflow implements WorkflowInterface
         }
 
         if (!$transitionBlockerList) {
-            throw new UndefinedTransitionException($transitionName, $this->name);
+            throw new UndefinedTransitionException($subject, $transitionName, $this);
         }
 
         if (!$applied) {
-            throw new NotEnabledTransitionException($transitionName, $this->name, $transitionBlockerList);
+            throw new NotEnabledTransitionException($subject, $transitionName, $this, $transitionBlockerList);
         }
 
         return $marking;

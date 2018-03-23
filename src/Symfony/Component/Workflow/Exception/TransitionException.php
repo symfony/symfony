@@ -11,56 +11,39 @@
 
 namespace Symfony\Component\Workflow\Exception;
 
+use Symfony\Component\Workflow\WorkflowInterface;
+
 /**
  * @author Andrew Tch <andrew.tchircoff@gmail.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class TransitionException extends LogicException
 {
-    /**
-     * @var mixed
-     */
     private $subject;
-
-    /**
-     * @var string
-     */
     private $transitionName;
+    private $workflow;
 
-    /**
-     * @var string
-     */
-    private $workflowName;
-
-    public function __construct($subject, $transitionName, $workflowName)
+    public function __construct($subject, string $transitionName, WorkflowInterface $workflow, string $message)
     {
+        parent::__construct($message);
+
         $this->subject = $subject;
         $this->transitionName = $transitionName;
-        $this->workflowName = $workflowName;
-
-        parent::__construct(sprintf('Unable to apply transition "%s" for workflow "%s".', $this->transitionName, $this->workflowName));
+        $this->workflow = $workflow;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSubject()
     {
         return $this->subject;
     }
 
-    /**
-     * @return string
-     */
-    public function getTransitionName()
+    public function getTransitionName(): string
     {
         return $this->transitionName;
     }
 
-    /**
-     * @return string
-     */
-    public function getWorkflowName()
+    public function getWorkflow(): WorkflowInterface
     {
-        return $this->workflowName;
+        return $this->workflow;
     }
 }

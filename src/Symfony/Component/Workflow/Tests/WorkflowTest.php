@@ -271,6 +271,9 @@ class WorkflowTest extends TestCase
             $this->assertCount(1, $e->getTransitionBlockerList());
             $list = iterator_to_array($e->getTransitionBlockerList());
             $this->assertSame('The marking does not enable the transition.', $list[0]->getMessage());
+            $this->assertSame($e->getWorkflow(), $workflow);
+            $this->assertSame($e->getSubject(), $subject);
+            $this->assertSame($e->getTransitionName(), 't2');
         }
     }
 

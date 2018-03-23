@@ -7,7 +7,7 @@
 
     <framework:config>
         <framework:messenger>
-            <framework:doctrine-transaction >
+            <framework:doctrine-transaction>
                 <framework:entity-manager-name>foobar</framework:entity-manager-name>
             </framework:doctrine-transaction>
         </framework:messenger>

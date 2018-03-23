@@ -30,6 +30,7 @@
             <xsd:element name="cache" type="cache" minOccurs="0" maxOccurs="1" />
             <xsd:element name="workflow" type="workflow" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="lock" type="lock" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="messenger" type="messenger" minOccurs="0" maxOccurs="1" />
         </xsd:choice>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -341,5 +342,33 @@
                 <xsd:attribute name="name" type="xsd:string" />
             </xsd:extension>
         </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="messenger">
+        <xsd:all>
+            <xsd:element name="routing" type="messenger_routing" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="doctrine-transaction" type="messenger_doctrine_transaction" minOccurs="0" maxOccurs="1" />
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="messenger_routing">
+        <xsd:sequence>
+            <xsd:element name="sender" type="messenger_routing_sender" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="messenger_routing_sender">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="message-class" type="xsd:string" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="messenger_doctrine_transaction">
+        <xsd:sequence>
+            <xsd:element name="entity-manager-name" type="xsd:string" />
+        </xsd:sequence>
+        <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 </xsd:schema>

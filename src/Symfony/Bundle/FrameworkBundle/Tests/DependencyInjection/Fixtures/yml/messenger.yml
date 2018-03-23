@@ -1,2 +1,5 @@
 framework:
-    messenger: ~
+    messenger:
+        routing:
+            'App\Foo': 'sender.foo'
+            'App\Bar': 'sender.bar'

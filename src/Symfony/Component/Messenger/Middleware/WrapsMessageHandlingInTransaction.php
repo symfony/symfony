@@ -34,7 +34,7 @@ class WrapsMessageHandlingInTransaction implements MiddlewareInterface
 
     /**
      * @param ManagerRegistry $managerRegistry
-     * @param string $entityManagerName
+     * @param string          $entityManagerName
      */
     public function __construct(ManagerRegistry $managerRegistry, string $entityManagerName)
     {

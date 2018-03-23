@@ -1,0 +1,177 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-03-28T13:00:29Z
+
+The original implementation (https://github.com/api-platform/core/blob/master/src/Hydra/Serializer/ConstraintViolationListNormalizer.php) was following the Hydra W3C draft.
+
+WDYT about keeping Hydra support in Symfony?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-03-28T13:03:10Z
+
+Another alternative is to implement RFC7807 (supported by API Platform and Zend Apigility): https://github.com/api-platform/core/blob/master/src/Problem/Serializer/ConstraintViolationListNormalizer.php
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-03-28T13:16:33Z
+
+RFC7807 looks like the ideal solution to create something standard ... but its status is still: "PROPOSED STANDARD". Can we guess the chances of being changed a lot in the future or even rejected?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-03-29T12:52:06Z
+
+I implemented RFC7807 (supported by API Platform and Zend Apigility)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-03-29T13:45:38Z
+
+Can you add a note about the fact that it implements RFC7807 in the phpdocs?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-04-03T14:13:49Z
+
+Comment addressed. PR updated.
+
+Note: I also renamed `propertyPath` to property_path`.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-03T14:18:55Z
+
+> Note: I also renamed propertyPath to `property_path`
+
+Why this change? AFAIK, camel case is preferred (for instance, it's what Google and Schema.org use).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-04-03T14:20:26Z
+
+Ah ok. I will revert it so. Usually I prefer Snake Case in my array / API...
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-04-03T14:22:56Z
+
+Reverted. The PR is now ready.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-04-03T14:25:16Z
+
+👍 for me. @teohhanhui would you mind reviewing this PR? I know you studied this RFC.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2017-04-03T19:33:10Z
+
+This PR seems to bring over the same mistakes as I've pointed out in api-platform/core#793
+
+Reproducing it here:
+
+The current implementation is not RFC 7807 compliant:
+
+> Consumers MUST use the "type" string as the primary identifier for the problem type
+> (https://tools.ietf.org/html/rfc7807#section-3.1)
+>
+> A problem's type URI SHOULD resolve to HTML documentation that explains how to resolve the problem.
+> (https://tools.ietf.org/html/rfc7807#section-4)
+
+But instead we're using a link to the "Status Code Definitions" section of RFC 2616 (deprecated and replaced by RFC 7231).
+
+So I propose we should omit the "type" altogether, which is allowed:
+
+> When this member is not present, its value is assumed to be "about:blank".
+> (https://tools.ietf.org/html/rfc7807#section-3.1)
+
+In which case the spec further states:
+
+> When "about:blank" is used, the title SHOULD be the same as the recommended HTTP status phrase for that code (e.g., "Not Found" for 404, and so on)
+> (https://tools.ietf.org/html/rfc7807#section-4.2)
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2017-04-03T19:36:39Z
+
+Since we're normalizing Symfony Validator constraint violations, it'd be perfect if we have specific pages on symfony.com to explain each violation (this would be what we put in the `type` property of the Problem Details object). We already have a UUID for each violation, so let's make full use of that.
+
+(Echoing @webmozart's original suggestion in #15154)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-09-26T21:22:10Z
+
+Any update about this one?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-09-26T22:13:16Z
+
+What should I do ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-09-27T05:56:35Z
+
+Fixing the comments raised by @teohanhui
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-10-05T16:37:23Z
+
+I have rebased this PR and now it's targeting 4.1 (I guess it's too late for 3.4 ?)
+
+I have removed the `type` attribute of the response.
+
+This normalizer still does not really implement the RFC. It's not really possible. We can not get the HTTP Status code of the response.
+
+So I don't know how to unlock this PR. May be we can simply remove the reference to the RFC, or to explain it does not follow each rules of the RFC.
+
+What do you think ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-10-05T16:54:18Z
+
+The status code can be passed through the context (it can be optional).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-10-05T16:56:10Z
+
+> The status code can be passed through the context (it can be optional).
+
+But it's not mandatory, and it's boring if you need to pass 4XX each time ... :/
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-02-16T14:22:35Z
+
+I have rebased the PR ; it's not ready
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-14T14:06:03Z
+
+Ping
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-22T07:43:22Z
+
+@lyrixx "it's not ready" -> I suppose you meant "it's now ready", right?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-22T09:37:20Z
+
+> @lyrixx "it's not ready" -> I suppose you meant "it's now ready", right?
+
+Oups, You are right.
+
+---
+
+I have addressed your comment. It should be OK now

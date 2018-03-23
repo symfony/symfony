@@ -1,0 +1,393 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-12-01T11:43:04Z
+
+Now that 4.0 is out the door, can we get some more input from the symfony core team.
+Ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-12-02T17:15:34Z
+
+@sroze can we tag all consumers with tag `queue.consumer`? Even [reference tagged services](http://symfony.com/doc/current/service_container/tags.html#reference-tagged-services)
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-12-02T18:10:11Z
+
+`message.consumer`  or `message.handler`? would be better.
+
+---------------------------------------------------------------------------
+
+by Koc at 2017-12-02T21:22:19Z
+
+It depends on accepted terminology. Maybe even without dot separatorm like already proposed in this PR `message_middleware` tag.
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-03T11:50:58Z
+
+@Koc do you mean the message handlers or message receivers? Following the reviews, I had [to rename them](https://github.com/symfony/symfony/pull/24411#pullrequestreview-80532086). Check out the [concepts documentation](https://github.com/sroze/symfony/blob/add-message-component/src/Symfony/Component/Message/README.md#concepts) to clarify.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-12-23T13:59:56Z
+
+I've converted a small project from SimpleBus to Messaging component.
+I had to change the following:
+
+* namespace from `SimpleBus` to `Symfony`
+* rename the method from `handle` to `dispatch` I'm still not fond of having dispatch instead of handle, but I understand the reasoning. However this will have to be explained to people.
+* change tag from `command_handler` to `message_handler`
+* change namespace from `*\Command\*` to `*\Message\*`
+* inject `message_bus` instead of `command_bus`
+* Use `MessageBus` instead of `CommandBus`
+
+I still cannot get rid of the SimpleBus as this is missing the EventRecorder and a EventBus.
+More to follow
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-12-27T10:47:08Z
+
+Should we move this out of the FrameworkBundle (into the MessageBundle? BusBundle?) we are cramming to much into it as it is.
+And then also add the ability to easily create more buses.
+The framework configuration tree is becoming bloated.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-12-27T15:34:30Z
+
+There is another proposal to add event bus ready to discussion at sroze/symfony#4
+
+---------------------------------------------------------------------------
+
+by sroze at 2017-12-28T23:04:59Z
+
+> Should we move this out of the FrameworkBundle (into the MessageBundle? BusBundle?) we are cramming to much into it as it is.
+
+I am not sure this makes sense (for now at least) to create a dedicated Bundle for this component. FrameworkBundle is already complex and... this makes sense. All we need from the integration with the FrameworkBundle is to be able to create buses and configure the middlewares for each. Not sure we need more.
+
+> There is another proposal to add event bus ready to discussion at sroze/symfony#4
+
+As we discussed privately already, my position on this point is that we should not bring more than one bus by default. There are obviously many reasons but the main ones are:
+1. Ease the understanding while starting with buses for beginners
+2. Multiple buses would prevent auto wiring to work properly
+3. If the FrameworkBundle integration allows us to create multiple buses, I guess that would be enough for "advanced users" to create different buses with different middlewares
+
+> Could we create a Worker/Loop in the component?
+
+@Nyholm Even if this will be almost only a loop over the receiver to dispatch the message, I think that it is valuable. I'll, therefore, extract this from the command to a `Worker` class within the Message component.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-12-29T00:08:30Z
+
+@sroze that means a single `dispatch($eventOrCommandMessage)` API right? Sounds nice!
+
+I voted :+1: for the separate message bundle as i see no real reason to ship a framework bundle with message infrastructure by default.. but i guess we dont mind really (`message vs. framework.message`),
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-12-29T08:34:53Z
+
+Another reason a separate bundle might be a good idea is one can have `sf/framework-bundle:3.4` + `sf/message-bundle:4.1`. Instead of forcing framework:4.1 =/
+
+---------------------------------------------------------------------------
+
+by makasim at 2018-01-07T21:10:20Z
+
+Signal handling is a vital part of message consumption. I cannot find anything about it. How is it supposed to be plugged in?
+
+---------------------------------------------------------------------------
+
+by makasim at 2018-01-07T21:13:46Z
+
+There are some basic features that should be thought out: message priority, expiration and delaying.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-01-07T21:48:20Z
+
+> Signal handling is a vital part of message consumption. I cannot find anything about it. How is it supposed to be plugged in?
+
+You are correct, this is something that need to be added to the `Worker` class I believe, so we don't keep `receive()`ing messages from the receiver. Interestingly, all my experimentations so far (with the [enqueue-bridge](https://github.com/sroze/enqueue-bridge) did not require that to have SIGTERM to work correctly.
+
+> There are some basic features that should be thought out: message priority, expiration and delaying.
+> [...]
+> AMQP allows messages to be acknowledged, rejected or re-queued. It is not clear how I can control it.
+
+@makasim I believe that these options are definitely on the adapter side of the things, as they depend on the transport used behind the scenes. I know you are knowledgeable about these topics so it would be fantastic to have your help on the [enqueue-bridge](https://github.com/sroze/enqueue-bridge) to take account of these points. Note that this bridge is in my own namespace right now but should be taken over by either Symfony or Enqueue when we merge this pull-request.
+
+---------------------------------------------------------------------------
+
+by makasim at 2018-01-19T07:47:13Z
+
+I've been playing with this PR lately, it looks interesting though there are some concerns I'd like to share with you:
+
+* The idea of the component is to be transport agnostic. transport settings and logic remain in an adapter. The problem is even simple things require coupling between handlers (the bus level) and an adapter (lower level). For example, how to reject an invalid message?
+
+* The bus itself is very abstract hence there is no way to use an underlying adapter with full power. For example, I can set a delay on an adapter itself, but in this case, all messages are delayed. How can I delay only one given message?
+
+* I question myself, what is the value of this layer then? There is still coupling, and it exposes very limited set of adapter's features.
+
+* There is no (easy) way to migrate from one adapter to another.
+
+* Lot's of services. Since there is no way to adjust things on per message basis, one forced to create more receivers and senders with slightly different settings (for at least every queue). If I have 20 queues I need 20 senders plus 20 receivers, and 20 bus objects.
+
+* A developer is supposed to write own receivers, senders every now and then, even though an underlying transport library supports needed features and exposes clear API.
+
+* With the current sender interface, It is not clear how to do RPC over MQ.
+
+* 3rd party libraries and bundles wont be able to develop sharable and adapter agnostic handlers.
+
+* Comes with a price - complexity.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-01-26T13:15:22Z
+
+> The problem is even simple things require coupling between handlers (the bus level) and an adapter (lower level). For example, how to reject an invalid message?
+
+"Simple things" are dependent on the context, obviously. As you mentioned, "rejecting" a message is not part of the Message component, as it is something specific to AMQP (or AMQP-like) brokers. As we discussed in https://github.com/sroze/enqueue-bridge/issues/1: In my point of view, the handler should throw an exception that implements an interface given by the adapter. The enqueue adapter for example, would provide the `MessageShouldBeRetriedExceptionInterface` and `MessageToBeRejectedExceptionInterface` interfaces.
+
+> [...] Lot's of services. Since there is no way to adjust things on per message basis, one forced to create more receivers and senders with slightly different settings (for at least every queue). If I have 20 queues I need 20 senders plus 20 receivers, and 20 bus objects.
+> [...] How can I delay only one given message?
+
+This is the same problem than the previous one in fact. I don't see why we couldn't have an adapter exposing such complex logic via an interface on the messages: an `DelayedMessage` interface with a `delayedUntil(): \DateTime` method for example.
+
+> what is the value of this layer then? There is still coupling, and it exposes very limited set of adapter's features.
+
+That's a very good question to be asked. There is no point when we only take the sending/consuming messages from an AMQP(-like) broker point of view. But there is much more than that in processing messages: CQRS and/or Event Sourced architectures, for example, are based on message buses (from different types usually, query/command/event). Allowing Symfony developers to use this(these) message buses for their applications and maybe later "extending it" by routing (see that routing is part of this PR) the messages to some producer is very powerful.
+
+> There is no (easy) way to migrate from one adapter to another.
+
+If you use adapter-specific features, that's a fair point. But if you just send messages across the wire, the change is a one-liner in the message routing configuration.
+
+> A developer is supposed to write own receivers, senders every now and then, even though an underlying transport library supports needed features and exposes clear API.
+
+Nop, it should not at all. Why would you say so? :thinking:
+
+> With the current sender interface, It is not clear how to do RPC over MQ.
+
+What do you mean? How can I help to clarify? Because the bus allows returning values so in case the message is routed to a sender... what has called `$bus->dispatch(...)` will return the value returned by the sender, so in case of synchronous calls (i.e. RPC) it can directly get it.
+
+> 3rd party libraries and bundles wont be able to develop sharable and adapter agnostic handlers.
+
+They will: that's the point of these middlewares. Were you thinking about a specific point you believed was not possible?
+
+> Comes with a price - complexity
+
+Interestingly, my idea is behind this component is to make it simple to start with.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2018-03-07T22:02:07Z
+
+I've taken a look at this PR, and to me it looks great. I'm a heavy user of SimpleBus today, and I'll be happy to migrate to this Message component. Even the things we're doing that are unusual (like named messages) or custom (like having a message validation middleware) seem very doable.
+
+Good job everyone. 👍
+
+---------------------------------------------------------------------------
+
+by clubdesarrolladores at 2018-03-09T17:11:14Z
+
++1!!!!!!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-12T17:35:30Z
+
+I've updated my (message driven) demo app from SimpleBus to SF message.
+
+https://github.com/msgphp/symfony-demo-app/commit/d82b85999763392875dd7c80eb1a9dc54c7fa5de
+
+It currently uses both buses actually. By default it just works like a charm, but i only tested simple command handling, so feel free to play around with it.
+
+![image](https://user-images.githubusercontent.com/1047696/37299516-d62c06e6-2623-11e8-9898-9e5fa4e7d6c3.png)
+
+cc @sroze
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-12T17:51:00Z
+
+@fabpot good catches, I updated the PR accordingly.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-12T20:15:45Z
+
+@stof @xabbuh @dunglas @lyrixx @weaverryan @chalasr @ogizanagi as you did not review this PR yet as core team members if you have a bit of time, could you have a look at this one? Thank you :)
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-13T09:05:31Z
+
+One last design change I think we need to do:
+```patch
+interface ReceiverInterface
+{
+-    public function receive(): iterable;
++    public function receive(): \Generator;
+}
+```
+
+It's less "generic" but at least we ensure the ability to pass exceptions back to the functions `yield`ing and therefore handling properly message rejections when applicable.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-13T18:01:25Z
+
+@ogizanagi @chalasr @dunglas @ro0NL thank you for the review. I've updated the PR accordingly 👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-20T10:31:51Z
+
+I'm not sure if `Message` is the right component name. It makes it feel like it's only about describing messages. What about `Messaging` instead or perhaps even better "Messenger"?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-20T10:47:44Z
+
+@fabpot I've been back and forth on this question as well. "Messenger" would be more align with the existing components than "Messaging". Tbh, I'm happy with "Message" or "Messenger" either way, I think they both describe this fundamental perspective of moving "messages" around (through adapters if needed) to handlers.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-20T10:48:53Z
+
+👍 for Messenger
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-20T10:50:05Z
+
+I propose to mark the component as experimental (see https://symfony.com/doc/current/contributing/code/experimental.html). That would allow us to have more time to test it in real conditions and make ajustments if needed.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-20T11:42:25Z
+
+About component name, how about "MessageBus"?
+
+---------------------------------------------------------------------------
+
+by sstok at 2018-03-20T12:02:24Z
+
+I would say MessageBus (or ServiceBus), because that's what it about. And it's a well know design-pattern. Most commonly used is MessageBus, ServiceBus is more a concept then a pattern.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-20T12:17:32Z
+
+I don't like calling a component as a design pattern.
+
+Still think that Messenger is much better.
+
+On 20/03/2018 13:02, Sebastiaan Stok wrote:
+> I would say MessageBus (or ServiceBus), because that's what it about.
+> And it's a well know design-pattern. Most commonly used is MessageBus,
+> ServiceBus is more a concept then a pattern.
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/24411#issuecomment-374572926>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAC40ZH-kqPakzOslnxqp_OvjbNoH5q8ks5tgO_SgaJpZM4Psa6z>.
+>
+
+---------------------------------------------------------------------------
+
+by iltar at 2018-03-20T12:29:32Z
+
+While I do like the name "Messenger", I don't think it completely falls in line with the rest of the component names. For example: http-kernel component isn't called web-application-starter component either. The current components are named after what it is, not what it does, hence my vote goes to "message-bus".
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-20T12:56:15Z
+
+I'm 👎on "MessageBus". I do agree that we shouldn't name things based on the design pattern they use but that's not the main reason why I believe "MessageBus" would be a wrong name: this component **contains** a message-bus, this component isn't one. It's more than that: it has a routing mechanism to route messages to adapters instead of calling a handler. It also has a worker and a consume command to consume messages from adapters and dispatch them to the bus.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-20T13:00:17Z
+
+The new components recently introduced have been (if I'm not mistaking) "Lock" (not "Locker"), "WebLink" (not "WebLinker"), "Workflow", "Ldap", "PropertyInfo". The only exception is "VarDumper" :)
+
+> While I do like the name "Messenger", I don't think it completely falls in line with the rest of the component names
+
+While I tend to agree, I don't really care either "Message" or "Messenger". But if it's such a hard question to find a name, I'd vote for keeping the existing one because it "works" with existing names and changing it might not bring much value compared to the work required to rename.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-03-20T13:28:41Z
+
+To me "Messenger" sounds like Facebook Messenger / What's App like (or
+integration) component. I prefer Message.
+
+2018-03-20 14:00 GMT+01:00 Samuel ROZE <notifications@github.com>:
+
+> The new components recently introduced have been (if I'm not mistaking)
+> "Lock" (not "Locker"), "WebLink" (not "WebLinker"), "Workflow", "Ldap",
+> "PropertyInfo". The only exception is "VarDumper" :)
+>
+> While I do like the name "Messenger", I don't think it completely falls in
+> line with the rest of the component names
+>
+> While I tend to agree, I don't really care either "Message" or
+> "Messenger". But if it's such a hard question to find a name, I'd vote for
+> keeping the existing one because it "works" with existing names and
+> changing it might not bring much value compared to the work required to
+> rename.
+
+---------------------------------------------------------------------------
+
+by ged15 at 2018-03-20T14:58:17Z
+
+How about "Messaging"?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-20T18:28:48Z
+
+I'd also vote for `Message` for the reasons given by @sroze & @dunglas.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-20T21:34:31Z
+
+After maaany discussions, especially with @fabpot and @nicolas-grekas, the component is going to be called « Messenger ».
+
+---------------------------------------------------------------------------
+
+by pborreli at 2018-03-21T09:34:55Z
+
+@sroze so now you have to rename your conference name at Symfony Live Paris 😄
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-21T09:39:25Z
+
+@pborreli I know 😅
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-21T23:32:33Z
+
+I have squashed all the commits and added tests for what I believe is really important for now. I'd argue the bits that aren't covered by tests will be covered as long as we keep the policy that every change in this experimental component has to be covered by tests.
+
+Therefore, I'd say it's ready to be merged :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-22T07:04:44Z
+
+@sroze Can you add a sentence about the fact that the new component is experimental in the README file?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-22T08:47:14Z
+
+@fabpot just added a message and a link to the documentation 👍  (kept two commits so it's super easy to revert the experimental one before 4.2)

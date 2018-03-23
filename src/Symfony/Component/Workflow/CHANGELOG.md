@@ -11,6 +11,7 @@ CHANGELOG
  * Added TransitionBlockers as a way to pass around reasons why exactly
    transitions can't be made.
  * Added a `MetadataStore`.
+ * Added Registry::all to return all the workflows associated with the specific subject
 
 4.0.0
 -----

@@ -30,7 +30,7 @@
         "symfony/security-core": "~2.6.13|~2.7.9|~2.8",
         "symfony/security-csrf": "~2.6",
         "symfony/stopwatch": "~2.3",
-        "symfony/templating": "~2.1",
+        "symfony/templating": "~2.7",
         "symfony/translation": "~2.7",
         "doctrine/annotations": "~1.0"
     },

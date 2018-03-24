@@ -25,11 +25,11 @@
     {% if prepend or append %}
         <div class="input-group">
             {% if prepend %}
-                <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+                <span class="input-group-addon">{{ money_pattern|form_encode_currency }}</span>
             {% endif %}
             {{- block('form_widget_simple') -}}
             {% if append %}
-                <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
+                <span class="input-group-addon">{{ money_pattern|form_encode_currency }}</span>
             {% endif %}
         </div>
     {% else %}

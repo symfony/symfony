@@ -136,13 +136,16 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         $binding = $bindings[$bindingName];
 
                         list($bindingValue, $bindingId) = $binding->getValues();
+                        $binding->setValues(array($bindingValue, $bindingId, true));
 
                         if (!$bindingValue instanceof Reference) {
-                            continue;
+                            $args[$p->name] = new Reference('value.'.$container->hash($bindingValue));
+                            $container->register((string) $args[$p->name], 'mixed')
+                                ->setFactory('current')
+                                ->addArgument(array($bindingValue));
+                        } else {
+                            $args[$p->name] = $bindingValue;
                         }
-
-                        $binding->setValues(array($bindingValue, $bindingId, true));
-                        $args[$p->name] = $bindingValue;
 
                         continue;
                     } elseif (!$type || !$autowire) {

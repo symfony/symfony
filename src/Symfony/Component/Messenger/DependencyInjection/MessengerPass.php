@@ -31,7 +31,7 @@ class MessengerPass implements CompilerPassInterface
     private $messageHandlerResolverService;
     private $handlerTag;
 
-    public function __construct(string $messageBusService = 'message_bus', string $messageHandlerResolverService = 'messenger.handler_resolver', string $handlerTag = 'message_handler')
+    public function __construct(string $messageBusService = 'message_bus', string $messageHandlerResolverService = 'messenger.handler_resolver', string $handlerTag = 'messenger.message_handler')
     {
         $this->messageBusService = $messageBusService;
         $this->messageHandlerResolverService = $messageHandlerResolverService;

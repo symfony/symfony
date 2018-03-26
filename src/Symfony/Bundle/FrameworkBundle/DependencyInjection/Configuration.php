@@ -987,7 +987,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('doctrine_transaction')
                             ->canBeEnabled()
                             ->children()
-                                ->scalarNode('entity_manager_name')->info('The name of the entity manager to use')->defaultValue('default')->end()
+                                ->scalarNode('entity_manager_name')->info('The name of the entity manager to use')->defaultNull()->end()
                             ->end()
                         ->end()
                     ->end()

@@ -17,11 +17,6 @@
                     <p class="break-long-words trace-message">{{ exception.message }}</p>
                 {% endif %}
             </span>
-
-            <form class="trace-toggle-vendors">
-                <input id="trace-html-{{ index }}-toggle-vendors" type="checkbox" checked aria-label="Toggle traces from vendors" onchange="var vendorTraces = document.querySelectorAll('#trace-html-{{ index }} .trace-from-vendor'); for (var i = 0; i < vendorTraces.length; i++) { vendorTraces[i].style.display = this.checked ? 'none' : 'block'; };" />
-                <label for="trace-html-{{ index }}-toggle-vendors">Hide vendors</label>
-            </form>
         </div>
 
         <div id="trace-html-{{ index }}" class="sf-toggle-content">
@@ -31,7 +26,7 @@
             {% set _display_code_snippet = _is_first_user_code and not _is_vendor_trace %}
             {% if _display_code_snippet %}{% set _is_first_user_code = false %}{% endif %}
             <div class="trace-line {{ _is_vendor_trace ? 'trace-from-vendor' }}">
-                {{ include('@Twig/Exception/trace.html.twig', { prefix: index, i: i, trace: trace, _display_code_snippet: _display_code_snippet }, with_context = false) }}
+                {{ include('@Twig/Exception/trace.html.twig', { prefix: index, i: i, trace: trace, style: _is_vendor_trace ? 'compact' : _display_code_snippet ? 'expanded' }, with_context = false) }}
             </div>
         {% endfor %}
         </div>

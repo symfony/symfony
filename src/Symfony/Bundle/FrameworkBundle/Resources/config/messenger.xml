@@ -25,7 +25,7 @@
             <tag name="message_bus_middleware" priority="-10" />
         </service>
 
-        <service id="messenger.middleware.doctrine_transaction" class="Symfony\Component\Messenger\Middleware\WrapsMessageHandlingInTransaction">
+        <service id="messenger.middleware.doctrine_transaction" class="Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware">
             <argument type="service" id="doctrine" />
             <argument /> <!-- Entity manager name -->
 

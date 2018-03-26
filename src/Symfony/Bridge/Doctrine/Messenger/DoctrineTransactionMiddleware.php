@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Middleware;
+namespace Symfony\Bridge\Doctrine\Messenger;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\MiddlewareInterface;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class WrapsMessageHandlingInTransaction implements MiddlewareInterface
+class DoctrineTransactionMiddleware implements MiddlewareInterface
 {
     private $managerRegistry;
     private $entityManagerName;

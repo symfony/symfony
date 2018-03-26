@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1447,6 +1448,9 @@ class FrameworkExtension extends Extension
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
 
         if ($config['doctrine_transaction']['enabled']) {
+            if (!class_exists(DoctrineTransactionMiddleware::class)) {
+                throw new LogicException('You must install symfony/doctrine-bridge to use the "DoctrineTransactionMiddleware"');
+            }
             $container->getDefinition('messenger.middleware.doctrine_transaction')->replaceArgument(1, $config['doctrine_transaction']['entity_manager_name']);
         } else {
             $container->removeDefinition('messenger.middleware.doctrine_transaction');

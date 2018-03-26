@@ -975,23 +975,21 @@ class Configuration implements ConfigurationInterface
                                     $newConfig = [];
                                     foreach ($config as $k => $v) {
                                         if (!is_int($k)) {
-                                            return $config;
+                                            $newConfig[$k] = array('senders'=>is_array($v) ? array_values($v) : array($v));
+                                        } else {
+                                            $newConfig[$v['message-class']]['senders'] = array_map(
+                                                function ($a) {
+                                                    return is_string($a) ? $a : $a['service'];
+                                                },
+                                                array_values($v['sender'])
+                                            );
                                         }
-                                        $newConfig[$v['message-class']] = array_map(function($a) {
-                                            return is_string($a) ? $a : $a['service'];
-                                        }, array_values($v['sender']));
                                     }
 
                                     return $newConfig;
                                 })
                             ->end()
                             ->prototype('array')
-                                ->beforeNormalization()
-                                    ->ifString()
-                                    ->then(function ($v) {
-                                        return array('senders' => array($v));
-                                    })
-                                ->end()
                                 ->children()
                                     ->arrayNode('senders')
                                         ->requiresAtLeastOneElement()

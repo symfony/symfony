@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-03-23T10:03:11Z
+
+Might be a silly question, but why add it in the first place? Why not only add it if the serializer isn't available?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-23T12:19:43Z
+
+@iltar Good question, AFAIK we use that approach in general. I guess having as much services as possible declared in xml is good for discoverability

@@ -7,9 +7,12 @@
 
     <framework:config>
         <framework:messenger>
-            <framework:routing>
-                <framework:sender message-class="App\Foo">sender.foo</framework:sender>
-                <framework:sender message-class="App\Bar">sender.bar</framework:sender>
+            <framework:routing message-class="App\Bar">
+                <framework:sender service="sender.bar"></framework:sender>
+                <framework:sender service="sender.biz"></framework:sender>
+            </framework:routing>
+            <framework:routing message-class="App\Foo">
+                <framework:sender service="sender.foo"></framework:sender>
             </framework:routing>
         </framework:messenger>
     </framework:config>

@@ -969,6 +969,22 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('routing')
                             ->useAttributeAsKey('message_class')
+                            ->beforeNormalization()
+                                ->always()
+                                ->then(function ($config) {
+                                    $newConfig = [];
+                                    foreach ($config as $k => $v) {
+                                        if (!is_int($k)) {
+                                            return $config;
+                                        }
+                                        $newConfig[$v['message-class']] = array_map(function($a) {
+                                            return is_string($a) ? $a : $a['service'];
+                                        }, array_values($v['sender']));
+                                    }
+
+                                    return $newConfig;
+                                })
+                            ->end()
                             ->prototype('array')
                                 ->beforeNormalization()
                                     ->ifString()

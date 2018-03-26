@@ -255,7 +255,7 @@ class ConfigurationTest extends TestCase
                 'routing' => array(),
                 'doctrine_transaction' => array(
                     'enabled' => false,
-                    'entity_manager_name' => 'default',
+                    'entity_manager_name' => null,
                 ),
             ),
         );

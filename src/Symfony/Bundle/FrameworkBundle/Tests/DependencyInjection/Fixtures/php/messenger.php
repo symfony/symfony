@@ -3,8 +3,8 @@
 $container->loadFromExtension('framework', array(
     'messenger' => array(
         'routing' => array(
+            'App\Bar' => ['sender.bar', 'sender.biz'],
             'App\Foo' => 'sender.foo',
-            'App\Bar' => 'sender.bar',
         ),
     ),
 ));

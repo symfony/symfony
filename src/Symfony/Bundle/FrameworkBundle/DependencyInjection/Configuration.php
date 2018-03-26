@@ -972,10 +972,10 @@ class Configuration implements ConfigurationInterface
                             ->beforeNormalization()
                                 ->always()
                                 ->then(function ($config) {
-                                    $newConfig = [];
+                                    $newConfig = array();
                                     foreach ($config as $k => $v) {
                                         if (!is_int($k)) {
-                                            $newConfig[$k] = array('senders'=>is_array($v) ? array_values($v) : array($v));
+                                            $newConfig[$k] = array('senders' => is_array($v) ? array_values($v) : array($v));
                                         } else {
                                             $newConfig[$v['message-class']]['senders'] = array_map(
                                                 function ($a) {

@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+use Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 
 /**
  * The base node class.
@@ -24,6 +25,9 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 abstract class BaseNode implements NodeInterface
 {
     const DEFAULT_PATH_SEPARATOR = '.';
+
+    private static $placeholderUniquePrefix;
+    private static $placeholders = array();
 
     protected $name;
     protected $parent;
@@ -35,6 +39,8 @@ abstract class BaseNode implements NodeInterface
     protected $equivalentValues = array();
     protected $attributes = array();
     protected $pathSeparator;
+
+    private $handlingPlaceholder;
 
     /**
      * @throws \InvalidArgumentException if the name contains a period
@@ -48,6 +54,47 @@ abstract class BaseNode implements NodeInterface
         $this->name = $name;
         $this->parent = $parent;
         $this->pathSeparator = $pathSeparator;
+    }
+
+    /**
+     * Register possible (dummy) values for a dynamic placeholder value.
+     *
+     * Matching configuration values will be processed with a provided value, one by one. After a provided value is
+     * successfully processed the configuration value is returned as is, thus preserving the placeholder.
+     *
+     * @internal
+     */
+    public static function setPlaceholder(string $placeholder, array $values): void
+    {
+        if (!$values) {
+            throw new \InvalidArgumentException('At least one value must be provided.');
+        }
+
+        self::$placeholders[$placeholder] = $values;
+    }
+
+    /**
+     * Sets a common prefix for dynamic placeholder values.
+     *
+     * Matching configuration values will be skipped from being processed and are returned as is, thus preserving the
+     * placeholder. An exact match provided by {@see setPlaceholder()} might take precedence.
+     *
+     * @internal
+     */
+    public static function setPlaceholderUniquePrefix(string $prefix): void
+    {
+        self::$placeholderUniquePrefix = $prefix;
+    }
+
+    /**
+     * Resets all current placeholders available.
+     *
+     * @internal
+     */
+    public static function resetPlaceholders(): void
+    {
+        self::$placeholderUniquePrefix = null;
+        self::$placeholders = array();
     }
 
     public function setAttribute($key, $value)
@@ -249,8 +296,34 @@ abstract class BaseNode implements NodeInterface
             ));
         }
 
-        $this->validateType($leftSide);
-        $this->validateType($rightSide);
+        if ($leftSide !== $leftPlaceholders = self::resolvePlaceholderValue($leftSide)) {
+            foreach ($leftPlaceholders as $leftPlaceholder) {
+                $this->handlingPlaceholder = $leftSide;
+                try {
+                    $this->merge($leftPlaceholder, $rightSide);
+                } finally {
+                    $this->handlingPlaceholder = null;
+                }
+            }
+
+            return $rightSide;
+        }
+
+        if ($rightSide !== $rightPlaceholders = self::resolvePlaceholderValue($rightSide)) {
+            foreach ($rightPlaceholders as $rightPlaceholder) {
+                $this->handlingPlaceholder = $rightSide;
+                try {
+                    $this->merge($leftSide, $rightPlaceholder);
+                } finally {
+                    $this->handlingPlaceholder = null;
+                }
+            }
+
+            return $rightSide;
+        }
+
+        $this->doValidateType($leftSide);
+        $this->doValidateType($rightSide);
 
         return $this->mergeValues($leftSide, $rightSide);
     }
@@ -267,6 +340,20 @@ abstract class BaseNode implements NodeInterface
             $value = $closure($value);
         }
 
+        // resolve placeholder value
+        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
+            foreach ($placeholders as $placeholder) {
+                $this->handlingPlaceholder = $value;
+                try {
+                    $this->normalize($placeholder);
+                } finally {
+                    $this->handlingPlaceholder = null;
+                }
+            }
+
+            return $value;
+        }
+
         // replace value with their equivalent
         foreach ($this->equivalentValues as $data) {
             if ($data[0] === $value) {
@@ -275,7 +362,7 @@ abstract class BaseNode implements NodeInterface
         }
 
         // validate type
-        $this->validateType($value);
+        $this->doValidateType($value);
 
         // normalize value
         return $this->normalizeValue($value);
@@ -308,7 +395,20 @@ abstract class BaseNode implements NodeInterface
      */
     final public function finalize($value)
     {
-        $this->validateType($value);
+        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
+            foreach ($placeholders as $placeholder) {
+                $this->handlingPlaceholder = $value;
+                try {
+                    $this->finalize($placeholder);
+                } finally {
+                    $this->handlingPlaceholder = null;
+                }
+            }
+
+            return $value;
+        }
+
+        $this->doValidateType($value);
 
         $value = $this->finalizeValue($value);
 
@@ -318,6 +418,10 @@ abstract class BaseNode implements NodeInterface
             try {
                 $value = $closure($value);
             } catch (Exception $e) {
+                if ($e instanceof UnsetKeyException && null !== $this->handlingPlaceholder) {
+                    continue;
+                }
+
                 throw $e;
             } catch (\Exception $e) {
                 throw new InvalidConfigurationException(sprintf('Invalid configuration for path "%s": %s', $this->getPath(), $e->getMessage()), $e->getCode(), $e);
@@ -363,4 +467,85 @@ abstract class BaseNode implements NodeInterface
      * @return mixed The finalized value
      */
     abstract protected function finalizeValue($value);
+
+    /**
+     * Tests if placeholder values are allowed for this node.
+     */
+    protected function allowPlaceholders(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Gets allowed dynamic types for this node.
+     */
+    protected function getValidPlaceholderTypes(): array
+    {
+        return array();
+    }
+
+    private static function resolvePlaceholderValue($value)
+    {
+        if (\is_string($value)) {
+            if (isset(self::$placeholders[$value])) {
+                return self::$placeholders[$value];
+            }
+
+            if (0 === strpos($value, self::$placeholderUniquePrefix)) {
+                return array();
+            }
+        }
+
+        return $value;
+    }
+
+    private static function getType($value): string
+    {
+        switch ($type = \gettype($value)) {
+            case 'boolean':
+                return 'bool';
+            case 'double':
+                return 'float';
+            case 'integer':
+                return 'int';
+        }
+
+        return $type;
+    }
+
+    private function doValidateType($value): void
+    {
+        if (null === $this->handlingPlaceholder || null === $value) {
+            $this->validateType($value);
+
+            return;
+        }
+
+        if (!$this->allowPlaceholders()) {
+            $e = new InvalidTypeException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', get_class($this), $this->getPath()));
+            $e->setPath($this->getPath());
+
+            throw $e;
+        }
+
+        $knownTypes = array_keys(self::$placeholders[$this->handlingPlaceholder]);
+        $validTypes = $this->getValidPlaceholderTypes();
+
+        if (array_diff($knownTypes, $validTypes)) {
+            $e = new InvalidTypeException(sprintf(
+                'Invalid type for path "%s". Expected %s, but got %s.',
+                $this->getPath(),
+                1 === count($validTypes) ? '"'.reset($validTypes).'"' : 'one of "'.implode('", "', $validTypes).'"',
+                1 === count($knownTypes) ? '"'.reset($knownTypes).'"' : 'one of "'.implode('", "', $knownTypes).'"'
+            ));
+            if ($hint = $this->getInfo()) {
+                $e->addHint($hint);
+            }
+            $e->setPath($this->getPath());
+
+            throw $e;
+        }
+
+        $this->validateType($value);
+    }
 }

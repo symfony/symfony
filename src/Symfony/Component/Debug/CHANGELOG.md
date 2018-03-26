@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-2.7.1
------
-
-* fix support for PHPDBG SAPI in `Debug::enable()`
-
 2.7.0
 -----
 

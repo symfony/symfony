@@ -95,10 +95,6 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
 
     public function getMessages(): array
     {
-        if (!isset($this->data['messages'])) {
-            return [];
-        }
-
-        return $this->data['messages'];
+        return $this->data['messages'] ?? array();
     }
 }

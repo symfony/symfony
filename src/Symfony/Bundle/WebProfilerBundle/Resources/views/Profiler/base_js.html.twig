@@ -168,6 +168,10 @@
             durationCell.textContent = 'n/a';
             row.appendChild(durationCell);
 
+            request.liveDurationHandle = setInterval(function() {
+                durationCell.textContent = (new Date() - request.start) + 'ms';
+            }, 100);
+
             row.className = 'sf-ajax-request sf-ajax-request-loading';
             tbody.insertBefore(row, tbody.firstChild);
 
@@ -176,6 +180,8 @@
 
         var finishAjaxRequest = function(index) {
             var request = requestStack[index];
+            clearInterval(request.liveDurationHandle);
+
             if (!request.DOMNode) {
                 return;
             }

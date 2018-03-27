@@ -260,4 +260,15 @@ class FormHelper extends Helper
     {
         return $this->renderer->humanize($text);
     }
+
+    public function htmlEntities($text)
+    {
+        $text = htmlentities($text, ENT_QUOTES | (defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+
+        if ('UTF-8' === $charset = $this->getCharset()) {
+            return $text;
+        }
+
+        return iconv('UTF-8', $charset, $text);
+    }
 }

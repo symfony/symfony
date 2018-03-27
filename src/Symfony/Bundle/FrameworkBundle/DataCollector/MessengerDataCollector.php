@@ -53,6 +53,7 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
         $debugRepresentation = array(
             'message' => array(
                 'type' => get_class($message),
+                'object' => $this->cloneVar($message),
             ),
         );
 
@@ -63,6 +64,12 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
             if (is_object($result)) {
                 $debugRepresentation['result'] = array(
                     'type' => get_class($result),
+                    'object' => $this->cloneVar($result),
+                );
+            } elseif (is_array($result)) {
+                $debugRepresentation['result'] = array(
+                    'type' => 'array',
+                    'object' => $this->cloneVar($result),
                 );
             } else {
                 $debugRepresentation['result'] = array(
@@ -77,7 +84,7 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
             );
         }
 
-        $this->data[] = $debugRepresentation;
+        $this->data['messages'][] = $debugRepresentation;
 
         if (null !== $exception) {
             throw $exception;
@@ -88,6 +95,6 @@ class MessengerDataCollector extends DataCollector implements MiddlewareInterfac
 
     public function getMessages(): array
     {
-        return $this->data;
+        return $this->data['messages'] ?? array();
     }
 }

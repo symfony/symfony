@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Messenger\Handler\ChainHandler;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
@@ -67,16 +69,25 @@ class MessengerPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($this->handlerTag, true) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                $handles = $tag['handles'] ?? $this->guessHandledClass($r = $container->getReflectionClass($container->getParameterBag()->resolveValue($container->getDefinition($serviceId)->getClass())), $serviceId);
-
-                if (!class_exists($handles)) {
-                    $messageClassLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf('used as argument type in method "%s::__invoke()"', $r->getName());
-
-                    throw new RuntimeException(sprintf('Invalid handler service "%s": message class "%s" %s does not exist.', $serviceId, $handles, $messageClassLocation));
-                }
-
+                $handles = $tag['handles'] ?? $this->guessHandledClasses($r = $container->getReflectionClass($container->getDefinition($serviceId)->getClass()), $serviceId);
                 $priority = $tag['priority'] ?? 0;
-                $handlersByMessage[$handles][$priority][] = new Reference($serviceId);
+
+                foreach ($handles as $messageClass) {
+                    if (is_array($messageClass)) {
+                        $messagePriority = $messageClass[1];
+                        $messageClass = $messageClass[0];
+                    } else {
+                        $messagePriority = $priority;
+                    }
+
+                    if (!class_exists($messageClass)) {
+                        $messageClassLocation = isset($tag['handles']) ? 'declared in your tag attribute "handles"' : sprintf($r->implementsInterface(MessageHandlerInterface::class) ? 'returned by method "%s::getHandledMessages()"' : 'used as argument type in method "%s::__invoke()"', $r->getName());
+
+                        throw new RuntimeException(sprintf('Invalid handler service "%s": message class "%s" %s does not exist.', $serviceId, $messageClass, $messageClassLocation));
+                    }
+
+                    $handlersByMessage[$messageClass][$messagePriority][] = new Reference($serviceId);
+                }
             }
         }
 
@@ -108,8 +119,16 @@ class MessengerPass implements CompilerPassInterface
         $handlerResolver->replaceArgument(0, ServiceLocatorTagPass::register($container, $handlersLocatorMapping));
     }
 
-    private function guessHandledClass(\ReflectionClass $handlerClass, string $serviceId): string
+    private function guessHandledClasses(\ReflectionClass $handlerClass, string $serviceId): array
     {
+        if ($handlerClass->implementsInterface(MessageSubscriberInterface::class)) {
+            if (!$handledMessages = $handlerClass->getName()::getHandledMessages()) {
+                throw new RuntimeException(sprintf('Invalid handler service "%s": method "%s::getHandledMessages()" must return one or more messages.', $serviceId, $handlerClass->getName()));
+            }
+
+            return $handledMessages;
+        }
+
         try {
             $method = $handlerClass->getMethod('__invoke');
         } catch (\ReflectionException $e) {
@@ -129,7 +148,7 @@ class MessengerPass implements CompilerPassInterface
             throw new RuntimeException(sprintf('Invalid handler service "%s": type-hint of argument "$%s" in method "%s::__invoke()" must be a class , "%s" given.', $serviceId, $parameters[0]->getName(), $handlerClass->getName(), $type));
         }
 
-        return $parameters[0]->getType();
+        return array((string) $parameters[0]->getType());
     }
 
     private function registerReceivers(ContainerBuilder $container)

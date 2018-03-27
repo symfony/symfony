@@ -253,6 +253,12 @@ class ConfigurationTest extends TestCase
             'messenger' => array(
                 'enabled' => !class_exists(FullStack::class) && class_exists(MessageBusInterface::class),
                 'routing' => array(),
+                'middlewares' => array(
+                    'doctrine_transaction' => array(
+                        'enabled' => false,
+                        'entity_manager_name' => null,
+                    ),
+                ),
             ),
         );
     }

@@ -1,0 +1,5 @@
+framework:
+    messenger:
+        routing:
+            'App\Bar': ['sender.bar', 'sender.biz']
+            'App\Foo': 'sender.foo'

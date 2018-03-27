@@ -90,17 +90,18 @@ header .container { display: flex; justify-content: space-between; }
 .exception-illustration { flex-basis: 111px; flex-shrink: 0; height: 66px; margin-left: 15px; opacity: .7; }
 
 .trace + .trace { margin-top: 30px; }
-.trace-head { background-color: #e0e0e0; padding: 10px; }
+.trace-head { background-color: #e0e0e0; padding: 10px; position: relative; }
 .trace-head .trace-class { color: #222; font-size: 18px; font-weight: bold; line-height: 1.3; margin: 0; position: relative; }
 .trace-head .trace-namespace { color: #999; display: block; font-size: 13px; }
 .trace-head .icon { position: absolute; right: 0; top: 0; }
 .trace-head .icon svg { height: 24px; width: 24px; }
 
-.trace-details { background: #FFF; border: 1px solid #E0E0E0; box-shadow: 0px 0px 1px rgba(128, 128, 128, .2); margin: 1em 0; }
+.trace-details { background: #FFF; border: 1px solid #E0E0E0; box-shadow: 0px 0px 1px rgba(128, 128, 128, .2); margin: 1em 0; table-layout: fixed; }
 
 .trace-message { font-size: 14px; font-weight: normal; margin: .5em 0 0; }
-.trace-details { table-layout: fixed; }
+
 .trace-line { position: relative; padding-top: 8px; padding-bottom: 8px; }
+.trace-line + .trace-line { border-top: 1px solid #e0e0e0; }
 .trace-line:hover { background: #F5F5F5; }
 .trace-line a { color: #222; }
 .trace-line .icon { opacity: .4; position: absolute; left: 10px; top: 11px; }

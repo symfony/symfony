@@ -1,0 +1,362 @@
+---------------------------------------------------------------------------
+
+by mpiot at 2018-02-27T10:39:47Z
+
+Yes, I fix existing tests, and wite new (I've never do it, it take a little times, sorry...)
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-02-27T13:32:37Z
+
+Just a question, how can I execute tests ? Because when I do:
+
+    COMPOSER_ROOT_VERSION=4.0 composer install
+    vendor/bin/simple-phpunit src/Symfony/Bridge/Twig/Tests
+
+It return to me alle is ok, but Skip a lot of tests, but in TravisCi, it doesn't skip test and there is a lot of error, I can't try and push everytime to see what say Travis :-(
+
+I've try to do something like travis do:
+
+    cd src/Symfony/Bridge/Twig
+    composer update --no-progress --ansi --prefer-lowest --prefer-stable
+    SYMFONY_ROOT_DIR/phpunit --exclude-group tty,benchmark,intl-data
+
+But it does less tests, Skip all, and thrw an exception:
+
+>   Other deprecation notices (1)
+  1x: The each() function is deprecated. This message will be suppressed on further calls
+
+Thanks a lot, and sorry, it's the first tim I'm looking into tests... (I know, it's wrong... :p)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-27T13:37:34Z
+
+I usually do `./phpunit src/Symfony/Bridge/Twig`. That should not skip the tests.
+
+Here is a page that describes this in details: https://symfony.com/doc/current/contributing/code/tests.html
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-27T13:42:38Z
+
+Btw, I see that it is the "deps low" test that fails on Travis. That is okey for this PR since the changes on the different components depends on each other.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-02-27T13:45:11Z
+
+Oki, but I thought it would be nice to add tests for the new elements, right?
+
+Test the `form_help` output, and then, maybe it change something form the `form_row`, no ?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-27T13:46:39Z
+
+That would be excellent.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-02-27T13:58:27Z
+
+I'm pinging some of our biggest Symfony Form experts so they can double check these changes: @HeahDude, @vudaltsov, @yceruto Thanks!
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-02-27T14:03:44Z
+
+Thank you :-)
+Because I'm not very comfortable with Symfony Form, I'm just discovering the insides.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-02-28T18:04:01Z
+
+Excellent. This looks real good.
+
+(Bootstrap 4):
+![screen shot 2018-02-28 at 19 00 09](https://user-images.githubusercontent.com/1275206/36804101-d3e9d160-1cb9-11e8-9469-51890348f9e2.png)
+
+---------------
+
+There is one thing I'm missing. You need to add an `id` to the help block (`id="{{id}}_help`) and use the `aria-describedby` on the `<input>`.
+
+```html
+<label for="inputPassword5">Password</label>
+<input type="password" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock">
+<small id="passwordHelpBlock" class="form-text text-muted">
+  Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.
+</small>
+```
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-02-28T18:31:27Z
+
+@Nyholm  I fix it tomorrow :-)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-01T07:01:53Z
+
+Good. We also need the the aria-describedby on the <input>.
+
+After that I’m very happy.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-01T07:09:41Z
+
+@Nyholm This is done, just a little reflexion to avoid add the aria-describedBy, when there is not helpBlock. And some difficulties in the FrameworkBundle views, I don't know wwhat is its usage, but I don't like it :p
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-01T08:43:43Z
+
+@Nyholm I've fixed some of your suggestions :-) Mmm,  "Could you also make sure fabbot is happy?", how I do that ? :p
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-01T08:54:11Z
+
+Thanks!
+
+Fabbot is a script that make sure all PRs follow code standard and it also runs some test for "common things". It is real great.
+
+See the PR status.
+<img width="867" alt="screen shot 2018-03-01 at 09 49 42 copy" src="https://user-images.githubusercontent.com/1275206/36835404-69985c6e-1d36-11e8-8855-700ee1463f22.png">
+
+You see that there are some things fabbot complains about. Just copy the command and fabbot will fix things for you.
+
+<img width="1086" alt="screen shot 2018-03-01 at 09 51 2" src="https://user-images.githubusercontent.com/1275206/36835425-7be66bf4-1d36-11e8-856b-0f70f7db33a9.png">
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-01T08:58:35Z
+
+Oh yes, I've see that, but the correction, isn't the way used in all the other files... That's why I've not fix it and keep the way used in existing files.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-01T09:02:19Z
+
+No, you can trust the fabbot. It does only correct/review the files you've edited in this PR.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-01T09:09:06Z
+
+For exemple it say to fix:
+
+    <?php echo $view['form']->label($form) ?>
+    <?php echo $view['form']->errors($form) ?>
+    <?php echo $view['form']->widget($form, array('helpBlockDisplayed' => true)) ?>
+    <?php echo $view['form']->help($form) ?>
+
+By:
+
+    <?php echo $view['form']->label($form); ?>
+    <?php echo $view['form']->errors($form); ?>
+    <?php echo $view['form']->widget($form, array('helpBlockDisplayed' => true)); ?>
+    <?php echo $view['form']->help($form); ?>
+
+I've not edited other lines, just add one. That's why I've keep the syntax without the `;` at end.
+
+It's the same everywhere, it want to add `;` at end of each php block, but it's actually used nowhere in the folder `src/Symfony/Bundle/FrameworkBundle/Ressources/views/Form`. That's why I don't really know if I must do like fabpot.io say or do like all files are.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-01T09:12:27Z
+
+I guess fabbot has updated its rules since those other lines were added. I think we should follow the recommendations by fabbot in this case.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-01T10:48:50Z
+
+It bugs.... The diff is empty, the diff file doesn't exists and I've already apply the patch to add the licence header.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-09T22:25:42Z
+
+No news?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-18T11:06:52Z
+
+I've created a PR to your PR. Please review and merge https://github.com/mpiot/symfony/pull/1
+
+Fabbot will probably give some false negatives. Also, if you merge my PR and then rebase on master then everything will be great.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-20T17:12:26Z
+
+Thank you too :-)
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-20T17:13:46Z
+
+@vudaltsov can you review last changes ? Thanks a lot :-)
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-20T21:52:54Z
+
+@vudaltsov ha ha, thanks :p But @Nyholm helped me a lot ;-)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-21T07:17:25Z
+
+Looks like tests are broken. Can you have a look?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-21T07:30:05Z
+
+Are they? It is only the high/low tests that are broken. I thought they fail because this PR modifies multiple components.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-21T07:42:15Z
+
+As this PR is for master, test on high should not fail. And tests must never break on low (if they do, it might mean that some deps must be bumped).
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-21T08:41:05Z
+
+I don't really understand this errors, and how to view it on my machine (to avoid do commit each time to view if it works). I've try to use `export deps=high` like used in travis, before do a composer and phpunit command, but don't work. (I've no errors)
+
+In deps=high, errors are similar, an exemple:
+
+    PHP Fatal error:  Class
+    Symfony\Bridge\Twig\Tests\Extension\FormExtensionBootstrap3HorizontalLayoutTest contains 1
+    abstract method and must therefore be declared abstract or implement the remaining methods
+    (Symfony\Component\Form\Tests\AbstractLayoutTest::renderHelp) in symfony/src/Symfony/Bridge/Twig/Tests/Extension/FormExtensionBootstrap3HorizontalLayoutTest.php on line 24
+
+But I've declare the `abstract protected method renderHelp` in AbstractLayoutTest.php, and I've implement this method in FormExtensionBootstrap3HorizontalLayoutTest.php. I don't understand the error...
+
+I've not look at deps=low at the moment.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-21T08:55:27Z
+
+deps=high errors seems ok.
+Let's fix deps=low
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-21T11:40:32Z
+
+In deps=low and deps=high, the Travis script install with composer some dependencies as vendors, in the standard script, it use the general composer installl and use the actual `symfony/symfony` parts.
+
+In this PR I edit some parts of Symfony: `Bridge\Twig`, `BundleFrameworBundle`, `Component\Form`, then when the Travis script install `symfony\symfony` vendors, it don't use modification done in other parts of the `symfony\symfony` and have errors.
+
+In deps=high, the problem is about the don't right version of `symfony\component`, then it have a method that is not declared in the AbstractMethod of the component, becaus it install the actual version.
+
+In deps=low, it's a similar problem, in `symfony\Bridge\Twig` we use a new `help` option declare in `symfony\component\form` but it install the actual symfony version whithout changes mades in this PR.
+
+Have I right ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-21T12:13:27Z
+
+@mpiot yes, that's why you need to patch the composer.json of the Twig bridge.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-21T12:25:16Z
+
+@nicolas-grekas How can I do it ? Because the new component is not published, how can I edit the composer.json to call the PR version, because that don't exists yet ? Thanks (I don't really know about composer.json file and versions) Thanks and sorry about my ignorance about it... :-(
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-21T13:16:29Z
+
+```diff
+--- a/src/Symfony/Bridge/Twig/composer.json
++++ b/src/Symfony/Bridge/Twig/composer.json
+@@ -23,7 +23,7 @@
+         "symfony/asset": "~3.4|~4.0",
+         "symfony/dependency-injection": "~3.4|~4.0",
+         "symfony/finder": "~3.4|~4.0",
+-        "symfony/form": "^3.4.7|^4.0.7",
++        "symfony/form": "^4.1",
+         "symfony/http-foundation": "~3.4|~4.0",
+         "symfony/http-kernel": "~3.4|~4.0",
+         "symfony/polyfill-intl-icu": "~1.0",
+@@ -41,7 +41,7 @@
+         "symfony/workflow": "~3.4|~4.0"
+     },
+     "conflict": {
+-        "symfony/form": "<3.4.7|<4.0.7,>=4.0",
++        "symfony/form": "<4.1",
+         "symfony/console": "<3.4"
+     },
+     "suggest": {
+```
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-21T13:46:21Z
+
+Thanks @nicolas-grekas, I've try to edit the composer.json in the Bridge/Twig folder, but when I run the composer update and execute test, I've exactly the same problem. In vendors, the symfony/component/form is not the same as in the PR, then test failed again. If I commit this change, that was the same with travis, no ?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-21T17:15:37Z
+
+I think there is some travis magic =)
+
+Try to commit the change Nicolas suggest and see what travis says.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-21T17:43:22Z
+
+Wohoo. The "Travis magic" worked =)
+Tests are now passing.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-21T17:46:26Z
+
+Yes it appear the script "know" when the version doesn't exist and use the current branch. Nice :-) (I go read more about it, I'm interrested^^)
+
+But, I've hop deps=high passed too... Because know it have the right class with the implemented method...
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-21T17:55:17Z
+
+> Yes it appear the script "know" when the version doesn't exist and use the current branch. Nice :-) (I go read more about it, I'm interrested^^)
+
+Yeah, it is real cool. Lots of bash scrips working here.
+
+> But, I've hop deps=high passed too... Because know it have the right class with the implemented method...
+
+You get this error since the `deps=high` test tests component independently and you added a BC break in the test class.
+
+---------
+
+I must say a big thank you for your work on the forms the past weeks.  You made your first contribution to Symfony with your amazing Bootstrap4 PR (#25715). As @vudaltsov says, you are now becoming an expert within the form component internals. I really appreciate the work you've done.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-21T18:04:04Z
+
+Thanks especially to all those who helped me, I'm a little lost in all this. As you say, it's my first contributions, and I do lot of mystakes with Git, Tests, a lot of things I still don't know. Thank you for helping me when I'm stuck, at first I wanted to do it only for myself, because I was afraid of the community... Thanks :-)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-23T09:21:17Z
+
+@mpiot Can you rebase to get rid of the merge commit? We don't merge PR with a merge commit. Thanks.

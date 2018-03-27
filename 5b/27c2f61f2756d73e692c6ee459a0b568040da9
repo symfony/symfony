@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-23T10:28:18Z
+
+Thank you for the review
+
+![screen shot 2018-03-23 at 11 27 31](https://user-images.githubusercontent.com/1275206/37824542-4683a270-2e8d-11e8-9229-8a63bd15b2b9.png)
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-23T10:47:05Z
+
+IMO, messages should not be stored directly in `$this->data` in the collector, as this forbids us to store anything else in the future in this collector in case we need to collect more things. You should probably move this to `$this->data['messages']` instead.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-23T11:26:57Z
+
+Thank you for the review
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-26T09:51:38Z
+
+@Nyholm could you squash your commits?
+@stof can you have another look please?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-26T10:41:10Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-26T20:16:56Z
+
+Thank you
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T07:38:10Z
+
+I've rebased this PR now. Im ready for a final review.

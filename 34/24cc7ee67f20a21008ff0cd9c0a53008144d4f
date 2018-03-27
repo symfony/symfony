@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-01-25T13:54:37Z
+
+Doesn't this apply to 2.7 too?
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2018-01-25T14:09:12Z
+
+I've done this PR against master only as it requires xsd to have a new binary definition. But the actual fix can be applied to all versions I think.
+
+fabbot.io gives an error in a fixture file. Could this be avoided?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2018-01-25T14:54:53Z
+
+> fabbot.io gives an error in a fixture file. Could this be avoided?
+
+You did not cause the error, so you can ignore it, imho.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2018-01-26T14:51:11Z
+
+It deserves a unit test.
+
+I would be more comfortable to merge this change in master instead of in 2.7. It's not that trivial.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2018-01-26T15:09:42Z
+
+I made PR against `master`, not `2.7`. Also, what kind of unit test need to be added? I already added the use case in Dumpers and Loaders. Do you have another type of parameter to check?
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2018-02-09T17:16:13Z
+
+ping @derrabus @dunglas @xabbuh Can you change target to `master` instead of `2.7` I do agree that this is a new feature that should go to next version of php. On older version, a bug warning should indicate binary parameters are not well handled.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2018-03-04T08:34:34Z
+
+The CS complaints in the fixtures file can indeed be ignored. But can you please switch back to using explicit `array()` instead of the short array notation in the dumper class? :)
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2018-03-05T09:06:01Z
+
+Used traditional array syntax and added test on parameter with a single control char.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-22T17:47:18Z
+
+as bugfix on 3.4?

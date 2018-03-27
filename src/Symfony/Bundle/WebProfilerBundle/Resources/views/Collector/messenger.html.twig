@@ -1,0 +1,60 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% import _self as helper %}
+
+{% block toolbar %}
+    {% if collector.messages|length > 0 %}
+        {% set icon %}
+            {{ include('@WebProfiler/Icon/messenger.svg') }}
+            <span class="sf-toolbar-value">{{ collector.messages|length }}</span>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: 'messenger' }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon">{{ include('@WebProfiler/Icon/messenger.svg') }}</span>
+    <strong>Messages</strong>
+
+    <span class="count">
+        <span>{{ collector.messages|length }}</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Messages</h2>
+
+    {% if collector.messages is empty %}
+        <div class="empty">
+            <p>No messages have been collected.</p>
+        </div>
+    {% else %}
+        <table>
+            <thead>
+            <tr>
+                <th>Message</th>
+                <th>Result</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for message in collector.messages %}
+            <tr>
+                <td>{{ message.message.type }}</td>
+                <td>
+                    {% if message.result.type is defined %}
+                        {{ message.result.type }}
+                    {% endif %}
+
+                    {% if message.exception.type is defined %}
+                        {{ message.exception.type }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

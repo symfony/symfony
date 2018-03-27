@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-25T15:44:42Z
+
+@ostrolucky the main problem is moving this line -> `var profilerCell = row.children[0];`  I did that because this cell is now the first one instead of the last one, so it was weird to leave it at the end as before. But I can revert this if needed 😃
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2018-03-25T16:25:31Z
+
+Yes I see your reasoning. I would do the same in most codebases too.

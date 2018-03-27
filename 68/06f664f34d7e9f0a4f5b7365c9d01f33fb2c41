@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-26T21:34:56Z
+
+Why not `messenger.handler`? I don't think there is any ambiguity here, right?
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-26T21:40:14Z
+
+> Why not `messenger.handler`?
+
+Why not. I like this option as well. Any other thoughts?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-27T06:08:18Z
+
+messenger.message_handler looks like the most explicit to me, and opens for more kind of handlers in the futur, if needed.

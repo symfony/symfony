@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-26T08:56:14Z
+
+This is really nice!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2018-03-26T09:00:16Z
+
+I have often some issues in vendor so for me it will be more complicated to get to the point.
+If you really want to go this way, could you add a "remember my last choice" cookie ?
+Like we do with the debug bar (expanded / collapsed)
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-26T09:16:26Z
+
+Would be great if the toggle could be inplace of the hidden vendors. Putting it on the top right corner makes it hard to spot.
+We need a visual hint (some ellipses) that there is something hidden.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-26T09:19:34Z
+
+Or instead of hidding the full vendor frame, can't we just hide the arguments?
+I'd be extra cautious with hidding debugging info, because debugging generally needs full context to understand an issue.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-26T13:03:05Z
+
+After reading your comments, I propose a complete redesign of this feature. Now we don't hide anything, we just make info more compact for vendors and keep the existing design for your code.
+
+## Simple exceptions
+
+### Before
+![v3-simple-before](https://user-images.githubusercontent.com/73419/37907875-a8dd09cc-3106-11e8-8f2d-40dca1fb998b.png)
+
+### After
+![v3-simple-after](https://user-images.githubusercontent.com/73419/37907876-abfc570c-3106-11e8-946e-7aa824eb3fd3.png)
+
+## Complex exceptions
+
+### Before
+![v3-before](https://user-images.githubusercontent.com/73419/37907887-b1459f70-3106-11e8-9e42-ba2364eff4b5.png)
+
+### After
+![v3-after](https://user-images.githubusercontent.com/73419/37907902-b7fe1bb2-3106-11e8-9961-5e50bb0bf427.png)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2018-03-26T17:47:05Z
+
+That's really better this way. I love it 👍

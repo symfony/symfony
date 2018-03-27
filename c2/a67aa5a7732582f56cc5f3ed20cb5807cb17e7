@@ -1,0 +1,227 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-08-16T15:31:46Z
+
+I suggest wait for #23901 before continuing on this topic - that will provide a much better base to fix this issue.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-07T17:33:43Z
+
+@nicolas-grekas could you briefly describe the path you have in mind for this, and how it leverages `getProvidedTypes`?
+
+From a technical pov this approach was the only thing i could come up with, regarding decoupled state between di and config. I like how it works out-of-the-box for everyone :)
+
+My idea here was to generate a better default value using `getEnv()` actually, probably calling it before being compiled (as that's allowed anyway ^^)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-09-08T08:33:49Z
+
+The env placeholders contain the prefixes - so we can extract that, and use `EnvPlaceholderParameterBag::getProvidedTypes()` to get the type of each placeholder.
+That should be enough, isn't it?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-09T11:07:29Z
+
+@nicolas-grekas first round, wdyt?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-09T17:04:47Z
+
+@nicolas-grekas pushed latest changes real quick. Think this is heading towards what you have in mind; see BaseNode.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-10T08:44:11Z
+
+Tests looking good. Tried to keep the big code blob at a minimum, but tweaks are welcome :)
+
+Status: needs review
+
+deps=high failure expected.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-10T11:01:25Z
+
+@nicolas-grekas now with test for validating on merge :) see simplified BaseNode::resolvePlaceholderValues() + merge().
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-10T18:22:44Z
+
+@nicolas-grekas what about this;
+
+`node: 'value' > "process" > node: 'normalized-prefix value'`
+
+But then with env placeholders where `"env_NAME_x"` becomes `"normalized-prefix env_NAME_x"`.
+
+I think current behavior is OK as envs are normalized values (nothing happens with them after compile, i.e. no config normalization, except processing). Thus you'd have `NAME="normalized-prefix value"`.
+
+WDYT?
+
+edit: hm that only applies if a type conversion happens, and we lose the placeholder. For string-to-string we could in fact return the processed value if it still contains the original placeholder (and perhaps if not also). Not sure who's exactly responsible here :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-11T18:33:26Z
+
+Gave EnumNode a quick look, and we can let dynamic envs pass validly, sure. Just pick the first value i guess.
+
+However given real env can be an empty string, shouldnt the config constraint be updated instead? To fix
+
+```
+The value "" is not allowed for path "foo.enum_node". Permissible values: "a", "b"
+```
+
+on user's side? As he basically optin to that by using envs.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-16T07:50:48Z
+
+Failures unrelated. Real happy with the PR :)
+
+Guess from now on we need to decide per usecase, if someone experiences unexpected behavior. The problem is we dont really know what people do in normalization/finalization closures. Both can validate and normalize.
+
+In general normalization passes the real value (`env_int:NAME_xxx`), whereas finalization passes the placeholder (`int(0)`).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-20T07:56:04Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-26T14:49:57Z
+
+status: needs review
+
+cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-09-28T12:43:52Z
+
+Status: needs work :')
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T11:15:33Z
+
+LGTM, still :+1:
+@stof what about you?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-05T18:58:09Z
+
+Given the conditional behavior, should i revert composer.json? If we bump symfony/config then conflict rule + method_exists check could be removed no?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-05T19:10:37Z
+
+The check could be useful if Config is not installed in theory so let's remove the composer change yes
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-05T19:26:50Z
+
+Skip tests for deps=low i guess? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-06T05:21:52Z
+
+Yep
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-06T05:22:34Z
+
+Hum, or better: raise config in "require-dev", but not in "conflict", as you had before in fact...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-10-06T08:44:41Z
+
+@stof any +1 before I merge?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-10-06T17:36:29Z
+
+https://github.com/symfony/symfony/pull/23888#discussion_r143248877
+
+Status: needs work :sob:
+
+---------------------------------------------------------------------------
+
+by yannickl88 at 2017-12-20T21:39:30Z
+
+bump, what is the status of this? Ran into this issue today.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-12-21T09:47:24Z
+
+Kinda stuck :) yet still seeking a proper implementation for 4.1. So we still have a few months...
+
+@nicolas-grekas what about tracking env var processors from ContainerBuilder?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-26T13:23:09Z
+
+Ok. new plan :)
+
+The placeholder approach seems fine; Config knows about envs and happily passes validation preserving placeholder values.
+
+I think the final is step is to validate the placeholders as real dummy values once more after compilation, without affecting the compiled container or so. Just so we can late collect all registered env providers and throw some exceptions.
+
+Need to dive into all context a bit to pick up this PR.. but it could work :)
+
+cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-26T17:15:45Z
+
+@nicolas-grekas general concept is mostly ready for review :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-02-26T21:37:56Z
+
+DONE. few comments left to address :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-03T08:48:26Z
+
+@nicolas-grekas @stof i think it's ready :)
+
+i renamed the pass from `ValidateEnvPlaceholdersInExtensionConfigPass` to `ValidateEnvPlaceholdersPass` so that validating the default envs makes more sense.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-13T08:16:20Z
+
+ping @nicolas-grekas @stof @javiereguiluz :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-14T10:23:55Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by cdaguerre at 2018-03-19T10:08:54Z
+
+Does the milestone change mean it won't make it into the 3.4 branch?

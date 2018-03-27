@@ -1,13 +1,18 @@
 {% use "form_div_layout.html.twig" %}
 
 {%- block form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
     <tr>
         <td>
             {{- form_label(form) -}}
         </td>
         <td>
             {{- form_errors(form) -}}
-            {{- form_widget(form) -}}
+            {{- form_widget(form, widget_attr) -}}
+            {{- form_help(form) -}}
         </td>
     </tr>
 {%- endblock form_row -%}

@@ -259,9 +259,14 @@
     {%- if compound is defined and compound -%}
         {%- set element = 'fieldset' -%}
     {%- endif -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
     <{{ element|default('div') }} class="form-group">
         {{- form_label(form) -}}
-        {{- form_widget(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+        {{- form_help(form) -}}
     </{{ element|default('div') }}>
 {%- endblock form_row %}
 
@@ -287,3 +292,17 @@
         </span>
     {%- endif %}
 {%- endblock form_errors %}
+
+{# Help #}
+
+{% block form_help -%}
+    {%- if help is not empty -%}
+        <small id="{{ id }}_help" class="form-text text-muted">
+            {%- if translation_domain is same as(false) -%}
+                {{- help -}}
+            {%- else -%}
+                {{- help|trans({}, translation_domain) -}}
+            {%- endif -%}
+        </small>
+    {%- endif -%}
+{%- endblock form_help %}

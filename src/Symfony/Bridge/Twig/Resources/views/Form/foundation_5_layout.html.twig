@@ -267,11 +267,16 @@
 {# Rows #}
 
 {% block form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
     <div class="row">
         <div class="large-12 columns{% if (not compound or force_error|default(false)) and not valid %} error{% endif %}">
-            {{ form_label(form) }}
-            {{ form_widget(form) }}
-            {{ form_errors(form) }}
+            {{- form_label(form) -}}
+            {{- form_widget(form, widget_attr) -}}
+            {{- form_help(form) -}}
+            {{- form_errors(form) -}}
         </div>
     </div>
 {%- endblock form_row %}

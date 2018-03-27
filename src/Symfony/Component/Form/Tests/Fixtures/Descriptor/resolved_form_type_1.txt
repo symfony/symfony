@@ -14,9 +14,10 @@ Symfony\Component\Form\Extension\Core\Type\ChoiceType (Block prefix: "choice")
   choices                                          by_reference              csrf_token_manager     
   expanded                                         data                                             
   group_by                                         disabled                                         
-  multiple                                         inherit_data                                     
-  placeholder                                      label                                            
-  preferred_choices                                label_attr                                       
+  multiple                                         help                                             
+  placeholder                                      inherit_data                                     
+  preferred_choices                                label                                            
+                                                   label_attr                                       
                                                    label_format                                     
                                                    mapped                                           
                                                    method                                           

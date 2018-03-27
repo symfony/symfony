@@ -170,6 +170,18 @@ class FormHelper extends Helper
     }
 
     /**
+     * Renders the help of the given view.
+     *
+     * @param FormView $view The parent view
+     *
+     * @return string The HTML markup
+     */
+    public function help(FormView $view): string
+    {
+        return $this->renderer->searchAndRenderBlock($view, 'help');
+    }
+
+    /**
      * Renders the errors of the given view.
      *
      * @return string The HTML markup

@@ -24,21 +24,31 @@ col-sm-2
     {%- if expanded is defined and expanded -%}
         {{ block('fieldset_form_row') }}
     {%- else -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
         <div class="form-group row{% if (not compound or force_error|default(false)) and not valid %} is-invalid{% endif %}">
             {{- form_label(form) -}}
             <div class="{{ block('form_group_class') }}">
-                {{- form_widget(form) -}}
+                {{- form_widget(form, widget_attr) -}}
+                {{- form_help(form) -}}
             </div>
     {##}</div>
     {%- endif -%}
 {%- endblock form_row %}
 
 {% block fieldset_form_row -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
     <fieldset class="form-group">
         <div class="row{% if (not compound or force_error|default(false)) and not valid %} is-invalid{% endif %}">
             {{- form_label(form) -}}
             <div class="{{ block('form_group_class') }}">
-                {{- form_widget(form) -}}
+                {{- form_widget(form, widget_attr) -}}
+                {{- form_help(form) -}}
             </div>
         </div>
 {##}</fieldset>

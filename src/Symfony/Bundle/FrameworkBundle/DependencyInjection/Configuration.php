@@ -967,11 +967,12 @@ class Configuration implements ConfigurationInterface
                     ->info('Messenger configuration')
                     ->{!class_exists(FullStack::class) && class_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->beforeNormalization()
-                        ->ifTrue(function($config) {
+                        ->ifTrue(function ($config) {
                             return empty($config['middlewares']);
                         })
-                        ->then(function($config) {
+                        ->then(function ($config) {
                             $config['middlewares'] = array();
+
                             return $config;
                         })
                     ->end()

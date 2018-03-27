@@ -233,17 +233,29 @@ class EnvVarProcessorTest extends TestCase
         $this->assertSame('hello', $result);
     }
 
-    public function testGetEnvJson()
+    /**
+     * @dataProvider validJson
+     */
+    public function testGetEnvJson($value, $processed)
     {
         $processor = new EnvVarProcessor(new Container());
 
-        $result = $processor->getEnv('json', 'foo', function ($name) {
+        $result = $processor->getEnv('json', 'foo', function ($name) use ($value) {
             $this->assertSame('foo', $name);
 
-            return json_encode(array(1));
+            return $value;
         });
 
-        $this->assertSame(array(1), $result);
+        $this->assertSame($processed, $result);
+    }
+
+    public function validJson()
+    {
+        return array(
+            array('[1]', array(1)),
+            array('{"key": "value"}', array('key' => 'value')),
+            array(null, null),
+        );
     }
 
     /**
@@ -284,6 +296,7 @@ class EnvVarProcessorTest extends TestCase
             array(1.1),
             array(true),
             array(false),
+            array('foo'),
         );
     }
 

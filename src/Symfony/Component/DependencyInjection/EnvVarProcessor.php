@@ -129,8 +129,8 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 throw new RuntimeException(sprintf('Invalid JSON in env var "%s": '.json_last_error_msg(), $name));
             }
 
-            if (!is_array($env)) {
-                throw new RuntimeException(sprintf('Invalid JSON env var "%s": array expected, %s given.', $name, gettype($env)));
+            if (null !== $env && !is_array($env)) {
+                throw new RuntimeException(sprintf('Invalid JSON env var "%s": array or null expected, %s given.', $name, gettype($env)));
             }
 
             return $env;

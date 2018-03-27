@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-26T21:25:01Z
+
+Would be ok as bug fix on 2.7 on my side.
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2018-03-26T21:53:12Z
+
+@nicolas-grekas Updated as a bug fix on top of 2.7.
+
+---------------------------------------------------------------------------
+
+by hkdobrev at 2018-03-26T22:03:48Z
+
+On a separate note, there are quite a few places where checks for CLI hard-code the `cli` SAPI instead of using a function to hold all the CLI SAPIs. E.g. the simple PHPUnit runner, the var dumper and the process components support phpdbg, but not others like http foundation and http kernel. This could bring a lot of headaches to someone trying to use phpdbg debugger with a Symfony project. Would you welcome a PR addressing that in all components?

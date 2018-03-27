@@ -8,11 +8,11 @@
     <framework:config>
         <framework:messenger>
             <framework:routing message-class="App\Bar">
-                <framework:sender service="sender.bar"></framework:sender>
-                <framework:sender service="sender.biz"></framework:sender>
+                <framework:sender service="sender.bar" />
+                <framework:sender service="sender.biz" />
             </framework:routing>
             <framework:routing message-class="App\Foo">
-                <framework:sender service="sender.foo"></framework:sender>
+                <framework:sender service="sender.foo" />
             </framework:routing>
         </framework:messenger>
     </framework:config>

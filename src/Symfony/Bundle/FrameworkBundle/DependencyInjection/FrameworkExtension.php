@@ -1449,7 +1449,7 @@ class FrameworkExtension extends Extension
 
         if ($config['doctrine_transaction']['enabled']) {
             if (!class_exists(DoctrineTransactionMiddleware::class)) {
-                throw new LogicException('You must install symfony/doctrine-bridge to use the "DoctrineTransactionMiddleware"');
+                throw new LogicException('The Doctrine transaction middleware is only available when the doctrine bridge is installed. Try running "composer require symfony/doctrine-bridge".');
             }
             $container->getDefinition('messenger.middleware.doctrine_transaction')->replaceArgument(1, $config['doctrine_transaction']['entity_manager_name']);
         } else {

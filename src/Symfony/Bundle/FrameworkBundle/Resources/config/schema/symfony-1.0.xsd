@@ -363,9 +363,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="messenger_doctrine_transaction">
-        <xsd:sequence>
-            <xsd:element name="entity-manager-name" type="xsd:string" />
-        </xsd:sequence>
+        <xsd:attribute name="entity-manager-name" type="xsd:string" />
         <xsd:attribute name="enabled" type="xsd:boolean" />
     </xsd:complexType>
 </xsd:schema>

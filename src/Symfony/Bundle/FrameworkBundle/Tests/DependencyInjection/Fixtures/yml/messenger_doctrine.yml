@@ -1,5 +1,0 @@
-framework:
-    messenger:
-        middlewares:
-            doctrine_transaction:
-                entity_manager_name: 'foobar'

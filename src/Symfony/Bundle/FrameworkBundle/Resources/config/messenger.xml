@@ -31,13 +31,6 @@
             <tag name="message_bus_middleware" priority="100" />
         </service>
 
-        <service id="messenger.middleware.doctrine_transaction" class="Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware">
-            <argument type="service" id="doctrine" />
-            <argument /> <!-- Entity manager name -->
-
-            <tag name="message_bus_middleware" priority="9" />
-        </service>
-
         <!-- Asynchronous -->
         <service id="messenger.asynchronous.routing.sender_locator" class="Symfony\Component\Messenger\Asynchronous\Routing\SenderLocator">
             <argument type="service" id="messenger.sender_locator" />

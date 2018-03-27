@@ -13,7 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1453,15 +1452,6 @@ class FrameworkExtension extends Extension
 
         $container->getDefinition('messenger.sender_locator')->replaceArgument(0, $senderLocatorMapping);
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
-
-        if ($config['middlewares']['doctrine_transaction']['enabled']) {
-            if (!class_exists(DoctrineTransactionMiddleware::class)) {
-                throw new LogicException('The Doctrine transaction middleware is only available when the doctrine bridge is installed. Try running "composer require symfony/doctrine-bridge".');
-            }
-            $container->getDefinition('messenger.middleware.doctrine_transaction')->replaceArgument(1, $config['middlewares']['doctrine_transaction']['entity_manager_name']);
-        } else {
-            $container->removeDefinition('messenger.middleware.doctrine_transaction');
-        }
 
         if ($config['middlewares']['validation']['enabled']) {
             if (!$container->has('validator')) {

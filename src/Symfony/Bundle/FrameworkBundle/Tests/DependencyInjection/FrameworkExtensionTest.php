@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
+use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddAnnotationsCachedReaderPass;
@@ -497,6 +498,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testMessengerDoctrine()
     {
+        if (!class_exists(ContainerAwareEventManager::class)) {
+            self::markTestSkipped('Skipping tests since Doctrine bridge is not installed');
+        }
+
         $container = $this->createContainerFromFile('messenger_doctrine');
         $this->assertTrue($container->hasDefinition('messenger.middleware.doctrine_transaction'));
         $def = $container->getDefinition('messenger.middleware.doctrine_transaction');

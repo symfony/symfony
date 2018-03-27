@@ -132,6 +132,10 @@
             var row = document.createElement('tr');
             request.DOMNode = row;
 
+            var profilerCell = document.createElement('td');
+            profilerCell.textContent = 'n/a';
+            row.appendChild(profilerCell);
+
             var methodCell = document.createElement('td');
             methodCell.textContent = request.method;
             row.appendChild(methodCell);
@@ -164,10 +168,6 @@
             durationCell.textContent = 'n/a';
             row.appendChild(durationCell);
 
-            var profilerCell = document.createElement('td');
-            profilerCell.textContent = 'n/a';
-            row.appendChild(profilerCell);
-
             row.className = 'sf-ajax-request sf-ajax-request-loading';
             tbody.insertBefore(row, tbody.firstChild);
 
@@ -182,11 +182,11 @@
             pendingRequests--;
             var row = request.DOMNode;
             /* Unpack the children from the row */
-            var methodCell = row.children[0];
-            var statusCodeCell = row.children[2];
+            var profilerCell = row.children[0];
+            var methodCell = row.children[1];
+            var statusCodeCell = row.children[3];
             var statusCodeElem = statusCodeCell.children[0];
-            var durationCell = row.children[4];
-            var profilerCell = row.children[5];
+            var durationCell = row.children[5];
 
             if (request.error) {
                 row.className = 'sf-ajax-request sf-ajax-request-error';
@@ -217,7 +217,7 @@
             if (request.profilerUrl) {
                 profilerCell.textContent = '';
                 var profilerLink = document.createElement('a');
-                profilerLink.setAttribute('href', request.profilerUrl);
+                profilerLink.setAttribute('href', request.statusCode < 400 ? request.profilerUrl : request.profilerUrl + '?panel=exception');
                 profilerLink.textContent = request.profile;
                 profilerCell.appendChild(profilerLink);
             }

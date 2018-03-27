@@ -738,4 +738,13 @@ class YamlFileLoaderTest extends TestCase
             '$factory' => 'factory',
         ), array_map(function ($v) { return $v->getValues()[0]; }, $definition->getBindings()));
     }
+
+    public function testMergeParametersFromImports()
+    {
+        $containerBuilder = new ContainerBuilder();
+        $loader = new YamlFileLoader($containerBuilder, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('parameters-with-import.yml');
+
+        $this->assertSame('new_value', $containerBuilder->getParameter('key'));
+    }
 }

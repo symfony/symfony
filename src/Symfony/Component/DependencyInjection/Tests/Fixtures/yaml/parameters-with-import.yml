@@ -1,0 +1,5 @@
+imports:
+    - { resource: 'parameters.yml' }
+
+parameters:
+    key: new_value

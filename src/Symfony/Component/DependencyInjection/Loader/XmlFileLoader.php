@@ -511,6 +511,12 @@ class XmlFileLoader extends FileLoader
                     }
                     $arguments[$key] = new TaggedIteratorArgument($arg->getAttribute('tag'));
                     break;
+                case 'binary':
+                    if (false === $value = base64_decode($arg->nodeValue)) {
+                        throw new InvalidArgumentException(sprintf('Tag "<%s>" with type="binary" is not a valid base64 encoded string.', $name));
+                    }
+                    $arguments[$key] = $value;
+                    break;
                 case 'string':
                     $arguments[$key] = $arg->nodeValue;
                     break;

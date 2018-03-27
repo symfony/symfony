@@ -135,6 +135,8 @@ class ProjectServiceContainer extends Container
                 6 => 'false',
                 7 => 'null',
             ),
+            'binary' => 'ננננ',
+            'binary-control-char' => 'This is a Bell char ',
         );
     }
 }

@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-23T10:27:55Z
+
+Thank you for the review
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-23T11:55:25Z
+
+@chalasr The tests currently fails due invalid xml config. Do I need to modify the `symfony-1.0.xsd`?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-23T11:57:01Z
+
+@Nyholm yes
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-23T14:50:28Z
+
+I've got an error I cannot figure out:
+
+>  Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\XmlFrameworkExtensionTest::testMessenger
+Symfony\Component\Config\Definition\Exception\InvalidConfigurationException: Unrecognized options "0, 1" under "framework.messenger.routing.sender"
+
+Any help would be appreciated.
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-26T09:56:10Z
+
+@Nyholm could you move the middleware to the DoctrineBridge and let Doctrine decide the default manager name?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-26T10:50:04Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-26T20:20:27Z
+
+Finally done with the config. It took me way more time than I want to admit. Anyhow. I learnt something =)
+
+Example XML:
+
+```xml
+<framework:config>
+        <framework:messenger>
+            <framework:routing message-class="App\Bar">
+                <framework:sender service="sender.bar"></framework:sender>
+                <framework:sender service="sender.biz"></framework:sender>
+            </framework:routing>
+            <framework:routing message-class="App\Foo">
+                <framework:sender service="sender.foo"></framework:sender>
+            </framework:routing>
+        </framework:messenger>
+    </framework:config>
+```
+
+Example Yaml:
+
+```yaml
+framework:
+    messenger:
+        routing:
+            'App\Bar': ['sender.bar', 'sender.biz']
+            'App\Foo': 'sender.foo'
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T07:47:59Z
+
+Thank you for the reviews. I've updated accordingly and rebased the PR on master.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2018-03-27T09:05:52Z
+
+Just wondering, should this new config be wrapped in a `middlewares` node for explicitness? Also thinking about #26652, will we want the ability to define a different middleware set per bus, overriding the default one?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T09:21:32Z
+
+Good idea. I've updated the PR
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-27T09:38:21Z
+
+Example Yaml:
+
+```yaml
+framework:
+    messenger:
+        routing:
+            'App\Bar': ['sender.bar', 'sender.biz']
+            'App\Foo': 'sender.foo'
+        middlewares:
+            doctrine_transaction: ~
+```
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-27T10:03:04Z
+
+> Just wondering, should this new config be wrapped in a middlewares node for explicitness? Also thinking about #26652, will we want the ability to define a different middleware set per bus, overriding the default one?
+
+@chalasr I think we might want to do this in the future. I guess it really depends on the "demand" as it isn't that hard to register your own bus services yourself either.

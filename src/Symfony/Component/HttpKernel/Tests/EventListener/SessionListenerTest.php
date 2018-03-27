@@ -56,7 +56,7 @@ class SessionListenerTest extends TestCase
         $this->assertSame($session, $request->getSession());
     }
 
-    public function testResponseIsPrivate()
+    public function testResponseIsPrivateIfSessionStarted()
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->exactly(2))->method('isStarted')->willReturn(false);
@@ -74,6 +74,31 @@ class SessionListenerTest extends TestCase
         $this->assertTrue($response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($response->headers->hasCacheControlDirective('must-revalidate'));
         $this->assertSame('0', $response->headers->getCacheControlDirective('max-age'));
+        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
+    }
+
+    public function testResponseIsStillPublicIfSessionStartedAndHeaderPresent()
+    {
+        $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
+        $session->expects($this->exactly(2))->method('isStarted')->willReturn(false);
+        $session->expects($this->once())->method('hasBeenStarted')->willReturn(true);
+
+        $container = new Container();
+        $container->set('initialized_session', $session);
+
+        $listener = new SessionListener($container);
+        $kernel = $this->getMockBuilder(HttpKernelInterface::class)->disableOriginalConstructor()->getMock();
+
+        $response = new Response();
+        $response->setSharedMaxAge(60);
+        $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
+        $listener->onKernelResponse(new FilterResponseEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $response));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
+        $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
+        $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
     public function testUninitilizedSession()

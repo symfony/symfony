@@ -49,6 +49,7 @@ class PassConfig
         );
 
         $this->optimizationPasses = array(array(
+            new ValidateEnvPlaceholdersPass(),
             new ResolveChildDefinitionsPass(),
             new ServiceLocatorTagPass(),
             new DecoratorServicePass(),

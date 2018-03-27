@@ -54,4 +54,12 @@ class ScalarNode extends VariableNode
     {
         return null === $value || '' === $value;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getValidPlaceholderTypes(): array
+    {
+        return array('bool', 'int', 'float', 'string');
+    }
 }

@@ -41,18 +41,28 @@
             </thead>
             <tbody>
             {% for message in collector.messages %}
-            <tr>
-                <td>{{ message.message.type }}</td>
-                <td>
-                    {% if message.result.type is defined %}
-                        {{ message.result.type }}
-                    {% endif %}
-
-                    {% if message.exception.type is defined %}
-                        {{ message.exception.type }}
-                    {% endif %}
-                </td>
-            </tr>
+                <tr>
+                    <td>
+                        {% if message.result.object is defined %}
+                            {{ profiler_dump(message.message.object, maxDepth=2) }}
+                        {% else %}
+                            {{ message.message.type }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if message.result.object is defined %}
+                            {{ profiler_dump(message.result.object, maxDepth=2) }}
+                        {% elseif message.result.type is defined %}
+                            {{ message.result.type }}
+                            {% if message.result.value is defined %}
+                                {{ message.result.value }}
+                            {% endif %}
+                        {% endif %}
+                        {% if message.exception.type is defined %}
+                            {{ message.exception.type }}
+                        {% endif %}
+                    </td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>

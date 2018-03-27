@@ -814,6 +814,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param mixed $left
      * @param mixed $right
+     *
      * @return mixed[]|string
      */
     private function merge($left, $right)
@@ -829,8 +830,9 @@ class YamlFileLoader extends FileLoader
                     $right[$key] = $val;
                 }
             }
+
             return $right;
-        } elseif ($left === null && is_array($right)) {
+        } elseif (null === $left && is_array($right)) {
             return $right;
         }
 

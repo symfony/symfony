@@ -88,7 +88,7 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     {
         return array(
             new TwigFilter('humanize', array($this, 'humanize')),
-            new TwigFilter('form_html_entities', array($this, 'htmlEntities'), array('is_safe' => array('html'), 'needs_environment' => true)),
+            new TwigFilter('form_encode_currency', array($this, 'encodeCurrency'), array('is_safe' => array('html'), 'needs_environment' => true)),
         );
     }
 
@@ -125,17 +125,6 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     public function humanize($text)
     {
         return $this->renderer->humanize($text);
-    }
-
-    public function htmlEntities(Environment $environment, $text)
-    {
-        $text = htmlentities($text, ENT_QUOTES | (defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
-
-        if ('UTF-8' === $charset = $environment->getCharset()) {
-            return $text;
-        }
-
-        return iconv('UTF-8', $charset, $text);
     }
 
     /**
@@ -176,6 +165,20 @@ class FormExtension extends AbstractExtension implements InitRuntimeInterface
     public function isRootForm(FormView $formView)
     {
         return null === $formView->parent;
+    }
+
+    /**
+     * @internal
+     */
+    public function encodeCurrency(Environment $environment, $text)
+    {
+        if ('UTF-8' === $charset = $environment->getCharset()) {
+            return htmlspecialchars($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+        }
+
+        $text = htmlentities($text, ENT_QUOTES | (\defined('ENT_SUBSTITUTE') ? ENT_SUBSTITUTE : 0), 'UTF-8');
+
+        return iconv('UTF-8', $charset, $text);
     }
 
     /**

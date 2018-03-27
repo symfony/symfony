@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-12T14:39:04Z
+
+There are reasons for the current restriction:
+- having a single type (array) makes it easier to validate types, eg for chained processors or config validation
+- the other JSON types can easily be achieved using other processors (ie int, bool, string, null)
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-03-12T14:45:48Z
+
+I wondered if this might be what's happening. I have a case where in passing either an array or null.
+What if I changed this to allow `null`? I feel like this might be a useful case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-12T14:47:08Z
+
+if you want to set `null`, I think you can already achieve it with the const processor: `const:null`
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2018-03-12T14:53:38Z
+
+@nicolas-grekas but I think he's saying that an external piece of software generates this config that usually is a JSON-encoded array but it can be `null` when the config is empty (Symfony does the same and we use `array|null` everywhere instead of `array|empty array`). But I guess you'll need to change that external software to encode an empty JSON array when the config is empty.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-03-12T14:58:22Z
+
+Exactly, I need to accept either array or null.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-14T16:18:29Z
+
+would you mind adding a test case please?
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-03-15T11:30:16Z
+
+Sure, also added some more general testing around EnvVarProcessor as there don't seem to exist any at the moment.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-03-19T10:42:56Z
+
+Rebased on master to see if it would fix the tests, but now seems to fail on some other doctrine tests
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T17:22:33Z
+
+@mcfedr you said had more tests in `26542` before moving it to 3.4. Did you add them back here after the rebase?
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-03-19T17:28:01Z
+
+I was thinking it would make sense for the tests in #26542 in to be expanded to include this specific case of paring `"null"` as valid json, as this commit is based on master I cannot add that here until that commit https://github.com/symfony/symfony/commit/d818636019f7cbecc7a3d392a8a43b77a9cff37f is merged into master.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-19T17:34:37Z
+
+Indeed. Merge done, rebase unlocked on your side.
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2018-03-19T17:52:01Z
+
+Ok, rebased with extra test cases

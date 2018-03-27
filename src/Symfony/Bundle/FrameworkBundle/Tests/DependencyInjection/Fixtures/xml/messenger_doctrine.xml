@@ -7,7 +7,9 @@
 
     <framework:config>
         <framework:messenger>
-            <framework:doctrine-transaction entity-manager-name="foobar" />
+            <framework:middlewares>
+                <framework:doctrine-transaction entity-manager-name="foobar" />
+            </framework:middlewares>
         </framework:messenger>
     </framework:config>
 </container>

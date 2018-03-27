@@ -1447,11 +1447,11 @@ class FrameworkExtension extends Extension
         $container->getDefinition('messenger.sender_locator')->replaceArgument(0, $senderLocatorMapping);
         $container->getDefinition('messenger.asynchronous.routing.sender_locator')->replaceArgument(1, $messageToSenderIdsMapping);
 
-        if ($config['doctrine_transaction']['enabled']) {
+        if ($config['middlewares']['doctrine_transaction']['enabled']) {
             if (!class_exists(DoctrineTransactionMiddleware::class)) {
                 throw new LogicException('The Doctrine transaction middleware is only available when the doctrine bridge is installed. Try running "composer require symfony/doctrine-bridge".');
             }
-            $container->getDefinition('messenger.middleware.doctrine_transaction')->replaceArgument(1, $config['doctrine_transaction']['entity_manager_name']);
+            $container->getDefinition('messenger.middleware.doctrine_transaction')->replaceArgument(1, $config['middlewares']['doctrine_transaction']['entity_manager_name']);
         } else {
             $container->removeDefinition('messenger.middleware.doctrine_transaction');
         }

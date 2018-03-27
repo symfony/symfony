@@ -1,4 +1,5 @@
 framework:
     messenger:
-        doctrine_transaction:
-            entity_manager_name: 'foobar'
+        middlewares:
+            doctrine_transaction:
+                entity_manager_name: 'foobar'

@@ -966,6 +966,15 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('messenger')
                     ->info('Messenger configuration')
                     ->{!class_exists(FullStack::class) && class_exists(MessageBusInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->beforeNormalization()
+                        ->ifTrue(function($config) {
+                            return empty($config['middlewares']);
+                        })
+                        ->then(function($config) {
+                            $config['middlewares'] = array();
+                            return $config;
+                        })
+                    ->end()
                     ->children()
                         ->arrayNode('routing')
                             ->useAttributeAsKey('message_class')
@@ -998,10 +1007,13 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                         ->end()
-                        ->arrayNode('doctrine_transaction')
-                            ->canBeEnabled()
+                        ->arrayNode('middlewares')
                             ->children()
-                                ->scalarNode('entity_manager_name')->info('The name of the entity manager to use')->defaultNull()->end()
+                            ->arrayNode('doctrine_transaction')
+                                ->canBeEnabled()
+                                ->children()
+                                    ->scalarNode('entity_manager_name')->info('The name of the entity manager to use')->defaultNull()->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()

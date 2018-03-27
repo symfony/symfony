@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by zzenmate at 2018-03-14T20:37:49Z
+
+I added the most basic block for file_label and file_widget for overriding form-control-label, form-control-file and using custom-file-input, custom-file-label.
+
+---------------------------------------------------------------------------
+
+by mpiot at 2018-03-16T11:38:59Z
+
+We try to put errors in the label to respect a standard for blind people, but I think it's difficult in this case.. Because the label is directly in the field. I look if there is a way to do it.
+
+---------------------------------------------------------------------------
+
+by zzenmate at 2018-03-20T12:41:47Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2018-03-20T12:49:14Z
+
+There are still some work. Please see https://github.com/symfony/symfony/pull/26502#discussion_r175289610
+
+---------------------------------------------------------------------------
+
+by zzenmate at 2018-03-26T20:33:50Z
+
+status: needs review

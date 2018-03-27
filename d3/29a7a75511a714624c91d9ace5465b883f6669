@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by iltar at 2018-03-26T15:14:02Z
+
+"Message Bus" for me 👍, the other looks like a chat icon.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-26T15:24:02Z
+
+"Messaging" ? i also suggested https://www.materialui.co/icon/message to @sroze
+
+to me multiple baloons and thingies only clutter the icon.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-26T15:26:02Z
+
+to proposed message bus icon (small toolbar version) to me looks  like a routing thing, ie. http://c8.alamy.com/comp/HHAYN4/travel-tourism-distance-signposts-tour-route-direction-pole-data-HHAYN4.jpg
+
+---------------------------------------------------------------------------
+
+by sroze at 2018-03-26T15:38:23Z
+
+I quite like the "Message Bus" option, that shows the notion of routing (to/from adapters) behind the message bus(es).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2018-03-26T16:09:58Z
+
+Large version are nice, it's just the small version that might defeat its purpose, i.e. are hard to identify. IMHO icons like mail and security, thus more solid, are better candidates here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2018-03-26T16:42:28Z
+
+"Message Bus" looks good to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2018-03-26T16:59:10Z
+
+The icon still looks weird at small size in the screenshot. Would it be possible to simplify the icon to optimize it for display at small size (the toolbar will always display it at 24px)
+
+---------------------------------------------------------------------------
+
+by andreybolonin at 2018-03-26T20:02:00Z
+
++1 "Message Bus"

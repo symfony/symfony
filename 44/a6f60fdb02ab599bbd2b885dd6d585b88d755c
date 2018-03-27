@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2018-03-13T10:01:35Z
+
+would be great to turn the `framework.php_errors.log` config entry into a "bool|int", and when an "int" is provided, use the value to set the parameter
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-14T11:34:48Z
+
+@nicolas-grekas I have changed this PR, could you please guide me on how to write test for this ?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-26T06:33:29Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2018-03-26T15:08:35Z
+
+Tests Fixed.
